@@ -30,6 +30,8 @@ extern void func_0012CBC0(s8 *);
 extern void func_0012D060(s8 *);
 extern void func_0012FA98(s32, void *);
 
+/* MPEG decoder start-code loop: dispatches the sequence header (0x1B3), group of pictures
+   (0x1B8) and picture (0x100) handlers. */
 s32 func_0012CAB0(s8 *arg0) {
     struct {
         s32 a;

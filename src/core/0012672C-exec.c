@@ -36,6 +36,8 @@ extern u128_si D_00137E10;
 extern unsigned long func_0011AF40(void);
 extern int func_0011AF60(unsigned long);
 
+/* Reads the pixel data described by a store-image packet into dstaddr, in 16-byte units sized
+   from the width, height and pixel format. */
 int func_0012672C(SiStoreImage *sp, u128_si *dstaddr)
 {
     unsigned int cnt = 0;

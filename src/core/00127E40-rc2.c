@@ -39,6 +39,9 @@ extern s8 D_00141B00[];
 extern s8 D_00141BB0[];
 extern s8 D_001430C0[];
 
+/* Fills the request record D_00141BB0 (five ints and a path string of up to 0x3FF characters)
+   and sends it by RPC; returns -0x64 if uninitialised, -0xC8 if the lock fails and -0xD2 if
+   the string is empty. */
 s32 func_00127E40(s32 arg0, s32 arg1, s8 *arg2, s32 arg3, s32 arg4, s32 arg5) {
     s8 *g;
     s8 *rec;

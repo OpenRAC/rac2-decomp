@@ -12,6 +12,8 @@ extern int func_0011C000(unsigned long);
 extern void (*D_00134698)(int);
 extern void func_0011C7E8(const char *, ...);
 
+/* Prints a double as 0.dddddd followed by an e+N or eN exponent, normalising it to [0.1, 1)
+   and sending the sign through the callback D_00134698. */
 void func_0011C090(double value)
 {
     int exponent = 0;

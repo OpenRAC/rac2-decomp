@@ -27,6 +27,8 @@
 extern s32 D_001A7000[];
 extern s32 D_001A0000[];
 
+/* Counts the function pointers in the table at D_001A7000 (using the first word when it is not
+   -1) and calls them from last to first. */
 void func_0011FB8C(void) {
     s64 var_a1;
     s32 var_s1;

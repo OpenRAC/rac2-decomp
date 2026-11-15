@@ -36,6 +36,8 @@ static __inline__ saddr fde_compare (fde *x, fde *y)
   return (saddr)x->pc_begin - (saddr)y->pc_begin;
 }
 
+/* Splits an FDE vector: moves entries that are out of order from linear into erratic and
+   compacts the rest. */
 void func_001242A0 (fde_vector *linear, fde_vector *erratic)
 {
   u32 count = linear->count;

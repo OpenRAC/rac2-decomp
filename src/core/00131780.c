@@ -29,6 +29,7 @@ void func_00131780(unsigned char *p) {
 extern void func_001317E8(unsigned char *p);
 extern int func_00131730(int);
 
+/* Applies func_00131730 to bytes 1, 2, 3, 5, 6 and 7 of the clock buffer in place. */
 void func_001317E8(unsigned char *clock) {
     clock[7] = func_00131730(clock[7]);
     clock[6] = func_00131730(clock[6]);
@@ -146,6 +147,8 @@ void func_001319E0(unsigned char *s) {
 extern void func_001319B0(unsigned char *);
 extern void func_001319E0(unsigned char *);
 
+/* Adds an offset in minutes to a clock buffer, carrying into the hour with func_001319B0 or
+   borrowing with func_001319E0, then re-encodes it with func_001317E8. */
 void func_00131A08(unsigned char *clock, int offset) {
     int minutes;
     func_00131780(clock);
@@ -169,6 +172,8 @@ extern int func_00131670(void);
 extern int func_001316C8(void);
 extern void func_00131A08(unsigned char *, int);
 
+/* Adjusts a clock buffer by the offset from func_00131670 plus func_001316C8 hours (times 60,
+   minus 540 minutes) through func_00131A08. */
 void func_00131A98(unsigned char *clock) {
     int offset;
     int zone = func_00131670();
@@ -186,6 +191,7 @@ ASM_FUNC("asm/core", func_00131AE8);
    compiler puts the argument in the jump's delay slot. */
 extern void func_0011FA20(int);
 
+/* Ignores its status argument and calls func_0011FA20 with 0. */
 void func_00131CA8(int ignored_status) {
     func_0011FA20(0);
 }
@@ -210,6 +216,7 @@ void func_00132858(int value) {
     func_00132DF0(6, 4, (int)payload, 0, 0);
 }
 
+/* Queues sound command 9 with two ints through func_00132DF0. */
 void func_00132888(int first, int second) {
     int payload[4];
     payload[0] = first;
@@ -219,6 +226,8 @@ void func_00132888(int first, int second) {
 
 typedef struct { char bytes[24]; } CommandParameters24;
 
+/* Queues sound command 96 with a value and a 24-byte parameter block, or -1 when no block is
+   given. */
 void func_001328C0(int value, const CommandParameters24 *parameters) {
     struct {
         int value;
@@ -232,6 +241,7 @@ void func_001328C0(int value, const CommandParameters24 *parameters) {
     func_00132DF0(96, 28, (int)&payload, 0, 0);
 }
 
+/* Queues sound command 11 with one int through func_00132DF0. */
 void func_00132938(int value) {
     int payload[4];
     payload[0] = value;
@@ -239,6 +249,7 @@ void func_00132938(int value) {
 }
 
 
+/* Queues sound command 78 with three ints through func_00132DF0. */
 void func_001329B0(int first, int second, int third) {
     int payload[4];
     payload[0] = first;
@@ -250,12 +261,14 @@ void func_001329B0(int first, int second, int third) {
 
 
 
+/* Queues sound command 22 with one int through func_00132DF0. */
 void func_00132AF8(int value) {
     int payload[4];
     payload[0] = value;
     func_00132DF0(22, 4, (int)payload, 0, 0);
 }
 
+/* Queues sound command 0x17 with one int through func_00132DF0. */
 void func_00132B28(int param_1) {
   int auStack_20[4];
 
@@ -264,6 +277,7 @@ void func_00132B28(int param_1) {
   return;
 }
 
+/* Queues sound command 25 with one int and two extra callback arguments through func_00132DF0. */
 void func_00132B58(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
@@ -286,18 +300,21 @@ void func_00133220(void) {
 
 
 
+/* Queues sound command 46 with one int through func_00132DF0. */
 void func_00133400(int value) {
     int payload[4];
     payload[0] = value;
     func_00132DF0(46, 4, (int)payload, 0, 0);
 }
 
+/* Queues sound command 50 with one int and two extra callback arguments through func_00132DF0. */
 void func_00133430(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
     func_00132DF0(50, 4, (int)payload, fourth, fifth);
 }
 
+/* Queues sound command 79 with one int and two extra callback arguments through func_00132DF0. */
 void func_00133460(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;

@@ -9,6 +9,8 @@ extern void *D_00133E74;
 
 extern int func_00118CC8(void *arg0, int arg1, void *arg2);
 
+/* Variadic printf-style wrapper: stores the reentrancy block in the stream context, then
+   formats through func_00118CC8. */
 void func_00115D48(int arg0, ...) {
     void *obj = D_00133E74;
     void *ctx = *(void **)((char *)obj + 8);

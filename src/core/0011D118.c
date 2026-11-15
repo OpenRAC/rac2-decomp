@@ -5,6 +5,7 @@ void func_0011CB58(void);
 
 extern int D_001346A0;
 
+/* Calls func_0011CB58, then clears D_001346A0. */
 void func_0011D118(void)
 {
   func_0011CB58();

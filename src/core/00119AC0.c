@@ -11,6 +11,7 @@ extern char *D_00134674;
 
 extern int func_0011B1E8(int fd, char *buf, int len);
 
+/* Same as func_00118BC0 but with its own 128-byte staging buffer D_0013C180. */
 int func_00119AC0(int fd, char *src, unsigned int len, int flush) {
     unsigned int i;
     int r;

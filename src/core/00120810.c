@@ -15,6 +15,8 @@ typedef struct
   void *exception_handler;
 } old_exception_table;
 
+/* Looks up pc in an old-style exception table and returns the handler of the innermost region
+   that covers it. */
 void *func_00120810(void *pc, old_exception_table *table) {
     if (table) {
         int pos;

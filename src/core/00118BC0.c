@@ -11,6 +11,8 @@ extern char *D_0013466C;
 
 extern int func_0011B1E8(int fd, char *buf, int len);
 
+/* Appends len bytes of src to a 128-byte staging buffer and writes it to fd with func_0011B1E8
+   whenever it fills; flush == 1 writes out what is pending. */
 int func_00118BC0(int fd, char *src, unsigned int len, int flush) {
     unsigned int i;
     int r;

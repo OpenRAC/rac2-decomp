@@ -28,6 +28,8 @@ struct ExitReent {
     struct ExitProc *exitprocs;
 };
 
+/* Newlib exit: runs the registered exit handlers of the reentrancy block, then its cleanup
+   hook, then calls func_00131CA8 with status. */
 void func_00115E90(int status) {
     struct ExitReent *reent;
     struct ExitProc *proc;

@@ -17,6 +17,8 @@ extern double func_00117650(double);
 
 extern double func_00117848(double, double);
 
+/* Converts a double to a decimal digit string in a shared scratch buffer for the floating-
+   point printf path. */
 char *func_001185E8(double value, int ndigits, char ch, int dot) {
     union {
         double d;

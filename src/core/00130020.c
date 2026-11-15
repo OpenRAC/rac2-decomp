@@ -66,6 +66,9 @@ extern void func_00130288(void *, void *);
 extern void func_0012DC50(void *, int, int);
 extern void func_0012DD60(void *, int, int, int);
 
+/* Finishes a picture: reports through func_00130288 if the flag at 0x120 is set, otherwise
+   calls func_0012DC50 (frame, structure 3) or func_0012DD60 (two fields); then clears the
+   flag. */
 void func_00130098(char *object) {
     int width = *(int *)(object + 0x118);
     if (*(int *)(object + 0x120) != 0)

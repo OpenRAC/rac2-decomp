@@ -31,6 +31,8 @@ extern void func_0012C788(s64,s32);
 extern u32 func_0012C878(s64,s32);
  
 extern void func_0012C9C8(s64);
+/* Handles extension and user data: while the next start code is 0x1B5 or 0x1B2, calls the
+   extension handler selected from a table (ids above 10 use entry 0) or skips the user data. */
 void func_0012CC88(s64 arg0) {
     struct T44 tab;
     s32 v;

@@ -48,6 +48,8 @@ extern void func_0011AEA0(int);
 extern void func_00133108(void);
 extern int func_00133580(int);
 
+/* Sound system pump: when the reply has arrived, runs the pending callbacks of the finished
+   command buffer; also submits the buffer if one is waiting. */
 int func_00132028(void)
 {
     int i;

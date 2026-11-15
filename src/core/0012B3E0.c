@@ -42,6 +42,8 @@ typedef struct {
     s32 topFieldFirst;
 } MpegDec;
 
+/* Computes the dual-prime motion vectors DMV from the decoded vector mvx, mvy and the
+   differential dmvector, by picture structure and field order. */
 void func_0012B3E0(MpegDec *d, s32 DMV[][2], s32 *dmvector, s32 mvx, s32 mvy) {
     if (d->pictStruct == 3) {
         if (d->topFieldFirst) {

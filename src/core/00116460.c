@@ -61,6 +61,8 @@ extern void func_00116E10(void *, void *);
 
 #define MORECORE(reent, size) func_00115C90(reent, (size))
 
+/* Extends the top chunk of the heap by asking for more memory from the system (newlib
+   malloc_extend_top). */
 void func_00116460(void *reent_ptr, INTERNAL_SIZE_T nb) {
     char *brk;
     INTERNAL_SIZE_T front_misalign;

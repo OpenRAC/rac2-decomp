@@ -8,6 +8,8 @@ extern double func_00123078(int);
 extern double func_00122B00(double, double);
 extern double func_00122A40(double, double);
 
+/* libgcc __floatdidf: converts a signed 64-bit integer to a double, using software floating
+   point. */
 double func_001213B8(long value) {
     double high;
     double low;
@@ -88,6 +90,7 @@ extern DoubleParts *func_00122800(DoubleParts *, DoubleParts *, DoubleParts *);
 extern double func_00122630(DoubleParts *);
 extern int func_00122F10(DoubleParts *, DoubleParts *);
 
+/* Software double-precision addition. */
 double func_00122A40(double first, double second) {
     DoubleParts a, b, result;
     func_00122760(&first, &a);
@@ -95,6 +98,7 @@ double func_00122A40(double first, double second) {
     return func_00122630(func_00122800(&a, &b, &result));
 }
 
+/* Software double-precision subtraction (adds with the sign of the second operand flipped). */
 double func_00122A98(double first, double second) {
     DoubleParts a, b, result;
     func_00122760(&first, &a);
@@ -205,6 +209,7 @@ static __inline__ DoubleParts *dp_div_parts(DoubleParts *a, DoubleParts *b) {
     return a;
 }
 
+/* Software double-precision division. */
 double func_00122DA8(double first, double second) {
     DoubleParts a, b;
     DoubleParts *res;
@@ -227,6 +232,8 @@ static __inline__ int double_parts_isinf(DoubleParts *parts) {
     return parts->kind == 4;
 }
 
+/* Compares two doubles in software; returns the ordering from func_00122F10 (1 if either is
+   NaN). */
 int func_00123028(double first, double second) {
     DoubleParts a, b;
     func_00122760(&first, &a);
@@ -234,6 +241,7 @@ int func_00123028(double first, double second) {
     return func_00122F10(&a, &b);
 }
 
+/* Converts a signed 32-bit integer to a double in software. */
 double func_00123078(int value) {
     DoubleParts parts;
     parts.kind = 3;
@@ -256,6 +264,8 @@ double func_00123078(int value) {
     return func_00122630(&parts);
 }
 
+/* Converts a double to a signed 32-bit integer by truncation, saturating on overflow and
+   giving 0 for NaN. */
 int func_00123130(double value) {
     DoubleParts parts;
     int result;
@@ -274,6 +284,8 @@ int func_00123130(double value) {
     return parts.sign != 0 ? -result : result;
 }
 
+/* Converts a double to an unsigned 32-bit integer by truncation, saturating on overflow and
+   giving 0 for negatives and NaN. */
 unsigned int func_001231C8(double value) {
     DoubleParts parts;
     func_00122760(&value, &parts);

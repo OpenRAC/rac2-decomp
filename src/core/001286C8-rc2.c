@@ -30,6 +30,8 @@ extern s8 D_00143130[];
 extern s8 D_00143180[];
 extern s8 D_0013B990[];
 
+/* Sends a command id, a value and a byte payload of length *arg2 over RPC client D_00143130
+   (function 0x8000091B); returns 0 without sending if the client is busy. */
 s32 func_001286C8(s32 arg0, s32 arg1, s32 *arg2, u8 *arg3) {
     s32 var_a1;
     s32 r;

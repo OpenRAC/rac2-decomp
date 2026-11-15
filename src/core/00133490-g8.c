@@ -10,6 +10,8 @@ extern int func_00125620(void);
 
 extern void func_00132DF0(int arg0, int arg1, int arg2, int arg3, int arg4);
 
+/* Returns func_00125620() when D_001A748C is 0; otherwise queues sound command 0x37 and
+   returns 1. */
 int func_00133640(void) {
     if (D_001A748C == 0)
         return func_00125620();

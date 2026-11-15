@@ -7,6 +7,8 @@ extern int func_00132028(void);
 extern int func_00132C48(int, int, void *);
 extern void func_00133580(int);
 
+/* Sends sound command 0x2A with four ints (after finishing pending work) and stores the result
+   in D_001A748C; does nothing if D_001A748C is 1. */
 int func_00133250(int arg0, int arg1, int arg2, int arg3) {
     int args[4];
 

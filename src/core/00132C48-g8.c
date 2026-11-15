@@ -19,6 +19,8 @@ extern void func_00115D48(char *, ...);
 extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
 extern int func_00132220(void);
 extern void func_00133108(void);
+/* Sends a sound command with its payload and waits for the 12-byte reply
+   (snd_SendCommandSync); returns the reply's second word. */
 int func_00132C48(int cmd, int size, void *arg) {
     unsigned char *data = arg;
     int i;

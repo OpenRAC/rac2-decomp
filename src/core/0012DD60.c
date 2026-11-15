@@ -77,6 +77,8 @@ extern void func_0012D808(struct MpegFieldTransferState *, struct MpegPictureBuf
 extern void func_0012E608(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
 extern void func_0012DA98(struct MpegFieldTransferState *);
 
+/* Transfers the two field pictures of an MPEG frame in the order given by picture_structure,
+   using func_0012DAC0 for the timestamps. */
 void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffer *first,
                    struct MpegPictureBuffer *second) {
     s64 first_flags, second_flags;

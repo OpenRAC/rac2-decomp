@@ -23,6 +23,9 @@ extern int func_001253A8(int, int, void *, unsigned char *);
 extern int func_00133580(int);
 extern void func_00132DF0(int, int, void *, int, long);
 
+/* CdStartRead: starts a read of sectors from lba into buf with the given mode bytes; goes
+   through func_001253A8 when D_001A748C is 0, otherwise queues sound command 0x38 over RPC and
+   returns 1 (0 if busy). */
 int func_001334B8(int lba, int sectors, void *buf, unsigned char *mode) {
     int payload[4];
 

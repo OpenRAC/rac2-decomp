@@ -26,6 +26,7 @@
 
 extern s32 func_00132DF0();
 
+/* Queues sound command 24 with no payload and returns the result of func_00132DF0. */
 s32 func_00132AA0(void) {
     return func_00132DF0(24, 0, 0, 0, 0);
 }

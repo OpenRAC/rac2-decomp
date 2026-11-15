@@ -35,6 +35,9 @@ typedef struct {
     s32 v;
 } __attribute__((packed)) UA32;
 
+/* Parses a CIE (common information entry): augmentation string, alignment factors, return
+   register and the 'z' augmentation data; returns the pointer past it, or 0 if the
+   augmentation is not supported. */
 s8 *func_00123C28(s32 arg0, s32 arg1) {
     s32 sp[4];
     s32 temp_v0;

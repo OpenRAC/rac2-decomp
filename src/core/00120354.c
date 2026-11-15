@@ -5,6 +5,7 @@
    row, after one word of 0xCDCDCDCD linker fill. */
 extern void func_00115E28(void) __attribute__((noreturn));
 
+/* Calls abort (func_00115E28). */
 void func_00120354(void) {
     func_00115E28();
 }

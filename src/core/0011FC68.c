@@ -330,6 +330,7 @@ static inline UDItype __udivmoddi4 (UDItype n, UDItype d, UDItype *rp) {
     return ww.ll;
 }
 
+/* libgcc __divdi3: signed 64-bit division. */
 DItype func_0011FC68 (DItype u, DItype v) {
     word_type c = 0;
     DIunion uu, vv;

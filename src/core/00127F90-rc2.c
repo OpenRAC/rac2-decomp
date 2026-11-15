@@ -33,6 +33,8 @@ extern s32 func_0011AC40(s32);
 extern s32 func_0011AC70(s32);
 extern s32 func_0011D620(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
+/* Sends a two-int request (RPC function 0x10) with the block D_00141B80; returns -0x64 if
+   uninitialised and -0xC8 if the lock fails. */
 s32 func_00127F90(s32 arg0, s32 arg1) {
     s8 *base = D_00141B00;
     s8 *blk;

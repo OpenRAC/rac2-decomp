@@ -28,6 +28,8 @@ extern s32 func_0011D450(s8 *a0, u32 a1, s32 a2);
 extern s8 D_00140140[];
 extern s32 D_00134744;
 
+/* Binds RPC client D_00140140 to server 0x80000003, retrying with a short delay until it is
+   ready; sets D_00134744 to 0 and returns 0, or returns -1 if binding fails. */
 s32 func_0011E740(void) {
     s32 var_v0;
     s32 ret;

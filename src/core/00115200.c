@@ -4,11 +4,13 @@ extern void *D_00133E74;
 
 extern void *D_0013A308;
 
+/* Returns the address of errno: the current reentrancy block pointer D_00133E74. */
 void *func_00115200(void)
 {
     return D_00133E74;
 }
 
+/* Returns the address of the pointer variable D_0013A308. */
 void **func_00115210(void)
 {
     return &D_0013A308;
@@ -44,11 +46,14 @@ extern char D_0013A370[];
 /* Newlib abort and its separately entered assertion reporter. */
 void func_00115E28(void) __attribute__((noreturn));
 
+/* Newlib abort: leaves the program through func_00131CA8 with status 1. */
 void func_00115E28(void)
 {
     func_00131CA8(1);
 }
 
+/* Newlib assertion failure reporter: prints the failed expression with file and line through
+   func_00115CF0, then aborts. */
 void func_00115E38(const char *file, int line, const char *expression)
 {
     func_00115CF0(*(void **)((char *)D_00133E74 + 0xC),
@@ -67,6 +72,8 @@ extern int func_0011AB10(void);
 
 extern void func_0011AC60(int arg0);
 
+/* Recursive lock acquire: if the current id from func_0011AB10 is not the owner D_001341E0,
+   waits on semaphore D_00134DB8 and becomes owner; always raises the depth D_001341E4. */
 int func_00116300(void) {
     int id = func_0011AB10();
 
@@ -78,6 +85,7 @@ int func_00116300(void) {
     return ++D_001341E4;
 }
 
+/* Stores value in the word at offset 0x58 of the current reentrancy block D_00133E74. */
 void func_001163A0(unsigned int value)
 {
     *(unsigned int *)((unsigned char *)D_00133E74 + 0x58) = value;

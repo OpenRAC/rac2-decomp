@@ -1,5 +1,6 @@
 #include "include_asm.h"
 
+/* Copies n bytes from src to dest, byte by byte. */
 void func_001339F0(void *dest, const void *src, int n)
 {
     unsigned char *d = (unsigned char *)dest;
@@ -21,6 +22,8 @@ extern void func_00133230(void);
 extern void func_00132028(void);
 extern void func_00133580(int);
 
+/* Starts a read of second units from first into the buffer third with mode bytes {32, 1, 0,
+   0}, then calls func_00133230, snd_Pump and snd_CheckLoadInProgress(0). */
 void func_00133A28(int first, int second, void *third) {
     int enabled = 1;
     unsigned char mode[16];
@@ -52,10 +55,13 @@ typedef struct {
 } CopySetupData;
 extern CopySetupData D_0014B540;
 
+/* Reads 11 sectors starting at 1001 into D_0014B540. */
 void func_00133A78(void) {
     func_00133A28(1001, 11, &D_0014B540);
 }
 
+/* Reads three groups of sectors, listed in row index of D_0014B540, through the buffer and
+   copies each result into the fields of D_0014B540 (0x60, 0x1018 and 0x137C bytes). */
 void func_00133AA0(int index, void *buffer) {
     func_00133A28(D_0014B540.rows[index].first, 1, buffer);
     func_001339F0(D_0014B540.first, buffer, 0x60);

@@ -64,6 +64,8 @@ extern int func_0011D450(void *, int, int);
 extern void func_00115D48(const char *, ...);
 extern int func_00132C48(int, int, void *);
 
+/* Starts the sound system: sets up the double-buffered command and reply buffers, binds its
+   RPC servers and initialises it; bit 2 of options suppresses messages. */
 int func_00131DE8(int options)
 {
     int bind_result;

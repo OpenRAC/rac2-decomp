@@ -45,6 +45,8 @@ struct M2c_arg0
   s32 unk854;
 };
 
+/* Updates MPEG decoder state for the temporal reference: stores field 0x84C plus arg1 in field
+   0x1AC and clears field 0x854 when arg1 is non-zero. */
 void func_0012CFE8(struct M2c_arg0 *arg0, s32 arg1)
 {
   s32 temp_2_30;
@@ -77,6 +79,8 @@ void func_0012CFE8(struct M2c_arg0 *arg0, s32 arg1)
 extern int func_0012C878(void *, int);
 extern void func_0012CC88(void *);
 
+/* Handles an MPEG group of pictures header: resets fields, sets field 0x854 to 1, reads the
+   header bits and then processes extensions with func_0012CC88. */
 void func_0012D060(char *object) {
     *(int *)(object + 0xE8) = 0;
     *(int *)(object + 0x854) = 1;

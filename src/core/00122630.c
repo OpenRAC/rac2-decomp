@@ -96,6 +96,8 @@ static __inline__ int fp_pack_iszero(fp_number_type *number) {
     return number->kind == CLASS_ZERO;
 }
 
+/* Packs an unpacked software float (class, sign, exponent, fraction) into an IEEE double,
+   handling NaN, infinity, zero and denormals. */
 FLO_type func_00122630(fp_number_type *src) {
     FLO_union_type dst;
     fractype fraction = src->fraction.ll;

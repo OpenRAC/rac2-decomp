@@ -54,6 +54,8 @@ extern s64 func_00121AB8(s64, s64);
 #define sbrk_base  (D_00134600[0])
 #define sbrked_mem (D_00134618[0])
 
+/* Returns unused memory at the top of the heap to the system when at least a page can be
+   released (newlib malloc_trim). */
 s32 func_00117108(struct _reent *ptr, u32 pad) {
     s64 top_size;
     s64 extra;

@@ -6,6 +6,8 @@
 extern char *func_001240C8(int, int);
 extern void *func_00120A30(int, void *, int);
 
+/* Fills the first word of the record found by func_001240C8 with a register value from arg1
+   plus the record's offset; returns the record, or 0 if none. */
 char *func_00120B38(int arg0, char *arg1, int arg2) {
     char *s0 = func_001240C8(arg0, arg2);
     int a0;

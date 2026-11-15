@@ -7,6 +7,8 @@
    from __builtin_next_arg(arg1) minus the 0x30 of register-save area. */
 extern int func_00119BC8(int arg0, int arg1, void *arg2);
 
+/* Variadic printf-style wrapper: passes its two named arguments and the saved argument area to
+   func_00119BC8. */
 void func_00115CF0(int arg0, int arg1, ...) {
     func_00119BC8(arg0, arg1, (char *)__builtin_next_arg(arg1) - 0x30);
 }

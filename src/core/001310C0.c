@@ -29,6 +29,7 @@ typedef union {
 
 static const f64 one = 1.0, tiny = 1.0e-300;
 
+/* fdlibm __ieee754_sqrt: square root of x. */
 f64 func_001310C0(f64 x) {
     f64 z;
     s32 sign = (int)0x80000000;

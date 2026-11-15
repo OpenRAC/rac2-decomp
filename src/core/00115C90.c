@@ -7,6 +7,8 @@ extern int D_00133E78;
 
 extern u32 func_0011B270(int arg0);
 
+/* Calls func_0011B270 with arg1; when it returns -1 and D_00133E78 was set meanwhile, stores
+   that value in *arg0. Returns the call's result. */
 u32 func_00115C90(int *arg0, u32 arg1) {
     u32 result;
 

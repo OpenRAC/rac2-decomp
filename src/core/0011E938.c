@@ -79,6 +79,8 @@ extern char D_00140528[];
 extern char *D_0013474C;
 extern int func_00115340(void *, void *, int);
 
+/* Compares the 4-byte state D_00140528 with D_00134684 and D_0013474C using func_00115340;
+   returns 1 only when the state and both references differ from each other. */
 int func_0011EA38(void) {
     char *reference = D_00134684;
     char *state = D_00140528;
@@ -95,6 +97,7 @@ extern int D_00134748;
 extern char D_00140528[];
 extern void func_00115484(void *, int, int);
 
+/* Sets D_00134748 to -1, clears the 4 bytes at D_00140528 and returns 0. */
 int func_0011EAC8(void) {
     D_00134748 = -1;
     memset(D_00140528, 0, 4);

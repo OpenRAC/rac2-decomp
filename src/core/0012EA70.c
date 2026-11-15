@@ -1,5 +1,7 @@
 #include "include_asm.h"
 
+/* Advances a ring buffer position by param_2 / 8 bytes, wrapping around when the limit at
+   offset 0x24 is reached by subtracting the size at offset 0x28. */
 unsigned int func_0012EA70(unsigned int *param_1, int param_2)
 {
   unsigned int uVar1;

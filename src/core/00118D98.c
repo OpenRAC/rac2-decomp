@@ -57,6 +57,8 @@ extern unsigned int strlen(const char *) __asm__("func_001157AC");
 #define SARG() (flags & 0x20 ? GET(long long) : flags & 0x10 ? GET(long) : flags & 0x40 ? (long)(short)GET(int) : (long)GET(int))
 #define UARG() (flags & 0x20 ? GET(unsigned long long) : flags & 0x10 ? GET(unsigned long) : flags & 0x40 ? (unsigned long)(unsigned short)GET(int) : (unsigned long)GET(unsigned int))
 
+/* Formatted-output core with floating-point conversions: formats fmt with the arguments at ap
+   into the stream fp. */
 int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
 {
     register char *fmt;

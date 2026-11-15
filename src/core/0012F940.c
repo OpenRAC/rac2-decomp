@@ -26,6 +26,7 @@ int func_0012F948(char *p, unsigned int addr, int size) {
     return r1_func_0012BDD0(p);
 }
 
+/* Returns the word that resource->value points to. */
 unsigned int func_0012F9A8(struct IndirectWord *resource)
 {
     return *resource->value;

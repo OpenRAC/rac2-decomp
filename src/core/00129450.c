@@ -202,6 +202,9 @@ extern MpegMcFuncC D_00137ED0[];
 
 extern MpegMcFuncC D_00137EF0[];
 
+/* MPEG motion compensation for one macroblock: queues the block fetches from the reference
+   images for frame, field and dual-prime prediction according to picture_structure and
+   motion_type, and reports an unknown motion type. */
 void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type,
                    int pmv[2][2][2], int mvfs[2][2], int *dmvector) {
     int dmv[2][2];
@@ -300,6 +303,9 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
     }
 }
 
+/* Queues the luma and chroma fetch for one predicted block from reference image ref, using the
+   half-sample motion vector dx, dy, the source and destination fields and the averaging flag
+   avg (_getRef0). */
 void func_00129DA8(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
                    int yofs, int h, int bx, int by, int dx, int dy, int fieldpred,
                    int avg) {

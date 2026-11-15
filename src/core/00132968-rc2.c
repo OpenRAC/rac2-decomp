@@ -26,6 +26,7 @@
 
 extern s32 func_00132DF0();
 
+/* Queues sound command 0xD with two ints through func_00132DF0. */
 void func_00132968(s32 arg0, s32 arg1) {
     s32 sp[2];
     sp[0] = arg0;

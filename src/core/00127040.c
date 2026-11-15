@@ -103,6 +103,8 @@ extern int func_00126ED8(int);
 
 extern void func_00126E60(void *);
 
+/* Resets the state block p with func_00126E60, stores func_00126ED8(arg1) in p[12] unless it
+   is -1, clears p[8] and sets the flag bits in p[0]. */
 void func_00127218(int *p, int arg1) {
     int r = func_00126ED8(arg1);
 

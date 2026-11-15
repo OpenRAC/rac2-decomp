@@ -1,4 +1,6 @@
 #include "common.h"
+/* Rounds the decimal digit string buf of length len in place when its last digit is 5 or more,
+   carrying through 9s; returns 0 if the carry overflows the first digit, else 1. */
 int func_00118460(char *buf, int len) {
     char *p;
     if (len <= 0) goto done;

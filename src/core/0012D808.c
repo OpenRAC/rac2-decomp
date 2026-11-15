@@ -66,6 +66,8 @@ extern s32 func_0011F5E0();
 
 extern s32 func_0011F628();
 
+/* Fills the output record arg1 from the MPEG decoder state arg0; the path depends on the
+   picture structure at offset 0x174. */
 void func_0012D808(struct Rac1Cpr8Input *arg0, struct Rac1Cpr8Output *arg1) {
     struct Rac1Cpr8InputView *sp0;
     s32 sp4;

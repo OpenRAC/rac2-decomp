@@ -31,6 +31,8 @@ extern unsigned char D_00138152 NOT_SDA;
 
 extern void func_0011ACD0(unsigned int *);
 
+/* Returns the cached value D_00138152 if func_001315E0 is non-zero; otherwise reads a value
+   with func_0011ACD0 and returns its bits 1 to 2. */
 int func_00131620(void) {
     unsigned int local;
 

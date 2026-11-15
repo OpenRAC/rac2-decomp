@@ -49,6 +49,8 @@ static __inline__ int fp_cmp_iszero(fp_number_type *number) {
     return number->class == CLASS_ZERO;
 }
 
+/* Three-way compare of two unpacked software floats; returns 1 if either is NaN, else a
+   negative, zero or positive ordering. */
 int func_00122F10(fp_number_type *a, fp_number_type *b) {
     if (fp_cmp_isnan(a) || fp_cmp_isnan(b)) {
         return 1;

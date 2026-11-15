@@ -21,6 +21,7 @@ s32 func_0011C880(s32 *a0, s32 *a1) {
     dst[index] = value;
 }
 
+/* Copies the word at offset 0x10 of a0 to offset 8 of a1 and returns it. */
 s32 func_0011C8A0(s32 *a0, s32 *a1) {
     s32 value;
 

@@ -10,6 +10,8 @@ extern int D_00134DB8;
 
 extern void func_0011AC40(int arg0);
 
+/* Recursive lock release: when the depth D_001341E4 drops to 0, clears the owner D_001341E0
+   and releases semaphore D_00134DB8. */
 void func_00116360(void) {
     if (--D_001341E4 == 0) {
         D_001341E0 = -1;

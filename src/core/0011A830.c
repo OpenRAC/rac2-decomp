@@ -272,6 +272,7 @@ ASM_FUNC("asm/core", func_0011B080);
 
 ASM_FUNC("asm/core", func_0011B090);
 
+/* Clears D_00134688. */
 void func_0011B0A0(void)
 {
     D_00134688 = 0;

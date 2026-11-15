@@ -5,6 +5,8 @@ extern char D_00134640[];
 
 extern char *func_001184D0(char *arg0);
 
+/* Converts an integer to text in the given base, with a leading '-' for negative values; the
+   digits are produced reversed, then reversed by func_001184D0. */
 char *func_00118548(int input, char *buf, unsigned int base) {
     unsigned int value = input;
     unsigned int neg = (unsigned int)input >> 31;

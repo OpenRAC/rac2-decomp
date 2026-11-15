@@ -39,6 +39,8 @@ typedef struct {
     SdTrxdir trxdir; long trxdiraddr;
 } SdStoreImage __attribute__((aligned(16)));
 
+/* Fills a GS store-image packet (DMA tag, GIF tag, BITBLTBUF, TRXPOS, TRXREG, FINISH, TRXDIR)
+   for reading back the rectangle x, y, w, h; returns 7. */
 int func_0012646C(SdStoreImage *sp, short sbp, short sbw, short spsm, short x, short y, short w, short h)
 {
     sp->vifcode[0] = 0;

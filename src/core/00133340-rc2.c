@@ -26,6 +26,8 @@
 
 extern void func_00132DF0(s32 a0, s32 a1, void *a2, s32 a3, s64 t0);
 
+/* Queues sound command 0x2C with eight ints, packing the third/fifth and fourth/sixth
+   arguments as halfword pairs, plus two extra callback arguments. */
 void func_00133340(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9, s32 arg10, s64 arg11) {
     s32 buf[8];
     s32 p02;

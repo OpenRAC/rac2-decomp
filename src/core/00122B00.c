@@ -122,6 +122,7 @@ static __inline__ DoubleParts *dp_mul_parts(DoubleParts *a, DoubleParts *b,
     return tmp;
 }
 
+/* Software double-precision multiplication. */
 double func_00122B00(double first, double second) {
     DoubleParts a, b, tmp;
     DoubleParts *res;

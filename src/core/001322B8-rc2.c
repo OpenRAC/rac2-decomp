@@ -27,6 +27,9 @@ extern void func_0011B3D0();
 extern s32 *D_001A7480 __attribute__((sda));
 extern s32 D_001A7484 __attribute__((sda));
 
+/* Prepares the reply buffer arg0 of arg1 words: records pointer and length in D_001A7480 and
+   D_001A7484, clears the first word and the word after the data, and runs func_0011B3D0 over
+   both ends. */
 void func_001322B8(s32 *arg0, s32 arg1) {
     s8 *var_s0;
     s32 var_s1;

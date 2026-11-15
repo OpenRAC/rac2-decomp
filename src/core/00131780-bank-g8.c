@@ -23,6 +23,8 @@ extern int func_0011D620(const void *, int, int, int *, int, unsigned int *, int
 extern int D_001A71C4 MACRO_ADDR;
 extern char D_001A7600[], D_001A7630[];
 extern int func_00133580(int);
+/* Starts a sound bank load (bank, offset, callback, callback data) over RPC; prints a message
+   and returns if a load or transfer is already active. */
 void func_00132498(int bank, int offset, int callback, long callback_data) {
     D_001A7488 = 0;
     if (D_001A74C8 != 0) {

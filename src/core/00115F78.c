@@ -11,6 +11,7 @@ extern void func_00116E10(void *arg0, int arg1);
 
 extern void func_00116360(void *arg0) __asm__("func_00116360");
 
+/* Locked free: takes the allocator lock, frees the block with func_00116E10, releases the lock. */
 void func_00115F78(int arg0) {
     func_00116300(D_00133E74);
     FreeReentrant(D_00133E74, arg0);

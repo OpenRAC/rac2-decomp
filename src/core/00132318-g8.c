@@ -37,6 +37,8 @@ extern void func_0011AEA0(int);
 extern int func_0011D810(const void *);
 extern int func_0011D620(const void *, int, int, int *, int, unsigned int *, int, int, int);
 
+/* Requests a sound bank load by location and offset over RPC and returns the reply; returns 0
+   with a message if a load or transfer is already active. */
 unsigned int func_00132318(int loc, int offset) {
     unsigned int reply;
     unsigned int busy;
@@ -83,6 +85,8 @@ done:
     }
 }
 
+/* Requests loading of a sound bank by IOP address (RPC function 0x59) and returns the reply;
+   returns 0 if a transfer is already active. */
 unsigned int func_001326D8(int arg0) {
     unsigned int reply;
     unsigned int busy;

@@ -35,6 +35,8 @@ extern void func_0011AEA0(int);
 extern int func_00132028(void);
 extern void func_001330D0(void);
 
+/* Queues a sound command (id, payload, callback and data) in the active command buffer,
+   sending it at once when the system is idle and it has no payload. */
 void func_00132DF0(int cmd, int size, unsigned char *data, int cb, long cb_data)
 {
     int need;

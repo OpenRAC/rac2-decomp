@@ -23,6 +23,8 @@ extern void *D_00133E74;
 
 extern int func_00118CC8(void *arg0, char *arg1, void *arg2);
 
+/* Newlib sprintf: formats into arg0 through an in-memory stream with func_00118CC8 and NUL-
+   terminates the output; returns the formatted length. */
 int func_00115DA8(char *arg0, char *arg1, ...) {
     File_00115DA8 f;
     int result;

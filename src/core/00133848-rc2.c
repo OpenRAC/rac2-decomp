@@ -26,6 +26,7 @@
 
 extern s32 func_00132C48();
 
+/* Sends sound command 0x3B with six ints. */
 void func_00133848(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     s32 sp[6];
     sp[0] = arg0;

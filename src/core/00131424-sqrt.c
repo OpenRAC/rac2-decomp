@@ -21,6 +21,8 @@ extern int func_001313C8(double) __attribute__((const));
 extern int func_00131400(SqrtException *);
 extern int *func_00115200(void);
 
+/* Square root wrapper: computes func_001310C0 and, for a negative input, reports a domain
+   error (errno 33) according to the mode in D_0013BF10. */
 double func_00131424(double x)
 {
     SqrtException exc;

@@ -26,6 +26,7 @@
 
 extern void func_00132DF0(s32 a, s32 b, s32 *c, s32 d, s32 e);
 
+/* Queues sound command 0x50 with five ints through func_00132DF0. */
 void func_00133700(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     s32 arr[5];
 

@@ -31,6 +31,7 @@ extern void *D_00141844;
 extern s32 D_00141848;
 extern s32 D_001363A4;
 
+/* Calls the hook D_00141844 with D_00141848 when a hook is set and D_001363A4 is 0. */
 void func_001248B0(void) {
     void (*temp_a1)(s32);
 

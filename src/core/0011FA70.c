@@ -86,6 +86,7 @@ extern int D_001417EC;
 
 extern void func_0011FB98(void);
 
+/* Calls func_0011FB98 once only, guarded by the flag D_001417EC. */
 void func_0011FC48(void) {
     if (D_001417EC == 0) {
         D_001417EC = 1;

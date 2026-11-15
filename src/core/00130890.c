@@ -106,6 +106,7 @@ void func_00130A50(void *arg0) {
 extern void func_00130A60(void *arg0);
 extern char D_0013BE88[];
 
+/* Calls func_00130288 on the object with the fixed string D_0013BE88. */
 void func_00130A60(void *object) {
     func_00130288(object, D_0013BE88);
 }
@@ -113,6 +114,7 @@ void func_00130A60(void *object) {
 extern void func_00130A70(void *arg0);
 extern char D_0013BEA0[];
 
+/* Calls func_00130288 on the object with the fixed string D_0013BEA0. */
 void func_00130A70(void *object) {
     func_00130288(object, D_0013BEA0);
 }
@@ -120,6 +122,7 @@ void func_00130A70(void *object) {
 extern void func_00130A80(void *arg0);
 extern char D_0013BED8[];
 
+/* Calls func_00130288 on the object with the fixed string D_0013BED8. */
 void func_00130A80(void *object) {
     func_00130288(object, D_0013BED8);
 }
@@ -128,6 +131,8 @@ void func_00130A80(void *object) {
 /* Its entry is four bytes into the catalogued row, after one word of 0xCDCDCDCD fill. */
 extern void func_00130B80(void *arg0);
 
+/* Calls func_00130B80 with the sub-object at offset 0x4C of the structure that object+0x40
+   points to. */
 void func_00130A8C(void *object) {
     func_00130B80(*(char **)((char *)object + 0x40) + 0x4C);
 }

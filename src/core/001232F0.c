@@ -429,6 +429,7 @@ func_00123400  (FLO_union_type * src, fp_number_type * dst)
 
 extern FLO_type func_001232F0(fp_number_type *);
 
+/* Packs class, sign, exponent and fraction into a single-precision float with func_001232F0. */
 FLO_type func_001234C0(fp_class_type classification, unsigned int sign, int exponent, fractype fraction) {
     fp_number_type number;
     number.class = classification;
@@ -440,6 +441,8 @@ FLO_type func_001234C0(fp_class_type classification, unsigned int sign, int expo
 
 extern double func_00123268(fp_class_type, unsigned int, int, unsigned long);
 
+/* Converts a single-precision float to a double by unpacking it and repacking with
+   func_00123268. */
 double func_001234F0(FLO_type value) {
     fp_number_type number;
     FLO_type input = value;
@@ -479,6 +482,7 @@ unsigned char *func_00123530(unsigned char *param_1, unsigned int *param_2)
   return param_1;
 }
 
+/* Reads a signed LEB128 value from input into *output and returns the pointer past it. */
 unsigned char *func_00123578(unsigned char *input, int *output) {
     unsigned int shift = 0;
     int value = 0;
@@ -500,6 +504,8 @@ typedef struct {
     int count;
 } RecordOutput;
 
+/* Walks a list of length-prefixed records, collects those with non-zero second and third words
+   into output, and tracks the lowest start and highest end address in *minimum and *maximum. */
 void func_00123978(int *record, RecordOutput *output, unsigned int *minimum, unsigned int *maximum) {
     unsigned int low = *minimum;
     unsigned int high = *maximum;
@@ -566,6 +572,8 @@ static __gthread_mutex_t object_mutex = 0;
 extern struct object *D_00141838;
 extern void func_00123A00(struct object *);
 
+/* Finds the frame description entry (FDE) that covers pc: searches the registered objects,
+   then binary-searches the object's sorted FDE array. */
 fde *func_00123B40(void *pc) {
     struct object *ob;
     unsigned int lo, hi;

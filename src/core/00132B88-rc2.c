@@ -26,6 +26,8 @@
 
 extern s32 func_00132DF0(s32 a, s32 b, void *p, s32 c, s32 d);
 
+/* Queues sound command 0x21 with six ints and two extra callback arguments through
+   func_00132DF0. */
 void func_00132B88(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
     s32 blk[6];
 

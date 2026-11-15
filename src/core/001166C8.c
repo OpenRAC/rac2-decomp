@@ -174,6 +174,7 @@ extern u32 D_001341E8[];
 #define malloc_extend_top(nb) func_00116460(reent_ptr, (nb))
 #define RCALL reent_ptr,
 
+/* Allocates a block of the requested size from the reentrant heap (newlib malloc). */
 void *func_001166C8(struct _reent *reent_ptr, u32 bytes) {
   mchunkptr victim;                  /* inspected/selected chunk */
   INTERNAL_SIZE_T victim_size;       /* its size */

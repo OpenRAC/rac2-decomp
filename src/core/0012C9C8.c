@@ -112,6 +112,9 @@ typedef struct {
     int progressive_frame;          /* 0x188 */
 } PicExt_0012CDB0;
 
+/* Parses an MPEG-2 picture coding extension: reads the f_codes, picture structure,
+   top_field_first, frame_pred_frame_dct and further flag bits from the bitstream, writing some
+   of them to IPU_CTRL. */
 void func_0012CDB0(void *arg) {
     PicExt_0012CDB0 *arg0 = arg;
     int temp_2_35;

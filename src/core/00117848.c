@@ -66,6 +66,7 @@ do {								\
 
 static const double one = 1.0, Zero[] = { 0.0, -0.0 };
 
+/* fdlibm __ieee754_fmod: floating-point remainder of x divided by y. */
 double func_00117848(double x, double y)
 {
 	s32 n,hx,hy,hz,ix,iy,sx,i;

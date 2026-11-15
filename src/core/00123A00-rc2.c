@@ -28,6 +28,8 @@ extern s32 *func_001236C8(void *, s32);
 extern s32 func_00123930(s32);
 extern void func_00123978(s32, void *, void *, void *);
 
+/* Prepares a registered frame-unwind object: counts its FDEs and allocates working arrays to
+   build its sorted FDE table. */
 void func_00123A00(void *arg0) {
     u32 loc[6];
     s32 *s0;

@@ -11,6 +11,8 @@ extern int func_001166C8(void *arg0, int arg1);
 
 extern void func_00116360(void *arg0);
 
+/* Locked malloc: takes the allocator lock, allocates arg0 bytes with func_001166C8, releases
+   the lock and returns the block. */
 int func_00115F28(int arg0) {
     int result;
 

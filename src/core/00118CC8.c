@@ -10,6 +10,8 @@ extern int func_00118D98(void *arg0, void *arg1, char *arg2, void *arg3);
 
 extern int func_00119BF8(void *arg0, void *arg1, char *arg2, void *arg3);
 
+/* Printf dispatcher: uses the floating-point formatter func_00118D98 when fmt has an e, E, f,
+   g, G or L conversion, otherwise the integer-only formatter func_00119BF8. */
 int func_00118CC8(void *fp, char *fmt, void *ap) {
     char *p;
 

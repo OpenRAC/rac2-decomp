@@ -27,6 +27,7 @@ extern s32 func_00132028();
 extern s32 D_001A74A0 __attribute__((sda));
 extern s32 D_001A74C0 __attribute__((sda));
 
+/* Raises the entry count of the active sound command buffer by one and pumps the sound system. */
 void func_001330D0(void) {
     s32 *temp_a0;
 

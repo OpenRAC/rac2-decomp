@@ -14,6 +14,8 @@ typedef struct {
     int unk820;
 } Obj40;
 
+/* Sets field 0x008 to 2 and copies field 0x118 to 0x0AC if it was not already 2; sets field
+   0x820 to 1 and returns 1. */
 s32 func_0012DA98(void *arg0) {
     Obj40 *s = (Obj40 *)arg0;
     s32 r = 1;
@@ -34,6 +36,8 @@ s32 func_0012DA98(void *arg0) {
    __muldi3. */
 extern s64 func_00121AB8(s64 a, s64 b);
 
+/* Computes a timestamp into *arg2: the stored value at +0x18 of arg1 if it is non-negative,
+   otherwise a value derived from the counters at +0x78 to +0x90 of arg0. */
 s64 func_0012DAC0(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4) {
     char *s = arg0;
     char *t = arg1;

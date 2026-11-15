@@ -12,6 +12,7 @@ extern void func_001338C8();
 
 extern s32 func_00133930(s32, s32);
 
+/* Sends sound command 0x36 with one int and returns its result. */
 int func_00133490(int value)
 {
     int payload[4];
@@ -29,6 +30,7 @@ int func_00133490(int value)
 
 extern int func_00132DF0(int, int, void *, int, int);
 
+/* Queues sound command 81 with two ints and returns the result of func_00132DF0. */
 int func_00133750(int first, int second) {
     int payload[4];
     payload[0] = first;
@@ -38,6 +40,7 @@ int func_00133750(int first, int second) {
 
 extern int func_00132DF0(int, int, void *, int, int);
 
+/* Queues sound command 16 with four ints and returns the result of func_00132DF0. */
 int func_00133788(int first, int second, int third, int fourth) {
     int payload[4];
     payload[0] = first;
@@ -50,16 +53,19 @@ int func_00133788(int first, int second, int third, int fourth) {
 
 
 
+/* Sends sound command 61 with no payload and returns its result. */
 int func_00133890(void) {
     return func_00132C48(61, 0, 0);
 }
 
 
+/* Sends sound command 0x3C with no payload. */
 void func_001338C8(void)
 {
   func_00132C48(0x3c, 0, 0);
 }
 
+/* Sends sound command 62 with five ints and returns its result. */
 int func_001338F0(int first, int second, int third, int fourth, int fifth) {
     int payload[8];
     payload[0] = first;
@@ -71,6 +77,7 @@ int func_001338F0(int first, int second, int third, int fourth, int fifth) {
 }
 
 
+/* Sends sound command 0x5A with two ints and returns its result. */
 int func_00133930(int first, int second)
 {
     struct {
@@ -83,6 +90,7 @@ int func_00133930(int first, int second)
     return func_00132C48(0x5a, 8, &payload.first);
 }
 
+/* Sends sound command 91 with no payload and returns its result. */
 int func_00133960(void) {
     return func_00132C48(91, 0, 0);
 }

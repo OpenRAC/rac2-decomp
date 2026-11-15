@@ -17,6 +17,8 @@ extern void func_00115D48(char *);
 extern char D_0013BFA0[];
 extern char D_001A7040[] __attribute__((sda));
 
+/* Returns 1 when no reply is pending or the IOP has finished filling it (marker words are
+   0xFFFFFFFF), clearing the pending pointer; otherwise 0. */
 int func_00132220(void) {
     unsigned int *p;
 

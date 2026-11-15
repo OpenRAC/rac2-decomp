@@ -2,9 +2,11 @@
 
 extern int func_00115544(const char *, const char *);
 
+/* Returns value if the strings first and second compare equal, otherwise 0. */
 void *func_00120390(const char *first, const char *second, void *value) {
     return func_00115544(first, second) ? 0 : value;
 }
+/* Empty function. */
 void func_001203C0(void) {
 }
 
@@ -12,6 +14,8 @@ extern void *func_00115F28(unsigned int);
 extern int func_00115484(unsigned char *, int, int);
 extern void func_00120368(void);
 
+/* Allocates a 24-byte record with func_00115F28 (calling func_00120368 on failure), clears it
+   and points its second word at offset 16. */
 char *func_001203C8(void) {
     char *record = func_00115F28(24);
     if (record == 0) func_00120368();
@@ -22,16 +26,19 @@ char *func_001203C8(void) {
 
 extern char *(*D_00135D38)(void);
 
+/* Returns the pointer produced by the getter D_00135D38. */
 char *func_00120420(void) {
     return D_00135D38();
 }
 
+/* Returns the pointer produced by the getter D_00135D38, plus 8. */
 char *func_00120448(void) {
     return D_00135D38() + 8;
 }
 
 extern char *func_00120498(void);
 
+/* Installs func_00120498 as the getter D_00135D38 and returns its result. */
 char *func_00120470(void) {
     D_00135D38 = func_00120498;
     return D_00135D38();
@@ -41,6 +48,8 @@ extern int D_00141800;
 extern char D_001417F0[];
 extern char D_00141808[];
 
+/* Returns the 16-byte block D_001417F0, clearing it and setting its second word to D_00141808
+   on the first call. */
 char *func_00120498(void) {
     if (D_00141800 == 0) {
         D_00141800 = 1;
@@ -50,14 +59,17 @@ char *func_00120498(void) {
     return D_001417F0;
 }
 
+/* Returns the pointer produced by the getter D_00135D38, plus 4. */
 char *func_00120500(void) {
     return D_00135D38() + 4;
 }
 
+/* Returns the 16-bit field at index 3 of the record. */
 int func_00120800(short *record) {
     return record[3];
 }
 
+/* Returns the 16-bit field at index 2 of the record. */
 int func_00120808(short *record) {
     return record[2];
 }
@@ -67,6 +79,8 @@ int func_00120808(short *record) {
 extern void *func_00120A30(int, void *, int);
 extern void *func_001153D4(void *, const void *, unsigned int);
 
+/* Copies a register slot (16 bytes if index < 31, 4 if index <= 63, else 8) from source to
+   destination, each located with func_00120A30. */
 void *func_00120AB8(int index, void *source, void *destination) {
     void *from = func_00120A30(index, source, 0);
     void *to = func_00120A30(index, destination, 0);
@@ -74,6 +88,7 @@ void *func_00120AB8(int index, void *source, void *destination) {
     return func_001153D4(to, from, size);
 }
 
+/* Empty function. */
 void func_00120BC8(void)
 {
 }
@@ -135,6 +150,8 @@ extern void *func_001208E8(void *, void *, void *, int, int *);
 extern void *func_00120810(void *, void *);
 extern frame_state *func_00120B38(void *, frame_state *, frame_state *);
 
+/* Exception unwinding helper: searches for a handler for pc while stepping up the frame state;
+   returns the handler address. */
 void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
 		    frame_state **udata_p)
 {

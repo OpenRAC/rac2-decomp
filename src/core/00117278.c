@@ -58,6 +58,8 @@ extern const char _ctype_[];
 
 #define ERANGE 34
 
+/* Newlib strtol: parses an integer in the given base, skipping white space and accepting a
+   sign and 0x prefix, and sets *endptr. */
 long func_00117278(struct _reent *rptr, const char *nptr, char **endptr, int base) {
     register const char *s = nptr;
     register unsigned long acc;

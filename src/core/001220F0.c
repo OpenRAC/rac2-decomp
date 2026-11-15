@@ -331,6 +331,7 @@ static inline UDItype __udivmoddi4(UDItype n, UDItype d, UDItype *rp) {
 
 UDItype __udivmoddi4();
 
+/* libgcc __umoddi3: unsigned 64-bit remainder. */
 UDItype func_001220F0(UDItype u, UDItype v) {
     UDItype w;
 

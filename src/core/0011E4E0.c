@@ -184,6 +184,8 @@ extern int D_00140180[];
 extern int D_001401C0[];
 extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
 
+/* Sends RPC function 4 with three ints (the first two swapped) to D_00140140 and returns the
+   reply word; returns 0 if uninitialised or the call fails. */
 int func_0011E828(int first, int second, int third) {
     if (D_00134744 < 0)
         return 0;
@@ -201,6 +203,8 @@ extern int D_00140180[];
 extern int D_001401C0[];
 extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
 
+/* Sends RPC function 2 with one int to D_00140140 and returns the reply word; returns 0 if
+   uninitialised and -1 if the call fails. */
 int func_0011E8A8(int value) {
     if (D_00134744 < 0)
         return 0;

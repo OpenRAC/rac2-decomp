@@ -3,6 +3,7 @@
 extern int r1_D_0015EDC4 __attribute__((sda));
 extern void func_00132028(void);
 
+/* Clears r1_D_0015EDC4 and pumps the sound system with snd_Pump. */
 void func_00133230(void) {
     r1_D_0015EDC4 = 0;
     snd_Pump();
@@ -20,6 +21,8 @@ extern int *D_001A74B8[2] __attribute__((sda));
 extern int D_001A74C0 __attribute__((sda));
 extern int D_001A7040;
 extern void func_001322B8(void *, int, void *);
+/* Submits the active sound command buffer over RPC function 0x4D, then switches to the other
+   of the two command buffers and clears it. */
 void func_00133108(void) {
     func_001322B8(D_001A74B8[D_001A74C0], *D_001A74A0[D_001A74C0], D_001A74A0[D_001A74C0]);
     while (func_0011D810(&D_001A7040)) {
@@ -44,6 +47,8 @@ extern unsigned int D_001A7180 MACRO_ADDR;
 extern long D_001A74D8 MACRO_ADDR;
 extern int D_001A7140 MACRO_ADDR;
 extern char D_001A76F8[];
+/* Starts an asynchronous request (RPC function 0x57) with the given id, callback and data;
+   prints a message and returns if one is already active. */
 void func_001325E0(int a, int c, long d) {
     D_001A7488 = 0;
     if (D_001A74C8 != 0) {

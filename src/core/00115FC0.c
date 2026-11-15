@@ -55,6 +55,8 @@ extern unsigned int strlen(const char *);
 
 extern int strcmp(const char *, const char *);
 
+/* Converts one multibyte character to a wide character, with Shift-JIS handling in that
+   locale; returns the number of bytes used. */
 int func_00115FC0(MbtowcReent *r, int *pwc, const char *s, unsigned int n, int *state) {
     int dummy;
     unsigned char *t = (unsigned char *)s;

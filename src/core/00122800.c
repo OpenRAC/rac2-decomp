@@ -99,6 +99,8 @@ static __inline__ int fp_iszero(fp_number_type *number) {
     return number->kind == CLASS_ZERO;
 }
 
+/* Adds two unpacked software floats, handling NaN, infinity and zero operands, and returns the
+   result structure. */
 fp_number_type *func_00122800(fp_number_type *a, fp_number_type *b,
                               fp_number_type *tmp) {
   intfrac tfraction;

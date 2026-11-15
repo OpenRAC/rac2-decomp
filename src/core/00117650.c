@@ -66,6 +66,7 @@ do {								\
 
 static const double huge = 1.0e300;
 
+/* fdlibm floor: rounds a double down to an integer value. */
 double func_00117650(double x)
 {
 	s32 i0,i1,j0;

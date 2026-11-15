@@ -28,6 +28,7 @@ extern s32 D_001A748C __attribute__((sda));
 
 extern s32 D_001A7110 __attribute__((nosda));
 
+/* Returns the disc read status from func_00125588 when D_001A748C is 0, otherwise D_001A7110. */
 s32 func_00133688(void) {
     if (D_001A748C == 0) {
         return func_00125588();
