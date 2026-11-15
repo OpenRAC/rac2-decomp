@@ -41,29 +41,30 @@ extern int func_L00_0032EF10(int, int, int *);
 extern int func_L00_002ADEA0(int);
 extern unsigned char D_001A7AF8[] MACRO_ADDR;
 
+/* Picks which jump or roll move the hero starts from the buttons and speed, or fails if none fits. */
 int func_L00_002CAB08(void)
 {
     int offset;
-    if (D_00189E20.mode == 14) return 0;
-    offset = func_L00_002C3A40();
-    if ((D_00138320[0] & 8) && offset > 0 && func_L00_0032EFB0(0x40, 0x1F000, offset + 5, offset)) {
+    if (gHeroState.mode == 14) return 0;
+    offset = GetStepOffsetFromDirection();
+    if ((D_00138320[0] & 8) && offset > 0 && ArePadPressesWithinFrames(0x40, 0x1F000, offset + 5, offset)) {
         ref_L00_002CAB08_00(11, 1);
         return 1;
     }
-    if (D_00189E20.count_1b8 < 7) goto fail;
-    if (!func_L00_0032EF10(0x40, 9, 0)) goto fail;
-    if (func_L00_002ADEA0(3) == 2 && D_001A7AF8[2] != 0 && D_00189E20.flag_24fc == 0 &&
-        (2.5f < D_00189E20.distance_278 || D_00189E20.angle_280 < 0.785398244857788086f) &&
-        0.7f < D_00189E20.timer && 0.015000000596046448f < D_00189E20.speed_178)
+    if (gHeroState.count_1b8 < 7) goto fail;
+    if (!PadPressedWithin(0x40, 9, 0)) goto fail;
+    if (hero_slot_item_id(3) == 2 && gItemOwnedFlags[2] != 0 && gHeroState.flag_24fc == 0 &&
+        (2.5f < gHeroState.distance_278 || gHeroState.angle_280 < 0.785398244857788086f) &&
+        0.7f < gHeroState.timer && 0.015000000596046448f < gHeroState.speed_178)
         ref_L00_002CAB08_00(10, 1);
-    else if (func_L00_002ADEA0(3) == 3 && D_00189E20.flag_24fc == 0 && 0.7f < D_00189E20.timer &&
-             (2.5f < D_00189E20.distance_278 || D_00189E20.flag_284 != 0) &&
-             0.015000000596046448f < D_00189E20.speed_178) {
-        if (D_00189E20.flag_1e4 != 0) return 1;
+    else if (hero_slot_item_id(3) == 3 && gHeroState.flag_24fc == 0 && 0.7f < gHeroState.timer &&
+             (2.5f < gHeroState.distance_278 || gHeroState.flag_284 != 0) &&
+             0.015000000596046448f < gHeroState.speed_178) {
+        if (gHeroState.flag_1e4 != 0) return 1;
         ref_L00_002CAB08_00(16, 1);
-    } else if (func_L00_002ADEA0(3) == 3 && D_00189E20.flag_24fc == 0)
+    } else if (hero_slot_item_id(3) == 3 && gHeroState.flag_24fc == 0)
         ref_L00_002CAB08_00(13, 1);
-    else if (func_L00_002ADEA0(3) == 2 && D_00189E20.flag_24fc == 0 && D_001A7AF8[2] != 0)
+    else if (hero_slot_item_id(3) == 2 && gHeroState.flag_24fc == 0 && gItemOwnedFlags[2] != 0)
         ref_L00_002CAB08_00(15, 1);
     else
         ref_L00_002CAB08_00(7, 1);

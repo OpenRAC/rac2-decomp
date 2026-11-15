@@ -74,91 +74,92 @@ typedef struct {
     float inverse[16];
 } L06Basis;
 
-void func_L06_00420AE8(char *obj)
+/* Updates a gunner that follows a path, tracks the hero and fires shots; it blows up with a burst of debris when it dies. */
+void func_L06_00420AE8(char *moby)
 {
-    char *st = *(char **)(obj + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     unsigned int state;
-    int flags;
-    if (func_L06_00420230(obj)) {
-        func_0029F338(obj);
+    int hitFlags;
+    if (InitFollowerAndCheckHits(moby)) {
+        MarkMobySpawned(moby);
     } else {
-        switch ((unsigned char)obj[0x95]) {
+        switch ((unsigned char)moby[0x95]) {
         case 0:
-            state = (unsigned char)obj[0x20];
-            if (*(int *)(st + 0x258) > 0) {
+            state = (unsigned char)moby[0x20];
+            if (*(int *)(vars + 0x258) > 0) {
                 if (state < 3) {
-                    func_002A7750(obj, 2, 1);
+                    SetMobyState(moby, 2, 1);
                 } else if (state < 8) {
-                    if (func_002ACBC8(obj + 0x10, *(int *)(st + 0x268))) {
-                        if (*(int *)(st + 0x2A0) != -1) func_002A7750(obj, 6, 1);
-                        else func_002A7750(obj, 5, 1);
+                    if (IsPointInCuboid(moby + 0x10, *(int *)(vars + 0x268))) {
+                        if (*(int *)(vars + 0x2A0) != -1) SetMobyState(moby, 6, 1);
+                        else SetMobyState(moby, 5, 1);
                     } else {
-                        if (*(int *)(st + 0x2A0) != -1) func_002A7750(obj, 4, 1);
-                        else func_002A7750(obj, 3, 1);
+                        if (*(int *)(vars + 0x2A0) != -1) SetMobyState(moby, 4, 1);
+                        else SetMobyState(moby, 3, 1);
                     }
                 }
             } else if (state >= 4) {
                 if (state < 8) {
-                    if (func_002ACBC8(obj + 0x10, *(int *)(st + 0x268))) {
-                        if (*(int *)(st + 0x2A0) != -1) func_002A7750(obj, 6, 1);
-                        else func_002A7750(obj, 5, 1);
+                    if (IsPointInCuboid(moby + 0x10, *(int *)(vars + 0x268))) {
+                        if (*(int *)(vars + 0x2A0) != -1) SetMobyState(moby, 6, 1);
+                        else SetMobyState(moby, 5, 1);
                     } else {
-                        if (*(int *)(st + 0x2A0) != -1) func_002A7750(obj, 4, 1);
-                        else func_002A7750(obj, 3, 1);
+                        if (*(int *)(vars + 0x2A0) != -1) SetMobyState(moby, 4, 1);
+                        else SetMobyState(moby, 3, 1);
                     }
                 }
             }
-            *(int *)(st + 0x278) = 0;
+            *(int *)(vars + 0x278) = 0;
             break;
         case 1:
-            *(int *)(st + 0x278) = 0;
-            if (*(int *)(st + 0x258) != 1) {
-                if (*(int *)(st + 0x258) == 2) {
-                    if ((unsigned int)((unsigned char)obj[0x20] - 3) < 5) obj[0x95] = 2;
-                } else if ((unsigned int)((unsigned char)obj[0x20] - 3) < 5) {
-                    if (*(int *)(st + 0x2A0) != -1) func_002A7750(obj, 4, 1);
-                    else func_002A7750(obj, 3, 1);
+            *(int *)(vars + 0x278) = 0;
+            if (*(int *)(vars + 0x258) != 1) {
+                if (*(int *)(vars + 0x258) == 2) {
+                    if ((unsigned int)((unsigned char)moby[0x20] - 3) < 5) moby[0x95] = 2;
+                } else if ((unsigned int)((unsigned char)moby[0x20] - 3) < 5) {
+                    if (*(int *)(vars + 0x2A0) != -1) SetMobyState(moby, 4, 1);
+                    else SetMobyState(moby, 3, 1);
                 }
             }
             break;
         case 2:
-            *(int *)(st + 0x278) = 0;
-            if (*(int *)(st + 0x258) == 1) obj[0x95] = 1;
-            else if (*(int *)(st + 0x258) == 0) obj[0x95] = 0;
+            *(int *)(vars + 0x278) = 0;
+            if (*(int *)(vars + 0x258) == 1) moby[0x95] = 1;
+            else if (*(int *)(vars + 0x258) == 0) moby[0x95] = 0;
             break;
         case 3:
-            ++*(int *)(st + 0x278);
-            flags = func_002B1C20(obj, st + 0x60);
-            if (flags & 1) {
-                func_002A7750(obj, 8, -1);
-            } else if (flags & 2) {
-                if (*(unsigned char *)(obj + 0x43) != 1) func_002A7470(obj, 1, 0, 10);
-                *(int *)(st + 0x278) = 0;
-                qzero(st + 0x230);
-                obj[0x95] = 0;
+            ++*(int *)(vars + 0x278);
+            hitFlags = DispatchActionByKind(moby, vars + 0x60);
+            if (hitFlags & 1) {
+                SetMobyState(moby, 8, -1);
+            } else if (hitFlags & 2) {
+                if (*(unsigned char *)(moby + 0x43) != 1) StartAnimationBlended(moby, 1, 0, 10);
+                *(int *)(vars + 0x278) = 0;
+                qzero(vars + 0x230);
+                moby[0x95] = 0;
             }
             break;
         }
-        switch ((unsigned char)obj[0x20]) {
+        switch ((unsigned char)moby[0x20]) {
         case 0:
-            func_0026FEB8(D_L06_001B0830);
+            STUB_printf(D_L06_001B0830);
             break;
         case 2: {
             char *path;
-            if (func_L06_00420548(obj, 12.0f, 12.0f,
-                                 func_00283248(*(float *)(st + 0x220) - *(float *)(obj + 0x10),
-                                             *(float *)(st + 0x224) - *(float *)(obj + 0x14)),
+            if (MoveActorTowardGoal(moby, 12.0f, 12.0f,
+                                 FastMatrixHelperA(*(float *)(vars + 0x220) - *(float *)(moby + 0x10),
+                                             *(float *)(vars + 0x224) - *(float *)(moby + 0x14)),
                                  0.0f, 0)) {
-                path = D_L06_001FE500[*(int *)(st + 0x274)];
-                ++*(int *)(st + 0x26C);
-                if (*(int *)(st + 0x26C) >= *(int *)path) {
-                    if (*(int *)(st + 0x2A0) == -1) {
-                        *(int *)(st + 0x26C) = 0;
-                        qcopy(st + 0x220, D_L06_001FE500[*(int *)(st + 0x270)] + 0x10);
-                        qcopy(st + 0x210, st + 0x220);
-                        func_002A7750(obj, 3, -1);
-                    } else func_002A7750(obj, 4, -1);
-                } else qcopy(st + 0x220, ((L06Path *)path)->points[*(int *)(st + 0x26C)]);
+                path = gPathList[*(int *)(vars + 0x274)];
+                ++*(int *)(vars + 0x26C);
+                if (*(int *)(vars + 0x26C) >= *(int *)path) {
+                    if (*(int *)(vars + 0x2A0) == -1) {
+                        *(int *)(vars + 0x26C) = 0;
+                        qcopy(vars + 0x220, gPathList[*(int *)(vars + 0x270)] + 0x10);
+                        qcopy(vars + 0x210, vars + 0x220);
+                        SetMobyState(moby, 3, -1);
+                    } else SetMobyState(moby, 4, -1);
+                } else qcopy(vars + 0x220, ((L06Path *)path)->points[*(int *)(vars + 0x26C)]);
             }
             break;
         }
@@ -172,21 +173,21 @@ void func_L06_00420AE8(char *obj)
                 float fraction, distance, yaw;
                 char *path, *up;
                 int node;
-                func_L06_00382608(obj, *(int *)(st + 0x270), 0x80808080, 4, 1, 0.75f);
-                path = D_L06_001FE500[*(int *)(st + 0x270)];
-                node = func_L06_00382850(st + 0x1C0, path, 0.0f);
+                DrawPath(moby, *(int *)(vars + 0x270), 0x80808080, 4, 1, 0.75f);
+                path = gPathList[*(int *)(vars + 0x270)];
+                node = FindPointNearestWantedDistance(vars + 0x1C0, path, 0.0f);
                 if (node > 0)
-                    func_00282CF0(basis.direction, path + ((node << 4) + 0x10), path + (node << 4));
+                    FastVecSub(basis.direction, path + ((node << 4) + 0x10), path + (node << 4));
                 else
-                    func_00282CF0(basis.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
+                    FastVecSub(basis.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
                 up = D_L06_001AC520;
-                func_00282F20(basis.direction, basis.direction, 1.0f);
+                vec_scale_to_length(basis.direction, basis.direction, 1.0f);
                 qcopy(basis.up, up);
-                func_00282DD8(basis.side, basis.direction, basis.up);
-                func_00283698(basis.inverse, basis.direction);
-                func_00282CF0(offset, st + 0x1C0, path + ((node << 4) + 0x10));
-                func_002830C0(offset, offset, basis.inverse);
-                qcopy(target, D_00189EA0);
+                FastVecCross(basis.side, basis.direction, basis.up);
+                matrix_from_basis_rows(basis.inverse, basis.direction);
+                FastVecSub(offset, vars + 0x1C0, path + ((node << 4) + 0x10));
+                transform_vector(offset, offset, basis.inverse);
+                qcopy(target, gHeroPosition);
                 target[2] += 2.0f;
                 /* Retail restarts from the target before each component update. */
                 qcopy(test, target);
@@ -196,53 +197,53 @@ void func_L06_00420AE8(char *obj)
                 qcopy(test, target);
                 test[2] += offset[2];
                 index = node;
-                while (index > 0 && func_00282E80(st + 0x1C0, path + ((index << 4) + 0x10)) < 6.0f)
+                while (index > 0 && vec_distance_xy(vars + 0x1C0, path + ((index << 4) + 0x10)) < 6.0f)
                     --index;
-                distance = func_00282E80(st + 0x1C0, path + ((index << 4) + 0x10)) - 6.0f;
+                distance = vec_distance_xy(vars + 0x1C0, path + ((index << 4) + 0x10)) - 6.0f;
                 fraction = 0.0f;
-                func_L03_00339128(path + ((index << 4) + 0x10), obj, 2, 0x80000080, 0x7F, 20, 255, 0.33f);
-                func_L00_00341820(path, target, &index, &fraction, 0, distance);
-                func_L03_00339128(target, obj, 3, 0x80008000, 0x7F, 20, 255, 1.0f);
-                yaw = func_00283248(*(float *)(st + 0x1C0) - *(float *)(obj + 0x10),
-                                   *(float *)(st + 0x1C4) - *(float *)(obj + 0x14));
-                if (func_00282E80(obj + 0x10, st + 0x1C0) > 8.0f)
-                    yaw = func_00283B98(yaw, func_00283198(func_002ABB18(func_00283CE0(D_L06_001B2348) * 0.02f)) * 0.7853982448577881f);
-                index = func_L06_00382850(target, path, 0.0f);
-                if (func_L06_00420548(obj, 12.0f, 6.0f, yaw, 0.0f, 1)) {
+                CreateTimedEffectEntry(path + ((index << 4) + 0x10), moby, 2, 0x80000080, 0x7F, 20, 255, 0.33f);
+                Spline_AdvanceByDistance(path, target, &index, &fraction, 0, distance);
+                CreateTimedEffectEntry(target, moby, 3, 0x80008000, 0x7F, 20, 255, 1.0f);
+                yaw = FastMatrixHelperA(*(float *)(vars + 0x1C0) - *(float *)(moby + 0x10),
+                                   *(float *)(vars + 0x1C4) - *(float *)(moby + 0x14));
+                if (vec_distance_xy(moby + 0x10, vars + 0x1C0) > 8.0f)
+                    yaw = FastAddRotations(yaw, FastSinOrCosB(WrapAngleToPi(IntToFloat(D_L06_001B2348) * 0.02f)) * 0.7853982448577881f);
+                index = FindPointNearestWantedDistance(target, path, 0.0f);
+                if (MoveActorTowardGoal(moby, 12.0f, 6.0f, yaw, 0.0f, 1)) {
                     int desired = index;
-                    if (desired < *(int *)(st + 0x26C)) ++desired;
+                    if (desired < *(int *)(vars + 0x26C)) ++desired;
                     else --desired;
                     if (desired < 0) desired = 0;
-                    if (desired < *(int *)(st + 0x26C)) {
-                        --*(int *)(st + 0x26C);
-                        qcopy(st + 0x210, ((L06Path *)path)->points[*(int *)(st + 0x26C)]);
-                    } else if (desired > *(int *)(st + 0x26C)) {
-                        ++*(int *)(st + 0x26C);
-                        qcopy(st + 0x210, ((L06Path *)path)->points[*(int *)(st + 0x26C)]);
+                    if (desired < *(int *)(vars + 0x26C)) {
+                        --*(int *)(vars + 0x26C);
+                        qcopy(vars + 0x210, ((L06Path *)path)->points[*(int *)(vars + 0x26C)]);
+                    } else if (desired > *(int *)(vars + 0x26C)) {
+                        ++*(int *)(vars + 0x26C);
+                        qcopy(vars + 0x210, ((L06Path *)path)->points[*(int *)(vars + 0x26C)]);
                     } else {
-                        qcopy(st + 0x210, target);
-                        *(int *)(st + 0x26C) = desired;
+                        qcopy(vars + 0x210, target);
+                        *(int *)(vars + 0x26C) = desired;
                     }
-                    if (*(int *)(st + 0x26C) > *(int *)path - 1)
-                        *(int *)(st + 0x26C) = *(int *)path - 1;
-                    else if (*(int *)(st + 0x26C) < 0)
-                        *(int *)(st + 0x26C) = 0;
+                    if (*(int *)(vars + 0x26C) > *(int *)path - 1)
+                        *(int *)(vars + 0x26C) = *(int *)path - 1;
+                    else if (*(int *)(vars + 0x26C) < 0)
+                        *(int *)(vars + 0x26C) = 0;
                 }
-                node = *(int *)(st + 0x26C);
+                node = *(int *)(vars + 0x26C);
                 if (node > 0)
-                    func_00282CF0(basis2.direction, path + ((node << 4) + 0x10), path + (node << 4));
+                    FastVecSub(basis2.direction, path + ((node << 4) + 0x10), path + (node << 4));
                 else
-                    func_00282CF0(basis2.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
-                func_00282F20(basis2.direction, basis2.direction, 1.0f);
+                    FastVecSub(basis2.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
+                vec_scale_to_length(basis2.direction, basis2.direction, 1.0f);
                 qcopy(basis2.up, D_L06_001AC520);
-                func_00282DD8(basis2.side, basis2.direction, basis2.up);
+                FastVecCross(basis2.side, basis2.direction, basis2.up);
                 offset[0] = 0.0f;
                 offset[2] = 0.0f;
-                if (offset[1] > *(float *)(st + 0x29C)) offset[1] = *(float *)(st + 0x29C);
-                else if (offset[1] < -*(float *)(st + 0x29C)) offset[1] = -*(float *)(st + 0x29C);
-                func_00283098(offset, offset, basis2.direction);
-                func_00282CC0(st + 0x220, st + 0x210, offset);
-                func_L03_00339128(st + 0x220, obj, 5, 0x80800080, 0x7F, 30, 255, 1.2f);
+                if (offset[1] > *(float *)(vars + 0x29C)) offset[1] = *(float *)(vars + 0x29C);
+                else if (offset[1] < -*(float *)(vars + 0x29C)) offset[1] = -*(float *)(vars + 0x29C);
+                matrix_mul_vec3(offset, offset, basis2.direction);
+                FastVecAdd(vars + 0x220, vars + 0x210, offset);
+                CreateTimedEffectEntry(vars + 0x220, moby, 5, 0x80800080, 0x7F, 30, 255, 1.2f);
             }
             break;
         }
@@ -254,79 +255,79 @@ void func_L06_00420AE8(char *obj)
                 L06Basis basis;
                 float target[4], offset[4], velocity[4], acceleration[4], shot[4], joint[4];
                 float width, height, distance, phase;
-                char *record = D_L06_001B290C + (*(int *)(st + 0x2A0) << 7);
-                func_00282CF0(local, st + 0x190, record + 0x30);
-                func_002833F0(basis.direction, record + 0x70);
-                func_00283698(basis.inverse, basis.direction);
-                func_002830C0(local, local, basis.inverse);
+                char *record = D_L06_001B290C + (*(int *)(vars + 0x2A0) << 7);
+                FastVecSub(local, vars + 0x190, record + 0x30);
+                euler_rotation_basis(basis.direction, record + 0x70);
+                matrix_from_basis_rows(basis.inverse, basis.direction);
+                transform_vector(local, local, basis.inverse);
                 local[0] -= 6.0f;
-                width = func_00282DF0(record);
-                height = func_00282DF0(record + 0x10);
+                width = FastVecLength(record);
+                height = FastVecLength(record + 0x10);
                 if (local[0] > width) local[0] = width;
                 else if (local[0] < -width) local[0] = -width;
                 if (local[1] > height) local[1] = height;
                 else if (local[1] < -height) local[1] = -height;
                 local[2] = 0.0f;
-                func_00283098(local, local, basis.direction);
-                func_00282CC0(st + 0x220, record + 0x30, local);
-                if (*(int *)(st + 0x258) == 0) {
-                    char *path = D_L06_001FE500[*(int *)(st + 0x274)];
-                    qcopy(st + 0x220, ((L06Path *)path)->points[*(int *)path - 1]);
+                matrix_mul_vec3(local, local, basis.direction);
+                FastVecAdd(vars + 0x220, record + 0x30, local);
+                if (*(int *)(vars + 0x258) == 0) {
+                    char *path = gPathList[*(int *)(vars + 0x274)];
+                    qcopy(vars + 0x220, ((L06Path *)path)->points[*(int *)path - 1]);
                 }
-                if (func_00282E80(obj + 0x10, *(char **)(st + 0x1A0) + 0x10) < 13.0f) {
-                    target[0] = func_00283180(*(float *)(record + 0x78)) * 8.0f;
-                    target[1] = func_00283198(*(float *)(record + 0x78)) * 8.0f;
+                if (vec_distance_xy(moby + 0x10, *(char **)(vars + 0x1A0) + 0x10) < 13.0f) {
+                    target[0] = FastSinOrCosA(*(float *)(record + 0x78)) * 8.0f;
+                    target[1] = FastSinOrCosB(*(float *)(record + 0x78)) * 8.0f;
                     target[2] = 0.0f;
-                    func_00282CC0(target, obj + 0x10, target);
-                    *(L06Quad *)(st + 0x220) = *(L06Quad *)target;
+                    FastVecAdd(target, moby + 0x10, target);
+                    *(L06Quad *)(vars + 0x220) = *(L06Quad *)target;
                 }
-                if (*(int *)(st + 0x334)) qcopy(st + 0x220, obj + 0x10);
-                *(float *)(st + 0x228) = *(float *)(record + 0x38) + 1.0f;
-                if ((unsigned char)obj[0x20] == 6)
-                    func_00283248(*(float *)(st + 0x190) - *(float *)(obj + 0x10),
-                                *(float *)(st + 0x194) - *(float *)(obj + 0x14));
-                func_L06_00420740(obj, 1, basis.direction, basis.inverse,
-                    func_00283248(*(float *)(st + 0x190) - *(float *)(obj + 0x10),
-                                *(float *)(st + 0x194) - *(float *)(obj + 0x14)),
+                if (*(int *)(vars + 0x334)) qcopy(vars + 0x220, moby + 0x10);
+                *(float *)(vars + 0x228) = *(float *)(record + 0x38) + 1.0f;
+                if ((unsigned char)moby[0x20] == 6)
+                    FastMatrixHelperA(*(float *)(vars + 0x190) - *(float *)(moby + 0x10),
+                                *(float *)(vars + 0x194) - *(float *)(moby + 0x14));
+                MoveActorWithLocalAxes(moby, 1, basis.direction, basis.inverse,
+                    FastMatrixHelperA(*(float *)(vars + 0x190) - *(float *)(moby + 0x10),
+                                *(float *)(vars + 0x194) - *(float *)(moby + 0x14)),
                     0.0f, 5.0f, 12.0f, 10.0f, 10.0f, 10.0f, 10.0f, 0.02f, 6.0f);
-                distance = func_00282E80(obj + 0x10, st + 0x190);
-                func_0029FCC0(obj, 4, target);
-                func_00282CF0(offset, st + 0x190, st + 0x190);
-                func_00282D30(offset, offset, 0.0f);
-                func_00282CC0(offset, offset, st + 0x190);
-                *(float *)(st + 0x314) = func_00283248(func_00282E80(st + 0x190, target), target[2] - *(float *)(st + 0x198));
-                func_002AEC48(obj, st + 0x2B0, 1, 0.03f, 0.3f);
-                if (distance < *(float *)(st + 0x338) * 20.0f) {
-                    if (*(unsigned char *)(obj + 0x43) != 4) {
-                        *(float *)(obj + 0x48) = 0.5f;
-                        if (*(unsigned char *)(obj + 0x43) != 3) func_002A7470(obj, 3, 0, 10);
-                    } else if ((unsigned char)obj[0x42] == *(unsigned char *)(obj + 0x43) && (obj[0x60] & 2)) {
-                        *(float *)(obj + 0x48) = 0.5f;
-                        func_002A7470(obj, 3, 0, 10);
+                distance = vec_distance_xy(moby + 0x10, vars + 0x190);
+                TransformMobyJointToWorld(moby, 4, target);
+                FastVecSub(offset, vars + 0x190, vars + 0x190);
+                FastVecScale(offset, offset, 0.0f);
+                FastVecAdd(offset, offset, vars + 0x190);
+                *(float *)(vars + 0x314) = FastMatrixHelperA(vec_distance_xy(vars + 0x190, target), target[2] - *(float *)(vars + 0x198));
+                UpdateEasedNode(moby, vars + 0x2B0, 1, 0.03f, 0.3f);
+                if (distance < *(float *)(vars + 0x338) * 20.0f) {
+                    if (*(unsigned char *)(moby + 0x43) != 4) {
+                        *(float *)(moby + 0x48) = 0.5f;
+                        if (*(unsigned char *)(moby + 0x43) != 3) StartAnimationBlended(moby, 3, 0, 10);
+                    } else if ((unsigned char)moby[0x42] == *(unsigned char *)(moby + 0x43) && (moby[0x60] & 2)) {
+                        *(float *)(moby + 0x48) = 0.5f;
+                        StartAnimationBlended(moby, 3, 0, 10);
                     }
-                    func_0029FC20(obj, 1, joint);
-                    func_00282F20(velocity, joint, 0.3333333432674408f);
-                    func_00282CC0(velocity, velocity, st + 0x230);
-                    func_00282D30(acceleration, velocity, 1.0f / func_00283CE0(6));
-                    if ((unsigned char)obj[0x42] == 3) {
-                        phase = func_0029F530(obj);
+                    TransformMobyJointPoint(moby, 1, joint);
+                    vec_scale_to_length(velocity, joint, 0.3333333432674408f);
+                    FastVecAdd(velocity, velocity, vars + 0x230);
+                    FastVecScale(acceleration, velocity, 1.0f / IntToFloat(6));
+                    if ((unsigned char)moby[0x42] == 3) {
+                        phase = GetMobyAnimationValue(moby);
                         if (phase >= 4.0f) {
                             if (phase < 4.4f) {
-                                func_00282CF0(shot, st + 0x190, target);
-                                func_00282F20(shot, shot, 0.3333333432674408f);
-                                func_003280C8(obj, shot, target, 0, 0, *(float *)(st + 0x2A8));
-                                *(float *)(st + 0x2AC) += 1.0f;
+                                FastVecSub(shot, vars + 0x190, target);
+                                vec_scale_to_length(shot, shot, 0.3333333432674408f);
+                                SpawnSpinningEffectMoby(moby, shot, target, 0, 0, *(float *)(vars + 0x2A8));
+                                *(float *)(vars + 0x2AC) += 1.0f;
                             }
                         }
-                        if (*(float *)(st + 0x2AC) == 4.0f) {
-                            *(float *)(st + 0x2AC) = 0.0f;
-                            if (*(unsigned char *)(obj + 0x43) != 4) func_002A7470(obj, 4, 0, 10);
-                            *(float *)(obj + 0x48) = 0.5f;
+                        if (*(float *)(vars + 0x2AC) == 4.0f) {
+                            *(float *)(vars + 0x2AC) = 0.0f;
+                            if (*(unsigned char *)(moby + 0x43) != 4) StartAnimationBlended(moby, 4, 0, 10);
+                            *(float *)(moby + 0x48) = 0.5f;
                         }
                     }
                 } else {
-                    *(float *)(obj + 0x48) = 1.0f;
-                    if (*(unsigned char *)(obj + 0x43) != 0) func_002A7470(obj, 0, 0, 10);
+                    *(float *)(moby + 0x48) = 1.0f;
+                    if (*(unsigned char *)(moby + 0x43) != 0) StartAnimationBlended(moby, 0, 0, 10);
                 }
             }
             break;
@@ -336,31 +337,31 @@ void func_L06_00420AE8(char *obj)
             char *rec, *effect;
             int i;
             /* Retail reads sp+0x10 here without initializing it on this path. */
-            func_00282CF0(direction, D_L06_001B9840, local);
-            func_00282F20(direction, direction, 1.0f);
-            func_0032DA58(obj, obj + 0x10, direction, 5.0f);
-            func_002E5CF8(3, 0, obj);
-            if (*(int *)(st + 0x254) != -1) {
-                rec = D_00188660 + *(int *)(st + 0x254) * 0x70;
-                if (*(char **)(rec + 0x88) == obj && *(unsigned char *)(rec + 0x74))
-                    func_002E59F8(*(int *)(st + 0x254));
+            FastVecSub(direction, D_L06_001B9840, local);
+            vec_scale_to_length(direction, direction, 1.0f);
+            SpawnBlastEffectMoby(moby, moby + 0x10, direction, 5.0f);
+            PlayMobySound(3, 0, moby);
+            if (*(int *)(vars + 0x254) != -1) {
+                rec = gSoundState + *(int *)(vars + 0x254) * 0x70;
+                if (*(char **)(rec + 0x88) == moby && *(unsigned char *)(rec + 0x74))
+                    StopSoundVoice(*(int *)(vars + 0x254));
             }
-            *(int *)(st + 0x254) = -1;
+            *(int *)(vars + 0x254) = -1;
             for (i = 0; i < 6; ++i) {
-                func_002A7A00(velocity, 0.13333334028720856f, 0.20000001788139343f);
-                velocity[2] = func_00282C48(velocity[2]) * 2.5f;
-                func_00282CC0(velocity, velocity, D_L06_001A8F20);
-                effect = func_00273730(obj, 1, *(short *)(obj + 0xAA), i, obj + 0x10, obj + 0xF0, velocity, 255, 30.0f, 15.0f);
-                *(void (**)(void))(effect + 0x64) = func_00310C88;
+                RandomDirectionVector(velocity, 0.13333334028720856f, 0.20000001788139343f);
+                velocity[2] = FloatAbs(velocity[2]) * 2.5f;
+                FastVecAdd(velocity, velocity, D_L06_001A8F20);
+                effect = CreateCameraMoby(moby, 1, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0, velocity, 255, 30.0f, 15.0f);
+                *(void (**)(void))(effect + 0x64) = UpdateFadeOutMoby;
             }
-            func_002A6C58(obj, 0, 3);
-            func_0029F338(obj);
+            SetDeathBits(moby, 0, 3);
+            MarkMobySpawned(moby);
             goto done;
         }
         default:
             break;
         }
-        func_L06_0041FD90(obj);
+        TickActorTimersAndSpawnDust(moby);
     }
 done:
     return;

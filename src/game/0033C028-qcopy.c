@@ -1,3 +1,4 @@
+#include "names.h"
 struct SolIds {
     int ids[2];
 };
@@ -13,6 +14,7 @@ extern void func_0027FAA8(int, int, unsigned long, char *, int);
 extern void func_002802E0(void *, int, int, int, int, int, int, int, int);
 extern void func_00280190(void *, unsigned long, char *, int);
 
+/* Draws the on/off option menu with its setting line and a help box underneath. */
 void func_0033C028(char *object)
 {
     char buffer[64];
@@ -24,19 +26,19 @@ void func_0033C028(char *object)
     float x;
     int w, h;
 
-    func_0033AF48(object + 8);
+    DrawButtonPromptBar(object + 8);
     pair = D_001ADDD0;
     format = D_001ADDD8;
-    first = func_00288FB8(0x31E5);
-    second = func_00288FB8(pair.ids[D_001A7BB8 != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FAA8(D_001A7340 >> 1, 0x8C, 0x80F0F0F0UL, buffer, -1);
+    first = GetLocalizedString(0x31E5);
+    second = GetLocalizedString(pair.ids[gWidescreenFlag != 0]);
+    Sprintf(buffer, format, first, second);
+    DrawTextCenteredSmallFont(gScreenWidth >> 1, 0x8C, 0x80F0F0F0UL, buffer, -1);
     x = D_001B23A4;
     w = (int)(x * 170.0f + 0.5f);
     if (w != 0)
         h = (int)(x * 379.0f + 0.5f);
     else
         h = (int)(x * 379.0f + 0.5f);
-    func_002802E0(scratch, w, h, 44, 468, 254, 222, 20, 3);
-    func_00280190(scratch, 0x80F0F0F0UL, func_00288FB8(0x32A8), -1);
+    FontSetWindow(scratch, w, h, 44, 468, 254, 222, 20, 3);
+    DrawTextWindowSmallFont(scratch, 0x80F0F0F0UL, GetLocalizedString(0x32A8), -1);
 }

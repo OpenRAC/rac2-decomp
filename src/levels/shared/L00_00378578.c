@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Selected-item prompt and panel; the model has 28-byte trailing records. */
 typedef struct {
@@ -18,29 +19,30 @@ extern int func_0027FB40(int, int, unsigned long long, unsigned char *, int);
 extern int func_0028E588(int, int);
 extern void func_0028E868(int, int, int, int, int, int);
 
+/* Draws the buy and back labels and the item picture and two text lines on the right of the panel. */
 void func_L00_00378578(void) {
-    UpgradeModel *model = &D_L00_0022F7C0;
+    UpgradeModel *model = &gPurchaseMenuModel;
     int index = model->index;
     if (model->state != 0) {
         if (model->cells[index].price <= D_001A79FC) {
-            func_0027FB40(438, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
-                          (unsigned char *)func_00288FB8(0x113B), -1);
-            func_0027FB40(438, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
-                          (unsigned char *)func_00288FB8(0x1138), -1);
+            DrawTextCenteredMediumFont(438, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
+                          (unsigned char *)GetLocalizedString(0x113B), -1);
+            DrawTextCenteredMediumFont(438, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+                          (unsigned char *)GetLocalizedString(0x1138), -1);
         } else {
-            func_0027FB40(438, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
-                          (unsigned char *)func_00288FB8(0x1124), -1);
+            DrawTextCenteredMediumFont(438, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+                          (unsigned char *)GetLocalizedString(0x1124), -1);
         }
     } else {
-        func_0027FB40(438, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
-                      (unsigned char *)func_00288FB8(0x1125), -1);
-        func_0027FB40(438, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
-                      (unsigned char *)func_00288FB8(0x2D4F), -1);
+        DrawTextCenteredMediumFont(438, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
+                      (unsigned char *)GetLocalizedString(0x1125), -1);
+        DrawTextCenteredMediumFont(438, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+                      (unsigned char *)GetLocalizedString(0x2D4F), -1);
     }
-    func_0028E868(func_0028E588(0xEAA8, 1), 402, (int)(D_L00_001B25E0 * 64.0f + 0.5f), 89,
+    DrawHudSprite(GetIconFrame(0xEAA8, 1), 402, (int)(D_L00_001B25E0 * 64.0f + 0.5f), 89,
                   (int)(D_L00_001B25E0 * 115.0f + 0.5f), 64);
-    func_0027FB40(445, (int)(D_L00_001B25E0 * 130.0f + 0.5f), 0x80F0F0F0ULL,
+    DrawTextCenteredMediumFont(445, (int)(D_L00_001B25E0 * 130.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)D_L00_001AD788, -1);
-    func_0027FB40(445, (int)(D_L00_001B25E0 * 148.0f + 0.5f), 0x80F0F0F0ULL,
+    DrawTextCenteredMediumFont(445, (int)(D_L00_001B25E0 * 148.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)D_L00_001AD790, -1);
 }

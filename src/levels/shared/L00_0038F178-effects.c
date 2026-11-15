@@ -14,24 +14,24 @@ void func_L00_0038F178(char *actor) {
     float offset[4], velocity[4], jitter[4];
     float *jitterPoint, *velocityPoint;
     int firstColor, lastColor, kind, duration, size, count;
-    if (D_L00_001B19C8 & 7) return;
+    if (gFrameCounter_L00 & 7) return;
     jitterPoint = jitter;
     velocityPoint = velocity;
     count = 0;
     do {
         count--;
-        func_00282D30(offset, state, 0.5f);
-        func_002A7A00(jitterPoint, 0.0f, 0.016666668f);
-        func_00282CC0(offset, jitterPoint, offset);
-        func_00282C88((Quad *)velocityPoint);
-        offset[3] = func_002A7878(0.25f, 0.15f);
-        velocity[3] = func_002A7878(0.15f, 0.05f);
-        firstColor = func_00283D38(0x804080FF, 0x8040FFFF, func_002A7878(0.0f, 1.0f));
-        lastColor = func_00283D38(0x80104040, 0x80002080, func_002A7878(0.0f, 1.0f));
-        kind = func_00283CF0(func_002A7878(0.0f, 1.0f) + 1.0f);
-        duration = func_00283CF0((func_002A7878(-0.5f, 0.5f) + 1.0f) * 30.0f);
-        size = func_00283CF0((func_002A7878(-0.5f, 0.5f) + 1.0f) * 10.0f);
-        func_002B00D8(actor + 0x10, velocityPoint, velocityPoint, (float)duration * 0.0011111111f);
-        func_002BAA28(actor + 0x10, offset, velocityPoint, firstColor, lastColor, kind, duration, size, 0x10019);
+        FastVecScale(offset, state, 0.5f);
+        RandomDirectionVector(jitterPoint, 0.0f, 0.016666668f);
+        FastVecAdd(offset, jitterPoint, offset);
+        ClearVector128((Quad *)velocityPoint);
+        offset[3] = RandomFloatRange(0.25f, 0.15f);
+        velocity[3] = RandomFloatRange(0.15f, 0.05f);
+        firstColor = FastTweenColor(0x804080FF, 0x8040FFFF, RandomFloatRange(0.0f, 1.0f));
+        lastColor = FastTweenColor(0x80104040, 0x80002080, RandomFloatRange(0.0f, 1.0f));
+        kind = FloatToInt(RandomFloatRange(0.0f, 1.0f) + 1.0f);
+        duration = FloatToInt((RandomFloatRange(-0.5f, 0.5f) + 1.0f) * 30.0f);
+        size = FloatToInt((RandomFloatRange(-0.5f, 0.5f) + 1.0f) * 10.0f);
+        OffsetPositionAlongGravity(actor + 0x10, velocityPoint, velocityPoint, (float)duration * 0.0011111111f);
+        SpawnTrailParticle_002BAA28(actor + 0x10, offset, velocityPoint, firstColor, lastColor, kind, duration, size, 0x10019);
     } while (count >= 0);
 }

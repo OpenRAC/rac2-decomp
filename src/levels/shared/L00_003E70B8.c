@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad_000[0x140];
@@ -34,43 +35,44 @@ extern void func_00280B90(char *pkt, float *matrix, int mode);
    Its own unit: the two bodies it calls are C in L00_003E3258.c, and a call inside one
    object fixes the distance between the two, which the retail does not keep in every
    level.  From here both calls are global and the linker places them per program. */
-void func_L00_003E70B8(char *pos, int a1, int a2, char *a3, int t0,
-                       float fA, float fB, float fC)
+/* Draws one glowing sprite at a position, turned to face the aim point, with the given colour, size and blend. */
+void func_L00_003E70B8(char *position, int colorRgb, int alpha, char *texture, int blendFlags,
+                       float sizeScale, float roll, float offsetScale)
 {
-    char pkt[144];
-    float m[16];
-    float quat[4];
-    float off[4];
-    long long r;
+    char drawPacket[144];
+    float orientation[16];
+    float aim[4];
+    float towardAim[4];
+    long long textureReg;
 
-    ref_L00_003E70B8_00(pkt);
-    r = func_0027C878(a3);
+    ref_L00_003E70B8_00(drawPacket);
+    textureReg = GetEffectTextureDescriptor(texture);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(drawPacket + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(drawPacket + 128) = 280993940374112LL;
+    *(int *)(drawPacket + 76) = colorRgb + (alpha << 24);
+    *(int *)(drawPacket + 72) = colorRgb + (alpha << 24);
+    *(int *)(drawPacket + 68) = colorRgb + (alpha << 24);
+    *(int *)(drawPacket + 64) = colorRgb + (alpha << 24);
+    *(long long *)(drawPacket + 112) = 0LL;
+    *(long long *)(drawPacket + 120) = textureReg;
 
-    quat[3] = 0.0f;
-    quat[2] = func_00283248(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
-                            D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_L00_001B8C80.x_140),
-                             D_L00_001B8C80.z_148 - *(float *)(pos + 8));
-    quat[0] = fB;
+    aim[3] = 0.0f;
+    aim[2] = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(position + 0),
+                            D_L00_001B8C80.y_144 - *(float *)(position + 4));
+    aim[1] = -FastMatrixHelperA(vec_distance_xy(position, &D_L00_001B8C80.x_140),
+                             D_L00_001B8C80.z_148 - *(float *)(position + 8));
+    aim[0] = roll;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_L00_001B8C80.x_140, pos);
-    func_00282F20(off, off, fC);
+    euler_to_matrix(orientation, aim);
+    FastVecSub(towardAim, &D_L00_001B8C80.x_140, position);
+    vec_scale_to_length(towardAim, towardAim, offsetScale);
 
-    m[12] = *(float *)(pos + 0) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
+    orientation[12] = *(float *)(position + 0) + towardAim[0];
+    orientation[13] = *(float *)(position + 4) + towardAim[1];
+    orientation[14] = *(float *)(position + 8) + towardAim[2];
+    orientation[15] = 1.0f;
 
-    ref_L00_003E70B8_01(pkt, fA);
-    func_00280B90(pkt, m, 0);
+    ref_L00_003E70B8_01(drawPacket, sizeScale);
+    draw_world_quad(drawPacket, orientation, 0);
 }

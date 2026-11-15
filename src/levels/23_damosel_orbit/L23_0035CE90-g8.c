@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float D_L23_001AFAA0 __attribute__((sda));
 
@@ -14,8 +15,9 @@ extern void func_2F8EA8(char *, int, float);
 
 extern float func_2F91F0(float, float);
 
-void func_L23_003C1AE8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Updates the tether glow of an object: starts its effect once, then advances the glow angle each frame. */
+void func_L23_003C1AE8(char *moby) {
+    char *state = *(char **)(moby + 0x68);
 
     if (*(unsigned char *)(state + 0x371) == 0)
         func_31AF00(*(int *)(state + 0x2A0), 2, state + 0x370);
@@ -24,19 +26,20 @@ void func_L23_003C1AE8(char *arg0) {
                                             D_L23_001AFAA0 * 0.000290888245f);
 }
 
-void func_L23_00415FC8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    unsigned char kind = *(unsigned char *)(arg0 + 0x20);
+/* Starts an object: sets its look and size according to its initial state, then runs the shared setup. */
+void func_L23_00415FC8(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    unsigned char kind = *(unsigned char *)(moby + 0x20);
 
     if (kind == 0) {
-        *(unsigned short *)(arg0 + 0x34) |= 0x100;
-        *(unsigned short *)(arg0 + 0x32) = 0xFF;
-        *(unsigned char *)(arg0 + 0x30) = 0xFF;
+        *(unsigned short *)(moby + 0x34) |= 0x100;
+        *(unsigned short *)(moby + 0x32) = 0xFF;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
         *(float *)(state + 0x20) = 2000.0f;
         *(short *)(state + 0x24) = 2000;
-        *(short *)(arg0 + 0x7C) = 0x3FF;
-        func_3242D0(arg0, 1, 0);
-        *(unsigned short *)(arg0 + 0x34) |= 0x4000;
+        *(short *)(moby + 0x7C) = 0x3FF;
+        func_3242D0(moby, 1, 0);
+        *(unsigned short *)(moby + 0x34) |= 0x4000;
     } else if (kind == 1) {
         float f = D_L23_001B13C8;
 
@@ -44,9 +47,9 @@ void func_L23_00415FC8(char *arg0) {
             *(float *)(state + 0x20) = f;
             *(short *)(state + 0x24) = f;
         }
-        func_3242D0(arg0, 2, 0);
+        func_3242D0(moby, 2, 0);
     }
-    func_L23_004160B0(arg0);
+    HandleHitAndSpawnSparks(moby);
 }
 
 extern int D_L23_001B36B0;
@@ -64,16 +67,16 @@ extern float func_00282DB0(char *a, char *b);
 /* in state 8, with the flag at 0x001B36B0 clear, the object drawn and the half-word at +0x324 of
    its state set: compares the normalised offset from D_00189EA0 with the vector at +0xC0 of the
    object D_00189EA0 holds at +0x2210, and within the threshold hands back the float at +0x27C */
-int func_L23_003C19E0(char *arg0, float *arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+int func_L23_003C19E0(char *moby, float *outValue) {
+    char *state = *(char **)(moby + 0x68);
     char dir[16];
 
-    if (*(unsigned char *)(arg0 + 0x20) == 8 && D_L23_001B36B0 == 0 &&
-        *(unsigned char *)(arg0 + 0x31) != 0 && *(short *)(state + 0x324) != 0) {
-        func_00282CF0(dir, arg0 + 0x10, D_00189EA0);
-        func_00282F20(dir, dir, 1.0f);
-        if (func_00282DB0(dir, (char *)(*(int *)(D_00189EA0 + 0x2210) + 0xC0)) <= D_L23_001AFAB4) {
-            *arg1 = *(float *)(*(char **)(arg0 + 0x68) + 0x27C);
+    if (*(unsigned char *)(moby + 0x20) == 8 && D_L23_001B36B0 == 0 &&
+        *(unsigned char *)(moby + 0x31) != 0 && *(short *)(state + 0x324) != 0) {
+        FastVecSub(dir, moby + 0x10, gHeroPosition);
+        vec_scale_to_length(dir, dir, 1.0f);
+        if (FastVecDot(dir, (char *)(*(int *)(gHeroPosition + 0x2210) + 0xC0)) <= D_L23_001AFAB4) {
+            *outValue = *(float *)(*(char **)(moby + 0x68) + 0x27C);
             return 1;
         }
     }

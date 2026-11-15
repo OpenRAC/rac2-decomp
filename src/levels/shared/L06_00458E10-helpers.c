@@ -9,31 +9,32 @@ extern int D_L06_001B3778[];
 
 /* The func_L09_003A06B0 spawn for the level-06 slots: marks slot `index` busy, records it
    in the child's state and clears its handle. */
-char *func_L06_00458E10(char *object, char *a1, char *a2, int index, float f12)
+/* Spawns a child moby (class 4069) in a numbered slot, aimed along a direction. */
+char *func_L06_00458E10(char *object, char *direction, char *position, int index, float speed)
 {
-    char *s1 = func_0029EFD0(0xFE5);
-    char *s0;
-    float d;
+    char *child = CreateMoby(0xFE5 /* moby class 4069 */);
+    char *childVars;
+    float flatLength;
 
-    if (s1 != 0) {
-        *(u8 *)(s1 + 0x30) = 0xFF;
-        *(u16 *)(s1 + 0x32) = 0xFF;
-        *(u8 *)(s1 + 0x31) = 1;
-        *(u8 *)(s1 + 0x20) = 0;
-        *(u64 *)(s1 + 0x38) = *(u64 *)(object + 0x38);
-        qcopy(s1 + 0x10, a2);
+    if (child != 0) {
+        *(u8 *)(child + 0x30) = 0xFF;
+        *(u16 *)(child + 0x32) = 0xFF;
+        *(u8 *)(child + 0x31) = 1;
+        *(u8 *)(child + 0x20) = 0;
+        *(u64 *)(child + 0x38) = *(u64 *)(object + 0x38);
+        qcopy(child + 0x10, position);
         D_L06_001B3760[index] = 1;
-        s0 = *(char **)(s1 + 0x68);
-        qcopy(s0, a1);
-        *(u32 *)(s0 + 0x38) = 0xF0;
-        *(char **)(s0 + 0x3C) = object;
-        *(float *)(s0 + 0x40) = f12;
-        *(int *)(s0 + 0x48) = index;
-        *(int *)(s0 + 0x4C) = -1;
-        *(float *)(s1 + 0xF8) = func_00283248(*(float *)a1, *(float *)(a1 + 4));
-        d = func_00282E20(a1);
-        *(float *)(s1 + 0xF4) = -func_00283248(d, *(float *)(a1 + 8));
+        childVars = *(char **)(child + 0x68);
+        qcopy(childVars, direction);
+        *(u32 *)(childVars + 0x38) = 0xF0;
+        *(char **)(childVars + 0x3C) = object;
+        *(float *)(childVars + 0x40) = speed;
+        *(int *)(childVars + 0x48) = index;
+        *(int *)(childVars + 0x4C) = -1;
+        *(float *)(child + 0xF8) = FastMatrixHelperA(*(float *)direction, *(float *)(direction + 4));
+        flatLength = vec_length_xy(direction);
+        *(float *)(child + 0xF4) = -FastMatrixHelperA(flatLength, *(float *)(direction + 8));
         D_L06_001B3778[index] = -1;
     }
-    return s1;
+    return child;
 }

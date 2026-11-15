@@ -26,10 +26,10 @@ void func_L10_00425508(char *object, int bonus)
     int slot;
     int chance;
 
-    if (func_002A77E0(4) == 0) {
-        switch (func_002A77E0(48)) {
+    if (RandomIntBelow(4) == 0) {
+        switch (RandomIntBelow(48)) {
         case 0: case 1: case 2: case 3:
-            slot = func_002ED8A0(6);
+            slot = FindLastUsedChainEntry(6);
             if (slot < 0 || D_L10_002A3C70[slot].value == D_L10_002A3C70[slot].limit)
                 goto ordinary;
             func_L05_003CD1A8(object);
@@ -37,46 +37,46 @@ void func_L10_00425508(char *object, int bonus)
             D_L10_00221CD0[28]++;
             break;
         case 5:
-            slot = func_002ED8A0(2);
+            slot = FindLastUsedChainEntry(2);
             if (slot < 0 || D_L10_002A3C70[slot].value == D_L10_002A3C70[slot].limit)
                 goto fallback;
-            func_L05_00425FE0(object);
+            SpawnMobyClass117C(object);
             D_L10_00221CD0[26]++;
             D_L10_00221CD0[28]++;
             break;
         case 6:
-            slot = func_002ED8A0(3);
+            slot = FindLastUsedChainEntry(3);
             if (slot < 0 || D_L10_002A3C70[slot].value == D_L10_002A3C70[slot].limit)
                 goto fallback;
-            func_L05_00426568(object);
+            SpawnMobyClass117D(object);
             D_L10_00221CD0[22]++;
             D_L10_00221CD0[28]++;
             break;
         case 7:
-            slot = func_002ED8A0(4);
+            slot = FindLastUsedChainEntry(4);
             if (slot < 0 || D_L10_002A3C70[slot].value == D_L10_002A3C70[slot].limit) {
         case 4:
         fallback:
                 func_L05_003CFC48(object);
                 break;
             }
-            func_L05_00426B08(object);
+            SpawnMobyClass117F(object);
             D_L10_00221CD0[27]++;
             D_L10_00221CD0[28]++;
             break;
         default:
         ordinary:
-            func_L05_0041C118(object);
+            SpawnHomingPickup(object);
             D_L10_00221CD0[23]++;
             D_L10_00221CD0[28]++;
             break;
         }
     }
     if (bonus) {
-        chance = D_0013A148[D_001A79F0] * 2;
+        chance = D_0013A148[gCurrentMapIndex] * 2;
         if (chance > 11)
             chance = 11;
-        if (chance >= func_002A77E0(100)) {
+        if (chance >= RandomIntBelow(100)) {
             func_L05_003CD1A8(object);
             D_L10_00221CD0[24]++;
             D_L10_00221CD0[28]++;

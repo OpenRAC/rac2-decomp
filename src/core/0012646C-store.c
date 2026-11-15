@@ -39,27 +39,28 @@ typedef struct {
     SdTrxdir trxdir; long trxdiraddr;
 } SdStoreImage __attribute__((aligned(16)));
 
-int func_0012646C(SdStoreImage *sp, short sbp, short sbw, short spsm, short x, short y, short w, short h)
+/* Builds the command packet that reads an image back from graphics memory. */
+int func_0012646C(SdStoreImage *packet, short sbp, short sbw, short spsm, short x, short y, short w, short h)
 {
-    sp->vifcode[0] = 0;
-    *(unsigned long *)&sp->finish = 0;
-    sp->vifcode[1] = 0x06008000;
-    sp->vifcode[2] = 0x13000000;
-    sp->vifcode[3] = 0x50000006;
-    *(u128_sd *)&sp->giftag = (u128_sd)0;
-    sp->giftag.NLOOP = 5;
-    sp->giftag.EOP = 1;
-    sp->giftag.NREG = 1;
-    sp->giftag.REGS0 = 0xE;
-    *(unsigned long *)&sp->bitbltbuf = (unsigned long)sbp | ((unsigned long)sbw << 16) | ((unsigned long)spsm << 24);
-    sp->bitbltbufaddr = 0x50;
-    *(unsigned long *)&sp->trxpos = (unsigned long)x | ((unsigned long)y << 16);
-    sp->trxposaddr = 0x51;
-    *(unsigned long *)&sp->trxreg = (unsigned long)w | ((unsigned long)h << 32);
-    sp->trxregaddr = 0x52;
-    sp->finishaddr = 0x61;
-    *(unsigned long *)&sp->trxdir = 1;
-    sp->trxdiraddr = 0x53;
+    packet->vifcode[0] = 0;
+    *(unsigned long *)&packet->finish = 0;
+    packet->vifcode[1] = 0x06008000;
+    packet->vifcode[2] = 0x13000000;
+    packet->vifcode[3] = 0x50000006;
+    *(u128_sd *)&packet->giftag = (u128_sd)0;
+    packet->giftag.NLOOP = 5;
+    packet->giftag.EOP = 1;
+    packet->giftag.NREG = 1;
+    packet->giftag.REGS0 = 0xE;
+    *(unsigned long *)&packet->bitbltbuf = (unsigned long)sbp | ((unsigned long)sbw << 16) | ((unsigned long)spsm << 24);
+    packet->bitbltbufaddr = 0x50;
+    *(unsigned long *)&packet->trxpos = (unsigned long)x | ((unsigned long)y << 16);
+    packet->trxposaddr = 0x51;
+    *(unsigned long *)&packet->trxreg = (unsigned long)w | ((unsigned long)h << 32);
+    packet->trxregaddr = 0x52;
+    packet->finishaddr = 0x61;
+    *(unsigned long *)&packet->trxdir = 1;
+    packet->trxdiraddr = 0x53;
     CpuSync();
     return 7;
 }

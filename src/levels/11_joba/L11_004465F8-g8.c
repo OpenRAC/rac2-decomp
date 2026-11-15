@@ -54,33 +54,33 @@ extern void func_449878(char *a0);
 extern u8 *D_L11_001FC420[];
 extern u8 *D_L11_001B359C __attribute__((sda));
 
-s32 func_L11_00448D28(u8 *a0)
+s32 func_L11_00448D28(u8 *object)
 {
-    u8 *base;
-    u8 *p;
-    u16 *q;
-    u8 *e;
-    s32 n;
+    u8 *pool;
+    u8 *idList;
+    u16 *idPtr;
+    u8 *entity;
+    s32 count;
 
-    if (a0[0x21] == 0xFF)
+    if (object[0x21] == 0xFF)
         return 0;
-    p = D_L11_001FC420[a0[0x21]];
-    if (p == 0)
+    idList = gGroupIdLists[object[0x21]];
+    if (idList == 0)
         return 0;
-    q = (u16 *)p;
-    base = D_L11_001B359C;
-    n = 0;
+    idPtr = (u16 *)idList;
+    pool = gMobyTable_L11;
+    count = 0;
     for (;;) {
-        e = base + (*q & 0x7FFF) * 256;
-        if (e != 0 && e[0x20] != 0xFE && e[0x20] != 0xFD && *(s16 *)(e + 0xAA) == 0xD98
-            && e[0x95] == 6 && *(s16 *)(*(char **)(e + 0x68) + 0x366) == 1) {
-            n++;
-            if (n >= 3)
+        entity = pool + (*idPtr & 0x7FFF) * 256;
+        if (entity != 0 && entity[0x20] != 0xFE && entity[0x20] != 0xFD && *(s16 *)(entity + 0xAA) == 0xD98 /* moby class 3480 */
+            && entity[0x95] == 6 && *(s16 *)(*(char **)(entity + 0x68) + 0x366) == 1) {
+            count++;
+            if (count >= 3)
                 return 1;
         }
-        if ((s16)*q < 0)
+        if ((s16)*idPtr < 0)
             break;
-        q++;
+        idPtr++;
     }
     return 0;
 }
@@ -96,14 +96,14 @@ extern s32 D_L11_001B1C54;
 
 /* hands the object's 0x270 and 0x370 tables, its 0x4B0/0x4B4/0x4B8 words and the level's
    own 0x1B1C50/0x1B1C54 state to the scene manager */
-void func_L11_0044C220(char *a0)
+void func_L11_0044C220(char *moby)
 {
-    char *v0 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    func_2FD7E8(&D_L11_001B1C10, 4, v0 + 0x270, v0 + 0x370,
-                *(s32 *)(v0 + 0x4B4), *(s32 *)(v0 + 0x4B0),
+    func_2FD7E8(&D_L11_001B1C10, 4, vars + 0x270, vars + 0x370,
+                *(s32 *)(vars + 0x4B4), *(s32 *)(vars + 0x4B0),
                 D_L11_001B1C50, D_L11_001B1C54,
-                *(f32 *)(v0 + 0x4B8));
+                *(f32 *)(vars + 0x4B8));
 }
 
 typedef struct JobObject JobObject;
@@ -196,29 +196,29 @@ void func_L11_004471A8(JobObject *object)
     int chance;
     u16 timer;
 
-    if (func_00282978(&state->spawnTimer)) {
+    if (FastDecTimer(&state->spawnTimer)) {
         timer = D_L11_001B19A8;
         chance = D_L11_001B19AC;
         state->spawnTimer = timer;
-        if (!func_002A77E0(chance)) {
-            qcopy(position, &D_00189EA0);
-            func_00282CF0(velocity, position, func_L11_004417E8(object));
+        if (!RandomIntBelow(chance)) {
+            qcopy(position, &gHeroPosition);
+            FastVecSub(velocity, position, GetArenaCenterPoint(object));
             velocity[2] = 0;
-            func_00282F20(velocity, velocity, D_L11_001B19B4);
-            func_00282CC0(position, velocity, func_L11_004417E8(object));
+            vec_scale_to_length(velocity, velocity, D_L11_001B19B4);
+            FastVecAdd(position, velocity, GetArenaCenterPoint(object));
             position[2] += 5.0f;
         } else {
-            angle = func_002A7878(-3.1415927410125732f, 3.1415927410125732f);
-            base = func_L11_004417E8(object);
-            position[0] = base[0] + D_L11_001B19B4 * func_00283180(angle);
-            base = func_L11_004417E8(object);
-            position[1] = base[1] + D_L11_001B19B4 * func_00283198(angle);
-            position[2] = func_L11_004417E8(object)[2] + 5.0f;
+            angle = RandomFloatRange(-3.1415927410125732f, 3.1415927410125732f);
+            base = GetArenaCenterPoint(object);
+            position[0] = base[0] + D_L11_001B19B4 * FastSinOrCosA(angle);
+            base = GetArenaCenterPoint(object);
+            position[1] = base[1] + D_L11_001B19B4 * FastSinOrCosB(angle);
+            position[2] = GetArenaCenterPoint(object)[2] + 5.0f;
         }
         *(TI128 *)acceleration = 0;
         acceleration[2] = D_L11_001B19B0 * (1.0f / 60.0f);
         *(TI128 *)velocity = *(TI128 *)acceleration;
-        func_L11_0045FDB0(object, velocity, position, state->health, (float)state->f34, 1.0f,
+        CreateJobaSwirlEffect(object, velocity, position, state->health, (float)state->f34, 1.0f,
                           550.0f);
     }
 }
@@ -254,10 +254,10 @@ void func_L11_004484A8(JobObject *object)
 
     if (object->stage == 0) {
         state->params = state->paramBlock;
-        state->f48 = func_00283CF0(15.0f);
-        state->f4A = func_00283CF0(16.0f);
-        speed = func_002A7878(10.0f, 30.0f) * 0.01745329424738884f;
-        state->turnRate = func_002A77E0(2) ? -speed : speed;
+        state->f48 = FloatToInt(15.0f);
+        state->f4A = FloatToInt(16.0f);
+        speed = RandomFloatRange(10.0f, 30.0f) * 0.01745329424738884f;
+        state->turnRate = RandomIntBelow(2) ? -speed : speed;
         state->f80 = 1.3f;
         state->f84 = 1.3f;
         state->f69 = 2;
@@ -280,15 +280,15 @@ void func_L11_004484A8(JobObject *object)
         state->f29 = 1;
         state->f30 = 0.75f;
         state->fireTimer = 0;
-        if (!func_002A77E0(2))
+        if (!RandomIntBelow(2))
             object->flags |= 0x8000;
         state->turret = 0;
-        func_L11_00449878(object);
+        DeactivateSecurityRobot(object);
     }
     if (state->f36E == 0 && object->stage != 18 && !D_001A8FF4) {
         object->flags |= 0x400;
-        if (object->f31 && func_00282E48(object->position, D_L11_001BA8C0) < 24.0f) {
-            func_002A93B0(object);
+        if (object->f31 && fast_vec_dist(object->position, D_L11_001BA8C0) < 24.0f) {
+            UpdateMobyGroundCheck(object);
             object->f6F = 22;
         }
     } else {
@@ -296,36 +296,36 @@ void func_L11_004484A8(JobObject *object)
     }
     if (object->stage >= 3) {
         state->fFC = 1.0f;
-        hit = func_002A9640(object, 0x10000, 1);
+        hit = FindOwnedEffectSlot(object, 0x10000, 1);
         if (hit) {
             state->fFC = 1.0f;
-            if (func_L11_00448CE0(object, hit)) {
+            if (IsRobotHoldingItemInAttackState(object, hit)) {
                 state->f60 = 15;
-                func_002B0ED8(object, state->hitInfo, 1);
+                ApplyDamageToObject(object, state->hitInfo, 1);
                 state->f60 = 16;
                 if (state->turret && state->fireTimer == 0 && object->f31) {
                     func_L11_004493F8(state->turret->position, 2);
                     state->fireTimer = 60;
                 }
             } else {
-                func_002B0ED8(object, state->hitInfo, 0);
+                ApplyDamageToObject(object, state->hitInfo, 0);
             }
         } else {
-            func_002B0ED8(object, state->hitInfo, 0);
+            ApplyDamageToObject(object, state->hitInfo, 0);
         }
         if (state->health <= 0.0f && object->f95 != 7 && object->f95 != 8)
-            func_L11_00449970(object, 1, 0);
+            KillSecurityRobot(object, 1, 0);
         if (state->f36E) {
-            func_00283698(state->basis, object->rotation);
-            func_002AFFD8(object->position, state->anchor, 0);
-            if (!func_L11_004461C0(object->fB8, object->position) && object->f95 != 8) {
+            matrix_from_basis_rows(state->basis, object->rotation);
+            ComputeViewDirection(object->position, state->anchor, 0);
+            if (!IsPointInArenaInnerZone(object->fB8, object->position) && object->f95 != 8) {
                 state->health = 0;
-                func_002A7750(object, 18, 8);
+                SetMobyState(object, 18, 8);
             }
         }
         if (object->stage >= 2 && state->f2E == 2)
-            func_L11_00449970(object, 1, 1);
-        func_L11_00448DF8(object);
+            KillSecurityRobot(object, 1, 1);
+        UpdateSecurityRobotPairing(object);
     }
 }
 
@@ -353,14 +353,14 @@ void func_L11_00452450(char *object)
 
     if (*(u8 *)(object + 0x20) == 0) {
         *(char **)(state + 0x18) = state + 0x100;
-        turnRate = func_002A7878(15.0f, 40.0f) * 0.017453294f;
-        if (func_002A77E0(2) != 0)
+        turnRate = RandomFloatRange(15.0f, 40.0f) * 0.017453294f;
+        if (RandomIntBelow(2) != 0)
             turnRate = -turnRate;
         *(f32 *)(state + 0x2C8) = turnRate;
-        if (func_002A77E0(2) == 1)
+        if (RandomIntBelow(2) == 1)
             *(u16 *)(object + 0x34) |= 0x8000;
-        *(u8 *)(state + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(state + 0x4A) = func_00283CF0(12.0f);
+        *(u8 *)(state + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(state + 0x4A) = FloatToInt(12.0f);
         *(u8 *)(state + 0x60) = 0xB;
         *(s32 *)(state + 0x98) = 4;
         *(f32 *)(state + 0x100) = 0.8f;
@@ -370,56 +370,56 @@ void func_L11_00452450(char *object)
         *(f32 *)(state + 0x130) = 0.52359885f;
         *(f32 *)(state + 0x12C) = 0.0055555557f;
         *(f32 *)(state + 0x134) = 2.8f;
-        func_002B60B0(object, 0.004444444552063942f, 0.13333334028720856f,
+        SetControllerSpeedLimits(object, 0.004444444552063942f, 0.13333334028720856f,
                       0.0011635529808700085f, 0.10471977293491364f);
         *(u8 *)(state + 0x28) = 3;
-        func_L11_00452DF8(object);
+        DeactivateFlamethrowerRobot(object);
     }
     if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && D_001A8FF4 == 0) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) != 0 && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
-            func_002A93B0(object);
+        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+            UpdateMobyGroundCheck(object);
             *(u8 *)(object + 0x6F) = 0x16;
         }
     } else {
         *(u16 *)(object + 0x34) &= 0xFBFF;
     }
     aim = state + 0x290;
-    func_0029FCC0(object, 1, state + 0x270);
-    func_0029FCC0(object, 2, state + 0x280);
-    func_0029FC20(object, 3, matrix);
-    func_00282C88(aim);
+    TransformMobyJointToWorld(object, 1, state + 0x270);
+    TransformMobyJointToWorld(object, 2, state + 0x280);
+    TransformMobyJointPoint(object, 3, matrix);
+    ClearVector128(aim);
     *(s32 *)(state + 0x298) = 0;
     *(f32 *)(state + 0x290) = 0.25f;
-    func_002830C0(aim, aim, matrix);
-    func_00282CC0(aim, aim, matrix + 12);
+    transform_vector(aim, aim, matrix);
+    FastVecAdd(aim, aim, matrix + 12);
     if (*(u8 *)(object + 0x20) >= 3) {
-        hit = (char *)func_002A9640(object, 0x10000, 1);
+        hit = (char *)FindOwnedEffectSlot(object, 0x10000, 1);
         if (hit != 0) {
             source = *(char **)(hit + 0x20);
             if (source != 0 && *(u8 *)(object + 0x31) == 0) {
                 kind = *(s16 *)(source + 0xAA);
-                if (kind == 0xA03 || kind == 0xB89)
+                if (kind == 0xA03 /* moby class 2563 */ || kind == 0xB89 /* moby class 2953 */)
                     *(s32 *)(hit + 0x2C) = 0;
             }
         }
-        if (func_002B0ED8(object, state + 0x50, 0) == 5) {
+        if (ApplyDamageToObject(object, state + 0x50, 0) == 5) {
             *(s32 *)(state + 0xE0) = 0;
             *(f32 *)(state + 0xE4) = 0.8377582f;
         }
         if (*(s16 *)(state + 0x2D8) != 0) {
             char *pos;
-            func_00283698(state + 0x230, object + 0xC0);
+            matrix_from_basis_rows(state + 0x230, object + 0xC0);
             pos = object + 0x10;
-            func_002AFFD8(pos, state + 0x260, 0);
-            if (func_L11_004461C0(*(s32 *)(object + 0xB8), pos) == 0) {
+            ComputeViewDirection(pos, state + 0x260, 0);
+            if (IsPointInArenaInnerZone(*(s32 *)(object + 0xB8), pos) == 0) {
                 *(s32 *)(state + 0x20) = 0;
-                func_002A7750(object, 0xC, 4);
+                SetMobyState(object, 0xC, 4);
             }
         }
         if (*(u8 *)(object + 0x20) >= 2 && *(u8 *)(state + 0x2E) == 2)
-            func_L11_00452DF8(object);
-        *(s16 *)(state + 0x2D0) = func_002B3BA8(object, *(s32 *)(state + 0x2CC), 0, 0, 100.0f, 100.0f);
+            DeactivateFlamethrowerRobot(object);
+        *(s16 *)(state + 0x2D0) = SelectAimTarget_002B3BA8(object, *(s32 *)(state + 0x2CC), 0, 0, 100.0f, 100.0f);
         *(s32 *)(state + 0x2C4) = *(s32 *)(state + 0x220);
     }
 }

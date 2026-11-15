@@ -2,6 +2,7 @@
 extern void *D_L00_0029FF70[76];
 extern float D_0018AA58;
 /* Uses the level's existing kind table to choose a vertical adjustment. */
+/* Says whether an item kind needs an aim tweak, and gives the up or down angle for it. */
 int func_L00_002ADFE8(int kind, float *out)
 {
     /* These legitimate arm addresses keep labels in discarded object data. */

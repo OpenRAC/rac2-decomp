@@ -34,7 +34,7 @@ void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *sp
     span = spans;
     count = *ctrl >> 1;
     ctrl++;
-    func_00282A60((void *)0x70000000, 0, 0x2400);
+    ClearMemory((void *)0x70000000, 0, 0x2400);
     bit = 1;
     cursor = (unsigned char *)0x70000000;
     for (;;) {
@@ -71,12 +71,12 @@ void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *sp
             *w |= *r++ << 7;
             w++;
         } while (r < end);
-        func_00282B50(dst, (void *)0x70000000, 0x400);
+        FastMemoryHelperC(dst, (void *)0x70000000, 0x400);
         dst = next_dst;
         if (next_dst == dst_end) {
             return;
         }
-        func_00282A60((void *)0x70000000, 0, 0x2000);
+        ClearMemory((void *)0x70000000, 0, 0x2000);
         wrapped = cursor - 0x2000;
         from = (unsigned char *)0x70002000;
         to = (unsigned char *)0x70000000;
@@ -85,7 +85,7 @@ void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *sp
                 *to++ = *from++;
             } while (from < cursor);
         }
-        func_00282A60((void *)0x70002000, 0, 0x400);
+        ClearMemory((void *)0x70002000, 0, 0x400);
         cursor = wrapped;
     }
 }

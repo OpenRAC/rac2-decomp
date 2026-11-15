@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct Rec_00329520 {
     unsigned char prefix_00[0x10];
@@ -23,13 +24,14 @@ extern int func_002ACCA8(void *a, int b);
 extern int func_L00_003206B8(void *a, int b);
 extern int func_002A8AF0(void *a, void *b, int c);
 
+/* Tells whether a point is inside the region with the given index, by testing its bounds and then each of its shapes. */
 int func_L00_00329520(void *pos, int index)
 {
     char *base;
     Rec_00329520 *rec;
     int off;
     int i;
-    int *p;
+    int *shape;
 
     if (index < 0)
         return 0;
@@ -41,20 +43,20 @@ int func_L00_00329520(void *pos, int index)
         return 0;
     rec = (Rec_00329520 *)(D_L00_001B1B00_sda + off);
     for (i = 0; i < rec->n12; i++) {
-        if (func_002ACBC8(pos, rec->list20[i]) != 0)
+        if (IsPointInCuboid(pos, rec->list20[i]) != 0)
             return 1;
     }
     for (i = 0; i < rec->n14; i++) {
-        if (func_002ACCA8(pos, rec->list24[i]) != 0)
+        if (IsPointInsideUnitSphereOfRecord(pos, rec->list24[i]) != 0)
             return 1;
     }
     for (i = 0; i < rec->n16; i++) {
-        if (func_L00_003206B8(pos, rec->list28[i]) != 0)
+        if (IsPointInsideRecordVolume(pos, rec->list28[i]) != 0)
             return 1;
     }
     for (i = 0; i < rec->n10; i++) {
-        p = (int *)D_001FDA80[rec->list1C[i]];
-        if (func_002A8AF0(pos, p + 4, *p) != 0)
+        shape = (int *)D_001FDA80[rec->list1C[i]];
+        if (point_in_path_xy(pos, shape + 4, *shape) != 0)
             return 1;
     }
     return 0;

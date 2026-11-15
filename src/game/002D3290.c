@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /*
  * Disassembled at 0x002cd220
@@ -45,11 +46,12 @@ extern void func_0029C8F0(void);
 extern void func_0027C540(long param_1);
 
 /* Implementation matching decompiled output */
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
 long func_002D3290(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C8F0();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
@@ -60,13 +62,14 @@ extern int func_0029C920(int);
 extern int func_0033E310(int);
 extern void func_002D5E98(int);
 
+/* Handles button input for a menu page and, if the preview button is pressed, sends the selected entry as a menu message. */
 int func_002D32C0(void)
 {
     int result = 0;
-    int *state = D_00138180;
+    int *state = gPadState;
     int flags = state[0x1C4 / 4];
     if (flags & 0x10) {
-        char *root = D_001F2840;
+        char *root = gPauseMenuState;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -89,11 +92,11 @@ finish:
     else {
         func_0029C920(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC) {
-            char *entry = (char *)func_0033E310(D_001A8CFC + 0x3EDB8);
+            char *entry = (char *)GetSelectedListRecord(D_001A8CFC + 0x3EDB8);
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            func_002D5E98((int)&request);
+            StartMenuAction((int)&request);
         }
     }
     return result;

@@ -5,40 +5,41 @@ extern int D_L11_001B30C8[] NOT_SDA __attribute__((sda));
 extern void func_002A7750(void *, int, int);
 extern void func_L00_002E6CF0(void *, void *);
 extern void func_L11_0045B6C8(char *);
-void func_L11_0045B5C8(char *p)
+/* Fades the object in and out by pulsing its colour value up and down, and counts its frames. It asks for a refresh whenever the level counter changes. */
+void func_L11_0045B5C8(char *moby)
 {
-    char *q = *(char **)(p + 0x68);
-    unsigned short c;
-    int v;
+    char *vars = *(char **)(moby + 0x68);
+    unsigned short frameCount;
+    int fade;
     int old, current;
 
     if (D_L11_001CAE40 != 0)
         return;
-    switch (*(unsigned char *)(p + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned char *)(p + 0x30) = 0xFF;
-        func_002A7750(p, 1, -1);
-        *(int *)(q + 0x0) = 0x1000000;
-        *(int *)(q + 0x8) = 1;
-        *(int *)(q + 0x4) = 1;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        SetMobyState(moby, 1, -1);
+        *(int *)(vars + 0x0) = 0x1000000;
+        *(int *)(vars + 0x8) = 1;
+        *(int *)(vars + 0x4) = 1;
         break;
     case 1:
-        if (*(unsigned short *)(p + 0x96) >= 0x2D) {
-            *(unsigned short *)(p + 0x96) = 0;
-            *(int *)(q + 0x4) = -*(int *)(q + 0x4);
+        if (*(unsigned short *)(moby + 0x96) >= 0x2D) {
+            *(unsigned short *)(moby + 0x96) = 0;
+            *(int *)(vars + 0x4) = -*(int *)(vars + 0x4);
         }
-        v = *(int *)(q + 0x8) + *(int *)(q + 0x4);
+        fade = *(int *)(vars + 0x8) + *(int *)(vars + 0x4);
         old = D_L11_001B46D4[0];
         current = D_L11_001B30C8[0];
-        *(int *)(q + 0x0) = v << 24;
-        *(int *)(q + 0x8) = v;
+        *(int *)(vars + 0x0) = fade << 24;
+        *(int *)(vars + 0x8) = fade;
         if (old != current) {
             D_L11_001B46D4[0] = current;
-            func_L00_002E6CF0(func_L11_0045B6C8, p);
+            AddDrawCallbackToList1(DrawSpinningGlowSprites, moby);
         }
         break;
     }
-    c = *(unsigned short *)(p + 0x96);
-    if (c <= 0xFFFE)
-        *(unsigned short *)(p + 0x96) = c + 1;
+    frameCount = *(unsigned short *)(moby + 0x96);
+    if (frameCount <= 0xFFFE)
+        *(unsigned short *)(moby + 0x96) = frameCount + 1;
 }

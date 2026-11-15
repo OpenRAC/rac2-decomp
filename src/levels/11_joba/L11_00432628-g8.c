@@ -40,8 +40,8 @@ extern void func_0029F978(unsigned char *, unsigned int, unsigned char *);
 void func_L11_0043A9D8(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
-    float f20;
-    float f0;
+    float spinAngle;
+    float spinRate;
 
     *(unsigned char *)(state + 0x2E) = 3;
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
@@ -53,21 +53,21 @@ void func_L11_0043A9D8(char *obj)
     *(unsigned short *)(obj + 0x34) = (*(unsigned short *)(obj + 0x34) | 0x1000) & 0xFFB9;
     *(unsigned char *)(obj + 0x7F) = 0;
     if (*(unsigned char *)(obj + 0x43) != 1)
-        func_002A7470(obj, 1, 0, 0);
-    f20 = func_002A7878(10.0f, 30.0f) * 0.017453294f;
-    if (func_002A77E0(2) != 0)
-        f20 = -f20;
-    *(float *)(state + 0x2D4) = f20;
-    if (func_002A77E0(2) != 0)
-        f0 = -D_L11_001B1338;
+        StartAnimationBlended(obj, 1, 0, 0);
+    spinAngle = RandomFloatRange(10.0f, 30.0f) * 0.017453294f;
+    if (RandomIntBelow(2) != 0)
+        spinAngle = -spinAngle;
+    *(float *)(state + 0x2D4) = spinAngle;
+    if (RandomIntBelow(2) != 0)
+        spinRate = -D_L11_001B1338;
     else
-        f0 = D_L11_001B1338;
+        spinRate = D_L11_001B1338;
     *(short *)(state + 0x2EE) = 0;
-    *(float *)(state + 0x2DC) = f0;
-    func_00282A60((unsigned int *)(state + 0x220), 0, 0x40);
-    func_0029F978((unsigned char *)obj, 2, (unsigned char *)(state + 0x220));
-    func_00282A60((unsigned int *)(state + 0x260), 0, 0x40);
-    func_0029F978((unsigned char *)obj, 3, (unsigned char *)(state + 0x260));
+    *(float *)(state + 0x2DC) = spinRate;
+    ClearMemory((unsigned int *)(state + 0x220), 0, 0x40);
+    AttachManipulator((unsigned char *)obj, 2, (unsigned char *)(state + 0x220));
+    ClearMemory((unsigned int *)(state + 0x260), 0, 0x40);
+    AttachManipulator((unsigned char *)obj, 3, (unsigned char *)(state + 0x260));
 }
 
 extern float D_L11_001B12C4 __attribute__((sda));
@@ -101,40 +101,40 @@ void func_L11_004393D8(char *obj, int index, int flag)
     char *base3;
     int offset = index * 4;
     char *entry;
-    float v[3];
-    float t;
-    int r;
-    int rec;
+    float aimVec[3];
+    float falloff;
+    int randomValue;
+    int record;
 
-    entry = func_L11_004417E8(*(char **)(obj + 0xB8));
+    entry = GetArenaCenterPoint(*(char **)(obj + 0xB8));
 
-    base1 = D_L11_001B359C;
-    func_00282CF0(v, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
-    r = func_002A77E0(10) + 15;
-    func_00282F20(v, v, (float)r * (1.0f / 60.0f));
-    func_002ACB48(v, 1.0f / 60.0f);
-    r = func_002A77E0(5) + 5;
-    v[2] = (float)r * (1.0f / 60.0f);
+    base1 = gMobyTable_L11;
+    FastVecSub(aimVec, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
+    randomValue = RandomIntBelow(10) + 15;
+    vec_scale_to_length(aimVec, aimVec, (float)randomValue * (1.0f / 60.0f));
+    AddRandomOffsetToVector(aimVec, 1.0f / 60.0f);
+    randomValue = RandomIntBelow(5) + 5;
+    aimVec[2] = (float)randomValue * (1.0f / 60.0f);
 
-    t = 1.0f - ((float)*(short *)(state + 0x378) - 4.0f) * (1.0f / 6.0f);
-    if (t > 1.0f)
-        t = 1.0f;
-    if (t < 0.0f)
-        t = 0.0f;
+    falloff = 1.0f - ((float)*(short *)(state + 0x378) - 4.0f) * (1.0f / 6.0f);
+    if (falloff > 1.0f)
+        falloff = 1.0f;
+    if (falloff < 0.0f)
+        falloff = 0.0f;
 
-    base2 = D_L11_001B359C;
-    func_L11_0043A680(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), v, D_L11_001B12C4 * (1.0f / 3600.0f), t);
+    base2 = gMobyTable_L11;
+    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), aimVec, D_L11_001B12C4 * (1.0f / 3600.0f), falloff);
 
-    base3 = D_L11_001B359C;
+    base3 = gMobyTable_L11;
     /* The record's field at 0xB8 takes the object's own handle. */
     *(int *)((char *)((*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8) + (int)base3)
             + 0xB8) = *(int *)(obj + 0xB8);
-    rec = (int)((char *)(base3 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8)));
-    *(int *)(state + 0x364) = rec;
+    record = (int)((char *)(base3 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8)));
+    *(int *)(state + 0x364) = record;
     if (flag != 0)
-        func_L11_004417A8(*(char **)(obj + 0xB8), rec);
+        SetArenaBossOwner(*(char **)(obj + 0xB8), record);
     else
-        func_L11_004417A8(*(char **)(obj + 0xB8), 0);
+        SetArenaBossOwner(*(char **)(obj + 0xB8), 0);
 
     *(unsigned char *)(state + index + 0x380) = 1;
 }
@@ -175,37 +175,37 @@ extern float D_L11_001B1214[] __attribute__((sda));
    corners are crossed out from the span and submitted as one textured quad. */
 void func_L11_00434AF8(char *obj, void *q)
 {
-    EffectQuadFrame f;
-    char *st;
+    EffectQuadFrame quadFrame;
+    char *vars;
     int i;
 
-    f.saved = *(TI128 *)q;
-    st = *(char **)(obj + 0x68);
-    func_00282CF0(f.c, st, st + 0x10);
-    func_00282CF0(f.a, st, D_L11_001BA8C0);
-    func_00282CF0(f.b, st + 0x10, D_L11_001BA8C0);
-    func_00282DD8(f.a, f.a, f.c);
-    func_00282F20(f.a, f.a, 0.1f);
-    func_00282DD8(f.b, f.b, f.c);
-    func_00282F20(f.b, f.b, 0.1f);
-    f.quad.texture = func_0027C878(7);
-    f.quad.mode = 0x0000ff9000000260UL;
-    f.quad.registers = ((unsigned long)D_L11_001B11FC << 32) | 0x48;
-    f.quad.primitive = 0;
-    f.quad.color[0] = f.quad.color[1] = f.quad.color[2] = f.quad.color[3] = D_L11_001B1204;
+    quadFrame.saved = *(TI128 *)q;
+    vars = *(char **)(obj + 0x68);
+    FastVecSub(quadFrame.c, vars, vars + 0x10);
+    FastVecSub(quadFrame.a, vars, D_L11_001BA8C0);
+    FastVecSub(quadFrame.b, vars + 0x10, D_L11_001BA8C0);
+    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
+    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.1f);
+    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
+    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.1f);
+    quadFrame.quad.texture = GetEffectTextureDescriptor(7);
+    quadFrame.quad.mode = 0x0000ff9000000260UL;
+    quadFrame.quad.registers = ((unsigned long)D_L11_001B11FC << 32) | 0x48;
+    quadFrame.quad.primitive = 0;
+    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = D_L11_001B1204;
     for (i = 0; i < 4; i++) {
-        f.quad.uv[i][0] = D_L11_001B1210[i * 2];
-        f.quad.uv[i][1] = D_L11_001B1214[i * 2];
+        quadFrame.quad.uv[i][0] = D_L11_001B1210[i * 2];
+        quadFrame.quad.uv[i][1] = D_L11_001B1214[i * 2];
     }
-    func_00282CF0(&f.corner, st, f.a);
-    f.quad.position[0] = f.corner;
-    func_00282CC0(&f.corner, st, f.a);
-    f.quad.position[1] = f.corner;
-    func_00282CF0(&f.corner, st + 0x10, f.b);
-    f.quad.position[2] = f.corner;
-    func_00282CC0(&f.corner, st + 0x10, f.b);
-    f.quad.position[3] = f.corner;
-    func_00280B90(&f.quad, 0, 0);
+    FastVecSub(&quadFrame.corner, vars, quadFrame.a);
+    quadFrame.quad.position[0] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars, quadFrame.a);
+    quadFrame.quad.position[1] = quadFrame.corner;
+    FastVecSub(&quadFrame.corner, vars + 0x10, quadFrame.b);
+    quadFrame.quad.position[2] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars + 0x10, quadFrame.b);
+    quadFrame.quad.position[3] = quadFrame.corner;
+    draw_world_quad(&quadFrame.quad, 0, 0);
 }
 
 extern int D_L11_001B1200 __attribute__((sda));
@@ -215,40 +215,40 @@ extern int D_L11_001B1208 __attribute__((sda));
    once with its own texture and then again with the additive overlay. */
 void func_L11_00434D00(char *obj, void *q)
 {
-    EffectQuadFrame f;
-    char *st;
+    EffectQuadFrame quadFrame;
+    char *vars;
     int i;
 
-    f.saved = *(TI128 *)q;
-    st = *(char **)(obj + 0x68);
-    func_00282CF0(f.c, st, st + 0x10);
-    func_00282CF0(f.a, st, D_L11_001BA8C0);
-    func_00282CF0(f.b, st + 0x10, D_L11_001BA8C0);
-    func_00282DD8(f.a, f.a, f.c);
-    func_00282F20(f.a, f.a, 0.05f);
-    func_00282DD8(f.b, f.b, f.c);
-    func_00282F20(f.b, f.b, 0.05f);
-    f.quad.texture = func_0027C878(0x13);
-    f.quad.mode = 0x0000ff9000000260UL;
-    f.quad.registers = ((unsigned long)D_L11_001B1200 << 32) | 0x48;
-    f.quad.primitive = 0;
-    f.quad.color[0] = f.quad.color[1] = f.quad.color[2] = f.quad.color[3] = D_L11_001B1208;
+    quadFrame.saved = *(TI128 *)q;
+    vars = *(char **)(obj + 0x68);
+    FastVecSub(quadFrame.c, vars, vars + 0x10);
+    FastVecSub(quadFrame.a, vars, D_L11_001BA8C0);
+    FastVecSub(quadFrame.b, vars + 0x10, D_L11_001BA8C0);
+    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
+    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.05f);
+    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
+    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.05f);
+    quadFrame.quad.texture = GetEffectTextureDescriptor(0x13);
+    quadFrame.quad.mode = 0x0000ff9000000260UL;
+    quadFrame.quad.registers = ((unsigned long)D_L11_001B1200 << 32) | 0x48;
+    quadFrame.quad.primitive = 0;
+    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = D_L11_001B1208;
     for (i = 0; i < 4; i++) {
-        f.quad.uv[i][0] = D_L11_001B1210[i * 2];
-        f.quad.uv[i][1] = D_L11_001B1214[i * 2];
+        quadFrame.quad.uv[i][0] = D_L11_001B1210[i * 2];
+        quadFrame.quad.uv[i][1] = D_L11_001B1214[i * 2];
     }
-    func_00282CF0(&f.corner, st, f.a);
-    f.quad.position[0] = f.corner;
-    func_00282CC0(&f.corner, st, f.a);
-    f.quad.position[1] = f.corner;
-    func_00282CF0(&f.corner, st + 0x10, f.b);
-    f.quad.position[2] = f.corner;
-    func_00282CC0(&f.corner, st + 0x10, f.b);
-    f.quad.position[3] = f.corner;
-    func_00280B90(&f.quad, 0, 0);
-    f.quad.texture = func_0027C878(0x10);
-    f.quad.mode = 0x0000ff9000000260UL;
-    f.quad.registers = 0x8000000048UL;
-    f.quad.primitive = 0;
-    func_00280B90(&f.quad, 0, 0);
+    FastVecSub(&quadFrame.corner, vars, quadFrame.a);
+    quadFrame.quad.position[0] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars, quadFrame.a);
+    quadFrame.quad.position[1] = quadFrame.corner;
+    FastVecSub(&quadFrame.corner, vars + 0x10, quadFrame.b);
+    quadFrame.quad.position[2] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars + 0x10, quadFrame.b);
+    quadFrame.quad.position[3] = quadFrame.corner;
+    draw_world_quad(&quadFrame.quad, 0, 0);
+    quadFrame.quad.texture = GetEffectTextureDescriptor(0x10);
+    quadFrame.quad.mode = 0x0000ff9000000260UL;
+    quadFrame.quad.registers = 0x8000000048UL;
+    quadFrame.quad.primitive = 0;
+    draw_world_quad(&quadFrame.quad, 0, 0);
 }

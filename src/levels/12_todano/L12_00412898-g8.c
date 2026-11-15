@@ -37,6 +37,8 @@ extern s32 D_L12_001B29C8 MACRO_ADDR;
     } \
 }
 
+/* Shows a looping effect until the object it is linked to has been used up, then fades itself
+   out and removes itself. */
 void func_L12_00412898(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     s32 delta;
@@ -44,11 +46,11 @@ void func_L12_00412898(u8 *object) {
     s32 bits;
     TodanoObjectFlags *record;
 
-    if (func_002B38B8()) goto kill;
+    if (IsThirdPendingFlagSet()) goto kill;
     index = *(u16 *)(object + 0xB2);
     record = &D_L12_0021EDF0;
     if (record->flags[(s16)index]) goto kill;
-    bits = (u8)D_0019B4A8[((s16)index >> 1) + (D_001A79F0 << 10)];
+    bits = (u8)D_0019B4A8[((s16)index >> 1) + (gCurrentMapIndex << 10)];
     if (index & 1) {
         if ((bits >> 4) & 7) goto kill;
     } else if (bits & 7) {
@@ -64,12 +66,12 @@ kill: {
         INCREMENT_OBJECT_COUNTER(object);
         id = *(s32 *)(state + 0x10);
         if (id != -1) {
-            effect = D_00188660 + id * 0x70;
+            effect = gSoundState + id * 0x70;
             if (*(u8 **)(effect + 0x88) == object && effect[0x74])
-                func_002E59F8(id);
+                StopSoundVoice(id);
         }
         *(s32 *)(state + 0x10) = -1;
-        func_0029F338(object);
+        MarkMobySpawned(object);
         return;
     }
 
@@ -81,16 +83,16 @@ dispatch:
         *(u16 *)(object + 0x34) |= 0xA08;
         *(s16 *)(state + 0xE) = -1;
         *(f32 *)(state + 4) = 1.0f;
-        func_002A0488(object, 0x80, 0x80, 0x80);
+        set_moby_color(object, 0x80, 0x80, 0x80);
         break;
     case 1: {
         u8 *effect;
         u16 index;
         s32 bits;
 
-        effect = D_00188660 + *(s32 *)(state + 0x10) * 0x70;
+        effect = gSoundState + *(s32 *)(state + 0x10) * 0x70;
         if (*(u8 **)(effect + 0x88) != object || !effect[0x74])
-            *(s32 *)(state + 0x10) = func_002E5CF8(0, 4, object);
+            *(s32 *)(state + 0x10) = PlayMobySound(0, 4, object);
         {
             s32 id = *(s32 *)state;
             u8 *linked;
@@ -100,7 +102,7 @@ dispatch:
                 if (!linked || linked[0x20] == 0xFE || linked[0x20] == 0xFD)
                     goto activate;
                 index = *(u16 *)(linked + 0xB2);
-                bits = (u8)D_0019B4A8[((s16)index >> 1) + (D_001A79F0 << 10)];
+                bits = (u8)D_0019B4A8[((s16)index >> 1) + (gCurrentMapIndex << 10)];
                 if (index & 1) {
                     if ((bits >> 4) & 7) goto activate;
                     else goto update;
@@ -115,7 +117,7 @@ activate: {
             }
         }
 update:
-        func_L12_00412548(object, state);
+        PushObjectsOutOfRectangle(object, state);
         break;
     }
     case 2:
@@ -123,7 +125,7 @@ update:
         if (*(f32 *)(state + 4) < 0.0f)
             object[0x20] = 3;
         else
-            object[0x23] = func_00283CF0(*(f32 *)(state + 4) * 20.0f);
+            object[0x23] = FloatToInt(*(f32 *)(state + 4) * 20.0f);
         break;
     case 3: {
         s32 id;
@@ -131,16 +133,16 @@ update:
 
         id = *(s32 *)(state + 0x10);
         if (id != -1) {
-            effect = D_00188660 + id * 0x70;
+            effect = gSoundState + id * 0x70;
             if (*(u8 **)(effect + 0x88) == object && effect[0x74])
-                func_002E59F8(id);
+                StopSoundVoice(id);
         }
         *(s32 *)(state + 0x10) = -1;
         if (*(s16 *)(state + 0xE) != -1) {
-            func_00291450(*(s16 *)(state + 0xE));
+            FreePointLight(*(s16 *)(state + 0xE));
             *(s16 *)(state + 0xE) = -1;
         }
-        func_0029F338(object);
+        MarkMobySpawned(object);
         return;
     }
     }
@@ -154,5 +156,5 @@ update:
         delta = 0x10C0;
     }
     if (!(D_L12_001B29C8 << D_L12_001B17E0))
-        func_L00_00310838(*(void **)(object + 0x24), delta, 0);
+        offset_moby_class_point_pairs(*(void **)(object + 0x24), delta, 0);
 }

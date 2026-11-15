@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00132220, 148 bytes, boot. 989snd's snd_ServiceRpcCompletion: it polls
    the command channel's RPC completion (chan 0x1A7040) and either clears the
    pending descriptor or prints an error.
@@ -17,13 +18,14 @@ extern void func_00115D48(char *);
 extern char D_0013BFA0[];
 extern char D_001A7040[] __attribute__((sda));
 
+/* Checks whether the sound server has finished the last request. Returns 1 when it is done and 0 when it is still busy. */
 int func_00132220(void) {
     unsigned int *p;
 
-    func_0011AEA0(0);
+    FlushCache(0);
     if (D_001A7480 == 0)
         return 1;
-    if (func_0011D810(D_001A7040) != 0)
+    if (IsRpcHandleValid(D_001A7040) != 0)
         return 0;
     p = D_001A7480;
     if (p[0] == 0xFFFFFFFFu && p[1 + D_001A7484] == p[0]) {
@@ -31,6 +33,6 @@ int func_00132220(void) {
         return 1;
     }
     if (D_001A74F8 == 0)
-        func_00115D48(D_0013BFA0);
+        Printf(D_0013BFA0);
     return 0;
 }

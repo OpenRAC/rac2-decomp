@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { int a, b; } PAIR8;
 
@@ -115,55 +116,56 @@ extern float D_L00_001B1510 __attribute__((sda));
 extern float func_002702C8(float *, float, float, float, float, float);
 extern float func_002AA548(float *, float *, float, float, float, float);
 
-void func_L00_0041ACA0(char *a0, void *a1)
+/* Starts a small effect at an entry of the ring. It alternates between two choices each time it is called. */
+void func_L00_0041ACA0(char *object, void *entry)
 {
     int local[4];
     int sel[2];
-    char *p = *(char **)(a0 + 0x68);
-    float f;
+    char *state = *(char **)(object + 0x68);
+    float scale;
 
     func_2EE0D0(local);
     *(PAIR8 *)sel = D_L00_001B1458;
-    f = *(float *)(p + 0x50) * 0.025f;
-    func_3411A0(a1, local, sel[D_L00_001B1460 % 2], f);
+    scale = *(float *)(state + 0x50) * 0.025f;
+    func_3411A0(entry, local, sel[D_L00_001B1460 % 2], scale);
     D_L00_001B1460 = D_L00_001B1460 + 1;
 }
 
 /* Updates the type byte and interpolates the two values passed to the helper. */
-void func_L00_00421B50(char *obj, char *arg1)
+void func_L00_00421B50(char *moby, char *context)
 {
-    char *base;
-    char *p;
-    short v;
+    char *mobyVars;
+    char *anim;
+    short blendTimer;
     float scale;
-    float f12;
-    float f13;
-    float f14;
+    float valueA;
+    float valueB;
+    float valueC;
     float local[3];
 
-    base = *(char **)(obj + 0x70);
-    p = base + 0x60;
+    mobyVars = *(char **)(moby + 0x70);
+    anim = mobyVars + 0x60;
 
-    if (func_00282978((short *)(base + 0x126)) != 0) {
-        *(unsigned char *)(p + 0xC5) = *(unsigned char *)(p + 0xC4);
+    if (FastDecTimer((short *)(mobyVars + 0x126)) != 0) {
+        *(unsigned char *)(anim + 0xC5) = *(unsigned char *)(anim + 0xC4);
     }
-    v = *(short *)(p + 0xC6);
-    scale = (float)v * *(float *)(p + 0xC8);
-    func_L00_00421A98(obj, arg1, local, *(unsigned char *)(p + 0xC4));
+    blendTimer = *(short *)(anim + 0xC6);
+    scale = (float)blendTimer * *(float *)(anim + 0xC8);
+    OffsetPointByCameraVector(moby, context, local, *(unsigned char *)(anim + 0xC4));
 
-    if (*(unsigned char *)(p + 0xC4) == 3 ||
-        *(unsigned char *)(p + 0xC4) == 5 ||
-        *(unsigned char *)(p + 0xC4) == 6 ||
-        *(unsigned char *)(p + 0xC4) == 7 ||
-        *(unsigned char *)(p + 0xC4) == 1) {
-        f12 = D_L00_001B1524 + (D_L00_001B151C - D_L00_001B1524) * scale;
-        f13 = D_L00_001B1528 + (D_L00_001B1520 - D_L00_001B1528) * scale;
+    if (*(unsigned char *)(anim + 0xC4) == 3 ||
+        *(unsigned char *)(anim + 0xC4) == 5 ||
+        *(unsigned char *)(anim + 0xC4) == 6 ||
+        *(unsigned char *)(anim + 0xC4) == 7 ||
+        *(unsigned char *)(anim + 0xC4) == 1) {
+        valueA = D_L00_001B1524 + (D_L00_001B151C - D_L00_001B1524) * scale;
+        valueB = D_L00_001B1528 + (D_L00_001B1520 - D_L00_001B1528) * scale;
     } else {
-        f12 = D_L00_001B151C;
-        f13 = D_L00_001B1520;
+        valueA = D_L00_001B151C;
+        valueB = D_L00_001B1520;
     }
-    f14 = 0.0f;
-    func_L00_004219D8(obj, (float *)(p + 0x90), local, f12, f13, f14);
+    valueC = 0.0f;
+    EaseCameraVectorToward(moby, (float *)(anim + 0x90), local, valueA, valueB, valueC);
 }
 
 /* Resets the state of object +0x70: eases the motion and view values toward their
@@ -192,21 +194,21 @@ void func_L00_00422268(StateOwner *object)
     defaults = &D_L00_001BB040->motion;
     defaultView = &D_L00_001BB040->view;
     if (motion->h3C)
-        motion->f2C = func_002702C8(motion->v44, motion->f2C, motion->f40, motion->f48,
+        motion->f2C = StepSpringDamperClamped(motion->v44, motion->f2C, motion->f40, motion->f48,
                                     D_L00_001B14F8, *(float *)(temporary + 0x1C));
     else
-        motion->f2C = func_002702C8(motion->v44, motion->f2C, defaults->f2C, motion->f48,
+        motion->f2C = StepSpringDamperClamped(motion->v44, motion->f2C, defaults->f2C, motion->f48,
                                     D_L00_001B14F8, *(float *)(temporary + 0x1C));
     if (motion->h3E)
-        motion->f30 = func_002702C8(motion->v50, motion->f30, motion->f4C, motion->f54,
+        motion->f30 = StepSpringDamperClamped(motion->v50, motion->f30, motion->f4C, motion->f54,
                                     D_L00_001B14FC, 0.0f);
     else
-        motion->f30 = func_002702C8(motion->v50, motion->f30, defaults->f30, motion->f54,
+        motion->f30 = StepSpringDamperClamped(motion->v50, motion->f30, defaults->f30, motion->f54,
                                     D_L00_001B14FC, 0.0f);
     if (view->hDA)
-        view->fB0 = func_002702C8(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
+        view->fB0 = StepSpringDamperClamped(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
     else
-        view->fB0 = func_002702C8(view->vBC, view->fB0, defaultView->fB0, view->fB8,
+        view->fB0 = StepSpringDamperClamped(view->vBC, view->fB0, defaultView->fB0, view->fB8,
                                   0.2f, 0.0f);
     motion->h3C = 0;
     motion->h3E = 0;
@@ -222,10 +224,10 @@ void func_L00_00422268(StateOwner *object)
     recoil->f20 = 0.2f;
     recoil->h2 = 0;
     if (recoil->f2C != 0.0f)
-        func_002AA548(&recoil->f28, &recoil->f30, recoil->f2C,
+        StepValueTowardTarget(&recoil->f28, &recoil->f30, recoil->f2C,
                       recoil->f34, recoil->f38, 1.0f);
     else if (recoil->f28 != 0.0f)
-        func_002AA548(&recoil->f28, &recoil->f30, 0.0f,
+        StepValueTowardTarget(&recoil->f28, &recoil->f30, 0.0f,
                       recoil->f34, recoil->f38, 1.0f);
     recoil->f2C = 0.0f;
 

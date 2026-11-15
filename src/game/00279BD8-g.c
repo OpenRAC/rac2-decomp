@@ -1,3 +1,4 @@
+#include "names.h"
 extern void func_00282D30(void *, void *, float);
 
 /* Projects a world point to screen coordinates (rac1's project_to_screen): builds the
@@ -36,6 +37,7 @@ extern void func_00283388(void *);
 extern void func_00283788(void *, void *, void *);
 extern void func_002830C0(void *, void *, void *);
 
+/* Converts a point in the world into a screen position and depth. */
 void func_00279BD8(ScreenPoint279BD8 *screen_out, void *world_pos)
 {
     Locals279BD8 L;
@@ -43,14 +45,14 @@ void func_00279BD8(ScreenPoint279BD8 *screen_out, void *world_pos)
     float y;
     float x;
 
-    func_00283388(&L);
-    L.v30 = -D_001B5200.unk140 * 1024.0f;
-    L.v34 = -D_001B5200.unk144 * 1024.0f;
-    L.v38 = -D_001B5200.unk148 * 1024.0f;
-    func_00283788(&L.v40, (char *)&D_001B5200 + 0x40, &L);
-    func_00282D30(&L.blk80, world_pos, 1024.0f);
+    set_identity_matrix(&L);
+    L.v30 = -gActiveCamera.unk140 * 1024.0f;
+    L.v34 = -gActiveCamera.unk144 * 1024.0f;
+    L.v38 = -gActiveCamera.unk148 * 1024.0f;
+    multiply_matrix(&L.v40, (char *)&gActiveCamera + 0x40, &L);
+    FastVecScale(&L.blk80, world_pos, 1024.0f);
     L.v8C = 1.0f;
-    func_002830C0(&L.v90, &L.blk80, &L.v40);
+    transform_vector(&L.v90, &L.blk80, &L.v40);
     scale = D_001B9250[0] / L.v9C;
     screen_out->unk8 = L.v98 * 0.0009765625f;
     x = L.v90 * scale + 2048.0f;

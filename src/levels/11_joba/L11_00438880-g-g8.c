@@ -35,55 +35,56 @@ extern float D_L11_001B1280[] SDATA(D_L11_001B1280);
 extern float D_L11_001B1284[];
 extern float D_L11_001B12B4[] NOT_SDA;
 /* The alpha range endpoint at 001B12B4 is read as float by retail. */
+/* Draws the chain as a glowing ribbon between its points and scrolls its texture. */
 void func_L11_00438880(char *obj) {
     float end[4], start[4], span[4], a[4], b[4], inset[4];
     struct { Quadword pos[4]; unsigned int color[4]; float uv[4][2]; unsigned long words[4]; } quad;
     Quadword corner;
     float *uv0, *uv1;
-    char *st=*(char **)(obj+0x68);
+    char *vars=*(char **)(obj+0x68);
     int next, prev, following, i;
     unsigned char *flags;
     unsigned int color;
     if (*(unsigned char *)(obj+0x20)<2) return;
-    next=1; prev=0; flags=(unsigned char *)(st+0x380);
+    next=1; prev=0; flags=(unsigned char *)(vars+0x380);
     while(next<13) { int j=next-1; if(!flags[j]) break; next++; }
     while (next<12) {
-        qcopy(end,st+0x100+next*16);
-        qcopy(start,st+0x100+prev*16);
+        qcopy(end,vars+0x100+next*16);
+        qcopy(start,vars+0x100+prev*16);
         following=next+1;
-        func_00282CF0(inset,start,end);
-        func_00282F20(inset,inset,D_L11_001B12C0);
-        func_00282CC0(end,end,inset);
-        func_00282CF0(span,end,start);
-        func_00282CF0(a,end,D_L11_001BA8C0);
-        func_00282CF0(b,start,D_L11_001BA8C0);
-        func_00282DD8(a,a,span);
-        func_00282DD8(b,b,span);
-        func_00282F20(a,a,D_L11_001B12B8);
-        func_00282F20(b,b,D_L11_001B12B8);
-        func_00281DE8(&quad,23,1,128);
-        color=(D_L11_001B12A0 & 0xFFFFFF) | ((int)(func_002A7878(D_L11_001B12B0,D_L11_001B12B4[0])*(int)(D_L11_001B12A0>>24))<<24);
+        FastVecSub(inset,start,end);
+        vec_scale_to_length(inset,inset,D_L11_001B12C0);
+        FastVecAdd(end,end,inset);
+        FastVecSub(span,end,start);
+        FastVecSub(a,end,D_L11_001BA8C0);
+        FastVecSub(b,start,D_L11_001BA8C0);
+        FastVecCross(a,a,span);
+        FastVecCross(b,b,span);
+        vec_scale_to_length(a,a,D_L11_001B12B8);
+        vec_scale_to_length(b,b,D_L11_001B12B8);
+        InitQuadPacketState(&quad,23,1,128);
+        color=(D_L11_001B12A0 & 0xFFFFFF) | ((int)(RandomFloatRange(D_L11_001B12B0,D_L11_001B12B4[0])*(int)(D_L11_001B12A0>>24))<<24);
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=color;
         uv0=&quad.uv[0][0]; uv1=&quad.uv[0][1];
-        for(i=0;i<4;i++) { uv0[i*2]=D_L11_001B1280[i*2]+*(float *)(st+0x35C); uv1[i*2]=D_L11_001B1284[i*2]; }
-        func_00282CF0(&corner,end,a); quad.pos[0]=corner;
-        func_00282CC0(&corner,end,a); quad.pos[1]=corner;
-        func_00282CF0(&corner,start,b); quad.pos[2]=corner;
-        func_00282CC0(&corner,start,b); quad.pos[3]=corner;
-        func_00280B90(&quad,0,0);
-        func_00282F20(a,a,D_L11_001B12BC);
-        func_00282F20(b,b,D_L11_001B12BC);
-        func_00282CF0(&corner,end,a); quad.pos[0]=corner;
-        func_00282CC0(&corner,end,a); quad.pos[1]=corner;
-        func_00282CF0(&corner,start,b); quad.pos[2]=corner;
-        func_00282CC0(&corner,start,b); quad.pos[3]=corner;
-        func_00281DE8(&quad,43,1,128);
+        for(i=0;i<4;i++) { uv0[i*2]=D_L11_001B1280[i*2]+*(float *)(vars+0x35C); uv1[i*2]=D_L11_001B1284[i*2]; }
+        FastVecSub(&corner,end,a); quad.pos[0]=corner;
+        FastVecAdd(&corner,end,a); quad.pos[1]=corner;
+        FastVecSub(&corner,start,b); quad.pos[2]=corner;
+        FastVecAdd(&corner,start,b); quad.pos[3]=corner;
+        draw_world_quad(&quad,0,0);
+        vec_scale_to_length(a,a,D_L11_001B12BC);
+        vec_scale_to_length(b,b,D_L11_001B12BC);
+        FastVecSub(&corner,end,a); quad.pos[0]=corner;
+        FastVecAdd(&corner,end,a); quad.pos[1]=corner;
+        FastVecSub(&corner,start,b); quad.pos[2]=corner;
+        FastVecAdd(&corner,start,b); quad.pos[3]=corner;
+        InitQuadPacketState(&quad,43,1,128);
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=D_L11_001B12A4;
-        func_00280B90(&quad,0,0);
+        draw_world_quad(&quad,0,0);
         prev=next; next=following;
         while(next<13) { int j=next-1; if(!flags[j]) break; next++; }
     }
-    *(float *)(st+0x35C)+=D_L11_001B12A8;
-    if (*(float *)(st+0x35C)>1) *(float *)(st+0x35C)-=2;
-    if (*(float *)(st+0x35C)<-1) *(float *)(st+0x35C)+=2;
+    *(float *)(vars+0x35C)+=D_L11_001B12A8;
+    if (*(float *)(vars+0x35C)>1) *(float *)(vars+0x35C)-=2;
+    if (*(float *)(vars+0x35C)<-1) *(float *)(vars+0x35C)+=2;
 }

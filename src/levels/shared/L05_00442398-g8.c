@@ -17,18 +17,19 @@ extern int D_001A79F0 MACRO_ADDR;
 extern void func_L05_003D1E60(void *,int,int);
 extern void func_L05_004424B8(void *,float);
 extern void func_002AB6D8(void *,void *);
+/* Starts the ship's crash recovery. It remembers where the ship was and sets up the countdown before the ship is reset. */
 void func_L05_00442398(char *obj)
 {
     Quadword matrix[4];
     Entry *entry;
     float scale;
-    if (D_L05_001B1B20 != 6) {
+    if (gShipState != 6) {
         ModelSlot *slots = D_L05_001B1EC4;
         ModelRecord *models = D_L05_001B251C;
         {
             int index = *(short *)(obj + 0x84);
 
-            D_L05_001B1B20 = 6;
+            gShipState = 6;
             entry = slots[index].entry;
         }
         D_L05_001B1F60 = 0;
@@ -40,15 +41,15 @@ void func_L05_00442398(char *obj)
         }
         qcopy(D_L05_001B3620, obj + 0x30);
         scale = 1.0f;
-        if (D_001A79F0 == 20) scale = 2.0f;
-        func_L05_004424B8(obj, scale);
-        D_L05_001B1B24 = D_L05_001B1ADC;
+        if (gCurrentMapIndex == 20) scale = 2.0f;
+        UpdateShipRecordTransform(obj, scale);
+        gShipTransitionTimer = D_L05_001B1ADC;
         qcopy(&matrix[0], obj);
         qcopy(&matrix[1], obj + 0x10);
         qcopy(&matrix[2], obj + 0x20);
         qzero(&matrix[3]);
         ((float *)matrix)[3] = ((float *)matrix)[7] = ((float *)matrix)[11] = 0.0f;
         ((float *)matrix)[15] = 1.0f;
-        func_002AB6D8(matrix, D_L05_001B3610);
+        GetEulerAnglesFromMatrix(matrix, D_L05_001B3610);
     }
 }

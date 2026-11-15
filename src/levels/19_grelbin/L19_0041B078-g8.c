@@ -55,69 +55,70 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
     angle=func_002A7940(); \
     func_002AF000(vec,distance,angle,0.0f); \
     func_00282CC0(data+0x290,data+0x290,vec); \
-    { int timer=func_002A7820(580,600); int active=D_L19_001B1D20; \
-      I(data,0x230)=timer; D_L19_001B1D20=active-1; } }
+    { int timer=RandomIntRange(580,600); int active=gActiveYetiCount; \
+      I(data,0x230)=timer; gActiveYetiCount=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
 
+/* Updates a Y.E.T.I. every frame. It waits in hiding, runs toward the player, and attacks up close or with a leap. It runs away to a new spot when it is hurt. */
 void func_L19_0041B078(char *obj)
 {
     char *data;
     char *entity;
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
-    int mode, result;
-    if (!func_002ACD38(obj+0x10) || D_0018C0B4==111) return;
+    int aiMode, pathResult;
+    if (!IsObjectInSelectedZone(obj+0x10) || D_0018C0B4==111) return;
     data=*(char **)(obj+0x68);
-    if (func_L19_0041BFD0(obj)) { func_0029F338(obj); return; }
+    if (InitYetiStats(obj)) { MarkMobySpawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
-    mode=B(obj,0x95);
-    switch(mode) {
+    aiMode=B(obj,0x95);
+    switch(aiMode) {
     case 0:
-        if(I(data,0x278)==1 && I(data,0x26C)==0 && D_L19_001B1D20<D_L19_001B1D24) {
+        if(I(data,0x278)==1 && I(data,0x26C)==0 && gActiveYetiCount<gMaxActiveYetis) {
             if(I(data,0x264)==-1) {
                 if(I(data,0x250)==255 || !D_L19_001FB5A0[I(data,0x250)]) {
-                    HIDE(); func_002A7750(obj,10,2); ANIM(0,0,10); D_L19_001B1D20++;
-                } else if(!func_002A8508(I(data,0x250),-1)) {
-                    HIDE(); func_002A7750(obj,10,2); ANIM(0,0,10); D_L19_001B1D20++;
+                    HIDE(); SetMobyState(obj,10,2); ANIM(0,0,10); gActiveYetiCount++;
+                } else if(!CountMobysInGroupNotInState(I(data,0x250),-1)) {
+                    HIDE(); SetMobyState(obj,10,2); ANIM(0,0,10); gActiveYetiCount++;
                 }
             } else {
-                entity=D_L19_001B2A1C+(I(data,0x264)<<8);
+                entity=gMobyArray_L19+(I(data,0x264)<<8);
                 if(!entity || B(entity,0x20)==254 || B(entity,0x20)==253) {
-                    HIDE(); func_002A7750(obj,10,2); ANIM(0,0,10); D_L19_001B1D20++;
+                    HIDE(); SetMobyState(obj,10,2); ANIM(0,0,10); gActiveYetiCount++;
                 }
             }
-        } else if(I(data,0x240) && func_00282948(data+0x238)) {
+        } else if(I(data,0x240) && FastFloatHelperD(data+0x238)) {
             I(data,0x240)=0;
-            if(I(data,0x230)<300) I(data,0x230)=func_002A7820(480,600);
+            if(I(data,0x230)<300) I(data,0x230)=RandomIntRange(480,600);
         }
         break;
     case 1:
-        if ((I(data,0x278)==1 || I(data,0x27C)==1) && D_L19_001B1D20<D_L19_001B1D24) {
-            ANIM(3,0,10); func_002A7750(obj,14,2); D_L19_001B1D20++;
+        if ((I(data,0x278)==1 || I(data,0x27C)==1) && gActiveYetiCount<gMaxActiveYetis) {
+            ANIM(3,0,10); SetMobyState(obj,14,2); gActiveYetiCount++;
         }
         break;
     case 2:
-        if(func_002B3890(obj)) {
+        if(SetSecondPendingFlag(obj)) {
             DISABLE_COLLISION();
         }
         if(I(data,0x278)!=1 && I(data,0x27C)!=1 && B(obj,0x20)!=15 && B(obj,0x20)!=16) {
-            func_002A7750(obj,7,1); ANIM(7,0,10);
-            if(!func_002A77E0(3)) { ANIM(6,0,10); }
-            else if(func_002A77E0(2)) {
+            SetMobyState(obj,7,1); ANIM(7,0,10);
+            if(!RandomIntBelow(3)) { ANIM(6,0,10); }
+            else if(RandomIntBelow(2)) {
                 ANIM(13,0,10);
             }
             PICK_FLEE_TARGET();
         } else { DISABLE_COLLISION(); }
         break;
     case 3:
-        result=func_002B1C20(obj,data+0x140);
-        if(result&1) {
-            func_002A6C58(obj,0,3); func_L01_003E9CF8(obj,0,0); D_L19_001B1D20--;
-        } else if(result&2) {
-            if(I(data,0x204)==1 && D_L19_001B1D20<=D_L19_001B1D24) {
-                ANIM(3,0,10); func_002A7750(obj,14,2);
+        pathResult=DispatchActionByKind(obj,data+0x140);
+        if(pathResult&1) {
+            SetDeathBits(obj,0,3); QueueMobyForGlowEffect(obj,0,0); gActiveYetiCount--;
+        } else if(pathResult&2) {
+            if(I(data,0x204)==1 && gActiveYetiCount<=gMaxActiveYetis) {
+                ANIM(3,0,10); SetMobyState(obj,14,2);
             } else {
-                func_002A7750(obj,8,1);
+                SetMobyState(obj,8,1);
                 ANIM(2,0,10);
                 PICK_FLEE_TARGET();
             }
@@ -129,97 +130,97 @@ void func_L19_0041B078(char *obj)
     case 2:
         break;
     case 7:
-        if(B(obj,0x60)&2) {func_002A7750(obj,8,-1); ANIM(2,0,13);}
+        if(B(obj,0x60)&2) {SetMobyState(obj,8,-1); ANIM(2,0,13);}
         break;
     case 8:
-        if(func_002B3868(obj)) func_002B60B0(obj,0.0016666667f,0.050000004f,0.0069813179f,0.8377582f);
-        func_L01_00321178(obj,data+0x290);
-        if(func_00282E80(obj+0x10,data+0x290)<0.5f) {func_002A7750(obj,3,-1); ANIM(1,0,10);}
+        if(SetFirstPendingFlag(obj)) SetControllerSpeedLimits(obj,0.0016666667f,0.050000004f,0.0069813179f,0.8377582f);
+        TurnMobyTowardTarget(obj,data+0x290);
+        if(vec_distance_xy(obj+0x10,data+0x290)<0.5f) {SetMobyState(obj,3,-1); ANIM(1,0,10);}
         break;
     case 3:
         if(B(obj,0x60)&2) {
-            ANIM(12,0,10);func_002A7750(obj,1,0);
+            ANIM(12,0,10);SetMobyState(obj,1,0);
             B(obj,0x31)=0; I(obj,0x98)=0;H(obj)=(H(obj)|1)&0xEFFF;
         }
         break;
     case 10:
         entity=*(char **)(data+0x200);
-        func_L01_00322288(obj,func_00283248(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
-        if(func_002AEB60(obj,23.0f)) {
+        StartMobyEffectFromEntry(obj,FastMatrixHelperA(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
+        if(IsValueWithinStepOfThreshold(obj,23.0f)) {
             ANIM(7,1,2);
-            if(func_002A77E0(2)) {ANIM(6,0,2);}
-            func_002A7750(obj,11,-1);
-            if(I(data,0x274) || !func_002A77E0(2)) { ANIM(3,0,6);func_002A7750(obj,14,-1); }
+            if(RandomIntBelow(2)) {ANIM(6,0,2);}
+            SetMobyState(obj,11,-1);
+            if(I(data,0x274) || !RandomIntBelow(2)) { ANIM(3,0,6);SetMobyState(obj,14,-1); }
         }
         break;
     case 11:
         entity=*(char **)(data+0x200);
-        func_L01_00322288(obj,func_00283248(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
-        if(B(obj,0x60)&2) { ANIM(3,0,10);func_002A7750(obj,14,-1); }
+        StartMobyEffectFromEntry(obj,FastMatrixHelperA(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
+        if(B(obj,0x60)&2) { ANIM(3,0,10);SetMobyState(obj,14,-1); }
         break;
     case 14:
-        if(func_002B3868(obj)) {
-            func_002B60B0(obj,0.0033333334f,0.10000001f,0.0069813179f,0.8377582f); SOLID();
+        if(SetFirstPendingFlag(obj)) {
+            SetControllerSpeedLimits(obj,0.0033333334f,0.10000001f,0.0069813179f,0.8377582f); SOLID();
         }
-        if(func_00282E80(obj+0x10,*(char **)(data+0x200)+0x10)<7.0f && func_00282E80(obj+0x10,*(char **)(data+0x200)+0x10)>4.0f &&
-            func_00283C80(F(obj,0xF8),func_00283248(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
-            func_002B60B0(obj,0.02f,0.6f,0.0069813179f,0.8377582f);ANIM(4,0,10);func_002A7750(obj,15,-1);
-        } else if(func_00282E80(obj+0x10,*(char **)(data+0x200)+0x10)<=3.0f &&
-            func_00283C80(F(obj,0xF8),func_00283248(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
-            ANIM(10,0,10);func_002A7750(obj,16,-1);
-        } else func_002B4FF0(obj,data+0x1F0,F(data,0x270));
+        if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<7.0f && vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)>4.0f &&
+            FastDiffRots(F(obj,0xF8),FastMatrixHelperA(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
+            SetControllerSpeedLimits(obj,0.02f,0.6f,0.0069813179f,0.8377582f);ANIM(4,0,10);SetMobyState(obj,15,-1);
+        } else if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<=3.0f &&
+            FastDiffRots(F(obj,0xF8),FastMatrixHelperA(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
+            ANIM(10,0,10);SetMobyState(obj,16,-1);
+        } else TurnTowardTargetAndStepMovement(obj,data+0x1F0,F(data,0x270));
         break;
     case 15: {
         float attackDistance;
-        if(func_002B3868(obj)) { SOLID(); }
-        attackDistance=func_0029F530(obj);
-        if(attackDistance>4.0f && attackDistance<15.0f) func_L01_00321178(obj,data+0x1F0);
-        if(func_002AEB60(obj,30.0f)) {
-            ANIM(7,0,10);func_002A7750(obj,24,-1);
-            if(func_002A77E0(3)) {ANIM(6,0,10);} else if(func_002A77E0(2)) {ANIM(13,41,10);}
-            if(func_002A77E0(5)) { ANIM(5,0,10);func_002A7750(obj,17,-1); }
+        if(SetFirstPendingFlag(obj)) { SOLID(); }
+        attackDistance=GetMobyAnimationValue(obj);
+        if(attackDistance>4.0f && attackDistance<15.0f) TurnMobyTowardTarget(obj,data+0x1F0);
+        if(IsValueWithinStepOfThreshold(obj,30.0f)) {
+            ANIM(7,0,10);SetMobyState(obj,24,-1);
+            if(RandomIntBelow(3)) {ANIM(6,0,10);} else if(RandomIntBelow(2)) {ANIM(13,41,10);}
+            if(RandomIntBelow(5)) { ANIM(5,0,10);SetMobyState(obj,17,-1); }
         }
         if(attackDistance<19.0f) {
-            func_002A8D70(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
+            TestHitAtBone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
         }
         break;
     }
     case 16:
-        if(func_002B3868(obj)) {SOLID();}
-        if(func_002AEB60(obj,25.0f)) {
-            ANIM(7,0,10);func_002A7750(obj,24,-1);
-            if(func_002A77E0(3)) {ANIM(6,0,10);} else if(func_002A77E0(2)) {ANIM(13,41,10);}
-            if(func_002A77E0(3)) {ANIM(5,0,10);func_002A7750(obj,17,-1);}
+        if(SetFirstPendingFlag(obj)) {SOLID();}
+        if(IsValueWithinStepOfThreshold(obj,25.0f)) {
+            ANIM(7,0,10);SetMobyState(obj,24,-1);
+            if(RandomIntBelow(3)) {ANIM(6,0,10);} else if(RandomIntBelow(2)) {ANIM(13,41,10);}
+            if(RandomIntBelow(3)) {ANIM(5,0,10);SetMobyState(obj,17,-1);}
         }
-        if(func_0029F530(obj)<14.0f) {
-            func_002A8D70(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
+        if(GetMobyAnimationValue(obj)<14.0f) {
+            TestHitAtBone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
         }
         break;
     case 17: {
         char *target;
-        if(func_002B3868(obj)) {
-            vec[0]=func_00283180(func_00283B98(F(obj,0xF8),3.141593f))*18.0f;
-            vec[1]=func_00283198(func_00283B98(F(obj,0xF8),3.141593f))*18.0f;
+        if(SetFirstPendingFlag(obj)) {
+            vec[0]=FastSinOrCosA(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
+            vec[1]=FastSinOrCosB(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
             vec[2]=0.0f;
-            func_00282CC0(data+0x280,vec,obj+0x10);
-            func_002B60B0(obj,0.023333333f,0.8000001f,0.0069813179f,0.8377582f);
+            FastVecAdd(data+0x280,vec,obj+0x10);
+            SetControllerSpeedLimits(obj,0.023333333f,0.8000001f,0.0069813179f,0.8377582f);
         }
-        { float range=func_0029F530(obj);
+        { float range=GetMobyAnimationValue(obj);
         if(range>4.0f && range<14.0f) {
             target=data+0x280;
             { float dx=F(data,0x280)-F(obj,0x10); float dy=F(data,0x284)-F(obj,0x14);
-            angle=func_00283248(dx,dy); }
-            func_L02_00331440(obj,target,16,angle,-1.0f,-1.0f);
+            angle=FastMatrixHelperA(dx,dy); }
+            MoveToTargetWithTempLimits(obj,target,16,angle,-1.0f,-1.0f);
         }}
-        if(func_002AEB60(obj,21.0f)) {
-            ANIM(7,0,10);func_002A7750(obj,24,-1);
-            if(func_002A77E0(3)) {ANIM(6,0,10);} else if(func_002A77E0(2)) {ANIM(13,41,10);}
+        if(IsValueWithinStepOfThreshold(obj,21.0f)) {
+            ANIM(7,0,10);SetMobyState(obj,24,-1);
+            if(RandomIntBelow(3)) {ANIM(6,0,10);} else if(RandomIntBelow(2)) {ANIM(13,41,10);}
         }
         break;
     }
     case 24:
-        if(B(obj,0x60)&2) {ANIM(3,0,10);func_002A7750(obj,14,-1);}
+        if(B(obj,0x60)&2) {ANIM(3,0,10);SetMobyState(obj,14,-1);}
         break;
     }
-    func_L19_0041C2B8(obj);
+    UpdateMobyTimersAndAttachment(obj);
 }

@@ -24,8 +24,9 @@ extern void func_0012FB48(void *, int, int);
 extern void func_0012FB60(void *);
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BB98 */
-int func_0012F9B8(void *arg0) {
-    return ((Wrapper *)arg0)->obj->unk004 == 0;
+/* Tells whether the video decoder has not decoded any picture yet. */
+int func_0012F9B8(void *mpeg) {
+    return ((Wrapper *)mpeg)->obj->unk004 == 0;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BBA8 */
@@ -36,31 +37,33 @@ int func_0012F9B8(void *arg0) {
  * the object to func_00130088 (zero +0x848, kick the IPU chain via
  * r1_func_00127378).
  */
-void func_0012F9C8(void *arg0) {
-    char *w = (char *)arg0;
-    char *inner = *(char **)(w + 0x40);
+/* Resets the video decoder back to its starting state. */
+void func_0012F9C8(void *mpeg) {
+    char *wrapper = (char *)mpeg;
+    char *decoder = *(char **)(wrapper + 0x40);
 
-    *(int *)(inner + 0x0) = 0;
-    *(int *)(inner + 0x4) = 0;
-    *(int *)(inner + 0x8) = 0;
-    *(int *)(w + 0x8) = 0;
-    *(int *)(inner + 0xAC) = 0;
-    *(int *)(inner + 0x80) = -1;
-    func_00130178(inner);
-    *(int *)(inner + 0x118) = 0;
-    func_00130088(inner);
+    *(int *)(decoder + 0x0) = 0;
+    *(int *)(decoder + 0x4) = 0;
+    *(int *)(decoder + 0x8) = 0;
+    *(int *)(wrapper + 0x8) = 0;
+    *(int *)(decoder + 0xAC) = 0;
+    *(int *)(decoder + 0x80) = -1;
+    ResetMpegHardware(decoder);
+    *(int *)(decoder + 0x118) = 0;
+    RestartMpegHardware(decoder);
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BBF8 */
-int func_0012FA18(void *arg0) {
-    char *b = *(char **)((char *)arg0 + 0x40);
-    char *p;
-    p = *(char **)(b + 0x1B8); if (p != 0) *(int *)(p + 0x28) = 0;
-    p = *(char **)(b + 0x1C8); if (p != 0) *(int *)(p + 0x28) = 0;
-    p = *(char **)(b + 0x1D8); if (p != 0) *(int *)(p + 0x28) = 0;
-    p = *(char **)(b + 0x1BC); if (p != 0) *(int *)(p + 0x28) = 0;
-    p = *(char **)(b + 0x1CC); if (p != 0) *(int *)(p + 0x28) = 0;
-    p = *(char **)(b + 0x1DC); if (p != 0) *(int *)(p + 0x28) = 0;
+/* Clears one field in each of the six picture buffers of the video decoder. */
+int func_0012FA18(void *mpeg) {
+    char *decoder = *(char **)((char *)mpeg + 0x40);
+    char *buffer;
+    buffer = *(char **)(decoder + 0x1B8); if (buffer != 0) *(int *)(buffer + 0x28) = 0;
+    buffer = *(char **)(decoder + 0x1C8); if (buffer != 0) *(int *)(buffer + 0x28) = 0;
+    buffer = *(char **)(decoder + 0x1D8); if (buffer != 0) *(int *)(buffer + 0x28) = 0;
+    buffer = *(char **)(decoder + 0x1BC); if (buffer != 0) *(int *)(buffer + 0x28) = 0;
+    buffer = *(char **)(decoder + 0x1CC); if (buffer != 0) *(int *)(buffer + 0x28) = 0;
+    buffer = *(char **)(decoder + 0x1DC); if (buffer != 0) *(int *)(buffer + 0x28) = 0;
     return 1;
 }
 
@@ -76,13 +79,14 @@ int func_0012FA18(void *arg0) {
  * 2.95.3 (no type-based aliasing) the same C is 17/36; the old int-offset
  * spelling was 12/36 under both.
  */
-int func_0012FA70(void *arg0, int arg1, int arg2, int arg3) {
-    MpegCbTbl *t = *(MpegCbTbl **)((char *)arg0 + 0x40);
-    MpegCbFn old;
-    t->cb[arg1].data = (void *)arg3;
-    old = t->cb[arg1].func;
-    t->cb[arg1].func = (MpegCbFn)arg2;
-    return (int)old;
+/* Sets the function to call for one kind of video event and returns the previous one. */
+int func_0012FA70(void *mpeg, int eventType, int callback, int callbackData) {
+    MpegCbTbl *table = *(MpegCbTbl **)((char *)mpeg + 0x40);
+    MpegCbFn oldCallback;
+    table->cb[eventType].data = (void *)callbackData;
+    oldCallback = table->cb[eventType].func;
+    table->cb[eventType].func = (MpegCbFn)callback;
+    return (int)oldCallback;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BC78 */
@@ -97,40 +101,44 @@ int func_0012FA70(void *arg0, int arg1, int arg2, int arg3) {
  * `ret` then lands in $a3 with the table in $a2. Exact under both
  * compilers (one `entry` pointer is SIZE 84/80; the old spelling 12/80).
  */
-void *func_0012FA98(void *arg0, int *arg1) {
-    int ret = 0;
-    if (arg0 != 0) {
-        MpegCbTbl *t = *(MpegCbTbl **)((char *)arg0 + 0x40);
-        if (t != 0) {
-            if (t->cb[*arg1].func != 0) {
-                ret = t->cb[*arg1].func(arg0, arg1, t->cb[*arg1].data);
+/* Calls the function registered for a video event, if there is one, and returns its result. */
+void *func_0012FA98(void *mpeg, int *event) {
+    int result = 0;
+    if (mpeg != 0) {
+        MpegCbTbl *table = *(MpegCbTbl **)((char *)mpeg + 0x40);
+        if (table != 0) {
+            if (table->cb[*event].func != 0) {
+                result = table->cb[*event].func(mpeg, event, table->cb[*event].data);
             }
         }
     }
-    return (void *)ret;
+    return (void *)result;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BCC8 */
 /* No declaration needed: the definition above precedes this caller. The
    extern that used to sit here guessed `void (int, void *)` and now
    conflicts with the real signature. */
-void func_0012FAE8(int arg0) {
-    int local[8];
-    local[0] = 1;
-    func_0012FA98(arg0, local);
+/* Sends video event number 1 to the registered callback. */
+void func_0012FAE8(int mpeg) {
+    int event[8];
+    event[0] = 1;
+    DispatchMpegCallback(mpeg, event);
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BD28 */
-void func_0012FB48(void *arg0, int arg1, int arg2) {
-    int *p = (int *)arg0;
-    p[1] = arg2;
-    p[0] = arg1;
-    p[2] = arg1;
-    p[3] = arg1;
+/* Sets up four counters of a small state block from a start value and a size. */
+void func_0012FB48(void *state, int startValue, int size) {
+    int *words = (int *)state;
+    words[1] = size;
+    words[0] = startValue;
+    words[2] = startValue;
+    words[3] = startValue;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BD40 */
-void func_0012FB60(void *arg0) {
-    char *p = (char *)arg0;
-    *(int *)(p + 0xC) = *(int *)(p + 0x8);
+/* Copies one counter in a small state block into the one next to it. */
+void func_0012FB60(void *state) {
+    char *bytes = (char *)state;
+    *(int *)(bytes + 0xC) = *(int *)(bytes + 0x8);
 }

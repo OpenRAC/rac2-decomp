@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern unsigned char D_001A7B96 __attribute__((sda));
 typedef struct { int ids[2]; } SolTextPair;
 
@@ -58,26 +59,27 @@ extern unsigned long long func_00347EA0(unsigned long long);
 
 extern int func_0033E348(int);
 
-int func_0033CB18(char *a0, int a1)
+/* Handles input for the two-switch option menu: up/down moves the cursor and the confirm button flips the chosen switch. */
+int func_0033CB18(char *object, int flags)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *child = object + 8;
+    float *position;
+    int selected;
 
-    Fc558ca70_FUN_0033AE28(p);
-    q = *(float **)(a0 + 684);
-    Fc558ca70_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fc558ca70_FUN_0033AE28(child);
+    position = *(float **)(object + 684);
+    Fc558ca70_FUN_0033B018(child, position[0], position[1]);
+    if (flags & 0x1000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 680);
-        *(int *)(a0 + 680) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        selected = *(int *)(object + 680);
+        *(int *)(object + 680) = (selected + 1) % 2;
+    } else if (flags & 0x4000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 680);
-        *(int *)(a0 + 680) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        selected = *(int *)(object + 680);
+        *(int *)(object + 680) = (selected + 1) % 2;
+    } else if (flags & 0x40) {
         Fc558ca70_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 680)) {
+        switch (*(int *)(object + 680)) {
         case 0:
             Fc558ca70_D_001A7B95 = Fc558ca70_D_001A7B95 == 0;
             break;
@@ -86,15 +88,16 @@ int func_0033CB18(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (flags >> 6) & 1;
 }
 
+/* Cleans up the two-switch option menu. */
 char *func_0033CD80(char *object)
 {
     extern void func_003363D0(void *);
-    func_0033AB50((int)(object + 8));
-    func_003363D0(object + 0x2AC);
-    func_003363D0(object + 0x2F4);
+    DestroyButtonPromptBar((int)(object + 8));
+    ConstructDerivedObjectB(object + 0x2AC);
+    ConstructDerivedObjectB(object + 0x2F4);
     return object;
 }
 
@@ -103,6 +106,7 @@ char *func_0033CD80(char *object)
 
 /* func_0033D028 uses small data in 0033D028-g8.c. */
 
+/* Draws the audio options menu: the two volume sliders and the sound mode line. */
 void func_0033D2C0(char *object)
 {
     char buffer[128];
@@ -110,27 +114,28 @@ void func_0033D2C0(char *object)
     char *format, *first, *second;
     char *format2, *middle, *last;
     int color;
-    func_0033AF48(object + 8);
+    DrawButtonPromptBar(object + 8);
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE1A8;
     format = D_L00_001AE1B0;
-    first = func_00288FB8(0x2F0F);
-    func_00115DA8(buffer, format, first);
-    func_0027FA10(0x100, 0x91, color, buffer, -1);
-    func_00336548(object + 0x2AC);
+    first = GetLocalizedString(0x2F0F);
+    Sprintf(buffer, format, first);
+    DrawTextRightAlignedMediumFont(0x100, 0x91, color, buffer, -1);
+    DrawProgressBar(object + 0x2AC);
     color = *(int *)(object + 0x2A8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
-    middle = func_00288FB8(0x2F10);
-    func_00115DA8(buffer, format, middle);
-    func_0027FA10(0x100, 0xBE, color, buffer, -1);
-    func_00336548(object + 0x2F4);
+    middle = GetLocalizedString(0x2F10);
+    Sprintf(buffer, format, middle);
+    DrawTextRightAlignedMediumFont(0x100, 0xBE, color, buffer, -1);
+    DrawProgressBar(object + 0x2F4);
     color = *(int *)(object + 0x2A8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     format2 = D_L00_001AE118;
-    last = func_00288FB8(0x2F11);
-    second = func_00288FB8(pair.ids[*(int *)0x001A7B98 != 0]);
-    func_00115DA8(buffer, format2, last, second);
-    func_0027FB40(0x100, 0xE1, color, buffer, -1);
+    last = GetLocalizedString(0x2F11);
+    second = GetLocalizedString(pair.ids[*(int *)0x001A7B98 != 0]);
+    Sprintf(buffer, format2, last, second);
+    DrawTextCenteredMediumFont(0x100, 0xE1, color, buffer, -1);
 }
 
+/* Cleans up the one-switch option menu. */
 char *func_0033D440(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -140,21 +145,22 @@ char *func_0033D440(char *object)
 
 
 
+/* Handles input for a one-switch option menu: the confirm button flips the switch. */
 int func_0033D5A0 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7B96;
-  float *vec;
+  unsigned char *setting = &D_001A7B96;
+  float *position;
   int discarded;
 
   F5979c03f_FUN_0033AE28 (object + 8);
-  vec = *(float **) (object + 684);
-  F5979c03f_FUN_0033B018 (object + 8, vec[0], vec[1]);
+  position = *(float **) (object + 684);
+  F5979c03f_FUN_0033B018 (object + 8, position[0], position[1]);
 
   if ((flags & 0x40) && *(int *) (object + 680) == 0)
     {
       discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
       (void) discarded;
-      *g = (*g < 1);
+      *setting = (*setting < 1);
     }
 
   return (flags >> 6) & 1;
@@ -169,6 +175,7 @@ extern char *func_00288FB8(int);
 extern int func_00115DA8(char *, const char *, ...);
 extern void func_0027FAA8(int, int, unsigned long, char *, int);
 
+/* Draws the one-switch option line with its current on/off text. */
 void func_0033D638(char *object)
 {
     char buffer[128];
@@ -177,17 +184,18 @@ void func_0033D638(char *object)
     char *second;
     char *format;
     int color;
-    func_0033AF48(object + 8);
+    DrawButtonPromptBar(object + 8);
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
-    first = func_00288FB8(0x2D99);
-    second = func_00288FB8(pair.ids[*(unsigned char *)0x001A7B96 != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FAA8(0x100, 0xAA, color, buffer, -1);
+    first = GetLocalizedString(0x2D99);
+    second = GetLocalizedString(pair.ids[*(unsigned char *)0x001A7B96 != 0]);
+    Sprintf(buffer, format, first, second);
+    DrawTextCenteredSmallFont(0x100, 0xAA, color, buffer, -1);
 }
 
 
+/* Cleans up a one-switch option menu. */
 char *func_0033D708(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -197,26 +205,27 @@ char *func_0033D708(char *object)
 
 
 
-int func_0033D868(char *a0, int a1)
+/* Handles input for the second two-switch option menu: up/down moves the cursor and confirm flips a switch. */
+int func_0033D868(char *object, int flags)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *child = object + 8;
+    float *position;
+    int selected;
 
-    Fb7feb893_FUN_0033AE28(p);
-    q = *(float **)(a0 + 684);
-    Fb7feb893_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fb7feb893_FUN_0033AE28(child);
+    position = *(float **)(object + 684);
+    Fb7feb893_FUN_0033B018(child, position[0], position[1]);
+    if (flags & 0x1000) {
         Fb7feb893_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 680);
-        *(int *)(a0 + 680) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        selected = *(int *)(object + 680);
+        *(int *)(object + 680) = (selected + 1) % 2;
+    } else if (flags & 0x4000) {
         Fb7feb893_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 680);
-        *(int *)(a0 + 680) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        selected = *(int *)(object + 680);
+        *(int *)(object + 680) = (selected + 1) % 2;
+    } else if (flags & 0x40) {
         Fb7feb893_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 680)) {
+        switch (*(int *)(object + 680)) {
         case 0:
             Fb7feb893_D_001A7BB2 = Fb7feb893_D_001A7BB2 == 0;
             break;
@@ -225,10 +234,11 @@ int func_0033D868(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (flags >> 6) & 1;
 }
 
 
+/* Cleans up the two-switch option menu. */
 char *func_0033DAD0(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -238,6 +248,7 @@ char *func_0033DAD0(char *object)
 
 
 
+/* Handles input for a one-switch option menu: the confirm button flips the switch. */
 int func_0033DC30(char *object, int flags)
 {
     float *vec;
@@ -256,6 +267,7 @@ int func_0033DC30(char *object, int flags)
 }
 
 
+/* Draws the one-switch option line with its current on/off text. */
 void func_0033DCC8(char *object)
 {
     char buffer[128];
@@ -263,17 +275,18 @@ void func_0033DCC8(char *object)
     char *first;
     char *second;
     char *format;
-    func_0033AF48(object + 8);
+    DrawButtonPromptBar(object + 8);
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
-    first = func_00288FB8(0x2D9A);
-    second = func_00288FB8(pair.ids[*(unsigned char *)0x001A7BB2 != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FAA8(0x100, 0xAA, 0x80F0F0F0UL, buffer, -1);
+    first = GetLocalizedString(0x2D9A);
+    second = GetLocalizedString(pair.ids[*(unsigned char *)0x001A7BB2 != 0]);
+    Sprintf(buffer, format, first, second);
+    DrawTextCenteredSmallFont(0x100, 0xAA, 0x80F0F0F0UL, buffer, -1);
 }
 
 
 
+/* Cleans up a one-switch option menu. */
 char *func_0033DD80(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -283,6 +296,7 @@ char *func_0033DD80(char *object)
 
 
 
+/* Handles input for a one-switch option menu: the confirm button flips the switch. */
 int func_0033DEE0(char *object, int flags)
 {
     float *vec;
@@ -300,6 +314,7 @@ int func_0033DEE0(char *object, int flags)
     return (flags >> 6) & 1;
 }
 
+/* Cleans up a one-switch option menu. */
 char *func_0033DF78(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -309,6 +324,7 @@ char *func_0033DF78(char *object)
 
 
 
+/* Handles input for a one-switch option menu: the confirm button flips the switch. */
 int func_0033E0D8(char *object, int flags)
 {
     float *vec;
@@ -326,19 +342,21 @@ int func_0033E0D8(char *object, int flags)
     return (flags >> 6) & 1;
 }
 
-void* func_0033E170(void* param_1)
+/* Cleans up a menu page that has a scrolling list. */
+void* func_0033E170(void* object)
 {
-  func_0033AB50((int)param_1 + 8);
-  func_00347EA0((int)param_1 + 0x2b0);
-  return param_1;
+  DestroyButtonPromptBar((int)object + 8);
+  PassThroughHandle((int)object + 0x2b0);
+  return object;
 }
 
 
 
 
+/* Returns the list entry that is currently selected. */
 int func_0033E310(int owner)
 {
     int result;
-    result = func_0033E348(owner);
+    result = GetListSelectedIndex(owner);
     return *(int *)(owner + 0x378) + result * 0x14;
 }

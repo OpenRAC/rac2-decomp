@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     char pad0[0x30];
     float f30;
@@ -33,9 +34,10 @@ extern int D_L00_001B255C __attribute__((section(".sdata")));
 extern Cfg_390F28 D_L00_001BD2C0;
 extern void func_00284E18(int, int, int);
 
-void func_L00_00390F28(char *o, int full)
+/* Restores the lighting and fog settings saved by func_L00_00390E10; when full is set it also resets the view range. */
+void func_L00_00390F28(char *object, int full)
 {
-    State_390F28 *st = *(State_390F28 **)(o + 0x68);
+    State_390F28 *st = *(State_390F28 **)(object + 0x68);
 
     D_L00_001A8A44 = 0;
     D_L00_001B1984 = st->f30;
@@ -52,5 +54,5 @@ void func_L00_00390F28(char *o, int full)
         D_L00_001B1EB4 = 0x3C0;
         D_L00_001B20C0 = 0x1F4000;
     }
-    func_00284E18(D_L00_001BD2C0.a, D_L00_001BD2C0.b, D_L00_001BD2C0.c);
+    SetBackgroundColor(D_L00_001BD2C0.a, D_L00_001BD2C0.b, D_L00_001BD2C0.c);
 }

@@ -64,9 +64,9 @@ void func_L00_002D24E8(void)
     float time;
     float prior;
 
-    base = D_00189E20;
+    base = gHeroState;
     obj = *(AnimObject **)(base + 0x2290);
-    func_L00_002D1F60();
+    ClearHeroAnimFlags();
     HA->flags &= ~3;
     oldFrame = obj->frame;
     oldTime = obj->time;
@@ -96,30 +96,30 @@ void func_L00_002D24E8(void)
             HA->flags |= 1;
             obj->current = buffer;
             obj->frame = obj->nextFrame;
-            func_00282AB0(buffer, buffer + 0x600, 0x600);
+            CopyMemoryAligned(buffer, buffer + 0x600, 0x600);
             obj->nextFrame++;
             if (HA->request) {
                 HA->request = 0;
                 HA->rate = 1.0f / 0.0f; /* Retail uses a pooled positive infinity. */
                 /* Convert the cleared request, retaining the shared floating zero. */
                 obj->time = HA->request;
-                obj->nextFrame = *(u8 *)(D_00189E20 + 0xC44);
-                obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)(buffer + 0x600));
-                func_L00_002D24B8();
-                func_L00_002D20D0();
+                obj->nextFrame = *(u8 *)(gHeroState + 0xC44);
+                obj->next = CopyAnimationEntryData((char *)obj, obj->nextSeq, obj->nextFrame, (s32)(buffer + 0x600));
+                ClearHeroQueuedAnimation();
+                SyncSecondAnimationToMain();
             } else if (HA->queued != -1 && HA->queuedFrame < obj->nextFrame) {
                 HA->rate = 0.33333334f;
                 obj->time = 0.0f;
-                obj->nextFrame = *(u8 *)(D_00189E20 + 0xC40);
-                obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)(buffer + 0x600));
-                func_L00_002D20D0();
+                obj->nextFrame = *(u8 *)(gHeroState + 0xC40);
+                obj->next = CopyAnimationEntryData((char *)obj, obj->nextSeq, obj->nextFrame, (s32)(buffer + 0x600));
+                SyncSecondAnimationToMain();
             } else {
                 entry = obj->model->seqs[obj->nextSeq];
                 if ((u32)obj->nextFrame >= (u32)entry->count) {
                     obj->nextFrame = 0;
                     HA->flags |= 2;
                 }
-                obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+                obj->next = CopyAnimationEntryData((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
                 obj->time -= 1.0f;
                 obj->time /= HA->rate;
                 HA->rate = *(float *)obj->current;
@@ -133,34 +133,34 @@ void func_L00_002D24E8(void)
         s32 event;
         s32 i;
         s32 *events;
-        upper = obj->frame * 16 + func_00283CF0(obj->time * 16.0f);
-        lower = oldFrame * 16 + func_00283CF0(oldTime * 16.0f);
+        upper = obj->frame * 16 + FloatToInt(obj->time * 16.0f);
+        lower = oldFrame * 16 + FloatToInt(oldTime * 16.0f);
         sequence = obj->model->seqs[obj->seq];
         events = &sequence->frames[sequence->count];
         for (i = 0; i < sequence->triggers; i++, events++) {
             event = *events;
             frame = event >> 16;
             if (lower < frame && upper >= frame) {
-                func_002E5CF8(event & 0xFFFF, 0, (char *)obj);
+                PlayMobySound(event & 0xFFFF, 0, (char *)obj);
                 break;
             }
         }
     }
     if (obj->voice != 255) {
-        sound = D_00188660 + obj->voice * 0x70;
+        sound = gSoundState + obj->voice * 0x70;
         if (*(void **)(sound + 0x88) != obj)
             obj->voice = 255;
         else if (*(s16 *)(sound + 0x7E) != obj->sound) {
-            func_002E59F8(obj->voice);
+            StopSoundVoice(obj->voice);
             obj->voice = 255;
         }
     } else if (obj->sound != 255) {
-        obj->voice = func_002E5CF8(obj->sound, 4, (char *)obj);
+        obj->voice = PlayMobySound(obj->sound, 4, (char *)obj);
     }
-    func_L00_002D1ED8();
-    func_L00_002D2070();
+    UpdateLinkedObjectClock();
+    SyncLinkedObjectClock();
     prior = HA->frame;
-    time = func_0029F530((char *)obj);
+    time = GetMobyAnimationValue((char *)obj);
     HA->frame = time;
     if (time >= prior) HA->delta = time - prior;
     else HA->delta = delta;

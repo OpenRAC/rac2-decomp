@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 extern void func_00282CF0(void *, const void *, const void *);
@@ -5,6 +6,7 @@ extern void func_00282F70(void *, const void *, float);
 extern float func_00282DB0(const void *, const void *);
 extern float func_00282E80(const void *, const void *);
 
+/* Finds the closest point to a given point on a flat line segment, and returns how far away that point is. */
 float func_L00_00341B18(float *out, const float *point, const float *start, const float *end) {
     Vector delta;
     Vector normal;
@@ -14,14 +16,14 @@ float func_L00_00341B18(float *out, const float *point, const float *start, cons
     int axis;
     const float *a, *b;
     float *projection;
-    func_00282CF0(&delta, start, end);
+    FastVecSub(&delta, start, end);
     normal.f[0] = -delta.f[1];
     normal.f[1] = delta.f[0];
     normal.f[2] = 0.0f;
     base.q = *(const Quadword *)start;
     base.f[2] = 0.0f;
-    func_00282F70(&normal, &normal, 1.0f);
-    distance = func_00282DB0(&normal, &base);
+    FastVectorNormalizeHelper(&normal, &normal, 1.0f);
+    distance = FastVecDot(&normal, &base);
     distance = normal.f[0] * point[0] + normal.f[1] * point[1] - distance;
     out[0] = point[0] - distance * normal.f[0];
     out[1] = point[1] - distance * normal.f[1];
@@ -41,8 +43,8 @@ float func_L00_00341B18(float *out, const float *point, const float *start, cons
         ++a;
     } while (axis < 2);
     if (axis < 2) {
-        endpointDistance = func_00282E80(out, start);
-        if (endpointDistance < func_00282E80(out, end)) {
+        endpointDistance = vec_distance_xy(out, start);
+        if (endpointDistance < vec_distance_xy(out, end)) {
             *(Quadword *)out = *(const Quadword *)start;
             out[2] = 0.0f;
         } else {
@@ -50,5 +52,5 @@ float func_L00_00341B18(float *out, const float *point, const float *start, cons
             out[2] = 0.0f;
         }
     }
-    return func_00282E80(point, out);
+    return vec_distance_xy(point, out);
 }

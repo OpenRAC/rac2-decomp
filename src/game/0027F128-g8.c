@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* -G8 siblings for src/game/0027F128.c: these need the small-data addressing
    mode (absolute lui forms and gp-relative loads). */
@@ -14,8 +15,9 @@ extern int ref_L00_002EA630_01;
 extern f32 func_00283CE0(s32);
 extern s32 func_00283CF0(f32);
 
+/* Clears a data buffer and resets a related counter. */
 void func_00280630(void) {
-    func_00282A60(ref_L00_002EA630_00, 0, 0x600);
+    ClearMemory(ref_L00_002EA630_00, 0, 0x600);
     ref_L00_002EA630_01 = 0;
 }
 
@@ -32,11 +34,11 @@ int func_0027F1D8(u8 *text, int length, u8 *table, float scale) {
             c = *p;
             i++;
             p++;
-            total += func_00283CE0(*(s8 *)(table + c * 4 + 3)) * scale;
+            total += IntToFloat(*(s8 *)(table + c * 4 + 3)) * scale;
             if (i == length) break;
         } while (*p != 0);
     }
-    return func_00283CF0(total);
+    return FloatToInt(total);
 }
 
 extern s32 D_001A7BB8;
@@ -44,9 +46,10 @@ extern s32 D_001A7B90;
 extern s32 func_00124418(void);
 extern s32 func_001257D0(s32,s32,s32,s32);
 
+/* Updates the display mode when the screen type changes. */
 void func_00284000(void) {
     func_00124418();
-    if (D_001A7B90 != 0) D_001A7BB8 = 0;
-    if (D_001A7BB8 != 0) func_001257D0(0,0,0x50,1);
-    else func_001257D0(0,1,D_001A7B90 != 0 ? 3 : 2,0);
+    if (gIsPalVideo != 0) gWidescreenFlag = 0;
+    if (gWidescreenFlag != 0) ResetGsGraph(0,0,0x50,1);
+    else ResetGsGraph(0,1,gIsPalVideo != 0 ? 3 : 2,0);
 }

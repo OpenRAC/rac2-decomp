@@ -58,7 +58,7 @@ void func_L00_002A5518(void)
         D_L00_0025BE10.out_pitch = 0.296706f;
     if (D_L00_0025BE10.out_pitch < -0.17453295f)
         D_L00_0025BE10.out_pitch = -0.17453295f;
-    if ((unsigned int)(*(unsigned char *)((char *)D_00189E20.moby + 0x43) - 1) < 2) {
+    if ((unsigned int)(*(unsigned char *)((char *)gHeroState.moby + 0x43) - 1) < 2) {
         if (D_L00_0025BE10.out_yaw > 0.03490659f)
             D_L00_0025BE10.out_yaw = 0.03490659f;
         if (D_L00_0025BE10.out_yaw < -0.03490659f)
@@ -68,36 +68,36 @@ void func_L00_002A5518(void)
         if (D_L00_0025BE10.out_pitch < -0.122173056f)
             D_L00_0025BE10.out_pitch = -0.122173056f;
     }
-    func_L00_002A5480();
-    if (D_00189E20.counter == 0)
+    UpdateHeroEffectDelayTimer();
+    if (gHeroState.counter == 0)
         return;
-    D_00189E20.counter += 1;
-    if (D_00189E20.counter >= 12)
-        D_00189E20.counter = 0;
-    if (D_00189E20.counter == 0) {
+    gHeroState.counter += 1;
+    if (gHeroState.counter >= 12)
+        gHeroState.counter = 0;
+    if (gHeroState.counter == 0) {
         int i;
         for (i = 0; i < 7; i++) {
-            if (D_00189E20.effects[i].active)
-                func_0029F9F0((char *)D_00189E20.moby, (char *)&D_00189E20.effects[i]);
+            if (gHeroState.effects[i].active)
+                DetachManipulator((char *)gHeroState.moby, (char *)&gHeroState.effects[i]);
         }
         return;
     }
     {
         int i;
         for (i = 0; i < 7; i++) {
-            if (!D_00189E20.effects[i].active) {
-                func_0029F978(D_00189E20.moby, D_L00_001A7E40[i],
-                             (unsigned char *)&D_00189E20.effects[i]);
-                D_00189E20.effects[i].enabled = 1;
-                qcopy(&D_00189E20.effects[i].a, D_L00_0025DD90 + i);
-                qcopy(&D_00189E20.effects[i].b, D_L00_0025DE00 + i);
-                qcopy(&D_00189E20.effects[i].c, D_L00_0025DE70 + i);
+            if (!gHeroState.effects[i].active) {
+                AttachManipulator(gHeroState.moby, D_L00_001A7E40[i],
+                             (unsigned char *)&gHeroState.effects[i]);
+                gHeroState.effects[i].enabled = 1;
+                qcopy(&gHeroState.effects[i].a, D_L00_0025DD90 + i);
+                qcopy(&gHeroState.effects[i].b, D_L00_0025DE00 + i);
+                qcopy(&gHeroState.effects[i].c, D_L00_0025DE70 + i);
             }
         }
     }
     {
         int i;
         for (i = 0; i < 7; i++)
-            D_00189E20.effects[i].fade = D_L00_001A7E10[D_00189E20.counter];
+            gHeroState.effects[i].fade = D_L00_001A7E10[gHeroState.counter];
     }
 }

@@ -1,23 +1,24 @@
 #include "common.h"
 extern char *D_L02_001B1190[] SDATA(D_L02_001B1190);
 
-int func_L02_003FCBF0(char *a0) {
-    char *obj = *(char **)(a0 + 0x68);
-    char *sub = D_L02_001B1190[*(short *)(obj + 0x120)];
-    char *e = *(char **)(sub + 0x4) + *(short *)(obj + 0x122) * 0x14;
+/* Checks whether the current wave is finished so the next one can begin. */
+int func_L02_003FCBF0(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    char *challengeRow = D_L02_001B1190[*(short *)(state + 0x120)];
+    char *waveEntry = *(char **)(challengeRow + 0x4) + *(short *)(state + 0x122) * 0x14;
     int ok;
 
-    ok = *(int *)(obj + 0x90) == *(short *)(e + 0);
-    if (*(int *)(obj + 0x94) != *(short *)(e + 2))
+    ok = *(int *)(state + 0x90) == *(short *)(waveEntry + 0);
+    if (*(int *)(state + 0x94) != *(short *)(waveEntry + 2))
         ok = 0;
-    if (*(int *)(obj + 0x98) != *(short *)(e + 4))
+    if (*(int *)(state + 0x98) != *(short *)(waveEntry + 4))
         ok = 0;
     ok &= 1;
-    if (*(int *)(obj + 0x9C) != *(short *)(e + 6))
+    if (*(int *)(state + 0x9C) != *(short *)(waveEntry + 6))
         ok = 0;
-    if (*(unsigned char *)(e + 0x10))
-        ok &= *(int *)(obj + 0xA0);
-    if (*(unsigned char *)(e + 0x11))
-        ok &= *(int *)(obj + 0xA4);
-    return *(int *)(obj + 0x60) == 0 && ok != 0;
+    if (*(unsigned char *)(waveEntry + 0x10))
+        ok &= *(int *)(state + 0xA0);
+    if (*(unsigned char *)(waveEntry + 0x11))
+        ok &= *(int *)(state + 0xA4);
+    return *(int *)(state + 0x60) == 0 && ok != 0;
 }

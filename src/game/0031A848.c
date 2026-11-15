@@ -23,6 +23,7 @@ extern void func_00283098(void *, void *, void *);
 extern float func_002831B0(float);
 extern void ref_L00_003BFC98_00(void *, void *, int);
 
+/* Checks whether the target is turned away from where the object faces by more than the given number of degrees. Returns 1 if there is no target. */
 int func_0031A848(Moby31A848 *self, float limit) {
     float up[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
@@ -36,11 +37,11 @@ int func_0031A848(Moby31A848 *self, float limit) {
     ref_L00_003BFC98_00(self, fwd, 1);
     qcopy(up, &D_001A8BD0);
     up[0] = 1.0f;
-    func_00283098(up, up, (u8 *)self + 0xC0);
-    func_00282CF0(dir, vars->target + 0x10, (u8 *)self + 0x10);
-    func_00282F20(dir, dir, 1.0f);
-    func_00282F20(proj, fwd, func_00282DB0(fwd, dir));
-    func_00282CF0(dir, dir, proj);
-    func_00282F20(dir, dir, 1.0f);
-    return limit * 0.017453294f < func_00282C48(1.5707964f - func_002831B0(func_00282DB0(dir, up)));
+    matrix_mul_vec3(up, up, (u8 *)self + 0xC0);
+    FastVecSub(dir, vars->target + 0x10, (u8 *)self + 0x10);
+    vec_scale_to_length(dir, dir, 1.0f);
+    vec_scale_to_length(proj, fwd, FastVecDot(fwd, dir));
+    FastVecSub(dir, dir, proj);
+    vec_scale_to_length(dir, dir, 1.0f);
+    return limit * 0.017453294f < FloatAbs(1.5707964f - FastAngleHelper(FastVecDot(dir, up)));
 }

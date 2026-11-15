@@ -59,6 +59,7 @@ extern void func_00283098(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
+/* Per-frame update of the Damosel scene: tweaks a few kinds of objects, then in the final sequence sets off timed explosions with optional camera shake. */
 void func_L18_003170F8(void)
 {
     float position[4] __attribute__((aligned(16)));
@@ -67,28 +68,28 @@ void func_L18_003170F8(void)
     SceneMoby *moby;
     ExplosionSpot *spot;
 
-    func_L00_002FC980();
+    StartStartupAnimations();
     for (i = 0; i < D_L18_001BD4C0.count; i++) {
         object = D_L18_001BD4C0.objects[i];
-        if (object && *(short *)(object + 0xAA) == 0xE29) {
+        if (object && *(short *)(object + 0xAA) == 0xE29 /* moby class 3625 */) {
             *(unsigned short *)(object + 0x34) |= 0x800;
         }
-        if (*(short *)(object + 0xAA) == 0xD54) {
-            func_002E64A0(object);
+        if (*(short *)(object + 0xAA) == 0xD54 /* moby class 3412 */) {
+            UpdateEquipmentPieces(object);
         }
-        if (object && *(short *)(object + 0xAA) == 0xFA0) {
+        if (object && *(short *)(object + 0xAA) == 0xFA0 /* TV Screens */) {
             state = *(unsigned char **)(object + 0x68);
             if (state) {
-                func_L00_00326048(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
+                StoreAngleUpdateResult(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
             }
         }
     }
-    if (D_001A79F0 != 18 || D_L18_001BD4C0.mode != 4) {
+    if (gCurrentMapIndex != 18 || D_L18_001BD4C0.mode != 4) {
         return;
     }
     if (D_L18_001BD4C0.timer == 1) {
-        for (k = 0; &D_L18_001B281C[k] < D_L18_001B2820; k++) {
-            moby = &D_L18_001B281C[k];
+        for (k = 0; &gMobyTable_L18[k] < D_L18_001B2820; k++) {
+            moby = &gMobyTable_L18[k];
             moby->flags |= 0x41;
         }
     }
@@ -98,10 +99,10 @@ void func_L18_003170F8(void)
         if (timer == spot->time) {
             qcopy(position, spot->position);
             if (spot->cameraRelative) {
-                func_00283098(position, position, D_L18_001B9680.matrix);
-                func_00282CC0(position, position, D_L18_001B9680.position);
+                matrix_mul_vec3(position, position, D_L18_001B9680.matrix);
+                FastVecAdd(position, position, D_L18_001B9680.position);
             }
-            func_0032C700(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
+            SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {
                 D_L18_001B9680.shakeTime = 55;
                 D_L18_001B9680.secondaryShakeTime = 70;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_00329FF0 is a unit of its own: it is built with -g, whose line label in front of
    the `div.s` makes the assembler pad that division with retail's two nops (the
@@ -22,10 +23,10 @@ s32 func_L00_00329FF0(s32 value) {
         f32 q;
         f32 d;
 
-        q = func_00283CE0(value);
+        q = IntToFloat(value);
         d = (f32)divisor;
         q = q / d;
-        value = (func_00283CF0(q) + 1) << 4;
+        value = (FloatToInt(q) + 1) << 4;
     }
     return value;
 }

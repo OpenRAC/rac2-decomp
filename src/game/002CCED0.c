@@ -12,6 +12,7 @@ extern short D_L00_001AA8F2;
 extern short D_L00_001AA90A;
 extern short D_L00_001AA922;
 
+/* Updates five menu icon values from five unlock flags: each becomes 3 when unlocked and 0 when not. */
 void func_002CCED0(void)
 {
     D_L00_001AA8C2 = D_001A7BC9.value ? 3 : 0;

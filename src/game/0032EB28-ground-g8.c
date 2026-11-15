@@ -52,30 +52,30 @@ void func_003304D8(char *object)
     float inv, angle;
     char *vehicle = object;
 
-    func_00282C88(center);
+    ClearVector128(center);
     hit = 0;
-    func_00282C88(normal);
-    func_00282F20(offset, D_001B2830, D_001B096C + D_001B096C);
+    ClearVector128(normal);
+    vec_scale_to_length(offset, D_001B2830, D_001B096C + D_001B096C);
     points = D_00237780;
     out = points;
     count = 0;
     for (i = 0; i < 8; i++) {
         float *probe = probes[order[i]];
-        func_00282CC0(a, probe, offset);
-        if (func_002761F8(probe, a, 18, object, 0)) {
+        FastVecAdd(a, probe, offset);
+        if (CollLine(probe, a, 18, object, 0)) {
             hit = 1;
-            if (func_00300540(func_00278E78())) {
+            if (GetWeaponGroup(GetCollHitMaterial())) {
                 object[0x20] = 9;
                 *(int *)(state + 0x60) = 10;
                 continue;
             }
-            func_00282D30(b, D_001BAFC0, 0.0009765625f);
-            func_00282F20(b, b, 1.0f);
-            func_00282F20(c, D_001B2830, -1.0f);
-            if (func_00282C30(func_00282DB0(b, c) > 0.5f) || D_001B2844) {
+            FastVecScale(b, D_001BAFC0, 0.0009765625f);
+            vec_scale_to_length(b, b, 1.0f);
+            vec_scale_to_length(c, D_001B2830, -1.0f);
+            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || D_001B2844) {
                 qcopy(out, D_001BAFA0);
                 ++out;
-                func_00282CC0(center, center, D_001BAFA0);
+                FastVecAdd(center, center, D_001BAFA0);
                 ++count;
             }
         }
@@ -93,37 +93,37 @@ void func_003304D8(char *object)
         int grounded = hit;
 
         if (count) {
-            inv = 1.0f / func_00283CE0(count);
+            inv = 1.0f / IntToFloat(count);
             for (i = 0; i < count; ++i) {
-                func_00282CF0(a, hits[i], moby + 0x10);
-                func_00282CF0(b, hits[i + 1 == count ? 0 : i + 1], moby + 0x10);
-                func_00282F20(a, a, 1.0f);
-                func_00282F20(b, b, 1.0f);
-                func_00282DD8(edges[i], b, a);
-                func_00282F20(edges[i], edges[i], 1.0f);
-                func_00282CC0(normal, normal, edges[i]);
+                FastVecSub(a, hits[i], moby + 0x10);
+                FastVecSub(b, hits[i + 1 == count ? 0 : i + 1], moby + 0x10);
+                vec_scale_to_length(a, a, 1.0f);
+                vec_scale_to_length(b, b, 1.0f);
+                FastVecCross(edges[i], b, a);
+                vec_scale_to_length(edges[i], edges[i], 1.0f);
+                FastVecAdd(normal, normal, edges[i]);
             }
-            func_00282D30(normal, normal, inv);
-            func_00282F20(a, normal, 1.0f);
-            func_00282F20(c, moby + 0xE0, 1.0f);
-            func_00282F20(b, a, 1.0f);
-            func_00282DD8(axis, c, b);
-            angle = func_00282DB0(c, b) * (D_001B09CC * 0.5f);
-            func_00282D30(b, axis, func_00283198(angle));
-            b[3] = func_00283180(angle);
-            func_00283958(b, matrix);
-            func_00283738(moby + 0xC0, matrix, moby + 0xC0);
-            func_00282D30(center, center, inv);
-            func_00282CF0(target, center, moby + 0x10);
-            func_00282D30(target, D_001B2830, func_00282DB0(target, D_001B2830));
-            func_00282CC0(target, target, moby + 0x10);
-            func_00282D08(moby + 0x10, moby + 0x10, target, D_001B09C8);
+            FastVecScale(normal, normal, inv);
+            vec_scale_to_length(a, normal, 1.0f);
+            vec_scale_to_length(c, moby + 0xE0, 1.0f);
+            vec_scale_to_length(b, a, 1.0f);
+            FastVecCross(axis, c, b);
+            angle = FastVecDot(c, b) * (D_001B09CC * 0.5f);
+            FastVecScale(b, axis, FastSinOrCosB(angle));
+            b[3] = FastSinOrCosA(angle);
+            quaternion_to_rotation_basis(b, matrix);
+            multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
+            FastVecScale(center, center, inv);
+            FastVecSub(target, center, moby + 0x10);
+            FastVecScale(target, D_001B2830, FastVecDot(target, D_001B2830));
+            FastVecAdd(target, target, moby + 0x10);
+            lerp_vector(moby + 0x10, moby + 0x10, target, D_001B09C8);
         }
-        func_00282F20(a, moby + 0xE0, 0.15f);
-        func_00282CC0(a, moby + 0x10, a);
+        vec_scale_to_length(a, moby + 0xE0, 0.15f);
+        FastVecAdd(a, moby + 0x10, a);
         if (!grounded) {
             moby[0x20] = 4;
-            func_00282F20(vars, moby + 0xC0, *(float *)(vars + 0x58));
+            vec_scale_to_length(vars, moby + 0xC0, *(float *)(vars + 0x58));
         }
     }
 }

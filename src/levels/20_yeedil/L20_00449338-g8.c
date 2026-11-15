@@ -23,38 +23,39 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 extern void func_002A7750(char *, int, int);
 extern void func_00282CF0(void *, void *, void *);
 
-void func_L20_00449338(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    TI128 v0, v1, v2;
+/* Update handler for moby class 4739: lifts the object upward when it is triggered, then holds it at the top. */
+void func_L20_00449338(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    TI128 oldPos, oldRot, moveDelta;
 
-    qcopy(&v0, arg0 + 0x10);
-    qcopy(&v1, arg0 + 0xF0);
-    switch (*(u8 *)(arg0 + 0x20)) {
+    qcopy(&oldPos, moby + 0x10);
+    qcopy(&oldRot, moby + 0xF0);
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
         *(float *)(state + 0x90) = 0.0f;
-        qcopy(state + 0x60, arg0 + 0x10);
-        qcopy(state + 0x70, arg0 + 0xF0);
-        if ((*(u8 *)(arg0 + 0xB0) != 0xFF && *(u32 *)(state + 0x8C) != 0
-             && (D_0019B2E8[D_001A79F0][*(u8 *)(arg0 + 0xB0)] & 0x80))
+        qcopy(state + 0x60, moby + 0x10);
+        qcopy(state + 0x70, moby + 0xF0);
+        if ((*(u8 *)(moby + 0xB0) != 0xFF && *(u32 *)(state + 0x8C) != 0
+             && (D_0019B2E8[gCurrentMapIndex][*(u8 *)(moby + 0xB0)] & 0x80))
             || (*(int *)(state + 0x88) != -1
-                && func_L00_00329520(D_00189EA0, *(int *)(state + 0x88)) != 0)) {
+                && IsPointInsideRegion(gHeroPosition, *(int *)(state + 0x88)) != 0)) {
             float base = *(float *)(state + 0x68);
             float rise = *(float *)(state + 0x80);
 
-            *(u16 *)(arg0 + 0x34) |= 2;
-            *(float *)(arg0 + 0x18) = base + rise;
-            func_002A7750(arg0, 3, -1);
+            *(u16 *)(moby + 0x34) |= 2;
+            *(float *)(moby + 0x18) = base + rise;
+            SetMobyState(moby, 3, -1);
         } else {
-            func_002A7750(arg0, 1, -1);
+            SetMobyState(moby, 1, -1);
         }
         break;
     case 1:
-        if (*(u8 *)(arg0 + 0xBC) != 0 || func_002B38B8(arg0) != 0
-            || (*(u8 *)(arg0 + 0xB0) != 0xFF && *(u32 *)(state + 0x8C) != 0
-                && (D_0019B2E8[D_001A79F0][*(u8 *)(arg0 + 0xB0)] & 0x80))
+        if (*(u8 *)(moby + 0xBC) != 0 || IsThirdPendingFlagSet(moby) != 0
+            || (*(u8 *)(moby + 0xB0) != 0xFF && *(u32 *)(state + 0x8C) != 0
+                && (D_0019B2E8[gCurrentMapIndex][*(u8 *)(moby + 0xB0)] & 0x80))
             || (*(int *)(state + 0x88) != -1
-                && func_L00_00329520(D_00189EA0, *(int *)(state + 0x88)) != 0)) {
-            func_002A7750(arg0, 2, -1);
+                && IsPointInsideRegion(gHeroPosition, *(int *)(state + 0x88)) != 0)) {
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2: {
@@ -67,14 +68,14 @@ void func_L20_00449338(char *arg0) {
         baseline = *(float *)(state + 0x68);
         progress *= amplitude;
         baseline += progress;
-        *(float *)(arg0 + 0x18) = baseline;
+        *(float *)(moby + 0x18) = baseline;
         if (*(float *)(state + 0x90) >= 1.0f)
-            func_002A7750(arg0, 3, -1);
+            SetMobyState(moby, 3, -1);
         break;
     }
     }
-    if (*(u8 *)(arg0 + 0x20) < 3) {
-        func_00282CF0(&v2, arg0 + 0x10, &v0);
-        func_002AD6F0(state + 0x20, &v2, &v1, arg0 + 0xF0);
+    if (*(u8 *)(moby + 0x20) < 3) {
+        FastVecSub(&moveDelta, moby + 0x10, &oldPos);
+        CombineTransformsAndStore(state + 0x20, &moveDelta, &oldRot, moby + 0xF0);
     }
 }

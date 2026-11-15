@@ -54,6 +54,7 @@ extern s64 func_00121AB8(s64, s64);
 #define sbrk_base  (D_00134600[0])
 #define sbrked_mem (D_00134618[0])
 
+/* Hands unused memory at the end of the heap back to the system. */
 s32 func_00117108(struct _reent *ptr, u32 pad) {
     s64 top_size;
     s64 extra;
@@ -61,18 +62,18 @@ s32 func_00117108(struct _reent *ptr, u32 pad) {
     u8 *new_brk;
     u64 pagesz = malloc_getpagesize;
 
-    func_00116300(ptr);
+    AcquireMallocLock(ptr);
 
     top_size = chunksize(top);
     extra = ((top_size - pad - MINSIZE + (pagesz - 1)) / pagesz - 1) * pagesz;
 
     if (extra < (s64)pagesz) {
-        func_00116360(ptr);
+        ReleaseMallocLock(ptr);
         return 0;
     } else {
         current_brk = (u8 *)MORECORE(0);
         if (current_brk != (u8 *)(top) + top_size) {
-            func_00116360(ptr);
+            ReleaseMallocLock(ptr);
             return 0;
         } else {
             new_brk = (u8 *)MORECORE(-extra);
@@ -83,12 +84,12 @@ s32 func_00117108(struct _reent *ptr, u32 pad) {
                     sbrked_mem = (u32)(current_brk - (u8 *)sbrk_base);
                     set_head(top, top_size | 1);
                 }
-                func_00116360(ptr);
+                ReleaseMallocLock(ptr);
                 return 0;
             } else {
                 set_head(top, (top_size - extra) | 1);
                 sbrked_mem -= (u32)extra;
-                func_00116360(ptr);
+                ReleaseMallocLock(ptr);
                 return 1;
             }
         }

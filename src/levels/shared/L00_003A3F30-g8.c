@@ -26,6 +26,7 @@ extern int func_002E5CF8(int, int, char *);
 extern char *func_L00_003AB8B8(void *, void *);
 
 /* Update the firing effect and its input-controlled cooldown. */
+/* Per-frame update for the Seeker Gun moby: plays the firing effect and sets the cooldown from the fire button. */
 void func_L00_003A3F30(char *moby)
 {
     float position[4];
@@ -35,45 +36,45 @@ void func_L00_003A3F30(char *moby)
         *(unsigned char *)(moby + 0x20) = 1;
     if (*(unsigned char *)(moby + 0x42) == *(unsigned char *)(moby + 0x43) &&
         (*(unsigned char *)(moby + 0x60) & 2))
-        func_002A75E0(moby, 1, 0, 2, 0);
-    func_L00_0037E000(H->ptr[0x2290 / 4]);
+        StartAnimationBlendedWithFlags(moby, 1, 0, 2, 0);
+    ReleaseDeadOrExpiredSlots(H->ptr[0x2290 / 4]);
     *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L00_001AF624;
     D_L00_0025C64C = 0.1f;
     if (H->i[0x2294 / 4] == 1)
-        func_L00_002C42E0(29, 1);
+        SetHeroAction_L00(29, 1);
     if (H->i[0x2294 / 4] == 29) {
         unsigned int color;
-        if (*cooldown > 0.0f && func_L00_002D4040(-1))
+        if (*cooldown > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
-        func_00273318(moby, color, 0, 0x27, -1, 4, 2.0f, 0.0f, 90.0f);
+        AddMobyMarker(moby, color, 0, 0x27, -1, 4, 2.0f, 0.0f, 90.0f);
     }
     if (H->ptr[0x1450 / 4])
         H->ptr[0xBF8 / 4] = H->ptr[0x1450 / 4];
     ready = 1;
     if (H->i[0x2294 / 4] == 29) {
-        if (func_00282948(&H->i[0x2534 / 4]) == 0)
+        if (FastFloatHelperD(&H->i[0x2534 / 4]) == 0)
             ready = 0;
     } else
         H->i[0x2534 / 4] = 40;
-    if (func_002829D8(cooldown) && !H->b[0x22BC] &&
+    if (FastVectorHelperB(cooldown) && !H->b[0x22BC] &&
         (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] > 22 && ready) {
-        if (func_L00_002D3F30(-1, 1)) {
+        if (SpendWeaponAmmo(-1, 1)) {
             char *effect;
             D_L00_001B2860 = 1;
-            func_0029FCC0(moby, 0, (char *)position);
-            func_002E5CF8(1, 0, moby);
-            func_002A75E0(moby, 2, 0, 2, 0);
-            effect = func_L00_003AB8B8(position, moby);
+            TransformMobyJointToWorld(moby, 0, (char *)position);
+            PlayMobySound(1, 0, moby);
+            StartAnimationBlendedWithFlags(moby, 2, 0, 2, 0);
+            effect = FireEffectFromHeroFacing(position, moby);
             if (effect)
                 *(char **)(effect + 0xB8) = moby;
         } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L00_001B2860 == 1) {
-            func_002E5CF8(0, 0, moby);
+            PlayMobySound(0, 0, moby);
             D_L00_001B2860 = 0;
         }
         {
-            WeaponEntry *entry = &D_L00_00262570[D_00139580[0]];
+            WeaponEntry *entry = &gWeaponTable_L00[D_00139580[0]];
             *cooldown = 1.0f / entry->fireRate;
         }
     }

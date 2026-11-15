@@ -331,6 +331,7 @@ static inline UDItype __udivmoddi4(UDItype n, UDItype d, UDItype *rp) {
 
 UDItype __udivmoddi4();
 
+/* Gives the remainder of dividing one unsigned 64-bit number by another. */
 UDItype func_001220F0(UDItype u, UDItype v) {
     UDItype w;
 

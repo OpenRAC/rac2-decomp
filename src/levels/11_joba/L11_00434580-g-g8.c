@@ -52,68 +52,69 @@ extern unsigned int D_L11_001B11E8 __attribute__((sda));
 extern unsigned int D_L11_001B11F0 __attribute__((sda));
 extern unsigned int D_L11_001B11F8 __attribute__((sda));
 extern void func_L11_00434AA8(char *);
+/* Moves a thrown projectile each frame, spawns its trail, and bursts into pieces when it hits something or runs out of time. */
 void func_L11_00434580(char *obj) {
     float vel[4]; char collision[48]; float pos[4],pos2[4];
-    char *st=*(char **)(obj+0x68);
-    float scale=*(float *)(st+0x3C);
+    char *vars=*(char **)(obj+0x68);
+    float scale=*(float *)(vars+0x3C);
     float *impact;
-    *(float *)(st+0x38)+=1;
-    if (*(float *)(st+0x38)<25) {
+    *(float *)(vars+0x38)+=1;
+    if (*(float *)(vars+0x38)<25) {
         float size; int sign;
-        *(float *)(st+0x34)+=1;
-        func_00282F20(st+0x10,st+0x20,*(float *)(st+0x34));
-        func_00282F20(vel,st+0x20,0.06666667f);
-        func_002A8C00(collision,obj,0x10001,vel,scale);
+        *(float *)(vars+0x34)+=1;
+        vec_scale_to_length(vars+0x10,vars+0x20,*(float *)(vars+0x34));
+        vec_scale_to_length(vel,vars+0x20,0.06666667f);
+        make_hit_descriptor(collision,obj,0x10001,vel,scale);
         *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
-        func_00282CC0(st+0x10,st,st+0x10);
-        if(func_002761F8(st,st+0x10,0,obj,collision)) {
+        FastVecAdd(vars+0x10,vars,vars+0x10);
+        if(CollLine(vars,vars+0x10,0,obj,collision)) {
             impact=(float *)D_L11_001C0D20;
-            *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
-            if(!func_002B38B8(obj)) {
-                func_L11_00434F48(impact,6);
-                func_L00_003294F0(obj,1);
+            *(Quad34580 *)(vars+0x10)=*(Quad34580 *)impact;
+            if(!IsThirdPendingFlagSet(obj)) {
+                SpawnImpactParticleBurst_L11(impact,6);
+                SetObjectFlagBit(obj,1);
             }
-            func_0029F338(obj); return;
+            MarkMobySpawned(obj); return;
         }
-        size=func_002A7878(1,4);
-        sign=func_002A7820(25,35); if(!sign) sign--;
-        qcopy(pos,st+0x10); pos[2]-=0.1f;
-        func_002C2210(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+        size=RandomFloatRange(1,4);
+        sign=RandomIntRange(25,35); if(!sign) sign--;
+        qcopy(pos,vars+0x10); pos[2]-=0.1f;
+        SpawnGroundEffectParticle(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
         sign = -sign;
-        func_002C2210(st,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
-        func_002C2210(st,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
-        func_L00_002E6EF8(func_L11_00434AA8,obj);
+        SpawnGroundEffectParticle(vars,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
+        SpawnGroundEffectParticle(vars,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
+        AddDrawCallbackToList3(RunProjectileTrailSteps,obj);
         return;
-    } else if (*(float *)(st+0x38)>=25 && *(float *)(st+0x38)<34) {
-        if(func_00282E80(st,st+0x10)>1) {
+    } else if (*(float *)(vars+0x38)>=25 && *(float *)(vars+0x38)<34) {
+        if(vec_distance_xy(vars,vars+0x10)>1) {
             float size; int sign;
-            *(float *)(st+0x34)+=1;
-            func_00282F20(st+0x10,st+0x20,*(float *)(st+0x34));
-            func_00282F20(vel,st+0x20,0.06666667f);
-            func_002A8C00(collision,obj,0x10001,vel,scale);
+            *(float *)(vars+0x34)+=1;
+            vec_scale_to_length(vars+0x10,vars+0x20,*(float *)(vars+0x34));
+            vec_scale_to_length(vel,vars+0x20,0.06666667f);
+            make_hit_descriptor(collision,obj,0x10001,vel,scale);
             *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
-            func_00282CC0(st+0x10,st,st+0x10);
-            if(func_002761F8(st,st+0x10,0,obj,collision)) {
+            FastVecAdd(vars+0x10,vars,vars+0x10);
+            if(CollLine(vars,vars+0x10,0,obj,collision)) {
                 impact=(float *)D_L11_001C0D20;
-            *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
-                if(!func_002B38B8(obj)) {
-                    func_L11_00434F48(impact,3);
-                    func_L00_003294F0(obj,1);
+            *(Quad34580 *)(vars+0x10)=*(Quad34580 *)impact;
+                if(!IsThirdPendingFlagSet(obj)) {
+                    SpawnImpactParticleBurst_L11(impact,3);
+                    SetObjectFlagBit(obj,1);
                 }
-                func_0029F338(obj); return;
+                MarkMobySpawned(obj); return;
             }
-            func_00282F20(pos,st+0x20,1.66666675f);
-            func_00282CC0(st,st,pos);
-            size=func_002A7878(1,4);
-            sign=func_002A7820(25,35); if(!sign) sign--;
-            qcopy(pos2,st+0x10); pos2[2]-=0.1f;
-            func_002C2210(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
-            func_002C2210(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
-            func_L00_002E6EF8(func_L11_00434AA8,obj);
+            vec_scale_to_length(pos,vars+0x20,1.66666675f);
+            FastVecAdd(vars,vars,pos);
+            size=RandomFloatRange(1,4);
+            sign=RandomIntRange(25,35); if(!sign) sign--;
+            qcopy(pos2,vars+0x10); pos2[2]-=0.1f;
+            SpawnGroundEffectParticle(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+            SpawnGroundEffectParticle(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
+            AddDrawCallbackToList3(RunProjectileTrailSteps,obj);
             return;
 
         }
         return;
     }
-    func_0029F338(obj);
+    MarkMobySpawned(obj);
 }

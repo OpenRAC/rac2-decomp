@@ -46,62 +46,63 @@ extern void func_L07_003F6F00(void *);
 extern void func_L02_003CE908(void *);
 extern void func_L14_00428A08(void *);
 
+/* Updates the prison guard: it idles, wanders, walks toward the player, gets alerted and reacts to being hit. */
 void func_L14_004275E0(char *obj) {
-    char *s = *(char **)(obj+0x68);
+    char *vars = *(char **)(obj+0x68);
     typedef int Quad __attribute__((mode(TI)));
     Quad vec;
     int flags;
     float angle, speed;
-    func_L14_004281D0(obj);
+    UpdatePrisonGuardCommon(obj);
     switch (B(obj,0x95)) {
     case 0:
-        if (func_002B3890(obj)) {
-            func_002B60B0(obj,0.005f,0.06666667f,0.006981317885220051f,0.4188791f);
-            F(s,0x1D0)=D_L14_001B18B4*0.016666668f;
-            F(s,0x124)=0.006666667f;
-            F(s,0x134)=0.5f;
-            H(s,0x33A)=func_002A7820(0,30);
+        if (SetSecondPendingFlag(obj)) {
+            SetControllerSpeedLimits(obj,0.005f,0.06666667f,0.006981317885220051f,0.4188791f);
+            F(vars,0x1D0)=D_L14_001B18B4*0.016666668f;
+            F(vars,0x124)=0.006666667f;
+            F(vars,0x134)=0.5f;
+            H(vars,0x33A)=RandomIntRange(0,30);
         }
-        if (H(s,0x314)==1 && func_00282978(s+0x33A)) {
-            if (func_002A77E0(3)) func_002A7750(obj,9,2);
-            else func_002A7750(obj,8,2);
-        } else if (H(s,0x316)) {
-            if (func_002A77E0(2)) func_002A7750(obj,7,1);
-            else func_002A7750(obj,6,1);
-            H(s,0x316)=0;
-            if (H(s,0x310)<300) H(s,0x310)=func_002A7820(480,600);
+        if (H(vars,0x314)==1 && FastDecTimer(vars+0x33A)) {
+            if (RandomIntBelow(3)) SetMobyState(obj,9,2);
+            else SetMobyState(obj,8,2);
+        } else if (H(vars,0x316)) {
+            if (RandomIntBelow(2)) SetMobyState(obj,7,1);
+            else SetMobyState(obj,6,1);
+            H(vars,0x316)=0;
+            if (H(vars,0x310)<300) H(vars,0x310)=RandomIntRange(480,600);
         }
         break;
     case 1:
-        if (func_002B3890(obj)) {
-            func_002B60B0(obj,0.005f,0.06666667f,0.017453294f,1.0471977f);
-            F(s,0x1D0)=D_L14_001B18B0*0.016666668f;
-            F(s,0x134)=0.05f;
+        if (SetSecondPendingFlag(obj)) {
+            SetControllerSpeedLimits(obj,0.005f,0.06666667f,0.017453294f,1.0471977f);
+            F(vars,0x1D0)=D_L14_001B18B0*0.016666668f;
+            F(vars,0x134)=0.05f;
         }
-        if (H(s,0x314)==1) func_002A7750(obj,9,2);
-        else if (H(s,0x310)==0) func_002A7750(obj,1,0);
+        if (H(vars,0x314)==1) SetMobyState(obj,9,2);
+        else if (H(vars,0x310)==0) SetMobyState(obj,1,0);
         break;
     case 2:
-        if (func_002B3890(obj)) {
-            func_002B60B0(obj,0.005f,0.06666667f,0.017453294f,1.0471977f);
-            F(s,0x1D0)=D_L14_001B18B0*0.016666668f;
-            F(s,0x124)=0.006666667f;
-            F(s,0x134)=0.05f;
-            H(s,0x33A)=func_002A7820(0,30);
+        if (SetSecondPendingFlag(obj)) {
+            SetControllerSpeedLimits(obj,0.005f,0.06666667f,0.017453294f,1.0471977f);
+            F(vars,0x1D0)=D_L14_001B18B0*0.016666668f;
+            F(vars,0x124)=0.006666667f;
+            F(vars,0x134)=0.05f;
+            H(vars,0x33A)=RandomIntRange(0,30);
         }
-        if (H(s,0x314)!=1 && func_00282978(s+0x33A)) {
-            func_002A7750(obj,3,1);
-            H(s,0x310)=func_002A7820(580,600);
+        if (H(vars,0x314)!=1 && FastDecTimer(vars+0x33A)) {
+            SetMobyState(obj,3,1);
+            H(vars,0x310)=RandomIntRange(580,600);
         }
         break;
     case 3:
-        flags=func_002B1C20(obj,s+0x50);
-        if (flags&1) func_L02_003CEA28(obj);
+        flags=DispatchActionByKind(obj,vars+0x50);
+        if (flags&1) ExplodeAndRemoveMoby_L02(obj);
         else if (flags&2) {
-            if (H(s,0x314)==1) func_002A7750(obj,9,2);
+            if (H(vars,0x314)==1) SetMobyState(obj,9,2);
             else {
-                func_002A7750(obj,3,1);
-                H(s,0x310)=func_002A7820(580,600);
+                SetMobyState(obj,3,1);
+                H(vars,0x310)=RandomIntRange(580,600);
             }
         }
         break;
@@ -109,128 +110,128 @@ void func_L14_004275E0(char *obj) {
     switch (B(obj,0x20)) {
     case 1:
         if (!B(obj,0x31)) break;
-        if (func_002B3868(obj)) {
-            int choice=!func_002A77E0(4);
-            if (B(obj,0x43)!=choice) func_002A7470(obj,choice,0,10);
-            H(s,0x312)=func_002A7820(60,120);
+        if (SetFirstPendingFlag(obj)) {
+            int choice=!RandomIntBelow(4);
+            if (B(obj,0x43)!=choice) StartAnimationBlended(obj,choice,0,10);
+            H(vars,0x312)=RandomIntRange(60,120);
         }
         if (B(obj,0x43)==1) {
-            if (B(obj,0x60)&2) func_002A7470(obj,0,0,20);
-        } else if (H(s,0x312)==0) {
-            if (!H(s,0x338) || func_00282DB0(s+0x300,D_0018A0E0)>0.8f) func_002A7750(obj,2,-1);
+            if (B(obj,0x60)&2) StartAnimationBlended(obj,0,0,20);
+        } else if (H(vars,0x312)==0) {
+            if (!H(vars,0x338) || FastVecDot(vars+0x300,D_0018A0E0)>0.8f) SetMobyState(obj,2,-1);
         }
         break;
     case 2:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=6) func_002A7470(obj,6,0,20);
-            angle=func_002A7940(); speed=func_002A7878(2,5);
-            F(s,0x2F0)=func_00283180(angle)*speed;
-            F(s,0x2F4)=func_00283198(angle)*speed;
-            W(s,0x2F8)=0;
-            func_00282CC0(s+0x2F0,s+0x2F0,s+0x2E0);
-            if (W(s,0x218)!=-1) {
-                vec=*(Quad *)(s+0x2E0);
-                func_L02_0032EF10(&vec,s+0x2F0,s+0x2F0,W(s,0x218),1.5f);
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=6) StartAnimationBlended(obj,6,0,20);
+            angle=RandomAngle(); speed=RandomFloatRange(2,5);
+            F(vars,0x2F0)=FastSinOrCosA(angle)*speed;
+            F(vars,0x2F4)=FastSinOrCosB(angle)*speed;
+            W(vars,0x2F8)=0;
+            FastVecAdd(vars+0x2F0,vars+0x2F0,vars+0x2E0);
+            if (W(vars,0x218)!=-1) {
+                vec=*(Quad *)(vars+0x2E0);
+                ClampMoveToPathArea(&vec,vars+0x2F0,vars+0x2F0,W(vars,0x218),1.5f);
             }
         }
-        func_L02_003CE8B0(obj,s+0x2F0,0);
-        if (U(obj,0x96)>30 && (F(s,0x1CC)<=0.5f || U(obj,0x96)>180)) func_002A7750(obj,1,-1);
+        RunEntryHookByMode(obj,vars+0x2F0,0);
+        if (U(obj,0x96)>30 && (F(vars,0x1CC)<=0.5f || U(obj,0x96)>180)) SetMobyState(obj,1,-1);
         break;
     case 3:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=func_002A77E0(2)+4) func_002A7470(obj,func_002A77E0(2)+4,0,10);
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=RandomIntBelow(2)+4) StartAnimationBlended(obj,RandomIntBelow(2)+4,0,10);
         }
-        if (func_00282E48(obj+0x10,D_00189EA0)<D_L14_001B18B8_gp[0]) func_002A7750(obj,4,-1);
+        if (fast_vec_dist(obj+0x10,gHeroPosition)<D_L14_001B18B8_gp[0]) SetMobyState(obj,4,-1);
         else if (B(obj,0x60)&2) {
-            switch (func_002A77E0(3)) {
-            case 0:func_002A7750(obj,6,-1);break;
-            case 1:func_002A7750(obj,7,-1);break;
-            case 2:func_002A7750(obj,5,-1);break;
+            switch (RandomIntBelow(3)) {
+            case 0:SetMobyState(obj,6,-1);break;
+            case 1:SetMobyState(obj,7,-1);break;
+            case 2:SetMobyState(obj,5,-1);break;
             }
         }
         break;
     case 6:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=func_002A77E0(2)+2) func_002A7470(obj,func_002A77E0(2)+2,0,10);
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=RandomIntBelow(2)+2) StartAnimationBlended(obj,RandomIntBelow(2)+2,0,10);
         }
-        func_L02_00332630(obj,s+0x1F0);
-        if (B(obj,0x60)&2) func_002A7750(obj,3,-1);
+        CheckTargetPointFromOffset(obj,vars+0x1F0);
+        if (B(obj,0x60)&2) SetMobyState(obj,3,-1);
         break;
     case 7:
-        if (func_002B3868(obj) && B(obj,0x43)!=12) func_002A7470(obj,12,0,10);
-        func_L02_00332630(obj,s+0x1F0);
-        if (B(obj,0x60)&2) func_002A7750(obj,3,-1);
+        if (SetFirstPendingFlag(obj) && B(obj,0x43)!=12) StartAnimationBlended(obj,12,0,10);
+        CheckTargetPointFromOffset(obj,vars+0x1F0);
+        if (B(obj,0x60)&2) SetMobyState(obj,3,-1);
         break;
     case 4:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=6) func_002A7470(obj,6,0,10);
-            F(s,0x334)=func_002A7878(D_L14_001B18B8_gp[0],D_L14_001B18B8[1])+0.5f;
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=6) StartAnimationBlended(obj,6,0,10);
+            F(vars,0x334)=RandomFloatRange(D_L14_001B18B8_gp[0],D_L14_001B18B8[1])+0.5f;
         }
-        if ((func_L02_003CE8B0(obj,s+0x2E0,0)&128) || func_00282E80(obj+0x10,D_00189EA0)>F(s,0x334)) {
-            if (func_002A77E0(2)) func_002A7750(obj,6,-1);
-            else func_002A7750(obj,7,-1);
+        if ((RunEntryHookByMode(obj,vars+0x2E0,0)&128) || vec_distance_xy(obj+0x10,gHeroPosition)>F(vars,0x334)) {
+            if (RandomIntBelow(2)) SetMobyState(obj,6,-1);
+            else SetMobyState(obj,7,-1);
         }
         break;
     case 5:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=6) func_002A7470(obj,6,0,20);
-            angle=func_002A7940(); speed=func_002A7878(2,5);
-            F(s,0x2F0)=func_00283180(angle)*speed;
-            F(s,0x2F4)=func_00283198(angle)*speed;
-            W(s,0x2F8)=0;
-            func_00282CC0(s+0x2F0,s+0x2F0,s+0x2E0);
-            if (W(s,0x218)!=-1) {
-                vec=*(Quad *)(s+0x2E0);
-                func_L02_0032EF10(&vec,s+0x2F0,s+0x2F0,W(s,0x218),1.5f);
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=6) StartAnimationBlended(obj,6,0,20);
+            angle=RandomAngle(); speed=RandomFloatRange(2,5);
+            F(vars,0x2F0)=FastSinOrCosA(angle)*speed;
+            F(vars,0x2F4)=FastSinOrCosB(angle)*speed;
+            W(vars,0x2F8)=0;
+            FastVecAdd(vars+0x2F0,vars+0x2F0,vars+0x2E0);
+            if (W(vars,0x218)!=-1) {
+                vec=*(Quad *)(vars+0x2E0);
+                ClampMoveToPathArea(&vec,vars+0x2F0,vars+0x2F0,W(vars,0x218),1.5f);
             }
         }
-        func_L02_003CE8B0(obj,s+0x2F0,0);
-        if (U(obj,0x96)>30 && (F(s,0x1CC)<=0.5f || U(obj,0x96)>180)) func_002A7750(obj,3,-1);
+        RunEntryHookByMode(obj,vars+0x2F0,0);
+        if (U(obj,0x96)>30 && (F(vars,0x1CC)<=0.5f || U(obj,0x96)>180)) SetMobyState(obj,3,-1);
         break;
     case 8:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=func_002A77E0(2)+2) func_002A7470(obj,func_002A77E0(2)+2,0,10);
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=RandomIntBelow(2)+2) StartAnimationBlended(obj,RandomIntBelow(2)+2,0,10);
         }
-        if (B(obj,0x60)&2) func_002A7750(obj,9,-1);
+        if (B(obj,0x60)&2) SetMobyState(obj,9,-1);
         break;
     case 9:
-        if (func_002B3868(obj) && B(obj,0x43)!=6) func_002A7470(obj,6,0,5);
-        if (!(U(obj,0x96)&3)) F(s,0x31C)=(float)func_L02_0032E390(obj,D_0018C0B0[0],-1)*0.087266475f;
-        func_L02_003CE8B0(obj,s+0x1F0,1);
-        func_L02_003CEC70(obj);
-        if (F(s,0x1CC)<=1.25f) func_002A7750(obj,10,-1);
+        if (SetFirstPendingFlag(obj) && B(obj,0x43)!=6) StartAnimationBlended(obj,6,0,5);
+        if (!(U(obj,0x96)&3)) F(vars,0x31C)=(float)CountGroupSideFromObject(obj,gHeroMoby_0018C0B0[0],-1)*0.087266475f;
+        RunEntryHookByMode(obj,vars+0x1F0,1);
+        ClampAimYawPitch(obj);
+        if (F(vars,0x1CC)<=1.25f) SetMobyState(obj,10,-1);
         break;
     case 10:
-        if (func_002B3868(obj)) {
-            F(s,0x320)=func_00283248(F(s,0x1F0)-F(obj,0x10),F(s,0x1F4)-F(obj,0x14));
-            if (B(obj,0x43)!=8) func_002A7470(obj,8,2,10);
+        if (SetFirstPendingFlag(obj)) {
+            F(vars,0x320)=FastMatrixHelperA(F(vars,0x1F0)-F(obj,0x10),F(vars,0x1F4)-F(obj,0x14));
+            if (B(obj,0x43)!=8) StartAnimationBlended(obj,8,2,10);
         }
-        func_L01_00322288(obj,F(s,0x320));
-        if (func_002AEB60(obj,13.0f)) {
-            char *t=*(char **)(s+0x200);
+        StartMobyEffectFromEntry(obj,F(vars,0x320));
+        if (IsValueWithinStepOfThreshold(obj,13.0f)) {
+            char *target=*(char **)(vars+0x200);
             int play=1;
-            if (t && H(t,0xAA)==0x964 && U(obj,0x96)<=59) play=0;
-            if (play) func_002A8D70(obj,1,0.75f,1.0f,0x4000001,1.0f,0,1,0);
+            if (target && H(target,0xAA)==0x964 /* Gadgebot */ && U(obj,0x96)<=59) play=0;
+            if (play) TestHitAtBone(obj,1,0.75f,1.0f,0x4000001,1.0f,0,1,0);
         }
-        if ((B(obj,0x60)&2) && func_00282E80(obj+0x10,s+0x1F0)>1.25f) func_002A7750(obj,9,-1);
+        if ((B(obj,0x60)&2) && vec_distance_xy(obj+0x10,vars+0x1F0)>1.25f) SetMobyState(obj,9,-1);
         break;
     case 14:
-        if (func_002B3868(obj)) {
-            if (B(obj,0x43)!=10) func_002A7470(obj,10,0,5);
-            W(s,0x1BC)=D_L14_001B20C8[0];
+        if (SetFirstPendingFlag(obj)) {
+            if (B(obj,0x43)!=10) StartAnimationBlended(obj,10,0,5);
+            W(vars,0x1BC)=D_L14_001B20C8[0];
         }
-        func_00282F20(&vec,s+0x1A0,1.0f);
-        func_L02_003CE8B0(obj,&vec,0);
-        func_L07_003F6F00(obj);
-        func_002A8C28(obj,obj+0x10,0.6f,1.0f,0x4000000,1.0f,0,1,0);
-        if (F(s,0x190)>=F(obj,0x18)) {
-            if (H(s,0x314)==1) func_002A7750(obj,8,2);
-            else func_002A7750(obj,2,0);
-            W(s,0x138)&=~0x11;
+        vec_scale_to_length(&vec,vars+0x1A0,1.0f);
+        RunEntryHookByMode(obj,&vec,0);
+        SpawnFallingParticlePuff(obj);
+        SweepCollisionFromObject(obj,obj+0x10,0.6f,1.0f,0x4000000,1.0f,0,1,0);
+        if (F(vars,0x190)>=F(obj,0x18)) {
+            if (H(vars,0x314)==1) SetMobyState(obj,8,2);
+            else SetMobyState(obj,2,0);
+            W(vars,0x138)&=~0x11;
         }
         break;
-    case 12: func_L02_003CEA28(obj); break;
+    case 12: ExplodeAndRemoveMoby_L02(obj); break;
     }
-    func_L02_003CE908(obj);
-    if (B(obj,0x31)) func_L14_00428A08(obj);
+    ResetTurnAndPlaceObject(obj);
+    if (B(obj,0x31)) UpdateGroupMarkerPulse(obj);
 }

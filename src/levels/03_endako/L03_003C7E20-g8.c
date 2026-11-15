@@ -66,142 +66,143 @@ typedef struct {
    the private pointer live across the whole switch.
    &p->displacement and &p->velocity are written out each time: gcse keeps the first computation
    in a saved register. */
-void func_L03_003C7E20(char *a0)
+/* Per-frame update of moby class 2380 (Explosive Crate) and the two classes that share its code (2949 and 3324): they sit, get knocked up, fall, flash, then blow up and respawn. */
+void func_L03_003C7E20(char *moby)
 {
-    char buf[0x10] __attribute__((aligned(16)));
+    char tempPos[0x10] __attribute__((aligned(16)));
     char direction[0x10] __attribute__((aligned(16)));
     char hit[0x10] __attribute__((aligned(16)));
-    Actor7E20 *actor=(Actor7E20 *)a0;
-    Private7E20 *p = actor->privateData;
+    Actor7E20 *actor=(Actor7E20 *)moby;
+    Private7E20 *vars = actor->privateData;
     switch (actor->state) {
     case 0: {
         u16 id;
-        p->drawFlags=actor->drawFlags;
-        p->ground=actor->position[2];
-        qcopy((char *)&p->home,(char *)actor->position);
-        p->flags|=1;
-        if (actor->type==0xB85) {
+        vars->drawFlags=actor->drawFlags;
+        vars->ground=actor->position[2];
+        qcopy((char *)&vars->home,(char *)actor->position);
+        vars->flags|=1;
+        if (actor->type==0xB85 /* moby class 2949 */) {
             id=(u16)actor->uid;
             if (D_L03_0021EA30.flags[(s16)id] ||
-                ((D_0019B4A8[((s16)id>>1)+(D_001A79F0<<10)] >> ((id&1)?4:0))&7)) {
-                qcopy((char *)actor->position,D_L03_001B2B0C[p->index].position);
+                ((D_0019B4A8[((s16)id>>1)+(gCurrentMapIndex<<10)] >> ((id&1)?4:0))&7)) {
+                qcopy((char *)actor->position,D_L03_001B2B0C[vars->index].position);
             }
         }
-        func_002A7750(a0,1,-1);
+        SetMobyState(moby,1,-1);
         break;
     }
     case 1: {
         u16 id;
-        if (!(D_L03_001B2548&7)) {
-            if (func_002A89A8((char *)actor->position,0,0.5f)+0.05f<=actor->position[2])
-                func_002A7750(a0,3,-1);
+        if (!(gFrameCounter_L03&7)) {
+            if (ProbeGroundHeightBelow((char *)actor->position,0,0.5f)+0.05f<=actor->position[2])
+                SetMobyState(moby,3,-1);
         }
-        if (actor->type==0xCFC) {
-            char *v=func_002A9640(a0,0x10001,0);
-            if (v) {
-                func_002A7750(a0,4,-1);
-                if (*(char **)(v+0x20) && *(s16 *)(*(char **)(v+0x20)+0xAA)==0xB85)
-                    p->delay=1;
-                else p->delay=10;
+        if (actor->type==0xCFC /* moby class 3324 */) {
+            char *hitMoby=FindOwnedEffectSlot(moby,0x10001,0);
+            if (hitMoby) {
+                SetMobyState(moby,4,-1);
+                if (*(char **)(hitMoby+0x20) && *(s16 *)(*(char **)(hitMoby+0x20)+0xAA)==0xB85)
+                    vars->delay=1;
+                else vars->delay=10;
             }
-            if (D_00189E20.object26C==a0 || D_00189E20.object33C==a0 ||
-                D_00189E20.object270==a0 || D_00189E20.object588==a0)
-                func_002A7750(a0,4,-1);
-        } else if (p->pending && D_0018C0B4[0]!=0x31) {
-            p->pending=0;
-            if (func_002ACBC8((char *)actor->position,p->index)) {
-                qcopy((char *)actor->position,D_L03_001B2B0C[p->index].position);
+            if (gHeroState.object26C==moby || gHeroState.object33C==moby ||
+                gHeroState.object270==moby || gHeroState.object588==moby)
+                SetMobyState(moby,4,-1);
+        } else if (vars->pending && D_0018C0B4[0]!=0x31) {
+            vars->pending=0;
+            if (IsPointInCuboid((char *)actor->position,vars->index)) {
+                qcopy((char *)actor->position,D_L03_001B2B0C[vars->index].position);
                 id=(u16)actor->uid;
                 if (id&1) {
-                    u8 *b=&D_0019B4A8[((s16)id>>1)+(D_001A79F0<<10)];
-                    if (((*b>>4)&7)!=7) *b+=16;
+                    u8 *packedByte=&D_0019B4A8[((s16)id>>1)+(gCurrentMapIndex<<10)];
+                    if (((*packedByte>>4)&7)!=7) *packedByte+=16;
                 } else {
-                    u8 *b=&D_0019B4A8[((s16)id>>1)+(D_001A79F0<<10)];
-                    if ((*b&7)!=7) *b+=1;
+                    u8 *packedByte=&D_0019B4A8[((s16)id>>1)+(gCurrentMapIndex<<10)];
+                    if ((*packedByte&7)!=7) *packedByte+=1;
                 }
-            } else func_002C9218(p->effect,(char *)actor->position,(char *)actor->position,2.5f);
+            } else PushPointAwayFromPath(vars->effect,(char *)actor->position,(char *)actor->position,2.5f);
         }
         break;
     }
     case 2: {
-        f32 length;
+        f32 pullLength;
         f32 offset=2.3f;
-        p->displacement[2]+=offset;
-        length=func_00282DF0((char *)&p->displacement);
-        if (length!=0.0f) {
-            func_002AAC80(&p->damping,length,0.00027777778f,0.00027777778f,0.016666668f);
-            length-=p->damping;
-            if (length<0.0f) length=0.0f;
-            func_00282F20((char *)&p->displacement,(char *)&p->displacement,length);
+        vars->displacement[2]+=offset;
+        pullLength=FastVecLength((char *)&vars->displacement);
+        if (pullLength!=0.0f) {
+            ApproachTargetWithBraking(&vars->damping,pullLength,0.00027777778f,0.00027777778f,0.016666668f);
+            pullLength-=vars->damping;
+            if (pullLength<0.0f) pullLength=0.0f;
+            vec_scale_to_length((char *)&vars->displacement,(char *)&vars->displacement,pullLength);
         }
-        p->displacement[2]-=offset;
-        func_0029FCC0(p->node,2,buf);
-        func_00282CC0((char *)actor->position,buf,(char *)&p->displacement);
+        vars->displacement[2]-=offset;
+        TransformMobyJointToWorld(vars->node,2,tempPos);
+        FastVecAdd((char *)actor->position,tempPos,(char *)&vars->displacement);
         break;
     }
     case 3: {
-        p->velocity[2]-=0.008333334f;
-        func_00282CC0((char *)actor->position,(char *)actor->position,(char *)&p->velocity);
-        func_002C9218(p->effect,(char *)actor->position,(char *)actor->position,1.25f);
-        p->ground=func_002A89A8((char *)actor->position,0,0.5f);
-        if (actor->position[2]<=p->ground) {
-            if (actor->type==0xCFC) {
-                if (func_00278E78()==1) func_002A7750(a0,5,-1);
-                else func_002A7750(a0,4,-1);
-            } else func_002A7750(a0,1,-1);
-            func_002E5DA0(3,0,a0,0x94A);
-            p->effectTimer=2;
-            func_00282C88((char *)&p->velocity);
-            actor->position[2]=p->ground;
-            p->pending=1;
+        vars->velocity[2]-=0.008333334f;
+        FastVecAdd((char *)actor->position,(char *)actor->position,(char *)&vars->velocity);
+        PushPointAwayFromPath(vars->effect,(char *)actor->position,(char *)actor->position,1.25f);
+        vars->ground=ProbeGroundHeightBelow((char *)actor->position,0,0.5f);
+        if (actor->position[2]<=vars->ground) {
+            if (actor->type==0xCFC /* moby class 3324 */) {
+                if (GetCollHitMaterial()==1) SetMobyState(moby,5,-1);
+                else SetMobyState(moby,4,-1);
+            } else SetMobyState(moby,1,-1);
+            PlaySoundFromClassBank(3,0,moby,0x94A);
+            vars->effectTimer=2;
+            ClearVector128((char *)&vars->velocity);
+            actor->position[2]=vars->ground;
+            vars->pending=1;
         }
-        func_L03_003C8698(a0);
+        InitMobyEffectTrack(moby);
         break;
     }
     case 4:
-        if (func_002B3868(a0) && !p->delay) p->delay=130;
-        if (func_00282978((char *)&p->delay)) func_002A7750(a0,5,-1);
-        if (p->delay%60<10) {
-            func_002E5DA0(0,0,a0,0xCFC);
+        if (SetFirstPendingFlag(moby) && !vars->delay) vars->delay=130;
+        if (FastDecTimer((char *)&vars->delay)) SetMobyState(moby,5,-1);
+        if (vars->delay%60<10) {
+            PlaySoundFromClassBank(0,0,moby,0xCFC);
             actor->drawFlags=0x800000C0;
-        } else actor->drawFlags=p->drawFlags;
+        } else actor->drawFlags=vars->drawFlags;
         break;
     case 5: {
         char *position=(char *)actor->position;
-        qcopy(buf,position);
-        *(f32 *)(buf+8)+=1.0f;
-        func_002E5DA0(1,0,a0,0xCFC);
-        func_00282CF0(direction,D_L03_001B9980,buf);
-        func_00282F20(direction,direction,1.0f);
+        qcopy(tempPos,position);
+        *(f32 *)(tempPos+8)+=1.0f;
+        PlaySoundFromClassBank(1,0,moby,0xCFC);
+        FastVecSub(direction,D_L03_001B9980,tempPos);
+        vec_scale_to_length(direction,direction,1.0f);
         *(TI128 *)(hit)=0;
         *(f32 *)(hit+8)=1.0f;
-        func_00282CC0(hit,hit,position);
-        func_002A8C28(a0,hit,0x10001,0,1,0,4.0f,4.0f,1.0f);
-        func_0032DA58(a0,buf,direction,0.0f);
+        FastVecAdd(hit,hit,position);
+        SweepCollisionFromObject(moby,hit,0x10001,0,1,0,4.0f,4.0f,1.0f);
+        SpawnBlastEffectMoby(moby,tempPos,direction,0.0f);
         actor->collision=0;
         actor->flags=(actor->flags|0x41)&~0x1000;
-        func_002A7750(a0,6,-1);
+        SetMobyState(moby,6,-1);
         break;
     }
     case 6:
-        if (func_002B3868(a0)) p->respawnDelay=60;
-        if (func_00282978((char *)&p->respawnDelay)) {
-            qcopy((char *)actor->position,(char *)&p->home);
-            qcopy(buf,(char *)actor->position);
-            *(f32 *)(buf+8)+=1.3f;
-            if (!func_00277258(buf,0,a0,1.2f) &&
-                (*(f32 *)(buf+8)+=1.0f,!func_00277258(buf,0,a0,1.2f))) {
-                func_002A7750(a0,1,-1);
-                actor->drawFlags=p->drawFlags;
+        if (SetFirstPendingFlag(moby)) vars->respawnDelay=60;
+        if (FastDecTimer((char *)&vars->respawnDelay)) {
+            qcopy((char *)actor->position,(char *)&vars->home);
+            qcopy(tempPos,(char *)actor->position);
+            *(f32 *)(tempPos+8)+=1.3f;
+            if (!TestPointAgainstCollision(tempPos,0,moby,1.2f) &&
+                (*(f32 *)(tempPos+8)+=1.0f,!TestPointAgainstCollision(tempPos,0,moby,1.2f))) {
+                SetMobyState(moby,1,-1);
+                actor->drawFlags=vars->drawFlags;
                 actor->flags=(actor->flags&~0x41)|0x1000;
-                actor->collision=*(s32 *)(*(char **)(a0+0x24)+0x10);
-                func_L02_002EF388(a0,(char *)&p->home,(char *)actor->rotation,0,0);
+                actor->collision=*(s32 *)(*(char **)(moby+0x24)+0x10);
+                FuseObjectWithLinkedObjects(moby,(char *)&vars->home,(char *)actor->rotation,0,0);
                 actor->alpha=255;
-            } else p->respawnDelay=30;
+            } else vars->respawnDelay=30;
         }
         break;
     }
-    if (func_00282948((char *)&p->effectTimer)==2) {
+    if (FastFloatHelperD((char *)&vars->effectTimer)==2) {
         D_L03_001B9840.f180=0.1f;
         D_L03_001B9840.i188=60;
         D_L03_001B9840.f160=0.1f;

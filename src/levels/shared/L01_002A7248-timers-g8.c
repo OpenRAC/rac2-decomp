@@ -93,12 +93,14 @@ extern float func_00282E48(void *, void *);
 extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D3778(void *, void *, float);
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
- * src/overlays/shared/hero_vehicle_and_collision.c. */
+ * src/overlays/shared/hero_vehicle_and_collision.c.
+ * Each frame, advances the hero's timers and counters, pushes nearby objects away,
+ * tracks whether the hero stands still, and refreshes the reach distance and height. */
 void func_L01_002BE0E0(void) {
-    unsigned char *m, *pos, *hero;
+    unsigned char *moby, *mobyPos, *heroPos;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
-    if (!D_L01_00189E20.tilt_disabled) func_L00_002B9380();
+    if (!D_L01_00189E20.tilt_disabled) EaseHeroLeanToUpright();
     {
         int state = D_L01_00189E20.state_frames+1;
         int control = D_L01_00189E20.control_mode_frames+1;
@@ -109,46 +111,46 @@ void func_L01_002BE0E0(void) {
         D_L01_00189E20.step_frames = step;
         D_L01_00189E20.animation_frames = animation;
     }
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1E0);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1DC);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1D2);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1E4);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F8);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1FE);
-    func_00282948(((unsigned char *)&D_L01_00189E20)+0x1D4);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x210);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1D0);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F4);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F6);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x204);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x206);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F0);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1EC);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1EE);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x208);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x200);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x20E);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x20A);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x214);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x212);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1FC);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x216);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1FA);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x218);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F2);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x21A);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x21C);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1DE);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1E6);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x222);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x224);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x226);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E0);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1DC);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1D2);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E4);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F8);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FE);
+    FastFloatHelperD(((unsigned char *)&D_L01_00189E20)+0x1D4);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x210);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1D0);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F4);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F6);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x204);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x206);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F0);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1EC);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1EE);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x208);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x200);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x20E);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x20A);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x214);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x212);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FC);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x216);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FA);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x218);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F2);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x21A);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x21C);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1DE);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E6);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x222);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x224);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x226);
 
-    if (!(D_00138180.held&4)) D_L01_00189E20.field_20C = 0;
-    if (D_L01_00189E20.field_21C) func_L00_002A7A10();
+    if (!(gPadState.held&4)) D_L01_00189E20.field_20C = 0;
+    if (D_L01_00189E20.field_21C) QueueHeroGlowDrawRoutine();
     if (D_L01_00189E20.item_animation_active) D_L01_00189E20.item_animation_frames++;
     else D_L01_00189E20.item_animation_frames = 0;
-    if (D_00138180.no_direction) {
+    if (gPadState.no_direction) {
         D_L01_00189E20.stick_held_frames = 0;
         D_L01_00189E20.stick_idle_frames++;
     }
@@ -174,46 +176,46 @@ void func_L01_002BE0E0(void) {
         }
     }
     if (D_L01_00189E20.field_224) {
-        for (i = 0;(m = D_L01_001FB3E0[i]) != 0;i++) {
-            if (func_002ABB78(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((D_001B2088&7) == (((int)m>>8)&7) || !func_002A77E0(4)) {
-                    hero = (unsigned char *)&D_L01_00189E20+0x80;
-                    pos = m+0x10;
-                    if (func_00282E48(hero, pos)<15.37f) {
-                        func_00282CF0(sum, pos, hero);
-                        func_00282F20(sum, sum, 1.7f);
-                        func_002A8F70(m, D_L01_00189E20.field_2290, 0x4000000, hero, sum, 1.0f);
+        for (i = 0;(moby = D_L01_001FB3E0[i]) != 0;i++) {
+            if (IsMobyInSpecialClassRange(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
+                if ((D_001B2088&7) == (((int)moby>>8)&7) || !RandomIntBelow(4)) {
+                    heroPos = (unsigned char *)&D_L01_00189E20+0x80;
+                    mobyPos = moby+0x10;
+                    if (fast_vec_dist(heroPos, mobyPos)<15.37f) {
+                        FastVecSub(sum, mobyPos, heroPos);
+                        vec_scale_to_length(sum, sum, 1.7f);
+                        QueueImpactEffect(moby, D_L01_00189E20.field_2290, 0x4000000, heroPos, sum, 1.0f);
                     }
                 }
             }
         }
     }
-    for (i = 0;i<4;i++) func_00282948(D_L01_0025CF60+i*0x70);
+    for (i = 0;i<4;i++) FastFloatHelperD(D_L01_0025CF60+i*0x70);
     D_L01_00189E20.current_path_dist = 9999.0f;
-    if (D_L01_00189E20.field_34E && func_L00_002D3B00(((unsigned char *)&D_L01_00189E20)+0xF0)<0) {
+    if (D_L01_00189E20.field_34E && GetViewSpaceHeight(((unsigned char *)&D_L01_00189E20)+0xF0)<0) {
         if (D_L01_00189E20.pos_history_count != 32) goto history_done;
-        func_00282C88(sum);
+        ClearVector128(sum);
         count = 8;
         for (i = 0;i<count;) {
             history_index = D_L01_00189E20.pos_history_index-i;
             first_index = (history_index+31)%32;
             second_index = (history_index+30)%32;
-            func_00282CF0(delta, ((unsigned char *)&D_L01_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_L01_00189E20)+0x1D90+second_index*16);
+            FastVecSub(delta, ((unsigned char *)&D_L01_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_L01_00189E20)+0x1D90+second_index*16);
             i++;
-            func_00282CC0(sum, sum, delta);
+            FastVecAdd(sum, sum, delta);
         }
-        func_00282D30(sum, sum, 1.0f/(float)count);
-        if (func_00282DF0(sum)<0.016666668f) {
+        FastVecScale(sum, sum, 1.0f/(float)count);
+        if (FastVecLength(sum)<0.016666668f) {
             D_L01_00189E20.still_frames++;
             goto history_done;
         }
     }
     D_L01_00189E20.still_frames = 0;
 history_done:
-    func_L00_002C3838();
+    UpdateHeroLandingSlide();
     {
         unsigned char *bodyCenter = (unsigned char *)&D_L01_00189E20+0xE0;
-        func_L00_002D36E0(bodyCenter, 1, 0, 0, 0.7f);
+        BuildHeroRelativePoint(bodyCenter, 1, 0, 0, 0.7f);
         if (!(D_001B2088&3)) {
             if (D_L01_001A7AFF) {
                 D_L01_00189E20.reach_distance = 14;
@@ -227,7 +229,7 @@ history_done:
     }
     if (D_L01_00189E20.field_31C<4) {
         qcopy(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0x2D0);
-        func_L00_002D3778(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xD0, 0.5f);
+        ApplyHeroModeTransformReversed(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xD0, 0.5f);
     }
     else qcopy(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xE0);
     {
@@ -237,5 +239,5 @@ history_done:
             if (D_L01_00189E20.field_5C0 && D_L01_00189E20.field_1248 != 46) D_L01_00189E20.field_5C0 = 0;
         }
     }
-    if (D_L01_00189E20.field_88<1) func_L00_002B30E8();
+    if (D_L01_00189E20.field_88<1) RecordHeroPlayCounters();
 }

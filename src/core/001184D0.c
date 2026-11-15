@@ -2,6 +2,7 @@
 
 /* Reverse a string in place (IntegerToAscii's last step): find its length,
    then swap characters from both ends towards the middle. */
+/* Reverses a text string in place. */
 char *func_001184D0(char *s) {
     int c, i, j;
 

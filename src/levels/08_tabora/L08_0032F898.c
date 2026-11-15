@@ -28,33 +28,34 @@ extern float func_00282E80(void *, void *);
    func_L08_0032E920 and lies beyond `limit`. Writes the choice, its position, its +0xF0
    vector and two more vectors to `out` (or clears them) and returns 0 (none), 1 (a
    listed moby) or 2 (the starting candidate dropped). */
-int func_L08_0032F898(char *input, char *out, int a, int b, int c, int d, float minimum, float limit)
+/* Finds the closest decoy or sheep target near a point so the hero can lock on to it, and fills in the target data. Returns 0 for no target, 1 for a new target, 2 for dropping the current one. */
+int func_L08_0032F898(char *center, char *outData, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex, float minimum, float limit)
 {
-    char *selected = D_00189E20.selected;
+    char *selected = gHeroState.selected;
     int result = 0;
     int i;
 
-    if (D_00189E20.state == 0x18 || D_00189E20.mode == 0x6F) {
+    if (gHeroState.state == 0x18 || gHeroState.mode == 0x6F) {
         selected = 0;
         result = 2;
-    } else if (!func_L08_0032E920((char *)&D_00189E20 + 0x80, a, b, c, d)) {
-        if (limit < func_00282E80(input + 0x10, (char *)&D_00189E20 + 0x80)) {
+    } else if (!func_L08_0032E920((char *)&gHeroState + 0x80, planeListIndex, cornerBoxIndex, faceBoxIndex, edgeBoxIndex)) {
+        if (limit < vec_distance_xy(center + 0x10, (char *)&gHeroState + 0x80)) {
             selected = 0;
             result = 2;
         }
     }
     for (i = 1; i <= D_L08_001B2B30[0]; i++) {
         char *object = D_L08_001B29DC[0] + (D_L08_001B2B30[i] << 8);
-        if (object && (*(short *)(object + 0xAA) == 0xCB || *(short *)(object + 0xAA) == 0x76C ||
-                       *(short *)(object + 0xAA) == 0xEB0) &&
+        if (object && (*(short *)(object + 0xAA) == 0xCB /* Decoy */ || *(short *)(object + 0xAA) == 0x76C /* moby class 1900 */ ||
+                       *(short *)(object + 0xAA) == 0xEB0 /* Dark Sheep */) &&
             *(unsigned char *)(object + 0x20) != 0xFE && *(unsigned char *)(object + 0x20) != 0xFD &&
             *(unsigned char *)(object + 0x20) == 3) {
-            float distance = func_00282E80(input + 0x10, object + 0x10);
+            float distance = vec_distance_xy(center + 0x10, object + 0x10);
             int valid = 1;
             if (minimum <= distance)
                 valid = 0;
             else if (!(distance < limit)) {
-                if (!func_L08_0032E920(object + 0x10, a, b, c, d))
+                if (!func_L08_0032E920(object + 0x10, planeListIndex, cornerBoxIndex, faceBoxIndex, edgeBoxIndex))
                     valid = 0;
             }
             if (valid) {
@@ -65,24 +66,24 @@ int func_L08_0032F898(char *input, char *out, int a, int b, int c, int d, float 
         }
     }
     if (selected) {
-        *(char **)(out + 0x40) = selected;
-        qcopy(out, selected + 0x10);
-        qcopy(out + 0x10, selected + 0xF0);
-        if (selected == D_00189E20.selected) {
-            qcopy(out + 0x20, (char *)&D_00189E20 + 0xD0);
-            qcopy(out + 0x30, (char *)&D_00189E20 + 0xE0);
+        *(char **)(outData + 0x40) = selected;
+        qcopy(outData, selected + 0x10);
+        qcopy(outData + 0x10, selected + 0xF0);
+        if (selected == gHeroState.selected) {
+            qcopy(outData + 0x20, (char *)&gHeroState + 0xD0);
+            qcopy(outData + 0x30, (char *)&gHeroState + 0xE0);
         } else {
-            qcopy(out + 0x30, out);
-            *(float *)(out + 0x38) += 0.6f;
-            qcopy(out + 0x20, out + 0x30);
+            qcopy(outData + 0x30, outData);
+            *(float *)(outData + 0x38) += 0.6f;
+            qcopy(outData + 0x20, outData + 0x30);
         }
     } else {
-        *(int *)(out + 0x40) = 0;
-        qzero(out);
-        qzero(out + 0x10);
-        qzero(out + 0x30);
-        qzero(out + 0x20);
+        *(int *)(outData + 0x40) = 0;
+        qzero(outData);
+        qzero(outData + 0x10);
+        qzero(outData + 0x30);
+        qzero(outData + 0x20);
     }
-    *(int *)(out + 0x44) = result;
+    *(int *)(outData + 0x44) = result;
     return result;
 }

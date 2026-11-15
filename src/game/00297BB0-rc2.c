@@ -29,49 +29,50 @@ extern s32 D_001A9720[];
 
 typedef struct { s32 w[16]; } Tab32;
 
-void func_00297BB0(u8 *arg0)
+/* Shrinks a 4-bit map image into a 1-bit occlusion map. Each output bit is set when the sum of four samples is high enough. */
+void func_00297BB0(u8 *occlusionOut)
 {
-    s32 buf[128];
-    s32 tb[16];
-    u8 *in;
-    u8 *out;
-    s32 s0;
-    s32 k;
-    s32 i;
-    s32 q;
+    s32 rowSums[128];
+    s32 nibbleWeights[16];
+    u8 *src;
+    u8 *dst;
+    s32 row;
+    s32 col;
+    s32 cell;
+    s32 group;
 
-    out = arg0;
-    in = D_001C4FAC;
-    *(Tab32 *)tb = *(Tab32 *)D_001A9720;
-    for (s0 = 0; s0 < 0x200; s0++) {
-        if (s0 % 4 == 0) {
-            func_00282A60(buf, 0, 0x200);
+    dst = occlusionOut;
+    src = D_001C4FAC;
+    *(Tab32 *)nibbleWeights = *(Tab32 *)D_001A9720;
+    for (row = 0; row < 0x200; row++) {
+        if (row % 4 == 0) {
+            ClearMemory(rowSums, 0, 0x200);
         }
-        for (k = 0; k < 128; k += 2) {
-            u8 b = *in++;
-            buf[k] += tb[b & 0xF];
-            buf[k + 1] += tb[b >> 4];
+        for (col = 0; col < 128; col += 2) {
+            u8 packed = *src++;
+            rowSums[col] += nibbleWeights[packed & 0xF];
+            rowSums[col + 1] += nibbleWeights[packed >> 4];
         }
-        if (s0 % 4 == 3) {
-            for (i = 0; i < 128; i++) {
-                if (buf[i] < 8) {
-                    buf[i] = 0;
+        if (row % 4 == 3) {
+            for (cell = 0; cell < 128; cell++) {
+                if (rowSums[cell] < 8) {
+                    rowSums[cell] = 0;
                 } else {
-                    buf[i] = 1 << (i % 8);
+                    rowSums[cell] = 1 << (cell % 8);
                 }
             }
-            for (q = 0; q < 128; q += 8) {
-                u8 *bp = (u8 *)&buf[q];
-                s32 t1 = bp[0] | bp[4];
-                s32 t2 = bp[8] | t1;
-                s32 t3 = bp[12] | t2;
-                s32 t4 = bp[16] | t3;
-                s32 t5 = bp[20] | t4;
-                s32 t6 = bp[24] | t5;
-                s32 t7 = bp[28] | t6;
-                *out++ = t7;
+            for (group = 0; group < 128; group += 8) {
+                u8 *sumBytes = (u8 *)&rowSums[group];
+                s32 t1 = sumBytes[0] | sumBytes[4];
+                s32 t2 = sumBytes[8] | t1;
+                s32 t3 = sumBytes[12] | t2;
+                s32 t4 = sumBytes[16] | t3;
+                s32 t5 = sumBytes[20] | t4;
+                s32 t6 = sumBytes[24] | t5;
+                s32 t7 = sumBytes[28] | t6;
+                *dst++ = t7;
             }
         }
     }
-    *arg0 &= 0xFE;
+    *occlusionOut &= 0xFE;
 }

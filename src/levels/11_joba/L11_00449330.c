@@ -8,6 +8,7 @@ extern void func_0032B468(char *, int, char *, char *, int, int, float *, void *
 extern void func_003144D8(char *);
 extern char D_L11_001A8F20[] __attribute__((sda));
 
+/* Removes the item the robot is holding, with a small burst of effect if the robot is visible. */
 void func_L11_00449330(char *self, TI128 *pos) {
     char *state = *(char **)(self + 0x68);
     float copy[4];

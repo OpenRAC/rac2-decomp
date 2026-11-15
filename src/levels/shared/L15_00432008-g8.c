@@ -4,6 +4,7 @@ extern s32 D_L15_001B1520 __attribute__((sda));
 extern s32 D_L15_001B1520_4[] MACRO_ADDR;
 extern u8 D_L15_001395B8[];
 
+/* Caps four volume values at 127 and copies them into the sound settings table. */
 void func_L15_00432008(void)
 {
     if (D_L15_001B1520 > 0x7F)

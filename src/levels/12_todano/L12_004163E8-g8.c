@@ -44,28 +44,29 @@ typedef struct Node {
     s32 fC;               /* 0x0C */
 } Node;
 
+/* Waits for its linked moby to finish, rises with it, then blows both up and counts the break as saved progress. */
 void func_L12_004163E8(Actor *self)
 {
-    Node *s1 = self->f68;
+    Node *vars = self->f68;
 
     switch (self->f20) {
 
     case 0: {
-        u16 f;
+        u16 rawId;
 
         self->f20 = 1;
-        s1->f8 = self->f18;
-        f = self->fB2;
-        if (D_L12_0021EDF0.flags[(s16)f] != 0)
+        vars->f8 = self->f18;
+        rawId = self->fB2;
+        if (D_L12_0021EDF0.flags[(s16)rawId] != 0)
             goto Destroy;
         {
-            s32 bits = D_0019B4A8[((s16)f >> 1) + (D_001A79F0 << 10)];
-            if (f & 1) {
-                if (((bits >> 4) & 7) != 0)
+            s32 savedBits = D_0019B4A8[((s16)rawId >> 1) + (gCurrentMapIndex << 10)];
+            if (rawId & 1) {
+                if (((savedBits >> 4) & 7) != 0)
                     goto Destroy;
                 return;
             } else {
-                if ((bits & 7) == 0)
+                if ((savedBits & 7) == 0)
                     return;
                 goto Destroy;
             }
@@ -73,86 +74,86 @@ void func_L12_004163E8(Actor *self)
 
     }
     case 1:
-        if (s1->f0 != -1) {
-            if (func_L12_0041E8E8(D_L12_001B2E9C + (s1->f0 << 8)) == 0)
+        if (vars->f0 != -1) {
+            if (IsLinkedMobyFinished(D_L12_001B2E9C + (vars->f0 << 8)) == 0)
                 return;
         }
         self->f20 = 2;
-        s1->fC = 0x50;
+        vars->fC = 0x50;
         return;
 
     case 4: {
         s32 index;
-        s1->f4 = s1->f4 + 0.0013888889f;
-        self->f18 = self->f18 + s1->f4;
-        index = s1->f0;
+        vars->f4 = vars->f4 + 0.0013888889f;
+        self->f18 = self->f18 + vars->f4;
+        index = vars->f0;
         if (index != -1) {
             u8 *base = D_L12_001B2E9C;
-            ((Actor *)base)[index].f18 += s1->f4;
+            ((Actor *)base)[index].f18 += vars->f4;
         }
-        if (s1->f8 + 8.0f < self->f18)
+        if (vars->f8 + 8.0f < self->f18)
             self->f20 = 5;
         return;
 
     }
     case 2:
-        if (func_00282948(&s1->fC) != 0)
+        if (FastFloatHelperD(&vars->fC) != 0)
             return;
-        func_002A7750((u8 *)self, 3, -1);
-        s1->fC = D_L12_001B18F0;
+        SetMobyState((u8 *)self, 3, -1);
+        vars->fC = D_L12_001B18F0;
         return;
 
     case 3: {
-        u16 f;
+        u16 rawId;
 
-        if (func_00282948(&s1->fC) != 0) {
-            u8 *t = (u8 *)D_L12_001B2E9C + (s1->f0 << 8);
-            f32 local[4];
+        if (FastFloatHelperD(&vars->fC) != 0) {
+            u8 *child = (u8 *)D_L12_001B2E9C + (vars->f0 << 8);
+            f32 offset[4];
 
-            func_0032C700(t + 0x10, 1, 0xE, 0xA, 0xF, 0xA, 0x14, 1,
+            SpawnExplosion(child + 0x10, 1, 0xE, 0xA, 0xF, 0xA, 0x14, 1,
                           2.0f, 20.0f, 1, 1, 0, 0);
             self->f98 = 0;
             self->f34 = (self->f34 | 0x41) & 0xEFFF;
-            func_L12_0041E8F8(t);
-            func_00282F20(local, self->fC0, -0.10000000894069672f);
-            func_002B0A68(3.0f, 6.0f, 3.0f, 6.0f, (char *)self, 0x3F, local, 0xFF);
-            if (s1->f0 != -1) {
-                ((Actor *)D_L12_001B2E9C)[s1->f0].f34 &= 0xEFFF;
-                func_0029F338(D_L12_001B2E9C + (s1->f0 << 8));
+            TriggerLinkedMobyBurst(child);
+            vec_scale_to_length(offset, self->fC0, -0.10000000894069672f);
+            SpawnDebrisForMaskedParts(3.0f, 6.0f, 3.0f, 6.0f, (char *)self, 0x3F, offset, 0xFF);
+            if (vars->f0 != -1) {
+                ((Actor *)D_L12_001B2E9C)[vars->f0].f34 &= 0xEFFF;
+                MarkMobySpawned(D_L12_001B2E9C + (vars->f0 << 8));
             }
-        f = self->fB2;
-        if (f & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+        rawId = self->fB2;
+        if (rawId & 1) {
+            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (gCurrentMapIndex << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (gCurrentMapIndex << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }
 Destroy:
-        func_0029F338(self);
-        } else if (s1->fC == D_L12_001B18F0 / 2) {
-            if (s1->f0 != -1)
-                ((Actor *)D_L12_001B2E9C)[s1->f0].f20 = 4;
+        MarkMobySpawned(self);
+        } else if (vars->fC == D_L12_001B18F0 / 2) {
+            if (vars->f0 != -1)
+                ((Actor *)D_L12_001B2E9C)[vars->f0].f20 = 4;
         }
         return;
 
     }
     case 5: {
-        u16 f;
+        u16 rawId;
 
-        f = self->fB2;
-        if (f & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+        rawId = self->fB2;
+        if (rawId & 1) {
+            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (gCurrentMapIndex << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (gCurrentMapIndex << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }
-        func_0029F338(self);
+        MarkMobySpawned(self);
         return;
     }
     }

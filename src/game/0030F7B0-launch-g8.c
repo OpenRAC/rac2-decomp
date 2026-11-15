@@ -79,28 +79,28 @@ void func_00315E20(u8 *obj)
             D_0022AA10[i].owner = 0;
         obj[0x20] = 1;
     }
-    func_0029FCC0(obj, 1, D_001B2510);
-    func_0029FCC0(obj, 0, D_001B2520);
-    q = D_00189E20;
+    TransformMobyJointToWorld(obj, 1, D_001B2510);
+    TransformMobyJointToWorld(obj, 0, D_001B2520);
+    q = gHeroState;
     if (*(int *)(q + 0x2294) == 1)
-        func_0026F748(0x1D, 1);
-    func_0029FCC0(obj, 0, aim);
+        EmptyStubF748(0x1D, 1);
+    TransformMobyJointToWorld(obj, 0, aim);
 
     switch (obj[0x20]) {
     case 0:
         obj[0x20] = 1;
         st->target = 0;
     case 1:
-        p = D_00189E20;
+        p = gHeroState;
         if (*(u8 *)(p + 0x22BC) != 0)
             break;
-        st->target = func_00315C78(obj);
+        st->target = FindNearestEligibleTarget(obj);
         if (st->target != 0) {
-            d = func_00282E48(D_001B5340, st->target + 0x10) * 0.02f;
+            d = fast_vec_dist(gCameraState_001B5340, st->target + 0x10) * 0.02f;
             qcopy(pos, st->target + 0x10);
-            func_00273318(func_00282C48(0.9f - d * 0.65f), 0.0f, 90.0f, obj, 0xFF0FFF0F, pos, 0x26,
+            AddMobyMarker(FloatAbs(0.9f - d * 0.65f), 0.0f, 90.0f, obj, 0xFF0FFF0F, pos, 0x26,
                           -1, 4);
-            func_00282CF0(dir, st->target + 0x10, aim);
+            FastVecSub(dir, st->target + 0x10, aim);
         }
         if (!(D_00138324 & *(int *)(p + 0x1230)))
             break;
@@ -111,45 +111,45 @@ void func_00315E20(u8 *obj)
         else
             D_001AF548 = 4;
         obj[0x20] = 2;
-        func_0026F758();
+        EmptyStubF758();
         break;
     case 2: {
         char *player;
         Level_00315E20 *level;
 
-        if (!func_00282948(&D_001AF548))
+        if (!FastFloatHelperD(&D_001AF548))
             break;
-        player = D_00189E20;
+        player = gHeroState;
         *(int *)(player + 0xC20) = 0;
         if (D_0018C360[36].count < 0xFFFF)
             D_0018C360[36].count++;
         if (D_001A7390 > D_0018C360[36].maximum)
             D_0018C360[36].maximum = D_001A7390;
-        level = &D_00239BA0[D_0013958C];
+        level = &gWeaponTable_00239BA0[D_0013958C];
         launch.flags = 0x10000;
-        D_0018C360[36].levels = D_0018C360[36].levels | (1 << D_001A79F0) | 0x80000000;
+        D_0018C360[36].levels = D_0018C360[36].levels | (1 << gCurrentMapIndex) | 0x80000000;
         launch.range = level->range;
         launch.count = 1;
         launch.owner = obj;
         qcopy(&launch, dir);
-        func_00282F70(&launch, &launch, 1.0f);
+        FastVectorNormalizeHelper(&launch, &launch, 1.0f);
         launch.mode = 2;
         launch.dir[2] = 1.0f;
         launch.dir[3] = 5627.925f;
         launch.klass = *(u16 *)(obj + 0xAA);
         launch.kind = 3;
-        func_002A8E20(st->target, &launch);
+        QueueMobyImpact(st->target, &launch);
         obj[0x20] = 3;
         if (*(int *)(player + 0x340)) {
             D_001AF548 = 15;
-            func_00316400(obj, st->target, 7);
-            func_00316400(obj, st->target, 7);
-            func_00316400(obj, st->target, 7);
+            AllocEffectSlot(obj, st->target, 7);
+            AllocEffectSlot(obj, st->target, 7);
+            AllocEffectSlot(obj, st->target, 7);
         } else {
             D_001AF548 = 3;
-            func_00316400(obj, st->target, 3);
-            func_00316400(obj, st->target, 3);
-            func_00316400(obj, st->target, 3);
+            AllocEffectSlot(obj, st->target, 3);
+            AllocEffectSlot(obj, st->target, 3);
+            AllocEffectSlot(obj, st->target, 3);
         }
         st->target = 0;
         break;
@@ -157,19 +157,19 @@ void func_00315E20(u8 *obj)
     case 3: {
         char *player;
 
-        if (!func_00282948(&D_001AF548))
+        if (!FastFloatHelperD(&D_001AF548))
             break;
-        player = D_00189E20;
+        player = gHeroState;
         *(float *)(player + 0xC20) = 1.0f;
         D_001AF548 = 7;
         obj[0x20] = 4;
         break;
     }
     case 4:
-        if (func_00282948(&D_001AF548))
+        if (FastFloatHelperD(&D_001AF548))
             obj[0x20] = 1;
         break;
     }
-    func_003166C8(obj);
-    func_0027CFD0(func_00316248, obj);
+    UpdateEffectSlots(obj);
+    RegisterOverlayDrawCallback(DrawLockOnEffectSprites, obj);
 }

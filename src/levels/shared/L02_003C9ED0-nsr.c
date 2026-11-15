@@ -25,10 +25,10 @@ void func_L02_003C9ED0(char *obj)
     *(unsigned short *)(*(char **)(sub + 0x10) + 0x34) &= 0xFFFE;
     *(unsigned char *)(*(char **)(sub + 0x10) + 0x31) = 1;
     *(int *)(*(char **)(sub + 0x10) + 0x98) = *(int *)(*(int *)(*(char **)(sub + 0x10) + 0x24) + 0x10);
-    func_002833F0(*(char **)(sub + 0x10) + 0xC0, *(char **)(sub + 0x10) + 0xF0);
-    func_00282D30(*(char **)(sub + 0x10) + 0xC0, *(char **)(sub + 0x10) + 0xC0, *(float *)(sub + 0xC));
-    func_00282D30(*(char **)(sub + 0x10) + 0xD0, *(char **)(sub + 0x10) + 0xD0, *(float *)(sub + 0xC));
-    func_002AEC18(*(char **)(sub + 0x10), func_00283D38(0x80FF8000, *(int *)(sub + 0x30), *(float *)(sub + 0xC)));
+    euler_rotation_basis(*(char **)(sub + 0x10) + 0xC0, *(char **)(sub + 0x10) + 0xF0);
+    FastVecScale(*(char **)(sub + 0x10) + 0xC0, *(char **)(sub + 0x10) + 0xC0, *(float *)(sub + 0xC));
+    FastVecScale(*(char **)(sub + 0x10) + 0xD0, *(char **)(sub + 0x10) + 0xD0, *(float *)(sub + 0xC));
+    SetMobyLightColor(*(char **)(sub + 0x10), FastTweenColor(0x80FF8000, *(int *)(sub + 0x30), *(float *)(sub + 0xC)));
     func_002A10E8(*(char **)(sub + 0x10));
     for (i = 1; i < 4; i++, rotations += 4, offsets += 4) {
         int index = i * 4;
@@ -38,13 +38,13 @@ void func_L02_003C9ED0(char *obj)
             *(unsigned short *)(*slot + 0x34) &= 0xFFFE;
             *(unsigned char *)(*slot + 0x31) = 1;
             *(int *)(*slot + 0x98) = *(int *)(*(int *)(*slot + 0x24) + 0x10);
-            func_002AE838(offset, offsets);
-            func_00283098(offset, offset, *(char **)(sub + 0x10) + 0xC0);
-            func_00282CC0(*slot + 0x10, *(char **)(sub + 0x10) + 0x10, offset);
-            func_002AE838(rotation, rotations);
-            func_002833F0(*slot + 0xC0, rotation);
-            func_00283738(*slot + 0xC0, *(char **)(sub + 0x10) + 0xC0, *slot + 0xC0);
-            func_002AEC18(*slot, func_00283D38(0x80FF8000, *(int *)(sub + index + 0x30), *(float *)(sub + 0xC)));
+            DecodeByteColorVector(offset, offsets);
+            matrix_mul_vec3(offset, offset, *(char **)(sub + 0x10) + 0xC0);
+            FastVecAdd(*slot + 0x10, *(char **)(sub + 0x10) + 0x10, offset);
+            DecodeByteColorVector(rotation, rotations);
+            euler_rotation_basis(*slot + 0xC0, rotation);
+            multiply_matrix3x3(*slot + 0xC0, *(char **)(sub + 0x10) + 0xC0, *slot + 0xC0);
+            SetMobyLightColor(*slot, FastTweenColor(0x80FF8000, *(int *)(sub + index + 0x30), *(float *)(sub + 0xC)));
             func_002A10E8(*slot);
         }
     }

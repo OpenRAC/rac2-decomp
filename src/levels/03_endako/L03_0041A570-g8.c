@@ -21,33 +21,34 @@ extern void func_0029F338(void *);
 
 typedef struct { int enabled; void *handle; int timer; } DestructionState;
 
-void func_L03_0041A570(u8 *e) {
-    DestructionState *s=*(DestructionState **)(e+0x68);
+/* Waits for a hit, then explodes with a burst of sparks and debris. */
+void func_L03_0041A570(u8 *moby) {
+    DestructionState *vars=*(DestructionState **)(moby+0x68);
     Vec pos, a,b,c,d,f,g,h,i,j,k,l,m;
     pos.q=0; pos.f[2]=-8.0f;
-    switch(e[0x20]) {
+    switch(moby[0x20]) {
     case 0:
-        func_00282D30(&pos,&pos,*(float *)(e+0x2c));
-        s->handle=func_L00_0033E220(&pos,e,0x40202080,*(float *)(e+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
-        func_002A7750(e,1,-1);
-        if (s->enabled) D_L03_001AEBF8--;
+        FastVecScale(&pos,&pos,*(float *)(moby+0x2c));
+        vars->handle=SpawnObjectFollowingEffect(&pos,moby,0x40202080,*(float *)(moby+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
+        SetMobyState(moby,1,-1);
+        if (vars->enabled) D_L03_001AEBF8--;
         break;
     case 1:
-        if(func_002A9640(e,0x4010000,0) && !s->enabled) {
-            D_L03_001AEBF8--; func_002A7750(e,2,-1);
+        if(FindOwnedEffectSlot(moby,0x4010000,0) && !vars->enabled) {
+            D_L03_001AEBF8--; SetMobyState(moby,2,-1);
         }
-        e[0xa8]=255;
+        moby[0xa8]=255;
         break;
     case 2: {
         int skip = D_L03_001B1B50;
-        func_L00_0032A258(e,D_L03_001B1B30,D_L03_001B1B28,D_L03_001B1B20,63,0,skip,0,65535,255,0);
-        func_002E5CF8(0,0,e);
-        func_0032C700(e+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
-        { u16 *flags=(u16 *)(e+0x34);
+        ExplodeObjectIntoPieces(moby,D_L03_001B1B30,D_L03_001B1B28,D_L03_001B1B20,63,0,skip,0,65535,255,0);
+        PlayMobySound(0,0,moby);
+        SpawnExplosion(moby+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
+        { u16 *flags=(u16 *)(moby+0x34);
           *flags |= 0x41;
-          s->timer=30; }
-        func_L00_00326620(e,0xf40,0);
-        func_002A7750(e,3,-1);
+          vars->timer=30; }
+        SpawnChildMoby_L00(moby,0xf40,0);
+        SetMobyState(moby,3,-1);
         break;
     }
     case 3:
@@ -60,13 +61,13 @@ void func_L03_0041A570(u8 *e) {
         g.f[0]=5; g.f[1]=5; g.f[2]=-7;
         h.f[0]=-15; h.f[1]=-5; h.f[2]=-10;
         i.f[0]=-7; i.f[1]=5;
-        if(func_002B3868(e)) func_L03_002ECF08(e,&a,&b,&f,&g,40,1);
-        func_00282D08(&l,&f,&h,1.0f-(float)s->timer*0.033333335f);
-        func_00282D08(&m,&g,&i,1.0f-(float)s->timer*0.033333335f);
-        func_00282D08(&j,&a,&c,1.0f-(float)s->timer*0.033333335f);
-        func_00282D08(&k,&b,&d,1.0f-(float)s->timer*0.033333335f);
-        func_L03_002ECF08(e,&j,&k,&l,&m,3,1);
-        if(func_00282948(&s->timer)) func_0029F338(e);
+        if(SetFirstPendingFlag(moby)) SpawnParticleBurst(moby,&a,&b,&f,&g,40,1);
+        lerp_vector(&l,&f,&h,1.0f-(float)vars->timer*0.033333335f);
+        lerp_vector(&m,&g,&i,1.0f-(float)vars->timer*0.033333335f);
+        lerp_vector(&j,&a,&c,1.0f-(float)vars->timer*0.033333335f);
+        lerp_vector(&k,&b,&d,1.0f-(float)vars->timer*0.033333335f);
+        SpawnParticleBurst(moby,&j,&k,&l,&m,3,1);
+        if(FastFloatHelperD(&vars->timer)) MarkMobySpawned(moby);
         break;
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -26,21 +27,21 @@ extern void func_00281A08(void *, int, void *, void *, int, int, int, int, float
    the words at +0x190 and +0x194 and the float at +0x198) to the resident effect scheduler,
    together with the level's float template D_L26_002967A0 and the two words D_L26_001B0478 and
    D_L26_001B047C. */
-void func_L26_003D4AE8(u8 *a0) {
-    u16 *p;
-    u8 *e;
-    u8 *s;
+void func_L26_003D4AE8(u8 *object) {
+    u16 *groupIds;
+    u8 *entity;
+    u8 *state;
 
-    for (p = D_L26_001FA6E0[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L26_001B1C38 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L26_001FA6E0[a0[0x21]]);
-         p++) {
-        e = D_L26_001B1C1C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (groupIds = D_L26_001FA6E0[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L26_001B1C38 && groupIds != 0 &&
+         ((groupIds != 0 && (short)groupIds[-1] >= 0) || groupIds == D_L26_001FA6E0[object[0x21]]);
+         groupIds++) {
+        entity = D_L26_001B1C1C_1[0] + ((*groupIds & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        s = *(u8 **)(e + 0x68);
-        func_00281A08(D_L26_002967A0, 6, s + 0x80, s + 0x100, *(int *)(s + 0x194),
-                      *(int *)(s + 0x190), D_L26_001B0478, D_L26_001B047C, *(float *)(s + 0x198));
+        state = *(u8 **)(entity + 0x68);
+        DrawTrailRibbon_00281A08(D_L26_002967A0, 6, state + 0x80, state + 0x100, *(int *)(state + 0x194),
+                      *(int *)(state + 0x190), D_L26_001B0478, D_L26_001B047C, *(float *)(state + 0x198));
     }
 }
 
@@ -70,6 +71,8 @@ extern void func_00283698(void *, void *);
 extern void func_002AFFD8(char *, char *, int);
 extern void func_00325D30(char *, char *);
 
+/* Sets up a flying creature on its first frame. Each frame after that it reacts to the hero being
+   close, updates its movement and returns 1 once it is finished and should be removed. */
 int func_L26_003DBE18(unsigned char *object) {
     char *private = *(char **)(object + 0x68);
     float height;
@@ -80,14 +83,14 @@ int func_L26_003DBE18(unsigned char *object) {
         private[0x60] = 7;
         *(float *)(private + 0x84) = 0.8f;
         *(float *)(private + 0x8C) = 0.15f;
-        height = func_002B0360((char *)object + 0x10) - 1.5f;
+        height = GetDistanceFromGravityCenter((char *)object + 0x10) - 1.5f;
         turn = D_L26_001B05D8;
         *(float *)(private + 0x100) = 1.0f;
         turn *= 0.017453294f;
         *(float *)(private + 0x90) = height;
         *(float *)(private + 0x104) = 0.5f;
         {
-            int flip = func_002A77E0(2);
+            int flip = RandomIntBelow(2);
             float angle = turn;
             if (flip) angle = -angle;
             *(float *)(private + 0x1DC) = angle;
@@ -100,20 +103,20 @@ int func_L26_003DBE18(unsigned char *object) {
             *(short *)(private + 0x24) = 3;
             *(float *)(private + 0x20) = 3.0f;
         }
-        func_00325B70((char *)object, (char **)(private + 0x270), 0, 2);
-        func_002A7750(object, 1, 0);
-        if (object[0x43]) func_002A7470(object, 0, 0, 0);
+        SpawnEnemyChildParts((char *)object, (char **)(private + 0x270), 0, 2);
+        SetMobyState(object, 1, 0);
+        if (object[0x43]) StartAnimationBlended(object, 0, 0, 0);
     }
-    if (object[0x31] && func_00282E48(object + 0x10, D_L26_001B8B80) < 24.0f) {
-        func_002A93B0(object);
+    if (object[0x31] && fast_vec_dist(object + 0x10, D_L26_001B8B80) < 24.0f) {
+        UpdateMobyGroundCheck(object);
         object[0x6F] = 0x16;
     }
-    if (func_002B0ED8(object, private + 0x50, 0)) func_L26_003DC128(object);
-    *(short *)(private + 0x224) = func_002B3BA8(object, *(int *)(private + 0x210), 0, 0, 16.0f, 0.0f);
-    func_00283698(private + 0x230, object + 0xC0);
-    func_002AFFD8((char *)object + 0x10, private + 0x260, 0);
+    if (ApplyDamageToObject(object, private + 0x50, 0)) SetGroupMobyAlertFlagL26(object);
+    *(short *)(private + 0x224) = SelectAimTarget_002B3BA8(object, *(int *)(private + 0x210), 0, 0, 16.0f, 0.0f);
+    matrix_from_basis_rows(private + 0x230, object + 0xC0);
+    ComputeViewDirection((char *)object + 0x10, private + 0x260, 0);
     if ((unsigned char)private[0x2E] == 2) {
-        func_00325D30((char *)object, private + 0x270);
+        DestroyAttachedParts((char *)object, private + 0x270);
         return 1;
     }
     return 0;

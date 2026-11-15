@@ -330,6 +330,7 @@ static inline UDItype __udivmoddi4 (UDItype n, UDItype d, UDItype *rp) {
     return ww.ll;
 }
 
+/* Divides one big signed number by another and returns the result. */
 DItype func_0011FC68 (DItype u, DItype v) {
     word_type c = 0;
     DIunion uu, vv;

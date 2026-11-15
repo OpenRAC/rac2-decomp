@@ -22,6 +22,7 @@ extern void func_00282DD8(void *, const void *, const void *);
 extern void func_002ACE78(float *, float *, float);
 extern void func_00273978(void *, int, int, const void *, const void *, unsigned char, float);
 
+/* Finds the first unused object in a group, puts it at the given position and launches it with the given velocity. Returns that object, or 0 if none is free. */
 u8 *func_L20_00440198(int group, const float position[4], const float velocity[4], float lifetime)
 {
     float delta[4] __attribute__((aligned(16)));
@@ -40,23 +41,23 @@ u8 *func_L20_00440198(int group, const float position[4], const float velocity[4
             break;
         if (actor[0x20] == 6) {
             qcopy(actor + 0x10, position);
-            *(float *)(actor + 0xF8) = func_00283248(
-                D_00189E20.position[0] - *(float *)(actor + 0x10),
-                D_00189E20.position[1] - *(float *)(actor + 0x14));
+            *(float *)(actor + 0xF8) = FastMatrixHelperA(
+                gHeroState.position[0] - *(float *)(actor + 0x10),
+                gHeroState.position[1] - *(float *)(actor + 0x14));
             flags = *(u16 *)(actor + 0x34);
             flags = (flags & 0xFFBE) | 0x1000;
             *(u16 *)(actor + 0x34) = flags;
             *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
             *(u16 *)(actor + 0x34) = flags & 0xEFFF;
-            func_002A7398((s8 *)actor, 7, 0);
-            func_002A7750(actor, 7, 3);
+            StartAnimationImmediate((s8 *)actor, 7, 0);
+            SetMobyState(actor, 7, 3);
             func_002A0F48(actor);
-            func_00282C98(origin);
-            func_00282DD8(delta, origin, velocity);
-            func_002ACE78(delta, delta, 0.10471977293491364f);
+            VectorCopyHelperA(origin);
+            FastVecCross(delta, origin, velocity);
+            SetDirectionWithComplement(delta, delta, 0.10471977293491364f);
             state = *(u8 **)(actor + 0x68);
             *(u8 **)(actor + 0x68) = state + 0x210;
-            func_00273978(actor, 3, 0, velocity, delta, 0xFF, 15.0f);
+            InitCameraTracking(actor, 3, 0, velocity, delta, 0xFF, 15.0f);
             *(u8 **)(actor + 0x68) = state;
             *(float *)(state + 0x288) = lifetime;
             {

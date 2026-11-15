@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L23_00429DC8 is a unit of its own: retail clears its start vector as plain C, with the
    zero materialised (`por $v0,$zero,$zero` ... `sq $v0,0($sp)`), which -frac2-zero-ti-por keeps,
@@ -30,6 +31,8 @@ extern void func_002A7750(void *, s32, s32);
 
 /* arms the object once: clears the list, builds the 500/500/575 start position and the 16 slots
    (the count, spread over the list of used edges, scaled by sixteenths) */
+/* Sets up the controller object the first time it runs. It places it, counts which links
+   between points are in use, and fills a table of 16 steps. */
 void func_L23_00429DC8(u8 *obj) {
     s32 *payload = *(s32 **)(obj + 0x68);
     s32 i, j, k, m, n, found;
@@ -51,7 +54,7 @@ void func_L23_00429DC8(u8 *obj) {
         v.f[1] = 500.0f;
         v.f[2] = 575.0f;
         *(TI128 *)(obj + 0x10) = v.q;
-        func_002A7750(obj, 1, 0);
+        SetMobyState(obj, 1, 0);
         for (i = 0; i < 0x48; i++) {
             float *p = D_L23_002A7170[i];
 

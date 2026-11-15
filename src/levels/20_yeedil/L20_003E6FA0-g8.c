@@ -22,78 +22,78 @@ extern float func_00282E80(void *,void *),func_00282E48(void *,void *),func_0028
 extern void func_002AF000(void *,float,float,float);
 
 /* Target selection: the nearest visible candidate in front of the player within the aim cone. */
-char *func_L20_003E6FA0(char *obj,Vec *origin,float *yaw,float *pitch) {
+char *func_L20_003E6FA0(char *moby,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
-    char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
-    Vec *pos; int n,index,accepted,visible,tries,i;
+    char *vars=*(char **)(moby+0x68),*selected,*candidate,*definition,*hit;
+    Vec *pos; int disabledCount,index,accepted,visible,tries,i;
     float best=D_L20_001B0314,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
-    func_00282D30(&frame.offset,D_00189E20.object+0xE0,0.5f);
+    FastVecScale(&frame.offset,gHeroState.object+0xE0,0.5f);
     selected=0;
-    func_00282CC0(&frame.player,D_00189E20.object+0x10,&frame.offset);
-    if(func_002761F8(&frame.player,start,6,D_00189E20.object,0)) {
+    FastVecAdd(&frame.player,gHeroState.object+0x10,&frame.offset);
+    if(CollLine(&frame.player,start,6,gHeroState.object,0)) {
         qcopy(start,&D_L20_001C0420);
         return 0;
     }
-    n=0; index=0;
+    disabledCount=0; index=0;
     while((candidate=D_L20_001FBEE0[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
-        if(*(short *)(candidate+0xAA)==0xE7D || *(short *)(candidate+0xAA)==0xEB0) goto next;
-        { Vec *t=&frame.target; qcopy(t,candidate+0x10); }
-        definition=func_002AB1F0(candidate);
+        if(*(short *)(candidate+0xAA)==0xE7D /* Sheep */ || *(short *)(candidate+0xAA)==0xEB0 /* Dark Sheep */) goto next;
+        { Vec *aimPos=&frame.target; qcopy(aimPos,candidate+0x10); }
+        definition=GetMobyPrivateValue0(candidate);
         if(!definition || *(unsigned char *)(definition+0xE)==3) goto next;
-        func_00282D30(&frame.aim,candidate+0xE0,*(float *)(definition+0x10));
-        func_00282CC0(&frame.target,&frame.target,&frame.aim);
+        FastVecScale(&frame.aim,candidate+0xE0,*(float *)(definition+0x10));
+        FastVecAdd(&frame.target,&frame.target,&frame.aim);
         if(!candidate || !*(char **)(candidate+0x24) || *(short *)(*(char **)(candidate+0x24)+0x46)!=5) goto next;
         accepted=0;
-        heading=func_00283248(frame.target.f[0]-start->f[0],frame.target.f[1]-start->f[1]);
-        elevation=func_00283248(func_00282E80(start,&frame.target),frame.target.f[2]-start->f[2]);
-        delta=func_00283C80(*yaw,heading);
-        distance=func_00282E48(start,&frame.target);
-        if(D_L20_001A8FF0 || D_00189E20.allowed || D_L20_001A8FF4) {
+        heading=FastMatrixHelperA(frame.target.f[0]-start->f[0],frame.target.f[1]-start->f[1]);
+        elevation=FastMatrixHelperA(vec_distance_xy(start,&frame.target),frame.target.f[2]-start->f[2]);
+        delta=FastDiffRots(*yaw,heading);
+        distance=fast_vec_dist(start,&frame.target);
+        if(D_L20_001A8FF0 || gHeroState.allowed || D_L20_001A8FF4) {
             if(distance<2.5f) {
-            func_00282CF0(&frame.ray,candidate+0x10,D_00189E20.object+0x10);
-            dot=func_00282DB0(&frame.ray,D_00189E20.object+0xE0);
-            if(func_00282C48(dot)<2.0f) {
-                func_00282D30(&frame.axis,D_00189E20.object+0xE0,dot);
-                func_00282CF0(&frame.ray,&frame.ray,&frame.axis);
-                dot=func_00282DB0(&frame.ray,D_00189E20.object+0xC0);
-                { float len=func_00282DF0(&frame.ray);
-                if(len!=0.0f && 1.5707964f-func_002831B0(dot/len)<1.0471977f) accepted=1; }
+            FastVecSub(&frame.ray,candidate+0x10,gHeroState.object+0x10);
+            dot=FastVecDot(&frame.ray,gHeroState.object+0xE0);
+            if(FloatAbs(dot)<2.0f) {
+                FastVecScale(&frame.axis,gHeroState.object+0xE0,dot);
+                FastVecSub(&frame.ray,&frame.ray,&frame.axis);
+                dot=FastVecDot(&frame.ray,gHeroState.object+0xC0);
+                { float len=FastVecLength(&frame.ray);
+                if(len!=0.0f && 1.5707964f-FastAngleHelper(dot/len)<1.0471977f) accepted=1; }
             }
             }
         } else {
             if(distance<2.5f) {
-                char *pobj=D_00189E20.object;
-                angle=func_00283248(*(float *)(candidate+0x10)-D_00189E20.position.f[0],*(float *)(candidate+0x14)-D_00189E20.position.f[1]);
-                if(func_00283C80(*(float *)(pobj+0xF8),angle)<1.0471977f && func_00282C48(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
+                char *playerMoby=gHeroState.object;
+                angle=FastMatrixHelperA(*(float *)(candidate+0x10)-gHeroState.position.f[0],*(float *)(candidate+0x14)-gHeroState.position.f[1]);
+                if(FastDiffRots(*(float *)(playerMoby+0xF8),angle)<1.0471977f && FloatAbs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
             }
         }
-        if(accepted && !func_002761F8(start,&frame.target,6,D_00189E20.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
-        if((distance>best && candidate!=*(char **)(ctx+0x10)) || distance>D_L20_001B0314) goto next;
-        func_002AF000(&frame.aim,distance,*yaw,*pitch+D_00189E20.pitch*0.5f);
-        func_00282CC0(&frame.aim,&frame.aim,start);
-        angle=func_00282E48(&frame.aim,&frame.target);
-        angle=func_002831B0(angle/(distance+distance)); angle+=angle;
-        if(D_L20_001B0310*0.017453294f<angle && (definition=func_002AB1F0(candidate))!=0) {
-            radius=func_00283CE0((unsigned char)definition[10])*0.125f;
-            length=func_002831B0(radius/distance);
+        if(accepted && !CollLine(start,&frame.target,6,gHeroState.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
+        if((distance>best && candidate!=*(char **)(vars+0x10)) || distance>D_L20_001B0314) goto next;
+        BuildSphericalOffset(&frame.aim,distance,*yaw,*pitch+gHeroState.pitch*0.5f);
+        FastVecAdd(&frame.aim,&frame.aim,start);
+        angle=fast_vec_dist(&frame.aim,&frame.target);
+        angle=FastAngleHelper(angle/(distance+distance)); angle+=angle;
+        if(D_L20_001B0310*0.017453294f<angle && (definition=GetMobyPrivateValue0(candidate))!=0) {
+            radius=IntToFloat((unsigned char)definition[10])*0.125f;
+            length=FastAngleHelper(radius/distance);
             if(radius<distance) { angle-=length; if(angle<0.0f) angle=0.0f; }
         }
         if(angle<D_L20_001B0310*0.017453294f) {
             visible=1;
             qcopy(&frame.ray,start); tries=0;
-            while(func_002761F8(&frame.ray,&frame.target,6,obj,0)) {
+            while(CollLine(&frame.ray,&frame.target,6,moby,0)) {
                 Collision *col;
                 if(++tries>6) break;
                 col=&D_L20_001C0400;
                 hit=col->hit;
                 if(hit) {
-                    if(*(short *)(hit+0xAA)==0xE7D || *(short *)(hit+0xAA)==0xEB0) {
-                        frame.disabled[n++]=hit; *(int *)(hit+0x98)=0;
-                        if(n>127) break;
+                    if(*(short *)(hit+0xAA)==0xE7D /* Sheep */ || *(short *)(hit+0xAA)==0xEB0 /* Dark Sheep */) {
+                        frame.disabled[disabledCount++]=hit; *(int *)(hit+0x98)=0;
+                        if(disabledCount>127) break;
                         qcopy(&frame.ray,&col->point);
                         continue;
                     }
@@ -101,11 +101,11 @@ char *func_L20_003E6FA0(char *obj,Vec *origin,float *yaw,float *pitch) {
                 }
                 visible=0; break;
             }
-            if(visible) { *pitch=-elevation; best=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(ctx+0x10)) return selected; }
+            if(visible) { *pitch=-elevation; best=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(vars+0x10)) return selected; }
         }
 next:
         ++index;
     }
-    for(i=0;i<n;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
+    for(i=0;i<disabledCount;++i) { char *disabledMoby=frame.disabled[i]; *(int *)(disabledMoby+0x98)=*(int *)(*(char **)(disabledMoby+0x24)+0x10); }
     return selected;
 }

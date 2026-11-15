@@ -47,8 +47,8 @@ void func_L04_003E5830(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L04_001B9680, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
@@ -56,39 +56,40 @@ void func_L04_003E5830(float *pos, int count) {
     axis[3] = 1.0f;
     for (i = 0; i < count; i++) {
         size = func_002A7878_range(0.5f, 2.0f);
-        sign = func_002A77E0(2);
+        sign = RandomIntBelow(2);
         if (!sign) sign--;
         angle = func_002A7878_range(-1.0471977f, 1.0471977f);
-        func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
+        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
+        vec_scale_to_length((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
         velocity[2] = func_002A7878_range(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0(origin, pos, offset);
-        pos[0] += func_002A78D8(0, 0.15f);
-        pos[1] += func_002A78D8(0, 0.15f);
-        pos[2] += func_002A78D8(0, 0.15f);
-        particle = func_002C2210(origin, 60, size * 0.1f, size, 0x80CA00CB, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
-        particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        FastVecAdd(origin, pos, offset);
+        pos[0] += RandomSignedFloatRange(0, 0.15f);
+        pos[1] += RandomSignedFloatRange(0, 0.15f);
+        pos[2] += RandomSignedFloatRange(0, 0.15f);
+        particle = SpawnGroundEffectParticle(origin, 60, size * 0.1f, size, 0x80CA00CB, 0, sign, velocity, 0, 0.002f);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
+        particle = SpawnGroundEffectParticle(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
 
-void *func_L04_003E5E40(unsigned char *a0, void *a1, float f12) {
-    unsigned char *obj = func_0029EFD0(a1);
+/* Creates a new moby of the given class at the parent's position and turning, sized from its class scale. */
+void *func_L04_003E5E40(unsigned char *parent, void *classId, float scaleFactor) {
+    unsigned char *child = CreateMoby(classId);
 
-    if (obj != 0) {
-        obj[0x30] = 0xFF;
-        obj[0x31] = 1;
-        *(unsigned short *)(obj + 0x32) = 0xFF;
-        obj[0x20] = 0;
-        *(float *)(obj + 0x2C) = *(float *)(*(unsigned char **)(obj + 0x24) + 0x24) * f12;
-        *(Q16_B0e5d8f83 *)(obj + 0x10) = *(Q16_B0e5d8f83 *)(a0 + 0x10);
-        *(Q16_B0e5d8f83 *)(obj + 0xF0) = *(Q16_B0e5d8f83 *)(a0 + 0xF0);
-        obj[0x62] = 1;
-        func_002A0F48(obj);
+    if (child != 0) {
+        child[0x30] = 0xFF;
+        child[0x31] = 1;
+        *(unsigned short *)(child + 0x32) = 0xFF;
+        child[0x20] = 0;
+        *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24) * scaleFactor;
+        *(Q16_B0e5d8f83 *)(child + 0x10) = *(Q16_B0e5d8f83 *)(parent + 0x10);
+        *(Q16_B0e5d8f83 *)(child + 0xF0) = *(Q16_B0e5d8f83 *)(parent + 0xF0);
+        child[0x62] = 1;
+        func_002A0F48(child);
     }
-    return obj;
+    return child;
 }
 
 typedef union {
@@ -259,33 +260,35 @@ Moby *func_L04_003EDD40(Moby *parent, Vec *position)
     return result;
 }
 
-void func_L04_003EDF80(unsigned char *a0, unsigned char *a1) {
-    if (func_002A9640(a0, 0x10000, 0) != 0) {
-        a0[0x20] = 2;
-        a1[0x57] = 0x78;
-        func_002AB800(a0, a1 + 0x50);
+/* Switches the moby to state 2 and starts a timed effect on it when a check passes, then refreshes the effect. */
+void func_L04_003EDF80(unsigned char *moby, unsigned char *vars) {
+    if (FindOwnedEffectSlot(moby, 0x10000, 0) != 0) {
+        moby[0x20] = 2;
+        vars[0x57] = 0x78;
+        StartColorFade(moby, vars + 0x50);
     }
-    a0[0xA8] = 0xFF;
-    func_002AB8C0(a0, a1 + 0x50);
+    moby[0xA8] = 0xFF;
+    UpdateColorFade(moby, vars + 0x50);
 }
 
 /* Stamps byte 0x81 from the per-record lookup, then walks the twenty slots: a slot whose
    object is live (not in either harness state) without the 0xB66 mark raises the count,
    every other slot is remembered in the returned index (-1 when all twenty pass). */
-int func_L04_003EDFF0(unsigned char *a0, char *a1)
+/* Counts the live objects of one kind among twenty slots and returns the last slot that is free, or -1 if none is. */
+int func_L04_003EDFF0(unsigned char *moby, char *varsArg)
 {
-    char *s0 = a1;
+    char *vars = varsArg;
     int i;
     int last = -1;
 
-    *(unsigned char *)(s0 + 0x81) = func_002A8508(*(void **)(s0 + 0x84), -1);
+    *(unsigned char *)(vars + 0x81) = CountMobysInGroupNotInState(*(void **)(vars + 0x84), -1);
     for (i = 0; i < 20; i++) {
-        char *e = *(char **)(s0 + 0xA0 + i * 4);
+        char *slotMoby = *(char **)(vars + 0xA0 + i * 4);
 
-        if (e != 0 && *(short *)(e + 0xAA) == 0xB66
-            && *(unsigned char *)(e + 0x20) != 0xFE
-            && *(unsigned char *)(e + 0x20) != 0xFD) {
-            *(unsigned char *)(s0 + 0x81) = *(unsigned char *)(s0 + 0x81) + 1;
+        if (slotMoby != 0 && *(short *)(slotMoby + 0xAA) == 0xB66 /* moby class 2918 */
+            && *(unsigned char *)(slotMoby + 0x20) != 0xFE
+            && *(unsigned char *)(slotMoby + 0x20) != 0xFD) {
+            *(unsigned char *)(vars + 0x81) = *(unsigned char *)(vars + 0x81) + 1;
         } else {
             last = i;
         }
@@ -296,65 +299,67 @@ int func_L04_003EDFF0(unsigned char *a0, char *a1)
 
 
 
-void func_L04_003F5F30(unsigned char *a0) {
-    unsigned char *obj = *(unsigned char **)(a0 + 0x68);
-    float *p;
-    unsigned int *q;
-    unsigned int v;
+/* Sets up four glow sprites with random start phases, sizes and fading brightness. */
+void func_L04_003F5F30(unsigned char *moby) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    float *phasePtr;
+    unsigned int *alphaPtr;
+    unsigned int alphaValue;
     int i;
     int j;
 
-    p = (float *)(obj + 0x14);
+    phasePtr = (float *)(vars + 0x14);
     for (i = 3; i >= 0; i--) {
-        *p++ = (float)func_002A77E0(0xFF);
+        *phasePtr++ = (float)RandomIntBelow(0xFF);
     }
-    *(float *)(obj + 0x24) = -1.0f;
-    *(float *)(obj + 0x28) = -2.25f;
-    *(float *)(obj + 0x2C) = 1.25f;
-    *(float *)(obj + 0x30) = 2.5f;
+    *(float *)(vars + 0x24) = -1.0f;
+    *(float *)(vars + 0x28) = -2.25f;
+    *(float *)(vars + 0x2C) = 1.25f;
+    *(float *)(vars + 0x30) = 2.5f;
     j = 3;
-    q = (unsigned int *)(obj + 0x40);
-    v = 0xFF;
+    alphaPtr = (unsigned int *)(vars + 0x40);
+    alphaValue = 0xFF;
     for (; j >= 0; j--) {
-        *q = v;
-        q--;
-        v -= 0x40;
+        *alphaPtr = alphaValue;
+        alphaPtr--;
+        alphaValue -= 0x40;
     }
-    *(float *)(obj + 0x44) = 2.0f;
-    *(float *)(obj + 0x48) = 2.5f;
-    *(float *)(obj + 0x4C) = 2.5f;
-    *(float *)(obj + 0x50) = 2.0f;
+    *(float *)(vars + 0x44) = 2.0f;
+    *(float *)(vars + 0x48) = 2.5f;
+    *(float *)(vars + 0x4C) = 2.5f;
+    *(float *)(vars + 0x50) = 2.0f;
 }
 
 
-void func_L04_003F8FA0(unsigned char *a0) {
-    unsigned char *obj = *(unsigned char **)(a0 + 0x68);
-    float *p;
-    unsigned int *q;
-    unsigned int v;
+/* Sets up four glow sprites with random start phases, sizes and fading brightness (variant with a smaller state block). */
+void func_L04_003F8FA0(unsigned char *moby) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    float *phasePtr;
+    unsigned int *alphaPtr;
+    unsigned int alphaValue;
     int i;
     int j;
 
-    p = (float *)(obj + 0x10);
+    phasePtr = (float *)(vars + 0x10);
     for (i = 3; i >= 0; i--) {
-        *p++ = (float)func_002A77E0(0xFF);
+        *phasePtr++ = (float)RandomIntBelow(0xFF);
     }
-    *(float *)(obj + 0x20) = -1.0f;
-    *(float *)(obj + 0x24) = -2.25f;
-    *(float *)(obj + 0x28) = 1.25f;
-    *(float *)(obj + 0x2C) = 2.5f;
+    *(float *)(vars + 0x20) = -1.0f;
+    *(float *)(vars + 0x24) = -2.25f;
+    *(float *)(vars + 0x28) = 1.25f;
+    *(float *)(vars + 0x2C) = 2.5f;
     j = 3;
-    q = (unsigned int *)(obj + 0x3C);
-    v = 0xFF;
+    alphaPtr = (unsigned int *)(vars + 0x3C);
+    alphaValue = 0xFF;
     for (; j >= 0; j--) {
-        *q = v;
-        q--;
-        v -= 0x40;
+        *alphaPtr = alphaValue;
+        alphaPtr--;
+        alphaValue -= 0x40;
     }
-    *(float *)(obj + 0x40) = 2.0f;
-    *(float *)(obj + 0x44) = 2.5f;
-    *(float *)(obj + 0x48) = 2.5f;
-    *(float *)(obj + 0x4C) = 2.0f;
+    *(float *)(vars + 0x40) = 2.0f;
+    *(float *)(vars + 0x44) = 2.5f;
+    *(float *)(vars + 0x48) = 2.5f;
+    *(float *)(vars + 0x4C) = 2.0f;
 }
 
 
@@ -450,36 +455,36 @@ Moby *func_L04_003F9ED0(Moby *projectile, ProjectileVars *vars, float *position,
     probe.owner = projectile;
     probe.active = 1;
     qcopy(probe.v, direction);
-    func_00282F70(&probe, &probe, 1);
+    FastVectorNormalizeHelper(&probe, &probe, 1);
     probe.enabled = 1;
     probe.v[3] = 5627.925f;
     probe.mode = 3;
     probe.oClass = projectile->oClass;
     probe.v[2] = 1;
 
-    func_00282CC0(step, pos, direction);
-    lineHit = func_002761F8(pos, step, 0, vars->ignored, &probe);
+    FastVecAdd(step, pos, direction);
+    lineHit = CollLine(pos, step, 0, vars->ignored, &probe);
     if (lineHit) {
         collided = 1;
         remaining = 0;
     } else {
         stride = 0.49f;
-        remaining = func_00282DF0(direction);
+        remaining = FastVecLength(direction);
         if (remaining > 0)
-            func_00282D30(unit, direction, 1.0f / remaining);
+            FastVecScale(unit, direction, 1.0f / remaining);
         else
             qzero(unit);
     }
     while (remaining > 0 && !collided) {
         if (stride < remaining) {
-            func_00282D30(step, unit, stride);
+            FastVecScale(step, unit, stride);
             remaining -= stride;
         } else {
-            func_00282D30(step, unit, remaining);
+            FastVecScale(step, unit, remaining);
             remaining = 0;
         }
-        func_00282CC0(pos, pos, step);
-        if (func_00277F48(0.5f, pos, 0, vars->ignored, &probe))
+        FastVecAdd(pos, pos, step);
+        if (ProcessCollisionHit(0.5f, pos, 0, vars->ignored, &probe))
             collided = 1;
     }
 
@@ -490,37 +495,37 @@ Moby *func_L04_003F9ED0(Moby *projectile, ProjectileVars *vars, float *position,
                 goto done;
             projectile->fBC = 2;
             hitMoby = collision->moby;
-            if (hitMoby->oClass == 0xA1F)
+            if (hitMoby->oClass == 0xA1F /* moby class 2591 */)
                 qcopy(pos, &projectile->position);
             else
                 qcopy(pos, &hitMoby->position);
-            func_00282CF0(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
-            func_00282F20((char *)hitDelta, (char *)hitDelta, 1);
+            FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+            vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
             result = projectile;
-            func_00283028(response, direction, &D_L04_001BFAE0.normal);
-            func_00282F20((char *)response, (char *)response, 0.033333335f);
-            func_00282F20((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+            FastVectorNormalize(response, direction, &D_L04_001BFAE0.normal);
+            vec_scale_to_length((char *)response, (char *)response, 0.033333335f);
+            vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
         } else if (collision->count > 0) {
             *(Q16_B0e5d8f83 *)forward = *(Q16_B0e5d8f83 *)direction;
             func_001290E0(&collision->hit.normal, &collision->hit.normal);
             func_001290E0(forward, forward);
-            dot = func_00282DB0(forward, &collision->hit.normal);
+            dot = FastVecDot(forward, &collision->hit.normal);
             if (dot > 0 && dot < 0.707f) {
-                func_00282D30(&collision->hit.normal, &collision->hit.normal, dot);
-                func_00282CC0(direction, direction, &collision->hit.normal);
-                func_00282CD8(target, pos, direction);
-                projectile->rotation.f[2] = func_00283248(direction[0], direction[1]);
-                projectile->rotation.f[1] = -func_00283248(func_00282E20(direction), direction[2]);
+                FastVecScale(&collision->hit.normal, &collision->hit.normal, dot);
+                FastVecAdd(direction, direction, &collision->hit.normal);
+                add_vectors(target, pos, direction);
+                projectile->rotation.f[2] = FastMatrixHelperA(direction[0], direction[1]);
+                projectile->rotation.f[1] = -FastMatrixHelperA(vec_length_xy(direction), direction[2]);
                 *(Q16_B0e5d8f83 *)hitPoint = collision->hit.point.q;
-                func_L04_0040C0C0(hitPoint, direction, 4, 0);
+                SpawnParticleBurst_L04(hitPoint, direction, 4, 0);
             } else {
                 projectile->fBC = 1;
                 qcopy(pos, &D_L04_001BFAE0.point);
-                func_00282CF0(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
-                func_00282F20((char *)hitDelta, (char *)hitDelta, 1);
-                func_00283028(response, direction, &D_L04_001BFAE0.normal);
-                func_00282F20((char *)response, (char *)response, 0.033333335f);
-                func_00282F20((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+                FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+                vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
+                FastVectorNormalize(response, direction, &D_L04_001BFAE0.normal);
+                vec_scale_to_length((char *)response, (char *)response, 0.033333335f);
+                vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
             }
         }
     }
@@ -533,65 +538,66 @@ extern void ref_L04_003FA5A8_00(void *, float, float, float);
 extern unsigned char *ref_L04_003FA5A8_01(void *, void *, void *, float *, float *, float *, float, float);
 extern void ref_L04_003FA5A8_02(void *, void *, void *);
 extern void ref_L04_003FA5A8_03(void *, void *, void *, void *, void *, void *, void *);
+/* Creates a homing rocket for its owner and aims it at the given target, or at the best target found ahead. */
 unsigned char *func_L04_003FA5A8(unsigned char *owner, float *pos,
-    unsigned char *target, float x, float y, float z, float angle, float tilt)
+    unsigned char *target, float aimYaw, float aimPitch, float aimHeight, float facingYaw, float facingPitch)
 {
     float origin[4], matrix[16], position[4];
-    unsigned char *m = func_0029EFD0((void *)0xABD);
-    unsigned char *state;
+    unsigned char *rocket = CreateMoby((void *)0xABD /* moby class 2749 */);
+    unsigned char *vars;
 
-    if (m != 0) {
-        m[0x30] = 255;
-        *(short *)(m + 0x32) = 255;
-        m[0x31] = 1;
-        m[0x20] = 0;
-        *(float *)(m + 0xF8) = angle;
-        *(float *)(m + 0xF4) = tilt;
-        *(float *)(m + 0x2C) =
-            *(float *)(*(unsigned char **)(m + 0x24) + 0x24) * 3.0f;
-        state = *(unsigned char **)(m + 0x68);
+    if (rocket != 0) {
+        rocket[0x30] = 255;
+        *(short *)(rocket + 0x32) = 255;
+        rocket[0x31] = 1;
+        rocket[0x20] = 0;
+        *(float *)(rocket + 0xF8) = facingYaw;
+        *(float *)(rocket + 0xF4) = facingPitch;
+        *(float *)(rocket + 0x2C) =
+            *(float *)(*(unsigned char **)(rocket + 0x24) + 0x24) * 3.0f;
+        vars = *(unsigned char **)(rocket + 0x68);
         if (target == 0) {
-            ref_L04_003FA5A8_00(matrix, 0.33333334f, angle, tilt);
+            ref_L04_003FA5A8_00(matrix, 0.33333334f, facingYaw, facingPitch);
             *(Q16_B0e5d8f83 *)position = *(Q16_B0e5d8f83 *)pos;
-            target = ref_L04_003FA5A8_01(m, position, matrix, &x, &y, &z,
+            target = ref_L04_003FA5A8_01(rocket, position, matrix, &aimYaw, &aimPitch, &aimHeight,
                 0.349065899848938f, 30.0f);
         }
-        *(void **)(state + 0x20) = owner;
-        qcopy(m + 0x10, pos);
-        *(int *)(state + 0x48) = 1;
-        *(float *)(state + 0x44) = 0.8333333730697632f;
-        *(int *)(state + 0x34) = 0;
-        *(int *)(state + 0x38) = 0;
-        *(int *)(state + 0x30) = 0;
-        *(int *)(state + 0x54) = -1;
-        *(int *)(state + 0x50) = -1;
-        *(void **)(state + 0x28) = target;
-        *(float *)(state + 0x3C) = x;
-        *(float *)(state + 0x40) = y;
-        *(int *)(state + 0x24) = 300;
+        *(void **)(vars + 0x20) = owner;
+        qcopy(rocket + 0x10, pos);
+        *(int *)(vars + 0x48) = 1;
+        *(float *)(vars + 0x44) = 0.8333333730697632f;
+        *(int *)(vars + 0x34) = 0;
+        *(int *)(vars + 0x38) = 0;
+        *(int *)(vars + 0x30) = 0;
+        *(int *)(vars + 0x54) = -1;
+        *(int *)(vars + 0x50) = -1;
+        *(void **)(vars + 0x28) = target;
+        *(float *)(vars + 0x3C) = aimYaw;
+        *(float *)(vars + 0x40) = aimPitch;
+        *(int *)(vars + 0x24) = 300;
         if (target != 0) {
-            qcopy(state, target + 0x10);
-            *(float *)(state + 8) += z;
-            *(float *)(state + 0x2C) = z;
+            qcopy(vars, target + 0x10);
+            *(float *)(vars + 8) += aimHeight;
+            *(float *)(vars + 0x2C) = aimHeight;
         }
-        if (owner != 0 && *(short *)(owner + 0xAA) == 0xBBC) {
-            *(short *)(state + 0x4E) = 60;
-            *(short *)(state + 0x4C) = 60;
+        if (owner != 0 && *(short *)(owner + 0xAA) == 0xBBC /* moby class 3004 */) {
+            *(short *)(vars + 0x4E) = 60;
+            *(short *)(vars + 0x4C) = 60;
         } else {
-            *(short *)(state + 0x4E) = 1;
-            *(short *)(state + 0x4C) = 1;
+            *(short *)(vars + 0x4E) = 1;
+            *(short *)(vars + 0x4C) = 1;
         }
         *(Q16_B0e5d8f83 *)origin = *(Q16_B0e5d8f83 *)(owner + 0x10);
         origin[2] = pos[2];
         ref_L04_003FA5A8_02(matrix, pos, origin);
-        if (target != 0 && *(short *)(target + 0xAA) != 0xBBC) {
-            ref_L04_003FA5A8_03(m, state, origin, matrix,
+        if (target != 0 && *(short *)(target + 0xAA) != 0xBBC /* moby class 3004 */) {
+            ref_L04_003FA5A8_03(rocket, vars, origin, matrix,
                 matrix + 12, matrix + 4, matrix + 8);
         }
-        func_002A0F48(m);
-        *(float *)(m + 0x2C) += *(float *)(m + 0x2C);
+        func_002A0F48(rocket);
+        *(float *)(rocket + 0x2C) += *(float *)(rocket + 0x2C);
     }
-    return m;
+    return rocket;
 }
 
 /* func_L04_003FA7E0 is defined in L04_003FA7E0.c. */
@@ -639,18 +645,18 @@ void func_L04_003FB990(unsigned char *m, void *vars)
     void *rayResult = 0;
     int sparkKind = 8, sparkArg = 0;
     if (radius < 0.75f) radius = 0.75f;
-    n = func_00277F48(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
+    n = ProcessCollisionHit(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
     for (count = 0; count < n; count++) {
         if (D_L04_001C3B40[count] == *(unsigned char **)(v + 0x74)) continue;
         if (*(float *)(v + 0x7C) > 0) {
-            angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
+            angle = FastMatrixHelperA(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
-            if (func_00283C80(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
-            angle = func_00283248(func_00282E80(m + 0x10, D_L04_001C3B40[count] + 0x10),
+            if (FastDiffRots(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
+            angle = FastMatrixHelperA(vec_distance_xy(m + 0x10, D_L04_001C3B40[count] + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x18) - *(float *)(m + 0x18));
-            if (func_00283C80(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
+            if (FastDiffRots(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
         }
-        if (func_00282E48((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
+        if (fast_vec_dist((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
             B990Impact impact;
             impact.source = *(void **)(v + 0x74);
             impact.flags = 0x230000;
@@ -659,14 +665,14 @@ void func_L04_003FB990(unsigned char *m, void *vars)
             impact.objectClass = *(unsigned short *)(m + 0xAA);
             impact.strength = 1.0f;
             impact.unk20 = 0x230000;
-            angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
+            angle = FastMatrixHelperA(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
-            impact.vector[0] = func_00283180(angle);
-            impact.vector[1] = func_00283198(angle);
+            impact.vector[0] = FastSinOrCosA(angle);
+            impact.vector[1] = FastSinOrCosB(angle);
             impact.vector[2] = 1.0f;
             impact.vector[3] = 5627.9248046875f;
-            func_002A8E20(D_L04_001C3B40[count], &impact);
-            func_002E5CF8(soundId, soundArg, *(void **)(v + 0x74));
+            QueueMobyImpact(D_L04_001C3B40[count], &impact);
+            PlayMobySound(soundId, soundArg, *(void **)(v + 0x74));
         }
     }
     {
@@ -675,15 +681,15 @@ void func_L04_003FB990(unsigned char *m, void *vars)
     for (side = 0; side < 2; side++) {
         sign = (side & 1) ? 1.0f : -1.0f;
         for (i = 0; i < 5; i++) {
-            angle0 = func_00283C28(func_00283CE0(i) * sign * 0.1396263688802719f);
-            angle1 = func_00283C28(func_00283CE0(i + 1) * sign * 0.1396263688802719f);
-            func_002AF000(ray[0], range, func_00283B98(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            func_002AF000(ray[1], range, func_00283B98(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            func_00282CD8(ray[2], ray[0], m + 0x10);
-            func_00282CD8(ray[2], ray[1], m + 0x10);
-            if (func_002761F8(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
-                func_002AF000(ray[2], 0.33333334326744f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
-                func_L04_0040C0C0(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
+            angle0 = FastFloatHelperG(IntToFloat(i) * sign * 0.1396263688802719f);
+            angle1 = FastFloatHelperG(IntToFloat(i + 1) * sign * 0.1396263688802719f);
+            BuildSphericalOffset(ray[0], range, FastAddRotations(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            BuildSphericalOffset(ray[1], range, FastAddRotations(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            add_vectors(ray[2], ray[0], m + 0x10);
+            add_vectors(ray[2], ray[1], m + 0x10);
+            if (CollLine(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
+                BuildSphericalOffset(ray[2], 0.33333334326744f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
+                SpawnParticleBurst_L04(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
             }
         }
     }
@@ -720,49 +726,51 @@ extern void func_L04_003FBEF8(void);
 extern unsigned char D_00188660[];
 extern int D_L04_001B0488 __attribute__((sda));
 
-void func_L04_003FC678(unsigned char *m)
+/* Keeps the blast effect on its owner and damages nearby objects each frame until its short timer runs out. */
+void func_L04_003FC678(unsigned char *effect)
 {
-    L04_C678Vars *v = *(L04_C678Vars **)(m + 0x68);
-    int s;
-    L04_C678Slot *e;
+    L04_C678Vars *vars = *(L04_C678Vars **)(effect + 0x68);
+    int soundSlot;
+    L04_C678Slot *soundRecord;
 
-    *(L04_C678Quad *)(m + 0x10) = *(L04_C678Quad *)(v->owner + 0x10);
-    func_002AA800(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.026179943f);
-    v->age = v->age + 1.0f;
-    if (v->timer != 0 && func_00282948(&v->timer) != 0) {
-        s = D_L04_001B0488;
-        if (s != -1) {
-            e = (L04_C678Slot *)(D_00188660 + s * 0x70);
-            if (e->owner == v->owner && e->active != 0) {
-                func_002E59F8(s);
+    *(L04_C678Quad *)(effect + 0x10) = *(L04_C678Quad *)(vars->owner + 0x10);
+    StepAngleTowardTarget(effect + 0xF8, 0, *(float *)(vars->owner + 0xF8), 0.026179943f);
+    vars->age = vars->age + 1.0f;
+    if (vars->timer != 0 && FastFloatHelperD(&vars->timer) != 0) {
+        soundSlot = D_L04_001B0488;
+        if (soundSlot != -1) {
+            soundRecord = (L04_C678Slot *)(gSoundState + soundSlot * 0x70);
+            if (soundRecord->owner == vars->owner && soundRecord->active != 0) {
+                StopSoundVoice(soundSlot);
             }
         }
         D_L04_001B0488 = -1;
-        func_0029F338(m);
+        MarkMobySpawned(effect);
         return;
     }
-    if (30.0f < v->age && v->timer == 0) {
-        v->timer = func_00283CF0(15.0f);
+    if (30.0f < vars->age && vars->timer == 0) {
+        vars->timer = FloatToInt(15.0f);
     } else {
-        func_L04_003FB990(m, v);
+        DamageMobysInFiringCone(effect, vars);
     }
-    func_L00_002E6DB8(func_L04_003FBEF8, m);
+    AddDrawCallbackToList2(DrawDomeEffect, effect);
 }
 
-void *func_L04_00400A18(unsigned char *a0, void *a1, float f12) {
-    unsigned char *obj = func_0029EFD0(a1);
+/* Creates a new moby of the given class at the parent's position and turning, sized from its class scale (without the extra flag). */
+void *func_L04_00400A18(unsigned char *parent, void *classId, float scaleFactor) {
+    unsigned char *child = CreateMoby(classId);
 
-    if (obj != 0) {
-        obj[0x30] = 0xFF;
-        *(unsigned short *)(obj + 0x32) = 0xFF;
-        obj[0x31] = 1;
-        obj[0x20] = 0;
-        *(float *)(obj + 0x2C) = *(float *)(*(unsigned char **)(obj + 0x24) + 0x24) * f12;
-        *(Q16_B0e5d8f83 *)(obj + 0x10) = *(Q16_B0e5d8f83 *)(a0 + 0x10);
-        *(Q16_B0e5d8f83 *)(obj + 0xF0) = *(Q16_B0e5d8f83 *)(a0 + 0xF0);
-        func_002A0F48(obj);
+    if (child != 0) {
+        child[0x30] = 0xFF;
+        *(unsigned short *)(child + 0x32) = 0xFF;
+        child[0x31] = 1;
+        child[0x20] = 0;
+        *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24) * scaleFactor;
+        *(Q16_B0e5d8f83 *)(child + 0x10) = *(Q16_B0e5d8f83 *)(parent + 0x10);
+        *(Q16_B0e5d8f83 *)(child + 0xF0) = *(Q16_B0e5d8f83 *)(parent + 0xF0);
+        func_002A0F48(child);
     }
-    return obj;
+    return child;
 }
 
 /* func_L04_00400AB0 and func_L04_00400D48 are in L04_003C8380-path-g8.c. */
@@ -782,129 +790,132 @@ extern float func_002AA2E8(float *, float, float);
 extern int func_00282978(short *);
 
 /* Blend the nearby pressure-surface contact using a full64-byte inverse matrix. */
-void func_L04_004027B0(unsigned char *object, unsigned char *state) {
+/* Checks whether the racer is inside a nearby boost pad area and keeps a boost timer going, easing the boost up or down. */
+void func_L04_004027B0(unsigned char *racer, unsigned char *racerVars) {
     EffectVector delta;
     EffectMatrix4 inverse;
-    unsigned char *nearby;
-    unsigned char *contact;
-    int kind;
+    unsigned char *pad;
+    unsigned char *padVars;
+    int padClass;
     float distance;
-    if (*(int *)(state + 0x80) == -1) return;
-    func_002A8600(&nearby, *(int *)(state + 0x80), 0, 0);
-    while (nearby) {
-        kind = *(short *)(nearby + 0xAA);
-        if (kind == 0x474 || kind == 0xCEF) {
-            func_00282CF0(&delta, nearby + 0x10, object + 0x10);
-            distance = func_00282DB0(&delta, &delta);
+    if (*(int *)(racerVars + 0x80) == -1) return;
+    GetFirstMobyInGroup(&pad, *(int *)(racerVars + 0x80), 0, 0);
+    while (pad) {
+        padClass = *(short *)(pad + 0xAA);
+        if (padClass == 0x474 /* moby class 1140 */ || padClass == 0xCEF /* moby class 3311 */) {
+            FastVecSub(&delta, pad + 0x10, racer + 0x10);
+            distance = FastVecDot(&delta, &delta);
             if (!(20.0f < distance)) {
-                func_00283388(&inverse);
-                func_00283698(&inverse, nearby + 0xC0);
-                func_002830C0(&delta, &delta, &inverse);
-                if (func_00282C48(delta.f[0]) < 2.8f && func_00282C48(delta.f[1]) < 1.25f && func_00282C48(delta.f[2]) < 1.5f) {
-                    contact = *(unsigned char **)(nearby + 0x68);
-                    if (*(short *)(state + 0x140) == 0 && (*(unsigned char **)(state + 0x164))[0x20] != 3)
-                        func_002E5CF8(0, 0, (char *)nearby);
-                    *(unsigned short *)(state + 0x140) = *(unsigned short *)contact;
+                set_identity_matrix(&inverse);
+                matrix_from_basis_rows(&inverse, pad + 0xC0);
+                transform_vector(&delta, &delta, &inverse);
+                if (FloatAbs(delta.f[0]) < 2.8f && FloatAbs(delta.f[1]) < 1.25f && FloatAbs(delta.f[2]) < 1.5f) {
+                    padVars = *(unsigned char **)(pad + 0x68);
+                    if (*(short *)(racerVars + 0x140) == 0 && (*(unsigned char **)(racerVars + 0x164))[0x20] != 3)
+                        PlayMobySound(0, 0, (char *)pad);
+                    *(unsigned short *)(racerVars + 0x140) = *(unsigned short *)padVars;
                 }
             }
         }
-        func_002A86E8(&nearby, nearby, 0, 0);
+        GetNextMobyInGroup(&pad, pad, 0, 0);
     }
-    if (*(short *)(state + 0x140) != 0) {
-        *(short *)(state + 0x142) = 1;
-        func_002AA2E8((float *)(state + 0x13C), 0.10000000894069672f, 0.0055555556900799274f);
-        if (*(short *)(state + 0x140)) func_00282978((short *)(state + 0x140));
+    if (*(short *)(racerVars + 0x140) != 0) {
+        *(short *)(racerVars + 0x142) = 1;
+        ApproachValue((float *)(racerVars + 0x13C), 0.10000000894069672f, 0.0055555556900799274f);
+        if (*(short *)(racerVars + 0x140)) FastDecTimer((short *)(racerVars + 0x140));
     } else {
-        *(short *)(state + 0x142) = 0;
-        func_002AA2E8((float *)(state + 0x13C), 0.0f, 0.002777777845039964f);
+        *(short *)(racerVars + 0x142) = 0;
+        ApproachValue((float *)(racerVars + 0x13C), 0.0f, 0.002777777845039964f);
     }
 }
 
-void func_L04_004029D8(unsigned char *m) {
-    unsigned char *s = *(unsigned char **)(m + 0x68);
-    float f;
-    unsigned char *o;
-    s[0xA2] = s[0x9C];
-    *(Q16_B0e5d8f83 *)(m+0x10) = *(Q16_B0e5d8f83 *)(s+0xB0);
-    *(Q16_B0e5d8f83 *)(m+0xF0) = *(Q16_B0e5d8f83 *)(s+0xC0);
-    s[0xA0] = 0;
-    f = func_00283CE0(s[0xA2]-1);
-    *(float *)(s+0x134) = 0.36916667222976685f - f * 0.011666666716337204f - (1.0f - (float)*(int *)(s+0x1A8)*0.1f)*0.03333333507180214f;
-    *(int *)(s+0x138)=0;
-    *(int *)(s+0x158)=0;
-    *(int *)(s+0x13C)=0;
-    *(short *)(s+0x142)=0;
-    *(short *)(s+0x140)=0;
-    *(int *)(s+0x160)=0;
-    *(int *)(s+0x24C)=0;
-    if (*(int *)(s+0x54)==-1) *(char **)(s+0x110)=D_L04_001FE340[*(int *)(s+0x50)];
-    else *(char **)(s+0x110)=D_L04_001FE340[*(int *)(s+0x54)];
-    *(float *)(s+0xA8)=5.0f;
-    *(float *)(s+0x1F8)=1.0f;
-    *(int *)(s+0xAC)=0;
-    *(int *)(s+0x114)=0;
-    *(int *)(s+0x118)=0;
-    *(int *)(s+0x128)=0;
-    *(int *)(s+0x12C)=0;
-    *(int *)(s+0x130)=0;
-    *(int *)(s+0x244)=0;
-    *(int *)(s+0x1F4)=0;
-    *(int *)(s+0x144)=0;
-    s[0xA4]=0; s[0xA5]=0; *(short *)(s+0xA6)=0;
-    *(int *)(s+0x154)=0;
-    *(int *)(s+0x150)=0;
-    *(int *)(s+0x148)=0;
-    *(int *)(s+0x178)=0;
-    *(int *)(s+0x248)=0;
-    *(int *)(s+0x14C)=0;
-    *(int *)(s+0x15C)=0;
-    s[0xA1]=0;
-    qzero(s+0xD0); qzero(s+0xE0); qzero(s+0x100);
-    o=*(unsigned char **)(s+0x110);
-    func_002C96F8(o,s+0x114,s+0x118,s+0xF0,*(float *)(s+0xA8),*(float *)(o+0x1C));
-    *(float *)(s+0x16C)=func_002A7878_range(-1.5f,1.5f);
-    *(int *)(s+0x174)=func_00283CF0(func_002A7878_range(3.0f,6.0f)*60.0f);
-    *(int *)(s+0x170)=0;
-    *(int *)(m+0x98)=*(int *)(*(unsigned char **)(m+0x24)+0x10);
-    *(unsigned short *)(m+0x34)=(*(unsigned short *)(m+0x34)&0xFFBE)|0x1400;
-    if (!*(void **)(s+0x8C)) {
-        *(void **)(s+0x8C)=func_L04_003E5E40(m,(void *)0x8EF,0.25f);
-        if (!*(void **)(s+0x8C)) goto done;
+/* Puts a racer back at its start spot, clears its race state and restarts its route. */
+void func_L04_004029D8(unsigned char *racer) {
+    unsigned char *vars = *(unsigned char **)(racer + 0x68);
+    float offset;
+    unsigned char *route;
+    vars[0xA2] = vars[0x9C];
+    *(Q16_B0e5d8f83 *)(racer+0x10) = *(Q16_B0e5d8f83 *)(vars+0xB0);
+    *(Q16_B0e5d8f83 *)(racer+0xF0) = *(Q16_B0e5d8f83 *)(vars+0xC0);
+    vars[0xA0] = 0;
+    offset = IntToFloat(vars[0xA2]-1);
+    *(float *)(vars+0x134) = 0.36916667222976685f - offset * 0.011666666716337204f - (1.0f - (float)*(int *)(vars+0x1A8)*0.1f)*0.03333333507180214f;
+    *(int *)(vars+0x138)=0;
+    *(int *)(vars+0x158)=0;
+    *(int *)(vars+0x13C)=0;
+    *(short *)(vars+0x142)=0;
+    *(short *)(vars+0x140)=0;
+    *(int *)(vars+0x160)=0;
+    *(int *)(vars+0x24C)=0;
+    if (*(int *)(vars+0x54)==-1) *(char **)(vars+0x110)=gRoutePathTable[*(int *)(vars+0x50)];
+    else *(char **)(vars+0x110)=gRoutePathTable[*(int *)(vars+0x54)];
+    *(float *)(vars+0xA8)=5.0f;
+    *(float *)(vars+0x1F8)=1.0f;
+    *(int *)(vars+0xAC)=0;
+    *(int *)(vars+0x114)=0;
+    *(int *)(vars+0x118)=0;
+    *(int *)(vars+0x128)=0;
+    *(int *)(vars+0x12C)=0;
+    *(int *)(vars+0x130)=0;
+    *(int *)(vars+0x244)=0;
+    *(int *)(vars+0x1F4)=0;
+    *(int *)(vars+0x144)=0;
+    vars[0xA4]=0; vars[0xA5]=0; *(short *)(vars+0xA6)=0;
+    *(int *)(vars+0x154)=0;
+    *(int *)(vars+0x150)=0;
+    *(int *)(vars+0x148)=0;
+    *(int *)(vars+0x178)=0;
+    *(int *)(vars+0x248)=0;
+    *(int *)(vars+0x14C)=0;
+    *(int *)(vars+0x15C)=0;
+    vars[0xA1]=0;
+    qzero(vars+0xD0); qzero(vars+0xE0); qzero(vars+0x100);
+    route=*(unsigned char **)(vars+0x110);
+    SampleKeyTrack(route,vars+0x114,vars+0x118,vars+0xF0,*(float *)(vars+0xA8),*(float *)(route+0x1C));
+    *(float *)(vars+0x16C)=func_002A7878_range(-1.5f,1.5f);
+    *(int *)(vars+0x174)=FloatToInt(func_002A7878_range(3.0f,6.0f)*60.0f);
+    *(int *)(vars+0x170)=0;
+    *(int *)(racer+0x98)=*(int *)(*(unsigned char **)(racer+0x24)+0x10);
+    *(unsigned short *)(racer+0x34)=(*(unsigned short *)(racer+0x34)&0xFFBE)|0x1400;
+    if (!*(void **)(vars+0x8C)) {
+        *(void **)(vars+0x8C)=SpawnMobyAtParentPose(racer,(void *)0x8EF /* Enemy Hoverbike Racer */,0.25f);
+        if (!*(void **)(vars+0x8C)) goto done;
     }
     {
-    unsigned char *child=*(unsigned char **)(s+0x8C);
+    unsigned char *child=*(unsigned char **)(vars+0x8C);
     *(unsigned short *)(child+0x34)&=0xFFBE;
     }
-    *(Q16_B0e5d8f83 *)(*(unsigned char **)(s+0x8C)+0x10)=*(Q16_B0e5d8f83 *)(m+0x10);
-    *(Q16_B0e5d8f83 *)(*(unsigned char **)(s+0x8C)+0xF0)=*(Q16_B0e5d8f83 *)(m+0xF0);
-    (*(unsigned char **)(s+0x8C))[0x30]=0;
-    func_002A05A8(*(void **)(s+0x8C));
-    func_002A0F48(*(void **)(s+0x8C));
+    *(Q16_B0e5d8f83 *)(*(unsigned char **)(vars+0x8C)+0x10)=*(Q16_B0e5d8f83 *)(racer+0x10);
+    *(Q16_B0e5d8f83 *)(*(unsigned char **)(vars+0x8C)+0xF0)=*(Q16_B0e5d8f83 *)(racer+0xF0);
+    (*(unsigned char **)(vars+0x8C))[0x30]=0;
+    func_002A05A8(*(void **)(vars+0x8C));
+    func_002A0F48(*(void **)(vars+0x8C));
 done:
-    *(short *)(s+0x17E)=0; *(short *)(s+0x17C)=-1;
-    *(int *)(s+0x180)=0; m[0x20]=2;
-    *(int *)(s+0x120)=-1;
-    *(int *)(s+0x240)=*(int *)(s+0x1C0)=*(int *)(s+0x124)=
-    *(int *)(s+0x11C)=*(int *)(s+0x1AC)=*(int *)(s+0x1A0)=*(int *)(s+0x19C)=0;
+    *(short *)(vars+0x17E)=0; *(short *)(vars+0x17C)=-1;
+    *(int *)(vars+0x180)=0; racer[0x20]=2;
+    *(int *)(vars+0x120)=-1;
+    *(int *)(vars+0x240)=*(int *)(vars+0x1C0)=*(int *)(vars+0x124)=
+    *(int *)(vars+0x11C)=*(int *)(vars+0x1AC)=*(int *)(vars+0x1A0)=*(int *)(vars+0x19C)=0;
 }
 
 extern float func_00282E48(char *arg0, char *arg1);
 
 extern char *D_001FE340[];
 
-void func_L04_00402C88(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *obj;
+/* Works out the length of each leg of the racer's routes. */
+void func_L04_00402C88(char *racer) {
+    char *vars = *(char **)(racer + 0x68);
+    char *route;
 
     {
         int *slot;
         int i;
 
-        slot = (int *)(state + 0x54);
+        slot = (int *)(vars + 0x54);
         for (i = 5; i >= 0; i--, slot++) {
             if (*slot != -1) {
-                obj = D_001FE340[*slot];
-                *(float *)(obj + 0x1C) = func_00282E48(obj + 0x10, obj + 0x20);
+                route = D_001FE340[*slot];
+                *(float *)(route + 0x1C) = fast_vec_dist(route + 0x10, route + 0x20);
             }
         }
     }
@@ -913,16 +924,16 @@ void func_L04_00402C88(char *arg0) {
         int *slot;
         int i;
 
-        slot = (int *)(state + 0x6C);
+        slot = (int *)(vars + 0x6C);
         for (i = 3; i >= 0; i--, slot++) {
             if (*slot != none) {
-                obj = D_001FE340[*slot];
-                *(float *)(obj + 0x1C) = func_00282E48(obj + 0x10, obj + 0x20);
+                route = D_001FE340[*slot];
+                *(float *)(route + 0x1C) = fast_vec_dist(route + 0x10, route + 0x20);
             }
         }
     }
-    if (*(int *)(state + 0x7C) != -1) {
-        obj = D_001FE340[*(int *)(state + 0x7C)];
-        *(float *)(obj + 0x1C) = func_00282E48(obj + 0x10, obj + 0x20);
+    if (*(int *)(vars + 0x7C) != -1) {
+        route = D_001FE340[*(int *)(vars + 0x7C)];
+        *(float *)(route + 0x1C) = fast_vec_dist(route + 0x10, route + 0x20);
     }
 }

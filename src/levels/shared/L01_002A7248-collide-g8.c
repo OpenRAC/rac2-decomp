@@ -76,34 +76,34 @@ int func_L01_002B5EA0(int arg)
     float delta[4] __attribute__((aligned(16)));
     int steep, i, hit;
 
-    if (D_00189E20.collision_off)
+    if (gHeroState.collision_off)
         return 1;
-    qcopy(old, D_00189E20.pos);
+    qcopy(old, gHeroState.pos);
     func_002E3438(offset);
-    if (D_00189E20.constrain_pending) {
+    if (gHeroState.constrain_pending) {
         func_002CA1C0();
-        D_00189E20.constrain_pending = 0;
+        gHeroState.constrain_pending = 0;
     }
     steep = 0;
-    if (func_002E3560(D_00189E20.axis, D_00189E20.up) > -0.92f)
+    if (func_002E3560(gHeroState.axis, gHeroState.up) > -0.92f)
         steep = 1;
-    if (D_00189E20.control_mode != 0x11) {
-        if (D_00189E20.gravity_mode || D_00189E20.mode || steep) {
-            if (D_00189E20.state == 2)
+    if (gHeroState.control_mode != 0x11) {
+        if (gHeroState.gravity_mode || gHeroState.mode || steep) {
+            if (gHeroState.state == 2)
                 func_002C9020(offset, offset, 5.0f);
-            else if (D_00189E20.gravity_mode == 1 || D_00189E20.mode)
+            else if (gHeroState.gravity_mode == 1 || gHeroState.mode)
                 func_002C8E60(offset, 0, 0.0f, 0.0f, 0.6f);
             else if (D_L01_001A9030)
                 func_002C9020(offset, offset, 0.77f);
             else
-                func_002C8E60(offset, 0, 0.0f, 0.0f, D_00189E20.capsule_bottom);
+                func_002C8E60(offset, 0, 0.0f, 0.0f, gHeroState.capsule_bottom);
         } else {
-            offset[2] = D_00189E20.capsule_bottom;
+            offset[2] = gHeroState.capsule_bottom;
         }
     }
-    func_002E3470(D_00189E20.pos, D_00189E20.pos, offset);
+    func_002E3470(gHeroState.pos, gHeroState.pos, offset);
     for (i = 0; i < 8; i++) {
-        CollideHero *p = &D_00189E20;
+        CollideHero *p = &gHeroState;
         float *pos;
 
         if (p->gravity_mode || steep) {
@@ -123,18 +123,18 @@ int func_L01_002B5EA0(int arg)
         }
         if (!hit)
             break;
-        qcopy(D_00189E20.pos, D_L01_001BF900.pos);
-        qcopy(D_00189E20.wall_normal, D_L01_001BF900.normal);
-        qcopy(D_00189E20.wall_point, D_L01_001BF900.point);
+        qcopy(gHeroState.pos, D_L01_001BF900.pos);
+        qcopy(gHeroState.wall_normal, D_L01_001BF900.normal);
+        qcopy(gHeroState.wall_point, D_L01_001BF900.point);
         p->wall_hit = 1;
         p->hit_moby = D_L01_001BF900.moby;
     }
-    func_002E34A0(D_00189E20.pos, D_00189E20.pos, offset);
-    func_002E34A0(delta, D_00189E20.pos, old);
+    func_002E34A0(gHeroState.pos, gHeroState.pos, offset);
+    func_002E34A0(delta, gHeroState.pos, old);
     {
         float length = func_002E35A0(delta);
 
-        if (D_00189E20.capsule_radius * 1.5f < length) {
+        if (gHeroState.capsule_radius * 1.5f < length) {
             if (arg == 0xF) {
                 if (delta[0] > 512.0f)
                     delta[0] = 512.0f;
@@ -148,8 +148,8 @@ int func_L01_002B5EA0(int arg)
                     delta[2] = 512.0f;
                 else if (delta[2] < -512.0f)
                     delta[2] = -512.0f;
-                func_002E3738(delta, delta, D_00189E20.capsule_radius);
-                func_002E3470(D_00189E20.pos, old, delta);
+                func_002E3738(delta, delta, gHeroState.capsule_radius);
+                func_002E3470(gHeroState.pos, old, delta);
             }
             return -1;
         }

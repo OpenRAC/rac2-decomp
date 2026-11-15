@@ -42,6 +42,9 @@ extern void func_L00_003F00A0(void *);
 extern void ref_L00_003EEE90_00(void (*)(void *),void *);
 extern void func_L00_003EFA00(void *);
 typedef struct { char pad[0x10]; float phase; int timer; float rate; int alpha, unused, count, handle; } State4BF0;
+/* Updates the blast moby (class 3301). At the start it sets up the particle pool and throws a
+   burst of particles. Then it hurts nearby enemies as the blast grows, fades out, and removes
+   itself when its particles are gone. */
 void func_L00_003EEE90(char *object)
 {
     Vec4BF0 center, query, direction;
@@ -50,8 +53,8 @@ void func_L00_003EEE90(char *object)
     int *timer;
     State4BF0 *data = *(State4BF0 **)(object+0x68);
     float scale;
-    if (*(unsigned char *)(object+0x20) && !func_002B4038(*(short *)(object+0xAA),data->handle)) goto destroy;
-    func_00300190(object+0x10,object+0x10);
+    if (*(unsigned char *)(object+0x20) && !IsSavedRecordValue(*(short *)(object+0xAA),data->handle)) goto destroy;
+    TransformVectorOrCopy(object+0x10,object+0x10);
     switch (*(unsigned char *)(object+0x20)) {
     case 0: {
         int i;
@@ -62,11 +65,11 @@ void func_L00_003EEE90(char *object)
         data->rate=2.0f/3.0f;
         data->alpha=127;
         data->count=111;
-        data->handle=func_L00_00329E90(object,0,&allocation);
-        mem=func_L00_0032A088(*(short *)(object+0xAA),data->handle);
+        data->handle=AcquireEntitySlot(object,0,&allocation);
+        mem=GetSlotBody(*(short *)(object+0xAA),data->handle);
         D_L00_001B2BB4=mem;
-        D_L00_001B2BB8=(char *)func_L00_003EEE20((int)(mem+0x50));
-        D_L00_001B2BBC[0]=(int *)func_L00_003EEE20((int)(D_L00_001B2BB8+0xA000));
+        D_L00_001B2BB8=(char *)AlignUpTo16_L00((int)(mem+0x50));
+        D_L00_001B2BBC[0]=(int *)AlignUpTo16_L00((int)(D_L00_001B2BB8+0xA000));
         i=0;
         do { D_L00_001B2BBC[0][i]=0; i++; } while(i<144);
         { char *p = D_L00_001B2BB8+319*128+124;
@@ -74,11 +77,11 @@ void func_L00_003EEE90(char *object)
         *(int *)(D_L00_001B2BB4_1+0x30)=0;
         qcopy(center,object+0x10);
         center[2]+=1.0f;
-        func_L00_003EFF58(object,20,object+0x10,data,1.0f/6.0f);
-        func_L00_003EF560(object,object+0x10);
+        SpawnTrailEffectRecord(object,20,object+0x10,data,1.0f/6.0f);
+        SpawnBlastBurstParticles(object,object+0x10);
         qcopy(query,center);
         query[3]=2.0f;
-        if(func_00283DB8(query,100.0f)!=-1) {
+        if(FastMathHelperA(query,100.0f)!=-1) {
             D_L00_001B8C80.amount=0.45f;
             D_L00_001B8C80.timer=40;
             D_L00_001B8C80.state=0;
@@ -91,24 +94,24 @@ void func_L00_003EEE90(char *object)
         if(data->count<0) data->count=0;
         data->phase+=data->rate;
         timer=&data->timer;
-        scale=1.0f-func_00283CE0(*timer)/func_00283CE0(20);
+        scale=1.0f-IntToFloat(*timer)/IntToFloat(20);
         scale*=6.0f;
-        count=func_00277F48(object+0x10,0,object,0,scale+0.001f);
+        count=ProcessCollisionHit(object+0x10,0,object,0,scale+0.001f);
         for(i=0;i<count;i++) {
-            if((func_002AB1F0(D_L00_001C3280[i]) || (*(unsigned short *)(D_L00_001C3280[i]+0x34)&0x4000)) && D_L00_001C3280[i]!=D_00189E20.target && *(short *)(D_L00_001C3280[i]+0xAA)!=0xA5A) {
-                func_00282CF0(direction,D_L00_001C3280[i]+0x10,object+0x10);
-                func_00282F20(direction,direction,1.0f);
-                func_00282F20(&hit,&hit,1.0f);
-                func_002A8C00(((Weapon4BF0 *)((unsigned int)D_L00_00262570 + D_00139568[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
+            if((GetMobyPrivateValue0(gAreaHitTargets[i]) || (*(unsigned short *)(gAreaHitTargets[i]+0x34)&0x4000)) && gAreaHitTargets[i]!=gHeroState.target && *(short *)(gAreaHitTargets[i]+0xAA)!=0xA5A /* Mini-Nuke */) {
+                FastVecSub(direction,gAreaHitTargets[i]+0x10,object+0x10);
+                vec_scale_to_length(direction,direction,1.0f);
+                vec_scale_to_length(&hit,&hit,1.0f);
+                make_hit_descriptor(((Weapon4BF0 *)((unsigned int)gWeaponTable_L00 + gItemSlotToRecord[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
                 *(TI4BF0 *)hit.point = *(TI4BF0 *)direction;
                 hit.flags=3; hit.type=5; hit.active=1;
                 hit.point[3]=5627.925f;
-                hit.id=*(short *)(D_L00_001C3280[i]+0xAA);
-                func_002A8E20(D_L00_001C3280[i],&hit);
-                func_0032D758(D_L00_001C3280[i],42,*(int *)(object+0xB8));
+                hit.id=*(short *)(gAreaHitTargets[i]+0xAA);
+                QueueMobyImpact(gAreaHitTargets[i],&hit);
+                StartAttachedEffect(gAreaHitTargets[i],42,*(int *)(object+0xB8));
             }
         }
-        if(func_00282948(timer)) {
+        if(FastFloatHelperD(timer)) {
             *(unsigned char *)(object+0x20)=2;
             data->timer=40;
         }
@@ -116,24 +119,24 @@ void func_L00_003EEE90(char *object)
     }
     case 2:
         data->phase+=data->rate;
-        scale=func_00283CE0(data->timer)*0.025f;
-        if(func_00282948(&data->timer)) {
+        scale=IntToFloat(data->timer)*0.025f;
+        if(FastFloatHelperD(&data->timer)) {
             if(data->alpha) --data->alpha;
             else { data->alpha=0; *(unsigned char *)(object+0x20)=6; }
-        } else data->alpha=func_00283CF0(func_00283CE0(127)*scale);
+        } else data->alpha=FloatToInt(IntToFloat(127)*scale);
         break;
     case 6:
         data->phase+=data->rate;
         if(!*(int *)(D_L00_001B2BB4_1+0x38)) {
 destroy:
-            func_L00_003EF550();
-            func_0029F338(object); return;
+            ClearEffectRecordsAndFlag();
+            MarkMobySpawned(object); return;
         }
         break;
     }
     D_L00_001B0834-=0.04f;
     if(D_L00_001B0830 < -8.0f) D_L00_001B0830+=8.0f;
     if(D_L00_001B0834 < -8.0f) D_L00_001B0834+=8.0f;
-    func_L00_003F00A0(object);
-    ref_L00_003EEE90_00(func_L00_003EFA00,object);
+    UpdateOwnerEffectRecords(object);
+    ref_L00_003EEE90_00(RunBlastEffectFrame,object);
 }

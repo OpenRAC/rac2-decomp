@@ -59,18 +59,18 @@ void func_L17_003C7680(char *object)
 
     if (angle > 3.1415927f)
         angle -= 6.2831855f;
-    I(object, 0x78) = func_00283D38(0x80464646, 0x80828282, (func_00283198(angle) + 1.0f) * 0.5f);
+    I(object, 0x78) = FastTweenColor(0x80464646, 0x80828282, (FastSinOrCosB(angle) + 1.0f) * 0.5f);
     old.q = *(Q *)(object + 16);
     if (U(object, 0x20) == 0) {
         U(object, 0x20) = 1;
         if (state->path1 != -1)
-            *(Q *)(object + 16) = *(Q *)(D_L17_001FE880[state->path1] + 16);
+            *(Q *)(object + 16) = *(Q *)(gPathTable_L17[state->path1] + 16);
         else if (state->path2 != -1)
-            *(Q *)(object + 16) = *(Q *)(D_L17_001FE880[state->path2] + 16);
+            *(Q *)(object + 16) = *(Q *)(gPathTable_L17[state->path2] + 16);
     }
     if (state->trigger1 != -1 && state->path1 != -1) {
-        char *trigger = D_L17_001B2C1C + state->trigger1 * 256;
-        char *path = D_L17_001FE880[state->path1];
+        char *trigger = gMobyPool_L17 + state->trigger1 * 256;
+        char *path = gPathTable_L17[state->path1];
 
         switch (state->state1) {
         case 0:
@@ -84,7 +84,7 @@ void func_L17_003C7680(char *object)
             state->timer += 1.0f;
             if (state->timer >= D_L17_001B03A0 * 60.0f)
                 state->timer = D_L17_001B03A0 * 60.0f;
-            func_L17_003C7498(object, path, &old, D_L17_001B03A0);
+            MovePlatformAlongPathByTimer(object, path, &old, D_L17_001B03A0);
             if (state->timer >= D_L17_001B03A0 * 60.0f) {
                 state->wait = 0;
                 state->state1 = 2;
@@ -104,15 +104,15 @@ void func_L17_003C7680(char *object)
             state->timer -= 1.0f;
             if (state->timer <= 0.0f)
                 state->timer = 0;
-            func_L17_003C7498(object, path, &old, D_L17_001B03A0);
+            MovePlatformAlongPathByTimer(object, path, &old, D_L17_001B03A0);
             if (state->timer <= 0.0f)
                 state->state1 = 0;
             break;
         }
     }
     if (state->trigger2 != -1 && state->path2 != -1) {
-        char *path = D_L17_001FE880[state->path2];
-        char *trigger = D_L17_001B2C1C + state->trigger2 * 256;
+        char *path = gPathTable_L17[state->path2];
+        char *trigger = gMobyPool_L17 + state->trigger2 * 256;
         int allow;
         float height;
 
@@ -124,7 +124,7 @@ void func_L17_003C7680(char *object)
             if (allow) {
                 int index = state->gate;
 
-                if (index != -1 && U(D_L17_001B2C1C + index * 256, 0x20) != 3)
+                if (index != -1 && U(gMobyPool_L17 + index * 256, 0x20) != 3)
                     allow = 0;
                 if (allow && (!trigger || U(trigger, 0x20) == 254 || U(trigger, 0x20) == 253 ||
                               U(trigger, 0x20) == state->target)) {
@@ -137,7 +137,7 @@ void func_L17_003C7680(char *object)
             state->timer += 1.0f;
             if (state->timer >= D_L17_001B03A4 * 60.0f)
                 state->timer = D_L17_001B03A4 * 60.0f;
-            func_L17_003C7498(object, path, &old, D_L17_001B03A4);
+            MovePlatformAlongPathByTimer(object, path, &old, D_L17_001B03A4);
             if (state->timer >= D_L17_001B03A4 * 60.0f) {
                 state->wait = 0;
                 state->state2 = 2;
@@ -146,9 +146,9 @@ void func_L17_003C7680(char *object)
         case 2:
             state->wait += 1.0f;
             if (state->wait >= D_L17_001B03A8 * 60.0f) {
-                if (!func_002ACBC8(D_00189EA0, state->player)) {
+                if (!IsPointInCuboid(gHeroPosition, state->player)) {
                     state->state2 = 3;
-                    func_002E5DA0(1, 0, object, 0x93b);
+                    PlaySoundFromClassBank(1, 0, object, 0x93b);
                     U(trigger, 0xbc) = 0;
                     state->speed = 0;
                 } else {
@@ -161,7 +161,7 @@ void func_L17_003C7680(char *object)
             lower.f[2] -= 20.01f;
             qcopy(&upper, object + 16);
             upper.f[2] += 0.5f;
-            if (func_002761F8(&upper, &lower, 2, object, 0))
+            if (CollLine(&upper, &lower, 2, object, 0))
                 height = D_L17_001C0028;
             else
                 height = 0.0f;
@@ -172,11 +172,11 @@ void func_L17_003C7680(char *object)
                 state->speed = 0;
                 F(object, 0x18) = height;
                 state->state2 = 0;
-                func_002E5CF8(0, 0, object);
+                PlayMobySound(0, 0, object);
             }
             break;
         }
     }
-    func_00282CF0(&delta, object + 16, &old);
-    func_002AD6F0(&state->bounds, &delta, object + 0xf0, object + 0xf0);
+    FastVecSub(&delta, object + 16, &old);
+    CombineTransformsAndStore(&state->bounds, &delta, object + 0xf0, object + 0xf0);
 }

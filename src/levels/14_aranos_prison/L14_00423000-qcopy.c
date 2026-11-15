@@ -81,10 +81,11 @@ typedef struct {
     short h77C;
 } L14State_423000;
 
-void func_L14_00423000(char *a0)
+/* Sets the actor's speeds, sizes and hit settings on its first frame, then starts its first animation state. */
+void func_L14_00423000(char *self)
 {
-    L14State_423000 *s = *(L14State_423000 **)(a0 + 0x68);
-    short n;
+    L14State_423000 *s = *(L14State_423000 **)(self + 0x68);
+    short startState;
 
     s->b70 = 8;
     s->iA8 = 4;
@@ -109,8 +110,8 @@ void func_L14_00423000(char *a0)
     s->bD3 = 0x1A;
     s->h24 = 0x10;
     s->b28 = 3;
-    *(unsigned char *)(a0 + 0x30) = 0xC8;
-    *(unsigned short *)(a0 + 0x32) = 0xC8;
+    *(unsigned char *)(self + 0x30) = 0xC8;
+    *(unsigned short *)(self + 0x32) = 0xC8;
     s->f144 = 0.25f;
     s->f110 = 0.4000000059604645f;
     s->f114 = 0.5f;
@@ -120,7 +121,7 @@ void func_L14_00423000(char *a0)
     s->f13C = 0.0055555556900799274f;
     s->i14C = -1;
     s->f120 = 3.141590118408203f;
-    func_002B60B0(a0, 0.0033333334140479565f, 0.10000000894069672f,
+    SetControllerSpeedLimits(self, 0.0033333334140479565f, 0.10000000894069672f,
                 0.0034906589426100254f, 0.20943954586982727f);
 
     s->f740 = s->f740 * 0.01745329424738884f;
@@ -128,14 +129,14 @@ void func_L14_00423000(char *a0)
     s->p15C = s->area600;
     if (s->i738 != -1)
         s->i14C = s->i738;
-    s->i750 = func_L02_0032E508(a0, s->i73C, s->area200, 0x20);
-    s->h77C = func_002A77E0(2);
+    s->i750 = BuildRouteNodes(self, s->i73C, s->area200, 0x20);
+    s->h77C = RandomIntBelow(2);
 
-    s->vec710 = *(L14_TI128 *)(a0 + 0x10);
+    s->vec710 = *(L14_TI128 *)(self + 0x10);
 
-    n = s->h774;
-    if (n > 0 && (n != 3 || s->i730 != -1))
-        func_002A7750(a0, n, 1);
+    startState = s->h774;
+    if (startState > 0 && (startState != 3 || s->i730 != -1))
+        SetMobyState(self, startState, 1);
     else
-        func_002A7750(a0, 1, 1);
+        SetMobyState(self, 1, 1);
 }

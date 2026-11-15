@@ -27,36 +27,37 @@
 extern f32 func_00282C10(f32);
 extern f32 func_00282C48(f32);
 
-s32 func_002A88A0(f32 *arg0, f32 *arg1, f32 fparg0, f32 fparg1, f32 fparg2) {
-    f32 temp_f0;
-    f32 temp_f0_2;
-    f32 temp_f14;
-    f32 temp_f1;
-    f32 temp_f22;
-    f32 temp_f2;
-    f32 temp_f3;
-    s32 var_v0;
+/* Solves a quadratic equation and returns how many real roots it has (0, 1 or 2), larger root first. */
+s32 func_002A88A0(f32 *rootHigh, f32 *rootLow, f32 a, f32 b, f32 c) {
+    f32 sqrtPart;
+    f32 lowRoot;
+    f32 fourAc;
+    f32 highRoot;
+    f32 discriminant;
+    f32 negB;
+    f32 twoA;
+    s32 rootCount;
 
-    temp_f14 = fparg0 * (fparg2 * 4.0f);
-    temp_f22 = (fparg1 * fparg1) - temp_f14;
-    if (temp_f22 == 0.0f) {
-        *arg0 = -fparg1 / (2.0f * fparg0);
+    fourAc = a * (c * 4.0f);
+    discriminant = (b * b) - fourAc;
+    if (discriminant == 0.0f) {
+        *rootHigh = -b / (2.0f * a);
         return 1;
     }
-    temp_f0 = func_00282C10(func_00282C48(temp_f22));
-    temp_f2 = -fparg1;
-    temp_f3 = 2.0f * fparg0;
-    temp_f0_2 = (temp_f2 - temp_f0) / temp_f3;
-    *arg0 = (temp_f2 + temp_f0) / temp_f3;
-    *arg1 = temp_f0_2;
-    temp_f1 = *arg0;
-    if (temp_f1 < temp_f0_2) {
-        *arg1 = temp_f1;
-        *arg0 = temp_f0_2;
+    sqrtPart = square_root(FloatAbs(discriminant));
+    negB = -b;
+    twoA = 2.0f * a;
+    lowRoot = (negB - sqrtPart) / twoA;
+    *rootHigh = (negB + sqrtPart) / twoA;
+    *rootLow = lowRoot;
+    highRoot = *rootHigh;
+    if (highRoot < lowRoot) {
+        *rootLow = highRoot;
+        *rootHigh = lowRoot;
     }
-    var_v0 = 0;
-    if (temp_f22 > 0.0f) {
-        var_v0 = 2;
+    rootCount = 0;
+    if (discriminant > 0.0f) {
+        rootCount = 2;
     }
-    return var_v0;
+    return rootCount;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef signed int s32;
@@ -48,34 +49,34 @@ void func_L18_0043E760(u8 *obj) {
     f32 buf[4];
 
     if (obj[0x20] == 0) {
-        *(f32 *)(state + 0x150) = func_002A7940();
+        *(f32 *)(state + 0x150) = RandomAngle();
         *(TI128 *)(state + 0x140) = *(TI128 *)(obj + 0x10);
-        func_L18_0043EDE8(obj);
-        func_002A7750(obj, 1, -1);
+        InitRibbonEmitters(obj);
+        SetMobyState(obj, 1, -1);
     }
     if (obj[0x31] != 0) {
         period = 60;
-        phase = func_00283CE0(D_L18_001B2348 % period);
-        rise = func_00283CE0(60);
+        phase = IntToFloat(D_L18_001B2348 % period);
+        rise = IntToFloat(60);
         phase = phase * 6.2831855f;
         phase = phase / rise;
         phase = phase - 3.1415927f;
-        rise = func_00283180(phase);
+        rise = FastSinOrCosA(phase);
         x = D_L18_001B1C28;
         y = D_L18_001B1C2C;
         *(f32 *)(state + 0x158) = rise * 0.5f + 0.5f;
-        a = func_L01_0031BC68(x, y, phase);
-        b = func_L01_0031BC68(D_L18_001B1C30, D_L18_001B1C34, phase);
-        func_00282CF0(buf, D_L18_001B97C0, obj + 0x10);
-        func_00282F20(buf, buf, 1.0f);
-        rise = func_00282C48(func_00282DB0(buf, obj + 0xC0));
+        a = PulseColor(x, y, phase);
+        b = PulseColor(D_L18_001B1C30, D_L18_001B1C34, phase);
+        FastVecSub(buf, gCameraPosition_L18, obj + 0x10);
+        vec_scale_to_length(buf, buf, 1.0f);
+        rise = FloatAbs(FastVecDot(buf, obj + 0xC0));
         rise = rise * rise;
         *(f32 *)(state + 0x15C) = rise;
-        *(s32 *)(obj + 0x78) = func_L00_0031C998(b, a, rise);
-        func_L18_0043EF40(obj);
-        func_L00_002E6CF0(func_L18_0043EA90, obj);
-        func_L00_002E6CF0(func_L18_0043E938, obj);
-        func_L00_002E6CF0(func_L18_0043E9B0, obj);
+        *(s32 *)(obj + 0x78) = LerpIntegerFraction(b, a, rise);
+        PickTableVectorsForBanner(obj);
+        AddDrawCallbackToList1(DrawRibbonsAndBursts, obj);
+        AddDrawCallbackToList1(PlaceObjectAtProbeHeight, obj);
+        AddDrawCallbackToList1(EmitFadeLevelParticleBurst, obj);
     }
-    func_002AEE70(obj, (f32 *)(state + 0x150), (f32 *)(state + 0x154), D_L18_001B1C38, D_L18_001B1C3C * 0.00029088824f, *(f32 *)(state + 0x148));
+    UpdateWrappedAngleOffset(obj, (f32 *)(state + 0x150), (f32 *)(state + 0x154), D_L18_001B1C38, D_L18_001B1C3C * 0.00029088824f, *(f32 *)(state + 0x148));
 }

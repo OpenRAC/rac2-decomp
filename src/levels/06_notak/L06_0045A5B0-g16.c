@@ -70,46 +70,47 @@ extern int func_L06_0045A500(void *, int, int);
 #define W(p, o) (*(int *)((u8 *)(p) + (o)))
 #define F(p, o) (*(float *)((u8 *)(p) + (o)))
 
+/* Updates a Notak walking creature: it wanders, chases the player when it spots them, grabs and carries them, and removes itself if it leaves the map. */
 void func_L06_0045A5B0(u8 *self) {
     Hit hit;
-    Vector v70, v80, v90, vA0, vB0, vC0;
-    u8 *s6;
-    u8 *hp;
-    float *wp;
-    u8 *p1, *p4, *p5, *p7, *p8, *p9, *p16, *p15;
-    int s2, s3, s1, st;
-    u8 s4, s7;
-    u8 old;
-    int cur;
-    int nw;
-    float f20, f21, f22;
+    Vector vecHead, vecDelta, vecTmp1, vecTmp2, vecPrevPos, vecTarget;
+    u8 *vars;
+    u8 *pathData;
+    float *unusedPtr;
+    u8 *selfPosA, *selfPosB, *selfPosC, *velA, *velB, *velC, *velD, *velE;
+    int rayHit, timerExpired, closeEnough, tableIdx;
+    u8 nextAnim, nextState;
+    u8 oldMode;
+    int curIndex;
+    int newMode;
+    float floatA, floatB, floatC;
 
-    if (self != NULL && (s6 = *(u8 **)(self + 0x68)) != NULL) {
-        func_L06_003660F0(self, 0, s6 + 0x140, 2.20000005f);
+    if (self != NULL && (vars = *(u8 **)(self + 0x68)) != NULL) {
+        UpdateAttachedEffectScale(self, 0, vars + 0x140, 2.20000005f);
         if (B(self, 0x20) == 0) {
-            if (func_L06_00459D08(self, s6) != 0) {
-                func_0026FEB8(D_L06_001B1A68, H(self, 0xB2));
-                func_0029F338(self);
+            if (ResolveSpawnRecordLinks(self, vars) != 0) {
+                STUB_printf(D_L06_001B1A68, H(self, 0xB2));
+                MarkMobySpawned(self);
                 return;
             }
             goto check;
         }
-        func_L06_00361728(self, &hit, 30.0f);
-        func_L00_00410D18(self, s6, s6 + 0x20);
-        func_002AB8C0(self, s6 + 0x50);
-        s3 = func_00282948(s6 + 0x124) != 0;
-        if (W(s6, 0x100) != 0 && B(self, 0x20) >= 7) {
-            hp = *(u8 **)(s6 + 0x138);
-            s2 = func_002A8AF0(&hit, hp + 0x10, *(int *)hp) != 0;
+        FindNearestTargetForMoby(self, &hit, 30.0f);
+        EmptyMobyUpdate(self, vars, vars + 0x20);
+        UpdateColorFade(self, vars + 0x50);
+        timerExpired = FastFloatHelperD(vars + 0x124) != 0;
+        if (W(vars, 0x100) != 0 && B(self, 0x20) >= 7) {
+            pathData = *(u8 **)(vars + 0x138);
+            rayHit = point_in_path_xy(&hit, pathData + 0x10, *(int *)pathData) != 0;
         } else {
-            hp = *(u8 **)(s6 + 0x138);
-            s2 = func_002A8AF0(D_00189EA0, hp + 0x10, *(int *)hp) != 0;
-            if (func_00282E80(self + 0x10, D_00189EA0) < 30.0f) {
-                hit.obj = *(void **)(D_00189EA0 + 0x2210);
-                qcopy(&hit.pos, D_00189EA0);
-                qcopy(&hit.v30, D_00189EA0 + 0x10);
-                qcopy(&hit.v40, D_00189EA0 + 0x50);
-                qcopy(&hit.v50, D_00189EA0 + 0x60);
+            pathData = *(u8 **)(vars + 0x138);
+            rayHit = point_in_path_xy(gHeroPosition, pathData + 0x10, *(int *)pathData) != 0;
+            if (vec_distance_xy(self + 0x10, gHeroPosition) < 30.0f) {
+                hit.obj = *(void **)(gHeroPosition + 0x2210);
+                qcopy(&hit.pos, gHeroPosition);
+                qcopy(&hit.v30, gHeroPosition + 0x10);
+                qcopy(&hit.v40, gHeroPosition + 0x50);
+                qcopy(&hit.v50, gHeroPosition + 0x60);
                 hit.kind = 0;
             } else {
                 hit.obj = NULL;
@@ -120,343 +121,343 @@ void func_L06_0045A5B0(u8 *self) {
                 hit.kind = 2;
             }
         }
-        if (W(s6, 0x100) != 0) {
-            hp = *(u8 **)(s6 + 0x118);
-            func_002A8AF0(self + 0x10, hp + 0x10, *(int *)hp);
+        if (W(vars, 0x100) != 0) {
+            pathData = *(u8 **)(vars + 0x118);
+            point_in_path_xy(self + 0x10, pathData + 0x10, *(int *)pathData);
         }
-        old = B(self, 0xBC);
-        s7 = 0xFF;
-        nw = func_L06_00459BA8(self, s6);
-        s4 = 0xFF;
-        B(self, 0xBC) = nw;
-        if (old != (u8)nw) {
-            st = (u8)nw + old * 3;
-            s7 = D_L06_001B1970[st];
-            s4 = D_L06_001B1980[st];
+        oldMode = B(self, 0xBC);
+        nextState = 0xFF;
+        newMode = ClassifyHeadroomSize(self, vars);
+        nextAnim = 0xFF;
+        B(self, 0xBC) = newMode;
+        if (oldMode != (u8)newMode) {
+            tableIdx = (u8)newMode + oldMode * 3;
+            nextState = D_L06_001B1970[tableIdx];
+            nextAnim = D_L06_001B1980[tableIdx];
         }
-        func_0029FCC0(self, 0, v70.f);
-        if (func_00277258(v70.f, 1, self, 0.800000012f) != 0 && func_00278E78() == 0) {
-            f20 = **(float **)(s6 + 0x11C);
-            f20 -= F(s6, 0x120);
-            f20 *= 0.5f;
-            if (f20 < func_00282C48(F(self, 0x18) - v70.f[2])) {
-                f20 = (**(float **)(s6 + 0x11C) - F(s6, 0x120)) * 0.5f;
+        TransformMobyJointToWorld(self, 0, vecHead.f);
+        if (TestPointAgainstCollision(vecHead.f, 1, self, 0.800000012f) != 0 && GetCollHitMaterial() == 0) {
+            floatA = **(float **)(vars + 0x11C);
+            floatA -= F(vars, 0x120);
+            floatA *= 0.5f;
+            if (floatA < FloatAbs(F(self, 0x18) - vecHead.f[2])) {
+                floatA = (**(float **)(vars + 0x11C) - F(vars, 0x120)) * 0.5f;
             } else {
-                f20 = func_00282C48(F(self, 0x18) - v70.f[2]);
+                floatA = FloatAbs(F(self, 0x18) - vecHead.f[2]);
             }
-            if (F(s6, 0xC8) < 0.0f) {
-                f20 = -f20;
+            if (F(vars, 0xC8) < 0.0f) {
+                floatA = -floatA;
             }
             if (B(self, 0x20) == 0xE || B(self, 0x20) == 0xC) {
-                f20 *= 2.0f;
+                floatA *= 2.0f;
             }
-            p1 = self + 0x10;
-            if (func_00282E80(p1, D_L06_001BFCA0) > 0.5f) {
-                f21 = func_00282E80(p1, D_L06_001BFCA0) * 2.0f;
+            selfPosA = self + 0x10;
+            if (vec_distance_xy(selfPosA, D_L06_001BFCA0) > 0.5f) {
+                floatB = vec_distance_xy(selfPosA, D_L06_001BFCA0) * 2.0f;
             } else {
-                f21 = 1.0f;
+                floatB = 1.0f;
             }
-            if (D_L06_001B2348[0] % 45 == H(self, 0xB2) && func_002A77E0(2) == 0) {
-                func_002FD1B8(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), f21, f20);
+            if (D_L06_001B2348[0] % 45 == H(self, 0xB2) && RandomIntBelow(2) == 0) {
+                RippleDisturb(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), floatB, floatA);
             }
-            if (D_L06_001B2348[0] % ((func_001163B0() & 7) + 0x14) == 0) {
-                f22 = func_002A7878(1.5f, 2.4000001f);
-                v70.f[0] += func_002A7878(-0.150000006f, 0.150000006f);
-                v70.f[1] += func_002A7878(-0.150000006f, 0.150000006f);
-                v70.f[2] = func_002A90F8(D_L06_001BFCA0, NULL);
-                func_002C19D8(v70.f, NULL, -1, f22, 5250.0f);
+            if (D_L06_001B2348[0] % ((Rand() & 7) + 0x14) == 0) {
+                floatC = RandomFloatRange(1.5f, 2.4000001f);
+                vecHead.f[0] += RandomFloatRange(-0.150000006f, 0.150000006f);
+                vecHead.f[1] += RandomFloatRange(-0.150000006f, 0.150000006f);
+                vecHead.f[2] = GetGroundHeightAtPosition(D_L06_001BFCA0, NULL);
+                SpawnDriftingParticle_002C19D8(vecHead.f, NULL, -1, floatC, 5250.0f);
             }
         }
-        if (F(s6, 0x13C) >= 1.0f) {
-            *(Quad *)D_00189EA0 = *(Quad *)(self + 0x10);
+        if (F(vars, 0x13C) >= 1.0f) {
+            *(Quad *)gHeroPosition = *(Quad *)(self + 0x10);
         }
-        cur = W(s6, 0x108);
-        if (cur != -1 && B(*(u8 **)(D_L06_001B281C + (cur << 8) + 0x68), 0x14) != 0) {
+        curIndex = W(vars, 0x108);
+        if (curIndex != -1 && B(*(u8 **)(D_L06_001B281C + (curIndex << 8) + 0x68), 0x14) != 0) {
             if (B(self, 0x43) != 0xD) {
-                func_002A7470(self, 0xD, 0, 0xA);
+                StartAnimationBlended(self, 0xD, 0, 0xA);
             }
             B(self, 0x20) = 0x14;
         }
         switch (B(self, 0x20)) {
         case 0:
-            func_0026FEB8(D_L06_001B1AA0);
+            STUB_printf(D_L06_001B1AA0);
             break;
         case 20:
-            cur = W(s6, 0x108);
-            if (cur != -1 && B(*(u8 **)(D_L06_001B281C + (cur << 8) + 0x68), 0x14) == 0) {
+            curIndex = W(vars, 0x108);
+            if (curIndex != -1 && B(*(u8 **)(D_L06_001B281C + (curIndex << 8) + 0x68), 0x14) == 0) {
                 B(self, 0x20) = 0x15;
             }
             break;
         case 21:
             if (UH(self, 0x96) >= 0x168) {
                 if (B(self, 0x43) != 0) {
-                    func_002A7470(self, 0, 0, 0xA);
+                    StartAnimationBlended(self, 0, 0, 0xA);
                 }
                 UH(self, 0x96) = 0;
                 B(self, 0x20) = 1;
             } else {
-                func_L06_0045A0D0(self, s6, 0.00416666688f, 0.013888889f, 0.13333334f);
+                ApplyFallAndMove(self, vars, 0.00416666688f, 0.013888889f, 0.13333334f);
                 UH(self, 0x96) = UH(self, 0x96) + 1;
             }
             break;
         case 1:
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 0) {
-                func_002A7470(self, 0, 0, 0xA);
+                StartAnimationBlended(self, 0, 0, 0xA);
             }
-            if (s2 != 0 && hit.obj != NULL && hit.obj == D_0018C0B0 && func_L06_0045A500(self, 4, 6) == 0) {
+            if (rayHit != 0 && hit.obj != NULL && hit.obj == gHeroMoby_0018C0B0 && IsGroupMemberInStateRange(self, 4, 6) == 0) {
                 if (B(self, 0x43) != 1) {
-                    func_002A7470(self, 1, 0, 0xA);
+                    StartAnimationBlended(self, 1, 0, 0xA);
                 }
                 B(self, 0x20) = 4;
             }
-            if (hit.obj != NULL && hit.obj == D_0018C0B0 && func_L06_0045A490(self, hit.obj, 1.5f) != 0) {
+            if (hit.obj != NULL && hit.obj == gHeroMoby_0018C0B0 && ProbeHitsTarget(self, hit.obj, 1.5f) != 0) {
                 if (B(self, 0x43) != 2) {
-                    func_002A7470(self, 2, 0, 2);
+                    StartAnimationBlended(self, 2, 0, 2);
                 }
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
                 B(self, 0x20) = 5;
-            } else if (s3 != 0) {
+            } else if (timerExpired != 0) {
                 if (B(self, 0x43) != 1) {
-                    func_002A7470(self, 1, 0, 0xA);
+                    StartAnimationBlended(self, 1, 0, 0xA);
                 }
-                W(s6, 0x124) = func_001163B0() % 200 + 0x12C;
-                F(s6, 0x12C) = func_002A7940();
+                W(vars, 0x124) = Rand() % 200 + 0x12C;
+                F(vars, 0x12C) = RandomAngle();
                 B(self, 0x20) = 2;
             }
-            func_00282D30(s6 + 0xC0, s6 + 0xC0, 0.949999988f);
-            func_L06_0045A0D0(self, s6, 0.00416666688f, 0.013888889f, 0.13333334f);
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            FastVecScale(vars + 0xC0, vars + 0xC0, 0.949999988f);
+            ApplyFallAndMove(self, vars, 0.00416666688f, 0.013888889f, 0.13333334f);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 2:
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 1) {
-                func_002A7470(self, 1, 0, 0xA);
+                StartAnimationBlended(self, 1, 0, 0xA);
             }
-            if (s2 != 0 && hit.obj != NULL && hit.obj == D_0018C0B0) {
-                if (func_L06_0045A500(self, 4, 6) == 0) {
+            if (rayHit != 0 && hit.obj != NULL && hit.obj == gHeroMoby_0018C0B0) {
+                if (IsGroupMemberInStateRange(self, 4, 6) == 0) {
                     if (B(self, 0x43) != 1) {
-                        func_002A7470(self, 1, 0, 0xA);
+                        StartAnimationBlended(self, 1, 0, 0xA);
                     }
                     B(self, 0x20) = 4;
                 }
             } else {
-                func_002A7CA0(self, F(s6, 0x12C), s6 + 0x110, 0.000484813732f, 0.00126051577f, 0.029088825f);
-                F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), 0.0f, 0.000484813732f, 0.00126051577f, 0.029088825f);
-                if (s3 != 0 && func_002ACBC8(self + 0x10, W(s6, 0x104)) != 0) {
+                MobySpringTurn(self, F(vars, 0x12C), vars + 0x110, 0.000484813732f, 0.00126051577f, 0.029088825f);
+                F(self, 0xF4) = TurnAngleTowardTarget(vars + 0x114, F(self, 0xF4), 0.0f, 0.000484813732f, 0.00126051577f, 0.029088825f);
+                if (timerExpired != 0 && IsPointInCuboid(self + 0x10, W(vars, 0x104)) != 0) {
                     if (B(self, 0x43) != 0) {
-                        func_002A7470(self, 0, 0, 0xA);
+                        StartAnimationBlended(self, 0, 0, 0xA);
                     }
-                    W(s6, 0x124) = func_001163B0() % 120 + 0x3C;
+                    W(vars, 0x124) = Rand() % 120 + 0x3C;
                     B(self, 0x20) = 1;
                 }
             }
-            func_L06_00459EC0(self, s6);
-            if (func_L06_0045A1B0(self, s6, F(s6, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f) != 0 && s3 != 0) {
+            ChooseFreeHeading(self, vars);
+            if (AdjustSpeedTowardFacing(self, vars, F(vars, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f) != 0 && timerExpired != 0) {
                 if (B(self, 0x43) != 0) {
-                    func_002A7470(self, 0, 0, 0xA);
+                    StartAnimationBlended(self, 0, 0, 0xA);
                 }
-                W(s6, 0x124) = func_001163B0() % 120 + 0x3C;
+                W(vars, 0x124) = Rand() % 120 + 0x3C;
                 B(self, 0x20) = 1;
             }
-            if (hit.obj != NULL && hit.obj == D_0018C0B0 && func_L06_0045A490(self, hit.obj, 1.5f) != 0) {
+            if (hit.obj != NULL && hit.obj == gHeroMoby_0018C0B0 && ProbeHitsTarget(self, hit.obj, 1.5f) != 0) {
                 if (B(self, 0x43) != 2) {
-                    func_002A7470(self, 2, 0, 2);
+                    StartAnimationBlended(self, 2, 0, 2);
                 }
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
                 B(self, 0x20) = 5;
             }
-            func_L06_0045A0D0(self, s6, 0.00416666688f, 0.013888889f, 0.13333334f);
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            ApplyFallAndMove(self, vars, 0.00416666688f, 0.013888889f, 0.13333334f);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 4:
-            p4 = self + 0x10;
-            s1 = 1;
-            f22 = func_00283248(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
-            func_002A7CA0(self, f22, s6 + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
-            { float t = -func_00283248(func_00282E80(p4, &hit), hit.pos.f[2] - F(self, 0x18));
-            F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), t, 0.00349065894f, 0.0f, 0.209439546f); }
-            if (func_00282E80(p4, D_00189EA0) < 3.0f) {
+            selfPosB = self + 0x10;
+            closeEnough = 1;
+            floatC = FastMatrixHelperA(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
+            MobySpringTurn(self, floatC, vars + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
+            { float t = -FastMatrixHelperA(vec_distance_xy(selfPosB, &hit), hit.pos.f[2] - F(self, 0x18));
+            F(self, 0xF4) = TurnAngleTowardTarget(vars + 0x114, F(self, 0xF4), t, 0.00349065894f, 0.0f, 0.209439546f); }
+            if (vec_distance_xy(selfPosB, gHeroPosition) < 3.0f) {
             } else {
-                s1 = 0;
+                closeEnough = 0;
             }
-            if (s1 != 0) {
-                func_00282D30(s6 + 0xC0, s6 + 0xC0, 0.899999976f);
+            if (closeEnough != 0) {
+                FastVecScale(vars + 0xC0, vars + 0xC0, 0.899999976f);
             }
-            if (func_L06_0045A1B0(self, s6, f22, 0.209439531f, 0.00555555569f, 0.52359885f, 0.000833333354f, 0.333333343f, 0.0833333358f) != 0 && s1 != 0 && (u32)(W(D_00189EA0, 0x221C) - 0x11) < 2) {
+            if (AdjustSpeedTowardFacing(self, vars, floatC, 0.209439531f, 0.00555555569f, 0.52359885f, 0.000833333354f, 0.333333343f, 0.0833333358f) != 0 && closeEnough != 0 && (u32)(W(gHeroPosition, 0x221C) - 0x11) < 2) {
                 if (B(self, 0x43) != 2) {
-                    func_002A7470(self, 2, 0, 2);
+                    StartAnimationBlended(self, 2, 0, 2);
                 }
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
                 W(self, 0x98) = 0;
                 B(self, 0x20) = 5;
-                F(s6, 0x13C) = 0.0f;
-                qcopy(s6 + 0xF0, p4);
+                F(vars, 0x13C) = 0.0f;
+                qcopy(vars + 0xF0, selfPosB);
             }
-            F(s6, 0x128) = hit.pos.f[2] - 0.25f;
-            func_L06_0045A0D0(self, s6, 0.010555556f, 0.0f, 0.633333385f);
-            if (s2 == 0 || D_0018A16C == 0) {
+            F(vars, 0x128) = hit.pos.f[2] - 0.25f;
+            ApplyFallAndMove(self, vars, 0.010555556f, 0.0f, 0.633333385f);
+            if (rayHit == 0 || D_0018A16C == 0) {
                 if (B(self, 0x43) != 1) {
-                    func_002A7470(self, 1, 0, 0xA);
+                    StartAnimationBlended(self, 1, 0, 0xA);
                 }
                 B(self, 0x20) = 2;
             }
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 5:
-            p5 = self + 0x10;
-            func_0029FCC0(self, 0, v70.f);
-            func_00282CF0(&v80, v70.f, p5);
-            f21 = func_00283248(hit.pos.f[0] - v70.f[0], hit.pos.f[1] - v70.f[1]);
-            func_002A7CA0(self, f21, s6 + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
+            selfPosC = self + 0x10;
+            TransformMobyJointToWorld(self, 0, vecHead.f);
+            FastVecSub(&vecDelta, vecHead.f, selfPosC);
+            floatB = FastMatrixHelperA(hit.pos.f[0] - vecHead.f[0], hit.pos.f[1] - vecHead.f[1]);
+            MobySpringTurn(self, floatB, vars + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
             F(self, 0xF4) = F(self, 0xF4) * 0.699999988f;
-            F(s6, 0x13C) = F(s6, 0x13C) + 0.0280000009f;
-            qcopy(&vB0, p5);
-            func_00282CF0(&v90, &hit, &v80);
-            func_00282CF0(&vA0, &v90, s6 + 0xF0);
-            func_00282D30(&vA0, &vA0, F(s6, 0x13C) < 1.0f ? F(s6, 0x13C) : 1.0f);
-            func_00282CC0(&vC0, &vA0, s6 + 0xF0);
-            func_002A7EA0(self, p5, &vC0, 0.75f, 0.75f, 40.0f, 6.28318596f, 3);
-            func_00282CF0(s6 + 0xC0, p5, &vB0);
-            if (F(s6, 0x13C) >= 1.0f) {
-                ((Hero *)D_00189E20)->i[0x24CC / 4] = 0;
-                func_L00_002C42E0(0x39, 1);
-                W(((Hero *)D_00189E20)->ptr[0x2290 / 4], 0x9C) = -1;
-                ((Hero *)D_00189E20)->b[0x22B5] = 1;
+            F(vars, 0x13C) = F(vars, 0x13C) + 0.0280000009f;
+            qcopy(&vecPrevPos, selfPosC);
+            FastVecSub(&vecTmp1, &hit, &vecDelta);
+            FastVecSub(&vecTmp2, &vecTmp1, vars + 0xF0);
+            FastVecScale(&vecTmp2, &vecTmp2, F(vars, 0x13C) < 1.0f ? F(vars, 0x13C) : 1.0f);
+            FastVecAdd(&vecTarget, &vecTmp2, vars + 0xF0);
+            MoveOverGround(self, selfPosC, &vecTarget, 0.75f, 0.75f, 40.0f, 6.28318596f, 3);
+            FastVecSub(vars + 0xC0, selfPosC, &vecPrevPos);
+            if (F(vars, 0x13C) >= 1.0f) {
+                ((Hero *)gHeroState)->i[0x24CC / 4] = 0;
+                SetHeroAction_L00(0x39, 1);
+                W(((Hero *)gHeroState)->ptr[0x2290 / 4], 0x9C) = -1;
+                ((Hero *)gHeroState)->b[0x22B5] = 1;
                 B(self, 0x20) = 6;
             } else {
-                F(s6, 0x12C) = f21;
+                F(vars, 0x12C) = floatB;
             }
             break;
         case 6:
-            func_L06_00459EC0(self, s6);
-            func_L06_0045A1B0(self, s6, F(s6, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f);
-            func_L06_0045A0D0(self, s6, 0.00333333341f, 0.013888889f, 0.116666675f);
-            func_002A7CA0(self, F(s6, 0x12C), s6 + 0x110, 0.000436332368f, 0.000872664736f, 0.0523598865f);
-            F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), 0.0f, 0.000436332368f, 0.000872664736f, 0.0523598865f);
+            ChooseFreeHeading(self, vars);
+            AdjustSpeedTowardFacing(self, vars, F(vars, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f);
+            ApplyFallAndMove(self, vars, 0.00333333341f, 0.013888889f, 0.116666675f);
+            MobySpringTurn(self, F(vars, 0x12C), vars + 0x110, 0.000436332368f, 0.000872664736f, 0.0523598865f);
+            F(self, 0xF4) = TurnAngleTowardTarget(vars + 0x114, F(self, 0xF4), 0.0f, 0.000436332368f, 0.000872664736f, 0.0523598865f);
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 1) {
-                func_002A7470(self, 1, 0, 0xA);
+                StartAnimationBlended(self, 1, 0, 0xA);
             }
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 7:
-            if (s2 != 0) {
+            if (rayHit != 0) {
                 if (B(self, 0x43) != 4) {
-                    func_002A7470(self, 4, 0, 0xA);
+                    StartAnimationBlended(self, 4, 0, 0xA);
                 }
                 B(self, 0x20) = 9;
-            } else if (s3 != 0) {
+            } else if (timerExpired != 0) {
                 if (B(self, 0x43) != 4) {
-                    func_002A7470(self, 4, 0, 0xA);
+                    StartAnimationBlended(self, 4, 0, 0xA);
                 }
-                W(s6, 0x124) = func_001163B0() % 200 + 0x12C;
-                F(s6, 0x12C) = func_002A7940();
+                W(vars, 0x124) = Rand() % 200 + 0x12C;
+                F(vars, 0x12C) = RandomAngle();
                 B(self, 0x20) = 8;
             }
-            p7 = s6 + 0xC0;
-            func_00282D30(p7, p7, 0.949999988f);
-            F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
-            if (func_L04_0033CB08(self, p7, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                func_00282D30(p7, p7, 0.5f);
+            velA = vars + 0xC0;
+            FastVecScale(velA, velA, 0.949999988f);
+            F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
+            if (BlendWithScaledCount(self, velA, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+                FastVecScale(velA, velA, 0.5f);
             }
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 8:
-            if (s2 != 0) {
+            if (rayHit != 0) {
                 if (B(self, 0x43) != 4) {
-                    func_002A7470(self, 4, 0, 0xA);
+                    StartAnimationBlended(self, 4, 0, 0xA);
                 }
                 B(self, 0x20) = 9;
             } else {
-                func_002A7CA0(self, F(s6, 0x12C), s6 + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-                F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), 0.0f, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-                if (s3 != 0 && func_002ACBC8(self + 0x10, W(s6, 0x104)) != 0) {
+                MobySpringTurn(self, F(vars, 0x12C), vars + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
+                F(self, 0xF4) = TurnAngleTowardTarget(vars + 0x114, F(self, 0xF4), 0.0f, 0.000218166184f, 0.000436332368f, 0.0130899716f);
+                if (timerExpired != 0 && IsPointInCuboid(self + 0x10, W(vars, 0x104)) != 0) {
                     if (B(self, 0x43) != 3) {
-                        func_002A7470(self, 3, 0, 0xA);
+                        StartAnimationBlended(self, 3, 0, 0xA);
                     }
-                    W(s6, 0x124) = func_001163B0() % 120 + 0x3C;
+                    W(vars, 0x124) = Rand() % 120 + 0x3C;
                     B(self, 0x20) = 7;
                 }
             }
-            func_L06_00459EC0(self, s6);
-            if (func_L06_0045A1B0(self, s6, F(s6, 0x12C), 0.3490659f, 0.000833333354f, 1.0471977f, 0.00249999994f, 0.0166666675f, 0.0166666675f) != 0 && s3 != 0) {
+            ChooseFreeHeading(self, vars);
+            if (AdjustSpeedTowardFacing(self, vars, F(vars, 0x12C), 0.3490659f, 0.000833333354f, 1.0471977f, 0.00249999994f, 0.0166666675f, 0.0166666675f) != 0 && timerExpired != 0) {
                 if (B(self, 0x43) != 3) {
-                    func_002A7470(self, 3, 0, 0xA);
+                    StartAnimationBlended(self, 3, 0, 0xA);
                 }
-                W(s6, 0x124) = func_001163B0() % 120 + 0x3C;
+                W(vars, 0x124) = Rand() % 120 + 0x3C;
                 B(self, 0x20) = 7;
             }
-            p8 = s6 + 0xC0;
-            F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
-            if (func_L04_0033CB08(self, p8, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                func_00282D30(p8, p8, 0.5f);
+            velB = vars + 0xC0;
+            F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
+            if (BlendWithScaledCount(self, velB, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+                FastVecScale(velB, velB, 0.5f);
             }
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 9:
         case 10:
-            f20 = func_00283248(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
-            func_002A7CA0(self, f20, s6 + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-            if (func_L06_0045A1B0(self, s6, f20, 0.52359885f, 0.00111111114f, 1.57079649f, 0.00249999994f, 0.0250000022f, 0.0166666675f) != 0 && func_00282E80(self + 0x10, &hit) < 1.89999998f && B(self, 0x20) != 0xA) {
+            floatA = FastMatrixHelperA(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
+            MobySpringTurn(self, floatA, vars + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
+            if (AdjustSpeedTowardFacing(self, vars, floatA, 0.52359885f, 0.00111111114f, 1.57079649f, 0.00249999994f, 0.0250000022f, 0.0166666675f) != 0 && vec_distance_xy(self + 0x10, &hit) < 1.89999998f && B(self, 0x20) != 0xA) {
                 if (B(self, 0x43) != 5) {
-                    func_002A7470(self, 5, 0, 2);
+                    StartAnimationBlended(self, 5, 0, 2);
                 }
                 B(self, 0x20) = 0xA;
             }
-            p9 = s6 + 0xC0;
-            F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
-            if (func_L04_0033CB08(self, p9, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                func_00282D30(p9, p9, 0.5f);
+            velC = vars + 0xC0;
+            F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
+            if (BlendWithScaledCount(self, velC, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+                FastVecScale(velC, velC, 0.5f);
             }
-            B(s6, 0x48) = func_00283CF0(8.0f);
-            B(s6, 0x4A) = func_00283CF0(9.60000038f);
-            if (s2 == 0) {
+            B(vars, 0x48) = FloatToInt(8.0f);
+            B(vars, 0x4A) = FloatToInt(9.60000038f);
+            if (rayHit == 0) {
                 if (B(self, 0x43) != 4) {
-                    func_002A7470(self, 4, 0, 0xA);
+                    StartAnimationBlended(self, 4, 0, 0xA);
                 }
                 B(self, 0x20) = 8;
             }
-            func_L06_0045A2D8(self, s6, 0xA, 5, 17.0f, 20.0f, 1.0f, 1.0f, 1.0f, 4, 4, 0xB, hit.obj);
+            TryPickupTransition(self, vars, 0xA, 5, 17.0f, 20.0f, 1.0f, 1.0f, 1.0f, 4, 4, 0xB, hit.obj);
             if (B(self, 0x60) & 2) {
                 if (B(self, 0x43) != 4) {
-                    func_002A7470(self, 4, 0, 0xA);
+                    StartAnimationBlended(self, 4, 0, 0xA);
                 }
-                W(s6, 0x124) = func_001163B0() % 200 + 0x12C;
+                W(vars, 0x124) = Rand() % 200 + 0x12C;
                 B(self, 0x20) = 8;
             }
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 11:
@@ -465,53 +466,53 @@ void func_L06_0045A5B0(u8 *self) {
             }
             break;
         case 12:
-            if (func_L06_0035EA68(self, s6 + 0x60) & 1) {
-                func_L06_00459C38(self, s6);
+            if (mine_fall(self, vars + 0x60) & 1) {
+                StartAnimationForSizeClass(self, vars);
             }
             break;
         case 13:
             if (B(self, 0x60) & 2) {
-                func_L06_00459C38(self, s6);
+                StartAnimationForSizeClass(self, vars);
             }
             break;
         case 14:
-            if (func_L06_0035EA68(self, s6 + 0x60) & (B(self, 0x60) & 2)) {
-                func_002ABBB8(self, s6 + 0xC0, NULL, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, -1, 7.0f, 0, 1, -1, 0, 0x810001);
-                func_0029F338(self);
+            if (mine_fall(self, vars + 0x60) & (B(self, 0x60) & 2)) {
+                SpawnExplosionEffects(self, vars + 0xC0, NULL, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, -1, 7.0f, 0, 1, -1, 0, 0x810001);
+                MarkMobySpawned(self);
                 return;
             }
             break;
         case 16:
-            p16 = s6 + 0xC0;
-            func_00282D30(p16, p16, 0.949999988f);
-            F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
-            func_L04_0033CB08(self, p16, 0x400, 0x10, 1.0f, 0.0f);
+            velD = vars + 0xC0;
+            FastVecScale(velD, velD, 0.949999988f);
+            F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
+            BlendWithScaledCount(self, velD, 0x400, 0x10, 1.0f, 0.0f);
             if (B(self, 0x60) & 2) {
-                func_L06_00459C38(self, s6);
+                StartAnimationForSizeClass(self, vars);
             }
             break;
         case 15:
-            p15 = s6 + 0xC0;
-            func_00282D30(p15, p15, 0.949999988f);
-            F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
-            func_L04_0033CB08(self, p15, 0x400, 0x10, 1.0f, 0.0f);
-            if (s7 != 0xFF) {
-                if (B(self, 0x43) != s4) {
-                    func_002A7470(self, s4, 0, 6);
+            velE = vars + 0xC0;
+            FastVecScale(velE, velE, 0.949999988f);
+            F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
+            BlendWithScaledCount(self, velE, 0x400, 0x10, 1.0f, 0.0f);
+            if (nextState != 0xFF) {
+                if (B(self, 0x43) != nextAnim) {
+                    StartAnimationBlended(self, nextAnim, 0, 6);
                 }
-                B(self, 0x20) = s7;
+                B(self, 0x20) = nextState;
             }
             break;
         case 17:
-            func_00282D30(s6 + 0xC0, s6 + 0xC0, 0.949999988f);
+            FastVecScale(vars + 0xC0, vars + 0xC0, 0.949999988f);
             if (B(self, 0x60) & 2) {
-                func_L06_00459C38(self, s6);
+                StartAnimationForSizeClass(self, vars);
             }
             break;
         }
     check:
         if (F(self, 0x10) < 2.0f || F(self, 0x10) > 1021.0f || F(self, 0x14) < 2.0f || F(self, 0x14) > 1021.0f || F(self, 0x18) < 2.0f || F(self, 0x18) > 1021.0f) {
-            func_0029F338(self);
+            MarkMobySpawned(self);
         }
     }
 }

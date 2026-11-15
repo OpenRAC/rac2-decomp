@@ -18,7 +18,8 @@ extern float ref_L22_003A39C8_05 __attribute__((sda));
 /* Spawns an object of kind TYPE at POS in the first free slot of its row, counts it, and gives
  * it the position as it was on entry. Returns the slot index, or -1 when the row is full.
  * The level 22/23 copy of func_L23_0041C8C0, with a five-way switch. */
-s32 func_L22_003A39C8(char *obj, TI128 *pos, s32 type, s32 arg3)
+/* Creates a pickup of the given kind at a position, in the first free place of its row. Returns the place number or -1 when the row is full. */
+s32 func_L22_003A39C8(char *obj, TI128 *pos, s32 type, s32 spawnArg)
 {
     float saved[4] __attribute__((aligned(16)));
     char *slot;
@@ -38,17 +39,17 @@ s32 func_L22_003A39C8(char *obj, TI128 *pos, s32 type, s32 arg3)
     if (i != -1) {
         switch (type) {
         case 0:
-            ref_L22_003A39C8_00[type][i] = (s32)func_L22_003FB1F8(obj, pos, arg3, ref_L22_003A39C8_03);
+            ref_L22_003A39C8_00[type][i] = (s32)SpawnLinkedScaledObject(obj, pos, spawnArg, ref_L22_003A39C8_03);
             break;
         case 1:
-            ref_L22_003A39C8_00[type][i] = (s32)func_L22_003FC780(obj, pos, arg3, ref_L22_003A39C8_04);
+            ref_L22_003A39C8_00[type][i] = (s32)SpawnLinkedScaledObjectB(obj, pos, spawnArg, ref_L22_003A39C8_04);
             break;
         case 3:
-            ref_L22_003A39C8_00[type][i] = (s32)func_L22_003FC780(obj, pos, arg3, ref_L22_003A39C8_04);
+            ref_L22_003A39C8_00[type][i] = (s32)SpawnLinkedScaledObjectB(obj, pos, spawnArg, ref_L22_003A39C8_04);
             break;
         case 2:
         case 4:
-            ref_L22_003A39C8_00[type][i] = (s32)func_L22_003FD1E8(obj, pos, arg3, ref_L22_003A39C8_05);
+            ref_L22_003A39C8_00[type][i] = (s32)SpawnLinkedScaledObjectC(obj, pos, spawnArg, ref_L22_003A39C8_05);
             break;
         }
         slot = (char *)ref_L22_003A39C8_00[type][i];

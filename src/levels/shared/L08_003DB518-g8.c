@@ -54,52 +54,54 @@ static __inline__ s32 hud_round(f32 value, f32 scale, f32 half, s32 active)
     return result;
 }
 
+/* Draws the counter meter on screen: it fades in, shows two centred text labels, then an icon
+   with a number at the bottom of the screen. */
 s32 func_L08_003DB518(void)
 {
     Style style;
     char text[16];
-    Meter *state = *(Meter **)(D_L08_001B0488 + 0x68);
+    Meter *meter = *(Meter **)(D_L08_001B0488 + 0x68);
     f32 t, fade, bottom, size, z, half, half2;
-    s32 r, texture, x, y, x2, y2, width, height, one, one2, entry;
+    s32 margin, texture, x, y, x2, y2, width, height, one, one2, entry;
     char *label;
 
-    func_L00_0037B750();
+    AppendDrawListPacketB();
     fade = 1.0f;
     size = 32.0f;
-    state->fade += D_L08_001B046C;
-    if (state->fade > fade) state->fade = fade;
+    meter->fade += D_L08_001B046C;
+    if (meter->fade > fade) meter->fade = fade;
     if (D_L08_001A904C) {
         entry = 0x8710;
-        func_L08_00300090();
-        func_L08_00300100();
+        BeginSavedFloatHold();
+        SetSavedFloatAndUpdate();
         z = 0.0f;
-        label = (char *)func_00336D50(D_L08_001A904C + entry, 0xAC);
-        func_00300A00(label, 0x60442D00, (f32)(D_001A7340 / 2), (f32)(D_001A7344 / 2), fade, fade, z);
-        label = (char *)func_00336D50(D_L08_001A904C + entry, 0xAD);
-        func_00300A00(label, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)(D_001A7344 / 2), fade, fade, z);
-        func_L08_003000C0();
+        label = (char *)FindTableEntryById(D_L08_001A904C + entry, 0xAC);
+        DrawScaledObjectTwoAxes(label, 0x60442D00, (f32)(gScreenWidth / 2), (f32)(gScreenHeight / 2), fade, fade, z);
+        label = (char *)FindTableEntryById(D_L08_001A904C + entry, 0xAD);
+        DrawScaledObjectTwoAxes(label, 0x55F0C070, (f32)(gScreenWidth / 2), (f32)(gScreenHeight / 2), fade, fade, z);
+        EndSavedFloatHold();
     }
     do {
         half = 0.5f;
-        t = (fade - state->fade) * size;
+        t = (fade - meter->fade) * size;
         fade = t * half;
-        r = (s32)(D_L08_001B0468 * D_L08_001B3244 + half);
+        margin = (s32)(D_L08_001B0468 * D_L08_001B3244 + half);
     } while (0);
     one = 1;
     style = D_L08_001B0490;
-    bottom = (f32)(D_001A7344 - r);
-    texture = func_0028E588(0xEAA2, func_L08_003DB4E8());
-    x = func_00283CF0(D_L08_001B0460 + fade);
+    bottom = (f32)(gScreenHeight - margin);
+    texture = GetIconFrame(0xEAA2, GetModeSelector());
+    x = FloatToInt(D_L08_001B0460 + fade);
     t = D_L08_001B3244;
-    y = func_00283CF0(bottom + (f32)screen_y(fade - (f32)D_L08_001B0484, t, half, one));
+    y = FloatToInt(bottom + (f32)screen_y(fade - (f32)D_L08_001B0484, t, half, one));
     half2 = 0.5f;
     one2 = 1;
-    width = func_00283CF0(size * state->fade);
-    height = hud_round((f32)func_00283CF0(size * state->fade), D_L08_001B3244, half2, one2);
-    func_0028EA58(texture, x, y, width, height, &style);
-    func_00115DA8(text, D_L08_001B04A0, state->count);
-    x2 = func_00283CF0(D_L08_001B0460 + (f32)D_L08_001B047C);
-    y2 = func_00283CF0(bottom) + screen_y((f32)D_L08_001B0480, D_L08_001B3244, half2, one2);
-    func_0027FAA8(x2, y2, 0x80F0F0F0UL, text, func_001157AC(text));
+    width = FloatToInt(size * meter->fade);
+    height = hud_round((f32)FloatToInt(size * meter->fade), D_L08_001B3244, half2, one2);
+    DrawHudSpriteGradient(texture, x, y, width, height, &style);
+    Sprintf(text, D_L08_001B04A0, meter->count);
+    x2 = FloatToInt(D_L08_001B0460 + (f32)D_L08_001B047C);
+    y2 = FloatToInt(bottom) + screen_y((f32)D_L08_001B0480, D_L08_001B3244, half2, one2);
+    DrawTextCenteredSmallFont(x2, y2, 0x80F0F0F0UL, text, strlen_001157AC(text));
     return 0;
 }

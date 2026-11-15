@@ -57,35 +57,37 @@ extern void r1_func_00123EC0(int, unsigned short, void *);
 extern void func_00127B40(int);
 
 /* rac1-decomp src/core/001236F0.c: func_00123C30 */
+/* Starts reading bytes from an open memory card file into a buffer. */
 int func_00127888(int fd, void *buf, int nbyte) {
-    char *cd = r1_D_00159B00;
-    int *p;
+    char *client = r1_D_00159B00;
+    int *request;
     char *next;
-    int r;
+    int result;
 
-    if (*(int *)(cd + 0x24) == 0) {
+    if (*(int *)(client + 0x24) == 0) {
         return -100;
     }
     if (r1_func_00118CC0(r1_D_00132EAC) < 0) {
         return -200;
     }
-    p = &r1_D_00159B80;
+    request = &r1_D_00159B80;
     next = r1_D_0015A000;
-    p[0] = fd;
-    p[7] = (int)next;
-    r1_func_0011AD70((void *)(p[6] = (int)buf), p[3] = nbyte);
+    request[0] = fd;
+    request[7] = (int)next;
+    r1_func_0011AD70((void *)(request[6] = (int)buf), request[3] = nbyte);
     r1_func_0011AD70(next, 0xC0);
-    r = r1_func_0011B4C8(cd, 5, 1, p, 0x30, r1_D_0015B0C0, 4, func_001277F8, next);
-    if (r == 0) {
+    result = r1_func_0011B4C8(client, 5, 1, request, 0x30, r1_D_0015B0C0, 4, CopyMcReadEdgeBytes, next);
+    if (result == 0) {
         r1_D_00132EA8 = 5;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return result;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00123D48 */
 /* sceMcWrite: copies the unaligned lead of the buffer into the request, sends RPC 6. Adapted from Lombyte (GPL-3.0) for PAL: src/sdk/storage/memory_card/sce_mc_write.c, sceMcWrite. */
+/* Starts writing bytes from a buffer to an open memory card file. */
 int func_001279A0(int fd, unsigned char *buffer, int size) {
     int rpc_result;
     unsigned int i;
@@ -129,6 +131,7 @@ ASM_FUNC("asm/core", func_00127B18);
 /* mcDelayThread (libmc): sleep this thread until an alarm of `time`
    h-lines wakes it: SetAlarm (r1_func_00118B20) with mcHearAlarm
    (r1_func_00123EC0) on GetThreadId(), then SleepThread(). */
+/* Makes the current thread sleep for a short time while it waits for the memory card. */
 void func_00127B40(int time) {
     r1_func_00118B20((unsigned short)time, r1_func_00123EC0, r1_func_00118BE0());
     r1_func_00118C00();

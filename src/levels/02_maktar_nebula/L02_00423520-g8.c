@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_00423520 is a unit of its own: retail clears its vector as plain C, with the zero
    materialised (`por $v0,$zero,$zero` ... `sq $v0,0($sp)`), which -frac2-zero-ti-por keeps
@@ -28,55 +29,56 @@ extern char *func_00273730(char *, int, int, int, char *, char *, float *, float
 extern void func_L00_003263D0(char *, char *, float, int, int, char *, float, int, int, float, float);
 extern void func_L02_00423838(u8 *, float, float);
 
-void func_L02_00423520(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
-    float v[4];
-    float w[4];
-    int p20, p24, p28, p2c;
+/* A breakable object (moby class 3341). It waits to be hit, then flies apart into pieces with a puff of sparks, and goes away. */
+void func_L02_00423520(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    float velocity[4];
+    float backDir[4];
+    int firstValue, secondValue, partMask, unusedValue;
     int i;
-    float r1, r2;
+    float sizeA, sizeB;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        func_0029F648(a0, &p20, &p24);
-        *(u16 *)(a0 + 0x7C) = p20;
-        *(u16 *)(a0 + 0x34) = *(u16 *)(a0 + 0x34) | 0x1000;
-        func_002A7750(a0, 1, -1);
+        GetMobyAnimationEntryCount(moby, &firstValue, &secondValue);
+        *(u16 *)(moby + 0x7C) = firstValue;
+        *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x1000;
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002A9640(a0, 0x4010000, 0) != 0) {
-            D_L02_001AEC78 = D_L02_001AEC78 - 1;
-            func_002A7750(a0, 2, -1);
+        if (FindOwnedEffectSlot(moby, 0x4010000, 0) != 0) {
+            gHoveringObjectCount = gHoveringObjectCount - 1;
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        *(u16 *)(a0 + 0x7C) = 0;
+        *(u16 *)(moby + 0x7C) = 0;
         *(int *)state = 0x78;
-        *(int *)(a0 + 0x98) = 0;
-        func_L00_00326110(a0, 1, 1.0f);
-        func_0029F648(a0, &p28, &p2c);
-        func_002E5CF8(0, 0, a0);
+        *(int *)(moby + 0x98) = 0;
+        SpawnScaledBolts(moby, 1, 1.0f);
+        GetMobyAnimationEntryCount(moby, &partMask, &unusedValue);
+        PlayMobySound(0, 0, moby);
         for (i = 0; i < 16; i++) {
-            if ((p28 >> i) & 1) {
-                r1 = func_002A7878(D_L02_001B2040, D_L02_001B2040_1[1]);
-                r2 = func_002A7878(D_L02_001B2040_1[2], D_L02_001B2040_1[3]);
-                v[0] = func_002A7878(D_L02_001B2020, D_L02_001B2020_1[4]) * 0.016666668f;
-                v[1] = func_002A78D8(D_L02_001B2020_1[1], D_L02_001B2020_1[5]) * 0.016666668f;
-                v[2] = func_002A7878(D_L02_001B2020_1[2], D_L02_001B2020_1[6]) * 0.016666668f;
-                func_00283098(v, v, a0 + 0xC0);
-                func_00273730((char *)a0, 2, 0xD0D, i, (char *)(a0 + 0x10), (char *)(a0 + 0xF0), v, r2, r1, 0xFF);
+            if ((partMask >> i) & 1) {
+                sizeA = RandomFloatRange(D_L02_001B2040, D_L02_001B2040_1[1]);
+                sizeB = RandomFloatRange(D_L02_001B2040_1[2], D_L02_001B2040_1[3]);
+                velocity[0] = RandomFloatRange(D_L02_001B2020, D_L02_001B2020_1[4]) * 0.016666668f;
+                velocity[1] = RandomSignedFloatRange(D_L02_001B2020_1[1], D_L02_001B2020_1[5]) * 0.016666668f;
+                velocity[2] = RandomFloatRange(D_L02_001B2020_1[2], D_L02_001B2020_1[6]) * 0.016666668f;
+                matrix_mul_vec3(velocity, velocity, moby + 0xC0);
+                CreateCameraMoby((char *)moby, 2, 0xD0D /* moby class 3341 */, i, (char *)(moby + 0x10), (char *)(moby + 0xF0), velocity, sizeB, sizeA, 0xFF);
             }
         }
-        *(TI128 *)v = 0;
-        v[0] = -0.8f;
-        v[2] = 1.5f;
-        func_00283098(v, v, a0 + 0xC0);
-        func_00282CC0(v, v, a0 + 0x10);
-        func_00282F20(w, a0 + 0xC0, -0.083333336f);
-        func_L00_003263D0((char *)a0, (char *)v, 0.25f, 4, 1, (char *)w, 5.0f, 0x50404040, 0, 0.5f, 1.0f);
-        func_L02_00423838(a0, -0.083333336f, -0.25f);
-        func_002A7750(a0, 3, -1);
+        *(TI128 *)velocity = 0;
+        velocity[0] = -0.8f;
+        velocity[2] = 1.5f;
+        matrix_mul_vec3(velocity, velocity, moby + 0xC0);
+        FastVecAdd(velocity, velocity, moby + 0x10);
+        vec_scale_to_length(backDir, moby + 0xC0, -0.083333336f);
+        SpawnTintedEffects((char *)moby, (char *)velocity, 0.25f, 4, 1, (char *)backDir, 5.0f, 0x50404040, 0, 0.5f, 1.0f);
+        ThrowSparkBurst(moby, -0.083333336f, -0.25f);
+        SetMobyState(moby, 3, -1);
         break;
     }
-    a0[0xA8] = 0xFF;
+    moby[0xA8] = 0xFF;
 }

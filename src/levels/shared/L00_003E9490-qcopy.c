@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 typedef struct {
@@ -11,17 +12,18 @@ extern void func_00282CF0(char *local, char *first, char *second);
 extern void func_00282D30(char *a, char *b, float value);
 extern void func_00282CC0(char *target, char *first, char *local);
 
-void func_L00_003E9490(float t, Vec16_Fc936841d *dst, Vec16_Fc936841d *src, Vec16_Fc936841d *other)
+/* Finds the point part-way between two points, at the given amount from 0 to 1. */
+void func_L00_003E9490(float t, Vec16_Fc936841d *result, Vec16_Fc936841d *from, Vec16_Fc936841d *to)
 {
-    Vec16_Fc936841d local;
+    Vec16_Fc936841d offset;
 
     if (t == 0.0f) {
-        *(TI128 *)dst = *(TI128 *)src;
+        *(TI128 *)result = *(TI128 *)from;
     } else if (t == 1.0f) {
-        *(TI128 *)dst = *(TI128 *)other;
+        *(TI128 *)result = *(TI128 *)to;
     } else {
-        func_00282CF0((char *)&local, (char *)other, (char *)src);
-        func_00282D30((char *)&local, (char *)&local, t);
-        func_00282CC0((char *)dst, (char *)src, (char *)&local);
+        FastVecSub((char *)&offset, (char *)to, (char *)from);
+        FastVecScale((char *)&offset, (char *)&offset, t);
+        FastVecAdd((char *)result, (char *)from, (char *)&offset);
     }
 }

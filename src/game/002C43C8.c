@@ -32,28 +32,30 @@ extern void func_0029FCC0(void *, int, void *);
 extern float func_002A7878(float, float);
 extern void func_002B9180(void *);
 
+/* Updates an effect attached to a joint of another object, with a random sideways spread.
+   It disappears when that object is gone or dying. */
 void func_002C43C8(Effect2C43C8 *e) {
     float mtx[16] __attribute__((aligned(16)));
     float off[4] __attribute__((aligned(16)));
     Attach2C43C8 *at = &e->at;
-    Moby2C43C8 *m = at->moby;
+    Moby2C43C8 *target = at->moby;
     float size;
     float keep;
-    float k;
-    float r;
+    float spreadRange;
+    float offsetAmount;
 
-    if (m == 0 || m->uid != at->uid || m->state == 0xFE || m->state == 0xFD) {
-        func_002B9180(e);
+    if (target == 0 || target->uid != at->uid || target->state == 0xFE || target->state == 0xFD) {
+        KillParticle(e);
         return;
     }
-    size = at->scale * func_002A7878(0.05f, 1.0f);
+    size = at->scale * RandomFloatRange(0.05f, 1.0f);
     keep = e->dir[3];
-    func_0029FCC0(e->at.moby, at->joint, e->pos);
-    func_0029FC20(e->at.moby, at->joint, mtx);
-    k = func_00283CE0(at->spread);
-    r = func_002A7878(-k, k);
-    func_00282F20(off, mtx, (r * 0.01f - 1.0f) * at->dist);
-    func_00282CC0(e->dir, e->pos, off);
+    TransformMobyJointToWorld(e->at.moby, at->joint, e->pos);
+    TransformMobyJointPoint(e->at.moby, at->joint, mtx);
+    spreadRange = IntToFloat(at->spread);
+    offsetAmount = RandomFloatRange(-spreadRange, spreadRange);
+    vec_scale_to_length(off, mtx, (offsetAmount * 0.01f - 1.0f) * at->dist);
+    FastVecAdd(e->dir, e->pos, off);
     e->pos[3] = size;
     e->dir[3] = keep;
 }

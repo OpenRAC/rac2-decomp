@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern int D_L30_001B2A68 __attribute__((sda));
 extern short D_0018A000;
 extern unsigned long long D_00138180[];
@@ -64,73 +65,75 @@ extern void func_42C028(int);
 extern void func_316DB8(char *);
 extern int D_0018C0E8;
 
-void func_L30_00418670(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Restores a saved setting and removes the helper object this object created. */
+void func_L30_00418670(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
 
     func_42C028(3);
-    D_0018C0E8 = *(int *)(st + 0x5C);
-    func_316DB8(*(char **)(st + 0x50));
+    D_0018C0E8 = *(int *)(vars + 0x5C);
+    func_316DB8(*(char **)(vars + 0x50));
 }
 
 
-void func_L30_004130E8(char *obj) {
-    int *st = *(int **)(obj + 0x68);
+/* Updates the tuning menu: draws it, moves the cursor, and changes the chosen value with left and right. */
+void func_L30_004130E8(char *moby) {
+    int *vars = *(int **)(moby + 0x68);
     int step = 0;
     D_L30_001B2A68 = 1;
     D_0018A000 = 5;
-    func_2EDB20(func_L30_004135A0, obj);
-    if (D_00138180[0x1A0 / 8] & 0x9000000000ULL) {
-        func_316DB8(obj);
+    func_2EDB20(DrawMuseumTweakMenu, moby);
+    if (gPadState[0x1A0 / 8] & 0x9000000000ULL) {
+        func_316DB8(moby);
         return;
     }
-    if (((int *)D_00138180)[0x1A4 / 4] & 0x4000) {
-        func_323FB0(st, st[1] - 1, 1);
-        if (st[2] < st[0] - 15) st[2]++;
-    } else if (((int *)D_00138180)[0x1A4 / 4] & 0x1000) {
-        func_323FB0(st, 0, 1);
-        if (st[0] < st[2]) st[2]--;
-    } else if (((int *)D_00138180)[0x1A0 / 4] & 0x2000) {
-        step = (((int *)D_00138180)[0x1A0 / 4] & 15) ? 5 : 1;
-    } else if (((int *)D_00138180)[0x1A0 / 4] & 0x8000) {
-        step = (((int *)D_00138180)[0x1A0 / 4] & 15) ? -5 : -1;
+    if (((int *)gPadState)[0x1A4 / 4] & 0x4000) {
+        func_323FB0(vars, vars[1] - 1, 1);
+        if (vars[2] < vars[0] - 15) vars[2]++;
+    } else if (((int *)gPadState)[0x1A4 / 4] & 0x1000) {
+        func_323FB0(vars, 0, 1);
+        if (vars[0] < vars[2]) vars[2]--;
+    } else if (((int *)gPadState)[0x1A0 / 4] & 0x2000) {
+        step = (((int *)gPadState)[0x1A0 / 4] & 15) ? 5 : 1;
+    } else if (((int *)gPadState)[0x1A0 / 4] & 0x8000) {
+        step = (((int *)gPadState)[0x1A0 / 4] & 15) ? -5 : -1;
     }
-    if (step && *(unsigned short *)(obj + 0x96) >= 5) {
-        *(unsigned short *)(obj + 0x96) = 0;
-        switch (D_L30_001B3D30[st[0]]) {
+    if (step && *(unsigned short *)(moby + 0x96) >= 5) {
+        *(unsigned short *)(moby + 0x96) = 0;
+        switch (D_L30_001B3D30[vars[0]]) {
         case 0: {
-            int value = *(int *)D_L30_00260E30[st[0]];
+            int value = *(int *)D_L30_00260E30[vars[0]];
             value += step;
-            if (value > D_L30_00260F30[st[0]][1]) value = D_L30_00260F30[st[0]][1];
-            else if (value < D_L30_00260F30[st[0]][0]) value = D_L30_00260F30[st[0]][0];
-            *(int *)D_L30_00260E30[st[0]] = value;
+            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
+            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
+            *(int *)D_L30_00260E30[vars[0]] = value;
             break;
         }
         case 1: {
-            float value = *(float *)D_L30_00260E30[st[0]] + step * 0.01f;
-            if (value > D_L30_00260F30[st[0]][1]) value = D_L30_00260F30[st[0]][1];
-            else if (value < D_L30_00260F30[st[0]][0]) value = D_L30_00260F30[st[0]][0];
-            *(float *)D_L30_00260E30[st[0]] = value;
+            float value = *(float *)D_L30_00260E30[vars[0]] + step * 0.01f;
+            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
+            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
+            *(float *)D_L30_00260E30[vars[0]] = value;
             break;
         }
         case 2: {
-            unsigned char value = *(unsigned char *)D_L30_00260E30[st[0]];
+            unsigned char value = *(unsigned char *)D_L30_00260E30[vars[0]];
             value += step;
-            if (value > D_L30_00260F30[st[0]][1]) value = D_L30_00260F30[st[0]][1];
-            else if (value < D_L30_00260F30[st[0]][0]) value = D_L30_00260F30[st[0]][0];
-            *(unsigned char *)D_L30_00260E30[st[0]] = value;
+            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
+            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
+            *(unsigned char *)D_L30_00260E30[vars[0]] = value;
             break;
         }
         case 3: {
-            short value = *(short *)D_L30_00260E30[st[0]];
+            short value = *(short *)D_L30_00260E30[vars[0]];
             value += step;
-            if (value > D_L30_00260F30[st[0]][1]) value = D_L30_00260F30[st[0]][1];
-            else if (value < D_L30_00260F30[st[0]][0]) value = D_L30_00260F30[st[0]][0];
-            *(short *)D_L30_00260E30[st[0]] = value;
+            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
+            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
+            *(short *)D_L30_00260E30[vars[0]] = value;
             break;
         }
         }
     }
-    (*(unsigned short *)(obj + 0x96))++;
+    (*(unsigned short *)(moby + 0x96))++;
 }
 
 
@@ -139,54 +142,55 @@ void func_L30_004130E8(char *obj) {
 /* func_L30_004135A0 is defined in L30_004135A0-g8.c. */
 
 
-void func_L30_00415090(char *obj) {
-    char *st = *(char **)(obj + 0x68);
+/* Updates the explosion tester: opens the tuning menu on a button press and spawns a test explosion every 45 frames. */
+void func_L30_00415090(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
     char *menu;
     long buttons;
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(int *)(obj + 0x1C) = 0;
-        func_320FD0(obj, 1, -1);
+        *(int *)(moby + 0x1C) = 0;
+        func_320FD0(moby, 1, -1);
         break;
     case 1:
-        if (*(int *)(st + 0x3C) != -1 && func_326868(D_00189EA0, *(int *)(st + 0x3C))) {
+        if (*(int *)(vars + 0x3C) != -1 && func_326868(gHeroPosition, *(int *)(vars + 0x3C))) {
             func_32B1B0(1, 0x27E6, 1);
             buttons = D_00138320;
             buttons &= 3;
-            if (buttons == 3) func_320FD0(obj, 2, -1);
+            if (buttons == 3) func_320FD0(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_32C070(obj)) {
-            *(char **)(st + 0x2C) = func_L30_00413490(obj);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 4, D_L30_001B1E28, 1, 0, 1);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 12, D_L30_001B1E30, 0, 0, 50);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 16, D_L30_001B1E48, 0, 0, 50);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 20, D_L30_001B1E60, 0, 0, 50);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 24, D_L30_001B1E78, 0, 0, 50);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 28, D_L30_001B1E90, 0, 0, 50);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 32, D_L30_001B1EA0, 0, 0, 255);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 36, D_L30_001B1EA8, 0, 0, 255);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 40, D_L30_001B1EB0, 0, 0, 255);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 48, D_L30_001B1EB8, 0, 0, 1);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 52, D_L30_001B1ED0, 0, 0, 1);
-            func_L30_00413528(*(void **)(st + 0x2C), st + 8, D_L30_001B1EE0, 0, 0, 1);
+        if (func_32C070(moby)) {
+            *(char **)(vars + 0x2C) = SpawnMuseumTweakMenu(moby);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 4, D_L30_001B1E28, 1, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 12, D_L30_001B1E30, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 16, D_L30_001B1E48, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 20, D_L30_001B1E60, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 24, D_L30_001B1E78, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 28, D_L30_001B1E90, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 32, D_L30_001B1EA0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 36, D_L30_001B1EA8, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 40, D_L30_001B1EB0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 48, D_L30_001B1EB8, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 52, D_L30_001B1ED0, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 8, D_L30_001B1EE0, 0, 0, 1);
 
         }
         func_32B1B0(1, 0, 1);
-        menu = *(char **)(st + 0x2C);
-        if (!menu || *(short *)(menu + 0xAA) != 0x118A || *(unsigned char *)(menu + 0x20) == 0xFE || *(unsigned char *)(menu + 0x20) == 0xFD) {
-            func_320FD0(obj, 1, -1);
+        menu = *(char **)(vars + 0x2C);
+        if (!menu || *(short *)(menu + 0xAA) != 0x118A /* moby class 4490 */ || *(unsigned char *)(menu + 0x20) == 0xFE || *(unsigned char *)(menu + 0x20) == 0xFD) {
+            func_320FD0(moby, 1, -1);
         }
         break;
     }
-    if (*(float *)(obj + 0x1C) >= 45.0f) {
+    if (*(float *)(moby + 0x1C) >= 45.0f) {
         int color;
-        *(int *)(obj + 0x1C) = 0;
-        color = (*(int *)(st + 40) << 16) | (*(int *)(st + 36) << 8) | *(int *)(st + 32);
-        *(char **)st = func_L30_004153D8(obj + 0x10, *(float *)(st + 4), *(int *)(st + 8), *(int *)(st + 12), *(int *)(st + 16), *(int *)(st + 20), *(int *)(st + 24), *(int *)(st + 28), *(int *)(st + 48), *(int *)(st + 52), *(int *)(st + 56), color);
+        *(int *)(moby + 0x1C) = 0;
+        color = (*(int *)(vars + 40) << 16) | (*(int *)(vars + 36) << 8) | *(int *)(vars + 32);
+        *(char **)vars = SpawnMuseumExplosion(moby + 0x10, *(float *)(vars + 4), *(int *)(vars + 8), *(int *)(vars + 12), *(int *)(vars + 16), *(int *)(vars + 20), *(int *)(vars + 24), *(int *)(vars + 28), *(int *)(vars + 48), *(int *)(vars + 52), *(int *)(vars + 56), color);
     }
-    *(float *)(obj + 0x1C) += 1.0f;
+    *(float *)(moby + 0x1C) += 1.0f;
 }
 
 /* func_L30_004153D8 is defined in L30_004153D8.c. */
@@ -205,100 +209,103 @@ extern char *func_316A50(int);
 extern void func_32BFF0(void *, void *);
 extern void func_2F56B0(void *, void *);
 
-void func_L30_00418570(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
-    char *o;
+/* Creates a helper effect object linked to this one and stores it in this object's variables. */
+void func_L30_00418570(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    char *spawned;
 
-    o = func_316A50(0xB28);
-    if (o == 0) return;
-    func_32BFF0(o, a0);
-    func_2F56B0(o + 0xC0, o + 0xF0);
-    *(u16 *)(o + 0x34) |= 0x100;
-    *(char **)(st + 0x50) = o;
+    spawned = func_316A50(0xB28 /* moby class 2856 */);
+    if (spawned == 0) return;
+    func_32BFF0(spawned, moby);
+    func_2F56B0(spawned + 0xC0, spawned + 0xF0);
+    *(u16 *)(spawned + 0x34) |= 0x100;
+    *(char **)(vars + 0x50) = spawned;
 }
 
 
-void func_L30_004186B0(char *obj) {
-    char *st = *(char **)(obj + 0x68);
-    MuseumParticleBounds *bounds = (MuseumParticleBounds *)st;
+/* Updates the particle tester: opens the tuning menu on a button press and emits a test particle at random intervals. */
+void func_L30_004186B0(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    MuseumParticleBounds *bounds = (MuseumParticleBounds *)vars;
     unsigned char *particle;
 
-    switch ((unsigned char)obj[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
         if (bounds->maximum < 0) bounds->maximum = 0;
         if (bounds->minimum > bounds->maximum) bounds->minimum = bounds->maximum;
         else if (bounds->minimum < 0) bounds->minimum = 0;
-        *(float *)(st + 0xC) = func_002A7820(bounds->minimum, bounds->maximum);
-        func_002A7750(obj, 1, -1);
+        *(float *)(vars + 0xC) = RandomIntRange(bounds->minimum, bounds->maximum);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (*(int *)(st + 0x48) != -1 && func_002ACBC8(D_00189EA0, *(int *)(st + 0x48))) {
-            func_002B0CE0(1, 0x27E6, 1);
-            if ((D_00138320 & 3) == 3) func_002A7750(obj, 2, -1);
+        if (*(int *)(vars + 0x48) != -1 && IsPointInCuboid(gHeroPosition, *(int *)(vars + 0x48))) {
+            ForceClaimNotice(1, 0x27E6, 1);
+            if ((D_00138320 & 3) == 3) SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_002B3868(obj)) {
-            *(char **)(st + 0x3C) = func_L30_00413490(obj);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x00, D_L30_001B2110, 1, -1000, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x04, D_L30_001B2120, 1, -1000, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x08, D_L30_001B2130, 1, -1000, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x10, D_L30_001B2140, 0, 1, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x14, D_L30_001B2150, 0, 0, 255);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x18, D_L30_001B2158, 0, 0, 255);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x1C, D_L30_001B2160, 0, 0, 255);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x20, D_L30_001B2168, 0, -1000, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x24, D_L30_001B2178, 0, 0, 127);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x28, D_L30_001B2188, 0, 0, 127);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x2C, D_L30_001B2198, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x30, D_L30_001B21A8, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x34, D_L30_001B21B8, 1, -1000, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x40, D_L30_001B21C0, 0, 0, 103);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x44, D_L30_001B21D0, 0, 0, 20);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x4C, D_L30_001B21E0, 3, 0, 1000);
-            func_L30_00413528(*(char **)(st + 0x3C), st + 0x4E, D_L30_001B21F0, 3, 0, 1000);
+        if (SetFirstPendingFlag(moby)) {
+            *(char **)(vars + 0x3C) = SpawnMuseumTweakMenu(moby);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x00, D_L30_001B2110, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x04, D_L30_001B2120, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x08, D_L30_001B2130, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x10, D_L30_001B2140, 0, 1, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x14, D_L30_001B2150, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x18, D_L30_001B2158, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x1C, D_L30_001B2160, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x20, D_L30_001B2168, 0, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x24, D_L30_001B2178, 0, 0, 127);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x28, D_L30_001B2188, 0, 0, 127);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x2C, D_L30_001B2198, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x30, D_L30_001B21A8, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x34, D_L30_001B21B8, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x40, D_L30_001B21C0, 0, 0, 103);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x44, D_L30_001B21D0, 0, 0, 20);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x4C, D_L30_001B21E0, 3, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x4E, D_L30_001B21F0, 3, 0, 1000);
         }
-        func_002B0CE0(1, 0, 1);
-        if (*(char **)(st + 0x3C) == 0
-            || *(short *)(*(char **)(st + 0x3C) + 0xAA) != 0x118A
-            || (unsigned char)(*(char **)(st + 0x3C))[0x20] == 0xFE
-            || (unsigned char)(*(char **)(st + 0x3C))[0x20] == 0xFD) {
-            func_002A7750(obj, 1, -1);
+        ForceClaimNotice(1, 0, 1);
+        if (*(char **)(vars + 0x3C) == 0
+            || *(short *)(*(char **)(vars + 0x3C) + 0xAA) != 0x118A /* moby class 4490 */
+            || (unsigned char)(*(char **)(vars + 0x3C))[0x20] == 0xFE
+            || (unsigned char)(*(char **)(vars + 0x3C))[0x20] == 0xFD) {
+            SetMobyState(moby, 1, -1);
         }
         break;
     }
 
-    if ((*(float *)(st + 0xC))-- == 0.0f) {
+    if ((*(float *)(vars + 0xC))-- == 0.0f) {
         if (bounds->minimum > bounds->maximum) bounds->minimum = bounds->maximum;
         else if (bounds->minimum < 0) bounds->minimum = 0;
-        *(float *)(st + 0xC) = func_002A7820(bounds->minimum, bounds->maximum);
-        particle = func_002C65A0(obj + 0x10, st, *(int *)(st + 0x10),
-                                 (*(int *)(st + 0x1C) << 16) | (*(int *)(st + 0x18) << 8) | *(int *)(st + 0x14),
-                                 *(int *)(st + 0x20), *(int *)(st + 0x24), *(int *)(st + 0x28),
-                                 *(float *)(st + 0x2C) * 210000.0f, *(float *)(st + 0x30) * 210000.0f,
-                                 *(float *)(st + 0x34), *(int *)(st + 0x38));
+        *(float *)(vars + 0xC) = RandomIntRange(bounds->minimum, bounds->maximum);
+        particle = SpawnGravityFadeParticle(moby + 0x10, vars, *(int *)(vars + 0x10),
+                                 (*(int *)(vars + 0x1C) << 16) | (*(int *)(vars + 0x18) << 8) | *(int *)(vars + 0x14),
+                                 *(int *)(vars + 0x20), *(int *)(vars + 0x24), *(int *)(vars + 0x28),
+                                 *(float *)(vars + 0x2C) * 210000.0f, *(float *)(vars + 0x30) * 210000.0f,
+                                 *(float *)(vars + 0x34), *(int *)(vars + 0x38));
         if (particle) {
             particle[9] = 0xFF;
-            particle[2] = D_L30_001FF940[*(int *)(st + 0x40)][*(int *)(st + 0x44)];
+            particle[2] = D_L30_001FF940[*(int *)(vars + 0x40)][*(int *)(vars + 0x44)];
         }
     }
 }
 
-void func_L30_004191E0(char *obj) {
-    char *st = *(char **)(obj + 0x68);
-    if (*(short *)(st + 2) - *(short *)st < 2 && *(short *)(st + 4)) {
-        if (*(int *)(st + 0x1C)) {
-            func_002FC560(0x42, 0x48);
-            func_0027DE50(0, D_001A6480.y, 0, D_001A6480.x, (unsigned long)(int)0x80808080);
+/* Draws a screen flash and fades a light near the end of a countdown. */
+void func_L30_004191E0(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    if (*(short *)(vars + 2) - *(short *)vars < 2 && *(short *)(vars + 4)) {
+        if (*(int *)(vars + 0x1C)) {
+            VU1_addGSregister(0x42, 0x48);
+            DrawColoredRectangle(0, gScreenAdjustOffsets.y, 0, gScreenAdjustOffsets.x, (unsigned long)(int)0x80808080);
         }
     }
-    if (*(int *)(st + 0x18)) {
-        if (*(short *)(st + 2) - *(short *)st < 10) {
-            float t = (*(short *)(st + 2) - *(short *)st) * 0.1f;
-            func_L05_0042F4E8(obj + 0x10, 0x3C, *(float *)(st + 8) + (*(float *)(st + 12) - *(float *)(st + 8)) * t, 0.5f, 0.0f, 0.0f, 0.0f, 0);
-        } else if ((unsigned short)(*(unsigned short *)st - 0x2E) < 4) {
-            float t = (*(short *)st - 0x2D) * 0.1f;
-            func_L05_0042F4E8(obj + 0x10, 0x3C, *(float *)(st + 8) + (*(float *)(st + 12) - *(float *)(st + 8)) * t, 0.5f, 0.0f, 0.0f, 0.0f, 0);
+    if (*(int *)(vars + 0x18)) {
+        if (*(short *)(vars + 2) - *(short *)vars < 10) {
+            float blend = (*(short *)(vars + 2) - *(short *)vars) * 0.1f;
+            DrawJitteredBillboardQuad_L05(moby + 0x10, 0x3C, *(float *)(vars + 8) + (*(float *)(vars + 12) - *(float *)(vars + 8)) * blend, 0.5f, 0.0f, 0.0f, 0.0f, 0);
+        } else if ((unsigned short)(*(unsigned short *)vars - 0x2E) < 4) {
+            float blend = (*(short *)vars - 0x2D) * 0.1f;
+            DrawJitteredBillboardQuad_L05(moby + 0x10, 0x3C, *(float *)(vars + 8) + (*(float *)(vars + 12) - *(float *)(vars + 8)) * blend, 0.5f, 0.0f, 0.0f, 0.0f, 0);
         }
     }
 }
@@ -307,14 +314,15 @@ extern int func_2F4B08(char *);
 extern void func_2EDD78(void *, char *);
 extern void func_L00_00415AA0(char *);
 
-void func_L30_0041A848(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Runs the next step once the first check passes, otherwise removes this object. */
+void func_L30_0041A848(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
 
-    if (func_2F4B08(st) == 0) {
-        func_2F4B08(st + 4);
-        func_2EDD78((void *)func_L00_00415AA0, a0);
+    if (func_2F4B08(vars) == 0) {
+        func_2F4B08(vars + 4);
+        func_2EDD78((void *)DrawScreenFlashAndGlow_L00, moby);
     } else {
-        func_316DB8(a0);
+        func_316DB8(moby);
     }
 }
 

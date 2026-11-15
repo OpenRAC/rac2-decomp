@@ -33,72 +33,73 @@ extern char D_L00_001B13F8 __attribute__((sda));
 extern char D_L00_001B1408 __attribute__((sda));
 extern char D_L00_001B1428 __attribute__((sda));
 
+/* Creates a lightning arc object for an owner and gives it one of four reusable sets of points. */
 char *func_L00_00412FF8(char *owner)
 {
-    char *object = func_0029EFD0(0x1195);
-    char *state;
+    char *moby = CreateMoby(0x1195 /* moby class 4501 */);
+    char *vars;
     int counter;
-    float local[4];
+    float offset[4];
 
-    if (object != 0) {
-        *(unsigned char *)(object + 0x20) = 1;
-        *(unsigned char *)(object + 0x30) = 0xFF;
-        state = *(char **)(object + 0x68);
-        *(unsigned short *)(state + 0x1E) = D_L00_001B13DC;
-        *(int *)(state + 0x18) = -1;
-        func_002833F0(object + 0xC0, D_00189EB0);
+    if (moby != 0) {
+        *(unsigned char *)(moby + 0x20) = 1;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        vars = *(char **)(moby + 0x68);
+        *(unsigned short *)(vars + 0x1E) = D_L00_001B13DC;
+        *(int *)(vars + 0x18) = -1;
+        euler_rotation_basis(moby + 0xC0, D_00189EB0);
         counter = D_L00_001B1378;
-        *(char **)(state + 0) = D_L00_0025A1A0 + counter * 0xA0;
-        *(char **)(state + 4) = D_L00_0025A420 + counter * 0x140;
+        *(char **)(vars + 0) = D_L00_0025A1A0 + counter * 0xA0;
+        *(char **)(vars + 4) = D_L00_0025A420 + counter * 0x140;
         if ((unsigned int)counter >= 4)
             D_L00_001B1378 = 0;
         D_L00_001B1378 = (D_L00_001B1378 + 1) % 4;
-        *(int *)(state + 0x24) = D_L00_001B137C;
-        *(char **)(state + 0x20) = owner;
-        func_00282D30(local, *(char **)(D_00189EB0 + 0x2200) + 0xE0, 0.75f);
-        func_00282CC0(object + 0x10, D_00189EB0 - 0x10, local);
-        func_L00_00413298(object);
+        *(int *)(vars + 0x24) = D_L00_001B137C;
+        *(char **)(vars + 0x20) = owner;
+        FastVecScale(offset, *(char **)(D_00189EB0 + 0x2200) + 0xE0, 0.75f);
+        FastVecAdd(moby + 0x10, D_00189EB0 - 0x10, offset);
+        ResetWaveLineEffect(moby);
     }
-    return object;
+    return moby;
 }
 
 /* Emits three effect particles at the object, then four spawns along its velocity at rising heights. */
-void func_L00_004173B0(char *object)
+void func_L00_004173B0(char *moby)
 {
     Vec up, velocity, pos, pos2, pos3, pos4;
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     int i;
     float angle, random, life, speed, spread, frame;
 
-    func_002AFFD8(object + 0x10, &up, 1);
-    if (*(int *)(state + 4) != 0)
+    ComputeViewDirection(moby + 0x10, &up, 1);
+    if (*(int *)(vars + 4) != 0)
         return;
     frame = 0.016666668f;
     for (i = 0; i < 3; i++) {
-        angle = func_002A7878(-0.9599311948f, -1.3962635994f);
-        random = func_002A7940();
-        speed = func_002A7878(0.0f, 0.5f);
+        angle = RandomFloatRange(-0.9599311948f, -1.3962635994f);
+        random = RandomAngle();
+        speed = RandomFloatRange(0.0f, 0.5f);
         spread = 0.3f;
         frame = 0.016666668f;
         speed *= frame;
-        func_002AF000(&velocity, speed, random, angle);
-        life = func_002A7878(0.65f, 0.85f) * 210000.0f;
-        pos.f[0] = *(float *)(object + 0x10) + func_002A78D8(0.0f, spread);
-        pos.f[1] = *(float *)(object + 0x14) + func_002A78D8(0.0f, spread);
-        pos.f[2] = *(float *)(object + 0x18) + func_002A78D8(0.0f, spread);
-        func_L00_0033E888(life, &pos, &velocity, 0x4F808080, 0x08101010, func_002A7820(35, 50), 1, 0.5f, 1, -1, 1);
+        BuildSphericalOffset(&velocity, speed, random, angle);
+        life = RandomFloatRange(0.65f, 0.85f) * 210000.0f;
+        pos.f[0] = *(float *)(moby + 0x10) + RandomSignedFloatRange(0.0f, spread);
+        pos.f[1] = *(float *)(moby + 0x14) + RandomSignedFloatRange(0.0f, spread);
+        pos.f[2] = *(float *)(moby + 0x18) + RandomSignedFloatRange(0.0f, spread);
+        SpawnSpinningParticle_L00(life, &pos, &velocity, 0x4F808080, 0x08101010, RandomIntRange(35, 50), 1, 0.5f, 1, -1, 1);
     }
-    func_002AFFD8(object + 0x10, &velocity, 1);
-    func_00282F20(&velocity, &velocity, 0.2f);
-    qcopy_nc(&pos, object + 0x10);
-    pos.f[2] += func_002A7878(0.1f, 0.4f);
-    func_L00_0033C0D0(object, &pos, &velocity, &D_L00_001B1418, func_002A77E0(2));
-    qcopy_nc(&pos2, object + 0x10);
-    pos2.f[2] += func_002A7878(0.9f, 1.2f);
-    func_L00_0033C0D0(object, &pos2, &velocity, &D_L00_001B13F8, func_002A77E0(2));
-    qcopy_nc(&pos3, object + 0x10);
-    pos3.f[2] += func_002A7878(0.8f, 1.5f);
-    func_L00_0033C0D0(object, &pos3, &velocity, &D_L00_001B1408, func_002A77E0(2));
-    qcopy_nc(&pos4, object + 0x10);
-    func_L00_0033C0D0(object, &pos4, &velocity, &D_L00_001B1428, func_002A77E0(2));
+    ComputeViewDirection(moby + 0x10, &velocity, 1);
+    vec_scale_to_length(&velocity, &velocity, 0.2f);
+    qcopy_nc(&pos, moby + 0x10);
+    pos.f[2] += RandomFloatRange(0.1f, 0.4f);
+    SpawnObjectRelativeParticle(moby, &pos, &velocity, &D_L00_001B1418, RandomIntBelow(2));
+    qcopy_nc(&pos2, moby + 0x10);
+    pos2.f[2] += RandomFloatRange(0.9f, 1.2f);
+    SpawnObjectRelativeParticle(moby, &pos2, &velocity, &D_L00_001B13F8, RandomIntBelow(2));
+    qcopy_nc(&pos3, moby + 0x10);
+    pos3.f[2] += RandomFloatRange(0.8f, 1.5f);
+    SpawnObjectRelativeParticle(moby, &pos3, &velocity, &D_L00_001B1408, RandomIntBelow(2));
+    qcopy_nc(&pos4, moby + 0x10);
+    SpawnObjectRelativeParticle(moby, &pos4, &velocity, &D_L00_001B1428, RandomIntBelow(2));
 }

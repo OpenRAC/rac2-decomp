@@ -1,3 +1,4 @@
+#include "names.h"
 /* Partial layouts measured from the resource and pose accesses. */
 typedef struct { int resource; int pad[5]; } PreviewResource24;
 typedef struct { int resource; int pad[3]; } PreviewResource16;
@@ -28,21 +29,21 @@ extern void func_002A0F48(unsigned char *);
 
 /* Once the selected preview resource is loaded: binds it to the preview object and sets its pose. */
 void func_L00_0037A2E8(void) {
-    char *model = (char *)&D_L00_0022F7C0;
+    char *model = (char *)&gPurchaseMenuModel;
     unsigned char *object;
     int selection;
     if (*(int *)(model + 0x50) == 0) {
-        if (!func_L00_00305600(D_L00_0022F7C0.mode0.rows[*(int *)(model + 0x70)].resource, *(int *)(model + 0x1C))) return;
+        if (!TryStartTocEntryAction(gPurchaseMenuModel.mode0.rows[*(int *)(model + 0x70)].resource, *(int *)(model + 0x1C))) return;
         object = *(unsigned char **)(model + 0x2C);
         *(int *)(model + 0x8C) = 0;
         *(int *)(model + 0x88) = 1;
-        func_0029F0C8(object, D_L00_0022F7C0.mode0.rows[*(int *)(model + 0x70)].resource);
+        InitMobyInstance(object, gPurchaseMenuModel.mode0.rows[*(int *)(model + 0x70)].resource);
         if (!*(void **)(object + 0x24)) {
             *(int *)(model + 0x8C) = 0;
             *(int *)(model + 0x88) = 0;
             return;
         }
-        func_002A0468(object, 0x202020, 14, 14, 0);
+        PackRenderCommandFields(object, 0x202020, 14, 14, 0);
         *(unsigned short *)(object + 0x32) = 64;
         *(unsigned short *)(object + 0x34) = 0x2010;
         object[0x31] = 1;
@@ -52,10 +53,10 @@ void func_L00_0037A2E8(void) {
         if (*(unsigned char *)(*(char **)(object + 0x24) + 0xC) > 1) {
             object[0x42] = 1;
             object[0x43] = 1;
-            func_0029F390(object);
+            update_moby_animation_state(object);
         }
         selection = *(int *)(model + 0x140 + *(int *)(model + 0x70) * 24);
-        if (!((PreviewInfo *)((char *)D_L00_00262570 + D_00139568[selection] * 224))->alternate) {
+        if (!((PreviewInfo *)((char *)gWeaponTable_L00 + gItemSlotToRecord[selection] * 224))->alternate) {
             *(float *)(model + 0x98) = D_L00_0028D900[selection].position.f[3];
             *(Quad *)(model + 0xC0) = D_L00_0028D900[selection].position.q;
             *(Quad *)(object + 0xF0) = D_L00_0028D900[selection].rotation.q;
@@ -67,17 +68,17 @@ void func_L00_0037A2E8(void) {
 
     } else {
         if (*(int *)(model + 0x50) != 1) return;
-        if (!func_L00_00305600(D_L00_0022F7C0.mode1.rows[*(int *)(model + 0x70)].resource, *(int *)(model + 0x1C))) return;
+        if (!TryStartTocEntryAction(gPurchaseMenuModel.mode1.rows[*(int *)(model + 0x70)].resource, *(int *)(model + 0x1C))) return;
         object = *(unsigned char **)(model + 0x2C);
         *(int *)(model + 0x8C) = 0;
         *(int *)(model + 0x88) = 1;
-        func_0029F0C8(object, D_L00_0022F7C0.mode1.rows[*(int *)(model + 0x70)].resource);
+        InitMobyInstance(object, gPurchaseMenuModel.mode1.rows[*(int *)(model + 0x70)].resource);
         if (!*(void **)(object + 0x24)) {
             *(int *)(model + 0x8C) = 0;
             *(int *)(model + 0x88) = 0;
             return;
         }
-        func_002A0468(object, 0x202020, 14, 14, 0);
+        PackRenderCommandFields(object, 0x202020, 14, 14, 0);
         *(unsigned short *)(object + 0x32) = 64;
         *(unsigned short *)(object + 0x34) = 0x2010;
         object[0x31] = 1;
@@ -87,10 +88,10 @@ void func_L00_0037A2E8(void) {
         if (*(unsigned char *)(*(char **)(object + 0x24) + 0xC) > 1) {
             object[0x42] = 1;
             object[0x43] = 1;
-            func_0029F390(object);
+            update_moby_animation_state(object);
         }
-        selection = D_L00_0022F7C0.choices1.rows[*(int *)(model + 0x70)].resource;
-        if (!((PreviewInfo *)((char *)D_L00_00262570 + D_00139568[selection] * 224))->alternate) {
+        selection = gPurchaseMenuModel.choices1.rows[*(int *)(model + 0x70)].resource;
+        if (!((PreviewInfo *)((char *)gWeaponTable_L00 + gItemSlotToRecord[selection] * 224))->alternate) {
             *(float *)(model + 0x98) = D_L00_0028D900[selection].position.f[3];
             *(Quad *)(model + 0xC0) = D_L00_0028D900[selection].position.q;
             *(Quad *)(object + 0xF0) = D_L00_0028D900[selection].rotation.q;
@@ -101,9 +102,9 @@ void func_L00_0037A2E8(void) {
         }
 
     }
-    if (D_001A7BB0[1]) D_L00_0022F7C0.state.position.f[2] -= 0.55f;
-    D_L00_0022F7C0.state.dirty = 1;
+    if (D_001A7BB0[1]) gPurchaseMenuModel.state.position.f[2] -= 0.55f;
+    gPurchaseMenuModel.state.dirty = 1;
     func_002A0F48(object);
-    if (D_L00_0022F7C0.state.state == 0 && D_L00_0022F7C0.state.loading == D_L00_0022F7C0.state.selected)
-    D_L00_0022F7C0.state.timer = 0;
+    if (gPurchaseMenuModel.state.state == 0 && gPurchaseMenuModel.state.loading == gPurchaseMenuModel.state.selected)
+    gPurchaseMenuModel.state.timer = 0;
 }

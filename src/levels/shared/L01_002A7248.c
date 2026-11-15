@@ -257,45 +257,47 @@ extern unsigned char D_L01_001395B8[];
 extern void func_003907B8(int a0, int a1, int a2);
 
 
+/* Runs the hero's per-frame updates, and the extra ones only while the hero is in a mode that needs them. */
 void func_L01_002A84D8(void) {
-    char *p;
+    char *hero;
 
     func_002C7CA8();
     func_002B4070();
     func_002ADDC8();
     func_002C37C8();
     func_002AEB80();
-    p = D_L01_00189E20;
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
+    hero = D_L01_00189E20;
+    if (*(unsigned char *)(hero + 0x22B4) != 0) {
         func_002B9878();
         func_002A7740();
-        if (*(unsigned char *)(p + 0x22B4) != 0) {
+        if (*(unsigned char *)(hero + 0x22B4) != 0) {
             func_002AB1C8();
             func_002A9520();
             func_002A9310();
-            func_002FDB00(p + 0x80);
+            func_002FDB00(hero + 0x80);
             func_002AB328();
-            func_0030F444(*(int *)(p + 0x2290));
+            func_0030F444(*(int *)(hero + 0x2290));
         }
     }
 }
 
 
+/* Starts the effect of the equipped weapon when that weapon has one and the hero holds a target. */
 void func_L01_002A9298(void) {
-    char *b = D_L01_00189E20;
-    int i = *(int *)(b + 0x1248);
-    unsigned char c;
-    unsigned char *t;
+    char *hero = D_L01_00189E20;
+    int i = *(int *)(hero + 0x1248);
+    unsigned char weaponId;
+    unsigned char *weaponEntry;
 
     if (i < 0)
         return;
-    c = *(unsigned char *)(D_L01_00139568 + i);
-    t = (unsigned char *)D_L01_002637A0 + c * 0xE0;
-    if (t[4] == 0)
+    weaponId = *(unsigned char *)(D_L01_00139568 + i);
+    weaponEntry = (unsigned char *)D_L01_002637A0 + weaponId * 0xE0;
+    if (weaponEntry[4] == 0)
         return;
-    if (*(int *)(b + 0x1220) == 0)
+    if (*(int *)(hero + 0x1220) == 0)
         return;
-    func_002A8EE0(*(int *)(b + 0x1220), *(int *)(b + 0x2290));
+    func_002A8EE0(*(int *)(hero + 0x1220), *(int *)(hero + 0x2290));
 }
 
 
@@ -346,9 +348,9 @@ extern LedgeProbeHit ledgeHit __asm__("D_L01_001BF900");
 int func_L01_002AE128(void *position, void *unused, char *out)
 {
     float v0[4], v1[4], v2[4], v3[4], v4[4], v5[4], v6[4], v7[4], v8[4], v9[4], v10[4], v11[4], v12[4], v13[4], v14[4], v15[4], v16[4], v17[4], v18[4], v19[4];
-    char *a, *b;
+    char *modelInfo, *collisionInfo;
     void *object;
-    int go, found, i, kind, ok;
+    int canGrab, found, i, kind, grabbable;
     int edge, j;
     float height;
     float step, max;
@@ -356,13 +358,13 @@ int func_L01_002AE128(void *position, void *unused, char *out)
     LedgeProbeResident *hero;
     if (out) IN(out,0x28)=0;
     if (ledgeHero.cooldown) return 0;
-    go=0;
+    canGrab=0;
     if (ledgeHero.vehicle==0) {
-        if ((ledgeHero.control==4 && (ledgeHero.pastApex || func_002C9280((char *)&ledgeHero+0xf0)<0.05833333730697632f)) || ledgeHero.control==2 || ledgeHero.state==8 || ledgeHero.state==25 || ledgeHero.state==26) go=1;
-        if (ledgeHero.state==14 && ledgeHero.frame<37.0f) go=0;
+        if ((ledgeHero.control==4 && (ledgeHero.pastApex || func_002C9280((char *)&ledgeHero+0xf0)<0.05833333730697632f)) || ledgeHero.control==2 || ledgeHero.state==8 || ledgeHero.state==25 || ledgeHero.state==26) canGrab=1;
+        if (ledgeHero.state==14 && ledgeHero.frame<37.0f) canGrab=0;
     }
-    if (out != (char *)&ledgeHero+0x550) go=1;
-    if (!go) return 0;
+    if (out != (char *)&ledgeHero+0x550) canGrab=1;
+    if (!canGrab) return 0;
     hero=&ledgeHero;
     down=-0.7f; top=1.15f; drop=-1.43f;
     found=0;
@@ -386,12 +388,12 @@ int func_L01_002AE128(void *position, void *unused, char *out)
     object=0;
     if(!found) goto fail;
     if(ledgeHit.moby) {
-        ok=0;
-        a=func_003148A0(ledgeHit.moby);
-        b=func_00316D00(ledgeHit.moby);
-        if(a && (*(unsigned short *)(a+0x1e)&1)) ok=1;
-        else if(b) ok=IN(b,0x3c)&1;
-        if(!ok) return 0;
+        grabbable=0;
+        modelInfo=func_003148A0(ledgeHit.moby);
+        collisionInfo=func_00316D00(ledgeHit.moby);
+        if(modelInfo && (*(unsigned short *)(modelInfo+0x1e)&1)) grabbable=1;
+        else if(collisionInfo) grabbable=IN(collisionInfo,0x3c)&1;
+        if(!grabbable) return 0;
         object=ledgeHit.moby;
     }
     if(out) *(void **)(out+0x38)=ledgeHit.moby;
@@ -563,43 +565,43 @@ void func_L01_002B0318(void)
     int weaponId, animation;
     int i;
 
-    hero = (HeroState *)D_00189E20;
-    if (hero->f22B8 && hero->f22BA && !func_L00_002D4040(-1))
-        func_L00_002AF7D0();
+    hero = (HeroState *)gHeroState;
+    if (hero->f22B8 && hero->f22BA && !get_ammo(-1))
+        cancel_hero_item_animation();
     for (i = 0; i < 2; i++) {
-        HeroState *player = (HeroState *)D_00189E20;
+        HeroState *player = (HeroState *)gHeroState;
         Moby **slot = &player->attached[i];
 
         if (*slot) {
             (*slot)->buffer0 = D_L01_001B7B00 + i * 0xC00;
             (*slot)->buffer1 = D_L01_001B7B00 + 0x600 + i * 0xC00;
-            weaponId = func_L00_002ADEA0(0);
+            weaponId = hero_slot_item_id(0);
             if (weaponId == player->weaponId) {
-                weapon = &((WeaponInfo *)D_L01_002637A0)[D_00139568[weaponId]];
+                weapon = &((WeaponInfo *)D_L01_002637A0)[gItemSlotToRecord[weaponId]];
                 animation = weapon->animation;
                 if (player->state == 12)
                     animation = weapon->altAnimation;
                 if (animation != -1 && (*slot)->animation != animation) {
                     player->animation = animation;
-                    func_L00_00311080(player->moby, *slot, animation, 0, 8, 1);
+                    initialize_moby_animation_blend(player->moby, *slot, animation, 0, 8, 1);
                 }
             }
             {
-                HeroState *owner = (HeroState *)D_00189E20;
+                HeroState *owner = (HeroState *)gHeroState;
 
-                func_L00_00310D30(owner->moby, *slot);
+                AdvanceAndDecodeAnimationFrames(owner->moby, *slot);
                 if (owner->attachedMode) {
                     if (owner->attachedMode == 2)
-                        func_002AA2E8(&(*slot)->fade, 0.0f, 0.25f);
+                        ApproachValue(&(*slot)->fade, 0.0f, 0.25f);
                     else
-                        func_002AA2E8(&(*slot)->fade, 0.0f, 0.07f);
-                    hero = (HeroState *)D_00189E20;
+                        ApproachValue(&(*slot)->fade, 0.0f, 0.07f);
+                    hero = (HeroState *)gHeroState;
                     if ((*slot)->fade == 0.0f) {
-                        func_L00_00310C88(hero->moby, slot);
+                        release_moby_animation_slot(hero->moby, slot);
                         return;
                     }
                 } else {
-                    func_002AA2E8(&(*slot)->fade, 1.0f, 0.2f);
+                    ApproachValue(&(*slot)->fade, 1.0f, 0.2f);
                     if (((*slot)->flags & 2) && !owner->f22BA) {
                         owner->attachedMode = 1;
                         (*slot)->f28 = 0;
@@ -610,21 +612,21 @@ void func_L01_002B0318(void)
             }
         }
     }
-    matrix = ((HeroState *)D_00189E20)->matrix;
-    state = (HeroState *)D_00189E20;
+    matrix = ((HeroState *)gHeroState)->matrix;
+    state = (HeroState *)gHeroState;
     {
         Moby *moby = state->moby;
 
         matrix[0] = moby->matrix[0];
         matrix[1] = moby->matrix[1];
         matrix[2] = moby->matrix[2];
-        func_00282C88(&state->f760);
+        ClearVector128(&state->f760);
     }
     state->f760 = 1.0f;
-    func_00283098(&state->f760, &state->f760, matrix);
+    matrix_mul_vec3(&state->f760, &state->f760, matrix);
     state->f770.quad = state->position;
     if (!state->f22C3)
-        state->f770.v[2] = func_00283B98(state->f770.v[2], 0.0f);
+        state->f770.v[2] = FastAddRotations(state->f770.v[2], 0.0f);
 }
 
 extern void func_L00_002AF7D0(void);
@@ -639,41 +641,42 @@ extern void func_L01_002BEB90(int a0, int a1);
 extern void func_L01_002B3D28(void);
 extern char D_00189E20[];
 
-void func_L01_002B3458(int a0, int a1, int a2) {
-    char *s0 = D_00189E20;
+/* Switches the hero to a new mode and a new moby, and resets the hero's state for it. */
+void func_L01_002B3458(int mode, int moveState, int newMoby) {
+    char *oldHero = gHeroState;
 
-    func_L00_002AF7D0();
-    s0[0x22B6] = 1;
-    func_L00_002B1F90();
-    *(int *)(s0 + 0x2290) = *(int *)(s0 + 0xC18);
-    func_L00_00322EC8(s0 + 0x18E0);
-    func_L00_00322EC8(s0 + 0x1A30);
-    *(int *)(*(int *)(s0 + 0x2290) + 0x9C) = -1;
-    if (a0 != 4 || *(unsigned char *)(s0 + 0x22B4) != a0)
-        func_L00_002D2E68();
-    func_L00_002A6708();
-    func_L00_002A53B8();
+    cancel_hero_item_animation();
+    oldHero[0x22B6] = 1;
+    UpdateHeroSlotCallbacks();
+    *(int *)(oldHero + 0x2290) = *(int *)(oldHero + 0xC18);
+    ReleaseSlotList(oldHero + 0x18E0);
+    ReleaseSlotList(oldHero + 0x1A30);
+    *(int *)(*(int *)(oldHero + 0x2290) + 0x9C) = -1;
+    if (mode != 4 || *(unsigned char *)(oldHero + 0x22B4) != mode)
+        SetHeroObjectsFlagBit();
+    ClearTrackedSlots();
+    ResetAllAttachmentRecords();
     {
-        char *s1 = D_00189E20;
+        char *heroForMode = gHeroState;
 
-        *(unsigned char *)(s1 + 0x22B4) = a0;
-        *(int *)(s1 + 0xC14) = a2;
-        *(int *)(s1 + 0x2290) = a2;
+        *(unsigned char *)(heroForMode + 0x22B4) = mode;
+        *(int *)(heroForMode + 0xC14) = newMoby;
+        *(int *)(heroForMode + 0x2290) = newMoby;
     }
-    func_L01_002B3D28();
+    UpdateHeroBlendChannels();
     {
-        char *s2 = D_00189E20;
+        char *heroForState = gHeroState;
 
-        *(float *)(s2 + 0x250) = *(float *)(s2 + 0x258);
-        *(float *)(s2 + 0x254) = *(float *)(s2 + 0x25C);
-        *(unsigned short *)(*(int *)(s2 + 0x2290) + 0x34) |= 6;
-        *(float *)(s2 + 0xC20) = 1.0f;
-        *(float *)(s2 + 0xC24) = 1.0f;
-        func_L00_002D24B8();
-        func_002A677C(*(int *)(s2 + 0x2290));
-        *(unsigned short *)(s2 + 0x24F2) = a1;
+        *(float *)(heroForState + 0x250) = *(float *)(heroForState + 0x258);
+        *(float *)(heroForState + 0x254) = *(float *)(heroForState + 0x25C);
+        *(unsigned short *)(*(int *)(heroForState + 0x2290) + 0x34) |= 6;
+        *(float *)(heroForState + 0xC20) = 1.0f;
+        *(float *)(heroForState + 0xC24) = 1.0f;
+        ClearHeroQueuedAnimation();
+        func_002A677C(*(int *)(heroForState + 0x2290));
+        *(unsigned short *)(heroForState + 0x24F2) = moveState;
     }
-    func_L01_002BEB90(a1, 2);
+    SetHeroMoveState(moveState, 2);
 }
 
 
@@ -698,7 +701,7 @@ void func_L01_002B4DA0(int force)
     char *base;
     char *velocity = D_L01_00189F10;
 
-    if (func_L00_002D3A58(velocity) < 0.0016666668f)
+    if (GetViewSpaceVectorLength(velocity) < 0.0016666668f)
         return;
     base = velocity - 0xF0;
     height = 0.37f;
@@ -707,43 +710,43 @@ void func_L01_002B4DA0(int force)
         height = 0;
         radius = 0.7f;
     }
-    func_L00_002D36E0(origin, 0, 0, height, 1);
-    func_L00_002D36E0(lowOrigin, 0, 0, height * 0.3f, 1);
-    if (force || func_00282E20(velocity) < 0.01f) {
-        func_00282F20(endpoint, base, radius);
-        func_00282F20(farEndpoint, base, radius * 1.4f);
+    BuildHeroRelativePoint(origin, 0, 0, height, 1);
+    BuildHeroRelativePoint(lowOrigin, 0, 0, height * 0.3f, 1);
+    if (force || vec_length_xy(velocity) < 0.01f) {
+        vec_scale_to_length(endpoint, base, radius);
+        vec_scale_to_length(farEndpoint, base, radius * 1.4f);
     } else {
-        func_L00_002D3B58(endpoint, velocity, 0);
-        func_00282F20(endpoint, endpoint, radius);
-        func_00282D30(farEndpoint, endpoint, 1.4f);
+        SetViewSpaceHeight(endpoint, velocity, 0);
+        vec_scale_to_length(endpoint, endpoint, radius);
+        FastVecScale(farEndpoint, endpoint, 1.4f);
     }
-    func_00282CC0(endpoint, endpoint, origin);
+    FastVecAdd(endpoint, endpoint, origin);
     material = -1;
-    func_00282CC0(farEndpoint, farEndpoint, lowOrigin);
+    FastVecAdd(farEndpoint, farEndpoint, lowOrigin);
     {
         char *hero = D_L01_00189E20;
 
-        if (func_002761F8(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF91C > 0)
-            material = func_00278E78();
+        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF91C > 0)
+            material = GetCollHitMaterial();
     }
     slope = 0;
     {
         char *hero = D_L01_00189E20;
 
-        if (func_002761F8(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF900.count > 0)
-            slope = func_L00_002D3EA8(D_L01_001BF900.normal);
+        if (CollLine(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF900.count > 0)
+            slope = GetViewSpaceAngle(D_L01_001BF900.normal);
     }
     if (slope >= 0.8726647f || material == 8 || material == 12) {
         float dot;
         char *hero = D_L01_00189E20;
 
         *(void **)(hero + 0x270) = D_L01_001BF900.moby;
-        func_L00_002D3B58(D_L01_001BF900.normal, D_L01_001BF900.normal, 0);
-        func_00282F20(D_L01_001BF900.normal, D_L01_001BF900.normal, 1);
-        dot = func_00282DB0(D_L01_001BF900.normal, hero + 0xF0);
+        SetViewSpaceHeight(D_L01_001BF900.normal, D_L01_001BF900.normal, 0);
+        vec_scale_to_length(D_L01_001BF900.normal, D_L01_001BF900.normal, 1);
+        dot = FastVecDot(D_L01_001BF900.normal, hero + 0xF0);
         if (dot < 0) {
-            func_00282D30(D_L01_001BF900.normal, D_L01_001BF900.normal, -dot);
-            func_00282CC0(hero + 0xF0, hero + 0xF0, D_L01_001BF900.normal);
+            FastVecScale(D_L01_001BF900.normal, D_L01_001BF900.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L01_001BF900.normal);
         }
     }
 }
@@ -754,9 +757,10 @@ void func_L01_002B4DA0(int force)
 
 /* func_L01_002BE0E0 is defined in L01_002A7248-timers-g8.c. */
 
-void func_L01_002C1988(unsigned long x) {
+/* Puts the hero into move state 1 or 2 unless a lock flag is set. */
+void func_L01_002C1988(unsigned long alternate) {
     unsigned long mode = 1;
-    if (x)
+    if (alternate)
         mode = 2;
     if (D_0018C0D4[0] == 0)
         func_002BEB90(0, mode);
@@ -764,14 +768,17 @@ void func_L01_002C1988(unsigned long x) {
 
 /* func_L01_002C2CF0 is defined in L01_002C2CF0-keep-block-order.c. */
 
+/* Sets the first flag bit on the hero's moby. */
 void func_L01_002C8990(void) {
-    *(unsigned short *)((char *)D_0018C0B0 + 0x34) |= 1;
+    *(unsigned short *)((char *)gHeroMoby_0018C0B0 + 0x34) |= 1;
 }
 
+/* Clears the first flag bit on the hero's moby. */
 void func_L01_002C89A8(void) {
-    *(unsigned short *)((char *)D_0018C0B0 + 0x34) &= 0xFFFE;
+    *(unsigned short *)((char *)gHeroMoby_0018C0B0 + 0x34) &= 0xFFFE;
 }
 
+/* Puts the hero into one of two move states depending on a speed value. */
 void func_L01_002C98B8(void) {
     if (D_L01_00189F90 < 0.045f)
         func_002BEB90(0, 1);
@@ -780,41 +787,42 @@ void func_L01_002C98B8(void) {
 }
 
 
-void func_L01_002E1510(char *a0, int a1, char *a2, int a3, char *a4) {
-    float buf[12];
-    char *p;
-    char *q;
-    char *r;
-    int n;
+/* Transforms each entry of a list by a matrix and then redraws the list several times with a growing matrix. */
+void func_L01_002E1510(char *entries, int entryCount, char *matrix, int passes, char *drawArg) {
+    float stepMatrix[12];
+    char *nextRow;
+    char *row;
+    char *drawPtr;
+    int remaining;
     int i;
 
-    if (a1 > 0) {
-        q = a0 + 0x30;
-        p = a0 + 0x20;
-        n = a1;
-        for (; n != 0; n--) {
-            func_00283098(p, p, a2);
-            p += 0x90;
-            func_00283098(q, q, a2);
-            q += 0x90;
+    if (entryCount > 0) {
+        row = entries + 0x30;
+        nextRow = entries + 0x20;
+        remaining = entryCount;
+        for (; remaining != 0; remaining--) {
+            matrix_mul_vec3(nextRow, nextRow, matrix);
+            nextRow += 0x90;
+            matrix_mul_vec3(row, row, matrix);
+            row += 0x90;
         }
     }
-    func_00283738(buf, a2, a2);
-    for (i = 0; i < a3; i++) {
+    multiply_matrix3x3(stepMatrix, matrix, matrix);
+    for (i = 0; i < passes; i++) {
         int k = (i & 1) ? 2 : 0;
-        if (a1 > 0) {
-            p = a0 + (k * 16 + 16);
-            q = a0 + k * 16;
-            r = a0;
-            n = a1;
-            while (n != 0) {
-                func_00283098(q, q, buf);
-                n--;
-                q += 0x90;
-                func_00283098(p, p, buf);
-                p += 0x90;
-                func_00280B90(r, a4, 1);
-                r += 0x90;
+        if (entryCount > 0) {
+            nextRow = entries + (k * 16 + 16);
+            row = entries + k * 16;
+            drawPtr = entries;
+            remaining = entryCount;
+            while (remaining != 0) {
+                matrix_mul_vec3(row, row, stepMatrix);
+                remaining--;
+                row += 0x90;
+                matrix_mul_vec3(nextRow, nextRow, stepMatrix);
+                nextRow += 0x90;
+                draw_world_quad(drawPtr, drawArg, 1);
+                drawPtr += 0x90;
             }
         }
     }
@@ -836,7 +844,7 @@ void func_L01_002E2608(MotionVec *corners, int texture, int kind, int color, int
     float rotated[4][2];
     int i, j, k;
 
-    func_00281DE8(&packet, texture, kind, 128);
+    InitQuadPacketState(&packet, texture, kind, 128);
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
 
     packet.uv[0][0] = 0.0f;
@@ -862,7 +870,7 @@ void func_L01_002E2608(MotionVec *corners, int texture, int kind, int color, int
         qcopy(&packet.pos[i], &corners[i]);
         packet.pos[i].v[3] = 1;
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }
 
 /* func_L01_002EABA8 is defined in L01_002A7248-pre.c. */
@@ -881,18 +889,19 @@ ASM_FUNC("asm/levels", func_L01_00304270);
 
 /* rac1-decomp src/overlays/shared/mobyutil_0026E8E0.c: func_L01_0026F090 */
 // Walks a list of moby indices and sets the state byte of each one that is non-negative.
+/* Walks a list of moby indices and sets the state byte of each one that is still in use. */
 void func_L01_003115E8(int list, int state)
 {
-    unsigned short *p;
-    unsigned short *q = (unsigned short *)r1_D_L01_001ABFC0[list];
-    if (q != 0) {
-        p = q;
+    unsigned short *cursor;
+    unsigned short *indexList = (unsigned short *)r1_D_L01_001ABFC0[list];
+    if (indexList != 0) {
+        cursor = indexList;
         do {
-            char *m = (char *)(((*p & 0x7FFF) << 8) + r1_D_L01_00160058_m);
-            if (m[0x20] >= 0) {
-                m[0x20] = state;
+            char *moby = (char *)(((*cursor & 0x7FFF) << 8) + r1_D_L01_00160058_m);
+            if (moby[0x20] >= 0) {
+                moby[0x20] = state;
             }
-        } while (*(short *)p++ >= 0);
+        } while (*(short *)cursor++ >= 0);
     }
 }
 
@@ -900,50 +909,54 @@ void func_L01_003115E8(int list, int state)
 
 /* func_L01_003120A8 is defined in L01_003120A8-helpers.c. */
 
-void func_L01_003128C0(char *p) {
-    *(int *)(p + 0x70) = 0;
-    *(float *)(p + 0x74) = 0.2f;
+/* Resets two values in a moby's private data to their starting values. */
+void func_L01_003128C0(char *vars) {
+    *(int *)(vars + 0x70) = 0;
+    *(float *)(vars + 0x74) = 0.2f;
 }
 
 
 /* chain of four probes on the same object; the first that reports a hit picks the code */
-int func_L01_003165E8(char *a0, int a1, char *a2, char *a3, char *t0) {
-    if (a1 >= 0) {
-        char *p = D_L01_001FE180[a1];
-        if (func_311B48(a0, p + 0x10, *(int *)p))
+/* Tests a point against four shapes in turn and says which one it is inside of, or 0 if none. */
+int func_L01_003165E8(char *point, int shapeIndex, char *shapeB, char *shapeC, char *shapeD) {
+    if (shapeIndex >= 0) {
+        char *shape = D_L01_001FE180[shapeIndex];
+        if (func_311B48(point, shape + 0x10, *(int *)shape))
             return 1;
     }
-    if (func_3163C8(a0, a2))
+    if (func_3163C8(point, shapeB))
         return 2;
-    if (func_316558(a0, a3))
+    if (func_316558(point, shapeC))
         return 3;
-    if (func_3164A0(a0, t0))
+    if (func_3164A0(point, shapeD))
         return 4;
     return 0;
 }
 
-void func_L01_00316C48(void *a0, void *a1, void *a2, void *a3, void *t0) {
-    float p[0x10];
-    float q[0x10];
-    float v[4];
+/* Moves an offset through two rotation matrices and writes the result relative to an origin. */
+void func_L01_00316C48(void *source, void *result, void *origin, void *rotationA, void *rotationB) {
+    float matrixA[0x10];
+    float matrixB[0x10];
+    float offset[4];
 
-    func_002E3CD8(p, a3);
-    func_002E3F60(p, p);
-    func_002E3CD8(q, t0);
-    func_002E34A0(v, a0, a2);
-    func_L01_002E3940(v, v, p);
-    func_L01_002E3940(v, v, q);
-    func_002E3470(a1, v, a2);
+    func_002E3CD8(matrixA, rotationA);
+    func_002E3F60(matrixA, matrixA);
+    func_002E3CD8(matrixB, rotationB);
+    func_002E34A0(offset, source, origin);
+    func_L01_002E3940(offset, offset, matrixA);
+    func_L01_002E3940(offset, offset, matrixB);
+    func_002E3470(result, offset, origin);
 }
 
 /* func_L01_00318638 is defined in L01_00318638-qcopy-barrier.c. */
 
-void func_L01_0031A278(char *a0, float *a1, float f12, float f13, float f14) {
-    a1[0] = f12;
-    a1[1] = f13;
-    a1[2] = f14;
-    func_002E3918(a1, a1, a0 + 0xC0);
-    func_002E3470(a1, a1, a0 + 0x10);
+/* Turns a local offset into a world point using the moby's matrix and position. */
+void func_L01_0031A278(char *moby, float *out, float x, float y, float z) {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    func_002E3918(out, out, moby + 0xC0);
+    func_002E3470(out, out, moby + 0x10);
 }
 
 /* Retail compares the vertical speed on landing, then stores the same value on both sides of the
@@ -957,148 +970,149 @@ static inline void MotionLandingSpeed(float *speed, float rising, float falling)
     }
 }
 
-void func_L01_0031AB20(char *m, MotionState *state, int path, float height, float radius, float extent)
+/* Moves a crate-like moby that the hero can push or drag: applies friction, gravity, pushback from walls and plays its sliding sound. */
+void func_L01_0031AB20(char *moby, MotionState *state, int path, float height, float radius, float extent)
 {
     MotionVec old, start, delta, turn, target, change, samples[8], matrix[3], actual;
     float speed, gain, limit, accel, ground;
     int i, handle;
     int phase = D_L01_001B2088[0];
 
-    if ((phase & 15) == (((int)m >> 8) & 15)) {
-        float dist = func_00282E48(&motionHero.position, m + 0x10);
+    if ((phase & 15) == (((int)moby >> 8) & 15)) {
+        float dist = fast_vec_dist(&motionHero.position, moby + 0x10);
 
-        if (*(unsigned short *)(m + 0x34) & 0x1000) {
+        if (*(unsigned short *)(moby + 0x34) & 0x1000) {
             if (state->distance < dist) {
-                *(unsigned short *)(m + 0x34) &= 0xEFFF;
+                *(unsigned short *)(moby + 0x34) &= 0xEFFF;
             }
         } else if (dist < state->distance) {
-            *(unsigned short *)(m + 0x34) |= 0x1000;
+            *(unsigned short *)(moby + 0x34) |= 0x1000;
         }
     }
-    qcopy(&old, m + 0x10);
-    if (motionHero.held == m) {
-        qcopy(&start, m + 0x10);
+    qcopy(&old, moby + 0x10);
+    if (motionHero.held == moby) {
+        qcopy(&start, moby + 0x10);
         start.v[2] += 0.5f;
-        if (func_002761F8(&start, &motionHero.probeEnd, 2, m, 0)) {
+        if (CollLine(&start, &motionHero.probeEnd, 2, moby, 0)) {
             motionHero.held = 0;
         }
-        func_00282CF0(&delta, m + 0x10, &motionHero.position);
-        if (state->frame != -1 && func_002ACBC8(m + 0x10, state->frame)) {
-            func_00283098(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
+        FastVecSub(&delta, moby + 0x10, &motionHero.position);
+        if (state->frame != -1 && IsPointInCuboid(moby + 0x10, state->frame)) {
+            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
             delta.v[1] = 0;
-            func_00283098(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
+            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
         }
         gain = 4.0f;
         if (state->gain != 0) {
             gain = state->gain;
         }
-        func_00282F70(&delta, &delta, gain);
-        func_00282CC0(&delta, &delta, &motionHero.position);
-        func_00282F20(&turn, &motionHero.motion, gain);
-        func_00282CC0(&turn, &turn, &motionHero.position);
+        FastVectorNormalizeHelper(&delta, &delta, gain);
+        FastVecAdd(&delta, &delta, &motionHero.position);
+        vec_scale_to_length(&turn, &motionHero.motion, gain);
+        FastVecAdd(&turn, &turn, &motionHero.position);
         turn.v[2] = delta.v[2];
-        func_00282D08(&delta, &delta, &turn, 0.5f);
-        func_00282CF0(&delta, &delta, &motionHero.position);
-        func_00282F20(&delta, &delta, gain);
-        func_00282CC0(&delta, &delta, &motionHero.position);
+        lerp_vector(&delta, &delta, &turn, 0.5f);
+        FastVecSub(&delta, &delta, &motionHero.position);
+        vec_scale_to_length(&delta, &delta, gain);
+        FastVecAdd(&delta, &delta, &motionHero.position);
         if (state->flags & 4) {
-            gain = func_00282E80(m + 0x10, &delta) * 0.5333333611f;
+            gain = vec_distance_xy(moby + 0x10, &delta) * 0.5333333611f;
             accel = 0.01388888899f;
             limit = 0.2666666806f;
         } else {
-            gain = func_00282E80(m + 0x10, &delta) * 0.06666667014f;
+            gain = vec_distance_xy(moby + 0x10, &delta) * 0.06666667014f;
             accel = 0.00555555569f;
             limit = 0.1333333403f;
         }
         if (limit < gain) {
             gain = limit;
         }
-        func_00282CF0(&target, &delta, m + 0x10);
+        FastVecSub(&target, &delta, moby + 0x10);
         target.v[2] = 0;
-        func_00282F20(&target, &target, gain);
-        func_00282CF0(&change, &target, state);
-        func_002AC9F8(&change, accel);
+        vec_scale_to_length(&target, &target, gain);
+        FastVecSub(&change, &target, state);
+        ClampVectorLength(&change, accel);
         state->velocity.v[0] += change.v[0];
         state->velocity.v[1] += change.v[1];
     } else {
-        speed = func_00282DF0(state);
-        func_002AA2E8(&speed, 0, 0.002777777845f);
-        func_00282F20(state, state, speed);
+        speed = FastVecLength(state);
+        ApproachValue(&speed, 0, 0.002777777845f);
+        vec_scale_to_length(state, state, speed);
     }
-    if (0.001f < func_00282DF0(state)) {
+    if (0.001f < FastVecLength(state)) {
         if (!(state->flags & 2)) {
-            qcopy(&start, m + 0x10);
-            qcopy(&delta, m + 0x10);
+            qcopy(&start, moby + 0x10);
+            qcopy(&delta, moby + 0x10);
             start.v[2] += 0.25f;
             delta.v[2] -= 1;
             ground = 0;
-            if (func_002761F8(&start, &delta, 16, m, 0)) {
+            if (CollLine(&start, &delta, 16, moby, 0)) {
                 ground = D_L01_001BF928;
             }
-            if (*(float *)(m + 0x18) < ground) {
-                *(float *)(m + 0x18) = ground;
+            if (*(float *)(moby + 0x18) < ground) {
+                *(float *)(moby + 0x18) = ground;
                 MotionLandingSpeed(&state->velocity.v[2], 0, 0);
             } else {
                 state->velocity.v[2] -= 0.00555555569f;
             }
         }
-        if (!(state->flags & 4) && func_00282E80(m + 0x10, &motionHero.position) < radius + 2.5f) {
+        if (!(state->flags & 4) && vec_distance_xy(moby + 0x10, &motionHero.position) < radius + 2.5f) {
             float toward;
 
-            func_00282CF0(&start, &motionHero.position, m + 0x10);
+            FastVecSub(&start, &motionHero.position, moby + 0x10);
             start.v[2] = 0;
-            func_00282F20(&start, &start, 1);
-            toward = func_00282DB0(&start, state);
+            vec_scale_to_length(&start, &start, 1);
+            toward = FastVecDot(&start, state);
             if (0 < toward) {
-                func_00282F20(&delta, &start, -toward);
-                func_00282CC0(state, state, &delta);
+                vec_scale_to_length(&delta, &start, -toward);
+                FastVecAdd(state, state, &delta);
             }
         }
         turn.q = 0;
         turn.v[2] = 0.7853982449f;
-        func_00282CC0(m + 0x10, m + 0x10, state);
-        qcopy(&delta, m + 0x10);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
+        qcopy(&delta, moby + 0x10);
         delta.v[2] += 0.25f;
-        func_002833F0(matrix, &turn);
-        func_00282F70(&start, state, radius);
+        euler_rotation_basis(matrix, &turn);
+        FastVectorNormalizeHelper(&start, state, radius);
         for (i = 0; i < 8; i++) {
-            func_00283098(&start, &start, matrix);
-            func_00282CC0(&samples[i], m + 0x10, &start);
+            matrix_mul_vec3(&start, &start, matrix);
+            FastVecAdd(&samples[i], moby + 0x10, &start);
             samples[i].v[2] += 0.25f;
-            func_L01_0031B300(m, state, &delta, &samples[i]);
+            PushMobyOutOfWall(moby, state, &delta, &samples[i]);
         }
-        func_00282D30(&target, state, 5);
-        func_00282CC0(&target, &target, m + 0x10);
+        FastVecScale(&target, state, 5);
+        FastVecAdd(&target, &target, moby + 0x10);
         target.v[2] += radius;
-        func_002A8C28(m, &target, 0x4000000, 0, 1, 0, radius + 0.2f, 1, 1);
-        qcopy(&change, m + 0x10);
+        SweepCollisionFromObject(moby, &target, 0x4000000, 0, 1, 0, radius + 0.2f, 1, 1);
+        qcopy(&change, moby + 0x10);
         change.v[2] += height;
-        if (func_L00_002E0200(&change, radius, extent, 0, m)) {
-            *(float *)(m + 0x10) = motionCollision.hitX;
-            *(float *)(m + 0x14) = motionCollision.hitY;
+        if (func_L00_002E0200(&change, radius, extent, 0, moby)) {
+            *(float *)(moby + 0x10) = motionCollision.hitX;
+            *(float *)(moby + 0x14) = motionCollision.hitY;
         }
         if (path != -1) {
-            func_002C9218(path, m + 0x10, m + 0x10, radius);
+            PushPointAwayFromPath(path, moby + 0x10, moby + 0x10, radius);
         }
-        func_00282CF0(&actual, m + 0x10, &old);
-        gain = func_00282E20(&actual);
-        if (gain < func_00282E20(state)) {
+        FastVecSub(&actual, moby + 0x10, &old);
+        gain = vec_length_xy(&actual);
+        if (gain < vec_length_xy(state)) {
             state->velocity.v[0] = actual.v[0];
             state->velocity.v[1] = actual.v[1];
         }
-        if (func_00282E20(state) != 0) {
-            char *sound = D_00188660 + state->sound * 0x70;
+        if (vec_length_xy(state) != 0) {
+            char *sound = gSoundState + state->sound * 0x70;
 
-            if (*(char **)(sound + 0x88) != m || !((unsigned char *)sound)[0x74]) {
-                state->sound = func_002E5CF8(0, 4, m);
+            if (*(char **)(sound + 0x88) != moby || !((unsigned char *)sound)[0x74]) {
+                state->sound = PlayMobySound(0, 4, moby);
             }
         } else {
             handle = state->sound;
             if (handle != -1) {
-                unsigned char *sound = (unsigned char *)D_00188660 + handle * 0x70;
+                unsigned char *sound = (unsigned char *)gSoundState + handle * 0x70;
 
-                if (*(char **)(sound + 0x88) == m && sound[0x74]) {
-                    func_002E59F8(handle);
+                if (*(char **)(sound + 0x88) == moby && sound[0x74]) {
+                    StopSoundVoice(handle);
                 }
             }
             state->sound = -1;
@@ -1106,10 +1120,10 @@ void func_L01_0031AB20(char *m, MotionState *state, int path, float height, floa
     } else {
         handle = state->sound;
         if (handle != -1) {
-            char *sound = D_00188660 + handle * 0x70;
+            char *sound = gSoundState + handle * 0x70;
 
-            if (*(char **)(sound + 0x88) == m && ((unsigned char *)sound)[0x74]) {
-                func_002E59F8(handle);
+            if (*(char **)(sound + 0x88) == moby && ((unsigned char *)sound)[0x74]) {
+                StopSoundVoice(handle);
             }
         }
         state->sound = -1;
@@ -1120,35 +1134,36 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 extern float func_00282C48(float f12);
 
-int func_L01_0031B300(void *a0, void *a1, void *a2, void *a3) {
-    Vector v, w;
-    float f20;
-    float f2;
-    char *g;
-    char *h;
-    char *p;
-    int v1;
+/* Casts a short ray for a moby and, if it hits a wall, pushes the moby back out of it. */
+int func_L01_0031B300(void *moby, void *unused, void *from, void *to) {
+    Vector toHit, normal;
+    float savedHeight;
+    float pushback;
+    char *hit;
+    char *normalPtr;
+    char *hitMoby;
+    int hitClass;
 
-    if (func_002761F8(a2, a3, 0x10, a0, 0) == 0)
+    if (CollLine(from, to, 0x10, moby, 0) == 0)
         goto fail;
-    g = (char *)&D_L01_001BF900;
-    p = *(char **)(g + 0x18);
-    if (p != 0) {
-        v1 = *(short *)(p + 0xAA);
-        if (v1 == 0x881 || v1 == 0)
+    hit = (char *)&D_L01_001BF900;
+    hitMoby = *(char **)(hit + 0x18);
+    if (hitMoby != 0) {
+        hitClass = *(short *)(hitMoby + 0xAA);
+        if (hitClass == 0x881 || hitClass == 0)
             return 0;
-        f20 = *(float *)(a0 + 0x18);
+        savedHeight = *(float *)(moby + 0x18);
     } else {
-        f20 = *(float *)(a0 + 0x18);
+        savedHeight = *(float *)(moby + 0x18);
     }
-    qcopy(&w, g + 0x40);
-    h = g + 0x40;
-    func_00282F20(w.f, w.f, 1.0f);
-    func_00282CF0(&v, a3, g + 0x20);
-    f2 = func_00282C48(func_00282DB0(v.f, w.f));
-    func_00282F20(w.f, (float *)h, f2);
-    func_00282CC0(a0 + 0x10, a0 + 0x10, &w);
-    *(float *)(a0 + 0x18) = f20;
+    qcopy(&normal, hit + 0x40);
+    normalPtr = hit + 0x40;
+    vec_scale_to_length(normal.f, normal.f, 1.0f);
+    FastVecSub(&toHit, to, hit + 0x20);
+    pushback = FloatAbs(FastVecDot(toHit.f, normal.f));
+    vec_scale_to_length(normal.f, (float *)normalPtr, pushback);
+    FastVecAdd(moby + 0x10, moby + 0x10, &normal);
+    *(float *)(moby + 0x18) = savedHeight;
     return 1;
 fail:
     return 0;
@@ -1156,39 +1171,40 @@ fail:
 
 
 int func_L01_0031BC68(int a0, int a1, float phase) {
-    float v = func_00283198(phase);
-    return func_00283D38(a0, a1, v * 0.5f + 0.5f);
+    float v = FastSinOrCosB(phase);
+    return FastTweenColor(a0, a1, v * 0.5f + 0.5f);
 }
 
 
 
 
-void func_L01_003208D0(void *a0, float *a1, int a2) {
-    unsigned char *p = (unsigned char *)a0;
-    float r;
-    int i;
+/* Makes a glow flicker with a changing colour and fades its brightness up or down. */
+void func_L01_003208D0(void *moby, float *phase, int active) {
+    unsigned char *bytes = (unsigned char *)moby;
+    float wave;
+    int color;
 
-    if (p[0x23] == 0 && a2 == 0)
+    if (bytes[0x23] == 0 && active == 0)
         return;
 
-    r = func_00283B98(*a1, 0.14544412f);
-    *a1 = r;
-    r = func_00283198(r);
-    i = func_00283D38(0x8000C020, 0x80008000, (r + 0.5f) * 0.5f);
-    if (func_002A7878(0.0f, 1.0f) < 0.05f)
-        i = func_00283D38(i, 0x8080FFFF, 0.3f);
-    func_002AEC18(a0, i);
+    wave = FastAddRotations(*phase, 0.14544412f);
+    *phase = wave;
+    wave = FastSinOrCosB(wave);
+    color = FastTweenColor(0x8000C020, 0x80008000, (wave + 0.5f) * 0.5f);
+    if (RandomFloatRange(0.0f, 1.0f) < 0.05f)
+        color = FastTweenColor(color, 0x8080FFFF, 0.3f);
+    SetMobyLightColor(moby, color);
 
-    if (a2 != 0) {
-        if (p[0x23] < 0x3D)
-            p[0x23] = p[0x23] + 3;
+    if (active != 0) {
+        if (bytes[0x23] < 0x3D)
+            bytes[0x23] = bytes[0x23] + 3;
         else
-            p[0x23] = 0x40;
+            bytes[0x23] = 0x40;
     } else {
-        if (p[0x23] >= 4)
-            p[0x23] = p[0x23] - 3;
+        if (bytes[0x23] >= 4)
+            bytes[0x23] = bytes[0x23] - 3;
         else
-            p[0x23] = 0;
+            bytes[0x23] = 0;
     }
 }
 
@@ -1212,9 +1228,10 @@ extern u8 D_L01_001B1E60[] __attribute__((sda));
 extern f32 D_L01_001B1E80[] __attribute__((sda));
 extern void func_0029F978(u8 *p, int a1, u8 *a2);
 
-void func_L01_003209F8(L01Thing *entry, s32 arg1, s32 id, f32 value)
+/* Starts an effect on every thing in the group that has the wanted kind. */
+void func_L01_003209F8(L01Thing *entry, s32 effectId, s32 id, f32 value)
 {
-    L01Thing *e;
+    L01Thing *thing;
     s32 wanted;
     s32 i;
 
@@ -1226,50 +1243,53 @@ void func_L01_003209F8(L01Thing *entry, s32 arg1, s32 id, f32 value)
     if (id != -1)
         wanted = id;
     for (i = 0; i < D_L01_001BD1C0.count; i++) {
-        e = D_L01_001BD1C0.items[i];
-        if (e->kind != wanted)
+        thing = D_L01_001BD1C0.items[i];
+        if (thing->kind != wanted)
             continue;
         if (D_L01_001B1E60[1] != 0)
             continue;
-        func_0029F978((u8 *)e, arg1, D_L01_001B1E60);
+        AttachManipulator((u8 *)thing, effectId, D_L01_001B1E60);
         D_L01_001B1E80[0] = value;
         D_L01_001B1E80[1] = value;
         D_L01_001B1E80[2] = value;
     }
 }
 
-int func_L01_00321178(char *a0, char *a1) {
-    float v = func_002E3B10(*(float *)(a1 + 0) - *(float *)(a0 + 0x10),
-                            *(float *)(a1 + 4) - *(float *)(a0 + 0x14));
-    return func_002B50E0(a0, a1, v);
+/* Turns a moby to face a target point. */
+int func_L01_00321178(char *moby, char *target) {
+    float angle = func_002E3B10(*(float *)(target + 0) - *(float *)(moby + 0x10),
+                            *(float *)(target + 4) - *(float *)(moby + 0x14));
+    return StepMovementController(moby, target, angle);
 }
 
-int func_L01_00322288(int a0, float f12) {
-    char *p = func_00321F08(a0);
-    if (p == 0)
+/* Starts an effect on a moby using values from its table entry. */
+int func_L01_00322288(int moby, float value) {
+    char *entry = func_00321F08(moby);
+    if (entry == 0)
         return 0;
-    func_003140B0((char *)a0 + 0xF8, p + 0xB4, 0, f12, *(float *)(p + 0x14),
-                  *(float *)(p + 0x18), *(float *)(p + 0x1C));
+    func_003140B0((char *)moby + 0xF8, entry + 0xB4, 0, value, *(float *)(entry + 0x14),
+                  *(float *)(entry + 0x18), *(float *)(entry + 0x1C));
     return 1;
 }
 
 
 
 /* shared native body of family d1b66aa7f0ecd20d */
-void func_L01_003242C8(char *dst, int x, int idx)
+/* Writes a number as text with thousands separators, such as 1,234,567. */
+void func_L01_003242C8(char *dst, int number, int idx)
 {
-    Sep6 t;
-    t = D_L01_001AA550;
-    if (x > 999999) {
-        int m = x / 1000000;
-        int w = x % 1000000;
-        func_00115DA8_2(dst, D_L01_001AA568, m, t.p[idx % 6], w / 1000,
-                          t.p[idx % 6], w % 1000);
-    } else if (x >= 1000)
-        func_00115DA8_2(dst, D_L01_001AA578, x / 1000,
-                          t.p[idx % 6], x % 1000);
+    Sep6 separators;
+    separators = D_L01_001AA550;
+    if (number > 999999) {
+        int millions = number / 1000000;
+        int remainder = number % 1000000;
+        func_00115DA8_2(dst, D_L01_001AA568, millions, separators.p[idx % 6], remainder / 1000,
+                          separators.p[idx % 6], remainder % 1000);
+    } else if (number >= 1000)
+        func_00115DA8_2(dst, D_L01_001AA578, number / 1000,
+                          separators.p[idx % 6], number % 1000);
     else
-        func_00115DA8_2(dst, D_L01_001AA588, x);
+        func_00115DA8_2(dst, D_L01_001AA588, number);
 }
 
 
@@ -1278,62 +1298,62 @@ extern int func_00115AC0(char *dst, char *src, int len);
 /* Expands a template: copies src into the scratchpad, then writes it to out, replacing %d (next number) and %<n>d (n-th number) with the numbers listed in nums (every second int, up to ten, stopped by -1). */
 void func_L01_00324410(char *out, char *src, int *nums)
 {
-    int tab[10];
-    unsigned char buf[32];
-    int i;
-    int *p;
-    int *q;
-    unsigned char *s;
-    char *w;
-    int n;
-    int cnt;
-    int v;
+    int numbers[10];
+    unsigned char digits[32];
+    int count;
+    int *numPtr;
+    int *tablePtr;
+    unsigned char *readPtr;
+    char *writePtr;
+    int copied;
+    int nextIndex;
+    int value;
 
-    p = nums;
-    i = 0;
-    func_00115AC0((char *)0x70000000, src, 0xFF);
+    numPtr = nums;
+    count = 0;
+    strncpy((char *)0x70000000, src, 0xFF);
 
-    q = tab;
+    tablePtr = numbers;
     for (;;) {
-        p += 2;
-        v = p[-2];
-        if (v == -1)
+        numPtr += 2;
+        value = numPtr[-2];
+        if (value == -1)
             break;
-        *q++ = v;
-        i++;
-        if (i >= 10)
+        *tablePtr++ = value;
+        count++;
+        if (count >= 10)
             break;
     }
 
-    s = (unsigned char *)0x70000000;
-    w = out;
-    cnt = 0;
-    while (*s != 0) {
-        if (*s == '%') {
-            if (s[1] == 'd') {
-                v = cnt++;
-                s += 2;
+    readPtr = (unsigned char *)0x70000000;
+    writePtr = out;
+    nextIndex = 0;
+    while (*readPtr != 0) {
+        if (*readPtr == '%') {
+            if (readPtr[1] == 'd') {
+                value = nextIndex++;
+                readPtr += 2;
             } else {
-                v = s[1] - '0';
-                s += 3;
+                value = readPtr[1] - '0';
+                readPtr += 3;
             }
-            func_L01_003242C8((char *)buf, tab[v], 0);
-            n = 0;
-            if (*buf != 0) {
-                while (buf[n] != 0 && n < 32) {
-                    *w = buf[n];
-                    n++;
-                    w++;
+            FormatNumberWithSeparators_L01((char *)digits, numbers[value], 0);
+            copied = 0;
+            if (*digits != 0) {
+                while (digits[copied] != 0 && copied < 32) {
+                    *writePtr = digits[copied];
+                    copied++;
+                    writePtr++;
                 }
             }
-            *w = 0;
+            *writePtr = 0;
         } else {
-            *w = *s;
-            s++;
-            w++;
+            *writePtr = *readPtr;
+            readPtr++;
+            writePtr++;
         }
     }
-    *w = 0;
+    *writePtr = 0;
 }
 
 
@@ -1341,25 +1361,26 @@ void func_L01_00324410(char *out, char *src, int *nums)
 
 /* func_L01_003245E0 is defined in L01_002A7248-g8.c (this unit has no $gp access for it). */
 
-void func_L01_003246A0(int a) {
-    char *base = D_00139A28;
-    char *p;
-    base = base + 0xC;
-    p = base + a * 16;
-    if (*(int *)p == 0)
-        *(int *)p = 1;
+/* Marks an entry of the table as used if it is not already. */
+void func_L01_003246A0(int index) {
+    char *table = D_00139A28;
+    char *entry;
+    table = table + 0xC;
+    entry = table + index * 16;
+    if (*(int *)entry == 0)
+        *(int *)entry = 1;
 }
 
 /* func_L01_003246D0 is defined in L01_003246D0.c. */
 
 /* Scans the half-open span of the pair table for the caller's key. */
 int func_L01_003246F8(int key) {
- unsigned n=(unsigned)D_L01_001A79F0;
+ unsigned group=(unsigned)D_L01_001A79F0;
  int i;
  int end;
- if(n>=0x13) return 0;
- i=D_L01_0028EA50[n];
- end=D_L01_0028EA50[n+1];
+ if(group>=0x13) return 0;
+ i=D_L01_0028EA50[group];
+ end=D_L01_0028EA50[group+1];
  while(i<end) {
   if(D_L01_001C5D20[i]==key) return i;
   i++;
@@ -1457,7 +1478,7 @@ void func_L01_00331CA0(Quad331CA0 *position, int kind, Quad331CA0 *velocity, flo
 {
     Quad331CA0 saved = *velocity;
     Quad331CA0 *vp = &saved;
-    Particle331CA0 *p = func_002B9030(0x49);
+    Particle331CA0 *p = AllocParticle(0x49);
 
     if (p) {
         float life = 0.0f;
@@ -1465,24 +1486,24 @@ void func_L01_00331CA0(Quad331CA0 *position, int kind, Quad331CA0 *velocity, flo
 
         switch (kind) {
         case 0:
-            func_002A7878(0.25f, 0.25f);
+            RandomFloatRange(0.25f, 0.25f);
             life = 0.12f;
             tint = 0x20;
             break;
         case 1:
-            func_002A7878(1.0f, 1.0f);
+            RandomFloatRange(1.0f, 1.0f);
             life = 0.5f;
             tint = 0xD;
             break;
         }
         p->size = 0x37;
         p->color = (tint << 24) | 0xFFFFFF;
-        p->alpha = func_00283CF0(4.0f) + 0x20;
+        p->alpha = FloatToInt(4.0f) + 0x20;
         p->b1 = 0;
         p->b3 = 0x48;
         p->b2 = D_L01_001FF164[kind];
         p->life = life * 210000.0f;
-        p->seed = func_002A7878(0.0f, 360.0f);
+        p->seed = RandomFloatRange(0.0f, 360.0f);
         p->position.q = *position;
         *(Quad331CA0 *)p->payload = *vp;
         p->payload[3] = scale;
@@ -1495,33 +1516,33 @@ void func_L01_00331CA0(Quad331CA0 *position, int kind, Quad331CA0 *velocity, flo
 /* Averages each 16-byte record of the table the argument points at against the record
    (i + 1) % n, storing the result in the record's own +0xC field and returning the
    running sum; a null argument reports and answers -1.0f. */
-float func_L01_003377C8(unsigned char *a0) {
-    unsigned char *s2;
-    unsigned char *q;
-    int s0, s1, n;
-    float f20;
-    float f0;
+float func_L01_003377C8(unsigned char *table) {
+    unsigned char *records;
+    unsigned char *record;
+    int index, nextIndex, count;
+    float total;
+    float segmentLength;
 
-    s2 = a0;
-    f20 = 0.0f;
-    if (s2 == 0) {
+    records = table;
+    total = 0.0f;
+    if (records == 0) {
         func_002A6CF0((int)D_L01_001AA6F8);
         return -1.0f;
     }
-    n = *(int *)s2;
-    if (n <= 0)
-        return f20;
-    s0 = 0;
+    count = *(int *)records;
+    if (count <= 0)
+        return total;
+    index = 0;
     do {
-        s1 = s0 + 1;
-        f0 = func_002E3618(s2 + 0x10 + (s0 << 4), s2 + 0x10 + ((s1 % n) << 4));
-        q = s2 + (s0 << 4);
-        *(float *)(q + 0x1C) = f0;
-        f20 += f0;
-        s0 = s1;
-        n = *(int *)s2;
-    } while (s0 < n);
-    return f20;
+        nextIndex = index + 1;
+        segmentLength = func_002E3618(records + 0x10 + (index << 4), records + 0x10 + ((nextIndex % count) << 4));
+        record = records + (index << 4);
+        *(float *)(record + 0x1C) = segmentLength;
+        total += segmentLength;
+        index = nextIndex;
+        count = *(int *)records;
+    } while (index < count);
+    return total;
 }
 
 typedef struct PathPoint {
@@ -1560,11 +1581,11 @@ int func_L01_00337888(PathFollower *follower, Path *path, PathPoint *out, int se
             next = 1;
     } else
         next = segment + direction;
-    func_00282CF0(toNext, &path->points[next], &path->points[segment]);
-    length = func_00282DF0(toNext);
-    func_00282F20(toNext, toNext, 1.0f);
-    func_00282CF0(toFollower, &follower->position, &path->points[segment]);
-    distance = func_00282DB0(toFollower, toNext);
+    FastVecSub(toNext, &path->points[next], &path->points[segment]);
+    length = FastVecLength(toNext);
+    vec_scale_to_length(toNext, toNext, 1.0f);
+    FastVecSub(toFollower, &follower->position, &path->points[segment]);
+    distance = FastVecDot(toFollower, toNext);
     distance += step;
     if (length < distance) {
         last = path->count - 1;
@@ -1577,26 +1598,28 @@ int func_L01_00337888(PathFollower *follower, Path *path, PathPoint *out, int se
                 next = 1;
         } else
             next = segment + direction;
-        func_00282CF0(toNext, &path->points[next], &path->points[segment]);
+        FastVecSub(toNext, &path->points[next], &path->points[segment]);
         distance -= length;
-        func_00282F20(toNext, toNext, 1.0f);
+        vec_scale_to_length(toNext, toNext, 1.0f);
     }
-    func_00282F20(toNext, toNext, distance);
-    func_00282CC0(out, toNext, &path->points[segment]);
+    vec_scale_to_length(toNext, toNext, distance);
+    FastVecAdd(out, toNext, &path->points[segment]);
     return segment;
 }
 
+/* Stores a value in a field of a sound slot. */
 int func_L01_00355BA0(int index, int value) {
-    char *p = D_00188660 + index * 0x70;
-    *(unsigned short *)(p + 0x80) = value;
+    char *sound = gSoundState + index * 0x70;
+    *(unsigned short *)(sound + 0x80) = value;
     return 1;
 }
 
 
-void func_L01_00371228(int a0, int a1) {
-    int i = func_003711D8(a0);
-    if (i >= 0)
-        D_L01_001395B8[i] |= (unsigned char)(1 << a1);
+/* Sets one bit in the flag table for the entry found for a key. */
+void func_L01_00371228(int key, int bit) {
+    int slot = func_003711D8(key);
+    if (slot >= 0)
+        D_L01_001395B8[slot] |= (unsigned char)(1 << bit);
 }
 
 /* func_L01_003801B8 is in L01_003801B8-g8.c for its GP accesses. */
@@ -1621,7 +1644,7 @@ typedef struct TriggerSettings {
    effect on, negative to turn it off; inactive reverses them. */
 void func_L01_003907B8(int index, TriggerSettings *settings, int active)
 {
-    Moby *p = (Moby *)D_L01_001B255C + index;
+    Moby *p = (Moby *)gMobyTable_L01 + index;
 
     if (p) {
         if (active) {
@@ -1665,12 +1688,13 @@ void func_L01_003907B8(int index, TriggerSettings *settings, int active)
 
 #undef SPATIAL_TRIGGER_EXEMPT
 
-void func_L01_003909E0(int a0, int a1, int a2, int a3) {
-    unsigned short *p = D_L01_001FB020[a2];
-    if (p != 0) {
+/* Applies a trigger's settings to every moby in a list of moby indices. */
+void func_L01_003909E0(int trigger, int settings, int listIndex, int active) {
+    unsigned short *cursor = D_L01_001FB020[listIndex];
+    if (cursor != 0) {
         do {
-            func_003907B8(*p & 0x7FFF, a1, a3);
-        } while (*(short *)p++ >= 0);
+            func_003907B8(*cursor & 0x7FFF, settings, active);
+        } while (*(short *)cursor++ >= 0);
     }
 }
 
@@ -1694,7 +1718,7 @@ void func_L01_00390A50(char *object)
     if (settings->switches[2])
         qcopy(&point, D_L01_001B94C0);
     else
-        qcopy(&point, D_00189EA0);
+        qcopy(&point, gHeroPosition);
     forced = *(unsigned char *)(object + 0x95);
     if (forced == 0) {
         if (settings->radius > 0.0f && func_002E3618(object + 0x10, &point) < settings->radius)
@@ -1702,7 +1726,7 @@ void func_L01_00390A50(char *object)
         if (!flag) {
             if (settings->path != -1) {
                 path = D_L01_001FE180[settings->path];
-                flag = func_002A8AF0((float *)&point, (float *)(path + 0x10), *(int *)path) != 0;
+                flag = point_in_path_xy((float *)&point, (float *)(path + 0x10), *(int *)path) != 0;
             }
         }
         if (!flag) {
@@ -1711,7 +1735,7 @@ void func_L01_00390A50(char *object)
                     goto done;
                 if (settings->volumes[i] == -1)
                     continue;
-                if (func_002ACBC8(&point, settings->volumes[i]))
+                if (IsPointInCuboid(&point, settings->volumes[i]))
                     break;
             }
             goto set;
@@ -1738,37 +1762,39 @@ done:
         mobys = settings->mobys;
         for (j = 0; j < 12; j++) {
             if (settings->lists[j] != -1)
-                func_L01_003909E0((int)object, (int)settings, settings->lists[j], flag);
+                ApplyTriggerSettingsToList((int)object, (int)settings, settings->lists[j], flag);
         }
         for (k = 0; k < 11; k++) {
             if (mobys[k] != -1)
-                func_L01_003907B8(mobys[k], (TriggerSettings *)settings, flag);
+                ApplySpatialTriggerObjectSettings(mobys[k], (TriggerSettings *)settings, flag);
         }
     }
 }
 
-void func_L01_00390C60(char *a0)
+/* Copies the shown or hidden state of the moby this one points to onto itself. */
+void func_L01_00390C60(char *moby)
 {
-    char *v0 = *(char **)(a0 + 0x68);
-    char *v1;
-    unsigned char a1;
+    char *vars = *(char **)(moby + 0x68);
+    char *owner;
+    unsigned char ownerState;
 
-    if (v0 == 0)
+    if (vars == 0)
         return;
-    v1 = *(char **)v0;
-    if (v1 == 0)
+    owner = *(char **)vars;
+    if (owner == 0)
         return;
-    a1 = *(unsigned char *)(v1 + 0x20);
-    if (a1 == 0xFE)
+    ownerState = *(unsigned char *)(owner + 0x20);
+    if (ownerState == 0xFE)
         return;
-    if (a1 == 0xFD)
+    if (ownerState == 0xFD)
         return;
-    if (*(unsigned short *)(v1 + 0x34) & 1)
-        *(unsigned short *)(a0 + 0x34) |= 0x41;
+    if (*(unsigned short *)(owner + 0x34) & 1)
+        *(unsigned short *)(moby + 0x34) |= 0x41;
     else
-        *(unsigned short *)(a0 + 0x34) &= 0xFFBE;
+        *(unsigned short *)(moby + 0x34) &= 0xFFBE;
 }
 
+/* Lights up every thing in the group that has one of two kinds. */
 void func_L01_00394148(void)
 {
     L01Thing *e;
@@ -1780,11 +1806,11 @@ void func_L01_00394148(void)
         return;
     for (i = 0; i < D_L01_001BD1C0.count; i++) {
         e = D_L01_001BD1C0.items[i];
-        if (e->kind != 0x398 && e->kind != 0x1BF)
+        if (e->kind != 0x398 /* moby class 920 */ && e->kind != 0x1BF /* moby class 447 */)
             continue;
         if (D_L01_001B1E60[1] != 0)
             continue;
-        func_0029F978((u8 *)e, 0, D_L01_001B1E60);
+        AttachManipulator((u8 *)e, 0, D_L01_001B1E60);
         D_L01_001B1E80[0] = 2.1f;
         D_L01_001B1E80[1] = 2.1f;
         D_L01_001B1E80[2] = 2.1f;

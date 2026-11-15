@@ -1,3 +1,4 @@
+#include "names.h"
 extern unsigned short *D_L05_001FB220[];
 extern unsigned char *D_L05_001B251C __attribute__((sda));
 extern int func_002ED688(unsigned char *);
@@ -12,7 +13,7 @@ int func_L05_0037B3A0(unsigned char *object) {
     if (head == 0) return 0;
     entry = (unsigned short *)head;
     do {
-        state = (unsigned char *)func_002ED688(D_L05_001B251C + ((*entry & 0x7FFF) << 8));
+        state = (unsigned char *)GetMobyMotionData(D_L05_001B251C + ((*entry & 0x7FFF) << 8));
         if (state) {
             next = count + 1;
             count = *(int *)(state + 0x110) != 1 ? count : next;

@@ -11,11 +11,12 @@ extern int func_001166C8(void *arg0, int arg1);
 
 extern void func_00116360(void *arg0);
 
-int func_00115F28(int arg0) {
+/* Gets a block of heap memory of the given size, taking the memory lock while it works. */
+int func_00115F28(int size) {
     int result;
 
-    func_00116300(D_00133E74);
-    result = func_001166C8(D_00133E74, arg0);
-    func_00116360(D_00133E74);
+    AcquireMallocLock(D_00133E74);
+    result = MallocReentrant(D_00133E74, size);
+    ReleaseMallocLock(D_00133E74);
     return result;
 }

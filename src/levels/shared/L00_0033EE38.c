@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_00282948(void *);
 
@@ -35,7 +36,7 @@ void func_L00_0033EE38(char *m)
     int al;
 
     m[8] += v[0xA];
-    if (func_00282948(m + 0x38)) {
+    if (FastFloatHelperD(m + 0x38)) {
         if (*(short *)(v + 8) - *(short *)(m + 0xA) < *(short *)(v + 0x1E)) {
             int c;
             int c2;
@@ -43,27 +44,27 @@ void func_L00_0033EE38(char *m)
             *(float *)(m + 0xC) = *(float *)(v + 4) + ((*(float *)(m + 0x20) + *(float *)(v + 4)) * 0.5f - *(float *)(v + 4)) * f4;
             c2 = (unsigned char)v[0xB] >> 1;
             c = (unsigned char)v[0xB];
-            al = func_00283CF0((float)c + (float)(c2 - c) * f4);
+            al = FloatToInt((float)c + (float)(c2 - c) * f4);
         } else {
-            f4 = func_00283CE0(*(short *)(v + 8) - 6);
+            f4 = IntToFloat(*(short *)(v + 8) - 6);
             f4 = (float)*(short *)(m + 0xA) / f4;
             *(float *)(m + 0xC) = *(float *)(m + 0x20) + ((*(float *)(m + 0x20) + *(float *)(v + 4)) * 0.5f - *(float *)(m + 0x20)) * f4;
-            al = func_00283CF0((float)((unsigned char)v[0xB] >> 1) * f4);
+            al = FloatToInt((float)((unsigned char)v[0xB] >> 1) * f4);
         }
         *(int *)(m + 4) = (al << 24) | (*(int *)(m + 4) & 0xFFFFFF);
         vcopy_L00_0033EE38(a, (float *)(v + 0xC));
-        func_00282CC0(m + 0x10, m + 0x10, a);
+        FastVecAdd(m + 0x10, m + 0x10, a);
         if (*(float *)(m + 0x10) < 2.0f || *(float *)(m + 0x10) > 1021.0f ||
             *(float *)(m + 0x14) < 2.0f || *(float *)(m + 0x14) > 1021.0f ||
             *(float *)(m + 0x18) < 2.0f || *(float *)(m + 0x18) > 1021.0f ||
-            func_00282978(m + 0xA)) {
-            func_002B9180(m);
+            FastDecTimer(m + 0xA)) {
+            KillParticle(m);
             return;
         }
     }
     if (*(float *)(m + 0x1C) != 0.0f) {
         if (*(float *)(m + 0x1C) == 2.0f)
-            func_00300190(m + 0x10, m + 0x10);
+            TransformVectorOrCopy(m + 0x10, m + 0x10);
         *(float *)(m + 0x1C) = 2.0f;
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef float f32;
 typedef unsigned char u8;
@@ -52,21 +53,22 @@ typedef struct { unsigned char pad[0x7C]; short f7C; } Obj_L13_00306F38;
 
 /* Walks the level's list of mobs like func_L02_00300CE8; when the game state is 0xD and the
    list's word at +0x30 is 0 or 1 it sets the 0x7C halfword of two of the list's objects. */
+/* Sets up the level's objects each load: shows some, runs setup on others, and prepares two special ones. */
 void func_L13_00306F38(void) {
     int i;
 
-    func_L00_002FC980();
+    StartStartupAnimations();
     for (i = 0; i < ref_L13_00306F38_00.count; i++) {
         Mob_L13_00306F38 *mob = ref_L13_00306F38_00.mobs[i];
 
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
         if (mob->type == 0xD54)
-            func_002E64A0(mob);
+            UpdateEquipmentPieces(mob);
         if (mob != 0 && mob->type == 0xFA0 && mob->p68 != 0)
-            func_L00_00326048(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
+            StoreAngleUpdateResult(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
-    if (D_001A79F0 == 0xD) {
+    if (gCurrentMapIndex == 0xD) {
         switch (ref_L13_00306F38_00.mode) {
         case 0:
             (*(Obj_L13_00306F38 **)((char *)&ref_L13_00306F38_00 + 0x1A0))->f7C = 7;
@@ -88,23 +90,24 @@ void func_L13_00306F38(void) {
 /* func_L13_0038C328 is in the -g8 sibling (L13_00306F38-g8.c): it addresses its
    three globals through $gp. */
 
-void func_L13_0038C470(u8 *a0) {
-    s32 *ptr = *(s32 **)(a0 + 0x68);
-    switch (a0[0x20]) {
+/* Toggles between two states each time the player enters a trigger box, calling a switch action each time. */
+void func_L13_0038C470(u8 *moby) {
+    s32 *vars = *(s32 **)(moby + 0x68);
+    switch (moby[0x20]) {
     case 0:
-        a0[0x30] = 0xFF;
-        func_3248E0(a0, 1, -1);
+        moby[0x30] = 0xFF;
+        func_3248E0(moby, 1, -1);
         break;
     case 1:
-        if (func_32A4D0(D_00189EA0, ptr[0]) != 0) {
-            func_337400(ptr[4], ptr[6]);
-            func_3248E0(a0, 2, -1);
+        if (func_32A4D0(gHeroPosition, vars[0]) != 0) {
+            func_337400(vars[4], vars[6]);
+            func_3248E0(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_32A4D0(D_00189EA0, ptr[1]) != 0) {
-            func_337400(ptr[5], ptr[7]);
-            func_3248E0(a0, 1, -1);
+        if (func_32A4D0(gHeroPosition, vars[1]) != 0) {
+            func_337400(vars[5], vars[7]);
+            func_3248E0(moby, 1, -1);
         }
         break;
     }
@@ -116,24 +119,29 @@ void func_L13_0038C470(u8 *a0) {
 
 
 
-void func_L13_003E1218(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_2F9748(*(f32 *)(a0 + 0xF4), 0.017453296f);
+/* Spins the object a small step around its vertical axis each frame. */
+void func_L13_003E1218(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = func_2F9748(*(f32 *)(moby + 0xF4), 0.017453296f);
 }
 
-void func_L13_003E1250(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_2F9748(*(f32 *)(a0 + 0xF4), 0.017453296f);
+/* Spins the object a small step around its vertical axis each frame. */
+void func_L13_003E1250(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = func_2F9748(*(f32 *)(moby + 0xF4), 0.017453296f);
 }
 
-void func_L13_003E1288(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_2F9748(*(f32 *)(a0 + 0xF4), 0.029088825f);
+/* Spins the object around its vertical axis each frame, a little faster. */
+void func_L13_003E1288(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = func_2F9748(*(f32 *)(moby + 0xF4), 0.029088825f);
 }
 
-void func_L13_003E12C0(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_2F9748(*(f32 *)(a0 + 0xF4), 0.017453296f);
+/* Spins the object a small step around its vertical axis each frame. */
+void func_L13_003E12C0(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = func_2F9748(*(f32 *)(moby + 0xF4), 0.017453296f);
 }
 
-void func_L13_003E12F8(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_2F9748(*(f32 *)(a0 + 0xF4), 0.017453296f);
+/* Spins the object a small step around its vertical axis each frame. */
+void func_L13_003E12F8(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = func_2F9748(*(f32 *)(moby + 0xF4), 0.017453296f);
 }
 
 /* func_L13_003E8850 is in L13_003E8850.c. */
@@ -151,120 +159,122 @@ extern void func_002AAA00(void *, void *, f32, f32, f32, f32, s32);
 extern void func_00282F20(void *, void *, f32);
 extern void func_00282CC0(void *, void *, void *);
 
-void func_L13_003FE708(u8 *a0) {
-    u8 *ptr = *(u8 **)(a0 + 0x68);
-    f32 vec[4];
+/* Lift arm that tilts down when the player is near or presses the control, then slides back after a short wait. */
+void func_L13_003FE708(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 step[4];
 
-    if (*(s32 *)ptr != 0) {
-        if (func_00282E80(a0 + 0x10, D_00189EA0) < 8.0f) {
-            if (a0[0x20] == 0) {
-                a0[0x20] = 1;
+    if (*(s32 *)vars != 0) {
+        if (vec_distance_xy(moby + 0x10, gHeroPosition) < 8.0f) {
+            if (moby[0x20] == 0) {
+                moby[0x20] = 1;
             }
         }
-    } else if (*(s32 *)(ptr + 8) != 0) {
-        if (func_00282E48(a0 + 0x10, D_00189EA0) < 8.0f) {
-            if (a0[0x20] == 0) {
-                if (*(s16 *)(D_00189EA0 + 0x2C8) == 1) {
-                    a0[0x20] = 2;
+    } else if (*(s32 *)(vars + 8) != 0) {
+        if (fast_vec_dist(moby + 0x10, gHeroPosition) < 8.0f) {
+            if (moby[0x20] == 0) {
+                if (*(s16 *)(gHeroPosition + 0x2C8) == 1) {
+                    moby[0x20] = 2;
                 }
             }
         }
     } else {
-        if (a0[0x20] == 0) {
-            *(u32 *)(a0 + 0x98) = 0;
-            a0[0x20] = 3;
+        if (moby[0x20] == 0) {
+            *(u32 *)(moby + 0x98) = 0;
+            moby[0x20] = 3;
         }
     }
 
-    if (a0[0x20] == 1) {
-        func_002AAA00(a0 + 0xF8, ptr + 4, -0.78539824f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
+    if (moby[0x20] == 1) {
+        ApproachTargetWithDirectionMode(moby + 0xF8, vars + 4, -0.78539824f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
     }
-    if (a0[0x20] == 2) {
-        func_002AAA00(a0 + 0xF8, ptr + 4, -1.5707965f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
+    if (moby[0x20] == 2) {
+        ApproachTargetWithDirectionMode(moby + 0xF8, vars + 4, -1.5707965f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
     }
-    if (a0[0x20] == 4) {
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
-        func_00282F20(vec, a0 + 0xD0, -0.16666667f);
-        func_00282CC0(a0 + 0x10, a0 + 0x10, vec);
-        if (*(u16 *)(a0 + 0x96) >= 11) {
-            *(u16 *)(a0 + 0x96) = 0;
-            a0[0x20] = 5;
+    if (moby[0x20] == 4) {
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
+        vec_scale_to_length(step, moby + 0xD0, -0.16666667f);
+        FastVecAdd(moby + 0x10, moby + 0x10, step);
+        if (*(u16 *)(moby + 0x96) >= 11) {
+            *(u16 *)(moby + 0x96) = 0;
+            moby[0x20] = 5;
         }
     }
-    if (a0[0x20] == 5) {
-        u32 c = *(u16 *)(a0 + 0x96) + 1;
+    if (moby[0x20] == 5) {
+        u32 ticks = *(u16 *)(moby + 0x96) + 1;
 
-        *(u16 *)(a0 + 0x96) = c;
-        if ((u16)c >= 31) {
-            *(u16 *)(a0 + 0x96) = 0;
-            a0[0x20] = 6;
+        *(u16 *)(moby + 0x96) = ticks;
+        if ((u16)ticks >= 31) {
+            *(u16 *)(moby + 0x96) = 0;
+            moby[0x20] = 6;
         }
     }
-    if (a0[0x20] == 6) {
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
-        func_00282F20(vec, a0 + 0xD0, 0.16666667f);
-        func_00282CC0(a0 + 0x10, a0 + 0x10, vec);
-        if (*(u16 *)(a0 + 0x96) >= 11) {
-            a0[0x20] = 0;
+    if (moby[0x20] == 6) {
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
+        vec_scale_to_length(step, moby + 0xD0, 0.16666667f);
+        FastVecAdd(moby + 0x10, moby + 0x10, step);
+        if (*(u16 *)(moby + 0x96) >= 11) {
+            moby[0x20] = 0;
         }
     }
 }
 
-void func_L13_003FE970(u8 *a0) {
-    u8 *ptr = *(u8 **)(a0 + 0x68);
-    f32 vec[4];
+/* Lift arm that tilts up when the player is near or presses the control, then slides back after a short wait. */
+void func_L13_003FE970(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 step[4];
 
-    if (*(s32 *)ptr != 0) {
-        if (func_00282E80(a0 + 0x10, D_00189EA0) < 8.0f) {
-            if (a0[0x20] == 0) {
-                a0[0x20] = 1;
+    if (*(s32 *)vars != 0) {
+        if (vec_distance_xy(moby + 0x10, gHeroPosition) < 8.0f) {
+            if (moby[0x20] == 0) {
+                moby[0x20] = 1;
             }
         }
-    } else if (*(s32 *)(ptr + 8) != 0) {
-        if (func_00282E48(a0 + 0x10, D_00189EA0) < 8.0f) {
-            if (a0[0x20] == 0) {
-                if (*(s16 *)(D_00189EA0 + 0x2C8) == 1) {
-                    a0[0x20] = 2;
+    } else if (*(s32 *)(vars + 8) != 0) {
+        if (fast_vec_dist(moby + 0x10, gHeroPosition) < 8.0f) {
+            if (moby[0x20] == 0) {
+                if (*(s16 *)(gHeroPosition + 0x2C8) == 1) {
+                    moby[0x20] = 2;
                 }
             }
         }
     } else {
-        if (a0[0x20] == 0) {
-            *(u32 *)(a0 + 0x98) = 0;
-            a0[0x20] = 3;
+        if (moby[0x20] == 0) {
+            *(u32 *)(moby + 0x98) = 0;
+            moby[0x20] = 3;
         }
     }
 
-    if (a0[0x20] == 1) {
-        func_002AAA00(a0 + 0xF8, ptr + 4, 2.3561947345733643f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
+    if (moby[0x20] == 1) {
+        ApproachTargetWithDirectionMode(moby + 0xF8, vars + 4, 2.3561947345733643f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
     }
-    if (a0[0x20] == 2) {
-        func_002AAA00(a0 + 0xF8, ptr + 4, 1.5707965f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
+    if (moby[0x20] == 2) {
+        ApproachTargetWithDirectionMode(moby + 0xF8, vars + 4, 1.5707965f, 0.0017453295f, 0.0017453295f, 0.0349065922f, 0);
     }
-    if (a0[0x20] == 4) {
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
-        func_00282F20(vec, a0 + 0xD0, 0.16666667f);
-        func_00282CC0(a0 + 0x10, a0 + 0x10, vec);
-        if (*(u16 *)(a0 + 0x96) >= 11) {
-            *(u16 *)(a0 + 0x96) = 0;
-            a0[0x20] = 5;
+    if (moby[0x20] == 4) {
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
+        vec_scale_to_length(step, moby + 0xD0, 0.16666667f);
+        FastVecAdd(moby + 0x10, moby + 0x10, step);
+        if (*(u16 *)(moby + 0x96) >= 11) {
+            *(u16 *)(moby + 0x96) = 0;
+            moby[0x20] = 5;
         }
     }
-    if (a0[0x20] == 5) {
-        u32 c = *(u16 *)(a0 + 0x96) + 1;
+    if (moby[0x20] == 5) {
+        u32 ticks = *(u16 *)(moby + 0x96) + 1;
 
-        *(u16 *)(a0 + 0x96) = c;
-        if ((u16)c >= 31) {
-            *(u16 *)(a0 + 0x96) = 0;
-            a0[0x20] = 6;
+        *(u16 *)(moby + 0x96) = ticks;
+        if ((u16)ticks >= 31) {
+            *(u16 *)(moby + 0x96) = 0;
+            moby[0x20] = 6;
         }
     }
-    if (a0[0x20] == 6) {
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
-        func_00282F20(vec, a0 + 0xD0, -0.16666667f);
-        func_00282CC0(a0 + 0x10, a0 + 0x10, vec);
-        if (*(u16 *)(a0 + 0x96) >= 11) {
-            a0[0x20] = 0;
+    if (moby[0x20] == 6) {
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
+        vec_scale_to_length(step, moby + 0xD0, -0.16666667f);
+        FastVecAdd(moby + 0x10, moby + 0x10, step);
+        if (*(u16 *)(moby + 0x96) >= 11) {
+            moby[0x20] = 0;
         }
     }
 }
@@ -272,11 +282,12 @@ void func_L13_003FE970(u8 *a0) {
 /* func_L13_004067F8 is in L13_004067F8-g8.c. */
 
 
-void func_L13_0041B260(u8 *a0) {
-    s32 *ptr = *(s32 **)(a0 + 0x68);
-    u8 *base = D_00189EA0;
-    if (func_32A4D0(base, ptr[0]) != 0) D_L13_001B2568 = 30.0f;
-    if (func_32A4D0(base, ptr[1]) != 0) D_L13_001B2568 = 95.0f;
+/* Sets a camera distance value depending on which of two trigger boxes the player is in. */
+void func_L13_0041B260(u8 *moby) {
+    s32 *vars = *(s32 **)(moby + 0x68);
+    u8 *base = gHeroPosition;
+    if (func_32A4D0(base, vars[0]) != 0) D_L13_001B2568 = 30.0f;
+    if (func_32A4D0(base, vars[1]) != 0) D_L13_001B2568 = 95.0f;
 }
 
 /* func_L13_0041BDA8 is in L13_0041BDA8.c. */
@@ -302,99 +313,100 @@ extern void func_002E59F8(s32);
 extern s32 func_L00_0035F5A0(s32, s32, u8 *);
 extern s32 func_00282948(u8 *);
 
-void func_L13_00422CB8(u8 *a0) {
+/* Controls a door-like object: moves between its open and closed states and switches other objects on or off as it goes. */
+void func_L13_00422CB8(u8 *moby) {
     static void *cases[5] = {&&c0, &&c1, &&done, &&c3, &&c4};
-    u8 *state = *(u8 **)(a0 + 0x68);
-    u16 *p;
-    u8 *e;
-    u8 *slot;
-    s32 idx;
-    s32 id;
-    u32 sel;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u16 *listEntry;
+    u8 *target;
+    u8 *soundSlot;
+    s32 soundIndex;
+    s32 soundId;
+    u32 stateIndex;
 
-    sel = a0[0x20];
-    if (sel < 5)
-        goto *D_L13_002ADD00[sel];
+    stateIndex = moby[0x20];
+    if (stateIndex < 5)
+        goto *D_L13_002ADD00[stateIndex];
     goto done;
 c0:
-    *(s32 *)(state + 0x2C) = -1;
-    if (D_L13_001FB420[*(s32 *)state] == 0) {
-        func_0026FEB8(D_L13_001B1C20);
-        func_0029F338(a0);
+    *(s32 *)(vars + 0x2C) = -1;
+    if (D_L13_001FB420[*(s32 *)vars] == 0) {
+        STUB_printf(D_L13_001B1C20);
+        MarkMobySpawned(moby);
         return;
     }
-    if (*(s32 *)(state + 4) == -1) {
-        func_0026FEB8(D_L13_001B1C48);
-        func_0029F338(a0);
+    if (*(s32 *)(vars + 4) == -1) {
+        STUB_printf(D_L13_001B1C48);
+        MarkMobySpawned(moby);
         return;
     }
-    *(s32 *)(state + 0x18) = 0;
-    *(s32 *)(state + 0x14) = 0;
-    *(s32 *)(state + 0x24) = *(s32 *)(state + 8);
-    *(s32 *)(state + 0x28) = *(s32 *)(state + 0xC);
-    func_002A7750(a0, 1, -1);
+    *(s32 *)(vars + 0x18) = 0;
+    *(s32 *)(vars + 0x14) = 0;
+    *(s32 *)(vars + 0x24) = *(s32 *)(vars + 8);
+    *(s32 *)(vars + 0x28) = *(s32 *)(vars + 0xC);
+    SetMobyState(moby, 1, -1);
     goto done;
 c1:
-    if (func_002ACBC8((u8 *)D_00189EA0, *(s32 *)(state + 0x10)) != 0)
-        func_002A7750(a0, 3, -1);
-    idx = *(s32 *)(state + 0x2C);
-    if (idx != -1) {
-        slot = D_00188660 + idx * 0x70;
-        if (*(u8 **)(slot + 0x88) == a0 && slot[0x74] != 0)
-            func_002E59F8(idx);
+    if (IsPointInCuboid((u8 *)gHeroPosition, *(s32 *)(vars + 0x10)) != 0)
+        SetMobyState(moby, 3, -1);
+    soundIndex = *(s32 *)(vars + 0x2C);
+    if (soundIndex != -1) {
+        soundSlot = gSoundState + soundIndex * 0x70;
+        if (*(u8 **)(soundSlot + 0x88) == moby && soundSlot[0x74] != 0)
+            StopSoundVoice(soundIndex);
     }
-    *(s32 *)(state + 0x2C) = -1;
+    *(s32 *)(vars + 0x2C) = -1;
     goto done;
 c3:
-    func_002B3868(a0);
-    id = *(s32 *)(state + 0x2C);
-    if (id == -1 || *(u8 **)((slot = D_00188660 + id * 0x70) + 0x88) != a0 || slot[0x74] == 0)
-        *(s32 *)(state + 0x2C) = func_L00_0035F5A0(0x13, 4, a0);
-    if (func_00282948(state + 0x24) != 0 && *(s32 *)(state + 0x14) == 0) {
-        for (p = D_L13_001FB420[*(s32 *)state];
-             (*(s32 *)state & 0xFF) != 0xFF && *(s32 *)state <= D_L13_001B2938 && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == D_L13_001FB420[*(s32 *)state]);
-             p++) {
-            e = (u8 *)D_L13_001B291C[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+    SetFirstPendingFlag(moby);
+    soundId = *(s32 *)(vars + 0x2C);
+    if (soundId == -1 || *(u8 **)((soundSlot = gSoundState + soundId * 0x70) + 0x88) != moby || soundSlot[0x74] == 0)
+        *(s32 *)(vars + 0x2C) = StartEffectInSlot(0x13, 4, moby);
+    if (FastFloatHelperD(vars + 0x24) != 0 && *(s32 *)(vars + 0x14) == 0) {
+        for (listEntry = D_L13_001FB420[*(s32 *)vars];
+             (*(s32 *)vars & 0xFF) != 0xFF && *(s32 *)vars <= D_L13_001B2938 && listEntry != 0 &&
+             ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == D_L13_001FB420[*(s32 *)vars]);
+             listEntry++) {
+            target = (u8 *)D_L13_001B291C[0] + ((*listEntry & 0x7FFF) << 8);
+            if (target == 0)
                 break;
-            if (*(s16 *)(e + 0xAA) == 0xEE7)
-                *(s32 *)(*(u8 **)(e + 0x68) + 0x628) = 1;
+            if (*(s16 *)(target + 0xAA) == 0xEE7)
+                *(s32 *)(*(u8 **)(target + 0x68) + 0x628) = 1;
         }
-        *(s32 *)(state + 0x14) = 1;
+        *(s32 *)(vars + 0x14) = 1;
     }
-    if (func_00282948(state + 0x28) != 0 && *(s32 *)(state + 0x18) == 0) {
-        *(s32 *)(*(u8 **)((u8 *)D_L13_001B291C[0] + (*(s32 *)(state + 4) << 8) + 0x68) + 0x3C) = 1;
-        *(s32 *)(state + 0x18) = 1;
+    if (FastFloatHelperD(vars + 0x28) != 0 && *(s32 *)(vars + 0x18) == 0) {
+        *(s32 *)(*(u8 **)((u8 *)D_L13_001B291C[0] + (*(s32 *)(vars + 4) << 8) + 0x68) + 0x3C) = 1;
+        *(s32 *)(vars + 0x18) = 1;
     }
-    if (*(s32 *)(state + 0x18) != 0 && *(s32 *)(state + 0x14) != 0) {
-        *(s32 *)(state + 0x28) = *(s32 *)(state + 0x1C);
-        *(s32 *)(state + 0x24) = *(s32 *)(state + 0x20);
-        func_002A7750(a0, 4, -1);
+    if (*(s32 *)(vars + 0x18) != 0 && *(s32 *)(vars + 0x14) != 0) {
+        *(s32 *)(vars + 0x28) = *(s32 *)(vars + 0x1C);
+        *(s32 *)(vars + 0x24) = *(s32 *)(vars + 0x20);
+        SetMobyState(moby, 4, -1);
     }
     goto done;
 c4:
-    if (func_00282948(state + 0x24) != 0 && *(s32 *)(state + 0x14) != 0) {
-        for (p = D_L13_001FB420[*(s32 *)state];
-             (*(s32 *)state & 0xFF) != 0xFF && *(s32 *)state <= D_L13_001B2938 && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == D_L13_001FB420[*(s32 *)state]);
-             p++) {
-            e = (u8 *)D_L13_001B291C[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+    if (FastFloatHelperD(vars + 0x24) != 0 && *(s32 *)(vars + 0x14) != 0) {
+        for (listEntry = D_L13_001FB420[*(s32 *)vars];
+             (*(s32 *)vars & 0xFF) != 0xFF && *(s32 *)vars <= D_L13_001B2938 && listEntry != 0 &&
+             ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == D_L13_001FB420[*(s32 *)vars]);
+             listEntry++) {
+            target = (u8 *)D_L13_001B291C[0] + ((*listEntry & 0x7FFF) << 8);
+            if (target == 0)
                 break;
-            if (*(s16 *)(e + 0xAA) == 0xEE7)
-                *(s32 *)(*(u8 **)(e + 0x68) + 0x628) = 0;
+            if (*(s16 *)(target + 0xAA) == 0xEE7)
+                *(s32 *)(*(u8 **)(target + 0x68) + 0x628) = 0;
         }
-        *(s32 *)(state + 0x14) = 0;
+        *(s32 *)(vars + 0x14) = 0;
     }
-    if (func_00282948(state + 0x28) != 0 && *(s32 *)(state + 0x18) != 0) {
-        *(s32 *)(*(u8 **)((u8 *)D_L13_001B291C[0] + (*(s32 *)(state + 4) << 8) + 0x68) + 0x3C) = 0;
-        *(s32 *)(state + 0x18) = 0;
+    if (FastFloatHelperD(vars + 0x28) != 0 && *(s32 *)(vars + 0x18) != 0) {
+        *(s32 *)(*(u8 **)((u8 *)D_L13_001B291C[0] + (*(s32 *)(vars + 4) << 8) + 0x68) + 0x3C) = 0;
+        *(s32 *)(vars + 0x18) = 0;
     }
-    if (*(s32 *)(state + 0x18) == 0 && *(s32 *)(state + 0x14) == 0) {
-        *(s32 *)(state + 0x24) = *(s32 *)(state + 8);
-        *(s32 *)(state + 0x28) = *(s32 *)(state + 0xC);
-        func_002A7750(a0, 1, -1);
+    if (*(s32 *)(vars + 0x18) == 0 && *(s32 *)(vars + 0x14) == 0) {
+        *(s32 *)(vars + 0x24) = *(s32 *)(vars + 8);
+        *(s32 *)(vars + 0x28) = *(s32 *)(vars + 0xC);
+        SetMobyState(moby, 1, -1);
     }
 done:
     return;
@@ -405,29 +417,30 @@ done:
 extern s32 func_002ACBC8(u8 *, s32);
 extern u8 D_001395B8[];
 
-void func_L13_00424728(u8 *a0) {
-    s32 *ptr = *(s32 **)(a0 + 0x68);
-    if (func_002ACBC8((u8 *)D_00189EA0, ptr[2]) != 0) {
+/* Marks five progress flags when the player enters four trigger boxes or another object reaches a certain state. */
+void func_L13_00424728(u8 *moby) {
+    s32 *vars = *(s32 **)(moby + 0x68);
+    if (IsPointInCuboid((u8 *)gHeroPosition, vars[2]) != 0) {
         if (D_001395B8[0x25] == 0) {
             D_001395B8[0x25] = 1;
         }
     }
-    if (func_002ACBC8((u8 *)D_00189EA0, ptr[3]) != 0) {
+    if (IsPointInCuboid((u8 *)gHeroPosition, vars[3]) != 0) {
         if (D_001395B8[0x24] == 0) {
             D_001395B8[0x24] = 1;
         }
     }
-    if (func_002ACBC8((u8 *)D_00189EA0, ptr[0]) != 0) {
+    if (IsPointInCuboid((u8 *)gHeroPosition, vars[0]) != 0) {
         if (D_001395B8[0x27] == 0) {
             D_001395B8[0x27] = 1;
         }
     }
-    if (func_002ACBC8((u8 *)D_00189EA0, ptr[1]) != 0) {
+    if (IsPointInCuboid((u8 *)gHeroPosition, vars[1]) != 0) {
         if (D_001395B8[0x28] == 0) {
             D_001395B8[0x28] = 1;
         }
     }
-    if (*((u8 *)D_L13_001B291C[0] + (ptr[4] << 8) + 0x20) == 2) {
+    if (*((u8 *)D_L13_001B291C[0] + (vars[4] << 8) + 0x20) == 2) {
         if (D_001395B8[0x26] == 0) {
             D_001395B8[0x26] = 1;
         }
@@ -442,23 +455,24 @@ void func_L13_00424728(u8 *a0) {
 extern void func_002E5CF8(s32, s32, u8 *);
 extern void func_002AA548(f32 *, f32 *, f32, f32, f32, f32);
 
-void func_L13_0042BEE0(u8 *a0) {
-    u8 *ptr = *(u8 **)(a0 + 0x68);
-    if (a0[0x20] == 0) {
-        *(u16 *)(a0 + 0x34) |= 0x800;
-        *(f32 *)(ptr + 0x8) = *(f32 *)(a0 + 0x18);
-        *(f32 *)(ptr + 0x4) = *(f32 *)(a0 + 0x18) - 6.0f;
-        a0[0x20] = 1;
+/* Waits for another object to reach its active state, then lifts this object up to its top height. */
+void func_L13_0042BEE0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] == 0) {
+        *(u16 *)(moby + 0x34) |= 0x800;
+        *(f32 *)(vars + 0x8) = *(f32 *)(moby + 0x18);
+        *(f32 *)(vars + 0x4) = *(f32 *)(moby + 0x18) - 6.0f;
+        moby[0x20] = 1;
     }
-    if (a0[0x20] == 1) {
-        u8 v = *((u8 *)D_L13_001B291C[0] + (*(u32 *)ptr << 8) + 0x20);
+    if (moby[0x20] == 1) {
+        u8 v = *((u8 *)D_L13_001B291C[0] + (*(u32 *)vars << 8) + 0x20);
         if (v == 2) {
-            func_002E5CF8(0, 0, a0);
-            a0[0x20] = v;
+            PlayMobySound(0, 0, moby);
+            moby[0x20] = v;
         }
     }
-    if (a0[0x20] == 2) {
-        func_002AA548((f32 *)(a0 + 0x18), (f32 *)(ptr + 0xC), *(f32 *)(ptr + 0x4),
+    if (moby[0x20] == 2) {
+        StepValueTowardTarget((f32 *)(moby + 0x18), (f32 *)(vars + 0xC), *(f32 *)(vars + 0x4),
                       0.0016666667f, 0.0016666667f, 0.200000018f);
     }
 }
@@ -467,36 +481,40 @@ extern s32 func_2AF870(u8 *);
 extern void func_327D00(f32 *, f32 *, f32, f32, f32, f32);
 extern u8 D_L13_001B1E60[];
 
-void func_L13_0042BFD8(u8 *a0) {
-    u8 *ptr = *(u8 **)(a0 + 0x68);
-    if (a0[0x20] == 0) {
-        *(u16 *)(a0 + 0x34) |= 0x800;
-        *(f32 *)(ptr + 0x8) = *(f32 *)(a0 + 0x18);
-        *(f32 *)(ptr + 0x4) = *(f32 *)(a0 + 0x18) - 6.0f;
-        a0[0x20] = 1;
+/* Waits for another object to reach its active state, then lifts this object up to its top height and starts a sound. */
+void func_L13_0042BFD8(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] == 0) {
+        *(u16 *)(moby + 0x34) |= 0x800;
+        *(f32 *)(vars + 0x8) = *(f32 *)(moby + 0x18);
+        *(f32 *)(vars + 0x4) = *(f32 *)(moby + 0x18) - 6.0f;
+        moby[0x20] = 1;
     }
-    if (a0[0x20] == 1) {
-        u8 v = *((u8 *)D_L13_001B291C[0] + (*(u32 *)ptr << 8) + 0x20);
+    if (moby[0x20] == 1) {
+        u8 v = *((u8 *)D_L13_001B291C[0] + (*(u32 *)vars << 8) + 0x20);
         if (v == 2) {
-            a0[0x20] = v;
+            moby[0x20] = v;
             func_2AF870(D_L13_001B1E60);
         }
     }
-    if (a0[0x20] == 2) {
-        func_327D00((f32 *)(a0 + 0x18), (f32 *)(ptr + 0xC), *(f32 *)(ptr + 0x4),
+    if (moby[0x20] == 2) {
+        func_327D00((f32 *)(moby + 0x18), (f32 *)(vars + 0xC), *(f32 *)(vars + 0x4),
                     0.0016666667f, 0.0016666667f, 0.200000018f);
     }
 }
 
 /* Separate camera activate, update and exit entries in camvtbl. */
+/* Camera hook that does nothing. */
 void func_L13_0043E8C0(void *camera)
 {
 }
 
+/* Camera hook that does nothing. */
 void func_L13_0043E8C8(void *camera)
 {
 }
 
+/* Camera hook that does nothing. */
 void func_L13_0043E8D0(void *camera)
 {
 }

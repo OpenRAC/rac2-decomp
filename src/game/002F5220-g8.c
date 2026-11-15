@@ -9,13 +9,14 @@ extern void func_00288BE8(char *);
 extern void func_002F5CB8(void (*)(void), int);
 extern void func_002F6458(void);
 
+/* Loads a data file into the shared buffer and sets up a callback and two flags for the next screen. */
 void func_002F64A8(void)
 {
     char *buffer = D_001BAD40;
     D_001A7478 = 1;
-    func_00288AA0(buffer, 21);
-    func_00288BE8(buffer);
-    func_002F5CB8(func_002F6458, 0);
+    PushRequestQueue(buffer, 21);
+    LaunchQueuedRequest(buffer);
+    SetStoredValuePair(FlagCurrentMenuEntry, 0);
     D_00152C28[0] = 1;
     D_0013955C[0] = 0;
 }
@@ -116,88 +117,89 @@ extern void func_002E6120(void);
 /* Starts cutscene n: marks it seen, clears the cutscene state and buffers, sets
    up the resource bases and hero, then waits for the dialog stream and three
    frames. */
-void func_002F53C8(int n)
+/* Starts a cutscene by its number. */
+void func_002F53C8(int cutsceneId)
 {
-    int index, i, v;
-    char *p, *o;
+    int index, i, memTop;
+    char *bufferPtr, *moby;
 
-    if ((unsigned)n < 0xB1)
-        *(D_00139768 + ((unsigned)n >> 2)) |= 1 << (n & 31);
-    func_00288B38(D_001BAD40);
-    index = func_002EF010(n);
+    if ((unsigned)cutsceneId < 0xB1)
+        *(D_00139768 + ((unsigned)cutsceneId >> 2)) |= 1 << (cutsceneId & 31);
+    MarkQueuedRequestsInFlagTable(D_001BAD40);
+    index = MapCutsceneIdToIndex(cutsceneId);
     if (index < 0)
         return;
-    func_002B72E8(0);
-    func_002B7CE0(0);
-    func_00282A60(&D_001B8840, 0, 0x1D0);
-    func_00282A60(D_001B1450, 0, 0x40);
-    func_00282A60(D_001B1390, 0, 0x40);
-    func_00282A60(D_001B2980, 0, 0x40);
-    func_00282A60(D_001B2980 + 0x40, 0, 0x40);
-    func_00282A60(D_001B13D0, 0, 0x40);
-    func_00282A60(D_001B1410, 0, 0x40);
-    p = D_0021F080;
+    music_Pause(0);
+    PumpMusicAndDiscRead(0);
+    ClearMemory(&gScenePlaybackState, 0, 0x1D0);
+    ClearMemory(D_001B1450, 0, 0x40);
+    ClearMemory(D_001B1390, 0, 0x40);
+    ClearMemory(D_001B2980, 0, 0x40);
+    ClearMemory(D_001B2980 + 0x40, 0, 0x40);
+    ClearMemory(D_001B13D0, 0, 0x40);
+    ClearMemory(D_001B1410, 0, 0x40);
+    bufferPtr = D_0021F080;
     for (i = 0; i < 7; i++) {
-        char *entry = p;
-        p += 0x40;
-        func_00282A60(entry, 0, 0x40);
+        char *entry = bufferPtr;
+        bufferPtr += 0x40;
+        ClearMemory(entry, 0, 0x40);
     }
     D_001A8C74 = 1.0f;
-    D_001B8840.id = index;
+    gScenePlaybackState.id = index;
     D_001A8C78 = 0;
-    D_001B8840.unk34 = 0;
-    D_001B8840.unk3C = 0;
-    if (D_001A79F0 == 20)
-        v = D_001B22B0[0] - 0x60000;
+    gScenePlaybackState.unk34 = 0;
+    gScenePlaybackState.unk3C = 0;
+    if (gCurrentMapIndex == 20)
+        memTop = D_001B22B0[0] - 0x60000;
     else
-        v = D_001B22B0[0] - 0x40000;
-    D_001B22B0[0] = v;
-    D_001B8840.base6C = D_001BAEC0.baseC + v;
-    D_001B8840.base70 = D_001BAEC0.base10 + v;
-    func_00288EA0();
-    D_001B15A0 = 1.0f;
-    D_001A8BB0 = 2;
+        memTop = D_001B22B0[0] - 0x40000;
+    D_001B22B0[0] = memTop;
+    gScenePlaybackState.base6C = D_001BAEC0.baseC + memTop;
+    gScenePlaybackState.base70 = D_001BAEC0.base10 + memTop;
+    ClearSubtitleState();
+    gScreenFade = 1.0f;
+    gCurrentGameMode = 2;
     D_001B15A4 = 0;
     D_001A8C7C = 0;
-    if (D_00189E20.active) {
-        func_0026F748(0x61, 2);
-        D_00189E20.flag = 1;
-        func_0026F720();
+    if (gHeroState.active) {
+        EmptyStubF748(0x61, 2);
+        gHeroState.flag = 1;
+        EmptyStubF720();
     }
     if (D_001B178C.moby)
         *(unsigned short *)(D_001B178C.moby + 0x34) |= 1;
-    if (D_001F2840.moby)
-        *(unsigned short *)(D_001F2840.moby + 0x34) |= 1;
+    if (gPauseMenuState.moby)
+        *(unsigned short *)(gPauseMenuState.moby + 0x34) |= 1;
     D_001B15A8 = 1;
     D_001B15AC = 52;
-    if (D_001A63A8.active) {
-        func_002B7CE0(1);
-        func_00293CA8(0);
+    if (gMusicState.active) {
+        PumpMusicAndDiscRead(1);
+        LoadChunkPartFromDisc(0);
     } else
-        func_00293CA8(0);
-    if (D_001A63A8.active)
-        func_002B7CE0(1);
-    func_00293D30();
-    func_002912F0();
-    for (o = D_001B1B60; (unsigned char)o[0x20] != 255; o += 0x100) {
-        if (!((unsigned char)o[0x20] & 0x80) && *(short *)(o + 0xAA) == 0xCB)
-            *(unsigned short *)(o + 0x34) |= 0x80;
+        LoadChunkPartFromDisc(0);
+    if (gMusicState.active)
+        PumpMusicAndDiscRead(1);
+    RelocateWorldObjectParts();
+    EmptyStub_002912F0();
+    for (moby = D_001B1B60; (unsigned char)moby[0x20] != 255; moby += 0x100) {
+        if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == 0xCB /* Decoy */)
+            *(unsigned short *)(moby + 0x34) |= 0x80;
     }
-    D_001A63A8.id = D_001B8840.id;
-    D_001A63A8.flag = 0;
-    while (D_001A63A8.state != 3 || D_001A63A8.timer >= 6000) {
-        func_002E4AC8();
-        func_001261F0(0);
+    gMusicState.id = gScenePlaybackState.id;
+    gMusicState.flag = 0;
+    while (gMusicState.state != 3 || gMusicState.timer >= 6000) {
+        UpdateSoundVoices();
+        GetGsCurrentField(0);
     }
     {
         int ticks = 0;
-        CutsceneState *state = &D_001B8840;
+        CutsceneState *state = &gScenePlaybackState;
 
         state->wait = -3;
-        func_002B6D28();
-        func_00293CA8(1);
+        ResumeMusicStream();
+        LoadChunkPartFromDisc(1);
         for (; state->wait < ticks; ticks--)
-            func_001261F0(0);
+            GetGsCurrentField(0);
     }
 }
 
@@ -206,72 +208,72 @@ void func_002F53C8(int n)
    talk and menu mobys and runs the pending end callback. */
 void func_002F57A8(void)
 {
-    char *o;
-    CutsceneHero *p;
-    CutsceneState *b;
-    float g, f;
+    char *moby;
+    CutsceneHero *hero;
+    CutsceneState *cutscene;
+    float heroGroundZ, cutsceneGroundZ;
     int i;
 
-    if ((unsigned short)(D_001A63A8.state - 6) >= 2)
-        D_001A63A8.state = 5;
-    func_002FC138();
-    func_0027D330(6);
+    if ((unsigned short)(gMusicState.state - 6) >= 2)
+        gMusicState.state = 5;
+    SelectPacketBufferSetup();
+    FadeToBlack(6);
     D_001B15A8 = 0;
     D_001B15AC = 0;
     D_001B15A4 = 0;
     D_001A8C7C = 0;
-    func_00272198(6.0f);
-    func_002F5220();
+    SetCameraTransitionFrames(6.0f);
+    ResetFrameCounters();
     D_001B9040.fov = 0.62f;
-    func_0027AB40();
-    for (i = 0; i < D_001B8840.count; i++) {
-        CutsceneMoby *m = D_001B8840.mobys[i];
+    UpdateViewContext();
+    for (i = 0; i < gScenePlaybackState.count; i++) {
+        CutsceneMoby *m = gScenePlaybackState.mobys[i];
         if (m) {
             m->parts->n--;
             m->parts->slots[m->parts->n] = 0;
-            func_0029F338(m);
+            MarkMobySpawned(m);
         }
     }
-    for (o = D_001B1B60; (unsigned char)o[0x20] != 255; o += 0x100) {
-        if (!((unsigned char)o[0x20] & 0x80) && *(short *)(o + 0xAA) == 0xCB)
-            *(unsigned short *)(o + 0x34) &= 0xFF7F;
+    for (moby = D_001B1B60; (unsigned char)moby[0x20] != 255; moby += 0x100) {
+        if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == 0xCB /* Decoy */)
+            *(unsigned short *)(moby + 0x34) &= 0xFF7F;
     }
-    p = &D_00189E20;
-    if (p->active) {
-        func_0026F750(1);
-        g = func_002A89A8(p->pos, 0, 0.5f);
-        if (2.0f < g) {
-            if (func_00282C48(p->pos[2] - g) < 4.5f)
-                p->pos[2] = g;
+    hero = &gHeroState;
+    if (hero->active) {
+        EmptyStubF750(1);
+        heroGroundZ = ProbeGroundHeightBelow(hero->pos, 0, 0.5f);
+        if (2.0f < heroGroundZ) {
+            if (FloatAbs(hero->pos[2] - heroGroundZ) < 4.5f)
+                hero->pos[2] = heroGroundZ;
         }
-        D_00189E20.flag = 0;
-        func_0026F728();
-        b = &D_001B8840;
-        if (b->restore) {
-            f = func_002A89A8(b->pos, 0, 0.5f);
-            if (2.0f < f && func_00282C48(b->pos[2] - f) < 2.0f)
-                b->pos[2] = f;
-            func_0026F778(D_001B8840.pos, D_001B8840.rot, 0, 1);
+        gHeroState.flag = 0;
+        EmptyStubF728();
+        cutscene = &gScenePlaybackState;
+        if (cutscene->restore) {
+            cutsceneGroundZ = ProbeGroundHeightBelow(cutscene->pos, 0, 0.5f);
+            if (2.0f < cutsceneGroundZ && FloatAbs(cutscene->pos[2] - cutsceneGroundZ) < 2.0f)
+                cutscene->pos[2] = cutsceneGroundZ;
+            EmptyStubF778(gScenePlaybackState.pos, gScenePlaybackState.rot, 0, 1);
         }
     }
     if (D_001B178C.moby)
         *(unsigned short *)(D_001B178C.moby + 0x34) &= 0xFFFE;
-    if (D_001F2840.moby) {
-        *(unsigned short *)(D_001F2840.moby + 0x34) &= 0xFFFE;
-        D_001F2840.moby = 0;
+    if (gPauseMenuState.moby) {
+        *(unsigned short *)(gPauseMenuState.moby + 0x34) &= 0xFFFE;
+        gPauseMenuState.moby = 0;
     }
     if (D_001B178C.moby) {
         char *moby = D_001B178C.moby;
         void *data = D_001B178C.data;
         D_001B178C.moby = 0;
         D_001B178C.data = 0;
-        func_002B8108(moby, data, 1);
+        RunDialogueNode(moby, data, 1);
     }
-    func_002B7340(30);
-    if (D_001A8C80 && !D_001BAD78[0] && D_001A8BB8 != 2 && D_001A8BB8 != 1) {
+    music_set_active_track_value(30);
+    if (D_001A8C80 && !D_001BAD78[0] && gRequestedGameMode != 2 && gRequestedGameMode != 1) {
         D_001A8C80(D_001A8C84);
         D_001A8C80 = 0;
         D_001A8C84 = 0;
     }
-    func_002E6120();
+    DestroyEquipmentPieces();
 }

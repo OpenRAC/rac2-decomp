@@ -40,9 +40,9 @@ int func_L22_002A8CE0(int check)
         return 0;
     default:
         if (check && STATE->field_22BA && !STATE->field_24EC) {
-            int index = func_L00_002ADEA0(0);
+            int index = hero_slot_item_id(0);
 
-            return ((Entry_002A8CE0 *)D_L22_002645F0)[D_00139568[index]].value;
+            return ((Entry_002A8CE0 *)D_L22_002645F0)[gItemSlotToRecord[index]].value;
         }
         if (STATE->field_24CC != 1) {
             return STATE->field_1492 ? 0x67 : 0;

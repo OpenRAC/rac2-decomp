@@ -29,39 +29,40 @@ extern char D_001C4FA0[];
 
 static __inline__ void SetColor_0033B910(char *w, int c)
 {
-    *func_00335E20(w) = c;
+    *GetFieldC(w) = c;
 }
 
-void func_0033B910(char *obj)
+/* Draws the map screen: title, labels, each of the 21 map spots, and the frame lines. */
+void func_0033B910(char *screen)
 {
     int i;
-    char *base;
+    char *game;
 
-    func_00336320(obj);
-    func_00336320(obj + 0x4C);
-    func_00336320(obj + 0x98);
-    func_00336A78(obj + 0x1D8);
-    func_00336A78(obj + 0x220);
-    func_00336A78(obj + 0x268);
-    func_00336828(obj + 0x2B0);
+    DrawScreenElementAtStoredPosition(screen);
+    DrawScreenElementAtStoredPosition(screen + 0x4C);
+    DrawScreenElementAtStoredPosition(screen + 0x98);
+    DrawAlignedTextLabel(screen + 0x1D8);
+    DrawAlignedTextLabel(screen + 0x220);
+    DrawAlignedTextLabel(screen + 0x268);
+    DrawColoredQuadWidget(screen + 0x2B0);
     for (i = 0; i < 21; i++) {
-        func_00335E38(obj + 0x2EC, (float)D_00265140[i].x + (*(float **)(obj + 0x1C8))[0],
-                      (float)D_00265140[i].y + (*(float **)(obj + 0x1C8))[1], 0.0f, 0.0f);
-        func_00336920(obj + 0x2EC, 0xE99E, D_00265140[i].text);
-        func_00335F88(obj + 0x2EC, D_00265140[i].scale, D_00265140[i].scale, 0.0f, 0.0f);
+        SetFirstFloat4(screen + 0x2EC, (float)gMapSpotTable[i].x + (*(float **)(screen + 0x1C8))[0],
+                      (float)gMapSpotTable[i].y + (*(float **)(screen + 0x1C8))[1], 0.0f, 0.0f);
+        SetWidgetValuePair(screen + 0x2EC, 0xE99E, gMapSpotTable[i].text);
+        SetSecondFloat4(screen + 0x2EC, gMapSpotTable[i].scale, gMapSpotTable[i].scale, 0.0f, 0.0f);
         if (D_001A7BE8[i] == 0)
-            SetColor_0033B910(obj + 0x2EC, 0x70A0C0C0);
+            SetColor_0033B910(screen + 0x2EC, 0x70A0C0C0);
         else
-            SetColor_0033B910(obj + 0x2EC, 0x7029A1FF);
+            SetColor_0033B910(screen + 0x2EC, 0x7029A1FF);
         if (D_001A7BC8[i] != 0)
-            func_00336828(obj + 0x2EC);
+            DrawColoredQuadWidget(screen + 0x2EC);
     }
-    base = D_001C4FA0;
-    if (*(int *)(base + 0x230) < 21) {
-        char *first = obj + 0xE4;
-        char *mid = obj + 0x130;
-        char *bar = obj + 0x17C;
-        char *q = obj + 0x114;
+    game = gMapOverlayState;
+    if (*(int *)(game + 0x230) < 21) {
+        char *first = screen + 0xE4;
+        char *mid = screen + 0x130;
+        char *bar = screen + 0x17C;
+        char *q = screen + 0x114;
         char *r = first;
         int k;
 
@@ -71,21 +72,21 @@ void func_0033B910(char *obj)
             r += 76;
             q += 76;
         }
-        func_0028FAB8((int)(func_00335E10(first)[0] + 1.0f),
-                      (int)(func_00335E10(mid)[1] + 6.0f),
-                      (int)(func_00335E10(first)[0] + 1.0f),
-                      (int)(func_00335E10(first)[1] - 4.0f), 0x180000FF, 0);
-        func_0028FAB8((int)(func_00335E10(bar)[0] + 8.0f),
-                      (int)(func_00335E10(bar)[1] + 2.0f),
-                      (int)(func_00335E10(bar)[0] + 304.0f),
-                      (int)(func_00335E10(bar)[1] + 2.0f), 0x180000FF, 0);
-        func_0028FAB8((int)(func_00335E10(first)[0] + 1.0f),
-                      (int)(func_00335E10(mid)[1] + 6.0f),
-                      (int)(func_00335E10(first)[0] + 1.0f),
-                      (int)(func_00335E10(first)[1] - 4.0f), 0x180000FF, 0);
-        func_0028FAB8((int)(func_00335E10(bar)[0] + 8.0f),
-                      (int)(func_00335E10(bar)[1] + 2.0f),
-                      (int)(func_00335E10(bar)[0] + 304.0f),
-                      (int)(func_00335E10(bar)[1] + 2.0f), 0x180000FF, 0);
+        DrawScreenLine((int)(GetFirstField(first)[0] + 1.0f),
+                      (int)(GetFirstField(mid)[1] + 6.0f),
+                      (int)(GetFirstField(first)[0] + 1.0f),
+                      (int)(GetFirstField(first)[1] - 4.0f), 0x180000FF, 0);
+        DrawScreenLine((int)(GetFirstField(bar)[0] + 8.0f),
+                      (int)(GetFirstField(bar)[1] + 2.0f),
+                      (int)(GetFirstField(bar)[0] + 304.0f),
+                      (int)(GetFirstField(bar)[1] + 2.0f), 0x180000FF, 0);
+        DrawScreenLine((int)(GetFirstField(first)[0] + 1.0f),
+                      (int)(GetFirstField(mid)[1] + 6.0f),
+                      (int)(GetFirstField(first)[0] + 1.0f),
+                      (int)(GetFirstField(first)[1] - 4.0f), 0x180000FF, 0);
+        DrawScreenLine((int)(GetFirstField(bar)[0] + 8.0f),
+                      (int)(GetFirstField(bar)[1] + 2.0f),
+                      (int)(GetFirstField(bar)[0] + 304.0f),
+                      (int)(GetFirstField(bar)[1] + 2.0f), 0x180000FF, 0);
     }
 }

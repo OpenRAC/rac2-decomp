@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
 
@@ -38,44 +39,47 @@ extern void func_002AAC80(char *a, float f1, float f2, float f3, float f4);
 
 extern void func_00283958(char *a, char *b);
 
-void func_00287BD8(char *arg0, int arg1)
+/* Turns the camera to follow the player: builds a rotation from the current view and eases it, then folds it into the camera matrix. */
+void func_00287BD8(char *easeState, int useFixedAngle)
 {
-    Block48_F8c659bbc a;
-    Block48_F8c659bbc b;
-    Block48_F8c659bbc c;
-    Block16_F8c659bbc d;
-    Block16_F8c659bbc e;
-    float v;
+    Block48_F8c659bbc finalRotation;
+    Block48_F8c659bbc combined;
+    Block48_F8c659bbc lookMatrix;
+    Block16_F8c659bbc axis;
+    Block16_F8c659bbc direction;
+    float halfAngle;
 
-    func_00282CF0((char *)&e, D_L00_001B8DC0, D_L00_001B1B10);
-    func_00282F20((char *)&e, (char *)&e, 1.0f);
-    func_002833F0((char *)&c, (char *)&D_L00_001A8E30);
-    func_00283738((char *)&b, D_L00_001B8DC0 + 560, (char *)&c);
-    func_00282DD8((char *)&d, (char *)&b, (char *)&e);
-    v = func_00282DF0((char *)&d) * 0.5f;
-    if (arg1 != 0) {
-        func_002ACE78((char *)&d, (char *)&d, -v);
+    FastVecSub((char *)&direction, gCameraPosition_L00, D_L00_001B1B10);
+    vec_scale_to_length((char *)&direction, (char *)&direction, 1.0f);
+    euler_rotation_basis((char *)&lookMatrix, (char *)&D_L00_001A8E30);
+    multiply_matrix3x3((char *)&combined, gCameraPosition_L00 + 560, (char *)&lookMatrix);
+    FastVecCross((char *)&axis, (char *)&combined, (char *)&direction);
+    halfAngle = FastVecLength((char *)&axis) * 0.5f;
+    if (useFixedAngle != 0) {
+        SetDirectionWithComplement((char *)&axis, (char *)&axis, -halfAngle);
     } else {
-        func_002AAC80(arg0, v, 5.8177649043500423431396e-04f,
+        ApproachTargetWithBraking(easeState, halfAngle, 5.8177649043500423431396e-04f,
                 5.8177649043500423431396e-04f,
                 5.2359886467456817626953e-02f);
-        func_002ACE78((char *)&d, (char *)&d, -*(float *)arg0);
+        SetDirectionWithComplement((char *)&axis, (char *)&axis, -*(float *)easeState);
     }
-    func_00283958((char *)&d, (char *)&a);
-    func_00283738(D_L00_001B8FF0, (char *)&a, D_L00_001B8FF0);
+    quaternion_to_rotation_basis((char *)&axis, (char *)&finalRotation);
+    multiply_matrix3x3(D_L00_001B8FF0, (char *)&finalRotation, D_L00_001B8FF0);
 }
 
 extern float D_L00_001A8DD0 __attribute__((sda));
-void func_00287D20(float *arg0) { char temp[0x40]; float value = *arg0 * 0.0002908882452175021f * D_L00_001A8DD0; func_002ACE78(temp, D_L00_001B8FF0, value); func_00283958(temp, temp + 0x10); func_00283738(D_L00_001B8FF0, temp + 0x10, D_L00_001B8FF0); }
+/* Rolls the camera by an amount taken from the stick roll value. */
+void func_00287D20(float *roll) { char rotation[0x40]; float angle = *roll * 0.0002908882452175021f * D_L00_001A8DD0; SetDirectionWithComplement(rotation, D_L00_001B8FF0, angle); quaternion_to_rotation_basis(rotation, rotation + 0x10); multiply_matrix3x3(D_L00_001B8FF0, rotation + 0x10, D_L00_001B8FF0); }
 
 extern void func_00282CC0(char *a, char *b, char *c);
 
 extern int D_L00_001A8DC8 __attribute__((sda));
 
-void func_00287D98(char *arg0)
+/* Moves the camera direction by the given offset and re-normalizes it. */
+void func_00287D98(char *offset)
 {
-    func_00282CF0(D_L00_001B8DC0, D_L00_001B8DC0, D_L00_001B1B10);
-    func_00282CC0(D_L00_001B8DC0, D_L00_001B8DC0, arg0);
-    func_00282F20(D_L00_001B8DC0, D_L00_001B8DC0, (float)D_L00_001A8DC8);
-    func_00282CC0(D_L00_001B8DC0, D_L00_001B8DC0, D_L00_001B1B10);
+    FastVecSub(gCameraPosition_L00, gCameraPosition_L00, D_L00_001B1B10);
+    FastVecAdd(gCameraPosition_L00, gCameraPosition_L00, offset);
+    vec_scale_to_length(gCameraPosition_L00, gCameraPosition_L00, (float)D_L00_001A8DC8);
+    FastVecAdd(gCameraPosition_L00, gCameraPosition_L00, D_L00_001B1B10);
 }

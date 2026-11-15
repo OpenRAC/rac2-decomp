@@ -37,6 +37,7 @@ struct LiftMoby {
 };
 extern struct LiftPoint *ref_L02_003EB8F8_00 __attribute__((sda));
 extern struct LiftPoint *ref_L02_003EB8F8_01 MACRO_ADDR;
+/* Runs an elevator. It moves between its stops, changes direction when the player stands on it or calls it, and plays a sound while moving. */
 void func_L02_003EB8F8(struct LiftMoby *obj) {
     struct LiftData *data = obj->data;
     int oldpos[4] __attribute__((aligned(16)));
@@ -72,11 +73,11 @@ void func_L02_003EB8F8(struct LiftMoby *obj) {
         speed=0.003888889f;
         d=delta;
         if (data->direction) {
-            if (HERO->pos[2]<obj->pos[2]-1.0f || F(D_L02_001BA500,8)<obj->pos[2]) {
-                ref_L02_003EB8F8_06(d,D_L02_001BA500,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x30);
+            if (HERO->pos[2]<obj->pos[2]-1.0f || F(gCameraPosition_L02,8)<obj->pos[2]) {
+                ref_L02_003EB8F8_06(d,gCameraPosition_L02,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x30);
                 ref_L02_003EB8F8_07(d,d,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x40);
                 if (ref_L02_003EB8F8_08(HERO->pos,data->waypoint) || (ref_L02_003EB8F8_04(delta[0])<1.0f && ref_L02_003EB8F8_04(delta[1])<1.0f)) {
-                    if (obj->kind==0xbf5) target+=5.0f; else target+=3.0f;
+                    if (obj->kind==0xbf5 /* moby class 3061 */ ) target+=5.0f; else target+=3.0f;
                 }
                 speed+=speed;
             } else target+=0.15f;
@@ -89,11 +90,11 @@ void func_L02_003EB8F8(struct LiftMoby *obj) {
         break;
     }
     if (ref_L02_003EB8F8_04(data->velocity)>0.01f) {
-        char *e=D_00188660+data->sound*0x70;
+        char *e=gSoundState+data->sound*0x70;
         if (P(e,0x88)!=obj || !*(unsigned char *)(e+0x74)) data->sound=ref_L02_003EB8F8_10(0,4,obj);
     } else {
         if (data->sound!=-1) {
-            char *e=D_00188660+data->sound*0x70;
+            char *e=gSoundState+data->sound*0x70;
             if (P(e,0x88)==obj && *(unsigned char *)(e+0x74)) ref_L02_003EB8F8_11(data->sound);
         }
         data->sound=-1;

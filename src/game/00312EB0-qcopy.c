@@ -11,6 +11,7 @@ extern int func_002AD5F8(char *, char *, char *, char *, char *, char *);
 typedef struct { char prefix[0x18]; char *target; char reserved[0xC]; float height; } ContactView;
 extern char ref_L00_00312EB0_00[];
 
+/* Keeps an object on the floor. It finds the ground below, rides any moving platform, and falls with gravity when in the air. */
 void func_00312EB0(unsigned char *object)
 {
     float start[4] __attribute__((aligned(16)));
@@ -21,20 +22,20 @@ void func_00312EB0(unsigned char *object)
     float gravity;
     int hit = 0;
     ContactView *contact;
-    if (!func_002ACD38(object + 0x10)) {
-        func_002A7750(object, 5, -1);
+    if (!IsObjectInSelectedZone(object + 0x10)) {
+        SetMobyState(object, 5, -1);
         return;
     }
     if (*(char **)(data + 0xC)) {
         qzero_nc(scratch);
-        func_002AD470(object, *(char **)(data + 0xC), data + 0x70,
+        ApplyCollisionPushToObject(object, *(char **)(data + 0xC), data + 0x70,
                        scratch, object + 0x10, scratch);
     }
     qcopy(start, object + 0x10);
-    func_002B00D8(object + 0x10, start, start, -0.5f);
+    OffsetPositionAlongGravity(object + 0x10, start, start, -0.5f);
     qcopy(end, start);
-    func_002B00D8(object + 0x10, end, end, 1.5f);
-    if (func_002761F8(start, end, 2, object, 0)) {
+    OffsetPositionAlongGravity(object + 0x10, end, end, 1.5f);
+    if (CollLine(start, end, 2, object, 0)) {
         hit = 1;
         height = *(float *)(ref_L00_00312EB0_00 + 0x28);
     } else {
@@ -43,7 +44,7 @@ void func_00312EB0(unsigned char *object)
     if (hit) {
         contact = (ContactView *)ref_L00_00312EB0_00;
         if (contact->target) {
-            if (func_002ABB78(contact->target)) {
+            if (IsMobyInSpecialClassRange(contact->target)) {
                 float x, y;
                 x = *(float *)(contact->target + 0x10);
                 *(float *)(data + 0x10) = x;
@@ -53,11 +54,11 @@ void func_00312EB0(unsigned char *object)
                 *(float *)(object + 0x14) = y;
                 *(float *)(object + 0x18) = contact->height;
                 qcopy(data + 0x10, object + 0x10);
-                func_002B00D8(object + 0x10, (float *)(data + 0x10), (float *)(data + 0x10), -0.5f);
-            } else if (!*(char **)(data + 0xC) && func_002AD0B0(contact->target)) {
+                OffsetPositionAlongGravity(object + 0x10, (float *)(data + 0x10), (float *)(data + 0x10), -0.5f);
+            } else if (!*(char **)(data + 0xC) && GetMobyPrivateValue2(contact->target)) {
                 char *target = contact->target;
                 *(char **)(data + 0xC) = target;
-                func_002AD5F8((char *)object, target, (char *)object + 0x10,
+                GetAttachmentRotationAngles((char *)object, target, (char *)object + 0x10,
                                (char *)object + 0xF0, data + 0x70, scratch);
             }
         }

@@ -9,27 +9,27 @@ extern int func_002A8508(int, int);
 
 /* Waits for its linked object or trigger, then wakes the eight targets it lists. */
 void func_L16_0041C990(char *obj) {
-    int *p = *(int **)(obj + 0x68);
+    int *vars = *(int **)(obj + 0x68);
     int i;
-    char *first;
+    char *linkedMoby;
 
     switch (*(u8 *)(obj + 0x20)) {
     case 0:
-        if (p[1] == -1 && p[2] == -1) {
-            func_002A7750(obj, 4, -1);
-        } else if (p[1] != -1) {
-            func_002A7750(obj, 1, -1);
+        if (vars[1] == -1 && vars[2] == -1) {
+            SetMobyState(obj, 4, -1);
+        } else if (vars[1] != -1) {
+            SetMobyState(obj, 1, -1);
         } else {
-            func_002A7750(obj, 2, -1);
+            SetMobyState(obj, 2, -1);
         }
         break;
     case 1:
-        first = D_L16_001B2B1C + (p[0] << 8);
-        if (first == 0 || *(u8 *)(first + 0x20) == 0xFE || *(u8 *)(first + 0x20) == 0xFD) {
-            if (func_002ACBC8(D_00189EA0, p[1]) != 0) {
+        linkedMoby = D_L16_001B2B1C + (vars[0] << 8);
+        if (linkedMoby == 0 || *(u8 *)(linkedMoby + 0x20) == 0xFE || *(u8 *)(linkedMoby + 0x20) == 0xFD) {
+            if (IsPointInCuboid(gHeroPosition, vars[1]) != 0) {
                 for (i = 0; i < 8; i++) {
-                    if (p[4 + i] != -1) {
-                        char *entry = D_L16_001B2B1C + (p[4 + i] << 8);
+                    if (vars[4 + i] != -1) {
+                        char *entry = D_L16_001B2B1C + (vars[4 + i] << 8);
                         if (*(s16 *)(entry + 0xAA) == 0xEA3) {
                             *(int *)(*(char **)(entry + 0x68) + 0x24C) = 1;
                         } else {
@@ -37,15 +37,15 @@ void func_L16_0041C990(char *obj) {
                         }
                     }
                 }
-                func_002A7750(obj, 4, -1);
+                SetMobyState(obj, 4, -1);
             }
         }
         break;
     case 2:
-        if (func_002A8508(p[2], -1) == 0) {
+        if (CountMobysInGroupNotInState(vars[2], -1) == 0) {
             for (i = 0; i < 8; i++) {
-                if (p[4 + i] != -1) {
-                    char *entry = D_L16_001B2B1C + (p[4] << 8);
+                if (vars[4 + i] != -1) {
+                    char *entry = D_L16_001B2B1C + (vars[4] << 8);
                     if (*(s16 *)(entry + 0xAA) == 0xEA3) {
                         *(int *)(*(char **)(entry + 0x68) + 0x24C) = 1;
                     } else {
@@ -53,7 +53,7 @@ void func_L16_0041C990(char *obj) {
                     }
                 }
             }
-            func_002A7750(obj, 4, -1);
+            SetMobyState(obj, 4, -1);
         }
         break;
     case 3:

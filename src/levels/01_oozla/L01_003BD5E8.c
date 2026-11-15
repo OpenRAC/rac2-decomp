@@ -28,19 +28,20 @@ typedef struct Mount {
 extern f32 func_L01_003BD560(void *, f32, f32, f32, f32);
 
 /* The mount's floor under the entry, raised to its minimum, and the ceiling over the hero. */
-void func_L01_003BD5E8(Ent *a0)
+/* Works out the floor height under the moby and the ceiling height used to keep it above the player. */
+void func_L01_003BD5E8(Ent *moby)
 {
-    Mount *s0 = a0->f68;
+    Mount *mount = moby->f68;
     f32 pos[4] __attribute__((aligned(16)));
-    f32 top, hero;
-    qcopy(pos, a0->pos);
-    if (a0->f20 == 0) {
-        s0->f224 = func_L01_003BD560(pos, s0->f1D8 + 20.0f, s0->f1D8 - 10.0f, s0->f27C, s0->f288);
+    f32 top, heroTop;
+    qcopy(pos, moby->pos);
+    if (moby->f20 == 0) {
+        mount->f224 = GetGroundHeightWithLimit(pos, mount->f1D8 + 20.0f, mount->f1D8 - 10.0f, mount->f27C, mount->f288);
     } else {
-        s0->f224 = func_L01_003BD560(pos, a0->pos[2] + 2.0f, a0->pos[2] - 10.0f, s0->f27C, s0->f288);
+        mount->f224 = GetGroundHeightWithLimit(pos, moby->pos[2] + 2.0f, moby->pos[2] - 10.0f, mount->f27C, mount->f288);
     }
-    if (s0->f224 < s0->f27C) s0->f224 = s0->f27C;
-    top = s0->f224 + 1.7f;
-    hero = ((Hero *)D_00189EA0)->f[8 / 4] + 0.1f;
-    s0->f228 = top > hero ? top : hero;
+    if (mount->f224 < mount->f27C) mount->f224 = mount->f27C;
+    top = mount->f224 + 1.7f;
+    heroTop = ((Hero *)gHeroPosition)->f[8 / 4] + 0.1f;
+    mount->f228 = top > heroTop ? top : heroTop;
 }

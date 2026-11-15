@@ -55,23 +55,23 @@ s32 func_L11_004295A0(u8 *object) {
         D_L11_001AED04++;
         *(s32 *)(data + 0x5B0) = 0;
         *(void **)(data + 0x18) = data + 0x140;
-        *(f32 *)(object + 0x18) = func_002A89A8(object + 0x10, 0, 0.5f);
+        *(f32 *)(object + 0x18) = ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
         *(s32 *)(data + 0x554) = 0;
         *(s32 *)(data + 0x560) = 0;
         *(s32 *)(data + 0x568) = 0;
-        data[0x48] = func_00283CF0(20.0f);
-        data[0x4A] = func_00283CF0(14.0f);
+        data[0x48] = FloatToInt(20.0f);
+        data[0x4A] = FloatToInt(14.0f);
         if (*(s32 *)(data + 0x528)) {
-            *(s32 *)(data + 0x520) = func_L02_0032E508(object, *(s32 *)(data + 0x524), data + 0x320, 16);
-            func_0026FEB8(D_L11_001B1008, *(s32 *)(data + 0x520));
+            *(s32 *)(data + 0x520) = BuildRouteNodes(object, *(s32 *)(data + 0x524), data + 0x320, 16);
+            STUB_printf(D_L11_001B1008, *(s32 *)(data + 0x520));
         }
         if (*(f32 *)(data + 0x298) == 0.0f)
-            *(f32 *)(data + 0x298) = func_002A78D8(15.0f, 25.0f) * 0.01745329424738884f;
+            *(f32 *)(data + 0x298) = RandomSignedFloatRange(15.0f, 25.0f) * 0.01745329424738884f;
         else
             *(f32 *)(data + 0x298) *= 0.01745329424738884f;
-        if (func_002A77E0(2) == 1) {
+        if (RandomIntBelow(2) == 1) {
             *(u16 *)(object + 0x34) |= 0x8000;
-            func_L00_003294F0(object, 1);
+            SetObjectFlagBit(object, 1);
         }
         data[0x70] = 31;
         *(s32 *)(data + 0xA8) = 4;
@@ -108,63 +108,63 @@ s32 func_L11_004295A0(u8 *object) {
         *(f32 *)(data + 0x16C) = 0.00138888892f;
         *(f32 *)(data + 0x170) = 1.483530044555664f;
         *(f32 *)(data + 0x174) = 1.5f;
-        func_002B60B0(object, 0.00152777787f, 0.0458333343f, 0.00116355298f, 0.104719773f);
+        SetControllerSpeedLimits(object, 0.00152777787f, 0.0458333343f, 0.00116355298f, 0.104719773f);
         data[0x28] = 3;
         data[0x29] = 1;
         *(f32 *)(data + 0x30) = 0.75f;
         *(f32 *)(data + 0x28C) = data[0x34];
         data[0x2E] = 1;
         if (*(s32 *)(data + 0x26C)) {
-            func_002A7750(object, 1, 5);
+            SetMobyState(object, 1, 5);
             if (*(s32 *)(data + 0x270) != -1) {
-                *(u8 **)(data + 0x274) = D_L11_001B359C + (*(s32 *)(data + 0x270) << 8);
+                *(u8 **)(data + 0x274) = gMobyTable_L11 + (*(s32 *)(data + 0x270) << 8);
                 qcopy_nc(object + 0x10, *(u8 **)(data + 0x274) + 0x10);
                 qcopy_nc(object + 0xF0, *(u8 **)(data + 0x274) + 0xF0);
                 *(s32 *)(object + 0x98) = 0;
                 *(u16 *)(object + 0x34) &= 0xAFFF;
                 *(u8 **)(*(u8 **)(*(u8 **)(data + 0x274) + 0x68) + 0x27C) = object;
-                *(u8 **)(data + 0x280) = func_0029EFD0(0x911);
+                *(u8 **)(data + 0x280) = CreateMoby(0x911 /* moby class 2321 */);
                 if (!*(u8 **)(data + 0x280)) return 1;
                 (*(u8 **)(data + 0x280))[0x30] = object[0x30];
                 (*(u8 **)(data + 0x280))[0x31] = 0;
                 func_002A0F48(*(u8 **)(data + 0x280));
                 qcopy_nc(*(u8 **)(data + 0x280) + 0x10, object + 0x10);
                 *(f32 *)(*(u8 **)(data + 0x280) + 0x18) += 0.75f;
-                *(u8 **)(data + 0x278) = func_0029EFD0(0xFF9);
+                *(u8 **)(data + 0x278) = CreateMoby(0xFF9 /* moby class 4089 */);
                 if (!*(u8 **)(data + 0x278)) return 1;
                 (*(u8 **)(data + 0x278))[0x30] = object[0x30];
                 *(u16 *)(*(u8 **)(data + 0x278) + 0x32) = *(u16 *)(object + 0x32);
                 (*(u8 **)(data + 0x278))[0x31] = 1;
                 *(u64 *)(*(u8 **)(data + 0x278) + 0x38) = *(u64 *)(object + 0x38);
                 func_002A0F48(*(u8 **)(data + 0x278));
-                func_002AF1D0(object, *(u8 **)(data + 0x278), 1, 0);
+                CopyJointTransformToObject(object, *(u8 **)(data + 0x278), 1, 0);
                 *(s32 *)(data + 0x290) = 0;
             } else {
-                func_0026FEB8(D_L11_002BADF8);
+                STUB_printf(D_L11_002BADF8);
                 *(s32 *)(data + 0x26C) = 0;
-                func_002A7750(object, 4, 0);
+                SetMobyState(object, 4, 0);
                 return 1;
             }
         } else {
-            func_002A7750(object, 4, 0);
-            if (object[0x43]) func_002A7470(object, 0, 0, 0);
+            SetMobyState(object, 4, 0);
+            if (object[0x43]) StartAnimationBlended(object, 0, 0, 0);
             if (*(s32 *)(data + 0x540) == 1) {
-                *(u8 **)(data + 0x55C) = D_L11_001B359C + (*(s32 *)(data + 0x544) << 8);
-                func_002A7750(object, 5, 0);
-                if (object[0x43] != 13) func_002A7470(object, 13, 0, 0);
+                *(u8 **)(data + 0x55C) = gMobyTable_L11 + (*(s32 *)(data + 0x544) << 8);
+                SetMobyState(object, 5, 0);
+                if (object[0x43] != 13) StartAnimationBlended(object, 13, 0, 0);
             } else if (*(s32 *)(data + 0x540) == 2) {
-                *(u8 **)(data + 0x55C) = D_L11_001B359C + (*(s32 *)(data + 0x544) << 8);
-                func_002A7750(object, 5, 0);
-                if (object[0x43] != 15) func_002A7470(object, 15, 5, 0);
+                *(u8 **)(data + 0x55C) = gMobyTable_L11 + (*(s32 *)(data + 0x544) << 8);
+                SetMobyState(object, 5, 0);
+                if (object[0x43] != 15) StartAnimationBlended(object, 15, 5, 0);
             } else if (*(s32 *)(data + 0x540) == 3) {
-                *(u8 **)(data + 0x55C) = D_L11_001B359C + (*(s32 *)(data + 0x544) << 8);
-                func_002A7750(object, 5, 0);
-                if (object[0x43] != 15) func_002A7470(object, 15, 0, 0);
+                *(u8 **)(data + 0x55C) = gMobyTable_L11 + (*(s32 *)(data + 0x544) << 8);
+                SetMobyState(object, 5, 0);
+                if (object[0x43] != 15) StartAnimationBlended(object, 15, 0, 0);
             } else if (*(s32 *)(data + 0x54C) != -1) {
-                func_002A7750(object, 11, 0);
-                if (object[0x43] != 4) func_002A7470(object, 4, 0, 0);
+                SetMobyState(object, 11, 0);
+                if (object[0x43] != 4) StartAnimationBlended(object, 4, 0, 0);
             }
-            *(u8 **)(data + 0x29C) = func_0029EFD0(0x9AC);
+            *(u8 **)(data + 0x29C) = CreateMoby(0x9AC /* moby class 2476 */);
             if (!*(u8 **)(data + 0x29C)) return 1;
             (*(u8 **)(data + 0x29C))[0x30] = object[0x30];
             *(u16 *)(*(u8 **)(data + 0x29C) + 0x32) = *(u16 *)(object + 0x32);
@@ -172,113 +172,113 @@ s32 func_L11_004295A0(u8 *object) {
             *(u64 *)(*(u8 **)(data + 0x29C) + 0x38) = *(u64 *)(object + 0x38);
             func_002A0F48(*(u8 **)(data + 0x29C));
             *(s32 *)(*(u8 **)(data + 0x29C) + 0x98) = 0;
-            func_002AF1D0(object, *(u8 **)(data + 0x29C), 3, 0);
-            *(u8 **)(data + 0x278) = func_0029EFD0(0xFF9);
+            CopyJointTransformToObject(object, *(u8 **)(data + 0x29C), 3, 0);
+            *(u8 **)(data + 0x278) = CreateMoby(0xFF9 /* moby class 4089 */);
             if (!*(u8 **)(data + 0x278)) return 1;
             (*(u8 **)(data + 0x278))[0x30] = object[0x30];
             *(u16 *)(*(u8 **)(data + 0x278) + 0x32) = *(u16 *)(object + 0x32);
             (*(u8 **)(data + 0x278))[0x31] = 1;
             *(u64 *)(*(u8 **)(data + 0x278) + 0x38) = *(u64 *)(object + 0x38);
             func_002A0F48(*(u8 **)(data + 0x278));
-            func_002AF1D0(object, *(u8 **)(data + 0x278), 2, 0);
+            CopyJointTransformToObject(object, *(u8 **)(data + 0x278), 2, 0);
         }
         qcopy_nc(data + 0x110, object + 0x10);
         *(f32 *)(data + 0x120) = 1.0f;
         *(f32 *)(data + 0x12C) = 8.0f;
         *(f32 *)(data + 0x130) = 10.0f;
     }
-    if (object[0x31] && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
-        func_002A93B0(object);
+    if (object[0x31] && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        UpdateMobyGroundCheck(object);
         object[0x6F] = 22;
     }
     if (data[0x2E] == 2) {
         if (*(void **)(data + 0x29C)) {
-            func_0029F338(*(void **)(data + 0x29C));
+            MarkMobySpawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
         if (*(void **)(data + 0x278)) {
-            func_0029F338(*(void **)(data + 0x278));
+            MarkMobySpawned(*(void **)(data + 0x278));
             *(void **)(data + 0x278) = 0;
         }
         if (*(void **)(data + 0x280)) {
-            func_0029F338(*(void **)(data + 0x280));
+            MarkMobySpawned(*(void **)(data + 0x280));
             *(void **)(data + 0x280) = 0;
         }
         return 1;
     }
-    if (*(void **)(data + 0x29C)) func_002AF1D0(object, *(void **)(data + 0x29C), 3, 0);
+    if (*(void **)(data + 0x29C)) CopyJointTransformToObject(object, *(void **)(data + 0x29C), 3, 0);
     if (*(u8 **)(data + 0x278)) {
-        func_0029FC20(object, 2, vectors);
+        TransformMobyJointPoint(object, 2, vectors);
         qcopy_nc(*(u8 **)(data + 0x278) + 0x10, vectors + 12);
         func_002A05A8(*(void **)(data + 0x278));
         func_002A0F48(*(void **)(data + 0x278));
-        func_00283678(*(u8 **)(data + 0x278) + 0xC0, vectors);
-        func_002ACEC0(*(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xE0, 3.14159298f);
-        func_002AB028(*(u8 **)(data + 0x278) + 0xC0);
+        copy_matrix3x4(*(u8 **)(data + 0x278) + 0xC0, vectors);
+        ApplyAxisRotationToQuaternion(*(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xE0, 3.14159298f);
+        NormalizeMatrixColumns(*(u8 **)(data + 0x278) + 0xC0);
         func_002A10E8(*(void **)(data + 0x278));
         *(u16 *)(*(u8 **)(data + 0x278) + 0x34) |= 6;
     }
     if (*(f32 *)(data + 0x20) <= 1.0f) {
         if (*(u8 **)(data + 0x29C)) {
-            func_002AC728(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
-            func_0029F338(*(void **)(data + 0x29C));
+            SpawnExplosionWithSparks(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
+            MarkMobySpawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
         *(s32 *)(data + 0x290) = 0;
     }
     *(s32 *)(data + 0x290) = 0;
-    damage = func_002B0ED8(object, data + 0x60, 0);
+    damage = ApplyDamageToObject(object, data + 0x60, 0);
     if (damage) {
         u8 *attacker = *(u8 **)(data + 0x38);
         if (attacker) {
             s32 cls = *(s16 *)(attacker + 0xAA);
-            if (cls != 0x47 && cls != 0xDD9 && cls != 0xD1B && cls != 0xCE7 && cls != 0xD07 && cls != 0)
+            if (cls != 0x47 /* moby class 71 */ && cls != 0xDD9 /* moby class 3545 */ && cls != 0xD1B /* moby class 3355 */ && cls != 0xCE7 /* moby class 3303 */ && cls != 0xD07 /* Jobian Saur-Beast */ && cls != 0)
                 D_L11_001AED00 = 0;
         }
         if (object[0xBC] == 1)
-            (D_L11_001B359C + (*(s32 *)(data + 0x548) << 8))[0x20] = 4;
+            (gMobyTable_L11 + (*(s32 *)(data + 0x548) << 8))[0x20] = 4;
         if (*(f32 *)(object + 0x48) != 1.0f) *(f32 *)(object + 0x48) = 1.0f;
         if (*(s32 *)(data + 0x290)) {
-            func_0029FCC0(object, 3, vectors);
-            func_L11_0042A5B0(vectors, 8);
+            TransformMobyJointToWorld(object, 3, vectors);
+            SpawnPairedSparkParticles_L11(vectors, 8);
         }
         if (damage == 5) {
             *(f32 *)(data + 0xF4) = 0.837758183f;
             *(s32 *)(data + 0xF0) = 0;
             if (*(u8 **)(data + 0x29C)) {
-                func_002AC728(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
-                func_0029F338(*(void **)(data + 0x29C));
+                SpawnExplosionWithSparks(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
+                MarkMobySpawned(*(void **)(data + 0x29C));
                 *(void **)(data + 0x29C) = 0;
             }
         }
         *(s32 *)(data + 0x290) = 0;
         data[0x57] = 0xD2;
-        func_002AB800(object, data + 0x50);
-        if (object[0x95] != 2) func_L11_0042A4C8(object);
-        if ((u32)(damage - 4) < 2 && D_L11_001B35B8 >= object[0x21] && func_002A8508(object[0x21], -1) >= 2) {
-            ids = D_L11_001FC420[object[0x21]];
+        StartColorFade(object, data + 0x50);
+        if (object[0x95] != 2) MarkGroupClassCF5CF6Members(object);
+        if ((u32)(damage - 4) < 2 && D_L11_001B35B8 >= object[0x21] && CountMobysInGroupNotInState(object[0x21], -1) >= 2) {
+            ids = gGroupIdLists[object[0x21]];
             do {
-                u8 *entry = D_L11_001B359C + ((*ids & 0x7FFF) << 8);
-                if (*(s16 *)(entry + 0xAA) == 0xCF6 && !*(s32 *)(*(u8 **)(entry + 0x68) + 0x294)) {
+                u8 *entry = gMobyTable_L11 + ((*ids & 0x7FFF) << 8);
+                if (*(s16 *)(entry + 0xAA) == 0xCF6 /* moby class 3318 */ && !*(s32 *)(*(u8 **)(entry + 0x68) + 0x294)) {
                     *(s32 *)(*(u8 **)(entry + 0x68) + 0x294) = 1;
                     break;
                 }
             } while (*(s16 *)ids++ >= 0);
         }
     }
-    *(s16 *)(data + 0x264) = func_002B3670(object, data + 0x268, *(s32 *)(data + 0x250), *(s32 *)(data + 0x254), *(f32 *)(data + 0x258), *(f32 *)(data + 0x25C), 0);
+    *(s16 *)(data + 0x264) = CheckHeroDistanceZones(object, data + 0x268, *(s32 *)(data + 0x250), *(s32 *)(data + 0x254), *(f32 *)(data + 0x258), *(f32 *)(data + 0x25C), 0);
     if (object[0x95] != 4) {
-        f32 floor = func_002A89A8(object + 0x10, 0, 0.5f);
+        f32 floor = ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
         *(f32 *)(object + 0x18) -= 0.313333333f;
         if (*(f32 *)(object + 0x18) < floor) *(f32 *)(object + 0x18) = floor;
     }
     if (*(f32 *)(object + 0x18) < 61.0f && D_L11_001B30C8 >= 6) {
-        func_0029F338(*(void **)(data + 0x278));
-        func_002A6C58(object, 0, 3);
-        if (D_L11_001B35B8 >= object[0x21] && func_002A8508(object[0x21], -1) >= 2) {
-            u16 *deathIds = D_L11_001FC420[object[0x21]];
+        MarkMobySpawned(*(void **)(data + 0x278));
+        SetDeathBits(object, 0, 3);
+        if (D_L11_001B35B8 >= object[0x21] && CountMobysInGroupNotInState(object[0x21], -1) >= 2) {
+            u16 *deathIds = gGroupIdLists[object[0x21]];
             do {
-                u8 *entry = D_L11_001B359C + ((*deathIds & 0x7FFF) << 8);
+                u8 *entry = gMobyTable_L11 + ((*deathIds & 0x7FFF) << 8);
                 if (!*(s32 *)(*(u8 **)(entry + 0x68) + 0x294)) {
                     *(s32 *)(*(u8 **)(entry + 0x68) + 0x294) = 1;
                     break;
@@ -286,8 +286,8 @@ s32 func_L11_004295A0(u8 *object) {
             } while (*(s16 *)deathIds++ >= 0);
         }
         if (*(u8 **)(data + 0x29C)) {
-            func_002AC728(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
-            func_0029F338(*(void **)(data + 0x29C));
+            SpawnExplosionWithSparks(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
+            MarkMobySpawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
         D_L11_001AED04--;
@@ -297,24 +297,24 @@ s32 func_L11_004295A0(u8 *object) {
 }
 
 /* Flags every record of the id list whose class halfword is 0xD07. */
-void func_L11_00431DB0(u8 *arg0) {
+void func_L11_00431DB0(u8 *moby) {
     void *list;
-    u16 *p;
-    u8 *base;
+    u16 *idPtr;
+    u8 *mobyTable;
 
-    if (arg0[0x21] == 0xFF)
+    if (moby[0x21] == 0xFF)
         return;
-    list = D_L11_001FC420[arg0[0x21]];
+    list = gGroupIdLists[moby[0x21]];
     if (list == 0)
         return;
-    p = list;
-    base = D_L11_001B359C;
+    idPtr = list;
+    mobyTable = gMobyTable_L11;
     do {
-        u8 *e = base + ((*p & 0x7FFF) << 8);
+        u8 *entry = mobyTable + ((*idPtr & 0x7FFF) << 8);
 
-        if (*(s8 *)(e + 0x20) >= 0 && *(s16 *)(e + 0xAA) == 0xD07)
-            *(s16 *)(*(u8 **)(e + 0x68) + 0x276) = 1;
-    } while (*(s16 *)p++ >= 0);
+        if (*(s8 *)(entry + 0x20) >= 0 && *(s16 *)(entry + 0xAA) == 0xD07 /* Jobian Saur-Beast */)
+            *(s16 *)(*(u8 **)(entry + 0x68) + 0x276) = 1;
+    } while (*(s16 *)idPtr++ >= 0);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -353,37 +353,37 @@ extern float D_L11_001B113C[] __attribute__((sda));
    corners are crossed out from the span and submitted. */
 void func_L11_00431EE8(char *obj, void *q)
 {
-    EffectQuadFrame f;
-    char *st;
+    EffectQuadFrame quadFrame;
+    char *vars;
     int i;
 
-    f.saved = *(TI128 *)q;
-    st = *(char **)(obj + 0x68);
-    func_00282CF0(f.c, st + 0x230, st + 0x240);
-    func_00282CF0(f.a, st + 0x230, D_L11_001BA8C0);
-    func_00282CF0(f.b, st + 0x240, D_L11_001BA8C0);
-    func_00282DD8(f.a, f.a, f.c);
-    func_00282F20(f.a, f.a, 0.1f);
-    func_00282DD8(f.b, f.b, f.c);
-    func_00282F20(f.b, f.b, 0.1f);
-    f.quad.texture = func_0027C878(7);
-    f.quad.mode = 0x0000ff9000000260UL;
-    f.quad.registers = 0x7000000048UL;
-    f.quad.primitive = 0;
-    f.quad.color[0] = f.quad.color[1] = f.quad.color[2] = f.quad.color[3] = 0x2F0000FF;
+    quadFrame.saved = *(TI128 *)q;
+    vars = *(char **)(obj + 0x68);
+    FastVecSub(quadFrame.c, vars + 0x230, vars + 0x240);
+    FastVecSub(quadFrame.a, vars + 0x230, D_L11_001BA8C0);
+    FastVecSub(quadFrame.b, vars + 0x240, D_L11_001BA8C0);
+    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
+    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.1f);
+    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
+    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.1f);
+    quadFrame.quad.texture = GetEffectTextureDescriptor(7);
+    quadFrame.quad.mode = 0x0000ff9000000260UL;
+    quadFrame.quad.registers = 0x7000000048UL;
+    quadFrame.quad.primitive = 0;
+    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = 0x2F0000FF;
     for (i = 0; i < 4; i++) {
-        f.quad.uv[i][0] = D_L11_001B1138[i * 2];
-        f.quad.uv[i][1] = D_L11_001B113C[i * 2];
+        quadFrame.quad.uv[i][0] = D_L11_001B1138[i * 2];
+        quadFrame.quad.uv[i][1] = D_L11_001B113C[i * 2];
     }
-    func_00282CF0(&f.corner, st + 0x230, f.a);
-    f.quad.position[0] = f.corner;
-    func_00282CC0(&f.corner, st + 0x230, f.a);
-    f.quad.position[1] = f.corner;
-    func_00282CF0(&f.corner, st + 0x240, f.b);
-    f.quad.position[2] = f.corner;
-    func_00282CC0(&f.corner, st + 0x240, f.b);
-    f.quad.position[3] = f.corner;
-    func_00280B90(&f.quad, 0, 0);
+    FastVecSub(&quadFrame.corner, vars + 0x230, quadFrame.a);
+    quadFrame.quad.position[0] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars + 0x230, quadFrame.a);
+    quadFrame.quad.position[1] = quadFrame.corner;
+    FastVecSub(&quadFrame.corner, vars + 0x240, quadFrame.b);
+    quadFrame.quad.position[2] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars + 0x240, quadFrame.b);
+    quadFrame.quad.position[3] = quadFrame.corner;
+    draw_world_quad(&quadFrame.quad, 0, 0);
 }
 
 extern char D_L11_001BA8C0[];
@@ -396,40 +396,40 @@ extern float D_L11_001B113C[] __attribute__((sda));
    corners are crossed out from the span and submitted (then drawn again as the overlay). */
 void func_L11_004320F8(char *obj, void *q)
 {
-    EffectQuadFrame f;
-    char *st;
+    EffectQuadFrame quadFrame;
+    char *vars;
     int i;
 
-    f.saved = *(TI128 *)q;
-    st = *(char **)(obj + 0x68);
-    func_00282CF0(f.c, st + 0x230, st + 0x240);
-    func_00282CF0(f.a, st + 0x230, D_L11_001BA8C0);
-    func_00282CF0(f.b, st + 0x240, D_L11_001BA8C0);
-    func_00282DD8(f.a, f.a, f.c);
-    func_00282F20(f.a, f.a, 0.05f);
-    func_00282DD8(f.b, f.b, f.c);
-    func_00282F20(f.b, f.b, 0.05f);
-    f.quad.texture = func_0027C878(0x13);
-    f.quad.mode = 0x0000ff9000000260UL;
-    f.quad.registers = 0x8000000048UL;
-    f.quad.primitive = 0;
-    f.quad.color[0] = f.quad.color[1] = f.quad.color[2] = f.quad.color[3] = 0x2FFFFFFF;
+    quadFrame.saved = *(TI128 *)q;
+    vars = *(char **)(obj + 0x68);
+    FastVecSub(quadFrame.c, vars + 0x230, vars + 0x240);
+    FastVecSub(quadFrame.a, vars + 0x230, D_L11_001BA8C0);
+    FastVecSub(quadFrame.b, vars + 0x240, D_L11_001BA8C0);
+    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
+    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.05f);
+    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
+    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.05f);
+    quadFrame.quad.texture = GetEffectTextureDescriptor(0x13);
+    quadFrame.quad.mode = 0x0000ff9000000260UL;
+    quadFrame.quad.registers = 0x8000000048UL;
+    quadFrame.quad.primitive = 0;
+    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = 0x2FFFFFFF;
     for (i = 0; i < 4; i++) {
-        f.quad.uv[i][0] = D_L11_001B1138[i * 2];
-        f.quad.uv[i][1] = D_L11_001B113C[i * 2];
+        quadFrame.quad.uv[i][0] = D_L11_001B1138[i * 2];
+        quadFrame.quad.uv[i][1] = D_L11_001B113C[i * 2];
     }
-    func_00282CF0(&f.corner, st + 0x230, f.a);
-    f.quad.position[0] = f.corner;
-    func_00282CC0(&f.corner, st + 0x230, f.a);
-    f.quad.position[1] = f.corner;
-    func_00282CF0(&f.corner, st + 0x240, f.b);
-    f.quad.position[2] = f.corner;
-    func_00282CC0(&f.corner, st + 0x240, f.b);
-    f.quad.position[3] = f.corner;
-    func_00280B90(&f.quad, 0, 0);
-    f.quad.texture = func_0027C878(0x10);
-    f.quad.mode = 0x0000ff9000000260UL;
-    f.quad.registers = 0x8000000048UL;
-    f.quad.primitive = 0;
-    func_00280B90(&f.quad, 0, 0);
+    FastVecSub(&quadFrame.corner, vars + 0x230, quadFrame.a);
+    quadFrame.quad.position[0] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars + 0x230, quadFrame.a);
+    quadFrame.quad.position[1] = quadFrame.corner;
+    FastVecSub(&quadFrame.corner, vars + 0x240, quadFrame.b);
+    quadFrame.quad.position[2] = quadFrame.corner;
+    FastVecAdd(&quadFrame.corner, vars + 0x240, quadFrame.b);
+    quadFrame.quad.position[3] = quadFrame.corner;
+    draw_world_quad(&quadFrame.quad, 0, 0);
+    quadFrame.quad.texture = GetEffectTextureDescriptor(0x10);
+    quadFrame.quad.mode = 0x0000ff9000000260UL;
+    quadFrame.quad.registers = 0x8000000048UL;
+    quadFrame.quad.primitive = 0;
+    draw_world_quad(&quadFrame.quad, 0, 0);
 }

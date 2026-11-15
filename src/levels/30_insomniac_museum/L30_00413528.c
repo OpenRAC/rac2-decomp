@@ -9,7 +9,7 @@ extern int D_L30_00260F30[][2];
    is one macro instruction instead of a high/low pair, which gives retail's setup order and
    registers. */
 void func_L30_00413528(char *menu, void *value, char *label, int type, int low, int high) {
-    int *st = *(int **)(menu + 0x68);
+    int *vars = *(int **)(menu + 0x68);
     int i;
     for (i = 0; i < 32; i++) {
         if (D_L30_00260E30[i] == 0) {
@@ -18,7 +18,7 @@ void func_L30_00413528(char *menu, void *value, char *label, int type, int low, 
             D_L30_001B3D30[i] = type;
             D_L30_00260F30[i][0] = low;
             D_L30_00260F30[i][1] = high;
-            st[1]++;
+            vars[1]++;
             return;
         }
     }

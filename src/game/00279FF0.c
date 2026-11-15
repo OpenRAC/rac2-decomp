@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00279FF0: copies one of two display configurations (the one at 0x1AD584 while
  * the flag at 0x1B5600 is set, else the one at 0x1B1640) into the settings block at
  * 0x1B9040, sets the mode word and applies it. The sources and the mode words are sda
@@ -28,6 +29,7 @@ extern int D_001B1DA0 __attribute__((sda));
 extern int D_001B1654 __attribute__((sda));
 extern void func_0027AB40(void);
 
+/* Loads one of two display settings into the live settings block and applies it. */
 void func_00279FF0(void)
 {
     if (D_001B5600 != 0) {
@@ -49,6 +51,6 @@ void func_00279FF0(void)
         D_001B9040.w = D_001B1640.w;
         D_001B1DA0 = 0x1F4000;
     }
-    func_0027AB40();
+    UpdateViewContext();
     D_001B1654 = 0;
 }

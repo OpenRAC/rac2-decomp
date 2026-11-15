@@ -4,13 +4,14 @@ extern volatile unsigned int * volatile D_001B22A8;
 extern void *F00300910_D_001B22A8 __attribute__((sda));
 extern unsigned char D_001AD840 __attribute__((sda));
 
+/* Starts a new graphics packet chain and remembers where it begins. */
 void func_00300910(void)
 {
-    D_001B22A8[0] = 0x30000003;
-    D_001B22A8[1] = (unsigned int)&D_001AD840;
-    D_001B22A8[2] = 0;
-    D_001B22A8[3] = 0x50000003;
-    F00300910_D_001B22A8 = (void *)(D_001B22A8 + 4);
+    gDmaPacketCursor[0] = 0x30000003;
+    gDmaPacketCursor[1] = (unsigned int)&D_001AD840;
+    gDmaPacketCursor[2] = 0;
+    gDmaPacketCursor[3] = 0x50000003;
+    F00300910_D_001B22A8 = (void *)(gDmaPacketCursor + 4);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -52,18 +53,18 @@ void func_00302848(char *obj, s32 quiet)
     s32 tint, color;
 
     qzero(&zero);
-    if (func_002A77E0(D_001AE930) == 0)
-        func_002C2210(obj + 0x10, D_001AE920[0], D_001AE920_blk[1], D_001AE92C, D_001AE900_blk[1], 0.0f, 2, func_002A77E0(1) ? -D_001AE928 : D_001AE928, D_001A8BD0, 0);
+    if (RandomIntBelow(D_001AE930) == 0)
+        SpawnGroundEffectParticle(obj + 0x10, D_001AE920[0], D_001AE920_blk[1], D_001AE92C, D_001AE900_blk[1], 0.0f, 2, RandomIntBelow(1) ? -D_001AE928 : D_001AE928, D_001A8BD0, 0);
     pos = obj + 0x10;
-    puff = func_002C2FD8(pos, D_001AE900, *(u8 *)(rec + 0x41), 0, 0, 2, 0, D_001AE8F0);
+    puff = SpawnFadingParticle_002C2FD8(pos, D_001AE900, *(u8 *)(rec + 0x41), 0, 0, 2, 0, D_001AE8F0);
     if (puff != 0)
         puff[2] = *D_001F0000[0x98E];
-    if (quiet == 0 && (D_001B1688[0] & 1)) {
-        func_002A7A00(&vec, 0.0f, 0.05f);
-        func_00282CC0(&vec, &vec, pos);
-        zero.f[2] = -(func_002A7878(D_001AE8E8, D_001AE8E8_blk[1]) * 0.016666668f);
-        tint = func_002A7820(D_001AE900_blk[5], D_001AE900_blk[6]);
-        color = func_00283D38(D_001AE900_blk[2], D_001AE900_blk[3], func_002A7878(0.0f, 1.0f));
-        func_002C3150(&vec, &zero, color, tint, func_002A77E0(0xFF), 0, D_001AE8F0_blk[2]);
+    if (quiet == 0 && (gGameTime[0] & 1)) {
+        RandomDirectionVector(&vec, 0.0f, 0.05f);
+        FastVecAdd(&vec, &vec, pos);
+        zero.f[2] = -(RandomFloatRange(D_001AE8E8, D_001AE8E8_blk[1]) * 0.016666668f);
+        tint = RandomIntRange(D_001AE900_blk[5], D_001AE900_blk[6]);
+        color = FastTweenColor(D_001AE900_blk[2], D_001AE900_blk[3], RandomFloatRange(0.0f, 1.0f));
+        SpawnHeroRelativeParticle(&vec, &zero, color, tint, RandomIntBelow(0xFF), 0, D_001AE8F0_blk[2]);
     }
 }

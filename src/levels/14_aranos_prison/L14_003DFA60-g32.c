@@ -26,49 +26,50 @@ extern float func_00283198(float);
 extern void func_00282F20(void *, void *, float);
 extern void func_00280B90(void *, void *, int);
 
+/* Draws a four-corner billboard that shows one frame of a strip of pictures. */
 void func_L14_003DFA60(char *self) {
     float mtx[16] __attribute__((aligned(16)));
-    DrawPacket p __attribute__((aligned(16)));
-    int n, i;
-    float angle, u, den;
-    float *v, *uv, *src, *src2;
-    n = func_L03_004197A8(D_L14_001B259C[0] + (*(int *)(*(char **)(self + 0x68) + 4) << 8));
-    func_00283658(mtx, self + 0xC0);
+    DrawPacket packet __attribute__((aligned(16)));
+    int frame, i;
+    float angle, u, uCoord;
+    float *vertex, *texCoord, *uvTable, *uTable;
+    frame = GetCountInState2(gMobyPool_L14[0] + (*(int *)(*(char **)(self + 0x68) + 4) << 8));
+    copy_matrix_rotation(mtx, self + 0xC0);
     func_L03_002EFB60(mtx, mtx, *(float *)(self + 0x2C) / *(float *)(*(char **)(self + 0x24) + 0x24));
     qcopy(mtx + 12, self + 0x10);
     mtx[15] = 1.0f;
-    func_00281DE8(p.pos, D_L14_001B0394, 0, 0x80);
-    src = D_L14_001B03BC;
-    src2 = D_L14_001B03B8;
-    for (i = 0; i < 4; i++, src2 += 2) {
-        angle = func_00283B98(D_L14_001B03A0 * 0.01745329424738884f, (float)i * 1.5707964f);
-        p.pos[i].f[0] = func_00283180(angle) * D_L14_001B03A4;
-        p.pos[i].f[1] = func_00283198(angle) * D_L14_001B03A4;
-        p.pos[i].f[2] = 0;
-        qzero_nc(&p.pos[i]);
-        p.pos[i].f[1] = (i >= 2) ? -1.0f : 1.0f;
+    InitQuadPacketState(packet.pos, D_L14_001B0394, 0, 0x80);
+    uvTable = D_L14_001B03BC;
+    uTable = D_L14_001B03B8;
+    for (i = 0; i < 4; i++, uTable += 2) {
+        angle = FastAddRotations(D_L14_001B03A0 * 0.01745329424738884f, (float)i * 1.5707964f);
+        packet.pos[i].f[0] = FastSinOrCosA(angle) * D_L14_001B03A4;
+        packet.pos[i].f[1] = FastSinOrCosB(angle) * D_L14_001B03A4;
+        packet.pos[i].f[2] = 0;
+        qzero_nc(&packet.pos[i]);
+        packet.pos[i].f[1] = (i >= 2) ? -1.0f : 1.0f;
         if (i & 1)
-            p.pos[i].f[2] = -1.0f;
+            packet.pos[i].f[2] = -1.0f;
         else
-            p.pos[i].f[2] = 1.0f;
-        v = p.pos[i].f;
+            packet.pos[i].f[2] = 1.0f;
+        vertex = packet.pos[i].f;
         if (D_001A7A44[0])
-            v[1] = -v[1];
-        func_00282F20(v, v, D_L14_001B03A4);
-        v[0] = D_L14_001B03A8;
-        v[3] = 1.0f;
-        v[2] += D_L14_001B03B0;
-        p.color[i] = D_L14_001B03AC;
-        uv = p.uv[i];
-        u = *src2;
-        uv[0] = u;
+            vertex[1] = -vertex[1];
+        vec_scale_to_length(vertex, vertex, D_L14_001B03A4);
+        vertex[0] = D_L14_001B03A8;
+        vertex[3] = 1.0f;
+        vertex[2] += D_L14_001B03B0;
+        packet.color[i] = D_L14_001B03AC;
+        texCoord = packet.uv[i];
+        u = *uTable;
+        texCoord[0] = u;
         if (i < 2)
-            den = u + (float)n / D_L14_001B039C;
+            uCoord = u + (float)frame / D_L14_001B039C;
         else
-            den = u + (float)(n + 1) / D_L14_001B039C;
-        uv[0] = den;
-        p.uv[i][1] = *src;
-        src += 2;
+            uCoord = u + (float)(frame + 1) / D_L14_001B039C;
+        texCoord[0] = uCoord;
+        packet.uv[i][1] = *uvTable;
+        uvTable += 2;
     }
-    func_00280B90(&p, mtx, 0);
+    draw_world_quad(&packet, mtx, 0);
 }

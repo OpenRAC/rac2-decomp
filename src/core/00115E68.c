@@ -5,6 +5,7 @@
    the 32-bit return type, which is retail's dsll32/dsra32 pair. */
 extern long func_001175F0(int arg0, int arg1, int arg2);
 
-int func_00115E68(int arg0) {
-    return (int)func_001175F0(arg0, 0, 10);
+/* Turns a text string of digits into a whole number. */
+int func_00115E68(int text) {
+    return (int)Strtol(text, 0, 10);
 }

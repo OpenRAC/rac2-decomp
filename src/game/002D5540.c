@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /*
  * Disassembled at 0x002cd220
@@ -44,16 +45,18 @@ extern void func_0027C540(long param_1);
 
 extern void func_0029CED8(void);
 
+/* Draws a menu page between the start and end of screen drawing. */
 long long func_002D5540(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CED8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
 /* func_002D5570 is matched in 002D5540-g8.c (-G8 small data). */
 
+/* Does nothing and returns zero. */
 int func_002D55D8(void) {
     return 0;
 }
@@ -62,10 +65,11 @@ int func_002D55D8(void) {
 
 extern void func_0029CB20(void);
 
+/* Draws a second kind of menu page between the start and end of screen drawing. */
 int func_002D5718(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CB20();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -74,11 +78,12 @@ extern void func_00341CD8(char *, int);
 extern void func_00341EB0(char *, char *);
 extern char D_00261540[];
 
+/* Sets up the text of a menu page when the menu data is loaded. */
 int func_002D5748(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_00341CD8(D_001A8CFC[0] + 0x3E430, 1);
-        func_00341EB0(D_001A8CFC[0] + 0x3E430, D_00261540);
+        SetMenuFlagAtOffset8(D_001A8CFC[0] + 0x3E430, 1);
+        SetListMenuRecords_00341EB0(D_001A8CFC[0] + 0x3E430, D_00261540);
     }
     return 0;
 }
@@ -89,13 +94,14 @@ extern int func_0029CA70(int);
 extern int func_003423B0(unsigned char *);
 extern void func_002D5E98(int);
 
+/* Reads the buttons on a menu page: cancel goes back, other keys close it, and confirm sends the chosen entry to the menu request handler. */
 int func_002D57A0(void)
 {
     int result = 0;
-    int *state = D_00138180;
+    int *state = gPadState;
     int flags = state[0x1C4 / 4];
     if (flags & 0x10) {
-        char *root = D_001F2840;
+        char *root = gPauseMenuState;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -118,11 +124,11 @@ finish:
     else {
         func_0029CA70(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC[0]) {
-            char *entry = (char *)func_003423B0((unsigned char *)(D_001A8CFC[0] + 0x3E1D8));
+            char *entry = (char *)GetSelectedListRecordAddress((unsigned char *)(D_001A8CFC[0] + 0x3E1D8));
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            func_002D5E98((int)&request);
+            StartMenuAction((int)&request);
         }
     }
     return result;
@@ -131,10 +137,11 @@ finish:
 
 extern void func_0029CAB0(void);
 
+/* Draws a third kind of menu page between the start and end of screen drawing. */
 int func_002D5870(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CAB0();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -142,11 +149,12 @@ extern void func_003423A8(char *, int);
 extern void func_00342380(char *, char *);
 extern char D_00261590[];
 
+/* Sets up the text of another menu page when the menu data is loaded. */
 int func_002D58A0(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_003423A8(D_001A8CFC[0] + 0x3E1D8, 1);
-        func_00342380(D_001A8CFC[0] + 0x3E1D8, D_00261590);
+        SetListMenuEnabled(D_001A8CFC[0] + 0x3E1D8, 1);
+        SetListMenuRecordTable(D_001A8CFC[0] + 0x3E1D8, D_00261590);
     }
     return 0;
 }
@@ -154,6 +162,7 @@ int func_002D58A0(void)
 extern int D_00138344;
 extern void func_0029C3A0(int);
 
+/* Draws a menu page using the current button state. */
 int func_002D58F8(void) {
     func_0029C3A0(D_00138344);
     return 0;
@@ -161,20 +170,23 @@ int func_002D58F8(void) {
 
 extern void func_0029C370(void);
 
+/* Draws a fourth kind of menu page between the start and end of screen drawing. */
 int func_002D5920(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C370();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
 extern int D_001C51D4;
 
+/* Clears the saved menu choice to "none". */
 int func_002D5950(void) {
     D_001C51D4 = -1;
     return 0;
 }
 
+/* Does nothing and returns zero. */
 int func_002D5968(void) {
     return 0;
 }
@@ -192,6 +204,7 @@ extern void func_00288CB0(int, int);
 extern void func_002B49E0(int, int, int, int, int);
 extern int func_0029C410(int);
 
+/* Reads the buttons on the page-select menu: cancel closes, confirm picks the highlighted page and plays a sound or starts the change. */
 int func_002D5970(void)
 {
     int result = 0;
@@ -199,9 +212,9 @@ int func_002D5970(void)
     if (flags & 0x10) {
         char *root;
         int value;
-        func_0027D330(4);
-        func_002C9C60(4.0f);
-        root = D_001F2840;
+        FadeToBlack(4);
+        SetPauseScaleInverse(4.0f);
+        root = gPauseMenuState;
         value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         if (value != 0) {
             *(int *)(root + 0x18) = value;
@@ -217,23 +230,23 @@ int func_002D5970(void)
         result = 0;
     } else if (flags & 0xD00) {
         result = 1;
-        D_001C51D0 = D_001A79F0;
+        D_001C51D0 = gCurrentMapIndex;
     } else if (flags & 0x40) {
-        int *base = D_001C4FA0;
-        if (D_001A79F0 != base[0x230 / 4]) {
+        int *base = gMapOverlayState;
+        if (gCurrentMapIndex != base[0x230 / 4]) {
             result = 1;
-            func_002E5E58(4, 0, 0);
+            PlaySoundFromGlobalBank(4, 0, 0);
             if (base[0x230 / 4] != 0 && D_001A7C01 == 0 && base[0x230 / 4] == 2) {
-                func_002B49E0(6, 2, 1, 0x19, 0);
-            } else if (func_0026F7C8() && func_0026F7D0()) {
-                func_00288CB0(D_001C4FA0[0x230 / 4], 1);
+                BeginSlotRequest(6, 2, 1, 0x19, 0);
+            } else if (EmptyStubF7C8() && EmptyStubF7D0()) {
+                SetSmallDataValueAndRefresh(gMapOverlayState[0x230 / 4], 1);
             } else {
-                func_002B49E0(6, 2, 1, D_001C4FA0[0x230 / 4], 0);
+                BeginSlotRequest(6, 2, 1, gMapOverlayState[0x230 / 4], 0);
             }
         } else {
             result = 1;
-            func_002E5E58(4, 0, 0);
-            func_0027D330(4);
+            PlaySoundFromGlobalBank(4, 0, 0);
+            FadeToBlack(4);
         }
     } else {
         func_0029C410(flags);
@@ -244,19 +257,21 @@ finish:
 
 extern void func_0029C3E0(void);
 
+/* Draws a fifth kind of menu page between the start and end of screen drawing. */
 int func_002D5B08(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C3E0();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
 extern int func_002D5B58(int, int, int *);
 
+/* Sends a menu request and ignores the result. */
 void func_002D5B38(int first, int second) {
     int result[4];
     result[0] = 0;
-    func_002D5B58(first, second, result);
+    ProcessMenuRequest(first, second, result);
 }
 
 typedef struct {
@@ -297,76 +312,76 @@ int func_002D5B58(int type, int value, int *result)
         goto done;
     goto *D_0026CD60[type];
 L3:
-    ((Func002D5B58Root *)D_001F2840)->f18 = value;
+    ((Func002D5B58Root *)gPauseMenuState)->f18 = value;
     goto done;
 L4:
-    func_002E5E58(4, 0, 0);
-    func_00287EA8();
-    D_001A7424 = (D_001A7424 | 2) & ~4;
+    PlaySoundFromGlobalBank(4, 0, 0);
+    ClearConfirmPending();
+    gSaveMenuFlags = (gSaveMenuFlags | 2) & ~4;
     D_001F29A0 = 0;
-    func_002B49E0(4, 1, 1, value, 0);
+    BeginSlotRequest(4, 1, 1, value, 0);
     goto done;
 L5:
-    func_002E5E58(4, 0, 0);
-    D_001A7424 = (D_001A7424 | 4) & ~2;
-    func_002B49E0(4, 1, 1, value, 0);
+    PlaySoundFromGlobalBank(4, 0, 0);
+    gSaveMenuFlags = (gSaveMenuFlags | 4) & ~2;
+    BeginSlotRequest(4, 1, 1, value, 0);
     D_001F29A0 = 1;
     goto done;
 L6: {
     Func002D5B58Root *root;
     int index = value >> 16;
     if (index != 0) {
-        Func002D5B58Root *first = (Func002D5B58Root *)D_001F2840;
+        Func002D5B58Root *first = (Func002D5B58Root *)gPauseMenuState;
         first->fFC = D_001C1220[index];
     }
-    root = (Func002D5B58Root *)D_001F2840;
+    root = (Func002D5B58Root *)gPauseMenuState;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 5;
     root->fF4 = value & 0xFFFF;
     ret = 1;
-    func_002DF190(0, 0x11);
+    PlayMenuSoundIfEnabled(0, 0x11);
     *result = 0;
     goto done;
 }
 L7: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)gPauseMenuState;
     root->fF4 = value;
     root->f100 = root->f14;
     root->f1C = 3;
     root->f104 = root->f08;
-    func_002DF190(0, 0x11);
+    PlayMenuSoundIfEnabled(0, 0x11);
     *result = 0;
 }
 L8: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)gPauseMenuState;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 4;
     root->fF4 = value;
     ret = 1;
-    func_002DF190(0, 0x11);
+    PlayMenuSoundIfEnabled(0, 0x11);
     *result = 0;
     goto done;
 }
 L10: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)gPauseMenuState;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 6;
     root->fF4 = value;
     ret = 1;
-    func_002DF190(0, 0x11);
+    PlayMenuSoundIfEnabled(0, 0x11);
     *result = 0;
     goto done;
 }
 L11: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)gPauseMenuState;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 7;
     ret = 1;
-    func_002DF190(0, 0x11);
+    PlayMenuSoundIfEnabled(0, 0x11);
     *result = 0;
     goto done;
 }
@@ -376,28 +391,30 @@ L9:
     *result = 0;
     goto done;
 L2:
-    func_002DF190(2, 0x11);
+    PlayMenuSoundIfEnabled(2, 0x11);
     goto done;
 L12:
-    func_002E5E58(4, 0, 0);
-    func_00285828(0, 0, 0, 0);
-    func_00285788(0, 0);
-    func_002B49E0(4, 1, 9, ((Func002D5B58Root *)D_001F2840)->f14, 0);
+    PlaySoundFromGlobalBank(4, 0, 0);
+    StoreFourSettings(0, 0, 0, 0);
+    SetMenuSizeLimits(0, 0);
+    BeginSlotRequest(4, 1, 9, ((Func002D5B58Root *)gPauseMenuState)->f14, 0);
     goto done;
 L13:
-    func_002B49E0(4, 1, 11, ((Func002D5B58Root *)D_001F2840)->f14, 0);
+    BeginSlotRequest(4, 1, 11, ((Func002D5B58Root *)gPauseMenuState)->f14, 0);
 done:
     return ret;
 }
 
+/* Runs the request for the currently highlighted row of a menu. */
 int func_002D5E38(char *object, int arg, int *result)
 {
     typedef struct { int first, value, third; } Func002D5E38Row;
     Func002D5E38Row *rows = *(Func002D5E38Row **)(object + 0x34);
     int index = *(int *)(object + 0x40);
-    return func_002D5B58(arg, rows[index].value, result);
+    return ProcessMenuRequest(arg, rows[index].value, result);
 }
 
+/* Runs the request stored in one menu entry. */
 void func_002D5E70(char *object, int *result) {
-    func_002D5B58(*(short *)(object + 2), *(int *)(object + 4), result);
+    ProcessMenuRequest(*(short *)(object + 2), *(int *)(object + 4), result);
 }

@@ -68,55 +68,56 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* Draws the HUD overlay: three label sprites, a fading bar and an icon, then puts the camera back as it was. */
 int func_L01_002F1588(void)
 {
     OverlayColorPair colors, source;
     float oldProjection, span, rounding, unit, zero, height;
     int top, bottom;
     unsigned char *node;
-    int x2, y, one, entry;
+    int barRight, labelY, one, nodeOffset;
     if (!D_L01_001A908C || *(int *)D_L01_0027EAC8 || *(int *)(D_L01_0027EAC8 + 0x24) != -1)
         return D_L01_001A90D0[0];
     oldProjection = *(float *)(hud_camera() + 0xB0);
     *(float *)(hud_camera() + 0xB0) = 0.6200000047683716f;
     span = 375.0f;
-    func_0027AB40();
+    UpdateViewContext();
     rounding = 0.5f;
     one = 1;
-    entry = 0x8710;
-    node = (unsigned char *)func_00336D50(D_L01_001A908C + entry, 142);
-    y = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
+    nodeOffset = 0x8710;
+    node = (unsigned char *)FindTableEntryById(D_L01_001A908C + nodeOffset, 142);
+    labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = 1.0f;
     unit = height;
     height = 0.0f;
     zero = height;
-    height = (float)y;
-    func_00300A00(node, 0x60442D00, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)func_00336D50(D_L01_001A908C + entry, 143);
-    y = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
-    height = (float)y;
-    func_00300A00(node, 0x60241700, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)func_00336D50(D_L01_001A908C + entry, 144);
-    y = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
-    height = (float)y;
-    func_00300A00(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
+    height = (float)labelY;
+    DrawScaledObjectTwoAxes(node, 0x60442D00, 250.0f, height, unit, unit, zero);
+    node = (unsigned char *)FindTableEntryById(D_L01_001A908C + nodeOffset, 143);
+    labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
+    height = (float)labelY;
+    DrawScaledObjectTwoAxes(node, 0x60241700, 250.0f, height, unit, unit, zero);
+    node = (unsigned char *)FindTableEntryById(D_L01_001A908C + nodeOffset, 144);
+    labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
+    height = (float)labelY;
+    DrawScaledObjectTwoAxes(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
     source.first = (int)0x800050C0;
-    source.second = func_00283D38(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
+    source.second = FastTweenColor(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
     colors = source;
-    x2 = func_00283CF0(190.0f + func_00283CE0(198) * D_L01_001A90C4[0]);
+    barRight = FloatToInt(190.0f + IntToFloat(198) * D_L01_001A90C4[0]);
     height = D_L01_001B2DC4[0];
     top = hud_round(374.0f, height, rounding, one);
     bottom = hud_round(388.0f, height, rounding, one);
-    func_0027EAE8(190, top, x2, bottom, 0, &colors);
+    DrawScreenRectangle(190, top, barRight, bottom, 0, &colors);
     if (D_L01_001A90CC[0]) {
-        int icon = func_0028E588(0xEAA7, D_L01_001A90CC[0] - 1);
+        int icon = GetIconFrame(0xEAA7, D_L01_001A90CC[0] - 1);
         height = D_L01_001B2DC4[0];
         /* This caller passes `one`, a local holding 1, as `active` (allowed by owner ruling). */
         top = label_y((void *)icon, 352.0f, height, rounding, one);
         bottom = label_y((void *)icon, 43.0f, height, rounding, one);
-        func_0028E868(icon, 139, top, 43, bottom, 128);
+        DrawHudSprite(icon, 139, top, 43, bottom, 128);
     }
     *(float *)(hud_camera() + 0xB0) = oldProjection;
-    func_0027AB40();
+    UpdateViewContext();
     return D_L01_001A90D0[0];
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_0033E888: initializes an allocated effect record and its payload. */
 typedef int Quad __attribute__((mode(TI)));
 typedef struct {
@@ -15,21 +16,22 @@ extern int func_001163B0(void);
 extern float func_00283CE0(int);
 extern unsigned char *D_L00_001FEAAC;
 
+/* Creates a spinning particle with a position, speed, color, size and life. It does nothing if the size is zero. */
 Particle *func_L00_0033E888(float life,float rotation,Quad *position,Quad *velocity,int color,int value,int size,int extra,int texture,int flags,int weight)
 {
     Particle *p;
     if(!size) return 0;
-    p=func_002B9030(0x5b);
+    p=AllocParticle(0x5b);
     if(p) {
         float *out;
         p->position.q=*position;
-        p->position.f[3]=func_00283CE0(weight);
+        p->position.f[3]=IntToFloat(weight);
         p->color=color;
-        p->alpha=func_00283CF0(4.0f)-96;
+        p->alpha=FloatToInt(4.0f)-96;
         if(flags!=-1) p->b3=flags; else p->b3=0x48;
         p->b1=0;
         p->life=life;
-        p->seed=func_001163B0();
+        p->seed=Rand();
         if(texture==-1) p->b2=*D_L00_001FEAAC; else p->b2=D_L00_001FEAAC[texture];
         out=p->payload;
         p->size=size;

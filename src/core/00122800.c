@@ -47,6 +47,7 @@ Boston, MA 02111-1307, USA.  */
    Wilson, all of Cygnus Support.  */
 
 #include "double_parts.h"
+#include "names.h"
 
 typedef float DFtype __attribute__ ((mode (DF)));
 
@@ -84,7 +85,7 @@ typedef DoubleParts fp_number_type;
 extern fp_number_type D_00141810;
 
 static __inline__ fp_number_type *nan_parts(void) {
-    return &D_00141810;
+    return &gDoublePartsNaN;
 }
 
 static __inline__ int fp_isnan(fp_number_type *number) {
@@ -99,6 +100,7 @@ static __inline__ int fp_iszero(fp_number_type *number) {
     return number->kind == CLASS_ZERO;
 }
 
+/* Adds two unpacked doubles and gives back the unpacked sum, handling zero, infinity and not-a-number. */
 fp_number_type *func_00122800(fp_number_type *a, fp_number_type *b,
                               fp_number_type *tmp) {
   intfrac tfraction;

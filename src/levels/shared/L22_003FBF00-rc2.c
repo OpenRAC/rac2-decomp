@@ -30,25 +30,26 @@ extern void ref_L22_003FBF00_03(void *a, void *b, f32 c);
 extern void ref_L22_003FBF00_04(void *a, void *b, f32 c);
 extern void ref_L22_003FBF00_05(void *a, void *b, void *c);
 
-void func_L22_003FBF00(void *arg0, void *arg1, s32 arg2) {
-    s32 ix ;
-    void *t0 ;
-    s32 sp[4];
-    s32 sp10[4];
-    s32 sp20[4];
-    void *temp_v1;
+/* Works out the world position of one of the object's eight particle anchors, scaled while the object is in its first state. */
+void func_L22_003FBF00(void *obj, void *outPos, s32 index) {
+    s32 slot ;
+    void *vars ;
+    s32 offset[4];
+    s32 mid[4];
+    s32 scaled[4];
+    void *particle;
 
-    ix = arg2;
-    t0 = (*(void **)((s8 *)(arg0) + (0x68)));
-    ref_L22_003FBF00_02(sp, (ix * 0x10) + (s32)ref_L22_003FBF00_00, (s8 *)t0 + 0x10, (*(f32 *)((s8 *)(t0) + (0x1C))));
-    t0 = (s8 *)t0 + (ix * 4);
-    temp_v1 = (*(void **)((s8 *)(t0) + (0x60)));
-    if (temp_v1 != 0) {
-        if ((*(u8 *)((s8 *)(arg0) + (0x20))) == 0) {
-            ref_L22_003FBF00_03(sp, sp, (*(f32 *)((s8 *)(temp_v1) + (0x28))));
+    slot = index;
+    vars = (*(void **)((s8 *)(obj) + (0x68)));
+    ref_L22_003FBF00_02(offset, (slot * 0x10) + (s32)ref_L22_003FBF00_00, (s8 *)vars + 0x10, (*(f32 *)((s8 *)(vars) + (0x1C))));
+    vars = (s8 *)vars + (slot * 4);
+    particle = (*(void **)((s8 *)(vars) + (0x60)));
+    if (particle != 0) {
+        if ((*(u8 *)((s8 *)(obj) + (0x20))) == 0) {
+            ref_L22_003FBF00_03(offset, offset, (*(f32 *)((s8 *)(particle) + (0x28))));
         }
     }
-    ref_L22_003FBF00_04(sp20, (s8 *)arg0 + 0xE0, ref_L22_003FBF00_01);
-    ref_L22_003FBF00_05(sp10, (s8 *)arg0 + 0x10, sp20);
-    ref_L22_003FBF00_05(arg1, sp10, sp);
+    ref_L22_003FBF00_04(scaled, (s8 *)obj + 0xE0, ref_L22_003FBF00_01);
+    ref_L22_003FBF00_05(mid, (s8 *)obj + 0x10, scaled);
+    ref_L22_003FBF00_05(outPos, mid, offset);
 }

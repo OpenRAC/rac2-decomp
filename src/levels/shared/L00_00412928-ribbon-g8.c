@@ -43,15 +43,15 @@ void func_L00_00413918(char *object, Vec *points, int alpha, int alpha2, int cou
     Frame segment;
     char *state = *(char **)(object + 0x68);
     int i;
-    float t, width;
+    float progress, width;
 
-    outer.texture = func_0027C878(0x17);
+    outer.texture = GetEffectTextureDescriptor(0x17);
     outer.tag3 = 0x8000000048ULL;
     outer.tag2 = 0xff9000000260ULL;
     outer.color[0] = outer.color[1] = outer.color[2] = outer.color[3] =
         (D_L00_001B1380 & 0xffffff) | ((unsigned)alpha << 24);
     outer.tag0 = 0;
-    inner.texture = func_0027C878(0xe);
+    inner.texture = GetEffectTextureDescriptor(0xe);
     inner.color[0] = inner.color[1] = inner.color[2] = inner.color[3] =
         (*(unsigned *)(state + 0x24) & 0xffffff) | ((unsigned)alpha2 << 24);
     inner.tag3 = outer.tag3;
@@ -80,54 +80,54 @@ void func_L00_00413918(char *object, Vec *points, int alpha, int alpha2, int cou
     size2.f[3] = 1;
     size2.f[2] = D_L00_001B1388 * D_L00_001B138C;
 
-    func_00282CF0(&dir, state + 0x30, object + 0x10);
-    func_00282F20(&dir, &dir, 1);
+    FastVecSub(&dir, state + 0x30, object + 0x10);
+    vec_scale_to_length(&dir, &dir, 1);
     qcopy(&frame.row[0], &dir);
-    func_00282DD8(&frame.row[1], &frame.row[0], object + 0xe0);
-    func_00282F20(&frame.row[1], &frame.row[1], 1);
-    func_00282DD8(&frame.row[2], &frame.row[1], &frame.row[0]);
+    FastVecCross(&frame.row[1], &frame.row[0], object + 0xe0);
+    vec_scale_to_length(&frame.row[1], &frame.row[1], 1);
+    FastVecCross(&frame.row[2], &frame.row[1], &frame.row[0]);
     qcopy(&frame.pos, object + 0x10);
 
     qcopy(&outer.v[0], &size);
-    func_00282D30(&outer.v[1], &outer.v[0], -1);
+    FastVecScale(&outer.v[1], &outer.v[0], -1);
     qcopy(&inner.v[0], &size2);
-    func_00282D30(&inner.v[1], &inner.v[0], -1);
-    func_002830C0(&first, &points[0], &frame);
-    func_002830C0(&second, &points[1], &frame);
-    func_00282CF0(&segment.row[0], &second, &first);
-    func_00282F20(&segment.row[0], &segment.row[0], 1);
-    func_00282CF0(&segment.row[1], D_L00_001B8C80 + 0x140, &first);
-    func_00282DD8(&segment.row[2], &segment.row[1], &segment.row[0]);
-    func_00282F20(&segment.row[2], &segment.row[2], 1);
-    func_00282DD8(&segment.row[1], &segment.row[0], &segment.row[2]);
+    FastVecScale(&inner.v[1], &inner.v[0], -1);
+    transform_vector(&first, &points[0], &frame);
+    transform_vector(&second, &points[1], &frame);
+    FastVecSub(&segment.row[0], &second, &first);
+    vec_scale_to_length(&segment.row[0], &segment.row[0], 1);
+    FastVecSub(&segment.row[1], D_L00_001B8C80 + 0x140, &first);
+    FastVecCross(&segment.row[2], &segment.row[1], &segment.row[0]);
+    vec_scale_to_length(&segment.row[2], &segment.row[2], 1);
+    FastVecCross(&segment.row[1], &segment.row[0], &segment.row[2]);
     qcopy(&segment.pos, &first);
-    func_002830C0(&outer.v[0], &outer.v[0], &segment);
-    func_002830C0(&outer.v[1], &outer.v[1], &segment);
-    func_002830C0(&inner.v[0], &inner.v[0], &segment);
-    func_002830C0(&inner.v[1], &inner.v[1], &segment);
+    transform_vector(&outer.v[0], &outer.v[0], &segment);
+    transform_vector(&outer.v[1], &outer.v[1], &segment);
+    transform_vector(&inner.v[0], &inner.v[0], &segment);
+    transform_vector(&inner.v[1], &inner.v[1], &segment);
 
     for (i = 1; i < count; i++) {
         qcopy(&outer.v[2], &size);
-        func_00282D30(&outer.v[3], &outer.v[2], -1);
+        FastVecScale(&outer.v[3], &outer.v[2], -1);
         qcopy(&inner.v[2], &size2);
-        func_00282D30(&inner.v[3], &inner.v[2], -1);
+        FastVecScale(&inner.v[3], &inner.v[2], -1);
         if (i == count - 1) {
-            func_002830C0(&segment.pos, &points[i], &frame);
+            transform_vector(&segment.pos, &points[i], &frame);
         } else {
-            func_002830C0(&first, &points[i], &frame);
-            func_002830C0(&second, &points[i + 1], &frame);
-            func_00282CF0(&segment.row[0], &second, &first);
-            func_00282F20(&segment.row[0], &segment.row[0], 1);
-            func_00282CF0(&segment.row[1], D_L00_001B8C80 + 0x140, &first);
-            func_00282DD8(&segment.row[2], &segment.row[1], &segment.row[0]);
-            func_00282F20(&segment.row[2], &segment.row[2], 1);
-            func_00282DD8(&segment.row[1], &segment.row[0], &segment.row[2]);
+            transform_vector(&first, &points[i], &frame);
+            transform_vector(&second, &points[i + 1], &frame);
+            FastVecSub(&segment.row[0], &second, &first);
+            vec_scale_to_length(&segment.row[0], &segment.row[0], 1);
+            FastVecSub(&segment.row[1], D_L00_001B8C80 + 0x140, &first);
+            FastVecCross(&segment.row[2], &segment.row[1], &segment.row[0]);
+            vec_scale_to_length(&segment.row[2], &segment.row[2], 1);
+            FastVecCross(&segment.row[1], &segment.row[0], &segment.row[2]);
             qcopy(&segment.pos, &first);
         }
-        func_002830C0(&outer.v[2], &outer.v[2], &segment);
-        func_002830C0(&outer.v[3], &outer.v[3], &segment);
-        func_002830C0(&inner.v[2], &inner.v[2], &segment);
-        func_002830C0(&inner.v[3], &inner.v[3], &segment);
+        transform_vector(&outer.v[2], &outer.v[2], &segment);
+        transform_vector(&outer.v[3], &outer.v[3], &segment);
+        transform_vector(&inner.v[2], &inner.v[2], &segment);
+        transform_vector(&inner.v[3], &inner.v[3], &segment);
 
         if (i == 1 && D_L00_001B13D0 == alpha2) {
             /* Fade the ribbon's first edge out (alpha 0) for this draw only. */
@@ -137,8 +137,8 @@ void func_L00_00413918(char *object, Vec *points, int alpha, int alpha2, int cou
             outer.color[0] = outer.color[1] = 0xffffff;
             color2 = inner.color[0];
             inner.color[0] = inner.color[1] = *(unsigned *)(state + 0x24) & 0xffffff;
-            func_00280B90(&outer, 0, 0);
-            func_00280B90(&inner, 0, 0);
+            draw_world_quad(&outer, 0, 0);
+            draw_world_quad(&inner, 0, 0);
             outer.color[0] = outer.color[1] = outer.color[2] = outer.color[3] = color;
             inner.color[0] = inner.color[1] = inner.color[2] = inner.color[3] = color2;
         } else if (i == count - 2 && D_L00_001B13D0 == alpha2) {
@@ -149,22 +149,22 @@ void func_L00_00413918(char *object, Vec *points, int alpha, int alpha2, int cou
             outer.color[2] = outer.color[3] = 0xffffff;
             color2 = inner.color[2];
             inner.color[2] = inner.color[3] = *(unsigned *)(state + 0x24) & 0xffffff;
-            func_00280B90(&outer, 0, 0);
-            func_00280B90(&inner, 0, 0);
+            draw_world_quad(&outer, 0, 0);
+            draw_world_quad(&inner, 0, 0);
             outer.color[0] = outer.color[1] = outer.color[2] = outer.color[3] = color;
             inner.color[0] = inner.color[1] = inner.color[2] = inner.color[3] = color2;
         } else {
-            func_00280B90(&outer, 0, 0);
-            func_00280B90(&inner, 0, 0);
+            draw_world_quad(&outer, 0, 0);
+            draw_world_quad(&inner, 0, 0);
         }
         qcopy(&outer.v[0], &outer.v[2]);
         qcopy(&outer.v[1], &outer.v[3]);
         qcopy(&inner.v[0], &inner.v[2]);
         qcopy(&inner.v[1], &inner.v[3]);
 
-        t = func_00283CE0(i);
-        t /= func_00283CE0(count);
-        width = func_002A7AA8(-1, 0, 1, 0, t);
+        progress = IntToFloat(i);
+        progress /= IntToFloat(count);
+        width = cubic_hermite_scalar(-1, 0, 1, 0, progress);
         size.f[2] = D_L00_001B1388 + (D_L00_001B1384 - D_L00_001B1388) * width;
         size2.f[2] = size.f[2] * D_L00_001B138C;
         outer.uv[0][0] = *(float *)(state + 0x14);
@@ -250,64 +250,64 @@ void func_L00_00413358(char *object)
 {
     BoltHit scratch;
     BoltState *state = *(BoltState **)(object + 0x68);
-    float distance = func_00282E48(object + 0x10, &state->pos);
-    float burst, ratio, spacing, step, t, a, b;
+    float distance = fast_vec_dist(object + 0x10, &state->pos);
+    float burst, ratio, spacing, step, burstSpeed, yaw, pitch;
     float point10, amp10, point19, phase19, wave19, amp19, rate19;
-    int i, sign, i10, i19;
+    int i, sign, lineIdx, waveIdx;
 
     if (state->timer != 0) {
-        if (func_00282978(&state->timer) && state->target != 0) {
+        if (FastDecTimer(&state->timer) && state->target != 0) {
             scratch.packet.flags = 0x810000;
             scratch.packet.enabled = 1;
             scratch.packet.owner = object;
-            scratch.packet.scale = ((HitRecord *)(D_00139595[0] * sizeof(HitRecord) + (int)D_L00_00262570))->scale;
-            func_00282CF0(&scratch, &state->pos, object + 0x10);
-            func_00282F20(&scratch, &scratch, 1);
+            scratch.packet.scale = ((HitRecord *)(D_00139595[0] * sizeof(HitRecord) + (int)gWeaponTable_L00))->scale;
+            FastVecSub(&scratch, &state->pos, object + 0x10);
+            vec_scale_to_length(&scratch, &scratch, 1);
             scratch.vector.f[3] = 5627.925f;
             scratch.packet.kind = 3;
             scratch.packet.mode = 2;
             scratch.packet.id = *(unsigned short *)(object + 0xAA);
-            func_002A8E20(state->target, &scratch);
+            QueueMobyImpact(state->target, &scratch);
         }
     }
 
     step = 0.017453294f;
-    point10 = func_00283CE0(state->timer);
-    point10 = point10 / func_00283CE0(6);
+    point10 = IntToFloat(state->timer);
+    point10 = point10 / IntToFloat(6);
     ratio = distance + (0.01f - distance) * point10;
-    spacing = ratio / func_00283CE0(10);
-    state->phase1 = func_00283B98(state->phase1, D_L00_001B13A0 * step);
-    state->phase2 = func_00283BE0(state->phase2, D_L00_001B13A8);
-    state->phase3 = func_00283B98(state->phase3, D_L00_001B13B4);
-    step = (360 / func_00283CE0(10)) * step;
+    spacing = ratio / IntToFloat(10);
+    state->phase1 = FastAddRotations(state->phase1, D_L00_001B13A0 * step);
+    state->phase2 = fast_subtract_rotations(state->phase2, D_L00_001B13A8);
+    state->phase3 = FastAddRotations(state->phase3, D_L00_001B13B4);
+    step = (360 / IntToFloat(10)) * step;
 
-    for (i10 = 0; i10 < 10; i10++) {
-        point10 = func_00283CE0(i10);
-        func_00283CE0(10);
+    for (lineIdx = 0; lineIdx < 10; lineIdx++) {
+        point10 = IntToFloat(lineIdx);
+        IntToFloat(10);
         amp10 = D_L00_001B1398;
-        if (i10 == 0 || i10 == 9) {
+        if (lineIdx == 0 || lineIdx == 9) {
             amp10 = 0;
         } else {
-            amp10 *= func_00283198(func_002ABB18(state->phase1 + point10 * step));
-            amp10 += func_002A78D8(0, D_L00_001B1394);
+            amp10 *= FastSinOrCosB(WrapAngleToPi(state->phase1 + point10 * step));
+            amp10 += RandomSignedFloatRange(0, D_L00_001B1394);
         }
-        state->line[i10].f[2] = amp10;
-        state->line[i10].f[1] = 0.0f;
-        state->line[i10].f[0] = spacing * point10;
-        state->line[i10].f[3] = 1;
+        state->line[lineIdx].f[2] = amp10;
+        state->line[lineIdx].f[1] = 0.0f;
+        state->line[lineIdx].f[0] = spacing * point10;
+        state->line[lineIdx].f[3] = 1;
     }
 
-    for (i19 = 0; i19 < 19; i19++) {
-        point19 = func_00283CE0(i19);
+    for (waveIdx = 0; waveIdx < 19; waveIdx++) {
+        point19 = IntToFloat(waveIdx);
         rate19 = point19 * D_L00_001B13AC;
-        state->wave[i19].f[2] = 0.0f;
-        phase19 = func_002ABB18(state->phase2 + rate19);
-        wave19 = D_L00_001B13BC * func_00283198(func_002ABB18(state->phase3 + point19 * D_L00_001B13B8));
-        amp19 = wave19 * func_00283198(phase19) + func_002A78D8(D_L00_001B1390, D_L00_001B1394);
-        state->wave[i19].f[2] += amp19;
-        state->wave[i19].f[1] = D_L00_001B13C0 * func_00283180(phase19);
-        state->wave[i19].f[0] = spacing * point19;
-        state->wave[i19].f[3] = 1;
+        state->wave[waveIdx].f[2] = 0.0f;
+        phase19 = WrapAngleToPi(state->phase2 + rate19);
+        wave19 = D_L00_001B13BC * FastSinOrCosB(WrapAngleToPi(state->phase3 + point19 * D_L00_001B13B8));
+        amp19 = wave19 * FastSinOrCosB(phase19) + RandomSignedFloatRange(D_L00_001B1390, D_L00_001B1394);
+        state->wave[waveIdx].f[2] += amp19;
+        state->wave[waveIdx].f[1] = D_L00_001B13C0 * FastSinOrCosA(phase19);
+        state->wave[waveIdx].f[0] = spacing * point19;
+        state->wave[waveIdx].f[3] = 1;
     }
 
     ref_L00_00413358_01(ref_L00_00413358_00, object);
@@ -317,23 +317,23 @@ void func_L00_00413358(char *object)
             float third = 0.0f;
             float frame = 0.016666668f;
             float size = 0.0f;
-            t = func_002A7878(1, 6) * frame;
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(&scratch, t, a, b);
-            sign = func_002A7820(1, 4);
-            if (func_002A77E0(2)) {
+            burstSpeed = RandomFloatRange(1, 6) * frame;
+            yaw = RandomAngle();
+            pitch = RandomAngle();
+            BuildSphericalOffset(&scratch, burstSpeed, yaw, pitch);
+            sign = RandomIntRange(1, 4);
+            if (RandomIntBelow(2)) {
                 sign = -sign;
             }
-            size = func_002A7878(0.4f, 0.8f);
-            func_002C2210(&state->pos, 15, state->color | 0x7F000000, 0, size * 0.3f, size, sign, &scratch, third, 0);
-            func_002C2210(&state->pos, 15, 0x307F7F7F, 0, size * 0.15f, size * 0.5f, -sign, &scratch, third, 0);
+            size = RandomFloatRange(0.4f, 0.8f);
+            SpawnGroundEffectParticle(&state->pos, 15, state->color | 0x7F000000, 0, size * 0.3f, size, sign, &scratch, third, 0);
+            SpawnGroundEffectParticle(&state->pos, 15, 0x307F7F7F, 0, size * 0.15f, size * 0.5f, -sign, &scratch, third, 0);
         }
-        sign = func_002A7820(1, 8);
-        if (func_002A77E0(2)) {
+        sign = RandomIntRange(1, 8);
+        if (RandomIntBelow(2)) {
             sign = -sign;
         }
-        burst = func_002A7878(0.15f, 3);
-        func_002C2210(&state->pos, 12, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, D_L00_001A8F20, 0, 0);
+        burst = RandomFloatRange(0.15f, 3);
+        SpawnGroundEffectParticle(&state->pos, 12, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, D_L00_001A8F20, 0, 0);
     }
 }

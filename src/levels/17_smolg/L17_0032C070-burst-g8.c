@@ -14,6 +14,8 @@ extern int func_002A77E0(int);
 extern void func_002C02F0(void *, void *, int, void *, int, int);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_002E59F8(int);
+/* Updates the moby that sprays a burst of randomly scattered particles: it waits, sprays for a
+   while, then stops its sound and starts over. */
 void func_L17_003A14A0(unsigned char *obj)
 {
     float matrix[16];
@@ -28,41 +30,41 @@ void func_L17_003A14A0(unsigned char *obj)
         break;
     case 1:
         *(int *)(state + 0x10) = -1;
-        if (func_00282948(state + 0xC)) {
+        if (FastFloatHelperD(state + 0xC)) {
             *(int *)(state + 0xC) = *(int *)(state + 4);
             obj[0x20] = 2;
         }
         break;
     case 2:
         random.q = 0;
-        random.f[0] = func_002A7878(-1.0f, 1.0f);
-        random.f[1] = func_002A7878(-1.0f, 1.0f);
-        random.f[2] = func_002A7878(-1.0f, 1.0f);
+        random.f[0] = RandomFloatRange(-1.0f, 1.0f);
+        random.f[1] = RandomFloatRange(-1.0f, 1.0f);
+        random.f[2] = RandomFloatRange(-1.0f, 1.0f);
         jitter.q = random.q;
         qcopy(&position, obj + 0x10);
-        func_00283410(matrix, obj + 0xF0);
-        func_00282C88(&velocity);
+        euler_to_matrix(matrix, obj + 0xF0);
+        ClearVector128(&velocity);
         velocity.f[0] = *(float *)state * (D_L17_001AF320 * 3.0f) * 0.016666668f;
-        func_00282D30(&jitter, &jitter, velocity.f[0] * D_L17_001AF324);
-        func_002830C0(&velocity, &velocity, matrix);
-        func_00282CD8(&random, &velocity, &jitter);
-        if (*(int *)(state + 0xC) >= 10 || func_002A77E0(10 - *(int *)(state + 0xC)) == 0) {
-            func_00282D30(&step, &velocity, 0.33f);
-            func_002C02F0(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
+        FastVecScale(&jitter, &jitter, velocity.f[0] * D_L17_001AF324);
+        transform_vector(&velocity, &velocity, matrix);
+        add_vectors(&random, &velocity, &jitter);
+        if (*(int *)(state + 0xC) >= 10 || RandomIntBelow(10 - *(int *)(state + 0xC)) == 0) {
+            FastVecScale(&step, &velocity, 0.33f);
+            SpawnScaledSmokeParticle(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
         }
-        if (*(int *)(state + 0xC) >= 10 || func_002A77E0(10 - *(int *)(state + 0xC)) == 0) {
-            func_00282CC0(&position, &position, &step);
-            func_002C02F0(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
+        if (*(int *)(state + 0xC) >= 10 || RandomIntBelow(10 - *(int *)(state + 0xC)) == 0) {
+            FastVecAdd(&position, &position, &step);
+            SpawnScaledSmokeParticle(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
         }
-        if (func_00282948(state + 0xC)) {
+        if (FastFloatHelperD(state + 0xC)) {
             int index;
             *(int *)(state + 0xC) = *(int *)(state + 8);
             obj[0x20] = 1;
             index = *(int *)(state + 0x10);
             if (index != -1) {
-                char *slot = D_00188660 + index * 0x70;
+                char *slot = gSoundState + index * 0x70;
                 if (*(char **)(slot + 0x88) == obj && *(unsigned char *)(slot + 0x74))
-                    func_002E59F8(index);
+                    StopSoundVoice(index);
             }
             *(int *)(state + 0x10) = -1;
         }

@@ -56,106 +56,107 @@ extern f32 func_002AAA00(void *, void *, f32, f32, f32, f32, s32);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_002AD6F0(void *, void *, void *, void *);
 
+/* Moves a lift up and down while turning it, when the hero stands on it and asks, or walks up to it. */
 void func_L12_0041D808(u8 *self)
 {
     f32 oldpos[4] __attribute__((aligned(16)));
     f32 oldrot[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
-    LiftVars *p = *(LiftVars **)(self + 0x68);
+    LiftVars *vars = *(LiftVars **)(self + 0x68);
     f32 target, speed, y;
 
     qcopy(oldpos, self + 0x10);
     qcopy(oldrot, self + 0xF0);
     switch (self[0x20]) {
     case 0:
-        F(self, 0xF8) = func_00283B98(F(self, 0xF8), 1.5707964897155762f);
-        qcopy_nc(p->origin, self + 0x10);
-        p->origin[3] = F(self, 0xF8);
-        func_002A7750(self, 2, -1);
+        F(self, 0xF8) = FastAddRotations(F(self, 0xF8), 1.5707964897155762f);
+        qcopy_nc(vars->origin, self + 0x10);
+        vars->origin[3] = F(self, 0xF8);
+        SetMobyState(self, 2, -1);
         break;
     case 2:
-        p->targetHeight = p->destination ?
-            F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38) : p->origin[2];
-        p->targetAngle = p->destination ?
-            func_00283B98(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
-                          4.7123894691467285f) : p->origin[3];
-        y = F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38);
-        if (D_00189E20.lift == self && D_00189E20.active) {
-            func_002B0C28(8, 0x279A, 1);
+        vars->targetHeight = vars->destination ?
+            F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x38) : vars->origin[2];
+        vars->targetAngle = vars->destination ?
+            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+                          4.7123894691467285f) : vars->origin[3];
+        y = F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x38);
+        if (gHeroState.lift == self && gHeroState.active) {
+            TryClaimNotice(8, 0x279A, 1);
             if (D_00138324 & 16) {
-                p->destination = (p->destination + 1) & 1;
-                func_002A7750(self, 3, -1);
+                vars->destination = (vars->destination + 1) & 1;
+                SetMobyState(self, 3, -1);
             }
-        } else if (p->destination) {
-            if (func_00282C48(D_00189E20.position[2] - p->origin[2]) < 4.0f &&
-                func_00282E80(D_00189E20.position, self + 0x10) < 32.0f) {
-                p->destination = 0;
-                func_002A7750(self, 1, -1);
+        } else if (vars->destination) {
+            if (FloatAbs(gHeroState.position[2] - vars->origin[2]) < 4.0f &&
+                vec_distance_xy(gHeroState.position, self + 0x10) < 32.0f) {
+                vars->destination = 0;
+                SetMobyState(self, 1, -1);
             }
-        } else if (func_00282C48(D_00189E20.position[2] - y) < 4.0f &&
-                   func_00282E80(D_00189E20.position, self + 0x10) < 32.0f) {
-            p->destination = 1;
-            func_002A7750(self, 1, -1);
+        } else if (FloatAbs(gHeroState.position[2] - y) < 4.0f &&
+                   vec_distance_xy(gHeroState.position, self + 0x10) < 32.0f) {
+            vars->destination = 1;
+            SetMobyState(self, 1, -1);
         }
         break;
     case 3:
-        if (func_002B3868(self)) {
-            func_L00_002D40A0(self + 0x10, 0, F(D_0018C0B0, 0xF8));
-            p->timer = 0;
+        if (SetFirstPendingFlag(self)) {
+            StartHeroTargetState(self + 0x10, 0, F(gHeroMoby_0018C0B0, 0xF8));
+            vars->timer = 0;
         }
-        if (++p->timer >= 361) {
-            func_L01_002C98B8();
-            func_002A7750(self, 2, -1);
-        } else if (func_L00_002D40F0() != 1) {
-            func_002A7750(self, 1, -1);
+        if (++vars->timer >= 361) {
+            SetHeroMoveStateBySpeed();
+            SetMobyState(self, 2, -1);
+        } else if (GetHeroTargetStateKind() != 1) {
+            SetMobyState(self, 1, -1);
         }
         break;
     case 1:
-        if (func_002B3868(self)) {
-            p->angularSpeed = 0;
-            p->speed = 0;
+        if (SetFirstPendingFlag(self)) {
+            vars->angularSpeed = 0;
+            vars->speed = 0;
         }
-        p->targetHeight = p->destination ?
-            F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38) : p->origin[2];
-        p->targetAngle = p->destination ?
-            func_00283B98(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
-                          4.7123894691467285f) : p->origin[3];
-        target = p->targetHeight;
+        vars->targetHeight = vars->destination ?
+            F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x38) : vars->origin[2];
+        vars->targetAngle = vars->destination ?
+            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+                          4.7123894691467285f) : vars->origin[3];
+        target = vars->targetHeight;
         speed = 0.003888889f;
-        if (p->destination) {
-            if (D_00189E20.position[2] < F(self, 0x18) - 1.0f &&
-                func_002ACBC8(D_00189E20.position, p->node)) {
+        if (vars->destination) {
+            if (gHeroState.position[2] < F(self, 0x18) - 1.0f &&
+                IsPointInCuboid(gHeroState.position, vars->node)) {
                 target += 3.0f;
                 speed = 0.007777778f;
             } else {
                 target += 0.5f;
             }
         }
-        func_002AA548(self + 0x18, &p->speed, target, 0.0019444445f, speed, 0.5f);
-        if (func_00282C48(p->targetHeight - F(self, 0x18)) < 0.6f &&
-            func_00282C48(p->speed) < 0.01f) {
+        StepValueTowardTarget(self + 0x18, &vars->speed, target, 0.0019444445f, speed, 0.5f);
+        if (FloatAbs(vars->targetHeight - F(self, 0x18)) < 0.6f &&
+            FloatAbs(vars->speed) < 0.01f) {
             {
-                s32 index = p->sound;
+                s32 index = vars->sound;
 
                 if (index != -1) {
-                    LiftSound *entry = (LiftSound *)(index * 0x70 + (s32)D_00188660);
+                    LiftSound *entry = (LiftSound *)(index * 0x70 + (s32)gSoundState);
 
                     if (entry->owner == self && entry->active)
-                        func_002E59F8(index);
+                        StopSoundVoice(index);
                 }
             }
-            p->sound = -1;
-            func_002A7750(self, 2, -1);
+            vars->sound = -1;
+            SetMobyState(self, 2, -1);
         } else {
-            LiftSound *entry = (LiftSound *)(p->sound * 0x70 + (s32)D_00188660);
+            LiftSound *entry = (LiftSound *)(vars->sound * 0x70 + (s32)gSoundState);
 
             if (entry->owner != self || !entry->active)
-                p->sound = func_002E5CF8(0, 4, self);
+                vars->sound = PlayMobySound(0, 4, self);
         }
-        func_002AAA00(self + 0xF8, &p->angularSpeed, p->targetAngle,
+        ApproachTargetWithDirectionMode(self + 0xF8, &vars->angularSpeed, vars->targetAngle,
                       0.00014544412260875106f, 0.00014544412260875106f, 0.10471977f, 0);
         break;
     }
-    func_00282CF0(delta, self + 0x10, oldpos);
-    func_002AD6F0((u8 *)p + 0x20, delta, oldrot, self + 0xF0);
+    FastVecSub(delta, self + 0x10, oldpos);
+    CombineTransformsAndStore((u8 *)vars + 0x20, delta, oldrot, self + 0xF0);
 }

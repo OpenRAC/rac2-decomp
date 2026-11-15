@@ -28,10 +28,11 @@ extern s32 ref_L04_0039FC28_literal_1;
 extern s32 ref_L04_0039FC28_00(f32);
 extern f32 ref_L04_0039FC28_01 __attribute__((sda));
 
-void func_L04_0039FC28(void *arg0, void *arg1) {
-    (*(s32 *)((s8 *)(arg1) + (0))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(arg0) + (0))) + *(f32*)(&ref_L04_0039FC28_literal_0)) * 1024.0f);
-    (*(s32 *)((s8 *)(arg1) + (4))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(arg0) + (4))) + *(f32*)(&ref_L04_0039FC28_literal_1)) * 1024.0f);
-    (*(s32 *)((s8 *)(arg1) + (8))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(arg0) + (8))) - 1.0f) * 1024.0f);
-    (*(s16 *)((s8 *)(arg1) + (0xC))) = ref_L04_0039FC28_00(ref_L04_0039FC28_01 * 1024.0f);
-    (*(s16 *)((s8 *)(arg1) + (0xE))) = ref_L04_0039FC28_00(ref_L04_0039FC28_01 * 1024.0f);
+/* Converts a position and a size into fixed-point numbers for the renderer. */
+void func_L04_0039FC28(void *pos, void *out) {
+    (*(s32 *)((s8 *)(out) + (0))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(pos) + (0))) + *(f32*)(&ref_L04_0039FC28_literal_0)) * 1024.0f);
+    (*(s32 *)((s8 *)(out) + (4))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(pos) + (4))) + *(f32*)(&ref_L04_0039FC28_literal_1)) * 1024.0f);
+    (*(s32 *)((s8 *)(out) + (8))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(pos) + (8))) - 1.0f) * 1024.0f);
+    (*(s16 *)((s8 *)(out) + (0xC))) = ref_L04_0039FC28_00(ref_L04_0039FC28_01 * 1024.0f);
+    (*(s16 *)((s8 *)(out) + (0xE))) = ref_L04_0039FC28_00(ref_L04_0039FC28_01 * 1024.0f);
 }

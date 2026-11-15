@@ -16,10 +16,10 @@ void func_L01_003DCD40(u8 *object, void *arg)
     float extra[4] __attribute__((aligned(16)));
 
     if (state[0x3E4])
-        func_L01_003DC8B8(object, matrix, extra);
+        MarkNearbyObjectsOfKind(object, matrix, extra);
     qcopy(position, object + 0x10);
-    func_L01_00318638(object, arg, state + 0x1C0);
-    func_L01_003DC9E0(object, position);
+    UpdateWanderHeading(object, arg, state + 0x1C0);
+    FollowAttachedObject(object, position);
     if (state[0x3E4])
-        func_L01_003DC9A8(matrix, extra);
+        ClearMarkedObjects(matrix, extra);
 }

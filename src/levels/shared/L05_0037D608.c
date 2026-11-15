@@ -1,3 +1,4 @@
+#include "names.h"
 /* Run the object's cache-slot list: for every record, hand the slot (offset from the cache
    pointer, read again at each site) to the engine with a random vector. The cache pointer is
    an sda word so each use is the assembler macro form (lui + lw), never hoisted. */
@@ -12,6 +13,7 @@ extern void func_002EE920(void *, float *);
 extern short *D_L05_001FB220[];
 extern u8 *D_L05_001B251C __attribute__((sda));
 
+/* Gives every piece in the object's slot list a small random push. */
 void func_L05_0037D608(void *object, void *argument, float value)
 {
     unsigned short *q = (unsigned short *)D_L05_001FB220[((unsigned char *)object)[0x21]];
@@ -24,13 +26,13 @@ void func_L05_0037D608(void *object, void *argument, float value)
         do {
             int offset = (*p & 0x7FFF) << 8;
 
-            if (func_002ED688(D_L05_001B251C + offset) != 0) {
-                float a = func_002A7940();
-                float b = func_002A7940();
+            if (GetMobyMotionData(D_L05_001B251C + offset) != 0) {
+                float a = RandomAngle();
+                float b = RandomAngle();
 
-                func_002AF000(vector, value, a, b);
-                func_00282CC0(vector, vector, argument);
-                func_002EE920(D_L05_001B251C + offset, vector);
+                BuildSphericalOffset(vector, value, a, b);
+                FastVecAdd(vector, vector, argument);
+                SetFollowerPushVector(D_L05_001B251C + offset, vector);
             }
         } while ((short)*p++ >= 0);
     }

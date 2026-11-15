@@ -41,6 +41,7 @@ extern float func_002A89A8(void *,int,float);
 #define AI_I(p,n) (*(int *)((char *)(p)+(n)))
 #define AI_B(p,n) (*(unsigned char *)((char *)(p)+(n)))
 
+/* Runs the brain of a simple creature that wanders around, turns toward the player when close and stays on the ground. */
 void func_00331800(char *object)
 {
     float dest[4] __attribute__((aligned(16)));
@@ -54,115 +55,115 @@ void func_00331800(char *object)
     int hit;
 
     if (AI_B(object,0x20) && D_001AD7EC) {
-        func_00283658(work.matrix,object+0xc0);
-        func_002AB6D8(work.matrix,dest);
-        func_002AD0E0(object,D_001AD7EC,object+0x10,dest,object+0x10,temp);
-        func_002833F0(object+0xc0,temp);
+        copy_matrix_rotation(work.matrix,object+0xc0);
+        GetEulerAnglesFromMatrix(work.matrix,dest);
+        TransformPointAndRotationByParent(object,D_001AD7EC,object+0x10,dest,object+0x10,temp);
+        euler_rotation_basis(object+0xc0,temp);
         qcopy(object+0xf0,temp);
     }
-    if (func_002A9640(object,0x4010000,0)) func_003320F0(object);
-    func_00283248(AI_F(object,0x10)-D_00189E20.pos[0],AI_F(object,0x14)-D_00189E20.pos[1]);
-    func_002A9288(object,0.5f);
+    if (FindOwnedEffectSlot(object,0x4010000,0)) UpdateExplosionEffectMoby(object);
+    FastMatrixHelperA(AI_F(object,0x10)-gHeroState.pos[0],AI_F(object,0x14)-gHeroState.pos[1]);
+    QueueGroundShadow(object,0.5f);
     switch (AI_B(object,0x20)) {
     case 0:
-        func_002A7750(object,1,-1);
+        SetMobyState(object,1,-1);
         break;
     case 1:
         if (AI_B(object,0x60)&2) {
-            r=func_002A7878(0,100);
-            if (r>=0 && r<20) func_002A7470(object,0,0,10);
-            if (r>=20 && r<50) func_002A7470(object,4,0,10);
-            if (r>=50 && r<100) func_002A7470(object,1,0,10);
+            r=RandomFloatRange(0,100);
+            if (r>=0 && r<20) StartAnimationBlended(object,0,0,10);
+            if (r>=20 && r<50) StartAnimationBlended(object,4,0,10);
+            if (r>=50 && r<100) StartAnimationBlended(object,1,0,10);
         }
-        if (func_00282E80(object+0x10,D_00189E20.pos)<2 && !D_001A8CA4 && !D_001A8CA0) {
-            func_002A7750(object,2,-1);
-            func_002A7470(object,2,0,10);
+        if (vec_distance_xy(object+0x10,gHeroState.pos)<2 && !D_001A8CA4 && !D_001A8CA0) {
+            SetMobyState(object,2,-1);
+            StartAnimationBlended(object,2,0,10);
             AI_F(object,0x48)=0.75f;
         }
-        if (func_00282948(state+0x70)) {
+        if (FastFloatHelperD(state+0x70)) {
             if (D_001A8CA4) return;
             if (!D_001A8CA0) {
-                if (func_002A77E0(2)) {
-                    func_002A7750(object,5,-1);
-                    AI_I(state,0x70)=func_002A7820(400,600);
-                    func_002A7470(object,2,0,10);
+                if (RandomIntBelow(2)) {
+                    SetMobyState(object,5,-1);
+                    AI_I(state,0x70)=RandomIntRange(400,600);
+                    StartAnimationBlended(object,2,0,10);
                     AI_F(object,0x48)=0.75f;
                 } else {
-                    func_002A7750(object,6,-1);
-                    AI_I(state,0x70)=func_002A7820(180,360);
-                    func_002A7470(object,3,0,10);
+                    SetMobyState(object,6,-1);
+                    AI_I(state,0x70)=RandomIntRange(180,360);
+                    StartAnimationBlended(object,3,0,10);
                 }
             }
         }
         break;
     case 6:
-        if (AI_B(object,0x60)&2) func_002A7470(object,3,0,10);
-        if (func_00282948(state+0x70)) {
-            func_002A7750(object,1,-1);
-            AI_I(state,0x70)=func_002A7820(120,600);
-            func_002A7470(object,func_002A77E0(2),0,10);
+        if (AI_B(object,0x60)&2) StartAnimationBlended(object,3,0,10);
+        if (FastFloatHelperD(state+0x70)) {
+            SetMobyState(object,1,-1);
+            AI_I(state,0x70)=RandomIntRange(120,600);
+            StartAnimationBlended(object,RandomIntBelow(2),0,10);
         }
         break;
     case 5:
         if (AI_B(object,0x60)&2) {
-            func_002A7470(object,2,0,10);
+            StartAnimationBlended(object,2,0,10);
             AI_F(object,0x48)=0.75f;
         }
         position=object+0x10;
-        if (func_00282E80(position,D_00189E20.pos)<2) {
-            func_002A7750(object,2,-1);
+        if (vec_distance_xy(position,gHeroState.pos)<2) {
+            SetMobyState(object,2,-1);
             AI_F(object,0x48)=0.1f;
-            func_002A7470(object,2,0,10);
+            StartAnimationBlended(object,2,0,10);
         }
-        if (func_00282948(state+0x70)) {
-            func_002A7750(object,1,-1);
-            AI_I(state,0x70)=func_002A7820(400,600);
+        if (FastFloatHelperD(state+0x70)) {
+            SetMobyState(object,1,-1);
+            AI_I(state,0x70)=RandomIntRange(400,600);
         }
-        angle=func_00283B98(AI_F(object,0xf8),func_002A7878(-30,30)*0.017453294f);
-        func_002A7CA0(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
-        func_00282F20(temp,object+0xc0,0.004166667f);
-        func_00282CC0(dest,position,temp);
+        angle=FastAddRotations(AI_F(object,0xf8),RandomFloatRange(-30,30)*0.017453294f);
+        MobySpringTurn(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
+        vec_scale_to_length(temp,object+0xc0,0.004166667f);
+        FastVecAdd(dest,position,temp);
         saved=work.matrix;
         qcopy_nc(saved,position);
-        if (func_002A7EA0(object,position,dest,0.1f,0.7f,0.25f,0.52359885f,2)) {
-            if (func_00277258(position,1,object,0.5f) && D_001BAF80.surface) qcopy(position,saved);
+        if (MoveOverGround(object,position,dest,0.1f,0.7f,0.25f,0.52359885f,2)) {
+            if (TestPointAgainstCollision(position,1,object,0.5f) && gCollisionHit.surface) qcopy(position,saved);
         } else {
-            angle=func_00283B98(AI_F(object,0xf8),func_002A7878(20,135)*0.017453294f);
-            func_002A7CA0(angle,object,state+0x58,4.848137541557662e-05f,0.00043633237f,0.013089972f);
+            angle=FastAddRotations(AI_F(object,0xf8),RandomFloatRange(20,135)*0.017453294f);
+            MobySpringTurn(angle,object,state+0x58,4.848137541557662e-05f,0.00043633237f,0.013089972f);
         }
         break;
     case 2:
         position=object+0x10;
-        if (func_00282E80(position,D_00189E20.pos)<2) {
-            angle=func_00283B98(AI_F(object,0xf8),func_002A7878(-30,30)*0.017453294f);
-            func_002A7CA0(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
-            func_00282F20(temp,object+0xc0,0.004166667f);
-            func_00282CC0(dest,position,temp);
+        if (vec_distance_xy(position,gHeroState.pos)<2) {
+            angle=FastAddRotations(AI_F(object,0xf8),RandomFloatRange(-30,30)*0.017453294f);
+            MobySpringTurn(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
+            vec_scale_to_length(temp,object+0xc0,0.004166667f);
+            FastVecAdd(dest,position,temp);
             saved=work.matrix;
             qcopy_nc(saved,position);
-            if (func_002A7EA0(object,position,dest,0.5f,0.7f,0.25f,0.52359885f,2)) {
-                if (func_00277258(position,1,object,0.5f) && D_001BAF80.surface) qcopy(position,saved);
+            if (MoveOverGround(object,position,dest,0.5f,0.7f,0.25f,0.52359885f,2)) {
+                if (TestPointAgainstCollision(position,1,object,0.5f) && gCollisionHit.surface) qcopy(position,saved);
             } else {
-                angle=func_00283B98(AI_F(object,0xf8),func_002A7878(-90,-10)*0.017453294f);
-                func_002A7CA0(angle,object,state+0x58,5.81776475883089e-05f,0.00043633237f,0.013089972f);
+                angle=FastAddRotations(AI_F(object,0xf8),RandomFloatRange(-90,-10)*0.017453294f);
+                MobySpringTurn(angle,object,state+0x58,5.81776475883089e-05f,0.00043633237f,0.013089972f);
             }
         } else {
             AI_F(object,0x48)=1;
-            func_002A7750(object,1,-1);
+            SetMobyState(object,1,-1);
         }
         break;
     case 4:
-        func_002B00B0(object,work.matrix,0);
-        func_00282F20(work.matrix,work.matrix,4);
-        func_00282CC0(work.v.far,object+0x10,work.matrix);
-        func_00282F20(work.matrix,work.matrix,-1);
-        func_00282CC0(work.v.near,object+0x10,work.matrix);
-        if (func_002761F8(work.v.near,work.v.far,0,object,0)) {
-            if (D_001BAF80.surface!=D_00189E20.surface) qcopy(object+0x10,D_001BAF80.point);
+        GetGravityDirectionAtObject(object,work.matrix,0);
+        vec_scale_to_length(work.matrix,work.matrix,4);
+        FastVecAdd(work.v.far,object+0x10,work.matrix);
+        vec_scale_to_length(work.matrix,work.matrix,-1);
+        FastVecAdd(work.v.near,object+0x10,work.matrix);
+        if (CollLine(work.v.near,work.v.far,0,object,0)) {
+            if (gCollisionHit.surface!=gHeroState.surface) qcopy(object+0x10,gCollisionHit.point);
         }
-        hit=func_00278E78();
-        if (hit>0 && hit!=10 && !D_001A8CA4) {func_003320F0(object);return;}
-        func_002A7750(object,0,-1);
+        hit=GetCollHitMaterial();
+        if (hit>0 && hit!=10 && !D_001A8CA4) {UpdateExplosionEffectMoby(object);return;}
+        SetMobyState(object,0,-1);
         break;
     case 3:
         break;
@@ -170,6 +171,6 @@ void func_00331800(char *object)
     if (!D_001A8CA4 && !D_001A8CA0) {
         qcopy(work.matrix,object+0x10);
         work.matrix[2]+=0.5f;
-        AI_F(object,0x18)=func_002A89A8(work.matrix,0,0.5f);
+        AI_F(object,0x18)=ProbeGroundHeightBelow(work.matrix,0,0.5f);
     }
 }

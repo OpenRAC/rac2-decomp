@@ -23,6 +23,7 @@ typedef struct {
  float angle, rotation, size; unsigned int color;
  int unknown, life, unknown2, flags, first, last, unknown3, type;
 } Effect7B;
+/* Spawns fire, glow and spark particles on the ship for its current scene. */
 void func_002E7BC8(void *object)
 {
  float pos[4], other[4], matrix[12], first[4], second[4], combined[4];
@@ -39,65 +40,65 @@ void func_002E7BC8(void *object)
  spark.unknown2 = 0x001C0000;
 #endif
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
- func_00283130(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
- func_00283130(second, next);
- func_00282D60(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
- func_00282D60(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
- func_00282CA8(combined, first, second);
- func_00283958(combined, matrix);
- func_00283738(matrix, o + 0xc0, matrix);
- func_00283098(pos, &D_001AC130, matrix);
- func_00283098(other, &D_001AC140, matrix);
- func_00282CC0(pos, pos, o + 0x10);
- func_00282CC0(other, other, o + 0x10);
- func_002ED368(object);
- effect.life = func_002A7820(95, 127);
- if (*(short *)(o + 0xaa) == 0x128c)
-  effect.color = func_00283D38(0xff0f0f, 0xff3f3f, func_002A7878(0.0f, 1.0f));
- else if (*(short *)(o + 0xaa) == 0x128d)
-  effect.color = func_00283D38(0xf6fcf, 0x3fcfef, func_002A7878(0.0f, 1.0f));
+ FastVectorHelperE(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
+ FastVectorHelperE(second, next);
+ scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
+ scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
+ VectorCopyHelperB(combined, first, second);
+ quaternion_to_rotation_basis(combined, matrix);
+ multiply_matrix3x3(matrix, o + 0xc0, matrix);
+ matrix_mul_vec3(pos, &D_001AC130, matrix);
+ matrix_mul_vec3(other, &D_001AC140, matrix);
+ FastVecAdd(pos, pos, o + 0x10);
+ FastVecAdd(other, other, o + 0x10);
+ UpdateEffectRecords(object);
+ effect.life = RandomIntRange(95, 127);
+ if (*(short *)(o + 0xaa) == 0x128c /* moby class 4748 */)
+  effect.color = FastTweenColor(0xff0f0f, 0xff3f3f, RandomFloatRange(0.0f, 1.0f));
+ else if (*(short *)(o + 0xaa) == 0x128d /* moby class 4749 */)
+  effect.color = FastTweenColor(0xf6fcf, 0x3fcfef, RandomFloatRange(0.0f, 1.0f));
  else
-  effect.color = func_00283D38(0xf4fdf, 0x1f8fff, func_002A7878(0.0f, 1.0f));
- effect.size = func_002A7878(1.0f, 2.0f);
- if (*(short *)(o + 0xaa) == 0x128c) qcopy(effect.pos, pos);
+  effect.color = FastTweenColor(0xf4fdf, 0x1f8fff, RandomFloatRange(0.0f, 1.0f));
+ effect.size = RandomFloatRange(1.0f, 2.0f);
+ if (*(short *)(o + 0xaa) == 0x128c /* moby class 4748 */) qcopy(effect.pos, pos);
  else qcopy(effect.pos, o + 0x10);
- if (*(short *)(o + 0xaa) != 0x128c) {
-  effect.pos[0] += func_002A7878(-0.25f, 0.25f);
-  effect.pos[1] += func_002A7878(-0.25f, 0.25f);
-  effect.pos[2] += func_002A7878(-0.25f, 0.25f);
+ if (*(short *)(o + 0xaa) != 0x128c /* moby class 4748 */) {
+  effect.pos[0] += RandomFloatRange(-0.25f, 0.25f);
+  effect.pos[1] += RandomFloatRange(-0.25f, 0.25f);
+  effect.pos[2] += RandomFloatRange(-0.25f, 0.25f);
  }
- func_00282C88(effect.velocity);
- effect.rotation = func_002A7940();
- effect.angle = func_002A7878(90.0f, 180.0f) * 0.0002908882452175021f;
- effect.first = effect.last = func_002A7820(70, 90);
+ ClearVector128(effect.velocity);
+ effect.rotation = RandomAngle();
+ effect.angle = RandomFloatRange(90.0f, 180.0f) * 0.0002908882452175021f;
+ effect.first = effect.last = RandomIntRange(70, 90);
  effect.type = 5;
- effect.flags = ((D_001B8840.frame % 2 + 1) << 1) | 1;
- func_002ED2B8(object, &effect);
- if (*(short *)(o + 0xaa) == 0x128c) {
+ effect.flags = ((gScenePlaybackState.frame % 2 + 1) << 1) | 1;
+ AddEffectRecord(object, &effect);
+ if (*(short *)(o + 0xaa) == 0x128c /* moby class 4748 */) {
   qcopy(effect.pos, other);
-  func_002ED2B8(object, &effect);
-  if (*(short *)(o + 0xaa) == 0x128c) {
-   if (!(D_001B8840.frame & 1)) {
-   spark.life = func_002A7820(127, 255);
+  AddEffectRecord(object, &effect);
+  if (*(short *)(o + 0xaa) == 0x128c /* moby class 4748 */) {
+   if (!(gScenePlaybackState.frame & 1)) {
+   spark.life = RandomIntRange(127, 255);
    spark.color = 0x3fff;
-   spark.size = func_002A7878(0.0625f, 0.125f);
+   spark.size = RandomFloatRange(0.0625f, 0.125f);
    qcopy(spark.pos, o + 0x10);
-   spark.pos[0] += func_002A7878(-1.5f, 1.5f);
-   spark.pos[1] += func_002A7878(-1.5f, 1.5f);
-   spark.pos[2] += func_002A7878(-1.5f, 1.5f);
-   func_00282C88(spark.velocity);
-   spark.rotation = func_002A7940();
-   spark.angle = func_002A7878(90.0f, 180.0f) * 0.0002908882452175021f;
-   spark.first = spark.last = func_002A7820(135, 160);
+   spark.pos[0] += RandomFloatRange(-1.5f, 1.5f);
+   spark.pos[1] += RandomFloatRange(-1.5f, 1.5f);
+   spark.pos[2] += RandomFloatRange(-1.5f, 1.5f);
+   ClearVector128(spark.velocity);
+   spark.rotation = RandomAngle();
+   spark.angle = RandomFloatRange(90.0f, 180.0f) * 0.0002908882452175021f;
+   spark.first = spark.last = RandomIntRange(135, 160);
    spark.type = 0;
    spark.flags = 0;
-   func_002ED2B8(object, &spark);
+   AddEffectRecord(object, &spark);
    spark.color = 0xffffff;
    spark.size *= 0.8f;
-   func_002ED2B8(object, &spark);
+   AddEffectRecord(object, &spark);
    }
-   color = (func_002A7820(32, 80) << 24) | 0xff1f1f;
-   func_00281EB8(o + 0x10, 5, color, 1, 5.0f, 1.0f, func_002A7940());
+   color = (RandomIntRange(32, 80) << 24) | 0xff1f1f;
+   DrawBillboardQuad_00281EB8(o + 0x10, 5, color, 1, 5.0f, 1.0f, RandomAngle());
   }
  }
 }

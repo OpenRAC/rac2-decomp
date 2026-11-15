@@ -20,40 +20,41 @@ extern s32 func_002E5CF8(s32, s32, char *);
 #define ENTRY() (D_00239BA0 + D_00139568[0x29] * 0xE0)
 
 /* One step of an object's launch routine: aims the pending hit and counts it down. */
-void func_00305058(char *obj)
+/* Fires the Miniturret's shot at its target and uses up one round. */
+void func_00305058(char *moby)
 {
-    V4_F305058 a, b, c, d, e;
-    char *rec = *(char **)(obj + 0x68);
-    char *link;
-    char *tgt;
-    float scale;
-    char *ent;
+    V4_F305058 upDir, targetPos, shotVelocity, muzzlePos, targetMotion;
+    char *vars = *(char **)(moby + 0x68);
+    char *targetInfo;
+    char *target;
+    float speed;
+    char *weaponDef;
 
-    func_0029FCC0(obj, 1, d);
-    func_002FE8D8(obj + 0x10, a);
-    if (*(float *)(rec + 0x5C) == 0.0f) {
-        if (*(s32 *)(rec + 0x50) != 0) {
-            if (*(char **)(rec + 0x68) != 0) {
-                link = func_002AB1F0(*(char **)(rec + 0x68));
-                tgt = *(char **)(rec + 0x68);
-                qcopy(b, tgt + 0x10);
-                if (link != 0) {
-                    func_00282D30(e, tgt + 0xE0, *(float *)(link + 0x10));
-                    func_00282CC0(b, b, e);
+    TransformMobyJointToWorld(moby, 1, muzzlePos);
+    GetObjectFacingDirection(moby + 0x10, upDir);
+    if (*(float *)(vars + 0x5C) == 0.0f) {
+        if (*(s32 *)(vars + 0x50) != 0) {
+            if (*(char **)(vars + 0x68) != 0) {
+                targetInfo = GetMobyPrivateValue0(*(char **)(vars + 0x68));
+                target = *(char **)(vars + 0x68);
+                qcopy(targetPos, target + 0x10);
+                if (targetInfo != 0) {
+                    FastVecScale(targetMotion, target + 0xE0, *(float *)(targetInfo + 0x10));
+                    FastVecAdd(targetPos, targetPos, targetMotion);
                 }
-                ent = ENTRY();
-                scale = *(float *)(ent + 0x50) * 0.016666668f;
-                func_00282CF0(c, b, d);
-                func_00282F20(c, c, scale);
-                func_003001E0(c, c, d);
-                func_00305438(obj, c);
-                func_002E5CF8(0, 0, obj);
-                *(s32 *)(rec + 0x40) = D_001AEC08;
-                *(s32 *)(rec + 0x44) = 6;
-                if (--*(s32 *)(rec + 0x60) <= 0)
-                    *(u8 *)(obj + 0x20) = 8;
-                ent = ENTRY();
-                *(float *)(rec + 0x5C) = 1.0f / *(float *)(ent + 0x54);
+                weaponDef = ENTRY();
+                speed = *(float *)(weaponDef + 0x50) * 0.016666668f;
+                FastVecSub(shotVelocity, targetPos, muzzlePos);
+                vec_scale_to_length(shotVelocity, shotVelocity, speed);
+                AddTransformedVectorOrCopy(shotVelocity, shotVelocity, muzzlePos);
+                AddParticleTrailEntry(moby, shotVelocity);
+                PlayMobySound(0, 0, moby);
+                *(s32 *)(vars + 0x40) = D_001AEC08;
+                *(s32 *)(vars + 0x44) = 6;
+                if (--*(s32 *)(vars + 0x60) <= 0)
+                    *(u8 *)(moby + 0x20) = 8;
+                weaponDef = ENTRY();
+                *(float *)(vars + 0x5C) = 1.0f / *(float *)(weaponDef + 0x54);
             }
         }
     }

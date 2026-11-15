@@ -27,7 +27,7 @@ void func_L26_003DF7E8(char *object) {
     float *private = *(float **)(object + 0x68);
     float blend;
     int j;
-    packet.state[1] = func_0027C878(D_L26_001B0678);
+    packet.state[1] = GetEffectTextureDescriptor(D_L26_001B0678);
     packet.state[2] = 0;
     packet.state[2] |= 0xFF9000000260ULL;
     packet.state[0] = 0;
@@ -54,23 +54,23 @@ void func_L26_003DF7E8(char *object) {
             for (j = 0; j < 4; j++) {
                 int index;
                 unsigned int *entry;
-                index = func_00283CF0(packet.uv[j][1] + 0.2f);
+                index = FloatToInt(packet.uv[j][1] + 0.2f);
                 packet.uv[j][0] = D_L26_001B0688[j][0] + private[2];
-                blend = func_00283198(private[0] * 3.1415927f);
+                blend = FastSinOrCosB(private[0] * 3.1415927f);
                 entry = &D_L26_001B0680[index];
-                packet.color[j] = func_00283D38(*entry & 0xFFFFFF, *entry, blend);
+                packet.color[j] = FastTweenColor(*entry & 0xFFFFFF, *entry, blend);
             }
-            func_00280B90(&packet, 0, 0);
+            draw_world_quad(&packet, 0, 0);
             for (j = 0; j < 4; j++) {
                 int index;
                 unsigned int *entry;
-                index = func_00283CF0(packet.uv[j][1] + 0.2f);
+                index = FloatToInt(packet.uv[j][1] + 0.2f);
                 packet.uv[j][0] = D_L26_001B0688[j][0] + private[3];
-                blend = func_00283198(private[1] * 3.1415927f);
+                blend = FastSinOrCosB(private[1] * 3.1415927f);
                 entry = &D_L26_001B0680[index];
-                packet.color[j] = func_00283D38(*entry & 0xFFFFFF, *entry, blend);
+                packet.color[j] = FastTweenColor(*entry & 0xFFFFFF, *entry, blend);
             }
-            func_00280B90(&packet, 0, 0);
+            draw_world_quad(&packet, 0, 0);
         }
     }
 }

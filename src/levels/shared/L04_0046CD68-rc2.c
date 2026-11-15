@@ -49,15 +49,16 @@ extern f32 ref_L04_0046CD68_04 __attribute__((sda));
 extern f32 ref_L04_0046CD68_05 __attribute__((sda));
 extern s32 ref_L04_0046CD68_06 __attribute__((sda));
 
-void func_L04_0046CD68(Outer *arg0, s32 arg1) {
-    Entity *ent = arg0->entity;
-    f32 *base = &ent->f70;
-    Entity *entv0 ;
+/* Sets up the follow-camera offset in its record, mirrored and slightly higher when asked to. */
+void func_L04_0046CD68(Outer *camera, s32 mirrored) {
+    Entity *record = camera->entity;
+    f32 *base = &record->f70;
+    Entity *recordAgain ;
 
-    ent->f70 = ref_L04_0046CD68_02;
-    if (arg1 != 0) {
+    record->f70 = ref_L04_0046CD68_02;
+    if (mirrored != 0) {
         if (ref_L04_0046CD68_06 != 0) {
-            ent->f70 = -ref_L04_0046CD68_02;
+            record->f70 = -ref_L04_0046CD68_02;
         }
     }
     base[1] = ref_L04_0046CD68_03;
@@ -65,14 +66,14 @@ void func_L04_0046CD68(Outer *arg0, s32 arg1) {
     base[3] = 1.0f;
     base[4] = ref_L04_0046CD68_00(base);
 
-    entv0 = arg0->entity;
-    entv0->f90 = ref_L04_0046CD68_05;
-    if (arg1 != 0) {
-        entv0->f90 = ref_L04_0046CD68_05 * 1.1f;
+    recordAgain = camera->entity;
+    recordAgain->f90 = ref_L04_0046CD68_05;
+    if (mirrored != 0) {
+        recordAgain->f90 = ref_L04_0046CD68_05 * 1.1f;
     }
 
-    entv0 = arg0->entity;
-    entv0->f94 = 0;
-    entv0->f98 = 0;
-    ref_L04_0046CD68_01(arg0);
+    recordAgain = camera->entity;
+    recordAgain->f94 = 0;
+    recordAgain->f98 = 0;
+    ref_L04_0046CD68_01(camera);
 }

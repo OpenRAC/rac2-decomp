@@ -110,394 +110,395 @@ extern void func_L00_0031D670(void *, void *, void *, float);
 extern void func_L00_0038B888(void *, int);
 
 
-void func_L00_0038BF18(char *m)
+/* Updates the hero's wrench object: checks what the swing hits, and handles the throw out and the return to the hero. */
+void func_L00_0038BF18(char *moby)
 {
-    f32 vec[8][4] __attribute__((aligned(16)));
-    char *pv;
-    float ang;
-    char *t;
-    char *t2;
-    char *t3;
+    f32 vectors[8][4] __attribute__((aligned(16)));
+    char *vars;
+    float angle;
+    char *heroMoby;
+    char *heroMobyCheck;
+    char *hitClass;
     char *mode;
     char *pos;
-    char *snd;
-    float *r;
+    char *sound;
+    float *link;
     float yaw;
-    float diff;
+    float yawDiff;
     float lim;
     float range;
-    float k;
-    float sc;
-    float d;
-    float zf;
-    float g;
-    float top;
-    LevelClass *cls;
-    CamMode *cm;
-    int ok;
-    int found;
-    int hit;
-    int done;
-    int far;
+    float pull;
+    float reachScale;
+    float distanceToHero;
+    float mobyZ;
+    float checkRadius;
+    float groundZ;
+    LevelClass *levelClass;
+    CamMode *camMode;
+    int canHit;
+    int swingAllowed;
+    int didHit;
+    int arrived;
+    int tooFar;
 
-    pv = *(char **)(m + 0x68);
-    ((Hero *)D_00189E20)->b[0x123C] = 0;
-    if (((Hero *)D_00189E20)->i[0x1244 / 4] == 3) {
+    vars = *(char **)(moby + 0x68);
+    ((Hero *)gHeroState)->b[0x123C] = 0;
+    if (((Hero *)gHeroState)->i[0x1244 / 4] == 3) {
         return;
     }
-    switch (*(u8 *)(m + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(void **)(m + 0xB8) = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-        if ((((Hero *)D_00189E20)->i[0x2294 / 4] == 1 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x1D)
-            && (*(u16 *)((char *)((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0x34) & 1)) {
-            func_00273318(m, 0xFF917267, 0, 0x25, -1, 4, 1.0f, 0.0f, 90.0f);
+        *(void **)(moby + 0xB8) = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+        if ((((Hero *)gHeroState)->i[0x2294 / 4] == 1 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x1D)
+            && (*(u16 *)((char *)((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x34) & 1)) {
+            AddMobyMarker(moby, 0xFF917267, 0, 0x25, -1, 4, 1.0f, 0.0f, 90.0f);
         }
-        if (pv != 0 && *(f32 *)(pv + 0x70) != 0.0f) {
-            ref_L00_0038BF18_00(func_L00_0038B208, m);
+        if (vars != 0 && *(f32 *)(vars + 0x70) != 0.0f) {
+            ref_L00_0038BF18_00(UpdateTrailStrips, moby);
         }
         if (D_001A72C0 == 0) {
-            *(u16 *)(m + 0x34) &= ~0x10;
+            *(u16 *)(moby + 0x34) &= ~0x10;
         } else {
-            *(u32 *)(m + 0x78) = 0x80909090;
-            *(u16 *)(m + 0x34) |= 0x10;
+            *(u32 *)(moby + 0x78) = 0x80909090;
+            *(u16 *)(moby + 0x34) |= 0x10;
         }
-        if (*(u8 *)(m + 0x43) != 0) {
-            if (*(u8 *)(m + 0x43) == 0xE) {
-                if (*(u8 *)(m + 0x60) & 2) {
-                    func_002A7470(m, 1, 0, 5);
+        if (*(u8 *)(moby + 0x43) != 0) {
+            if (*(u8 *)(moby + 0x43) == 0xE) {
+                if (*(u8 *)(moby + 0x60) & 2) {
+                    StartAnimationBlended(moby, 1, 0, 5);
                 }
                 return;
             }
-            if (((Hero *)D_00189E20)->b[0x22BE] != 0) {
-                if ((u8)(*(u8 *)(m + 0x43) - 0xF) >= 2) {
-                    func_002A7470(m, 0xF, 0, 4);
-                } else if ((*(u8 *)(m + 0x60) & 2) && *(u8 *)(m + 0x43) == 0xF) {
-                    func_002A7470(m, 0x10, 0, 5);
+            if (((Hero *)gHeroState)->b[0x22BE] != 0) {
+                if ((u8)(*(u8 *)(moby + 0x43) - 0xF) >= 2) {
+                    StartAnimationBlended(moby, 0xF, 0, 4);
+                } else if ((*(u8 *)(moby + 0x60) & 2) && *(u8 *)(moby + 0x43) == 0xF) {
+                    StartAnimationBlended(moby, 0x10, 0, 5);
                 }
                 return;
             }
-            if ((u8)(*(u8 *)(m + 0x43) - 0xF) < 2) {
-                func_002A7470(m, 0xE, 0, 2);
+            if ((u8)(*(u8 *)(moby + 0x43) - 0xF) < 2) {
+                StartAnimationBlended(moby, 0xE, 0, 2);
                 return;
             }
         }
-        if ((*(u8 *)(m + 0x60) & 2) && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x37 && ((Hero *)D_00189E20)->i[0x229C / 4] != 0x22
-            && *(u8 *)(m + 0x43) != 1) {
-            func_002A7470(m, 1, 0, 5);
+        if ((*(u8 *)(moby + 0x60) & 2) && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x37 && ((Hero *)gHeroState)->i[0x229C / 4] != 0x22
+            && *(u8 *)(moby + 0x43) != 1) {
+            StartAnimationBlended(moby, 1, 0, 5);
         }
-        func_L00_0038B6F8(m);
-        if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x13 && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x20 && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x2A
-            && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6D && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x14
-            && *(u8 *)(m + 0x43) >= 3 && *(u8 *)(m + 0x43) < 6) {
-            func_002A7470(m, 1, 0, 4);
+        SyncWeaponAnimToHero(moby);
+        if (((Hero *)gHeroState)->i[0x2294 / 4] != 0x13 && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x20 && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x2A
+            && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x6D && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x14
+            && *(u8 *)(moby + 0x43) >= 3 && *(u8 *)(moby + 0x43) < 6) {
+            StartAnimationBlended(moby, 1, 0, 4);
         }
-        t = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-        if (*(u8 *)(t + 0x43) != *(u8 *)(t + 0x42) || *(u8 *)(t + 0x41) - *(u8 *)(t + 0x40) >= 3) {
-            *(u16 *)(pv + 0x74) += 1;
+        heroMoby = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+        if (*(u8 *)(heroMoby + 0x43) != *(u8 *)(heroMoby + 0x42) || *(u8 *)(heroMoby + 0x41) - *(u8 *)(heroMoby + 0x40) >= 3) {
+            *(u16 *)(vars + 0x74) += 1;
         }
-        *(f32 *)(m + 0x48) = ((Hero *)D_00189E20)->f[0xC20 / 4];
-        cm = &D_L00_0025D990[((Hero *)D_00189E20)->h[0xBFC / 2]];
-        if (((Hero *)D_00189E20)->i[0x229C / 4] != 6 && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x2A) {
+        *(f32 *)(moby + 0x48) = ((Hero *)gHeroState)->f[0xC20 / 4];
+        camMode = &D_L00_0025D990[((Hero *)gHeroState)->h[0xBFC / 2]];
+        if (((Hero *)gHeroState)->i[0x229C / 4] != 6 && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x2A) {
             return;
         }
-        ok = 1;
-        if (((Hero *)D_00189E20)->i[0xC2C / 4] != 0 || ((Hero *)D_00189E20)->f[0xC38 / 4] < (f32)cm->i1C || (f32)cm->i20 < ((Hero *)D_00189E20)->f[0xC38 / 4]) {
-            ok = 0;
+        canHit = 1;
+        if (((Hero *)gHeroState)->i[0xC2C / 4] != 0 || ((Hero *)gHeroState)->f[0xC38 / 4] < (f32)camMode->i1C || (f32)camMode->i20 < ((Hero *)gHeroState)->f[0xC38 / 4]) {
+            canHit = 0;
         }
-        found = 0;
-        if (*(s16 *)(pv + 0x7C) != *(s16 *)(pv + 0x74)) {
-            t2 = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-            if (*(u8 *)(t2 + 0x42) == *(u8 *)(t2 + 0x43)) {
-                if (*(u8 *)(t2 + 0x42) == 0x17) {
-                    found = 1;
-                    if (!(0.0f <= ((Hero *)D_00189E20)->f[0xC38 / 4])) {
-                        found = 0;
+        swingAllowed = 0;
+        if (*(s16 *)(vars + 0x7C) != *(s16 *)(vars + 0x74)) {
+            heroMobyCheck = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+            if (*(u8 *)(heroMobyCheck + 0x42) == *(u8 *)(heroMobyCheck + 0x43)) {
+                if (*(u8 *)(heroMobyCheck + 0x42) == 0x17) {
+                    swingAllowed = 1;
+                    if (!(0.0f <= ((Hero *)gHeroState)->f[0xC38 / 4])) {
+                        swingAllowed = 0;
                     }
-                } else if (*(u8 *)(t2 + 0x42) == 0x18) {
-                    found = 1;
-                    if (!(0.0f <= ((Hero *)D_00189E20)->f[0xC38 / 4])) {
-                        found = 0;
+                } else if (*(u8 *)(heroMobyCheck + 0x42) == 0x18) {
+                    swingAllowed = 1;
+                    if (!(0.0f <= ((Hero *)gHeroState)->f[0xC38 / 4])) {
+                        swingAllowed = 0;
                     }
-                } else if (*(u8 *)(t2 + 0x42) == 0x19) {
-                    found = 1;
-                    if (!(12.0f <= ((Hero *)D_00189E20)->f[0xC38 / 4])) {
-                        found = 0;
+                } else if (*(u8 *)(heroMobyCheck + 0x42) == 0x19) {
+                    swingAllowed = 1;
+                    if (!(12.0f <= ((Hero *)gHeroState)->f[0xC38 / 4])) {
+                        swingAllowed = 0;
                     }
-                } else if (*(u8 *)(t2 + 0x42) == 0x2B) {
-                    found = 1;
-                    if (!(23.0f <= ((Hero *)D_00189E20)->f[0xC38 / 4])) {
-                        found = 0;
+                } else if (*(u8 *)(heroMobyCheck + 0x42) == 0x2B) {
+                    swingAllowed = 1;
+                    if (!(23.0f <= ((Hero *)gHeroState)->f[0xC38 / 4])) {
+                        swingAllowed = 0;
                     }
                 }
             }
         }
-        if (found != 0) {
-            *(f32 *)(pv + 0x70) = 1.0f;
-            *(s16 *)(pv + 0x7C) = *(s16 *)(pv + 0x74);
+        if (swingAllowed != 0) {
+            *(f32 *)(vars + 0x70) = 1.0f;
+            *(s16 *)(vars + 0x7C) = *(s16 *)(vars + 0x74);
         }
-        diff = 0.0f;
-        yaw = ((Hero *)D_00189E20)->f[0x98 / 4];
-        qcopy(&((Hero *)D_00189E20)->b[0xB90], &((Hero *)D_00189E20)->b[0xB70]);
-        qcopy(&((Hero *)D_00189E20)->b[0xB80], &((Hero *)D_00189E20)->b[0xB60]);
-        func_0029FCC0(m, 1, &((Hero *)D_00189E20)->b[0xB70]);
-        func_0029FCC0(((Hero *)D_00189E20)->ptr[0x2290 / 4], 0, &((Hero *)D_00189E20)->b[0xB60]);
-        if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x13 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6D || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x2A) {
-            yaw = func_00283248(((Hero *)D_00189E20)->f[0xB70 / 4] - ((Hero *)D_00189E20)->f[0x80 / 4], ((Hero *)D_00189E20)->f[0xB74 / 4] - ((Hero *)D_00189E20)->f[0x84 / 4]);
-            if (D_L00_0025D990[((Hero *)D_00189E20)->h[0xBFC / 2]].i4 == 1) {
-                yaw = func_00283B98(yaw, -1.57079649f);
+        yawDiff = 0.0f;
+        yaw = ((Hero *)gHeroState)->f[0x98 / 4];
+        qcopy(&((Hero *)gHeroState)->b[0xB90], &((Hero *)gHeroState)->b[0xB70]);
+        qcopy(&((Hero *)gHeroState)->b[0xB80], &((Hero *)gHeroState)->b[0xB60]);
+        TransformMobyJointToWorld(moby, 1, &((Hero *)gHeroState)->b[0xB70]);
+        TransformMobyJointToWorld(((Hero *)gHeroState)->ptr[0x2290 / 4], 0, &((Hero *)gHeroState)->b[0xB60]);
+        if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x13 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x6D || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x2A) {
+            yaw = FastMatrixHelperA(((Hero *)gHeroState)->f[0xB70 / 4] - ((Hero *)gHeroState)->f[0x80 / 4], ((Hero *)gHeroState)->f[0xB74 / 4] - ((Hero *)gHeroState)->f[0x84 / 4]);
+            if (D_L00_0025D990[((Hero *)gHeroState)->h[0xBFC / 2]].i4 == 1) {
+                yaw = FastAddRotations(yaw, -1.57079649f);
             } else {
-                yaw = func_00283B98(yaw, 1.57079649f);
+                yaw = FastAddRotations(yaw, 1.57079649f);
             }
         }
         {
-            func_00282CF0(vec[0], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60]);
-            func_00282F20(vec[0], vec[0], func_00282DF0(vec[0]) + 0.17f);
-            if (((Hero *)D_00189E20)->i[0x229C / 4] != 0xF && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6D && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x14) {
-                diff = func_00283C80(((Hero *)D_00189E20)->f[0x98 / 4],
-                                     func_00283248(((Hero *)D_00189E20)->f[0xB70 / 4] - ((Hero *)D_00189E20)->f[0x80 / 4],
-                                                   ((Hero *)D_00189E20)->f[0xB74 / 4] - ((Hero *)D_00189E20)->f[0x84 / 4]));
-                if (diff > 1.57079649f) {
-                    ok = 0;
+            FastVecSub(vectors[0], &((Hero *)gHeroState)->b[0xB70], &((Hero *)gHeroState)->b[0xB60]);
+            vec_scale_to_length(vectors[0], vectors[0], FastVecLength(vectors[0]) + 0.17f);
+            if (((Hero *)gHeroState)->i[0x229C / 4] != 0xF && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x6D && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x14) {
+                yawDiff = FastDiffRots(((Hero *)gHeroState)->f[0x98 / 4],
+                                     FastMatrixHelperA(((Hero *)gHeroState)->f[0xB70 / 4] - ((Hero *)gHeroState)->f[0x80 / 4],
+                                                   ((Hero *)gHeroState)->f[0xB74 / 4] - ((Hero *)gHeroState)->f[0x84 / 4]));
+                if (yawDiff > 1.57079649f) {
+                    canHit = 0;
                 }
-                func_L00_0038BE70((char *)vec[0]);
+                ScaleVectorByAngleLimit((char *)vectors[0]);
             }
-            func_00282CC0(&((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60], vec[0]);
-            if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x2A && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6D && diff < 1.22173059f
-                && ((Hero *)D_00189E20)->i[0x1B8 / 4] >= 11) {
-                qcopy(vec[0], &((Hero *)D_00189E20)->b[0x80]);
-                vec[0][2] = vec[0][2] + 0.5f;
-                ang = func_00283248(((Hero *)D_00189E20)->f[0xB70 / 4] - ((Hero *)D_00189E20)->f[0x80 / 4], ((Hero *)D_00189E20)->f[0xB74 / 4] - ((Hero *)D_00189E20)->f[0x84 / 4]);
-                qcopy(vec[1], &((Hero *)D_00189E20)->b[0x80]);
-                vec[1][2] = vec[1][2] + 0.5f;
-                vec[2][0] = func_00283180(ang) * 1.4f;
-                vec[2][1] = func_00283198(ang) * 1.4f;
-                vec[2][2] = 0.0f;
-                func_L00_0038BE70((char *)vec[2]);
-                func_00282CC0(vec[1], vec[1], vec[2]);
-                if (((Hero *)D_00189E20)->h[0xBFE / 2] == 0 && func_002761F8(vec[0], vec[1], 2, 0, 0) != 0 && func_00278E78() != 0
-                    && (D_L00_001BF200.moby == 0 || func_L00_0031F220(D_L00_001BF200.moby) != 0)) {
-                    ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                    func_002E5CF8(2, 0, m);
-                    func_L00_0038BA80(m);
-                    if (D_L00_001BF200.moby != 0) {
-                        if (((Hero *)D_00189E20)->b[0x22C3] == 0) {
-                            vec[3][0] = func_00283180(yaw);
-                            vec[3][1] = func_00283198(yaw);
-                            vec[3][2] = 0.0f;
+            FastVecAdd(&((Hero *)gHeroState)->b[0xB70], &((Hero *)gHeroState)->b[0xB60], vectors[0]);
+            if (((Hero *)gHeroState)->i[0x2294 / 4] != 0x2A && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x6D && yawDiff < 1.22173059f
+                && ((Hero *)gHeroState)->i[0x1B8 / 4] >= 11) {
+                qcopy(vectors[0], &((Hero *)gHeroState)->b[0x80]);
+                vectors[0][2] = vectors[0][2] + 0.5f;
+                angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0xB70 / 4] - ((Hero *)gHeroState)->f[0x80 / 4], ((Hero *)gHeroState)->f[0xB74 / 4] - ((Hero *)gHeroState)->f[0x84 / 4]);
+                qcopy(vectors[1], &((Hero *)gHeroState)->b[0x80]);
+                vectors[1][2] = vectors[1][2] + 0.5f;
+                vectors[2][0] = FastSinOrCosA(angle) * 1.4f;
+                vectors[2][1] = FastSinOrCosB(angle) * 1.4f;
+                vectors[2][2] = 0.0f;
+                ScaleVectorByAngleLimit((char *)vectors[2]);
+                FastVecAdd(vectors[1], vectors[1], vectors[2]);
+                if (((Hero *)gHeroState)->h[0xBFE / 2] == 0 && CollLine(vectors[0], vectors[1], 2, 0, 0) != 0 && GetCollHitMaterial() != 0
+                    && (gCollisionResult.moby == 0 || IsMobyMissingOrClass502(gCollisionResult.moby) != 0)) {
+                    ((Hero *)gHeroState)->h[0xBFE / 2] = 1;
+                    PlayMobySound(2, 0, moby);
+                    SpawnWeaponImpactSparks(moby);
+                    if (gCollisionResult.moby != 0) {
+                        if (((Hero *)gHeroState)->b[0x22C3] == 0) {
+                            vectors[3][0] = FastSinOrCosA(yaw);
+                            vectors[3][1] = FastSinOrCosB(yaw);
+                            vectors[3][2] = 0.0f;
                         } else {
-                            qcopy(vec[3], &((Hero *)D_00189E20)->b[0]);
+                            qcopy(vectors[3], &((Hero *)gHeroState)->b[0]);
                         }
-                        func_002A8F70(D_L00_001BF200.moby, m, 0x10000, D_L00_001BF200.pos, vec[3], 1.0f);
+                        QueueImpactEffect(gCollisionResult.moby, moby, 0x10000, gCollisionResult.pos, vectors[3], 1.0f);
                     }
                 }
             }
-            if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x14 && func_L00_002B3998(27.0f) != 0) {
-                func_002E5CF8(2, 0, m);
-                qcopy(vec[0], &((Hero *)D_00189E20)->b[0xB70]);
-                qcopy(vec[1], vec[0]);
-                func_L00_002D3778(vec[0], vec[0], 0.7f);
-                func_L00_002D3778(vec[1], vec[1], -0.9f);
-                if (func_002761F8(vec[0], vec[1], 2, 0, 0) != 0) {
-                    func_L00_0038BA80(m);
+            if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x14 && IsBelowPlaneWithinDepth(27.0f) != 0) {
+                PlayMobySound(2, 0, moby);
+                qcopy(vectors[0], &((Hero *)gHeroState)->b[0xB70]);
+                qcopy(vectors[1], vectors[0]);
+                ApplyHeroModeTransformReversed(vectors[0], vectors[0], 0.7f);
+                ApplyHeroModeTransformReversed(vectors[1], vectors[1], -0.9f);
+                if (CollLine(vectors[0], vectors[1], 2, 0, 0) != 0) {
+                    SpawnWeaponImpactSparks(moby);
                 }
             }
         }
-        if (ok != 0) {
-            cls = &D_L00_00262570[D_00139568[0xA]];
-            sc = 1.0f;
-            range = cls->f70;
-            if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x14) {
-                range = cls->f74;
-                sc = 1.55f;
+        if (canHit != 0) {
+            levelClass = &gWeaponTable_L00[gItemSlotToRecord[0xA]];
+            reachScale = 1.0f;
+            range = levelClass->f70;
+            if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x14) {
+                range = levelClass->f74;
+                reachScale = 1.55f;
             }
-            vec[3][0] = func_00283180(yaw);
-            vec[3][1] = func_00283198(yaw);
-            vec[3][2] = 0.0f;
-            func_002A8C00(vec[0], m, 0x10000, vec[3], range);
-            func_00282F70(vec[0], vec[0], sc);
-            vec[0][2] = 1.0f;
-            vec[0][3] = 5627.9248f;
-            ((CollQuery *)vec[0])->b19 = 1;
-            ((CollQuery *)vec[0])->h1A = *(u16 *)(m + 0xAA);
-            ((CollQuery *)vec[0])->b18 = 0;
-            if (((Hero *)D_00189E20)->b[0x22C3] != 0) {
-                qzero_nc(vec[3]);
-                func_002AFD88(((Hero *)D_00189E20)->ptr[0x2290 / 4], vec[3], 1.0f, 0.0f, 1.0f);
+            vectors[3][0] = FastSinOrCosA(yaw);
+            vectors[3][1] = FastSinOrCosB(yaw);
+            vectors[3][2] = 0.0f;
+            make_hit_descriptor(vectors[0], moby, 0x10000, vectors[3], range);
+            FastVectorNormalizeHelper(vectors[0], vectors[0], reachScale);
+            vectors[0][2] = 1.0f;
+            vectors[0][3] = 5627.9248f;
+            ((CollQuery *)vectors[0])->b19 = 1;
+            ((CollQuery *)vectors[0])->h1A = *(u16 *)(moby + 0xAA);
+            ((CollQuery *)vectors[0])->b18 = 0;
+            if (((Hero *)gHeroState)->b[0x22C3] != 0) {
+                qzero_nc(vectors[3]);
+                AddTransformedPointToVector(((Hero *)gHeroState)->ptr[0x2290 / 4], vectors[3], 1.0f, 0.0f, 1.0f);
             }
-            if (func_L00_0031C3D0(&((Hero *)D_00189E20)->b[0xB60], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB80], &((Hero *)D_00189E20)->b[0xB90],
-                                  ((Hero *)D_00189E20)->ptr[0x2290 / 4], (CollQuery *)vec[0], 5) != 0
-                && D_L00_001BF200.moby != 0 && func_L00_0038B848() == 0 && ((Hero *)D_00189E20)->h[0xBFE / 2] == 0
-                && (D_L00_001BF200.moby == 0 || *(char **)(D_L00_001BF200.moby + 0x24) == 0
-                    || *(s16 *)(*(char **)(D_L00_001BF200.moby + 0x24) + 0x46) != 0x14)) {
-                ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                func_002E5CF8(func_L00_0038B7F8(), 0, m);
-                func_L00_0038BA80(m);
+            if (SweepSegmentForHit(&((Hero *)gHeroState)->b[0xB60], &((Hero *)gHeroState)->b[0xB70], &((Hero *)gHeroState)->b[0xB80], &((Hero *)gHeroState)->b[0xB90],
+                                  ((Hero *)gHeroState)->ptr[0x2290 / 4], (CollQuery *)vectors[0], 5) != 0
+                && gCollisionResult.moby != 0 && IsCurrentRecordFlagSet() == 0 && ((Hero *)gHeroState)->h[0xBFE / 2] == 0
+                && (gCollisionResult.moby == 0 || *(char **)(gCollisionResult.moby + 0x24) == 0
+                    || *(s16 *)(*(char **)(gCollisionResult.moby + 0x24) + 0x46) != 0x14)) {
+                ((Hero *)gHeroState)->h[0xBFE / 2] = 1;
+                PlayMobySound(IsCurrentRecordByteOne(), 0, moby);
+                SpawnWeaponImpactSparks(moby);
             }
-            func_00282CF0(vec[5], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60]);
-            func_00282F20(vec[5], vec[5], func_00282DF0(vec[5]) - 0.085f);
-            func_00282CC0(vec[4], vec[5], &((Hero *)D_00189E20)->b[0xB60]);
-            g = 0.35f;
-            if (((Hero *)D_00189E20)->i[0x229C / 4] == 0xF) {
-                g = 0.7f;
+            FastVecSub(vectors[5], &((Hero *)gHeroState)->b[0xB70], &((Hero *)gHeroState)->b[0xB60]);
+            vec_scale_to_length(vectors[5], vectors[5], FastVecLength(vectors[5]) - 0.085f);
+            FastVecAdd(vectors[4], vectors[5], &((Hero *)gHeroState)->b[0xB60]);
+            checkRadius = 0.35f;
+            if (((Hero *)gHeroState)->i[0x229C / 4] == 0xF) {
+                checkRadius = 0.7f;
             }
-            if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x14) {
-                g = 0.47f;
+            if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x14) {
+                checkRadius = 0.47f;
             }
-            if (func_00277F48(g, vec[4], 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], (CollQuery *)vec[0]) == 0) {
+            if (ProcessCollisionHit(checkRadius, vectors[4], 0, ((Hero *)gHeroState)->ptr[0x2290 / 4], (CollQuery *)vectors[0]) == 0) {
                 return;
             }
-            if (D_L00_001C3280 != 0 && *(char **)(D_L00_001C3280 + 0x24) != 0
-                && *(s16 *)(*(char **)(D_L00_001C3280 + 0x24) + 0x46) == 0x12) {
+            if (gAreaHitTargets != 0 && *(char **)(gAreaHitTargets + 0x24) != 0
+                && *(s16 *)(*(char **)(gAreaHitTargets + 0x24) + 0x46) == 0x12) {
                 return;
             }
-            if (func_L00_0038B848() != 0) {
+            if (IsCurrentRecordFlagSet() != 0) {
                 return;
             }
-            if (((Hero *)D_00189E20)->h[0xBFE / 2] != 0) {
+            if (((Hero *)gHeroState)->h[0xBFE / 2] != 0) {
                 return;
             }
-            ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-            func_002E5CF8(func_L00_0038B7F8(), 0, m);
-            func_L00_0038BA80(m);
+            ((Hero *)gHeroState)->h[0xBFE / 2] = 1;
+            PlayMobySound(IsCurrentRecordByteOne(), 0, moby);
+            SpawnWeaponImpactSparks(moby);
         }
         break;
     case 10:
     case 11: {
-        func_L00_00322BE0(&((Hero *)D_00189E20)->b[0x1A30], 0);
-        *(void **)(m + 0xB8) = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-        ((Hero *)D_00189E20)->b[0x123C] = 2;
-        if (*(u8 *)(m + 0x20) == 10) {
-            snd = (char *)D_00188660 + ((Hero *)D_00189E20)->i[0x2430 / 4] * 0x70;
-            if (*(void **)(snd + 0x88) != ((Hero *)D_00189E20)->ptr[0x2290 / 4] || *(u8 *)(snd + 0x74) == 0) {
-                ((Hero *)D_00189E20)->i[0x2430 / 4] = func_002E5CF8(0xB, 4, ((Hero *)D_00189E20)->ptr[0x2290 / 4]);
+        UpdateTransformHistoryFollowers(&((Hero *)gHeroState)->b[0x1A30], 0);
+        *(void **)(moby + 0xB8) = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+        ((Hero *)gHeroState)->b[0x123C] = 2;
+        if (*(u8 *)(moby + 0x20) == 10) {
+            sound = (char *)gSoundState + ((Hero *)gHeroState)->i[0x2430 / 4] * 0x70;
+            if (*(void **)(sound + 0x88) != ((Hero *)gHeroState)->ptr[0x2290 / 4] || *(u8 *)(sound + 0x74) == 0) {
+                ((Hero *)gHeroState)->i[0x2430 / 4] = PlayMobySound(0xB, 4, ((Hero *)gHeroState)->ptr[0x2290 / 4]);
             }
         }
-        func_L00_00322A18(m, 0.0f, 0.0f, 0.40724355f);
-        if (((Hero *)D_00189E20)->h[0xBFE / 2] != 0 && func_00282948(pv + 0x6C) != 0) {
-            ((Hero *)D_00189E20)->h[0xBFE / 2] = 0;
+        ApplyOffsetToObjectMatrix(moby, 0.0f, 0.0f, 0.40724355f);
+        if (((Hero *)gHeroState)->h[0xBFE / 2] != 0 && FastFloatHelperD(vars + 0x6C) != 0) {
+            ((Hero *)gHeroState)->h[0xBFE / 2] = 0;
         }
-        pos = m + 0x10;
-        if (((Hero *)D_00189E20)->b[0x22C3] == 0) {
-            top = func_002A89A8(pos, 0, 0.5f);
-            zf = *(f32 *)(m + 0x18);
-            if (zf - top < 0.8f) {
-                top = top + 0.55f;
-                if (zf < top) {
-                    func_002AA2E8((f32 *)(m + 0x18), top, 0.06666667f);
+        pos = moby + 0x10;
+        if (((Hero *)gHeroState)->b[0x22C3] == 0) {
+            groundZ = ProbeGroundHeightBelow(pos, 0, 0.5f);
+            mobyZ = *(f32 *)(moby + 0x18);
+            if (mobyZ - groundZ < 0.8f) {
+                groundZ = groundZ + 0.55f;
+                if (mobyZ < groundZ) {
+                    ApproachValue((f32 *)(moby + 0x18), groundZ, 0.06666667f);
                 } else {
-                    func_002AA2E8((f32 *)(m + 0x18), top, 0.016666668f);
+                    ApproachValue((f32 *)(moby + 0x18), groundZ, 0.016666668f);
                 }
             }
         }
-        qcopy(vec[0], pos);
-        if (*(u8 *)(m + 0x20) == 10) {
-            qcopy(vec[1], &((Hero *)D_00189E20)->b[0x150]);
-            func_00282D30(vec[1], vec[1], 0.98f);
-            func_00282CC0(pos, pos, vec[1]);
-            func_00282F20(vec[1], pv + 0x40, *(f32 *)(pv + 0x60));
-            func_00282CC0(pos, pos, vec[1]);
-            *(f32 *)(pv + 0x64) = *(f32 *)(pv + 0x64) + 0.000787037017f;
-            func_002AA2E8((f32 *)(pv + 0x60), 0.0f, *(f32 *)(pv + 0x64));
-            if (*(f32 *)(pv + 0x60) == 0.0f) {
-                *(u8 *)(m + 0x20) = 11;
+        qcopy(vectors[0], pos);
+        if (*(u8 *)(moby + 0x20) == 10) {
+            qcopy(vectors[1], &((Hero *)gHeroState)->b[0x150]);
+            FastVecScale(vectors[1], vectors[1], 0.98f);
+            FastVecAdd(pos, pos, vectors[1]);
+            vec_scale_to_length(vectors[1], vars + 0x40, *(f32 *)(vars + 0x60));
+            FastVecAdd(pos, pos, vectors[1]);
+            *(f32 *)(vars + 0x64) = *(f32 *)(vars + 0x64) + 0.000787037017f;
+            ApproachValue((f32 *)(vars + 0x60), 0.0f, *(f32 *)(vars + 0x64));
+            if (*(f32 *)(vars + 0x60) == 0.0f) {
+                *(u8 *)(moby + 0x20) = 11;
             }
         } else {
-            qcopy(vec[1], &((Hero *)D_00189E20)->b[0x150]);
-            func_00282D30(vec[1], vec[1], 0.98f);
-            done = 0;
-            func_00282CC0(pos, pos, vec[1]);
-            func_L00_0038BD00(m);
-            func_00282CF0(vec[1], &((Hero *)D_00189E20)->b[0x1200], pos);
-            *(f32 *)(pv + 0x64) = *(f32 *)(pv + 0x64) + 0.00025f;
-            *(f32 *)(pv + 0x60) = *(f32 *)(pv + 0x60) + *(f32 *)(pv + 0x64);
-            d = func_00282DF0(vec[1]);
-            if (d / *(f32 *)(pv + 0x60) < 5.0f && *(u8 *)(m + 0x43) != 1) {
-                func_002A7470(m, 1, 0, 5);
+            qcopy(vectors[1], &((Hero *)gHeroState)->b[0x150]);
+            FastVecScale(vectors[1], vectors[1], 0.98f);
+            arrived = 0;
+            FastVecAdd(pos, pos, vectors[1]);
+            TriggerNearbyObjectResponse(moby);
+            FastVecSub(vectors[1], &((Hero *)gHeroState)->b[0x1200], pos);
+            *(f32 *)(vars + 0x64) = *(f32 *)(vars + 0x64) + 0.00025f;
+            *(f32 *)(vars + 0x60) = *(f32 *)(vars + 0x60) + *(f32 *)(vars + 0x64);
+            distanceToHero = FastVecLength(vectors[1]);
+            if (distanceToHero / *(f32 *)(vars + 0x60) < 5.0f && *(u8 *)(moby + 0x43) != 1) {
+                StartAnimationBlended(moby, 1, 0, 5);
             }
-            if (d <= *(f32 *)(pv + 0x60)) {
-                *(f32 *)(pv + 0x60) = d;
-                done = 1;
+            if (distanceToHero <= *(f32 *)(vars + 0x60)) {
+                *(f32 *)(vars + 0x60) = distanceToHero;
+                arrived = 1;
             }
-            func_00282F20(vec[1], vec[1], *(f32 *)(pv + 0x60));
-            func_00282CC0(pos, pos, vec[1]);
-            if (d / *(f32 *)(pv + 0x60) < 4.0f && ((Hero *)D_00189E20)->i[0xC40 / 4] != -1) {
-                func_L00_002D24D0(2);
-                ((Hero *)D_00189E20)->i[0xC44 / 4] = 0x1A;
-                if (((Hero *)D_00189E20)->i[0x2430 / 4] != -1) {
-                    snd = (char *)D_00188660 + ((Hero *)D_00189E20)->i[0x2430 / 4] * 0x70;
-                    if (*(void **)(snd + 0x88) == ((Hero *)D_00189E20)->ptr[0x2290 / 4] && *(u8 *)(snd + 0x74) != 0) {
-                        func_002E59F8(((Hero *)D_00189E20)->i[0x2430 / 4]);
+            vec_scale_to_length(vectors[1], vectors[1], *(f32 *)(vars + 0x60));
+            FastVecAdd(pos, pos, vectors[1]);
+            if (distanceToHero / *(f32 *)(vars + 0x60) < 4.0f && ((Hero *)gHeroState)->i[0xC40 / 4] != -1) {
+                SetHeroAnimationMode(2);
+                ((Hero *)gHeroState)->i[0xC44 / 4] = 0x1A;
+                if (((Hero *)gHeroState)->i[0x2430 / 4] != -1) {
+                    sound = (char *)gSoundState + ((Hero *)gHeroState)->i[0x2430 / 4] * 0x70;
+                    if (*(void **)(sound + 0x88) == ((Hero *)gHeroState)->ptr[0x2290 / 4] && *(u8 *)(sound + 0x74) != 0) {
+                        StopSoundVoice(((Hero *)gHeroState)->i[0x2430 / 4]);
                     }
                 }
-                ((Hero *)D_00189E20)->i[0x2430 / 4] = -1;
+                ((Hero *)gHeroState)->i[0x2430 / 4] = -1;
             }
-            far = 0;
-            if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x31 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x61 || d > 32.0f) {
-                far = 1;
+            tooFar = 0;
+            if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x31 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x61 || distanceToHero > 32.0f) {
+                tooFar = 1;
             }
-            if (done != 0 || far != 0) {
-                if (far == 0) {
-                    func_L00_002B9B88(5, 0);
+            if (arrived != 0 || tooFar != 0) {
+                if (tooFar == 0) {
+                    PlayHeroSound(5, 0);
                 }
-                if (((Hero *)D_00189E20)->i[0x2430 / 4] != -1) {
-                    snd = (char *)D_00188660 + ((Hero *)D_00189E20)->i[0x2430 / 4] * 0x70;
-                    if (*(void **)(snd + 0x88) == ((Hero *)D_00189E20)->ptr[0x2290 / 4] && *(u8 *)(snd + 0x74) != 0) {
-                        func_002E59F8(((Hero *)D_00189E20)->i[0x2430 / 4]);
+                if (((Hero *)gHeroState)->i[0x2430 / 4] != -1) {
+                    sound = (char *)gSoundState + ((Hero *)gHeroState)->i[0x2430 / 4] * 0x70;
+                    if (*(void **)(sound + 0x88) == ((Hero *)gHeroState)->ptr[0x2290 / 4] && *(u8 *)(sound + 0x74) != 0) {
+                        StopSoundVoice(((Hero *)gHeroState)->i[0x2430 / 4]);
                     }
                 }
-                ((Hero *)D_00189E20)->i[0x2430 / 4] = -1;
-                func_L00_00322EC8(&((Hero *)D_00189E20)->b[0x1A30]);
-                ((Hero *)D_00189E20)->b[0x123A] = 0;
-                *(u8 *)(m + 0x20) = 0;
+                ((Hero *)gHeroState)->i[0x2430 / 4] = -1;
+                ReleaseSlotList(&((Hero *)gHeroState)->b[0x1A30]);
+                ((Hero *)gHeroState)->b[0x123A] = 0;
+                *(u8 *)(moby + 0x20) = 0;
             }
         }
-        hit = 0;
-        if (func_002761F8(vec[0], pos, 2, 0, 0) != 0 && func_00278E78() != 0
-            && (D_L00_001BF200.moby == 0 || func_002ABB78(D_L00_001BF200.moby) == 0)) {
-            hit = D_L00_001BF200.count != 0;
+        didHit = 0;
+        if (CollLine(vectors[0], pos, 2, 0, 0) != 0 && GetCollHitMaterial() != 0
+            && (gCollisionResult.moby == 0 || IsMobyInSpecialClassRange(gCollisionResult.moby) == 0)) {
+            didHit = gCollisionResult.count != 0;
         }
-        if (hit != 0 || *(s16 *)(pv + 0x76) != 0) {
-            *(s16 *)(pv + 0x76) = 0;
-            if (((Hero *)D_00189E20)->h[0xBFE / 2] == 0) {
-                *(int *)(pv + 0x6C) = 0x1E;
-                ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                func_002E5CF8(2, 0, m);
+        if (didHit != 0 || *(s16 *)(vars + 0x76) != 0) {
+            *(s16 *)(vars + 0x76) = 0;
+            if (((Hero *)gHeroState)->h[0xBFE / 2] == 0) {
+                *(int *)(vars + 0x6C) = 0x1E;
+                ((Hero *)gHeroState)->h[0xBFE / 2] = 1;
+                PlayMobySound(2, 0, moby);
             }
-            if (*(u8 *)(m + 0x20) == 10) {
-                func_L00_0038BA80(m);
-                *(f32 *)(pv + 0x60) = *(f32 *)(pv + 0x60) * 0.5f;
-                *(u8 *)(m + 0x20) = 11;
+            if (*(u8 *)(moby + 0x20) == 10) {
+                SpawnWeaponImpactSparks(moby);
+                *(f32 *)(vars + 0x60) = *(f32 *)(vars + 0x60) * 0.5f;
+                *(u8 *)(moby + 0x20) = 11;
             }
         }
-        k = 1.2f;
-        if (*(u8 *)(m + 0x20) == 11) {
-            k = -0.37f;
+        pull = 1.2f;
+        if (*(u8 *)(moby + 0x20) == 11) {
+            pull = -0.37f;
         }
-        func_00282F20(vec[4], pv + 0x40, k);
-        func_002A8C00(vec[1], m, 0x10000, vec[4], (&D_L00_00262570[D_00139568[0xA]])->f70);
-        vec[1][2] = 1.0f;
-        if (((Hero *)D_00189E20)->b[0x22C3] != 0) {
-            qzero_nc(vec[1]);
-            func_002AFD88(((Hero *)D_00189E20)->ptr[0x2290 / 4], vec[1], k, 0.0f, 1.0f);
+        vec_scale_to_length(vectors[4], vars + 0x40, pull);
+        make_hit_descriptor(vectors[1], moby, 0x10000, vectors[4], (&gWeaponTable_L00[gItemSlotToRecord[0xA]])->f70);
+        vectors[1][2] = 1.0f;
+        if (((Hero *)gHeroState)->b[0x22C3] != 0) {
+            qzero_nc(vectors[1]);
+            AddTransformedPointToVector(((Hero *)gHeroState)->ptr[0x2290 / 4], vectors[1], pull, 0.0f, 1.0f);
         }
-        vec[1][3] = 5627.9248f;
-        ((CollQuery *)vec[1])->b19 = 1;
-        ((CollQuery *)vec[1])->h1A = ((Hero *)D_00189E20)->uh[0xC0C / 2] + 1;
-        ((CollQuery *)vec[1])->b18 = 0;
-        func_0029FCC0(m, 1, vec[5]);
-        if ((func_00277F48(0.4f, vec[5], 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], (CollQuery *)vec[1]) != 0
-             || (func_0029FCC0(m, 0, vec[5]), func_00277F48(0.4f, vec[5], 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], (CollQuery *)vec[1]) != 0))
-            && ((Hero *)D_00189E20)->h[0xBFE / 2] == 0 && D_L00_001BF200.moby != 0) {
-            t3 = *(char **)(D_L00_001BF200.moby + 0x24);
-            if (t3 == 0 || *(s16 *)(t3 + 0x46) != 0x14) {
-                r = func_002AB1F0(D_L00_001BF200.moby);
-                if (r == 0 || *(s16 *)((char *)r + 0x1C) == 0 || *(char **)((char *)r + 0x18) != m) {
-                    *(TI128 *)vec[7] = *(TI128 *)(D_L00_001BF200.moby + 0x10);
-                    func_L00_0031D670(vec[6], vec[5], vec[7], 0.5f);
-                    func_L00_0038B888(vec[6], 5);
-                    *(int *)(pv + 0x6C) = 0x1E;
-                    ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                    func_002E5CF8(func_L00_0038B7F8(), 0, m);
+        vectors[1][3] = 5627.9248f;
+        ((CollQuery *)vectors[1])->b19 = 1;
+        ((CollQuery *)vectors[1])->h1A = ((Hero *)gHeroState)->uh[0xC0C / 2] + 1;
+        ((CollQuery *)vectors[1])->b18 = 0;
+        TransformMobyJointToWorld(moby, 1, vectors[5]);
+        if ((ProcessCollisionHit(0.4f, vectors[5], 0, ((Hero *)gHeroState)->ptr[0x2290 / 4], (CollQuery *)vectors[1]) != 0
+             || (TransformMobyJointToWorld(moby, 0, vectors[5]), ProcessCollisionHit(0.4f, vectors[5], 0, ((Hero *)gHeroState)->ptr[0x2290 / 4], (CollQuery *)vectors[1]) != 0))
+            && ((Hero *)gHeroState)->h[0xBFE / 2] == 0 && gCollisionResult.moby != 0) {
+            hitClass = *(char **)(gCollisionResult.moby + 0x24);
+            if (hitClass == 0 || *(s16 *)(hitClass + 0x46) != 0x14) {
+                link = GetMobyPrivateValue0(gCollisionResult.moby);
+                if (link == 0 || *(s16 *)((char *)link + 0x1C) == 0 || *(char **)((char *)link + 0x18) != moby) {
+                    *(TI128 *)vectors[7] = *(TI128 *)(gCollisionResult.moby + 0x10);
+                    LerpVector4(vectors[6], vectors[5], vectors[7], 0.5f);
+                    SpawnSparkBurst_L00_2(vectors[6], 5);
+                    *(int *)(vars + 0x6C) = 0x1E;
+                    ((Hero *)gHeroState)->h[0xBFE / 2] = 1;
+                    PlayMobySound(IsCurrentRecordByteOne(), 0, moby);
                 }
             }
         }

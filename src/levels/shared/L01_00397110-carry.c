@@ -55,141 +55,142 @@ typedef struct {
  float x34;
  int x38, x3C, x40, x44, x48, x4C, x50;
 } CarryData;
-void func_L01_003980D0(char *m)
+/* Updates the Teleporter: spawns three spinning child objects, waits for the hero to press the button at the pad, then moves the hero to the linked teleporter. */
+void func_L01_003980D0(char *moby)
 {
- CarryData *d = *(CarryData **)(m+0x68);
+ CarryData *vars = *(CarryData **)(moby+0x68);
  int done=0, i, result;
  char **p;
  float v[4];
- unsigned short flags = *(u16 *)(m+0xB2);
+ unsigned short flags = *(u16 *)(moby+0xB2);
  if (D_L01_0021E4B0.disabled[(short)flags]) goto completed;
  {
-  int c = (u8)D_0019B4A8[((short)flags>>1)+(D_001A79F0<<10)];
-  if (flags&1) { if ((c>>4)&7) goto completed; }
-  else if(c&7) goto completed;
+  int savedBits = (u8)D_0019B4A8[((short)flags>>1)+(gCurrentMapIndex<<10)];
+  if (flags&1) { if ((savedBits>>4)&7) goto completed; }
+  else if(savedBits&7) goto completed;
   goto flags_checked;
 completed:
   done=1;
  }
 flags_checked:
  done=!!done;
- if (d->event!=-1 && !done && func_002ACBC8(D_00189EA0,d->event)) {
-  done=1; func_L01_00398008(m); func_L01_003990E8(m);
-  if (*(u8 *)(m+0x20)==5) func_002A7750(m,1,-1);
+ if (vars->event!=-1 && !done && IsPointInCuboid(gHeroPosition,vars->event)) {
+  done=1; IncrementSavedSwitchCounter(moby); ShowMobyAndLinkedParts(moby);
+  if (*(u8 *)(moby+0x20)==5) SetMobyState(moby,1,-1);
  }
- if (d->x3C) {
+ if (vars->x3C) {
   if (!D_001A7A00[0xA]) {
-   *(u16 *)(m+0x34)|=0x41;
-   *(int *)(m+0x98)=0;
+   *(u16 *)(moby+0x34)|=0x41;
+   *(int *)(moby+0x98)=0;
    return;
   }
-  *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10);
-  *(u16 *)(m+0x34)&=0xFFBE;
+  *(int *)(moby+0x98)=*(int *)(*(char **)(moby+0x24)+0x10);
+  *(u16 *)(moby+0x34)&=0xFFBE;
  }
- if (*(u16 *)(m+0x96)<0x7FFD) ++*(u16 *)(m+0x96);
- switch (*(u8 *)(m+0x20)) {
+ if (*(u16 *)(moby+0x96)<0x7FFD) ++*(u16 *)(moby+0x96);
+ switch (*(u8 *)(moby+0x20)) {
  case 0: {
   int i;
   char **p;
-  *(u8 *)(m+0x30)=255;
+  *(u8 *)(moby+0x30)=255;
   for(i=0;i<3;i++) {
-   char **p=d->children+i;
-   *p=func_0029EFD0(0x13B);
+   char **p=vars->children+i;
+   *p=CreateMoby(0x13B /* moby class 315 */);
    if(*p) {
     *(u16 *)(*p+0x32)=0x40; *(u8 *)(*p+0x31)=1;
-    *(u64 *)(*p+0x38)=*(u64 *)(D_00189E20.model+0x38);
-    *(u16 *)(*p+0x34)=*(u16 *)(m+0x34);
-    qcopy_nc(*p+0x10, m+0x10);
-    qcopy_nc(*p+0xF0, m+0xF0);
-    *(u8 *)(*p+0x30)=*(u8 *)(m+0x30);
-    if(*(char **)(*p+0x68)) **(char ***)(*p+0x68)=m;
-    *(float *)(*p+0xF8)=func_00283B98(*(float *)(*p+0xF8),i*2.0943954f);
+    *(u64 *)(*p+0x38)=*(u64 *)(gHeroState.model+0x38);
+    *(u16 *)(*p+0x34)=*(u16 *)(moby+0x34);
+    qcopy_nc(*p+0x10, moby+0x10);
+    qcopy_nc(*p+0xF0, moby+0xF0);
+    *(u8 *)(*p+0x30)=*(u8 *)(moby+0x30);
+    if(*(char **)(*p+0x68)) **(char ***)(*p+0x68)=moby;
+    *(float *)(*p+0xF8)=FastAddRotations(*(float *)(*p+0xF8),i*2.0943954f);
    }
   }
-  if(d->x38||done) func_002A7750(m,6,-1);
-  else { func_002A7750(m,5,-1); func_L01_00399098(m); }
+  if(vars->x38||done) SetMobyState(moby,6,-1);
+  else { SetMobyState(moby,5,-1); HideMobyAndLinkedParts(moby); }
   {
-  func_L01_00398938(m);
+  PositionCarriedObjects(moby);
   break;
 }
  }
  case 6:
-  if(*(u8 *)(m+0x21)!=255) func_L01_003115E8(*(u8 *)(m+0x21),1);
-  func_002A7750(m,1,-1);
+  if(*(u8 *)(moby+0x21)!=255) SetMobyStateInList(*(u8 *)(moby+0x21),1);
+  SetMobyState(moby,1,-1);
   
  case 1:
-  if(d->unlock>=0 && !(D_0019B2E8[d->unlock+(CarryLevelIndex<<4)]&0x80)) break;
-  if(d->target==-1 || D_00189E20.mode==2 || D_00189E20.linked!=m || D_00189E20.control) break;
-  if(d->x50) {
-   d->x50=!D_00189E20.busy;
+  if(vars->unlock>=0 && !(D_0019B2E8[vars->unlock+(CarryLevelIndex<<4)]&0x80)) break;
+  if(vars->target==-1 || gHeroState.mode==2 || gHeroState.linked!=moby || gHeroState.control) break;
+  if(vars->x50) {
+   vars->x50=!gHeroState.busy;
    D_L01_001A8FF4=4; D_L01_001A8FF0=2;
-  } else func_L01_00398A90(m);
+  } else ApplyLevelTableEntry(moby);
   if(!(D_00138324&0x10)) break;
-  func_002E5CF8(0,0,m); func_002A7750(m,2,-1);
-  d->x2C=0; d->x30=-1; d->x28=0;
-  func_L00_002D40A0(m+0x10,0,*(float *)(m+0xF8));
-  func_002A8C28(m,m+0x10,0x10000,0,1,0,1.5f,20.0f,1.0f);
+  PlayMobySound(0,0,moby); SetMobyState(moby,2,-1);
+  vars->x2C=0; vars->x30=-1; vars->x28=0;
+  StartHeroTargetState(moby+0x10,0,*(float *)(moby+0xF8));
+  SweepCollisionFromObject(moby,moby+0x10,0x10000,0,1,0,1.5f,20.0f,1.0f);
   break;
  case 7:
-  if(d->x20<1.0f) {
-   func_002AA548(&d->x20,&d->x28,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
-  } else if(d->x24<1.0f) {
-   func_002AA548(&d->x24,&d->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+  if(vars->x20<1.0f) {
+   StepValueTowardTarget(&vars->x20,&vars->x28,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+  } else if(vars->x24<1.0f) {
+   StepValueTowardTarget(&vars->x24,&vars->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
   } else {
-   func_002E5CF8(1,0,m); func_002A7750(m,8,-1); d->x34=0;
+   PlayMobySound(1,0,moby); SetMobyState(moby,8,-1); vars->x34=0;
   }
   {
-  func_L01_00398938(m);
+  PositionCarriedObjects(moby);
   break;
 }
  case 2:
-  result=func_L00_002D40F0();
-  if(d->x20<1.0f) {
-   func_002AA548(&d->x20,&d->x28,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+  result=GetHeroTargetStateKind();
+  if(vars->x20<1.0f) {
+   StepValueTowardTarget(&vars->x20,&vars->x28,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
   } else {
    int mode = CarryMode;
-   if(d->x24<1.0f) {
-   func_002AA548(&d->x24,&d->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
-  } else if(!(mode==4 && d->x20>0.25f)) {
-   if(result==2) { d->x34=1.95f; func_002A7750(m,3,-1); }
-   else if(!result) func_002A7750(m,4,-1);
-   else if(*(u16 *)(m+0x96)>=361) { func_L01_002C98B8(); d->x34=1.95f; func_002A7750(m,3,-1); }
+   if(vars->x24<1.0f) {
+   StepValueTowardTarget(&vars->x24,&vars->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+  } else if(!(mode==4 && vars->x20>0.25f)) {
+   if(result==2) { vars->x34=1.95f; SetMobyState(moby,3,-1); }
+   else if(!result) SetMobyState(moby,4,-1);
+   else if(*(u16 *)(moby+0x96)>=361) { SetHeroMoveStateBySpeed(); vars->x34=1.95f; SetMobyState(moby,3,-1); }
    }
   }
-  func_L01_00398938(m);
+  PositionCarriedObjects(moby);
   break;
  case 3:
-  if(d->x34!=0) {
-   func_L00_002E6CF0(func_L01_00398B50,m); func_002AA2E8(&d->x34,0.0f,0.06666667f); break;
+  if(vars->x34!=0) {
+   AddDrawCallbackToList1(DrawShrinkingMobyRings,moby); ApproachValue(&vars->x34,0.0f,0.06666667f); break;
   } else {
-   char *other=D_L01_001B255C+(d->target<<8);
-   CarryData *od=*(CarryData **)(other+0x68);
-   qcopy_nc(v, other+0x10); v[2]+=0.2f;
-   if(d->x4C!=-1) func_L00_00303530(d->x4C,od->x40);
-   func_L00_002B9D60(v,other+0xF0,0,1);
-   if(od->x48!=-1) func_L00_0042A500(od->x48);
-   func_L01_00323310(od->x40,od->x44);
-   func_002A7750(other,4,-1);
-   od->x28=0; od->x2C=0; od->x34=0;
-   od->x24=od->x20=1; od->x50=1;
-   func_002E5CF8(1,0,other); func_002A7750(m,1,-1);
-   d->x2C=d->x28=d->x24=d->x20=0;
-   d->x34=1.95f; func_L01_00398938(m);
+   char *linkedMoby=gMobyTable_L01+(vars->target<<8);
+   CarryData *linkedVars=*(CarryData **)(linkedMoby+0x68);
+   qcopy_nc(v, linkedMoby+0x10); v[2]+=0.2f;
+   if(vars->x4C!=-1) LoadSceneChunk(vars->x4C,linkedVars->x40);
+   ResetHeroPositionAndDirection(v,linkedMoby+0xF0,0,1);
+   if(linkedVars->x48!=-1) ResetCameraEntry(linkedVars->x48);
+   QueueKeyedRequest(linkedVars->x40,linkedVars->x44);
+   SetMobyState(linkedMoby,4,-1);
+   linkedVars->x28=0; linkedVars->x2C=0; linkedVars->x34=0;
+   linkedVars->x24=linkedVars->x20=1; linkedVars->x50=1;
+   PlayMobySound(1,0,linkedMoby); SetMobyState(moby,1,-1);
+   vars->x2C=vars->x28=vars->x24=vars->x20=0;
+   vars->x34=1.95f; PositionCarriedObjects(moby);
   }
   break;
  case 4: case 8:
-  if(func_002B3868(m)) {
-   p=d->children;
+  if(SetFirstPendingFlag(moby)) {
+   p=vars->children;
    for(i=2;i>=0;i--,p++) if(*p) *(u16 *)(*p+0x34)&=0xFF7F;
   }
-  if(d->x34<1.95f) {
-   func_L00_002E6CF0(func_L01_00398B50,m); func_002AA2E8(&d->x34,1.95f,0.06666667f);
-  } else if(d->x24>0) {
-   func_002AA548(&d->x24,&d->x28,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
-  } else if(d->x20>0) {
-   func_002AA548(&d->x20,&d->x2C,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
-  } else func_002A7750(m,1,-1);
-  func_L01_00398938(m);
+  if(vars->x34<1.95f) {
+   AddDrawCallbackToList1(DrawShrinkingMobyRings,moby); ApproachValue(&vars->x34,1.95f,0.06666667f);
+  } else if(vars->x24>0) {
+   StepValueTowardTarget(&vars->x24,&vars->x28,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+  } else if(vars->x20>0) {
+   StepValueTowardTarget(&vars->x20,&vars->x2C,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+  } else SetMobyState(moby,1,-1);
+  PositionCarriedObjects(moby);
  }
  ;
 }

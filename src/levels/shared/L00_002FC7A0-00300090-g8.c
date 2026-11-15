@@ -31,6 +31,7 @@ typedef struct {
 } TfragMaterialPacket;
 typedef struct { long lo; long hi; } TfragPacketQword;
 typedef struct { short x0; short x2; unsigned short x4; short x6; short x8; short xA; short xC; short xE; } TfragTexture;
+/* Sets up the level's tfrag (terrain) render data and writes the GS texture setup words for each material. */
 void func_L00_00300090(TfragRenderHeader *hdr, char *tbl) {
     char *base;
     float scale;
@@ -46,7 +47,7 @@ void func_L00_00300090(TfragRenderHeader *hdr, char *tbl) {
     D_L00_001B24E0[0] = scale * 6.0f;
     D_L00_001B24E0[1] = scale * 4.0f;
     D_L00_001B24E0[2] = scale + scale;
-    func_002EF080();
+    SetTfragDists();
     base = (char *)hdr + *(int *)hdr;
     D_L00_001B24D0 = base;
     n = D_L00_001B24D4;
@@ -77,8 +78,8 @@ void func_L00_00300090(TfragRenderHeader *hdr, char *tbl) {
             if (!(0 < a19)) {
                 a19 = 1;
             }
-            u = func_00282A18(t >> 16);
-            v = func_00282A18(m->x6);
+            u = log2dim(t >> 16);
+            v = log2dim(m->x6);
             gs = D_001A72F4 >> 8;
             /* The s64/u64 casts keep every OR chain at three operands of one type, so
                fold's reduce_expression_tree_depth leaves the left-to-right GS word trees

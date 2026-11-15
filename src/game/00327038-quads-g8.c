@@ -67,6 +67,7 @@ static inline void NextFace(int *value)
     *value = *value + 1;
 }
 
+/* Draws the many debris quads facing the camera, scaled by the object's size, with moving texture coordinates. */
 void func_0032C2E8(char *object)
 {
     RenderPacket packet;
@@ -89,16 +90,16 @@ void func_0032C2E8(char *object)
     packet.tag[3] |= (long long)D_001B05AC << 32;
     packet.tag[0] = 0;
 
-    func_002FE8D8(&D_00189E20.pos, &up);
-    func_00282CF0(&difference, &D_001B5340, &D_00189E20.pos);
-    func_00282F20(&packet.matrix[0], &difference, 1.0f);
-    func_00282DD8(&packet.matrix[1], &packet.matrix[0], &up);
-    func_00282F20(&packet.matrix[1], &packet.matrix[1], 1.0f);
-    func_00282DD8(&packet.matrix[2], &packet.matrix[1], &packet.matrix[0]);
-    func_00282F20(&difference, &difference, 2.0f);
-    packet.matrix[3].x = D_00189E20.pos.x + difference.x;
-    packet.matrix[3].y = D_00189E20.pos.y + difference.y;
-    packet.matrix[3].z = D_00189E20.pos.z + difference.z;
+    GetObjectFacingDirection(&gHeroState.pos, &up);
+    FastVecSub(&difference, &gCameraState_001B5340, &gHeroState.pos);
+    vec_scale_to_length(&packet.matrix[0], &difference, 1.0f);
+    FastVecCross(&packet.matrix[1], &packet.matrix[0], &up);
+    vec_scale_to_length(&packet.matrix[1], &packet.matrix[1], 1.0f);
+    FastVecCross(&packet.matrix[2], &packet.matrix[1], &packet.matrix[0]);
+    vec_scale_to_length(&difference, &difference, 2.0f);
+    packet.matrix[3].x = gHeroState.pos.x + difference.x;
+    packet.matrix[3].y = gHeroState.pos.y + difference.y;
+    packet.matrix[3].z = gHeroState.pos.z + difference.z;
     packet.matrix[3].w = 1.0f;
 
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = D_001B05B0;
@@ -116,17 +117,17 @@ void func_0032C2E8(char *object)
             for (corner = 0; corner < 4; corner++) {
                 int index = quad[corner].uv;
 
-                func_00282D30(&packet.vertex[corner], &D_0026AA00[quad[corner].vertex], *(float *)(state + 0x14) * 4.0f);
-                func_002830C0(&packet.vertex[corner], &packet.vertex[corner], packet.matrix);
-                func_0027C768(&packet.vertex[corner], &packet.uv[corner].u, &packet.uv[corner].v);
-                *(float *)u += func_00283180(D_00235D00[index].u) * 0.01f;
-                *(float *)v += func_00283180(D_00235D00[index].v) * 0.02f;
+                FastVecScale(&packet.vertex[corner], &D_0026AA00[quad[corner].vertex], *(float *)(state + 0x14) * 4.0f);
+                transform_vector(&packet.vertex[corner], &packet.vertex[corner], packet.matrix);
+                ProjectWorldToScreen(&packet.vertex[corner], &packet.uv[corner].u, &packet.uv[corner].v);
+                *(float *)u += FastSinOrCosA(D_00235D00[index].u) * 0.01f;
+                *(float *)v += FastSinOrCosA(D_00235D00[index].v) * 0.02f;
                 ClampUnit((float *)u);
                 ClampUnit((float *)v);
                 v += 8;
                 u += 8;
             }
-            func_00280B90(&packet, 0, 0);
+            draw_world_quad(&packet, 0, 0);
             NextFace(&face);
         } while (face < 127);
     }
@@ -134,8 +135,8 @@ void func_0032C2E8(char *object)
     phase = D_00235D00_1;
     face = 136;
     do {
-        phase->u = func_00283B98(phase->u, 0.6283186078071594f);
-        phase->v = func_00283B98(phase->v, 0.3141593039035797f);
+        phase->u = FastAddRotations(phase->u, 0.6283186078071594f);
+        phase->v = FastAddRotations(phase->v, 0.3141593039035797f);
         phase++;
         face--;
     } while (face >= 0);

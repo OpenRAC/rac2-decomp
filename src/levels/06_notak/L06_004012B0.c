@@ -29,88 +29,89 @@ extern Effect D_L06_001B9700;
 
 extern unsigned char *D_L06_001FF41C;
 typedef struct { int timer; float speed, height; int handle; Vec velocity; } UpdateState;
-void func_L06_004012B0(char *obj) {
+/* Updates an object (moby class 2232) that waits to be hit, then either floats up trailing smoke or bursts with a blast, and goes away. */
+void func_L06_004012B0(char *moby) {
     struct { Vec pos, direction, random; } frame;
-    UpdateState *ctx = *(UpdateState **)(obj+0x68);
+    UpdateState *vars = *(UpdateState **)(moby+0x68);
     char *hit, *particle;
     float speed;
     char *position;
     Vec *velocity;
 
-    switch ((unsigned char)obj[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        qcopy(&frame.pos,obj+0x10);
+        qcopy(&frame.pos,moby+0x10);
         frame.pos.f[2] += 10.0f;
-        func_00282CC0(&ctx->velocity,obj+0x10,&frame.pos);
-        ctx->handle=-1;
-        obj[0x20]=1;
+        FastVecAdd(&vars->velocity,moby+0x10,&frame.pos);
+        vars->handle=-1;
+        moby[0x20]=1;
         return;
     case 1:
-        hit=func_002A9640(obj,0x10000,0);
+        hit=FindOwnedEffectSlot(moby,0x10000,0);
         if (hit) {
-          if (*(short *)(*(char **)(hit+0x20)+0xAA)!=0x8B8) {
-            if (func_002A77E0(3)==1) {
-                ctx->timer=func_002A7820(20,10);
-                ctx->height=*(float *)(obj+0x18)+20.0f;
-                obj[0x20]=3;
+          if (*(short *)(*(char **)(hit+0x20)+0xAA)!=0x8B8 /* moby class 2232 */) {
+            if (RandomIntBelow(3)==1) {
+                vars->timer=RandomIntRange(20,10);
+                vars->height=*(float *)(moby+0x18)+20.0f;
+                moby[0x20]=3;
             } else {
-                ctx->timer=func_002A7820(0,10);
-                obj[0x20]=2;
+                vars->timer=RandomIntRange(0,10);
+                moby[0x20]=2;
             }
 
           }
         }
-        *(unsigned char *)(obj+0xA8)=255;
+        *(unsigned char *)(moby+0xA8)=255;
         return;
     case 2:
-        if (func_00282948(ctx)) {
+        if (FastFloatHelperD(vars)) {
             float unit = 1.0f;
-            func_002E5CF8(0,0,obj);
+            PlayMobySound(0,0,moby);
             frame.random.q=0;
             frame.random.f[2]=0.050000004f;
-            func_00282CF0(&frame.direction,&D_L06_001B9700.position,&frame.pos);
-            func_00282F20(&frame.direction,&frame.direction,unit);
-            func_0032DA58(obj,obj+0x10,&frame.direction,5.0f);
-            D_L06_001B9700.speed=0.1f;
-            D_L06_001B9700.limit=90;
-            D_L06_001B9700.scale=0.2f;
-            D_L06_001B9700.duration=60;
-            D_L06_001B9700.timer=0;
-            func_002A8C28(obj,3.0f,obj+0x10,0x10000,3.0f,1.0f,0,1,0);
-            func_002B0A68(obj,0xEF,3.0f,&frame.random,6.0f,3.0f,6.0f,255);
-            func_0029F338(obj);
+            FastVecSub(&frame.direction,&gCameraState_L06.position,&frame.pos);
+            vec_scale_to_length(&frame.direction,&frame.direction,unit);
+            SpawnBlastEffectMoby(moby,moby+0x10,&frame.direction,5.0f);
+            gCameraState_L06.speed=0.1f;
+            gCameraState_L06.limit=90;
+            gCameraState_L06.scale=0.2f;
+            gCameraState_L06.duration=60;
+            gCameraState_L06.timer=0;
+            SweepCollisionFromObject(moby,3.0f,moby+0x10,0x10000,3.0f,1.0f,0,1,0);
+            SpawnDebrisForMaskedParts(moby,0xEF,3.0f,&frame.random,6.0f,3.0f,6.0f,255);
+            MarkMobySpawned(moby);
         }
         return;
     case 3:
-        if (func_00282948(ctx)) {obj[0x20]=2; return;}
-        func_002AA548(obj+0x18,ctx->height,&ctx->speed,0.027777778f,0.027777778f,0.33333334f);
-        *(float *)(obj+0xF0)=func_00283B98(*(float *)(obj+0xF0),func_002A7820(-10,10)*0.017453294f);
-        *(float *)(obj+0xF4)=func_00283B98(*(float *)(obj+0xF4),func_002A7820(-10,10)*0.017453294f);
-        *(float *)(obj+0xF8)=func_00283B98(*(float *)(obj+0xF8),func_002A7820(-5,25)*0.017453294f);
-        velocity=&ctx->velocity;
-        func_00282F20(velocity,velocity,ctx->speed);
+        if (FastFloatHelperD(vars)) {moby[0x20]=2; return;}
+        StepValueTowardTarget(moby+0x18,vars->height,&vars->speed,0.027777778f,0.027777778f,0.33333334f);
+        *(float *)(moby+0xF0)=FastAddRotations(*(float *)(moby+0xF0),RandomIntRange(-10,10)*0.017453294f);
+        *(float *)(moby+0xF4)=FastAddRotations(*(float *)(moby+0xF4),RandomIntRange(-10,10)*0.017453294f);
+        *(float *)(moby+0xF8)=FastAddRotations(*(float *)(moby+0xF8),RandomIntRange(-5,25)*0.017453294f);
+        velocity=&vars->velocity;
+        vec_scale_to_length(velocity,velocity,vars->speed);
         break;
     default:
         speed = 0.0f;
         return;
     }
-    speed=ctx->speed;
+    speed=vars->speed;
     frame.random.q=0;
-    position=obj+0x10;
-    frame.random.f[0]=func_002A7878(-1.0f,1.0f);
-    frame.random.f[1]=func_002A7878(-1.0f,1.0f);
-    frame.random.f[2]=func_002A7878(-1.0f,1.0f);
+    position=moby+0x10;
+    frame.random.f[0]=RandomFloatRange(-1.0f,1.0f);
+    frame.random.f[1]=RandomFloatRange(-1.0f,1.0f);
+    frame.random.f[2]=RandomFloatRange(-1.0f,1.0f);
     frame.direction.q=frame.random.q;
-    func_00282F20(&frame.direction,&frame.direction,func_002A7878(0.1f,0.2f)*0.016666668f);
-    func_00282F20(&frame.pos,velocity,-func_002A7878(0.0016666668f,0.016666668f));
-    func_00282CC0(&frame.direction,&frame.direction,&frame.pos);
-    func_00282F20(&frame.pos,velocity,func_002A7878(0.0f,1.0f)*speed);
-    func_00282CC0(&frame.pos,&frame.pos,position);
-    particle=func_002C16C0(&frame.pos,&frame.direction,20,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
+    vec_scale_to_length(&frame.direction,&frame.direction,RandomFloatRange(0.1f,0.2f)*0.016666668f);
+    vec_scale_to_length(&frame.pos,velocity,-RandomFloatRange(0.0016666668f,0.016666668f));
+    FastVecAdd(&frame.direction,&frame.direction,&frame.pos);
+    vec_scale_to_length(&frame.pos,velocity,RandomFloatRange(0.0f,1.0f)*speed);
+    FastVecAdd(&frame.pos,&frame.pos,position);
+    particle=SpawnBurstParticle_002C16C0(&frame.pos,&frame.direction,20,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
     if (particle) {
         particle[2]=*D_L06_001FF41C;
         particle[3]=0x44;
-        if (func_002A7820(0,1)) {
+        if (RandomIntRange(0,1)) {
             particle[3]=0x48;
             *(int *)(particle+4)=0x70707F;
             {char *payload=particle+0x20;
@@ -120,6 +121,6 @@ void func_L06_004012B0(char *obj) {
             *(short *)(payload+0x1E)=0x7F;}
         }
     }
-    obj+=0x10;
-    func_002C16C0(obj,&frame.direction,7,127,0xB0B0B0,3,80000.0f,40000.0f,1.0f,-0.0004f,0.0f);
+    moby+=0x10;
+    SpawnBurstParticle_002C16C0(moby,&frame.direction,7,127,0xB0B0B0,3,80000.0f,40000.0f,1.0f,-0.0004f,0.0f);
 }

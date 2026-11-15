@@ -16,6 +16,7 @@ extern float func_002A7878(float, float), func_002A78D8(float, float), func_0028
 extern int func_00283CF0(float);
 extern void func_00282D30(void *, void *, float), func_002ACEC0(void *, void *, void *, float);
 extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
+/* Updates six lightning arcs: restarts finished ones with new random points, jitters the rest and fades them. */
 void func_L00_003D3388(char *object)
 {
     ArcVector local, direction, position, eye, delta[5];
@@ -29,47 +30,47 @@ void func_L00_003D3388(char *object)
     for (i = 0; i < 6; i++) {
         scale = D_L00_001B0218;
         qcopy(&position, data + 0x10);
-        if (func_00282978(&D_L00_001B2AE0[i])) {
+        if (FastDecTimer(&D_L00_001B2AE0[i])) {
             D_L00_001B2AF0[i] = 0;
             if (i < 4) {
                 D_L00_001B2AE0[i] = D_L00_001B2B00[i];
-                turn = func_002A78D8(0.3490659f, 1.3962636f);
-                angle = func_002A7878(-1.0471977f, 0.17453295f);
-                func_00282D30(&local, &direction, scale);
-                func_002ACEC0(&local, &local, D_L00_0018A560, angle);
-                func_002ACEC0(&local, &local, D_L00_0018A560 + 1, turn);
+                turn = RandomSignedFloatRange(0.3490659f, 1.3962636f);
+                angle = RandomFloatRange(-1.0471977f, 0.17453295f);
+                FastVecScale(&local, &direction, scale);
+                ApplyAxisRotationToQuaternion(&local, &local, D_L00_0018A560, angle);
+                ApplyAxisRotationToQuaternion(&local, &local, D_L00_0018A560 + 1, turn);
                 qcopy(&D_L00_00247310[i][0], &position);
-                func_00282CC0(&D_L00_00247310[i][1], &position, &local);
+                FastVecAdd(&D_L00_00247310[i][1], &position, &local);
                 sign = 1.0f;
                 for (j = 2; j < 5; j++) {
-                    func_00282CF0(&eye, &D_L00_00247310_1[i][j - 1], D_L00_001B8DC0);
-                    angle = func_002A7878(0.17453295f, 0.9599312f) * sign;
+                    FastVecSub(&eye, &D_L00_00247310_1[i][j - 1], gCameraPosition_L00);
+                    angle = RandomFloatRange(0.17453295f, 0.9599312f) * sign;
                     sign = -sign;
-                    func_002ACEC0(&local, &local, &eye, angle);
-                    func_00282CC0(&D_L00_00247310[i][j], &D_L00_00247310_1[i][j - 1], &local);
+                    ApplyAxisRotationToQuaternion(&local, &local, &eye, angle);
+                    FastVecAdd(&D_L00_00247310[i][j], &D_L00_00247310_1[i][j - 1], &local);
                 }
             }
         } else {
             shortArc = i < 4;
             for (j = 1; j < 5; j++) {
-                func_00282CF0(&delta[j], &D_L00_00247310[i][j], &D_L00_00247310_1[i][j - 1]);
-                delta[j].f[0] += func_002A78D8(0, 0.1f);
-                delta[j].f[1] += func_002A78D8(0, 0.1f);
-                delta[j].f[2] += func_002A78D8(0, 0.1f);
+                FastVecSub(&delta[j], &D_L00_00247310[i][j], &D_L00_00247310_1[i][j - 1]);
+                delta[j].f[0] += RandomSignedFloatRange(0, 0.1f);
+                delta[j].f[1] += RandomSignedFloatRange(0, 0.1f);
+                delta[j].f[2] += RandomSignedFloatRange(0, 0.1f);
             }
             qcopy(&D_L00_00247310[i][0], &position);
             for (j = 1; j < 5; j++)
-                func_00282CC0(&D_L00_00247310[i][j], &D_L00_00247310_1[i][j - 1], &delta[j]);
+                FastVecAdd(&D_L00_00247310[i][j], &D_L00_00247310_1[i][j - 1], &delta[j]);
             if (D_L00_001B2AE0[i] > D_L00_001B2B10[i]) {
-                ratio = func_00283CE0(D_L00_001B2AE0[i] - D_L00_001B2B10[i]) / func_00283CE0(15);
+                ratio = IntToFloat(D_L00_001B2AE0[i] - D_L00_001B2B10[i]) / IntToFloat(15);
                 {
                 float alphaScale = 32.0f;
                 if (!shortArc) alphaScale = 255.0f;
-                D_L00_001B2AF0[i] = func_00283CF0((1.0f - ratio) * alphaScale);
+                D_L00_001B2AF0[i] = FloatToInt((1.0f - ratio) * alphaScale);
                 }
             } else {
-                ratio = func_00283CE0(D_L00_001B2B10[i] - D_L00_001B2AE0[i]) / func_00283CE0(15);
-                D_L00_001B2AF0[i] = func_00283CF0((1.0f - ratio) * 32.0f);
+                ratio = IntToFloat(D_L00_001B2B10[i] - D_L00_001B2AE0[i]) / IntToFloat(15);
+                D_L00_001B2AF0[i] = FloatToInt((1.0f - ratio) * 32.0f);
             }
         }
     }

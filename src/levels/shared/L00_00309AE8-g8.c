@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned int D_001A7424;
 extern int D_001A7420_1;
@@ -12,7 +13,7 @@ extern int D_001A7420_4;
 /* Write state value 3 when bit 0x40 is clear in the absolute flag word; preserve the existing value otherwise. */
 void func_L00_00309AE8(void)
 {
-    if ((D_001A7424 & 0x40u) == 0)
+    if ((gSaveMenuFlags & 0x40u) == 0)
         D_001A7420_1 = 3;
 }
 

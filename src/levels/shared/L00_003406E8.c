@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float func_00283CE0(int a);
 extern int func_00283CF0_2(float f);
@@ -12,41 +13,42 @@ extern int func_00282978_3(char *p);
 extern void func_002B9180_6(char *p);
 
 /* Hand-adapted from func_002C8880. */
-void func_L00_003406E8(char *self) {
-    float a[4];
-    float b[4];
-    char *p = self + 0x20;
-    float t, f20, f21, f22;
+/* Updates a puff particle each frame: it moves, fades and grows, then is removed when its time runs out. */
+void func_L00_003406E8(char *particle) {
+    float step[4];
+    float velocity[4];
+    char *motion = particle + 0x20;
+    float timeLeft, alphaDrop, alphaStart, progress;
     int color;
 
-    b[0] = *(float *)(self + 0x20);
-    b[1] = *(float *)(p + 4);
-    b[2] = *(float *)(p + 8);
-    b[3] = 0;
-    func_00300190_1(self + 0x10, self + 0x10);
-    t = func_00283CE0(*(short *)(self + 0xA)) / func_00283CE0(*(unsigned char *)(p + 0x11));
-    f22 = 1.0f - t;
-    if (*(unsigned char *)(p + 0x13) == 0) {
-        color = func_00283D38_1(f22, 0x103080, *(int *)(p + 0xC));
-        *(int *)(self + 4) = color | (*(unsigned char *)(p + 0x12) << 24);
-        *(float *)(self + 0xC) = *(float *)(p + 0x14) + (*(float *)(p + 0x18) - *(float *)(p + 0x14)) * f22;
-        func_00282D30_13(a, b, *(float *)(p + 0x1C) * func_002A7798(f22));
+    velocity[0] = *(float *)(particle + 0x20);
+    velocity[1] = *(float *)(motion + 4);
+    velocity[2] = *(float *)(motion + 8);
+    velocity[3] = 0;
+    func_00300190_1(particle + 0x10, particle + 0x10);
+    timeLeft = IntToFloat(*(short *)(particle + 0xA)) / IntToFloat(*(unsigned char *)(motion + 0x11));
+    progress = 1.0f - timeLeft;
+    if (*(unsigned char *)(motion + 0x13) == 0) {
+        color = func_00283D38_1(progress, 0x103080, *(int *)(motion + 0xC));
+        *(int *)(particle + 4) = color | (*(unsigned char *)(motion + 0x12) << 24);
+        *(float *)(particle + 0xC) = *(float *)(motion + 0x14) + (*(float *)(motion + 0x18) - *(float *)(motion + 0x14)) * progress;
+        func_00282D30_13(step, velocity, *(float *)(motion + 0x1C) * EaseOutQuad(progress));
     } else {
-        f21 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = f20 * func_002A7790(f22);
-        *(int *)(self + 4) = *(int *)(p + 0xC) | (func_00283CF0_2(f21 - f20) << 24);
-        func_00282D30_13(a, b, *(float *)(p + 0x1C));
+        alphaStart = IntToFloat(*(unsigned char *)(motion + 0x12));
+        alphaDrop = IntToFloat(*(unsigned char *)(motion + 0x12));
+        alphaDrop = alphaDrop * Square(progress);
+        *(int *)(particle + 4) = *(int *)(motion + 0xC) | (func_00283CF0_2(alphaStart - alphaDrop) << 24);
+        func_00282D30_13(step, velocity, *(float *)(motion + 0x1C));
     }
-    func_00282CC0_13(self + 0x10, a, self + 0x10);
-    *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(p + 0x10);
-    if (func_00282978_3(self + 0xA) != 0) {
-        if (*(unsigned char *)(p + 0x13) == 0) {
-            *(unsigned char *)(p + 0x13) = 1;
-            *(unsigned char *)(p + 0x11) = 0x14;
-            *(short *)(self + 0xA) = 0x14;
+    func_00282CC0_13(particle + 0x10, step, particle + 0x10);
+    *(unsigned char *)(particle + 8) = *(unsigned char *)(particle + 8) + *(unsigned char *)(motion + 0x10);
+    if (func_00282978_3(particle + 0xA) != 0) {
+        if (*(unsigned char *)(motion + 0x13) == 0) {
+            *(unsigned char *)(motion + 0x13) = 1;
+            *(unsigned char *)(motion + 0x11) = 0x14;
+            *(short *)(particle + 0xA) = 0x14;
         } else {
-            func_002B9180_6(self);
+            func_002B9180_6(particle);
         }
     }
 }

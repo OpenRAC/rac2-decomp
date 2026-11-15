@@ -26,6 +26,7 @@ typedef struct {
  int unknown, life, unknown2, flags, first, last, unknown3, type;
 } Effect76;
 
+/* Draws one engine flame of the ship and adds a smoky puff behind it. */
 void func_002E76C0(void *object, int index, int alternate)
 {
  float pos[4], step[4], matrix[12], first[4], second[4], combined[4];
@@ -45,52 +46,52 @@ void func_002E76C0(void *object, int index, int alternate)
  effect.unknown2 = 0x001C0000;
 #endif
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
- func_00283130(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
- func_00283130(second, next);
- func_00282D60(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
- func_00282D60(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
- func_00282CA8(combined, first, second);
- func_00283958(combined, matrix);
- func_00283738(matrix, o + 0xc0, matrix);
+ FastVectorHelperE(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
+ FastVectorHelperE(second, next);
+ scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
+ scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
+ VectorCopyHelperB(combined, first, second);
+ quaternion_to_rotation_basis(combined, matrix);
+ multiply_matrix3x3(matrix, o + 0xc0, matrix);
  entry = &D_001AC090 + index * 4;
- func_00283098(pos, entry, matrix);
- func_00282CC0(pos, pos, o + 0x10);
+ matrix_mul_vec3(pos, entry, matrix);
+ FastVecAdd(pos, pos, o + 0x10);
  strength = (float)*(unsigned char *)(o + 0x95) * (entry[3] * (1.0f / 128.0f));
  count = strength * 5.0f;
  radius = strength * 0.06f + 0.06f;
  small = strength * 0.04f + 0.04f;
- count1 = func_00283CF0(count + 25.0f);
- count2 = func_00283CF0(count + 15.0f);
+ count1 = FloatToInt(count + 25.0f);
+ count2 = FloatToInt(count + 15.0f);
  start = strength * 0.375f + 0.375f;
  end = strength * 0.09999999403953552f + 0.09999999403953552f;
  inner = strength * 0.02499999850988388f + 0.02499999850988388f;
  outer = strength * 0.024999991059303284f + 0.175f;
  width = strength * 0.07499999552965164f + 0.07499999552965164f;
- color1 = func_00283D38(0x40204080, 0x40205080, strength);
- color2 = func_00283D38(-1, -1, strength);
- func_00282D30(step, matrix, -radius);
- func_002E7570(pos, step, count1, start, end, width, color1);
+ color1 = FastTweenColor(0x40204080, 0x40205080, strength);
+ color2 = FastTweenColor(-1, -1, strength);
+ FastVecScale(step, matrix, -radius);
+ DrawSpriteTrailAlongLine(pos, step, count1, start, end, width, color1);
  if (index == 0) {
-  func_00282D30(step, matrix, -small);
-  func_002E7570(pos, step, count2, outer, inner, 0.07499999552965164f, color2);
+  FastVecScale(step, matrix, -small);
+  DrawSpriteTrailAlongLine(pos, step, count2, outer, inner, 0.07499999552965164f, color2);
  }
- func_002ED368(object);
- effect.color = func_00283D38(0x2f7f, 0x7f7f, func_002A7878(0.0f, 1.0f));
+ UpdateEffectRecords(object);
+ effect.color = FastTweenColor(0x2f7f, 0x7f7f, RandomFloatRange(0.0f, 1.0f));
  if (alternate) { low = 24; high = 40; }
  else { low = 31; high = 63; }
- effect.life = func_002A7820(low, high);
- effect.size = func_002A7878(1.0f, 2.0f);
+ effect.life = RandomIntRange(low, high);
+ effect.size = RandomFloatRange(1.0f, 2.0f);
  qcopy(effect.pos, pos);
- effect.pos[0] += func_002A7878(-0.025f, 0.025f);
- effect.pos[1] += func_002A7878(-0.025f, 0.025f);
- effect.pos[2] += func_002A7878(-0.025f, 0.025f);
- func_00282C88(effect.velocity);
+ effect.pos[0] += RandomFloatRange(-0.025f, 0.025f);
+ effect.pos[1] += RandomFloatRange(-0.025f, 0.025f);
+ effect.pos[2] += RandomFloatRange(-0.025f, 0.025f);
+ ClearVector128(effect.velocity);
  qcopy(effect.velocity, D_001B2150);
- effect.rotation = func_002A7940();
- effect.angle = func_002A7878(90.0f, 180.0f) * 0.0002908882452175021f;
- effect.first = effect.last = func_002A7820(70, 90);
+ effect.rotation = RandomAngle();
+ effect.angle = RandomFloatRange(90.0f, 180.0f) * 0.0002908882452175021f;
+ effect.first = effect.last = RandomIntRange(70, 90);
  effect.type = 5;
  effect.flags = 1;
- if (!alternate) effect.flags = ((*(int *)(D_001B8840 + 0x34) % 2 + 1) << 1) | 1;
- func_002ED2B8(object, &effect);
+ if (!alternate) effect.flags = ((*(int *)(gScenePlaybackState + 0x34) % 2 + 1) << 1) | 1;
+ AddEffectRecord(object, &effect);
 }

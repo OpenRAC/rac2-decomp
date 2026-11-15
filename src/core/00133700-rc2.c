@@ -26,13 +26,14 @@
 
 extern void func_00132DF0(s32 a, s32 b, s32 *c, s32 d, s32 e);
 
-void func_00133700(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 arr[5];
+/* Sends sound command 0x50 with five values. */
+void func_00133700(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4) {
+    s32 payload[5];
 
-    arr[0] = arg0;
-    arr[1] = arg1;
-    arr[2] = arg2;
-    arr[3] = arg3;
-    arr[4] = arg4;
-    func_00132DF0(0x50, 0x14, arr, 0, 0);
+    payload[0] = p0;
+    payload[1] = p1;
+    payload[2] = p2;
+    payload[3] = p3;
+    payload[4] = p4;
+    QueueSoundCommand(0x50, 0x14, payload, 0, 0);
 }

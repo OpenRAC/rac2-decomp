@@ -12,32 +12,33 @@ extern float func_00282C48(float);
 extern int func_002E5CF8(int, int, void *);
 extern void func_002E59F8(int);
 
+/* Slides a platform toward its target height, moves whatever rides on it and keeps its motion sound playing. */
 void func_L14_003DF6A0(char *self) {
-    struct { Vector argument, rotation; } work;
-    char *state = *(char **)(self + 0x68);
+    struct { Vector argument, rotation; } scratch;
+    char *vars = *(char **)(self + 0x68);
     float target;
-    int index;
-    if (*(int *)(state + 0x7C))
-        target = *(float *)(((char (*)[0x80])D_L14_001B268C)[*(int *)(state + 0x60)] + 0x38);
+    int soundSlot;
+    if (*(int *)(vars + 0x7C))
+        target = *(float *)(((char (*)[0x80])D_L14_001B268C)[*(int *)(vars + 0x60)] + 0x38);
     else
-        target = *(float *)(state + 0x70);
-    func_002AA548(self + 0x18, state + 0x74, target,
+        target = *(float *)(vars + 0x70);
+    StepValueTowardTarget(self + 0x18, vars + 0x74, target,
                  0.0011111111f, 0.0022222222f, 1.0f);
-    work.rotation.q = 0;
-    work.rotation.f[2] = *(float *)(state + 0x74);
-    work.argument.q = work.rotation.q;
-    func_002AD6F0(state + 0x20, &work.argument, self + 0xF0, self + 0xF0);
-    if (0.01f < func_00282C48(*(float *)(state + 0x74))) {
-        char *entry = D_00188660 + *(int *)(state + 0x78) * 0x70;
-        if (*(char **)(entry + 0x88) != self || *(unsigned char *)(entry + 0x74) == 0)
-            *(int *)(state + 0x78) = func_002E5CF8(0, 4, self);
+    scratch.rotation.q = 0;
+    scratch.rotation.f[2] = *(float *)(vars + 0x74);
+    scratch.argument.q = scratch.rotation.q;
+    CombineTransformsAndStore(vars + 0x20, &scratch.argument, self + 0xF0, self + 0xF0);
+    if (0.01f < FloatAbs(*(float *)(vars + 0x74))) {
+        char *soundEntry = gSoundState + *(int *)(vars + 0x78) * 0x70;
+        if (*(char **)(soundEntry + 0x88) != self || *(unsigned char *)(soundEntry + 0x74) == 0)
+            *(int *)(vars + 0x78) = PlayMobySound(0, 4, self);
     } else {
-        index = *(int *)(state + 0x78);
-        if (index != -1) {
-            char *entry = D_00188660 + index * 0x70;
-            if (*(char **)(entry + 0x88) == self && *(unsigned char *)(entry + 0x74) != 0)
-                func_002E59F8(index);
+        soundSlot = *(int *)(vars + 0x78);
+        if (soundSlot != -1) {
+            char *soundEntry = gSoundState + soundSlot * 0x70;
+            if (*(char **)(soundEntry + 0x88) == self && *(unsigned char *)(soundEntry + 0x74) != 0)
+                StopSoundVoice(soundSlot);
         }
-        *(int *)(state + 0x78) = -1;
+        *(int *)(vars + 0x78) = -1;
     }
 }

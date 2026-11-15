@@ -16,27 +16,28 @@ extern char r1_D_00153130[];
  * stopping at a NUL or the buffer limit, then strtol() the tail starting
  * 9 bytes before the end and compare it against a build number. Same
  * open/read/close triplet as r1_func_0012D2A0 above. */
+/* Reads a small text file from disc and checks if the build number in it is newer than a fixed number. */
 int func_00125970(void) {
     int fd;
     char buf[0x100];
-    char *p;
-    unsigned int n;
+    char *writePtr;
+    unsigned int length;
 
     fd = r1_func_0011BF80(r1_D_00153130, 1);
     if (fd < 0) {
         return -1;
     }
-    n = 0;
-    p = buf;
-    while (n < 0x100) {
-        r1_func_0011C5C0(fd, p, 1);
-        if (*p++ == 0) {
+    length = 0;
+    writePtr = buf;
+    while (length < 0x100) {
+        r1_func_0011C5C0(fd, writePtr, 1);
+        if (*writePtr++ == 0) {
             break;
         }
-        n++;
+        length++;
     }
     r1_func_0011C208(fd);
-    return 0x1315670 < r1_func_00112380(&buf[n - 9]);
+    return 0x1315670 < r1_func_00112380(&buf[length - 9]);
 }
 
 ASM_FUNC("asm/core", func_00125A10);
@@ -61,26 +62,27 @@ extern char r1_D_00153140[];
 extern int r1_func_00121D18(void);
 
 /* rac1-decomp src/core/00121D18.c: func_00125A20 */
+/* Fills a display settings structure for the given picture format, size and position, based on the TV mode. */
 void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short dy) {
-    GsGParam *gp;
+    GsGParam *gParam;
     int dx1, dy1, dx2, dy2;
     int mode;
-    short omode;
-    unsigned short imode;
+    short outMode;
+    unsigned short interMode;
 
-    gp = r1_func_00121D08();
-    if (gp->outMode != 2 && gp->outMode != 3 && r1_func_00121D18() != 0) {
-        r1_func_00121DB8(gp->outMode, &dx1, &dy1, &dx2, &dy2);
+    gParam = r1_func_00121D08();
+    if (gParam->outMode != 2 && gParam->outMode != 3 && r1_func_00121D18() != 0) {
+        r1_func_00121DB8(gParam->outMode, &dx1, &dy1, &dx2, &dy2);
     } else {
         dy2 = 0;
         dx2 = 0;
         dy1 = 0;
         dx1 = 0;
     }
-    imode = gp->interMode;
+    interMode = gParam->interMode;
     disp->pmode = 0x66;
-    if (gp->interMode != 0) {
-        if (gp->ffMode != 0) {
+    if (gParam->interMode != 0) {
+        if (gParam->ffMode != 0) {
             disp->smode2 = 3;
         } else {
             disp->smode2 = 1;
@@ -90,14 +92,14 @@ void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short
     }
     disp->dispfb = ((unsigned long)(psm & 0xF) << 15) |
                    ((unsigned long)(((w + 63) >> 6) & 0x3F) << 9);
-    omode = gp->outMode;
-    if (omode == 2) {
-        if ((short)imode == 1) {
+    outMode = gParam->outMode;
+    if (outMode == 2) {
+        if ((short)interMode == 1) {
             int magh = (w + 2559) / w;
             unsigned long dxo = (unsigned long)dx1 + 636;
             disp->display = ((((unsigned long)(magh - 1) << 23) |
                             (((dx * magh + dxo) & 0xFFF) |
-                             ((unsigned long)(gp->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
+                             ((unsigned long)(gParam->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
                             (((unsigned long)(dy + dy1 + 50) & 0xFFF) << 12)) |
                             ((unsigned long)(magh * w - 1) << 32);
         } else {
@@ -110,13 +112,13 @@ void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short
                             (((unsigned long)(dy + dy1 + 25) & 0xFFF) << 12)) |
                             ((unsigned long)((w + 2559) / w * w - 1) << 32);
         }
-    } else if (omode == 3) {
-        if ((short)imode == 1) {
+    } else if (outMode == 3) {
+        if ((short)interMode == 1) {
             int magh = (w + 2559) / w;
             unsigned long dxo = (unsigned long)dx1 + 656;
             disp->display = ((((unsigned long)(magh - 1) << 23) |
                             (((dx * magh + dxo) & 0xFFF) |
-                             ((unsigned long)(gp->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
+                             ((unsigned long)(gParam->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
                             (((unsigned long)(dy + dy1 + 72) & 0xFFF) << 12)) |
                             ((unsigned long)(magh * w - 1) << 32);
         } else {
@@ -129,7 +131,7 @@ void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short
                             (((unsigned long)(dy + dy1 + 36) & 0xFFF) << 12)) |
                             ((unsigned long)((w + 2559) / w * w - 1) << 32);
         }
-    } else if (omode == 0x50) {
+    } else if (outMode == 0x50) {
         unsigned long dxo = (unsigned long)(dx * 2) + 232;
         disp->display = ((((unsigned long)(h - 1) << 44) |
                           ((((720 - w) / 2 * 2 + (unsigned long)dx1 + dxo) & 0xFFF) | 0x800000)) |
@@ -145,10 +147,11 @@ void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short
 /* Push a GS display-environment struct's quadword fields to the GS
  * privileged registers, picking the register set by the mode flag at
  * offset 6 of the GParam block (r1_func_00121D08's return). */
+/* Writes the display settings to the graphics chip registers. */
 void func_00125D94(GsDispEnv *env) {
-    GsGParam *info = r1_func_00121D08();
+    GsGParam *gParam = r1_func_00121D08();
 
-    if (info->version == 1) {
+    if (gParam->version == 1) {
         GS_PMODE = env->pmode;
         GS_DISPFB1 = env->dispfb;
         GS_DISPLAY1 = env->display;

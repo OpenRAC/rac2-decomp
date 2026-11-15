@@ -28,7 +28,7 @@ extern char *func_00308408(char *, char *, char *, int, float, u8, u8, u8, u8);
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
                                   u8 r, u8 g, u8 b, u8 a)
 {
-    func_00308408(obj, pos, velocity, type, radius, r, g, b, a);
+    SpawnShockwaveRing(obj, pos, velocity, type, radius, r, g, b, a);
 }
 
 /* Bursts at pos: six sparks, three coloured rings, then a damage ring for an owner. */
@@ -45,13 +45,13 @@ void func_L02_00422270(char *obj, char *pos)
     damage = 2.0f;
     scale = 1.0f;
     for (i = 0; i < 6; i++) {
-        speed = func_002A7878(8.0f, 10.0f) * (1.0f / 60.0f);
-        index = func_002A77E0(6);
+        speed = RandomFloatRange(8.0f, 10.0f) * (1.0f / 60.0f);
+        index = RandomIntBelow(6);
         first = ref_L02_00422270_00[index];
         last = ref_L02_00422270_01[index];
-        life = func_002A7820(15, 20);
-        spark = func_002BBCB0(pos, velocity, first, last, scale * 400000.0f, life,
-                              func_002A7820(30, 45), 0, 0, speed * scale);
+        life = RandomIntRange(15, 20);
+        spark = SpawnFireworkSparkParticle(pos, velocity, first, last, scale * 400000.0f, life,
+                              RandomIntRange(30, 45), 0, 0, speed * scale);
         if (spark)
             spark[3] = 0x44;
     }

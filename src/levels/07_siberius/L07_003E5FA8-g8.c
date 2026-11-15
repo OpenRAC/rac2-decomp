@@ -20,19 +20,19 @@ extern float D_L07_001B0AC0[] __attribute__((sda));
 extern int D_L07_001B0AC8 __attribute__((sda));
 
 /* Emit two particles at opposite local offsets, including platform motion. */
-void func_L07_003E5FA8(char *arg)
+void func_L07_003E5FA8(char *moby)
 {
     float carryDelta[4] __attribute__((aligned(16)));
     float angles[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    char *state = *(char **)(arg + 0x68);
+    char *state = *(char **)(moby + 0x68);
     int side;
 
     qzero_nc(angles);
     if (*(void **)(state + 0x260)) {
-        func_002AD0E0(arg, *(void **)(state + 0x260), arg + 0x10, angles, carryDelta, angles);
-        func_00282CF0(carryDelta, carryDelta, arg + 0x10);
+        TransformPointAndRotationByParent(moby, *(void **)(state + 0x260), moby + 0x10, angles, carryDelta, angles);
+        FastVecSub(carryDelta, carryDelta, moby + 0x10);
     } else {
         qzero_nc(carryDelta);
     }
@@ -44,15 +44,15 @@ void func_L07_003E5FA8(char *arg)
         position[2] = D_L07_001B0AD8;
         if (!side)
             position[2] = -position[2];
-        func_002A7A00(velocity, D_L07_001B0AB0 * (1.0f / 60.0f),
+        RandomDirectionVector(velocity, D_L07_001B0AB0 * (1.0f / 60.0f),
                       D_L07_001B0AB4[0] * (1.0f / 60.0f));
-        func_00282CC0(velocity, velocity, carryDelta);
-        randomValue = func_002A7820(D_L07_001B0AD0[0], D_L07_001B0AD0[1]);
-        func_00283098(position, position, arg + 0xC0);
+        FastVecAdd(velocity, velocity, carryDelta);
+        randomValue = RandomIntRange(D_L07_001B0AD0[0], D_L07_001B0AD0[1]);
+        matrix_mul_vec3(position, position, moby + 0xC0);
         randomValue = (unsigned char)randomValue;
-        func_00282CC0(position, position, arg + 0x10);
-        scale = func_002A7878(D_L07_001B0AC0[0], D_L07_001B0AC0[1]);
-        randomByte = func_002A77E0(255);
-        func_002C3150(position, velocity, D_L07_001B0AC8, scale, randomValue, (unsigned char)randomByte, 0);
+        FastVecAdd(position, position, moby + 0x10);
+        scale = RandomFloatRange(D_L07_001B0AC0[0], D_L07_001B0AC0[1]);
+        randomByte = RandomIntBelow(255);
+        SpawnHeroRelativeParticle(position, velocity, D_L07_001B0AC8, scale, randomValue, (unsigned char)randomByte, 0);
     }
 }

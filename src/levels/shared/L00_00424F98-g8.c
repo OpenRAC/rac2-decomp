@@ -33,53 +33,53 @@ extern float ref_L00_00424F98_03 SDATA(ref_L00_00424F98_03);
 
 /* The vehicle's steering and throttle inputs, with the stunt counter: holding the
    stick centred for a second counts one run and records the best time. */
-void func_L00_00424F98(char *obj, float *x, float *y)
+void func_L00_00424F98(char *vehicle, float *steerOut, float *throttleOut)
 {
-    L00_00424F98_Input *t = (L00_00424F98_Input *)(*(char **)(obj + 0x70) + 0x1C0);
-    L00_00424F98_Counter *c;
-    unsigned int n;
-    float v;
+    L00_00424F98_Input *input = (L00_00424F98_Input *)(*(char **)(vehicle + 0x70) + 0x1C0);
+    L00_00424F98_Counter *counter;
+    unsigned int runCount;
+    float stickY;
 
-    if (t->flags & 1) {
-        *x = 0.0f;
+    if (input->flags & 1) {
+        *steerOut = 0.0f;
     } else {
-        *x = D_00138280[0];
+        *steerOut = D_00138280[0];
         if (D_001A7BA8 == 0)
-            *x = -*x;
+            *steerOut = -*steerOut;
     }
-    if (*x == 0.0f) {
+    if (*steerOut == 0.0f) {
         ref_L00_00424F98_00 = 0;
         ref_L00_00424F98_01 = 0;
-        if (t->steer != 0.0f)
-            *x = t->steer;
+        if (input->steer != 0.0f)
+            *steerOut = input->steer;
     } else {
-        t->steer_out = ref_L00_00424F98_02;
-        c = &D_0018C750;
-        n = c->count;
-        if ((unsigned short)n < 3U) {
+        input->steer_out = ref_L00_00424F98_02;
+        counter = &gProgressStatistics;
+        runCount = counter->count;
+        if ((unsigned short)runCount < 3U) {
             ref_L00_00424F98_00++;
             if (ref_L00_00424F98_01 == 0 && ref_L00_00424F98_00 > 0x3C) {
-                if ((unsigned short)n < 0xFFFF)
-                    c->count = n + 1;
-                if (D_001A7390 > c->best)
-                    c->best = D_001A7390;
+                if ((unsigned short)runCount < 0xFFFF)
+                    counter->count = runCount + 1;
+                if (D_001A7390 > counter->best)
+                    counter->best = D_001A7390;
                 ref_L00_00424F98_01 = 1;
-                c->flags = (c->flags | (1u << D_001A79F0)) | 0x80000000u;
+                counter->flags = (counter->flags | (1u << gCurrentMapIndex)) | 0x80000000u;
             }
         }
     }
-    if (t->flags & 2) {
-        *y = 0.0f;
+    if (input->flags & 2) {
+        *throttleOut = 0.0f;
     } else {
-        v = D_00138284[0];
-        *y = -v;
+        stickY = D_00138284[0];
+        *throttleOut = -stickY;
         if (D_001A7BA4 == 0)
-            *y = v;
-        if (*y != 0.0f)
+            *throttleOut = stickY;
+        if (*throttleOut != 0.0f)
             return;
     }
     {
-        float throttle = t->throttle;
-        *y = throttle / ref_L00_00424F98_03;
+        float throttle = input->throttle;
+        *throttleOut = throttle / ref_L00_00424F98_03;
     }
 }

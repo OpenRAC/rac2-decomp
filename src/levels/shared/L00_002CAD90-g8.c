@@ -18,11 +18,11 @@ int func_L00_002D1B70(int id, int *out)
     TableEntry *table = 0;
     int index;
 
-    if (func_L00_002ADEA0(3) == 2)
+    if (hero_slot_item_id(3) == 2)
         table = D_L00_001A7D60;
-    else if (func_L00_002ADEA0(3) == 3)
+    else if (hero_slot_item_id(3) == 3)
         table = D_L00_001A7D48;
-    else if ((func_L00_002ADEA0(3) ^ 4) != 0)
+    else if ((hero_slot_item_id(3) ^ 4) != 0)
         table = 0;
     else
         table = D_L00_001A7D78;

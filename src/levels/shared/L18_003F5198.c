@@ -29,14 +29,15 @@ typedef struct {
     s32 configuration;
 } InitializationFields;
 
+/* Sets up a new Protopet: its timings, speeds, sizes and starting animation. */
 void func_L18_003F5198(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     s16 mode;
     s32 configuration;
     InitializationFields *settings = (InitializationFields *)state;
-    settings->duration = func_00283CF0(15.0f);
-    settings->speed = func_00283CF0(6.0f);
+    settings->duration = FloatToInt(15.0f);
+    settings->speed = FloatToInt(6.0f);
     configuration = *(s32 *)(state + 0x260);
     settings->type = 17;
     settings->ready = 1;
@@ -59,18 +60,18 @@ void func_L18_003F5198(u8 *object)
     *(float *)(state + 0x108) = 2.0f;
     *(float *)(state + 0x10C) = 5.0f;
     *(float *)(state + 0x110) = 1.5707964897155762f;
-    func_002B60B0(object, 0.004444444552063942f, 0.13333334028720856f, 0.0034906589426100254f, 0.20943954586982727f);
+    SetControllerSpeedLimits(object, 0.004444444552063942f, 0.13333334028720856f, 0.0034906589426100254f, 0.20943954586982727f);
     if (*(s32 *)(state + 0x260) != -1) *(s32 *)(state + 0x13C) = *(s32 *)(state + 0x260);
     *(float *)(state + 0x268) = *(float *)(object + 0x2C);
-    if (*(s32 *)(state + 0x280) != -1) *(u8 **)(state + 0x258) = D_L18_001B281C + (*(s32 *)(state + 0x280) << 8);
+    if (*(s32 *)(state + 0x280) != -1) *(u8 **)(state + 0x258) = gMobyTable_L18 + (*(s32 *)(state + 0x280) << 8);
     *(s32 *)(object + 0x98) = *(s32 *)(*(u8 **)(object + 0x24) + 0x10);
-    func_002A7750(object, 6, 2);
+    SetMobyState(object, 6, 2);
     mode = *(s16 *)(state + 0x296);
     if (mode == 14) {
-        if (*(s32 *)(state + 0x26C) != -1) func_002A7750(object, 14, 2);
-    } else if (mode == 1) func_L18_003F7590(object);
-    else if (mode == 2) func_002A7750(object, 2, 0);
+        if (*(s32 *)(state + 0x26C) != -1) SetMobyState(object, 14, 2);
+    } else if (mode == 1) ResetToIdle(object);
+    else if (mode == 2) SetMobyState(object, 2, 0);
     qcopy((state + 0x210), (object + 0x10));
     qcopy((state + 0x220), (object + 0xF0));
-    func_L18_0032B768(object, 0, 3);
+    SetTableEntryByte(object, 0, 3);
 }

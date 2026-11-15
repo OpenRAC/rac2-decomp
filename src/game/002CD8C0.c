@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char reserved00[0x14];
@@ -111,24 +112,27 @@ void func_0027C660(void);
 
 /* External functions declared with exact aliases from task.externals */
 
+/* Draws a menu screen through the shared screen-drawing helper and reports that nothing was chosen. */
 long long func_002CD8C0(void)
 {
-    func_0027C540(0LL);
+    SetupGifPaging(0LL);
     func_0029C450();
-    func_0027C660();
+    DoGifPaging();
     return 0LL;
 }
 
-int func_002CD8F0(void *object) { char *root=D_001A8CFC[0]; if (root != 0) { func_00341550(root+0x3BE08,1); *(void **)((char *)object+0x34)=func_00341558(D_001A8CFC[0]+0x3BE08); } return 0; }
+/* Sets up the menu list widget and hands the object its text-list pointer. */
+int func_002CD8F0(void *object) { char *root=D_001A8CFC[0]; if (root != 0) { SetTabbedMenuEnabled(root+0x3BE08,1); *(void **)((char *)object+0x34)=GetSelectedTabEntryValue(D_001A8CFC[0]+0x3BE08); } return 0; }
 
 /* func_002CDA20 is defined in 002CDA20.c. */
 
+/* Builds the three-entry Extras menu list and selects its first entry. */
 int func_002CDAB0(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_00341550(D_001A8CFC[0] + 0x3BE08, 1);
-        func_00341540(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
-        func_00341610(D_001A8CFC[0] + 0x3BE08, 0);
+        SetTabbedMenuEnabled(D_001A8CFC[0] + 0x3BE08, 1);
+        SetTabbedMenuTables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
+        SwitchTabbedMenuTab(D_001A8CFC[0] + 0x3BE08, 0);
     }
     return 0;
 }
@@ -137,11 +141,13 @@ int func_002CDAB0(void)
 
 /* func_002CDD88 is built from 002CDD88-g8.c. */
 
+/* Marks the menu cursor as reset. */
 int func_002CE5B8(void) {
     D_001AB9B0 = 1;
     return 0;
 }
 
+/* Menu callback that does nothing. */
 int func_002CE5C8(void) {
     return 0;
 }
@@ -150,22 +156,24 @@ int func_002CE5C8(void) {
 
 /* func_002CEBD0 is built from 002CEBD0-g8.c. */
 
-void func_002CF0A0(int a0, char *a1)
+/* Draws a thin box frame around the highlighted menu text, sized to the text width. */
+void func_002CF0A0(int textWidth, char *color)
 {
-    int h, k, p, m;
-    k = a0 / 2 + 5;
-    h = F750245c6_D_001A7340 / 2;
-    m = h - k;
-    p = h + k;
-    F750245c6_FUN_0028FC48(m - 2, 312, p + 4, 314, a1, 0);
-    F750245c6_FUN_0028FC48(m - 2, 333, p + 4, 335, a1, 0);
-    F750245c6_FUN_0028FC48(m - 2, 313, m, 334, a1, 0);
-    F750245c6_FUN_0028FC48(p + 2, 313, p + 4, 334, a1, 0);
+    int centerX, halfWidth, right, left;
+    halfWidth = textWidth / 2 + 5;
+    centerX = F750245c6_D_001A7340 / 2;
+    left = centerX - halfWidth;
+    right = centerX + halfWidth;
+    F750245c6_FUN_0028FC48(left - 2, 312, right + 4, 314, color, 0);
+    F750245c6_FUN_0028FC48(left - 2, 333, right + 4, 335, color, 0);
+    F750245c6_FUN_0028FC48(left - 2, 313, left, 334, color, 0);
+    F750245c6_FUN_0028FC48(right + 2, 313, right + 4, 334, color, 0);
 }
 
+/* Gives the object its text-list pointer when the menu list exists. */
 int func_002CF188(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = func_00341558(D_001A8CFC[0] + 0x3BE08);
+        *(void **)(object + 0x34) = GetSelectedTabEntryValue(D_001A8CFC[0] + 0x3BE08);
     return 0;
 }
 
@@ -177,6 +185,7 @@ int func_002CF188(char *object) {
 
 /* func_002CF7F0 is built from 002CF7F0-g8.c. */
 
+/* Menu callback that does nothing. */
 int func_002CFBE0(void) {
     return 0;
 }
@@ -184,6 +193,7 @@ int func_002CFBE0(void) {
 
 /* func_002CFDA8 is built from 002CFDA8-g8.c. */
 
+/* Menu callback that does nothing. */
 int func_002D01C8(void) {
     return 0;
 }
@@ -215,6 +225,7 @@ extern unsigned char D_001ABA35[] __attribute__((sda));
 extern unsigned char D_001ABA36[] __attribute__((sda));
 extern unsigned char D_001ABA37[] __attribute__((sda));
 
+/* Remembers which special items the player has just collected by setting their flags. */
 int func_002D1590(void)
 {
     if (D_001A8CFC[0] != 0 && ((unsigned char *)D_001A7A00)[0xA] != 0) {
@@ -246,12 +257,14 @@ int func_002D1590(void)
 
 
 
+/* Menu callback that does nothing. */
 int func_002D2010(void) {
     return 0;
 }
 
 
 
+/* Sets the menu scroll timer back to its start value. */
 int func_002D23D8(void) {
     if (D_001A8CFC[0] != 0) D_0025CADC = -300;
     return 0;
@@ -260,19 +273,21 @@ int func_002D23D8(void) {
 
 
 
+/* Menu callback that does nothing. */
 int func_002D2830(void) {
     return 0;
 }
 
+/* Handles menu input for the page: closes on cancel, and on confirm toggles between two display states. */
 int func_002D2838(void)
 {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -283,16 +298,16 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else if (flags & 0x40) {
-        func_002E5E58(4, 0, 0);
+        PlaySoundFromGlobalBank(4, 0, 0);
         switch (D_001A7908) {
         default:
             D_001A7908 = 0;
-            D_00189E20.second = 0;
-            D_00189E20.first = 0;
+            gHeroState.second = 0;
+            gHeroState.first = 0;
             break;
         case 0:
             D_001A7908 = 1;
-            func_00282F20(D_0018B300, (char *)D_0018B300 - 0x14E0, 1.0f);
+            vec_scale_to_length(D_0018B300, (char *)D_0018B300 - 0x14E0, 1.0f);
             break;
         }
     }
@@ -301,26 +316,29 @@ return_value:
 
 /* func_002D2918 is built from 002D2918-g8.c. */
 
+/* Passes the current pad buttons to the menu update helper. */
 int func_002D2BD8(void) {
     func_0029C640(D_00138344);
     return 0;
 }
 
+/* Draws a menu screen through the shared screen-drawing helper and reports that nothing was chosen. */
 int func_002D2C00(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C610();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
+/* Handles menu input: closes on cancel, otherwise passes the buttons on to the page handler. */
 int func_002D2C30(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
             value = -1;
             goto return_value;
         }

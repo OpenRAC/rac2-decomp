@@ -34,53 +34,53 @@ typedef struct RaceObject {
 } RaceObject;
 typedef struct {
     u8 pad000[0x190-0x0];
-    int x190;
-    int x194;
+    int finishLine;
+    int checkpointLine;
     u8 pad198[0x1E4-0x198];
-    int x1E4[21];
+    int racerSlots[21];
     u8 pad238[0x27C-0x238];
-    float x27C;
+    float speed;
     u8 pad280[0x310-0x280];
-    float x310;
-    int x314;
-    int x318;
-    int x31C;
-    int x320;
+    float routeDistance;
+    int path;
+    int pathPoint;
+    int checkpointArmed;
+    int rank;
     u8 pad324[0x330-0x324];
     int x330;
     int x334;
     u8 pad338[0x340-0x338];
-    int x340;
-    int x344;
+    int lossCount;
+    int winCount;
     u8 pad348[0x398-0x348];
     int x398;
     u8 pad39C[0x3A4-0x39C];
-    int x3A4;
-    int x3A8;
-    RaceObject *x3AC;
-    RaceObject *x3B0;
-    int x3B4;
-    float x3B8;
+    int wrongWayCount;
+    int pathChangeTimer;
+    RaceObject *trackedRacer;
+    RaceObject *nearestRacer;
+    int trackedTime;
+    float prevRouteDistance;
     u8 pad3BC[0x48C-0x3BC];
     int x48C;
     u8 pad490[0x4C4-0x490];
-    RaceObject *x4C4;
+    RaceObject *boostTarget;
     u8 pad4C8[0x63C-0x4C8];
     float x63C;
     u8 pad640[0x654-0x640];
-    int x654;
+    int routePoint;
     int x658;
-    int x65C;
+    int routeTimer;
     u8 pad660[0x6A0-0x660];
     int x6A0;
     u8 pad6A4[0x6D0-0x6A4];
-    RaceRoute *x6D0;
+    RaceRoute *route;
     int x6D4;
-    float x6D8;
+    float routeSpeed;
     u8 pad6DC[0x6E0-0x6DC];
-    int x6E0;
+    int homeRoute;
     u8 pad6E4[0x710-0x6E4];
-    int x710;
+    int switchTimer;
     u8 pad714[0x75C-0x714];
     int x75C;
 } RaceState;
@@ -131,101 +131,102 @@ extern void func_00282CF0(void *,void *,void *);
 extern float func_L00_002EE290(void *);
 extern int func_002A77E0(int),func_002A7820(int,int);
 
+/* Updates the player race each frame: follows the route position, counts laps, handles the finish with prizes and records, and works out the rank and the nearest rival, which may get a boost. */
 int func_L04_00412308(RaceObject *object,RaceState *state)
 {
     float delta[4] __attribute__((aligned(16)));
-    int oldPath, oldPoint, n, level, ticks, limit, done, empty, *bestTime;
+    int oldPath, oldPoint, winTotal, level, ticks, limit, done, empty, *bestTime;
     int *slot, i, rank;
     RaceRoute *route;
     RaceObject *other;
     RaceRivalState *vars, *loopVars;
-    float time, nearest, otherTime, length, distance, start;
-    func_L04_00410F10(object);
+    float myDistance, nearestDistance, otherTime, length, distance, start;
+    FindRacerZoneSlot(object);
     {
-        float previous=state->x310;
-        int lap=D_L04_001A8FE4, mode=D_L04_001B08F0;
-        oldPath=state->x314; oldPoint=state->x318;
-        state->x3B8=previous;
-        state->x310=func_L04_00410788(object,state,&state->x314,&state->x318,lap,mode);
+        float previous=state->routeDistance;
+        int lap=gCurrentLap, mode=D_L04_001B08F0;
+        oldPath=state->path; oldPoint=state->pathPoint;
+        state->prevRouteDistance=previous;
+        state->routeDistance=UpdateNearestRoutePoint(object,state,&state->path,&state->pathPoint,lap,mode);
     }
-    if (state->x310<state->x3B8 || (state->x318>=451 && oldPoint<3))
-        state->x3A4++;
-    else state->x3A4=0;
-    if (oldPath!=state->x314) state->x3A8=10;
-    if (state->x3A8>0) func_00282948(&state->x3A8);
-    else func_L04_00412130(object,0);
+    if (state->routeDistance<state->prevRouteDistance || (state->pathPoint>=451 && oldPoint<3))
+        state->wrongWayCount++;
+    else state->wrongWayCount=0;
+    if (oldPath!=state->path) state->pathChangeTimer=10;
+    if (state->pathChangeTimer>0) FastFloatHelperD(&state->pathChangeTimer);
+    else UpdateRacerRanks(object,0);
     {
     D_L04_001B0918++;
-    D_L04_001A8FE8++;
-    if (func_002ACBC8(object->position,state->x194)) {
-        if (state->x3A4>0) state->x31C=0;
-        else state->x31C=1;
+    gRaceTimeTicks++;
+    if (IsPointInCuboid(object->position,state->checkpointLine)) {
+        if (state->wrongWayCount>0) state->checkpointArmed=0;
+        else state->checkpointArmed=1;
     }
     }
-    if (func_002ACBC8(object->position,state->x190) && state->x31C) {
-        if (D_L04_001A8FE4<2) {
-            D_L04_001A8FE4++;
+    if (IsPointInCuboid(object->position,state->finishLine) && state->checkpointArmed) {
+        if (gCurrentLap<2) {
+            gCurrentLap++;
             D_L04_001B091C=180;
-            func_002E5CF8(13,0,object);
+            PlayMobySound(13,0,object);
             D_L04_001B0920=D_L04_001B0918;
             D_L04_001B0918=0;
-            state->x31C=0;
+            state->checkpointArmed=0;
         } else {
-            state->x6D0=D_L04_001FE340[state->x6E0];
-            length=func_00283CE0(func_L04_00400AB0(object,state->x6D0,0))*state->x6D0->length;
+            state->route=gRoutePathTable[state->homeRoute];
+            length=IntToFloat(FindNearestRoutePointIndex(object,state->route,0))*state->route->length;
             if (D_L04_001B08F0) start=length+20.0f;
             else start=length+5.0f;
-            state->x6D8=start;
-            route=state->x6D0;
-            func_002C96F8(start,route->length,route,&state->x654,&state->x6D4,&state->x6A0);
-            state->x65C=-1000; state->x710=240; state->x658=0;
+            state->routeSpeed=start;
+            route=state->route;
+            SampleKeyTrack(start,route->length,route,&state->routePoint,&state->x6D4,&state->x6A0);
+            state->routeTimer=-1000; state->switchTimer=240; state->x658=0;
             object->state=3;
             state->x398=60;
             D_L04_001B08F8=0;
-            func_002E5CF8(23,17,object);
-            func_002E59F8(state->x330);
-            state->x330=func_002E5CF8(20,4,object);
-            func_002E59F8(state->x334);
-            state->x334=func_002E5CF8(21,4,object);
-            func_L04_00412130(object,1);
-            func_L04_00410F80(object);
-            func_L04_0040E248(object,state);
-            if (state->x320!=1) {
-                int difficulty=D_L04_001B090C;
-                state->x340++;
-                func_L04_0040A2B8(difficulty);
-                func_L01_00323310(state->x48C,-1);
+            PlayMobySound(23,17,object);
+            StopSoundVoice(state->x330);
+            state->x330=PlayMobySound(20,4,object);
+            StopSoundVoice(state->x334);
+            state->x334=PlayMobySound(21,4,object);
+            UpdateRacerRanks(object,1);
+            SortRacersByFinishTime(object);
+            ReleaseRacerSoundHandles(object,state);
+            if (state->rank!=1) {
+                int difficulty=gCurrentRaceIndex;
+                state->lossCount++;
+                IncrementCourseFinishCount(difficulty);
+                QueueKeyedRequest(state->x48C,-1);
             } else {
-                func_L01_00323310(state->x75C,-1);
+                QueueKeyedRequest(state->x75C,-1);
                 {
-                int difficulty=D_L04_001B090C;
-                state->x344++;
-                func_L04_0040A220(difficulty);
+                int difficulty=gCurrentRaceIndex;
+                state->winCount++;
+                IncrementCourseWinCount(difficulty);
                 }
-                n=func_L04_0040A1D0(D_L04_001B090C);
-                if (n>3) n=3;
-                if (n>0) {
+                winTotal=GetCourseWinCount(gCurrentRaceIndex);
+                if (winTotal>3) winTotal=3;
+                if (winTotal>0) {
                     int scale=10;
-                    int reward=D_L04_002C63C0[D_L04_001B090C].reward[n-1];
+                    int reward=gRaceChallengeTable[gCurrentRaceIndex].reward[winTotal-1];
                     int multiplier=D_001A7A0A;
-                    int money=D_001A79F8;
+                    int money=gPlayerBolts;
                     int total;
                     if (multiplier) total=reward*scale+money;
                     else total=money+reward;
-                    D_001A79F8=total;
+                    gPlayerBolts=total;
                 }
             }
-            if (state->x320!=-1) {
-                int offset=D_L04_001B090C*4;
-                offset=D_001A79F0==4?offset:offset+20;
+            if (state->rank!=-1) {
+                int offset=gCurrentRaceIndex*4;
+                offset=gCurrentMapIndex==4?offset:offset+20;
                 bestTime=(int *)((u8 *)D_001A7368+offset);
-                if (D_L04_001A8FE8<*bestTime || !*bestTime) *bestTime=D_L04_001A8FE8;
+                if (gRaceTimeTicks<*bestTime || !*bestTime) *bestTime=gRaceTimeTicks;
             }
                 D_L04_001A8ED0[5]=1;
-                func_00132AF8(93); func_00132028();
-                level=D_001A79F0;
+                SendSoundCommand22(93); snd_Pump();
+                level=gCurrentMapIndex;
                 limit=level==4?7800:8820;
-                ticks=D_L04_001A8FE8;
+                ticks=gRaceTimeTicks;
                 done=0;
                 if (ticks>0) {
                     ticks/=6;
@@ -237,61 +238,61 @@ int func_L04_00412308(RaceObject *object,RaceState *state)
                     }
                     }
                 }
-                if (done || D_001A79F0==4 ||
-                    (D_001A79F0==11 && (D_L04_001B090C!=0 || func_L04_0040A1D0(0)>=2)))
-                    func_0029B3E0(0,-1);
+                if (done || gCurrentMapIndex==4 ||
+                    (gCurrentMapIndex==11 && (gCurrentRaceIndex!=0 || GetCourseWinCount(0)>=2)))
+                    MemcardSave(0,-1);
             return 1;
         }
     }
-    time=state->x310;
-    state->x320=1;
-    nearest=999.0f;
-    state->x3B0=0;
-    if (time>700.0f && !state->x31C) time-=D_L04_001B0928;
+    myDistance=state->routeDistance;
+    state->rank=1;
+    nearestDistance=999.0f;
+    state->nearestRacer=0;
+    if (myDistance>700.0f && !state->checkpointArmed) myDistance-=D_L04_001B0928;
     empty=-1;
-    slot=state->x1E4;
+    slot=state->racerSlots;
     for (i=20;i>=0;i--,slot++) {
         if (*slot==empty) continue;
-        other=D_L04_001B24DC+*slot;
+        other=gMobyPool_L04+*slot;
         if ((unsigned)(other->state-2)>=2) continue;
         loopVars=other->vars;
         otherTime=loopVars->routeDistance;
         if (otherTime>700.0f && !loopVars->checkpointArmed) otherTime-=D_L04_001B0928;
         if (!loopVars->finished) {
-            int otherLap=loopVars->lap, playerLap=D_L04_001A8FE4;
+            int otherLap=loopVars->lap, playerLap=gCurrentLap;
             if (playerLap>=otherLap) {
-                if (!(time<=otherTime)) goto skipRank;
+                if (!(myDistance<=otherTime)) goto skipRank;
                 if (otherLap!=playerLap) goto skipRank;
             }
         }
-        state->x320++;
+        state->rank++;
 skipRank:
         loopVars->nearestPlayer=0;
-        func_00282CF0(delta,object->position,other->position);
+        FastVecSub(delta,object->position,other->position);
         distance=func_L00_002EE290(delta);
-        if (distance<nearest) {state->x3B0=other;nearest=distance;}
+        if (distance<nearestDistance) {state->nearestRacer=other;nearestDistance=distance;}
     }
-    if (state->x3B0) {
-        vars=state->x3B0->vars;
+    if (state->nearestRacer) {
+        vars=state->nearestRacer->vars;
         vars->nearestPlayer=1;
-        if (nearest<10.0f) {
-            rank=(int)((4-D_L04_001B090C)*3.75f)+2+(int)(func_L04_0040A268(D_L04_001B090C)*0.3f);
-            if (D_L04_001A8FE8>=61 && vars->boostRequests<4 && vars->boostTimer<=0 &&
-                !state->x4C4 && state->x3B0->state==2 && state->x314==vars->path &&
-                (D_L04_001A8FE4<=vars->lap || state->x27C<=0.0f) && !func_002A77E0(rank-1)) {
+        if (nearestDistance<10.0f) {
+            rank=(int)((4-gCurrentRaceIndex)*3.75f)+2+(int)(GetCourseFinishCount(gCurrentRaceIndex)*0.3f);
+            if (gRaceTimeTicks>=61 && vars->boostRequests<4 && vars->boostTimer<=0 &&
+                !state->boostTarget && state->nearestRacer->state==2 && state->path==vars->path &&
+                (gCurrentLap<=vars->lap || state->speed<=0.0f) && !RandomIntBelow(rank-1)) {
                 int delay;
-                rank=(D_L04_001B090C+1)*120;
-                delay=func_002A7820(120,360)+360;
+                rank=(gCurrentRaceIndex+1)*120;
+                delay=RandomIntRange(120,360)+360;
                 vars->steeringTimer=0; vars->boostTimer=rank+delay;
                 vars->boostAmount=1.0f; vars->boostScale=1.0f; vars->boostPhase=0.0f;
                 vars->boostRequests=0;
-                state->x63C=1.0f;state->x4C4=state->x3B0;
+                state->x63C=1.0f;state->boostTarget=state->nearestRacer;
             } else if (vars->boostTimer<=0) {
-                if (nearest<10.0f) vars->boostRequests=4;
+                if (nearestDistance<10.0f) vars->boostRequests=4;
                 else vars->boostRequests=0;
             }
         }
     }
-    if (state->x3AC!=state->x3B0) {state->x3AC=state->x3B0;state->x3B4=0;}
+    if (state->trackedRacer!=state->nearestRacer) {state->trackedRacer=state->nearestRacer;state->trackedTime=0;}
     return 0;
 }

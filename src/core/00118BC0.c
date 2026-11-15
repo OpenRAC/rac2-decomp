@@ -11,12 +11,13 @@ extern char *D_0013466C;
 
 extern int func_0011B1E8(int fd, char *buf, int len);
 
+/* Collects printed bytes in a small buffer and sends them out when it is full or on request. */
 int func_00118BC0(int fd, char *src, unsigned int len, int flush) {
     unsigned int i;
     int r;
 
     if (flush == 1) {
-        r = func_0011B1E8(fd, D_0013C100, D_00134668);
+        r = WriteTtyViaDeci2(fd, D_0013C100, D_00134668);
         D_00134668 = 0;
         D_0013466C = D_0013C100;
         return r;
@@ -26,7 +27,7 @@ int func_00118BC0(int fd, char *src, unsigned int len, int flush) {
         D_0013466C++;
         D_00134668++;
         if (D_00134668 >= 0x80) {
-            r = func_0011B1E8(fd, D_0013C100, D_00134668);
+            r = WriteTtyViaDeci2(fd, D_0013C100, D_00134668);
             D_0013466C = D_0013C100;
             D_00134668 = 0;
             if (r == 0)

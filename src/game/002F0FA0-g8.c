@@ -16,24 +16,25 @@ extern int ref_002F0FA0_04;
 extern int ref_002F0FA0_05;
 extern int ref_002F0FA0_06 __attribute__((sda));
 
+/* Resets a list of records: clears the counters and sets every record back to its empty values. */
 void func_002F0FA0(void)
 {
-    Record002F0FA0 *p = ref_002F0FA0_00;
-    int v = ref_002F0FA0_02;
+    Record002F0FA0 *entry = ref_002F0FA0_00;
+    int startValue = ref_002F0FA0_02;
     Record002F0FA0 *end = ref_002F0FA0_01;
 
-    ref_002F0FA0_03 = v;
+    ref_002F0FA0_03 = startValue;
     ref_002F0FA0_04 = 0;
     ref_002F0FA0_05 = 0;
     ref_002F0FA0_06 = 0;
 
-    if (p == end)
+    if (entry == end)
         return;
 
     do {
-        p->unk16 = 0;
-        p->unk14 = 0xFFFF;
-        p->unk1F = 0xFF;
-        p++;
-    } while (p != ref_002F0FA0_01);
+        entry->unk16 = 0;
+        entry->unk14 = 0xFFFF;
+        entry->unk1F = 0xFF;
+        entry++;
+    } while (entry != ref_002F0FA0_01);
 }

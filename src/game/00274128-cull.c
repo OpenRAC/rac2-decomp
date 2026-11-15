@@ -30,39 +30,39 @@ void func_00274810(OozlaAppendObject164 *object, int index, const float *directi
     float point[4], vectors[3][4], projection[4];
     float c0[4], c1[4], c2[4], c3[4];
     int i = 0;
-    OozlaAppendDescriptor164 *p = object->descriptor;
+    OozlaAppendDescriptor164 *descriptor = object->descriptor;
 
-    func_00283098(point, p->points[p->indices[index]], object->transform[0]);
+    matrix_mul_vec3(point, descriptor->points[descriptor->indices[index]], object->transform[0]);
     func_00282F20_16(projection, (void *)direction,
                      func_00282DB0_3((void *)direction, point));
-    func_00282CF0(point, point, projection);
-    for (; i < p->count; i++) {
-        if (p->indices[i] == index) {
+    FastVecSub(point, point, projection);
+    for (; i < descriptor->count; i++) {
+        if (descriptor->indices[i] == index) {
             qcopy(vectors[i], point);
         } else {
-            func_00282CF0(vectors[i], p->points[p->indices[i]],
-                         p->points[p->indices[index]]);
-            func_00283098(vectors[i], vectors[i], object->transform[0]);
+            FastVecSub(vectors[i], descriptor->points[descriptor->indices[i]],
+                         descriptor->points[descriptor->indices[index]]);
+            matrix_mul_vec3(vectors[i], vectors[i], object->transform[0]);
             func_00282F20_16(projection, (void *)direction,
                              func_00282DB0_3((void *)direction, vectors[i]));
-            func_00282CF0(vectors[i], vectors[i], projection);
+            FastVecSub(vectors[i], vectors[i], projection);
             if (func_00282DB0_3(vectors[i], point) > 0.0f) {
-                p->indices[i] = p->indices[p->count - 1];
-                --p->count;
+                descriptor->indices[i] = descriptor->indices[descriptor->count - 1];
+                --descriptor->count;
             }
         }
     }
-    if (p->count == 3) {
-        func_00282DD8(c0, vectors[0], vectors[2]);
-        func_00282DD8(c1, vectors[1], vectors[2]);
-        func_00282DD8(c2, vectors[0], vectors[1]);
-        func_00282DD8(c3, vectors[1], vectors[0]);
+    if (descriptor->count == 3) {
+        FastVecCross(c0, vectors[0], vectors[2]);
+        FastVecCross(c1, vectors[1], vectors[2]);
+        FastVecCross(c2, vectors[0], vectors[1]);
+        FastVecCross(c3, vectors[1], vectors[0]);
         if (func_00282DB0_3(c0, c2) < 0.0f) {
-            p->indices[1] = p->indices[2];
-            --p->count;
+            descriptor->indices[1] = descriptor->indices[2];
+            --descriptor->count;
         } else if (func_00282DB0_3(c1, c3) < 0.0f) {
-            p->indices[0] = p->indices[2];
-            --p->count;
+            descriptor->indices[0] = descriptor->indices[2];
+            --descriptor->count;
         }
     }
 }

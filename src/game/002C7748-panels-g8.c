@@ -69,48 +69,49 @@ extern int func_002A0380(void);
 extern void func_002FC3C0(unsigned long);
 extern int func_00283CF0(float);
 
+/* Draws all the panels of the pause menu and fades the screen. */
 void func_002CBC58(int mode)
 {
     PanelCBC58 **panels = 0;
     int none = 0;
-    StateCBC58 *state = &D_001F2840;
+    StateCBC58 *state = &gPauseMenuState;
     int pass, i, j, x, y, w, h, lw, lh, result;
     int left, top, right, bottom, tw, th;
     float delta;
-    func_00284F40(0);
-    func_002FC990(state->buffer, D_001A72DC, D_001A7344 << 11);
+    AppendDrawListBufferTag(0);
+    UploadImageToGsPackets(state->buffer, D_001A72DC, gScreenHeight << 11);
     if (!mode) {
-    func_0027B858();
-    func_0027DDC0(0,0,0,0x38);
-    if (D_001F2840.mode == 4 && state->active) {
+    WriteClearColorPackets();
+    SetClearColorPacket(0,0,0,0x38);
+    if (gPauseMenuState.mode == 4 && state->active) {
     if (D_001AB91C) {
         void *page = state->page;
         if (page == D_00259018) {
-            func_0027C540(0); D_00210AD0(); func_0027C660(); return;
+            SetupGifPaging(0); D_00210AD0(); DoGifPaging(); return;
         }
         if (page == D_0025A738) {
-            func_0027C540(0); func_0028E458(); func_0029BF08(); func_0027C660(); return;
+            SetupGifPaging(0); UpdateHudRecordHandlers(); RunLevelCallbacksAndDraw(); DoGifPaging(); return;
         }
         if (page == D_0025A498 && !D_001AB910) {
-            func_0027C540(0); func_0029C2D0(); func_0027C660();
-        } else if (D_001F2840.page == (void *)D_0025A190 && !D_001AB910) {
-            func_0027C540(0); func_0029C340(); func_0027C660(); return;
-        } else if (D_001F2840.page == (void *)D_0025A058 && !D_001AB910) {
+            SetupGifPaging(0); func_0029C2D0(); DoGifPaging();
+        } else if (gPauseMenuState.page == (void *)D_0025A190 && !D_001AB910) {
+            SetupGifPaging(0); func_0029C340(); DoGifPaging(); return;
+        } else if (gPauseMenuState.page == (void *)D_0025A058 && !D_001AB910) {
             ;
         }
     }
-    func_002FC560(0x47,0x5360B);
-    if (D_001F2840.field168) {
-        func_002A0250(); func_002A01C8(); func_002A01F0();
+    VU1_addGSregister(0x47,0x5360B);
+    if (gPauseMenuState.field168) {
+        DrawMobysSetup(); FillScratchArea(); SaveScratchArea();
     }
-    if (D_001F2840.page) {
-        panels = D_001F2840.page->panels;
+    if (gPauseMenuState.page) {
+        panels = gPauseMenuState.page->panels;
         panels = (PanelCBC58 **)((char *)panels + none);
     }
-    if ((D_00138180.flags&15)==15 && (D_00138180.pressed&15))
-        func_0026FEB8(D_001AB920);
+    if ((gPadState.flags&15)==15 && (gPadState.pressed&15))
+        STUB_printf(D_001AB920);
     for (j=0;j<14;j++) {
-        StateCBC58 *st = &D_001F2840;
+        StateCBC58 *st = &gPauseMenuState;
         if (D_001AA450[j]) {
             PageCBC58 *pg = st->page;
             if (panels && panels[j]) {
@@ -122,8 +123,8 @@ void func_002CBC58(int mode)
             }
         }
     }
-    if ((D_00138180.flags&15)==15 && (D_00138180.pressed&15))
-        func_0026FEB8(D_001AB928);
+    if ((gPadState.flags&15)==15 && (gPadState.pressed&15))
+        STUB_printf(D_001AB928);
     for (pass=0;pass<2;pass++) {
         for (i=0;i<14;i++) {
             PanelCBC58 *p;
@@ -135,15 +136,15 @@ void func_002CBC58(int mode)
             lw=7; while ((1<<lw)<w) lw++;
             lh=7; while ((1<<lh)<h) lh++;
             while (lw+lh>=18) lh--;
-            if ((panels[i]->draw == func_002DBAD0 || panels[i]->draw == func_002DA118 ||
-                 panels[i]->draw == func_002D84B0 || panels[i]->draw == func_002DA9A8) && !(panels[i]->flags&8)) {
-                func_00280510(lw,lh,0,1.0f);
-                func_0028FDD8(0,0,1<<lw,1<<lh,D_001AA43C,0,0);
+            if ((panels[i]->draw == SetMenuClipRect || panels[i]->draw == DrawFadingMenuImage ||
+                 panels[i]->draw == DrawMenuTextList_002D84B0 || panels[i]->draw == DrawMenuPanel) && !(panels[i]->flags&8)) {
+                SetupScreenCopyDrawState(lw,lh,0,1.0f);
+                DrawScreenRectWithDepth(0,0,1<<lw,1<<lh,D_001AA43C,0,0);
                 result=panels[i]->draw(panels[i]);
-                func_00280600();
+                RunScreenEffectSetup();
             } else result=panels[i]->draw(panels[i]);
-            func_002FC560(0x42,0x8000000064L);
-            func_002FC560(0x47,0x43);
+            VU1_addGSregister(0x42,0x8000000064L);
+            VU1_addGSregister(0x47,0x43);
             if (result&1) continue;
             tw=1<<lw; th=1<<lh; left=0; right=tw; top=0; bottom=th;
             if (result&2) { right=w; bottom=h; }
@@ -161,24 +162,24 @@ void func_002CBC58(int mode)
                 else { top=bottom/2-h*bottom/(w*2); bottom-=top; }
             } else if (!(result&16)) continue;
             if (D_001AB92C)
-                func_0027E018(x,y,w,h,left,top,right-left,bottom-top,0x80808080L,D_001A7470);
+                DrawTexturedQuad(x,y,w,h,left,top,right-left,bottom-top,0x80808080L,D_001A7470);
         }
-        if (D_001AB930 && !pass && D_001F2840.field168) {
-            func_002A0220(); func_002A0380(); func_002FC3C0(16); func_0029FEE0();
-            D_001F2840.field168=0; D_001F2840.field16C=0;
+        if (D_001AB930 && !pass && gPauseMenuState.field168) {
+            RestoreScratchArea(); RunTextureUploadAndSetup(); WaitForDmaStatusBits(16); PatchMobyGifs();
+            gPauseMenuState.field168=0; gPauseMenuState.field16C=0;
         }
     }
-    func_0027B858();
-    if (D_001F2840.fade != D_001F2840.target) {
-        delta=D_001F2840.target-D_001F2840.fade;
-        if (delta>D_001F2840.step) delta=D_001F2840.step;
-        else if (delta < -D_001F2840.step) delta=-D_001F2840.step;
-        D_001F2840.fade+=delta;
+    WriteClearColorPackets();
+    if (gPauseMenuState.fade != gPauseMenuState.target) {
+        delta=gPauseMenuState.target-gPauseMenuState.fade;
+        if (delta>gPauseMenuState.step) delta=gPauseMenuState.step;
+        else if (delta < -gPauseMenuState.step) delta=-gPauseMenuState.step;
+        gPauseMenuState.fade+=delta;
     }
-    if (D_001F2840.fade != 0.0f)
-        func_0027DDC0(0,0,0,func_00283CF0(D_001F2840.fade*128.0f));
-    func_002FC560(0x42,0x8000000044L);
-    func_002FC560(0x47,0x5360B);
+    if (gPauseMenuState.fade != 0.0f)
+        SetClearColorPacket(0,0,0,FloatToInt(gPauseMenuState.fade*128.0f));
+    VU1_addGSregister(0x42,0x8000000044L);
+    VU1_addGSregister(0x47,0x5360B);
     }
     }
 }

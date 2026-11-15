@@ -51,7 +51,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 /* Moves between the two node-relative endpoints and pauses before reversing. */
 void func_L12_0041DDA8(u8 *self)
 {
-    u8 *v = *(u8 **)(self + 0x68);
+    u8 *vars = *(u8 **)(self + 0x68);
     f32 oldPos[4] __attribute__((aligned(16)));
     f32 oldRot[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
@@ -59,17 +59,17 @@ void func_L12_0041DDA8(u8 *self)
     VecDDA8 temp;
     f32 work[4] __attribute__((aligned(16)));
     f32 speed, oldSpeed, angle;
-    s32 *p, i;
+    s32 *nodeIds, i;
 
-    *(u32 *)(v + 0x70)|=2;
+    *(u32 *)(vars + 0x70)|=2;
     qcopy(oldPos, self + 0x10);
     qcopy(oldRot, self + 0xF0);
     switch (self[0x20]) {
     case 0:
         *(u16 *)(self + 0x34)|=0x1000;
-        *(u32 *)(v + 0xDC)|=1;
+        *(u32 *)(vars + 0xDC)|=1;
         self[0x20]=1;
-        *(f32 *)(v + 0x140)=*(f32 *)(v + 0x13C)=D_L12_001B1DF8;
+        *(f32 *)(vars + 0x140)=*(f32 *)(vars + 0x13C)=D_L12_001B1DF8;
         break;
     case 1:
         {
@@ -78,76 +78,76 @@ void func_L12_0041DDA8(u8 *self)
             /* The compiler retains this short delay and pads its loop. */
             for (delay = 0; delay < 2; delay++) {}
         }
-        func_L01_0031AB20(self, v + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(v + 0xEC));
-        p=(s32 *)(v + 0xE0);
-        for (i = 0; i < 2; i++, p++) {
-            if (*p != -1)
-                func_L00_00410D18(D_L12_001B2E9C_gp + (*p << 8));
+        UpdatePushableMoby(self, vars + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(vars + 0xEC));
+        nodeIds=(s32 *)(vars + 0xE0);
+        for (i = 0; i < 2; i++, nodeIds++) {
+            if (*nodeIds != -1)
+                EmptyMobyUpdate(D_L12_001B2E9C_gp + (*nodeIds << 8));
         }
-        if (*(s32 *)(v + 0xE8)!=-1 && func_002ACBC8(self + 0x10, *(s32 *)(v + 0xE8))) {
-            *(s32 *)(v + 0x138)=60;
-            func_002A7750(self, 3,-1);
+        if (*(s32 *)(vars + 0xE8)!=-1 && IsPointInCuboid(self + 0x10, *(s32 *)(vars + 0xE8))) {
+            *(s32 *)(vars + 0x138)=60;
+            SetMobyState(self, 3,-1);
             *(u16 *)(self + 0x34)&=0xEFFF;
-            *(f32 *)(v + 0x130)=1.0f;
+            *(f32 *)(vars + 0x130)=1.0f;
         }
         break;
     case 2:
         temp.q = 0;
-        temp.f[0]=*(f32 *)(v + 0x130);
+        temp.f[0]=*(f32 *)(vars + 0x130);
         motion.q=temp.q;
-        func_00283098(&motion, &motion, &D_L12_001B2F8C[*(s32 *)(v + 0xE8)]);
-        func_00282CC0(&motion, &motion,(u8 *)&D_L12_001B2F8C[*(s32 *)(v + 0xE8)]+0x30);
-        speed=func_00282E80(self + 0x10, &motion);
-        if (D_00189E20.attached!=self && D_L12_001B29C8%30==0) {
-            func_00282CF0(&temp, self + 0x10, &motion);
-            angle=func_00282DB0(&temp, D_00189E20.direction);
-            if (func_00282C48(angle)<*(f32 *)(v + 0x134)*0.9f) {
-                if (*(f32 *)(v + 0x13C)>3.0f) *(f32 *)(v + 0x13C)-=0.5f;
-                if (*(f32 *)(v + 0x140)<9.0f) *(f32 *)(v + 0x140)+=0.5f;
+        matrix_mul_vec3(&motion, &motion, &D_L12_001B2F8C[*(s32 *)(vars + 0xE8)]);
+        FastVecAdd(&motion, &motion,(u8 *)&D_L12_001B2F8C[*(s32 *)(vars + 0xE8)]+0x30);
+        speed=vec_distance_xy(self + 0x10, &motion);
+        if (gHeroState.attached!=self && D_L12_001B29C8%30==0) {
+            FastVecSub(&temp, self + 0x10, &motion);
+            angle=FastVecDot(&temp, gHeroState.direction);
+            if (FloatAbs(angle)<*(f32 *)(vars + 0x134)*0.9f) {
+                if (*(f32 *)(vars + 0x13C)>3.0f) *(f32 *)(vars + 0x13C)-=0.5f;
+                if (*(f32 *)(vars + 0x140)<9.0f) *(f32 *)(vars + 0x140)+=0.5f;
             } else {
-                if (*(f32 *)(v + 0x13C)<9.0f) *(f32 *)(v + 0x13C)+=0.5f;
-                if (*(f32 *)(v + 0x140)>3.0f) *(f32 *)(v + 0x140)-=0.5f;
+                if (*(f32 *)(vars + 0x13C)<9.0f) *(f32 *)(vars + 0x13C)+=0.5f;
+                if (*(f32 *)(vars + 0x140)>3.0f) *(f32 *)(vars + 0x140)-=0.5f;
             }
         }
-        oldSpeed=*(f32 *)(v + 0x134);
-        func_002AAC80(v + 0x134, speed, *(f32 *)(v + 0x13C)*0.00027777778f, *(f32 *)(v + 0x140)*0.00027777778f, D_L12_001B1DE8*0.016666668f);
-        func_00282CF0(delta, &motion, self + 0x10);
+        oldSpeed=*(f32 *)(vars + 0x134);
+        ApproachTargetWithBraking(vars + 0x134, speed, *(f32 *)(vars + 0x13C)*0.00027777778f, *(f32 *)(vars + 0x140)*0.00027777778f, D_L12_001B1DE8*0.016666668f);
+        FastVecSub(delta, &motion, self + 0x10);
         delta[2]=0;
-        func_00282F20(delta, delta, *(f32 *)(v + 0x134));
-        qcopy(&temp, D_00189EA0);
-        if (func_00282C48(temp.f[2]-D_L12_001B2F8C[*(s32 *)(v + 0xE8)].z)<2.5f)
-            temp.f[2]=D_L12_001B2F8C_gp[*(s32 *)(v + 0xE8)].z;
-        if (func_002ACBC8(&temp, *(s32 *)(v + 0xE8))) {
-            func_00282CF0(work, &temp, self + 0x10);
+        vec_scale_to_length(delta, delta, *(f32 *)(vars + 0x134));
+        qcopy(&temp, gHeroPosition);
+        if (FloatAbs(temp.f[2]-D_L12_001B2F8C[*(s32 *)(vars + 0xE8)].z)<2.5f)
+            temp.f[2]=D_L12_001B2F8C_gp[*(s32 *)(vars + 0xE8)].z;
+        if (IsPointInCuboid(&temp, *(s32 *)(vars + 0xE8))) {
+            FastVecSub(work, &temp, self + 0x10);
             {
                 s32 positive;
 
-                if (func_00282DB0(work, delta) >= 0.0f)
+                if (FastVecDot(work, delta) >= 0.0f)
                     positive = 1;
                 else
                     positive = 0;
                 if (positive == D_L12_001B1DE4 &&
-                    func_00282E48(&temp, self + 0x10) < D_L12_001B1DE0) {
-                    *(f32 *)(v + 0x134) = oldSpeed;
+                    fast_vec_dist(&temp, self + 0x10) < D_L12_001B1DE0) {
+                    *(f32 *)(vars + 0x134) = oldSpeed;
                     break;
                 }
             }
         }
-        func_00282CC0(self + 0x10, self + 0x10, delta);
+        FastVecAdd(self + 0x10, self + 0x10, delta);
         if (speed<0.01f) {
-            *(s32 *)(v + 0x138)=60;
-            *(f32 *)(v + 0x130)=-*(f32 *)(v + 0x130);
-            func_002A7750(self, 3,-1);
+            *(s32 *)(vars + 0x138)=60;
+            *(f32 *)(vars + 0x130)=-*(f32 *)(vars + 0x130);
+            SetMobyState(self, 3,-1);
         }
         break;
     case 3:
-        if (func_00282948(v + 0x138)) func_002A7750(self, 2,-1);
+        if (FastFloatHelperD(vars + 0x138)) SetMobyState(self, 2,-1);
         break;
     }
     if (self[0x31]) {
-        angle=func_00283CE0(D_L12_001B29C8_gp%60);
+        angle=IntToFloat(D_L12_001B29C8_gp%60);
         {
-            f32 denominator = func_00283CE0(60);
+            f32 denominator = IntToFloat(60);
 
             angle *= 6.2831855f;
             {
@@ -155,10 +155,10 @@ void func_L12_0041DDA8(u8 *self)
                 s32 second = D_L12_001B1DF4;
 
                 angle /= denominator;
-                *(s32 *)(self + 0x78) = func_L01_0031BC68(first, second, angle - 3.1415927f);
+                *(s32 *)(self + 0x78) = PulseColor(first, second, angle - 3.1415927f);
             }
         }
     }
-    func_00282CF0(delta, self + 0x10, oldPos);
-    func_002AD6F0(v + 0xA0, delta, oldRot, self + 0xF0);
+    FastVecSub(delta, self + 0x10, oldPos);
+    CombineTransformsAndStore(vars + 0xA0, delta, oldRot, self + 0xF0);
 }

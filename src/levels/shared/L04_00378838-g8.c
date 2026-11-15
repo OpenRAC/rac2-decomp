@@ -15,22 +15,23 @@ extern InitEntry12 D_L04_0021D7B0[];
 extern int * volatile D_L04_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L04_001C9C60;
 
-int func_L04_00378838(char *obj) {
+/* Fills the menu entry list from the level tables and selects the entry that is current. */
+int func_L04_00378838(char *menu) {
     int i, entry;
-    int *list;
+    int *idList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
         D_L04_0021D7B0[i].kind = 3;
         D_L04_0021D7B0[i].callback = D_L04_0029FEE0;
         D_L04_0021D7B0[i].id = D_L04_002A4420[D_00139948[i]].id;
         D_L04_0021D7B0[i].value = D_L04_002A4420[D_00139948[i]].value;
     }
-    list = D_L04_001AA770;
+    idList = D_L04_001AA770;
     D_L04_0021D7B0[i].id = 0;
-    *(int *)(obj + 0x40) = 0;
-    *(unsigned int *)(obj + 0x30) |= 0x8000;
-    for (i = 0, entry = list[0]; entry; entry = D_L04_001AA770[++i]) {
+    *(int *)(menu + 0x40) = 0;
+    *(unsigned int *)(menu + 0x30) |= 0x8000;
+    for (i = 0, entry = idList[0]; entry; entry = D_L04_001AA770[++i]) {
         if (D_L04_001C9C60.selected == entry) {
-            *(int *)(obj + 0x40) = i;
+            *(int *)(menu + 0x40) = i;
             break;
         }
     }

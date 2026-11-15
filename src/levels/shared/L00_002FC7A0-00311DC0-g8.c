@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern int D_L00_001B1F10 __attribute__((section(".sdata")));
 typedef struct {
     int objectValue;
@@ -34,7 +35,7 @@ void func_L00_00311DC0(unsigned char *object)
             position[0] = row->x * 0.25f;
             position[1] = row->y * 0.25f;
             position[2] = row->z * 0.25f;
-            func_00282CF0(delta, object + 0x10, position);
+            FastVecSub(delta, object + 0x10, position);
             d = func_L00_002EE290(delta);
             if (d < distance) {
                 distance = d;
@@ -53,7 +54,7 @@ void func_L00_00311DC0(unsigned char *object)
     {
         EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
         if (row->audioEnabled) {
-            unsigned char *sound = D_00188660;
+            unsigned char *sound = gSoundState;
             *(int *)(sound + 0x64) = row->audioMode;
             sound[0x68] = row->audio1;
             sound[0x69] = row->audio2;
@@ -61,7 +62,7 @@ void func_L00_00311DC0(unsigned char *object)
             sound[0x6b] |= 7;
         }
     }
-    func_002B6E78(D_L00_001B1F40[best].musicTrack, 1, 1024);
+    StartMusicStreamNoLoop(D_L00_001B1F40[best].musicTrack, 1, 1024);
     {
         EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
         if (row->fogNear < row->fogFar) {
@@ -76,7 +77,7 @@ void func_L00_00311DC0(unsigned char *object)
             }
             D_L00_001B198C = row->nearIntensity;
             D_L00_001B1990 = row->farIntensity;
-            func_00279FF0();
+            ApplyDisplayConfiguration();
         }
     }
 }

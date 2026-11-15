@@ -15,6 +15,7 @@ extern void func_00282C88(void *);
 extern f32 func_00282E20(void *);
 extern float func_00283248(float, float);
 
+/* Works out where the moby should aim and which angles it needs to face a target seen through the camera. */
 void func_L03_003D2518(u8 *self, f32 *aim, f32 *angles)
 {
     f32 rel[4] __attribute__((aligned(16)));
@@ -24,9 +25,9 @@ void func_L03_003D2518(u8 *self, f32 *aim, f32 *angles)
     f32 near;
     f32 x;
 
-    func_00282CF0(rel, D_00189EA0, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128 + 0x30);
-    func_00283098(rel, rel, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128 + 0x40);
-    near = 0.5f - func_00282E80(D_00189EA0, D_L03_001B9980) * 0.0625f;
+    FastVecSub(rel, gHeroPosition, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128 + 0x30);
+    matrix_mul_vec3(rel, rel, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128 + 0x40);
+    near = 0.5f - vec_distance_xy(gHeroPosition, D_L03_001B9980) * 0.0625f;
     if (near < 0.0f)
         near = 0.0f;
     x = rel[0] - near;
@@ -37,12 +38,12 @@ void func_L03_003D2518(u8 *self, f32 *aim, f32 *angles)
     *(L03_2518Quad *)tilt = 0;
     tilt[0] = x;
     tilt[3] = 1.0f;
-    func_002830C0(aim, tilt, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128);
-    func_00282C88(angles);
-    qcopy(rel, D_00189EA0);
+    transform_vector(aim, tilt, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128);
+    ClearVector128(angles);
+    qcopy(rel, gHeroPosition);
     rel[2] = *(f32 *)(self + 0x18);
-    func_00282CF0(dir, rel, aim);
+    FastVecSub(dir, rel, aim);
     dir[2] += 2.0f;
-    angles[1] = -func_00283248(func_00282E20(dir), dir[2]);
-    angles[2] = func_00283248(dir[0], dir[1]);
+    angles[1] = -FastMatrixHelperA(vec_length_xy(dir), dir[2]);
+    angles[2] = FastMatrixHelperA(dir[0], dir[1]);
 }

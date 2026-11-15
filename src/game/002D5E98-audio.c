@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from RAC1 src/game/pause.c: DrawSoundMenu.
  * Draws the sound/music volume sliders and playback mode row.
  */
@@ -35,46 +36,46 @@ int func_002D7DB8(Menu *menu)
 
     row_height = menu->height >> 2;
     center_x = menu->width >> 1;
-    func_0027C540(0);
+    SetupGifPaging(0);
     label_right = center_x - 8;
     border_left = center_x + 7;
     slider_left = center_x + 9;
     slider_padding = center_x + 0x4A;
 
     /* Row 1: sound volume. */
-    func_0027F980(label_right, row_height - 8,
+    DrawTextRightAlignedSmallFont(label_right, row_height - 8,
                   menu->selection == 0 ? 0x8020FFFF : 0x80FFA888,
-                  (u8 *)func_00288FB8(0x2F0F), -1);
-    func_0028FC48(border_left, row_height - 8, menu->width - 0x3F, row_height + 8,
+                  (u8 *)GetLocalizedString(0x2F0F), -1);
+    AppendScreenRectPacket(border_left, row_height - 8, menu->width - 0x3F, row_height + 8,
                   0x80696969, 0);
-    func_0028FC48(slider_left, row_height - 6, menu->width - 0x41, row_height + 6,
+    AppendScreenRectPacket(slider_left, row_height - 6, menu->width - 0x41, row_height + 6,
                   0x80383838, 0);
     slider_length = (menu->width - slider_padding) * D_001A7BA0 / 1024;
-    func_0028F788(func_0028E588(0xE99D, 8), slider_left << 4,
+    DrawHudQuadUV(GetIconFrame(0xE99D, 8), slider_left << 4,
                   (row_height - 6) << 4, (center_x + 8 + slider_length) << 4,
                   (row_height + 5) << 4, 0, 0xA0, 0x1F0, 0x150, 0x80);
 
     /* Row 2: music volume. */
     row_y = row_height + row_height;
-    func_0027F980(label_right, row_y - 8,
+    DrawTextRightAlignedSmallFont(label_right, row_y - 8,
                   menu->selection == 1 ? 0x8020FFFF : 0x80FFA888,
-                  (u8 *)func_00288FB8(0x2F10), -1);
-    func_0028FC48(border_left, row_y - 8, menu->width - 0x3F, row_y + 8,
+                  (u8 *)GetLocalizedString(0x2F10), -1);
+    AppendScreenRectPacket(border_left, row_y - 8, menu->width - 0x3F, row_y + 8,
                   0x80696969, 0);
-    func_0028FC48(slider_left, row_y - 6, menu->width - 0x41, row_y + 6,
+    AppendScreenRectPacket(slider_left, row_y - 6, menu->width - 0x41, row_y + 6,
                   0x80383838, 0);
     slider_length = (menu->width - slider_padding) * D_001A7B9C / 1024;
-    func_0028F788(func_0028E588(0xE99D, 9), slider_left << 4,
+    DrawHudQuadUV(GetIconFrame(0xE99D, 9), slider_left << 4,
                   (row_y - 6) << 4, (center_x + 8 + slider_length) << 4,
                   (row_y + 5) << 4, 0, 0xA0, 0x1F0, 0x150, 0x80);
 
     /* Row 3: playback mode. */
     row_y += row_height;
-    func_0027F980(label_right, row_y - 8,
+    DrawTextRightAlignedSmallFont(label_right, row_y - 8,
                   menu->selection == 2 ? 0x8020FFFF : 0x80FFA888,
-                  (u8 *)func_00288FB8(0x2F11), -1);
-    func_0027F538(center_x + 8, row_y - 8, 0x80FFA888,
-                  (u8 *)func_00288FB8(D_001A7B98 != 0 ? 0x2F13 : 0x2F12), -1);
-    func_0027C660();
+                  (u8 *)GetLocalizedString(0x2F11), -1);
+    DrawTextSmallFont(center_x + 8, row_y - 8, 0x80FFA888,
+                  (u8 *)GetLocalizedString(D_001A7B98 != 0 ? 0x2F13 : 0x2F12), -1);
+    DoGifPaging();
     return 2;
 }

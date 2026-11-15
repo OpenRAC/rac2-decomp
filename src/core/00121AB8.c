@@ -78,6 +78,7 @@ typedef union {
     __w.ll; })
 
 /* __muldi3 */
+/* Multiplies two 64-bit whole numbers. */
 DItype func_00121AB8 (DItype u, DItype v)
 {
   DIunion w;

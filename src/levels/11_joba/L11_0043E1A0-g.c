@@ -14,6 +14,7 @@ extern int func_00282978(short *);
 /* Tallies the group's living members and their health, records the losses in
  * the four-slot history and stores their weighted sum at 0x14C. Built with -g:
  * the debug line layout gives retail's single nop before div.s. */
+/* Counts the fighters still alive and their health, and keeps a short history of how many were lost recently. The arena uses that history to judge how well the player is doing. */
 void func_L11_00440360(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -33,62 +34,62 @@ void func_L11_00440360(u8 *object)
     u8 *motions;
     u8 *player;
     if (I32(state,0xc0) == 255) return;
-    groupList = (short *)D_L11_001FC420[I32(state,0xc0)];
+    groupList = (short *)gGroupIdLists[I32(state,0xc0)];
     if (groupList == 0) return;
     list = groupList;
     if (object[0x20] == 9 && object[0xbc] == 0) return;
     ((struct StateClassCount *)state)->count = 0;
     active=0; total=0.0f;
-    members=D_L11_001B359C;
+    members=gMobyTable_L11;
     do {
         member = members + ((*list & 0x7fff) << 8);
         if (member != 0 && member[0x20] != 254 && member[0x20] != 253 && member[0x20] != 1) {
             kind = S16(member,0xaa);
-            if (kind == 0xd98) {
+            if (kind == 0xd98 /* Joba security robot */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xdcf) {
+            } else if (kind == 0xdcf /* Joba smasher robot */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xdf4) {
+            } else if (kind == 0xdf4 /* moby class 3572 */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xdf7) {
+            } else if (kind == 0xdf7 /* moby class 3575 */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xdf9) {
+            } else if (kind == 0xdf9 /* Joba fighter */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xd37) {
+            } else if (kind == 0xd37 /* moby class 3383 */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 U16(state,0x200)++;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xd4a) {
+            } else if (kind == 0xd4a /* moby class 3402 */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 active++;
                 total += hp->health;
-            } else if (kind == 0xd4b) {
+            } else if (kind == 0xd4b /* moby class 3403 */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xb3a) {
+            } else if (kind == 0xb3a /* Arachnoid */) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 active++;
                 total += hp->health;
             }
         }
     } while (*list++ >= 0);
-    player = D_00189E20;
-    func_L11_00445DF8(object, I32(state,0x140)-active, F32(state,0x144)-total,
+    player = gHeroState;
+    StartRandomJobaBossAction(object, I32(state,0x140)-active, F32(state,0x144)-total,
         F32(state,0x148)-(float)I32(player,0x24cc));
     if (F32(state,0x148)-(float)I32(player,0x24cc) > 0.0f)
-        func_L00_0035F5A0(0x17,0,0);
+        StartEffectInSlot(0x17,0,0);
     if (active < I32(state,0x140))
         ((struct StateHistory *)state)->history[S16(state,0x1ec)].count += I32(state,0x140)-active;
     if (total < F32(state,0x144))
@@ -110,7 +111,7 @@ void func_L11_00440360(u8 *object)
         weights += countTerm;
     }
     F32(state,0x14c) = energy*0.2f + weights + motion * -2.0f;
-    if (func_00282978((short *)(state+0x1ee))) {
+    if (FastDecTimer((short *)(state+0x1ee))) {
         S16(state,0x1ec) = (short)(U16(state,0x1ec)+1)%4;
         ((struct StateHistory *)state)->history[S16(state,0x1ec)].count=0;
         ((struct StateHistory *)state)->history[S16(state,0x1ec)].energy=0;

@@ -8,44 +8,45 @@ extern float func_00283CE0(int n);
 extern int func_00283CF0(float f);
 
 
-void func_002BE150(char *a0)
+/* Makes an effect follow the object it belongs to, copying its position and fading it in or out. It disappears when that object goes away. */
+void func_002BE150(char *effect)
 {
-    char *s0;
-    char *s1;
-    unsigned char *p;
-    float f0;
-    float f1;
+    char *particle;
+    char *state;
+    unsigned char *source;
+    float size;
+    float fade;
     float f2;
-    float f3;
-    unsigned int c;
-    int r;
+    float zero;
+    unsigned int color;
+    int alpha;
 
-    s0 = a0;
-    if (s0 == 0)
+    particle = effect;
+    if (particle == 0)
         return;
-    s1 = s0 + 0x20;
-    p = *(unsigned char **)(s0 + 0x20);
-    if (p == 0 || (p[1] & 0x80)) {
-        func_002B9180(s0);
-        return;
-    }
-    qcopy(s0 + 0x10, p + 0x10);
-    *(unsigned char *)(s0 + 8) = p[8];
-    f0 = *(float *)(p + 0xC) * *(float *)(s1 + 4) + *(float *)(s1 + 8);
-    *(float *)(s0 + 0xC) = f0;
-    f3 = 0.0f;
-    f1 = *(float *)(s1 + 0xC) + *(float *)(s1 + 0x14);
-    *(float *)(s1 + 0xC) = f1;
-    if (f1 < f3) {
-        *(float *)(s1 + 0xC) = f3;
+    state = particle + 0x20;
+    source = *(unsigned char **)(particle + 0x20);
+    if (source == 0 || (source[1] & 0x80)) {
+        KillParticle(particle);
         return;
     }
-    if (1.0f < f1) {
-        *(float *)(s1 + 0xC) = 1.0f;
+    qcopy(particle + 0x10, source + 0x10);
+    *(unsigned char *)(particle + 8) = source[8];
+    size = *(float *)(source + 0xC) * *(float *)(state + 4) + *(float *)(state + 8);
+    *(float *)(particle + 0xC) = size;
+    zero = 0.0f;
+    fade = *(float *)(state + 0xC) + *(float *)(state + 0x14);
+    *(float *)(state + 0xC) = fade;
+    if (fade < zero) {
+        *(float *)(state + 0xC) = zero;
+        return;
     }
-    c = *(unsigned int *)(s0 + 4) & 0xFFFFFF;
-    r = func_00283CF0(((func_00283CE0((*(unsigned char **)(s0 + 0x20))[7]) / 256.0f)
-                       * *(float *)(s1 + 0x10) + *(float *)(s1 + 0xC)) * 256.0f);
-    c = c | ((unsigned int)r << 24);
-    *(unsigned int *)(s0 + 4) = c;
+    if (1.0f < fade) {
+        *(float *)(state + 0xC) = 1.0f;
+    }
+    color = *(unsigned int *)(particle + 4) & 0xFFFFFF;
+    alpha = FloatToInt(((IntToFloat((*(unsigned char **)(particle + 0x20))[7]) / 256.0f)
+                       * *(float *)(state + 0x10) + *(float *)(state + 0xC)) * 256.0f);
+    color = color | ((unsigned int)alpha << 24);
+    *(unsigned int *)(particle + 4) = color;
 }

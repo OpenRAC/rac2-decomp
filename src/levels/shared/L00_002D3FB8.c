@@ -6,19 +6,20 @@ extern int func_L00_002D3FB0(int);
 extern unsigned char D_00139568[];
 extern int D_00139688[];
 
-int func_L00_002D3FB8(int a0, int a1)
+/* Adds ammo to a weapon slot and caps it at the weapon limit. Returns how much did not fit. */
+int func_L00_002D3FB8(int slotIndex, int amount)
 {
-    int idx = func_L00_002D3FB0(a0);
-    int *slot = &D_00139688[idx];
-    Entry_262570 *e;
-    int v = *slot + a1;
+    int idx = ReturnArgument_L00_2(slotIndex);
+    int *slotPtr = &gItemAmmoCounts[idx];
+    Entry_262570 *entry;
+    int newTotal = *slotPtr + amount;
 
-    *slot = v;
-    e = &D_L00_00262570[D_00139568[idx]];
-    if (e->f8E != 0) {
-        int overflow = v - e->f8E;
+    *slotPtr = newTotal;
+    entry = &gWeaponTable_L00[gItemSlotToRecord[idx]];
+    if (entry->f8E != 0) {
+        int overflow = newTotal - entry->f8E;
         if (overflow <= 0) return 0;
-        *slot = e->f8E;
+        *slotPtr = entry->f8E;
         return overflow;
     }
     return 0;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { int ids[2]; } OptionPair;
 typedef struct { int ids[3]; } OptionTriple;
@@ -60,31 +61,32 @@ extern void func_0033B018(void *, float, float);
 extern int func_002E5E58(int, int, void *);
 extern void func_0027AB40(void);
 
+/* Sets up the four-option menu: its button prompt bar, labels and position. */
 void func_0033C468(u8_Ff4eb83c9 *self, void *arg) {
-    u8_Ff4eb83c9 *sub;
-    void *first, *second, *third;
+    u8_Ff4eb83c9 *prompt;
+    void *textA, *textB, *textC;
     *(void **)self = arg;
     if (arg != 0) {
-        void *t = func_00336E40_3(arg);
-        void *p = func_00336DA8_3(16, t);
-        *(void **)(self + 684) = p;
-        ((s32_Ff4eb83c9 *)p)[1] = 0;
-        ((s32_Ff4eb83c9 *)p)[2] = 0;
-        ((s32_Ff4eb83c9 *)p)[3] = 0;
-        ((s32_Ff4eb83c9 *)p)[0] = 0;
+        void *owner = func_00336E40_3(arg);
+        void *allocation = func_00336DA8_3(16, owner);
+        *(void **)(self + 684) = allocation;
+        ((s32_Ff4eb83c9 *)allocation)[1] = 0;
+        ((s32_Ff4eb83c9 *)allocation)[2] = 0;
+        ((s32_Ff4eb83c9 *)allocation)[3] = 0;
+        ((s32_Ff4eb83c9 *)allocation)[0] = 0;
     }
-    sub = self + 8;
+    prompt = self + 8;
     ((f32_Ff4eb83c9 *)*(void **)(self + 684))[0] = 255.0f;
     ((f32_Ff4eb83c9 *)*(void **)(self + 684))[1] = 195.0f;
-    func_0033ABD8_3(sub, arg, D_L04_001AE070);
-    first = func_00288FB8_2(11672);
-    second = func_00288FB8_2(11598);
-    third = func_00288FB8_2(11599);
-    func_0033B050_2(sub, first, second, third);
-    func_0033B030_3(sub, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_0033B0A8_2(sub, 0.65f);
+    func_0033ABD8_3(prompt, arg, D_L04_001AE070);
+    textA = func_00288FB8_2(11672);
+    textB = func_00288FB8_2(11598);
+    textC = func_00288FB8_2(11599);
+    func_0033B050_2(prompt, textA, textB, textC);
+    func_0033B030_3(prompt, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    func_0033B0A8_2(prompt, 0.65f);
     *(s32_Ff4eb83c9 *)(self + 680) = 0;
-    func_0033C590(self, 0);
+    UpdateFourOptionMenuInput(self, 0);
 }
 int func_0033C590(u8_Ff4eb83c9 *a0, int a1)
 {
@@ -96,19 +98,19 @@ int func_0033C590(u8_Ff4eb83c9 *a0, int a1)
     float *q;
     int v;
 
-    func_0033AE28(p);
+    UpdateButtonPromptBar(p);
     q = *(float **)(a0 + 0x2AC);
-    func_0033B018(p, q[0], q[1]);
+    SetMenuAnchorPosition(p, q[0], q[1]);
     if (a1 & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         v = *(int *)(a0 + 0x2A8);
         *(int *)(a0 + 0x2A8) = (v + 3) % 4;
     } else if (a1 & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         v = *(int *)(a0 + 0x2A8);
         *(int *)(a0 + 0x2A8) = (v + 1) % 4;
     } else if (a1 & 0x40) {
-        func_002E5E58(4, 0, 0);
+        PlaySoundFromGlobalBank(4, 0, 0);
         switch (*(int *)(a0 + 0x2A8)) {
         case 0:
             *sfx = *sfx < 1;
@@ -121,48 +123,49 @@ int func_0033C590(u8_Ff4eb83c9 *a0, int a1)
             break;
         case 3:
             *toggle = *toggle < 1;
-            func_0027AB40();
+            UpdateViewContext();
             break;
         }
     }
     return (a1 >> 6) & 1;
 }
 
+/* Draws the four option lines (two on/off options, a three-way option and an on/off option) and highlights the selected one. */
 void func_0033C738(char *object)
 {
     char buffer[128];
-    OptionPair onoff;
-    OptionTriple modes;
-    OptionPair toggle;
+    OptionPair onOffText;
+    OptionTriple modeText;
+    OptionPair toggleText;
     char *first, *second, *format;
     char *label2, *label3, *label4;
     int color;
-    func_0033AF48(object + 8);
-    onoff = D_001ADE20;
-    modes = D_001ADE28;
-    toggle = D_001ADDD0;
+    DrawButtonPromptBar(object + 8);
+    onOffText = D_001ADE20;
+    modeText = D_001ADE28;
+    toggleText = D_001ADDD0;
     format = D_001ADDD8;
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    first = func_00288FB8(0x2DE2);
-    second = func_00288FB8(onoff.ids[D_001A7BA4 != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FB40(D_001ADE00, D_001ADE04[0], color, buffer, -1);
+    first = GetLocalizedString(0x2DE2);
+    second = GetLocalizedString(onOffText.ids[D_001A7BA4 != 0]);
+    Sprintf(buffer, format, first, second);
+    DrawTextCenteredMediumFont(D_001ADE00, D_001ADE04[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
-    label2 = func_00288FB8(0x2DE1);
-    second = func_00288FB8(onoff.ids[D_001A7BA8 != 0]);
-    func_00115DA8(buffer, format, label2, second);
-    func_0027FB40(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
+    label2 = GetLocalizedString(0x2DE1);
+    second = GetLocalizedString(onOffText.ids[D_001A7BA8 != 0]);
+    Sprintf(buffer, format, label2, second);
+    DrawTextCenteredMediumFont(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     {
         int mode = D_001A7BAC;
-        label3 = func_00288FB8(0x2F18);
-        second = func_00288FB8(modes.ids[mode]);
+        label3 = GetLocalizedString(0x2F18);
+        second = GetLocalizedString(modeText.ids[mode]);
     }
-    func_00115DA8(buffer, format, label3, second);
-    func_0027FB40(D_001ADE10, D_001ADE14[0], color, buffer, -1);
+    Sprintf(buffer, format, label3, second);
+    DrawTextCenteredMediumFont(D_001ADE10, D_001ADE14[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 3 ? (int)0x80D0D0D0 : 0x70808080;
-    label4 = func_00288FB8(0x31E4);
-    second = func_00288FB8(toggle.ids[D_001A7BB1 != 0]);
-    func_00115DA8(buffer, format, label4, second);
-    func_0027FB40(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
+    label4 = GetLocalizedString(0x31E4);
+    second = GetLocalizedString(toggleText.ids[D_001A7BB1 != 0]);
+    Sprintf(buffer, format, label4, second);
+    DrawTextCenteredMediumFont(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
 }

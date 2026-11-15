@@ -25,22 +25,23 @@ extern void func_0029FCC0(u8 *a, s32 b, void *c);
 extern TI128 D_L07_001BF660;
 
 /* The tool's own spin: the shared vector, the two sampled ones, then the shared pass. */
-void func_L07_003F8AB0(u8 *a0)
+/* Fires a beam from the boss toward its target: works out the line, stops it at the first thing in the way, and spawns the beam object. */
+void func_L07_003F8AB0(u8 *moby)
 {
-    TI128 v[3];
-    u8 *s3;
-    f32 len;
+    TI128 beamPoints[3];
+    u8 *vars;
+    f32 distance;
 
-    s3 = *(u8 **)(a0 + 0x68);
-    func_002E5CF8(1, 0, a0);
-    func_0029FCC0(a0, 0, &v[0]);
-    func_L07_003F8898(a0, &v[2]);
-    func_00282CF0(&v[1], &v[2], &v[0]);
-    len = func_00282DF0(&v[1]);
-    func_00282F20(&v[1], &v[1], len + 2.0f);
-    func_00282CC0(&v[1], &v[1], &v[0]);
-    if (func_002761F8(&v[0], &v[1], 2, a0, 0) != 0) {
-        v[1] = D_L07_001BF660;
+    vars = *(u8 **)(moby + 0x68);
+    PlayMobySound(1, 0, moby);
+    TransformMobyJointToWorld(moby, 0, &beamPoints[0]);
+    GetPositionRelativeToParent(moby, &beamPoints[2]);
+    FastVecSub(&beamPoints[1], &beamPoints[2], &beamPoints[0]);
+    distance = FastVecLength(&beamPoints[1]);
+    vec_scale_to_length(&beamPoints[1], &beamPoints[1], distance + 2.0f);
+    FastVecAdd(&beamPoints[1], &beamPoints[1], &beamPoints[0]);
+    if (CollLine(&beamPoints[0], &beamPoints[1], 2, moby, 0) != 0) {
+        beamPoints[1] = D_L07_001BF660;
     }
-    func_L07_003F4B08(a0, *(s32 *)(s3 + 0x418), &v[0], &v[1], (f32)*(u8 *)(s3 + 0x34));
+    SpawnBeamMoby(moby, *(s32 *)(vars + 0x418), &beamPoints[0], &beamPoints[1], (f32)*(u8 *)(vars + 0x34));
 }

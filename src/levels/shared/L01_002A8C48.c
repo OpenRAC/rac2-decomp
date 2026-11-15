@@ -45,67 +45,68 @@ extern void func_30F444(int a0);
 extern void func_L01_002A9298(void);
 extern void func_2AB328(void);
 
+/* Runs one frame of the main game update: reads input, moves the hero and camera, and updates effects and menus. A shorter path is used when the game is in a special mode. */
 void func_L01_002A8C48(void) {
-    char *p;
+    char *hero;
 
-    p = D_00189E20;
-    *(short *)(p + 0x2162) = 0;
-    *(short *)(p + 0x2160) = 0;
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
-        func_L01_002A84D8();
+    hero = gHeroState;
+    *(short *)(hero + 0x2162) = 0;
+    *(short *)(hero + 0x2160) = 0;
+    if (*(unsigned char *)(hero + 0x22B4) != 0) {
+        UpdateHeroSubsystems();
         return;
     }
     func_2C7CA8();
-    func_L00_002B36E0();
-    func_L01_002ADDC8();
-    func_L01_002AE128(p + 0x80, p + 0x90, p + 0x550);
-    func_L01_002C37C8();
+    UpdateHeroInputAndHistory();
+    ReadHeroInputCommandFlags();
+    ProbeLedgeGrab(hero + 0x80, hero + 0x90, hero + 0x550);
+    UpdateHeroStateTransitions_L01();
     if (D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) {
-        if (*(unsigned char *)(p + 0x22B5) != 0)
+        if (*(unsigned char *)(hero + 0x22B5) != 0)
             func_2C8628();
         else
-            func_L00_002D3068();
+            ClearHeroObjectsFlagBit();
         return;
     }
     func_2AEB80();
-    if (*(unsigned char *)(p + 0x22B4) != 0)
+    if (*(unsigned char *)(hero + 0x22B4) != 0)
         return;
     func_2B9878();
-    func_L00_002AC1A0();
-    func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
+    UpdateHeroEasingTargetsAndPointEffects();
+    UpdateCameraBlendAngles();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
     func_2A7740();
     func_2AB028();
-    func_L00_002AA178(0);
-    func_L00_002B2120();
-    func_L00_002B2318();
-    func_L00_002B2200();
-    func_L00_002AFBC0();
-    if (*(unsigned char *)(p + 0x22B5) != 0 || func_L00_002D6418() != 0)
+    SpawnEffectFromRecord(0);
+    UpdateHeroItemsAndFlags();
+    UpdateHeroLockOnWeaponFire();
+    PlayHeroVoiceLineForProgress();
+    UpdateHeroItemsFrame();
+    if (*(unsigned char *)(hero + 0x22B5) != 0 || IsHeroActionAllowed() != 0)
         func_2C8628();
     else
-        func_L00_002D3068();
+        ClearHeroObjectsFlagBit();
     func_2A9520();
     func_2A9310();
-    func_L00_002A67F8();
-    func_L00_002D5EB8();
-    func_L00_002A6420();
-    func_L00_002D5158();
+    UpdateHeroStatTrackers();
+    UpdateCollectionProgress();
+    CheckHeroTargetingTriggers();
+    UpdateHeroAimAndTransitions();
     {
-        char *q = D_00189E20;
-        if ((*(int *)(q + 0x229C) != 0x16 && *(int *)(q + 0x229C) != 0x1F
-             && *(int *)(q + 0x2294) != 0x31) || func_L00_002A7000() != 0)
-            func_L00_003080D0(D_00189EA0);
+        char *heroBlock = gHeroState;
+        if ((*(int *)(heroBlock + 0x229C) != 0x16 && *(int *)(heroBlock + 0x229C) != 0x1F
+             && *(int *)(heroBlock + 0x2294) != 0x31) || IsHeroInSwingOrGrindMode() != 0)
+            ClearMapBitsAroundPosition(gHeroPosition);
     }
     {
-        char *q = D_00189E20;
-        func_30F444(*(int *)(q + 0x2290));
+        char *heroBlock = gHeroState;
+        func_30F444(*(int *)(heroBlock + 0x2290));
     }
-    func_L01_002A9298();
+    UpdateEquippedWeaponEffect();
     func_2AB328();
 }

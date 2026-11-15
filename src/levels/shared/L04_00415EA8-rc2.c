@@ -25,16 +25,17 @@
 
 extern s8 ref_L04_00415EA8_00[];
 
-void func_L04_00415EA8(s32 arg0) {
-    s32 var_a1;
-    s8 *base;
-    s8 *var_v1;
+/* Switches off the table entries owned by the given owner, or all of them when the owner is 0. */
+void func_L04_00415EA8(s32 owner) {
+    s32 remaining;
+    s8 *table;
+    s8 *entry;
 
-    base = ref_L04_00415EA8_00;
-    var_v1 = base + 0x144;
-    for (var_a1 = 0x8B; var_a1 >= 0; var_a1 -= 1, var_v1 += 0x150) {
-        if ((arg0 == 0) || (*(s32 *)(var_v1 + 4) == arg0)) {
-            *(s32 *)var_v1 = 0;
+    table = ref_L04_00415EA8_00;
+    entry = table + 0x144;
+    for (remaining = 0x8B; remaining >= 0; remaining -= 1, entry += 0x150) {
+        if ((owner == 0) || (*(s32 *)(entry + 4) == owner)) {
+            *(s32 *)entry = 0;
         }
     }
 }

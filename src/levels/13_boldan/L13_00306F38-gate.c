@@ -7,69 +7,70 @@ extern void func_002ACEC0(void *,void *,void *,float);
 extern float func_00282E80(void *,void *);
 extern struct { char pad[0x348]; short state; } D_00189E20;
 extern char D_00189EA0[];
-void func_L13_003FE420(char *obj) {
-    char *rec=*(char **)(obj+0x68);
-    if (!rec) { func_0029F338(obj); return; }
-    switch (*(u8 *)(obj+0x20)) {
+/* Gate that swings open when the player triggers it, stays open while the player is near, and closes again when the player leaves. */
+void func_L13_003FE420(char *moby) {
+    char *vars=*(char **)(moby+0x68);
+    if (!vars) { MarkMobySpawned(moby); return; }
+    switch (*(u8 *)(moby+0x20)) {
     case 0:
-        *(int *)(rec+0xC)=0;
-        *(int *)(rec+4)=0;
-        *(u16 *)(obj+0x34)|=0x100;
-        if (*(int *)rec) *(u8 *)(obj+0x20)=1;
-        else *(u8 *)(obj+0x20)=4;
+        *(int *)(vars+0xC)=0;
+        *(int *)(vars+4)=0;
+        *(u16 *)(moby+0x34)|=0x100;
+        if (*(int *)vars) *(u8 *)(moby+0x20)=1;
+        else *(u8 *)(moby+0x20)=4;
         break;
     case 1:
-        if (func_L00_00324120(obj)) {
-            if (D_00189E20.state==1 && func_002ACBC8((char *)&D_00189E20+0x80,*(int *)(rec+8))) {
-                *(u16 *)(obj+0x96)=0;
-                func_L13_002CEF00(0x6F,1);
-                *(u8 *)(obj+0x20)=2;
+        if (IsCurrentSelectedId(moby)) {
+            if (gHeroState.state==1 && IsPointInCuboid((char *)&gHeroState+0x80,*(int *)(vars+8))) {
+                *(u16 *)(moby+0x96)=0;
+                ChangeHeroAction(0x6F,1);
+                *(u8 *)(moby+0x20)=2;
             }
-            if (*(int *)(rec+8)!=-1 || !*(char **)(rec+0xC)) break;
-            if (*(u8 *)(*(char **)(rec+0xC)+0x20)==0xFE) goto opened;
-            if (*(u8 *)(*(char **)(rec+0xC)+0x20)!=0xFD) break;
+            if (*(int *)(vars+8)!=-1 || !*(char **)(vars+0xC)) break;
+            if (*(u8 *)(*(char **)(vars+0xC)+0x20)==0xFE) goto opened;
+            if (*(u8 *)(*(char **)(vars+0xC)+0x20)!=0xFD) break;
 opened:
-            if (D_00189E20.state==1) {
-                *(u16 *)(obj+0x96)=0;
-                *(u8 *)(obj+0x20)=2;
+            if (gHeroState.state==1) {
+                *(u16 *)(moby+0x96)=0;
+                *(u8 *)(moby+0x20)=2;
             }
-        } else *(u16 *)(obj+0x96)=0;
+        } else *(u16 *)(moby+0x96)=0;
         break;
     case 2:
-        if (*(u16 *)(obj+0x96)<91) {
-            func_002ACEC0(obj+0xC0,obj+0xC0,obj+0xD0,0.017453294f);
-            func_002ACEC0(obj+0xE0,obj+0xE0,obj+0xD0,0.017453294f);
-            (*(u16 *)(obj+0x96))++;
+        if (*(u16 *)(moby+0x96)<91) {
+            ApplyAxisRotationToQuaternion(moby+0xC0,moby+0xC0,moby+0xD0,0.017453294f);
+            ApplyAxisRotationToQuaternion(moby+0xE0,moby+0xE0,moby+0xD0,0.017453294f);
+            (*(u16 *)(moby+0x96))++;
         } else {
-            func_L13_002CEF00(0,1);
-            *(u8 *)(obj+0x20)=7;
+            ChangeHeroAction(0,1);
+            *(u8 *)(moby+0x20)=7;
         }
         break;
     case 3:
-        if (*(u16 *)(obj+0x96)<91 && *(int *)(rec+4)==0) {
-            func_002ACEC0(obj+0xC0,obj+0xC0,obj+0xD0,-0.034906588f);
-            func_002ACEC0(obj+0xE0,obj+0xE0,obj+0xD0,-0.034906588f);
-            *(u16 *)(obj+0x96)+=2;
+        if (*(u16 *)(moby+0x96)<91 && *(int *)(vars+4)==0) {
+            ApplyAxisRotationToQuaternion(moby+0xC0,moby+0xC0,moby+0xD0,-0.034906588f);
+            ApplyAxisRotationToQuaternion(moby+0xE0,moby+0xE0,moby+0xD0,-0.034906588f);
+            *(u16 *)(moby+0x96)+=2;
         }
-        if (*(u16 *)(obj+0x96)>=91 || *(int *)(rec+4)) {
-            *(int *)(rec+4)=1;
-            *(u8 *)(obj+0x20)=1;
-            *(u16 *)(obj+0x96)=0;
+        if (*(u16 *)(moby+0x96)>=91 || *(int *)(vars+4)) {
+            *(int *)(vars+4)=1;
+            *(u8 *)(moby+0x20)=1;
+            *(u16 *)(moby+0x96)=0;
         }
         break;
     case 5:
-        func_002ACEC0(obj+0xC0,obj+0xC0,obj+0xD0,-0.017453294f);
-        func_002ACEC0(obj+0xE0,obj+0xE0,obj+0xD0,-0.017453294f);
-        if (--*(u16 *)(obj+0x96)==0) {
-            *(u16 *)(obj+0x96)=0;
-            *(u8 *)(obj+0x20)=1;
+        ApplyAxisRotationToQuaternion(moby+0xC0,moby+0xC0,moby+0xD0,-0.017453294f);
+        ApplyAxisRotationToQuaternion(moby+0xE0,moby+0xE0,moby+0xD0,-0.017453294f);
+        if (--*(u16 *)(moby+0x96)==0) {
+            *(u16 *)(moby+0x96)=0;
+            *(u8 *)(moby+0x20)=1;
         }
         break;
     case 7:
-        if (func_00282E80(obj+0x10,D_00189EA0)<4.0f) *(short *)(D_00189EA0+0x194)=2;
-        else *(short *)(D_00189EA0+0x194)=0;
+        if (vec_distance_xy(moby+0x10,gHeroPosition)<4.0f) *(short *)(gHeroPosition+0x194)=2;
+        else *(short *)(gHeroPosition+0x194)=0;
     case 6:
-        if (D_00189E20.state!=1) *(u8 *)(obj+0x20)=5;
+        if (gHeroState.state!=1) *(u8 *)(moby+0x20)=5;
         break;
     }
 }

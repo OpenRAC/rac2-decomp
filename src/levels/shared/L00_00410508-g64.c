@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     int count0;
     int pad4;
@@ -31,46 +32,47 @@ extern int func_L00_003AB9C0(int a, void *b, int c, char *d, float e, float f, f
 extern float D_L00_001B12C0[4][4] __attribute__((sda));
 extern int D_L00_001B2D58 __attribute__((nosda));
 
+/* Spawns the next piece of a timed sequence at a spot picked from a table, then counts the sequence down. Ends the sequence when nothing more can be spawned. */
 void func_L00_00410508(Obj_410508 *self)
 {
-    Node_410508 *st = self->node;
-    float v[4];
-    float w[4];
-    float sign;
-    int n;
-    Obj_410508 *r;
+    Node_410508 *vars = self->node;
+    float offset[4];
+    float spawnPos[4];
+    float spinSign;
+    int step;
+    Obj_410508 *child;
 
-    if (func_L00_002D4040(-1) == 0) {
-        st->n = -1;
+    if (get_ammo(-1) == 0) {
+        vars->n = -1;
         return;
     }
-    n = st->n;
-    sign = (float)(n & 1);
-    if (sign == 0.0f)
-        sign = -1.0f;
-    st->n = n - 1;
-    func_00283098(v, D_L00_001B12C0[n], self->mtx);
-    func_00282CC0(w, self->pos, v);
-    if (st->n == -1) {
-        if (st->count0 != 0) {
-            v[2] = 0.0f;
-            v[0] = 0.0f;
+    step = vars->n;
+    spinSign = (float)(step & 1);
+    if (spinSign == 0.0f)
+        spinSign = -1.0f;
+    vars->n = step - 1;
+    matrix_mul_vec3(offset, D_L00_001B12C0[step], self->mtx);
+    FastVecAdd(spawnPos, self->pos, offset);
+    if (vars->n == -1) {
+        if (vars->count0 != 0) {
+            offset[2] = 0.0f;
+            offset[0] = 0.0f;
         }
     }
-    r = (Obj_410508 *)func_L00_003AB9C0((int)self, w, st->count0, (char *)v, st->f8, 4.0f, 8.0f, 0.5f);
-    if (r != 0) {
-        Sub_410508 *p;
-        func_L00_002D3F30(-1, 1);
+    child = (Obj_410508 *)SpawnTargetedProjectile((int)self, spawnPos, vars->count0, (char *)offset, vars->f8, 4.0f, 8.0f, 0.5f);
+    if (child != 0) {
+        Sub_410508 *childVars;
+        SpendWeaponAmmo(-1, 1);
         D_L00_001B2D58 = 1;
-        r->owner = self;
-        p = r->node;
+        child->owner = self;
+        childVars = child->node;
         {
-            float f = p->f20, z = 0.0f;
+            float spin = childVars->f20, zero = 0.0f;
 
-            if (z < f && sign < z)
-                p->f20 = -f;
-            else if (f < z && z < sign)
-                p->f20 = -p->f20;
+            if (zero < spin && spinSign < zero)
+                childVars->f20 = -spin;
+            else if (spin < zero && zero < spinSign)
+                childVars->f20 = -childVars->f20;
         }
     }
 }

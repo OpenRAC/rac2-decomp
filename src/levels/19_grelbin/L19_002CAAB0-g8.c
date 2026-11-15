@@ -55,133 +55,134 @@ typedef struct {
     int sound;
 } GrelbinState;
 
-void func_L19_003D2E38(char *m)
+/* Per-frame update for the Infiltrator Ball moby. It steps through its states, tracks its charge level and sounds, and removes itself when the sequence ends. */
+void func_L19_003D2E38(char *moby)
 {
-    GrelbinState *p;
+    GrelbinState *vars;
     int i, sound, kind;
 
-    p = *(GrelbinState **)(m + 0x68);
+    vars = *(GrelbinState **)(moby + 0x68);
     if (D_L19_001A8F00[0] != 7) {
-        if (*(unsigned char *)(m + 0x20))
-            func_002A7750(m, 0, -1);
+        if (*(unsigned char *)(moby + 0x20))
+            SetMobyState(moby, 0, -1);
         return;
     }
-    func_002AA2E8(D_L19_001B2424, 0.0f, 1.0f / 6.0f);
+    ApproachValue(D_L19_001B2424, 0.0f, 1.0f / 6.0f);
     D_L19_001B2728[0] = 1;
-    switch (*(unsigned char *)(m + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         for (i = 0; i < 52; i++)
-            func_002E59F8(i);
-        func_L19_003D3358(m);
-        *(unsigned short *)(m + 0x34) |= 0x100;
-        func_L19_003D3CA8(m);
-        func_002A7750(m, D_001A79F0[0] == 11 ? 1 : 3, -1);
+            StopSoundVoice(i);
+        func_L19_003D3358(moby);
+        *(unsigned short *)(moby + 0x34) |= 0x100;
+        func_L19_003D3CA8(moby);
+        SetMobyState(moby, gCurrentMapIndex[0] == 11 ? 1 : 3, -1);
         break;
     case 1:
-        if (D_001A7390[0] - D_0018C958.time > 1080 || !D_0018C958.time)
-            func_00288E18(0xA43, 0x9A);
-        else if (D_0018C958.time < D_001A7390[0])
-            D_0018C958.time = D_001A7390[0];
-        func_002A7750(m, 3, -1);
+        if (D_001A7390[0] - gSubtitleHistory.time > 1080 || !gSubtitleHistory.time)
+            RequestSubtitleVoiceLine(0xA43, 0x9A);
+        else if (gSubtitleHistory.time < D_001A7390[0])
+            gSubtitleHistory.time = D_001A7390[0];
+        SetMobyState(moby, 3, -1);
         break;
     case 2:
-        if (!p->field68) {
-            func_002A7750(m, 4, -1);
+        if (!vars->field68) {
+            SetMobyState(moby, 4, -1);
             break;
         }
-        if (func_L19_003D4490(m)) {
-            p->field6a = 1;
-            func_L19_003D3B58(m);
-            func_002E5CF8(4, 0, m);
-            func_002A7750(m, 3, -1);
+        if (func_L19_003D4490(moby)) {
+            vars->field6a = 1;
+            func_L19_003D3B58(moby);
+            PlayMobySound(4, 0, moby);
+            SetMobyState(moby, 3, -1);
         }
         break;
     case 3:
-        func_L19_003D4308(m);
-        if (p->field56) {
-            if (p->field66 != -1) {
-                p->field52 = (unsigned short)p->field66;
-                p->field66 = -1;
+        func_L19_003D4308(moby);
+        if (vars->field56) {
+            if (vars->field66 != -1) {
+                vars->field52 = (unsigned short)vars->field66;
+                vars->field66 = -1;
             } else {
-                func_L19_003D40C0(m);
+                func_L19_003D40C0(moby);
             }
-            kind = p->kind;
+            kind = vars->kind;
             kind ^= 255;
             if (kind == 0) {
-                func_002E5CF8(0, 0, m);
+                PlayMobySound(0, 0, moby);
             } else {
-                sound = func_002E5CF8(1, 0, m);
+                sound = PlayMobySound(1, 0, moby);
                 if (sound != -1)
-                    func_002E5F40(sound, func_00283CF0(
-                        func_00283CE0(p->field5e) / func_00283CE0(D_L19_001B06E8)
+                    SetVoicePitchBend(sound, FloatToInt(
+                        IntToFloat(vars->field5e) / IntToFloat(D_L19_001B06E8)
                         * 1024.0f) + 1024);
             }
-            if (p->field5e > p->field60) {
-                p->field60 = (unsigned short)p->field5e;
-                p->field68 = (unsigned short)p->field68 + D_L19_001B06F8;
-                if (p->field68 > D_L19_001B06F0)
-                    p->field68 = D_L19_001B06F0;
+            if (vars->field5e > vars->field60) {
+                vars->field60 = (unsigned short)vars->field5e;
+                vars->field68 = (unsigned short)vars->field68 + D_L19_001B06F8;
+                if (vars->field68 > D_L19_001B06F0)
+                    vars->field68 = D_L19_001B06F0;
             }
-            if (p->field5e == D_L19_001B06E8) {
-                func_002E5CF8(5, 0, m);
-                func_002A7750(m, 5, -1);
+            if (vars->field5e == D_L19_001B06E8) {
+                PlayMobySound(5, 0, moby);
+                SetMobyState(moby, 5, -1);
             } else {
-                func_002A7750(m, 2, -1);
+                SetMobyState(moby, 2, -1);
             }
         }
         break;
     case 4:
-        if (p->field56) {
-            if (p->field5c != p->field50) {
-                p->field52 = (unsigned short)p->field5c;
-                func_L19_003D3B58(m);
-                func_002E5CF8(2, 0, m);
+        if (vars->field56) {
+            if (vars->field5c != vars->field50) {
+                vars->field52 = (unsigned short)vars->field5c;
+                func_L19_003D3B58(moby);
+                PlayMobySound(2, 0, moby);
             } else {
-                p->field6a = 0;
-                p->field60 = 0;
-                p->field68 = D_L19_001B06F4;
-                func_002A7750(m, 2, -1);
+                vars->field6a = 0;
+                vars->field60 = 0;
+                vars->field68 = D_L19_001B06F4;
+                SetMobyState(moby, 2, -1);
             }
         } else {
-            func_L19_003D4308(m);
+            func_L19_003D4308(moby);
         }
         break;
     case 5:
-        if (func_002B3868(m))
-            *(unsigned short *)(m + 0x96) = 120;
-        if (!*(unsigned short *)(m + 0x96)) {
+        if (SetFirstPendingFlag(moby))
+            *(unsigned short *)(moby + 0x96) = 120;
+        if (!*(unsigned short *)(moby + 0x96)) {
             D_0018D090 = 65535;
-            func_L03_003E5218(D_L19_001AC000[0]);
+            SetMobyFlagOn(D_L19_001AC000[0]);
             goto destroy;
         }
-        (*(unsigned short *)(m + 0x96))--;
+        (*(unsigned short *)(moby + 0x96))--;
         break;
     }
     if (D_00138324 & 16) {
-        if (*(unsigned char *)(m + 0x20) == 5)
-            func_L03_003E5218(D_L19_001AC000[0]);
+        if (*(unsigned char *)(moby + 0x20) == 5)
+            SetMobyFlagOn(D_L19_001AC000[0]);
     destroy:
-        func_002B4B70(0, 0);
-        func_0029F338(m);
+        EndSlotRequest(0, 0);
+        MarkMobySpawned(moby);
         return;
     }
-    if (*(unsigned char *)(m + 0x20) != 5 && p->field6a)
-        func_00282978(&p->field68);
-    if (p->field6a && p->field68) {
-        char *s = D_00188660 + p->sound * 0x70;
-        if (*(char **)(s + 0x88) != m || !*(unsigned char *)(s + 0x74))
-            p->sound = func_002E5CF8(3, 4, m);
+    if (*(unsigned char *)(moby + 0x20) != 5 && vars->field6a)
+        FastDecTimer(&vars->field68);
+    if (vars->field6a && vars->field68) {
+        char *soundSlot = gSoundState + vars->sound * 0x70;
+        if (*(char **)(soundSlot + 0x88) != moby || !*(unsigned char *)(soundSlot + 0x74))
+            vars->sound = PlayMobySound(3, 4, moby);
     } else {
-        if (p->sound != -1) {
-            char *s = D_00188660 + p->sound * 0x70;
-            if (*(char **)(s + 0x88) == m && *(unsigned char *)(s + 0x74))
-                func_002E59F8(p->sound);
+        if (vars->sound != -1) {
+            char *soundSlot = gSoundState + vars->sound * 0x70;
+            if (*(char **)(soundSlot + 0x88) == moby && *(unsigned char *)(soundSlot + 0x74))
+                StopSoundVoice(vars->sound);
         }
-        p->sound = -1;
+        vars->sound = -1;
     }
-    func_L19_003D5218(m);
-    p->field58 -= D_L19_001B070C * (1.0f / 60.0f);
-    if (p->field58 < -1.0f)
-        p->field58 += 1.0f;
-    func_L00_002E6CF0(func_L03_003E3A00, m);
+    func_L19_003D5218(moby);
+    vars->field58 -= D_L19_001B070C * (1.0f / 60.0f);
+    if (vars->field58 < -1.0f)
+        vars->field58 += 1.0f;
+    AddDrawCallbackToList1(DrawPathPuzzleHud, moby);
 }

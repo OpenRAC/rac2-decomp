@@ -66,63 +66,64 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* Draws the button help lines at the bottom of the challenge menu. */
 void func_L02_003FDDE8(u8 *object, int enabled)
 {
     u8 *state;
     char *label;
     int phase, i, one, k3, entry;
-    unsigned int color, c;
-    float x3, nv, x, fy, pulse, half, sc, z;
-    HelpEntry *r;
+    unsigned int color, buttonColor;
+    float x3, nextX, x, fy, pulse, half, sc, z;
+    HelpEntry *entryRecord;
 
     if (D_L02_001A904C == 0) return;
-    func_L00_0037B7B0();
+    AppendDrawListPacketC();
     entry = 0x8710;
     state = *(u8 **)(object + 0x68);
     half = 0.5f;
-    label = (char *)func_00336D50(D_L02_001A904C + entry, 0x49);
+    label = (char *)FindTableEntryById(D_L02_001A904C + entry, 0x49);
     x = (float)D_L02_001B1264;
     one = 1;
     fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, one);
     sc = 1.0f;
     z = 0.0f;
-    func_00300A00(label, x, D_L02_001B1280, fy, D_L02_001B1260, sc, z);
-    label = (char *)func_00336D50(D_L02_001A904C + entry, 0x48);
+    DrawScaledObjectTwoAxes(label, x, D_L02_001B1280, fy, D_L02_001B1260, sc, z);
+    label = (char *)FindTableEntryById(D_L02_001A904C + entry, 0x48);
     x = (float)D_L02_001B1264;
     fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, 1);
-    func_00300A00(label, x, D_L02_001B127C, fy, D_L02_001B1260, sc, z);
-    phase = D_L02_001B30C8 % 50;
+    DrawScaledObjectTwoAxes(label, x, D_L02_001B127C, fy, D_L02_001B1260, sc, z);
+    phase = gFrameCounter_L02 % 50;
     if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
-    color = func_00283D38(D_L02_001B127C, D_L02_001B1280, pulse);
+    color = FastTweenColor(D_L02_001B127C, D_L02_001B1280, pulse);
     if (enabled) {
         if (*(short *)(state + 0x118) != 0) {
-            label = (char *)func_00336D50(D_L02_001A904C + 0x8710, 0x4b);
+            label = (char *)FindTableEntryById(D_L02_001A904C + 0x8710, 0x4b);
             k3 = 1;
             x3 = (float)D_L02_001B126C;
-            if (D_00138180.buttons & 0x8000) c = D_L02_001B1288; else c = color;
+            if (gPadState.buttons & 0x8000) buttonColor = D_L02_001B1288; else buttonColor = color;
             fy = (float)label_y(label, (float)D_L02_001B1270, D_L02_001B3E04, 0.5f, k3);
-            func_00300A00(label, x3, c, fy, D_L02_001B1260, 1.0f, 0.0f);
+            DrawScaledObjectTwoAxes(label, x3, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x118) + 1; i < 14; i++) {
-            if (D_001395B8[func_L02_003F9B70(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
-            if (i >= 12 && !func_00288D58()) continue;
+            if (D_001395B8[GetChallengeSaveIndex(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
+            if (i >= 12 && !IsFlagByteSet()) continue;
             if (i == 7) {
-                r = &D_L02_00264A70[D_00139568[0x1e]];
-                if (r->available == 0) continue;
+                entryRecord = &D_L02_00264A70[gItemSlotToRecord[0x1e]];
+                if (entryRecord->available == 0) continue;
             }
             if (i == 8) {
-                r = &D_L02_00264A70[D_00139568[0x2a]];
-                if (r->available == 0) continue;
+                entryRecord = &D_L02_00264A70[gItemSlotToRecord[0x2a]];
+                if (entryRecord->available == 0) continue;
             }
-            label = (char *)func_00336D50(D_L02_001A904C + 0x8710, 0x4a);
+            label = (char *)FindTableEntryById(D_L02_001A904C + 0x8710, 0x4a);
             one = 1;
-            c = (D_00138180.buttons & 0x2000) ? D_L02_001B128C : color;
-            nv = (float)D_L02_001B1274;
+            buttonColor = (gPadState.buttons & 0x2000) ? D_L02_001B128C : color;
+            nextX = (float)D_L02_001B1274;
             fy = (float)label_y(label, (float)D_L02_001B1278, D_L02_001B3E04, 0.5f, one);
-            func_00300A00(label, nv, c, fy, D_L02_001B1260, 1.0f, 0.0f);
+            DrawScaledObjectTwoAxes(label, nextX, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
             break;
         }
     }
-    func_002FC560(0x47, 0x5360b);
+    VU1_addGSregister(0x47, 0x5360b);
 }

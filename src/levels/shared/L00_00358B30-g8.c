@@ -52,28 +52,29 @@ extern void func_002833F0(void *, const void *);
 extern void func_L00_002D9D98(void);
 extern void func_L00_00358E50(void);
 
+/* Puts Ratchet back to the saved position, view and settings when a level is reloaded. */
 void func_L00_00358B30(void) {
     unsigned char *entity;
     int kind;
     int i;
-    D_00189E20.state = 15;
+    gHeroState.state = 15;
     if (D_L00_0021DDB0.active == 0) {
-        func_00282A60(D_L00_0021D140, 0, 0xC70);
+        ClearMemory(D_L00_0021D140, 0, 0xC70);
         return;
     }
-    func_00282AB0(D_L00_0021D140, &D_L00_0021DDB0, 0xC70);
-    qcopy(&D_00189E20.position, &D_L00_0021DDB0.position);
-    qcopy(&D_00189E20.rotation, &D_L00_0021DDB0.rotation);
-    *(int *)(D_00189E20.moby + 0x38) = D_L00_0021DDB0.field30;
-    *(int *)(D_00189E20.moby + 0x3C) = D_L00_0021DDB0.field34;
-    D_00188660.field64 = D_L00_0021DDB0.field38;
-    D_00188660.field68 = D_L00_0021DDB0.field3C;
-    D_00188660.field69 = D_L00_0021DDB0.field3D;
-    D_00188660.field6A = D_L00_0021DDB0.field3E;
-    D_00188660.field6B |= 7;
+    CopyMemoryAligned(D_L00_0021D140, &D_L00_0021DDB0, 0xC70);
+    qcopy(&gHeroState.position, &D_L00_0021DDB0.position);
+    qcopy(&gHeroState.rotation, &D_L00_0021DDB0.rotation);
+    *(int *)(gHeroState.moby + 0x38) = D_L00_0021DDB0.field30;
+    *(int *)(gHeroState.moby + 0x3C) = D_L00_0021DDB0.field34;
+    gSoundState.field64 = D_L00_0021DDB0.field38;
+    gSoundState.field68 = D_L00_0021DDB0.field3C;
+    gSoundState.field69 = D_L00_0021DDB0.field3D;
+    gSoundState.field6A = D_L00_0021DDB0.field3E;
+    gSoundState.field6B |= 7;
     D_001A63F0[0] = D_L00_0021DDB0.fieldC64;
     if (D_L00_001C9340[0] != D_L00_0021DDB0.fieldC68)
-        func_L00_00303530(D_L00_0021DDB0.fieldC68, *(int *)&D_L00_0021DDB0.fieldC64);
+        LoadSceneChunk(D_L00_0021DDB0.fieldC68, *(int *)&D_L00_0021DDB0.fieldC64);
     D_L00_001B1980[0] = D_L00_0021DDB0.field3F;
     D_L00_001B1981[0] = D_L00_0021DDB0.field40;
     D_L00_001B1982[0] = D_L00_0021DDB0.field41;
@@ -85,24 +86,24 @@ void func_L00_00358B30(void) {
         kind = 0;
         switch (D_L00_0021DDB0.field54) {
         case 1:
-            kind = 0x57;
+            kind = 0x57; /* Clank */
             break;
         case 2:
             kind = 0x1A3;
             break;
         default:
-            func_00282A28();
+            TrapAlways();
         }
         for (i = 0; (entity = D_L00_001B1E9C[0] + (i << 8)) < D_L00_001B1EA0[0]; i++) {
             if (*(short *)(entity + 0xAA) == kind) {
-                func_L00_002B2A40(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
+                SetHeroMode(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
                 break;
             }
         }
     }
 done:
-    func_002A0F48(D_00189E20.moby);
-    func_002833F0(D_00189E20.moby + 0xC0, &D_00189E20.rotation);
-    func_L00_002D9D98();
-    func_L00_00358E50();
+    func_002A0F48(gHeroState.moby);
+    euler_rotation_basis(gHeroState.moby + 0xC0, &gHeroState.rotation);
+    ResetDefaultCamera();
+    ApplyLevelDataBlocks();
 }

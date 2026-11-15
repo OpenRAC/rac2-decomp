@@ -1,5 +1,6 @@
 /* func_L00_003F9368: scale the object with its parent and emit its two trail effects. */
 #include "include_asm.h"
+#include "names.h"
 
 #ifndef RAC2_T_QUAD_3F9368
 #define RAC2_T_QUAD_3F9368
@@ -14,39 +15,40 @@ extern float func_00283B98(float, float);
 extern void func_00282D30(void *, void *, float);
 extern void func_L00_0033E220(void *, void *, int, int, int, float, float, int, int, int);
 
+/* Grows the object with its parent and spawns two glowing trails each frame. */
 void func_L00_003F9368(char *self)
 {
-    Vec_3f9368 v1;
-    Vec_3f9368 v2;
-    char *p;
-    float f20;
-    float f21;
-    float f22;
-    float f;
+    Vec_3f9368 leftDir;
+    Vec_3f9368 rightDir;
+    char *parent;
+    float scaleRatio;
+    float trailFade;
+    float trailLength;
+    float angle;
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         *(int *)(self + 0x78) = 0x150000FF;
-        func_002A7750(self, 1, -1);
+        SetMobyState(self, 1, -1);
     }
     if (*(unsigned char *)(self + 0x20) != 1) {
         return;
     }
-    p = *(char **)(self + 0x24);
-    f20 = *(float *)(self + 0x2C) / *(float *)(p + 0x24);
-    f22 = 243600.0f;
-    f21 = 0.1f;
-    f = func_00283B98(*(float *)(self + 0xF4), 0.05235988646745682f);
-    *(float *)(self + 0xF4) = f;
+    parent = *(char **)(self + 0x24);
+    scaleRatio = *(float *)(self + 0x2C) / *(float *)(parent + 0x24);
+    trailLength = 243600.0f;
+    trailFade = 0.1f;
+    angle = FastAddRotations(*(float *)(self + 0xF4), 0.05235988646745682f);
+    *(float *)(self + 0xF4) = angle;
 
-    v1.q = 0;
-    v1.f[1] = 0.5378739833831787f;
-    v1.f[2] = -0.3785569965839386f;
-    func_00282D30(&v1, &v1, f20);
-    func_L00_0033E220(&v1, self, 0x150000FF, -1, 1, f22, f21, 2, 1, -1);
+    leftDir.q = 0;
+    leftDir.f[1] = 0.5378739833831787f;
+    leftDir.f[2] = -0.3785569965839386f;
+    FastVecScale(&leftDir, &leftDir, scaleRatio);
+    SpawnObjectFollowingEffect(&leftDir, self, 0x150000FF, -1, 1, trailLength, trailFade, 2, 1, -1);
 
-    v2.q = 0;
-    v2.f[1] = 0.5123069882392883f;
-    v2.f[2] = 0.37711501121520996f;
-    func_00282D30(&v2, &v2, f20);
-    func_L00_0033E220(&v2, self, 0x150000FF, -1, 1, f22, f21, 2, 1, -1);
+    rightDir.q = 0;
+    rightDir.f[1] = 0.5123069882392883f;
+    rightDir.f[2] = 0.37711501121520996f;
+    FastVecScale(&rightDir, &rightDir, scaleRatio);
+    SpawnObjectFollowingEffect(&rightDir, self, 0x150000FF, -1, 1, trailLength, trailFade, 2, 1, -1);
 }

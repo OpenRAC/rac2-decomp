@@ -61,6 +61,7 @@ extern void func_L09_003F9970(void *);
 extern void func_L09_003F9A70(void *);
 extern int func_L09_003F9D08(void *);
 
+/* Update for the Megacorp Trooper Legs (moby class 3343). It picks what the trooper does next: walk, aim, shoot or die. */
 void func_L09_003FA080(char *self)
 {
     char *vars;
@@ -68,20 +69,20 @@ void func_L09_003FA080(char *self)
 
     if (D_L09_001B10F4 != 0)
         return;
-    if (func_002ACD38(self + 0x10) == 0)
+    if (IsObjectInSelectedZone(self + 0x10) == 0)
         return;
     vars = *(char **)(self + 0x68);
-    if (func_L09_003F9D08(self) != 0)
+    if (ProcessEnemyActivation(self) != 0)
         return;
-    func_L09_003F7468(self);
+    ClearValueOnSelfAndTorso(self);
     state = *(u8 *)(self + 0x95);
-    func_L09_003F8AE0(self);
+    UpdateTrooperLegsFrame(self);
     if (self == 0 || *(u8 *)(self + 0x20) == 0xFE || *(u8 *)(self + 0x20) == 0xFD || state == 0)
         return;
 
     switch (*(u8 *)(self + 0x95)) {
     case 0:
-        func_0026FEB8(D_L09_001B10F8, *(s16 *)(self + 0xB2), *(s16 *)(self + 0xAA));
+        STUB_printf(D_L09_001B10F8, *(s16 *)(self + 0xB2), *(s16 *)(self + 0xAA));
         break;
     case 1: {
         int k;
@@ -92,124 +93,124 @@ void func_L09_003FA080(char *self)
             if (*(int *)(vars + 0x204) == 1 || *(s16 *)(vars + 0x2E0) != 0) {
                 *(int *)(vars + 0x2D8) = *(int *)(vars + 0x2D4);
                 if ((*(u8 *)(vars + 0x302) ^ 1) & 1) {
-                    *(s16 *)(vars + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
-                    func_002A7750(self, *(u8 *)(self + 0x20), 2);
+                    *(s16 *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
+                    SetMobyState(self, *(u8 *)(self + 0x20), 2);
                 } else {
-                    func_L09_003F7518(self, 0xC, 0, func_002A7820(7, 0xC));
-                    func_002A7750(self, 8, 5);
+                    SetEnemyAnimationState(self, 0xC, 0, RandomIntRange(7, 0xC));
+                    SetMobyState(self, 8, 5);
                 }
             }
         }
         break;
     }
     case 2:
-        if (func_00282978(vars + 0x300) != 0) {
+        if (FastDecTimer(vars + 0x300) != 0) {
             *(int *)(vars + 0x2D8) = *(int *)(vars + 0x2D4);
             if (*(int *)(vars + 0x2B0) != -1) {
-                func_L09_003F7C50(self, *(int *)(vars + 0x2B0), -1);
+                SelectEnemyPath(self, *(int *)(vars + 0x2B0), -1);
                 if (*(u8 *)(self + 0x42) != 2)
-                    func_L09_003F7518(self, 2, 0, 0);
-                func_002A7750(self, 2, 3);
+                    SetEnemyAnimationState(self, 2, 0, 0);
+                SetMobyState(self, 2, 3);
             } else {
-                func_L09_003F7C50(self, *(int *)(vars + 0x2B8), -1);
-                func_L09_003F7518(self, 2, 0, 0xA);
+                SelectEnemyPath(self, *(int *)(vars + 0x2B8), -1);
+                SetEnemyAnimationState(self, 2, 0, 0xA);
                 *(float *)(self + 0x48) = D_L09_001B0F60;
-                func_002A7750(self, 4, 3);
+                SetMobyState(self, 4, 3);
             }
             if (*(u8 *)(vars + 0x302) & 2) {
-                func_L09_003F7C50(self, *(int *)(vars + 0x2C0), -1);
+                SelectEnemyPath(self, *(int *)(vars + 0x2C0), -1);
                 *(u8 *)(vars + 0x302) = 0;
             }
         }
     case 3:
-        *(float *)(vars + 0x2EC) = func_00283248(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
+        *(float *)(vars + 0x2EC) = FastMatrixHelperA(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
                                                  *(float *)(*(char **)(vars + 0x200) + 0x14) - *(float *)(self + 0x14));
         if (*(int *)(vars + 0x204) == 1)
-            *(s16 *)(vars + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
+            *(s16 *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
         break;
     case 4:
         *(float *)(vars + 0x2EC) = *(float *)(self + 0xF8);
         if (*(int *)(vars + 0x204) == 1 || *(s16 *)(vars + 0x2E0) != 0) {
-            func_L09_003F7C50(self, *(int *)(vars + 0x2B8), -1);
-            *(s16 *)(vars + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
-            func_L09_003F7518(self, 2, 0, 0xA);
+            SelectEnemyPath(self, *(int *)(vars + 0x2B8), -1);
+            *(s16 *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
+            SetEnemyAnimationState(self, 2, 0, 0xA);
             *(float *)(self + 0x48) = D_L09_001B0F60;
-            func_002A7750(self, 4, 3);
+            SetMobyState(self, 4, 3);
         }
         break;
     case 5:
-        *(float *)(vars + 0x2EC) = func_00283248(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
+        *(float *)(vars + 0x2EC) = FastMatrixHelperA(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
                                                  *(float *)(*(char **)(vars + 0x200) + 0x14) - *(float *)(self + 0x14));
         if (*(u8 *)(vars + 0x302) & 2) {
-            func_L09_003F7518(self, func_001163B0() & 1, 0, func_002A7820(10, 20));
-            func_L09_003F73E8(self);
-            *(s16 *)(vars + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
+            SetEnemyAnimationState(self, Rand() & 1, 0, RandomIntRange(10, 20));
+            ReleaseSharedCounter(self);
+            *(s16 *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
             *(s16 *)(vars + 0x300) = 1;
-            func_002A7750(self, *(u8 *)(self + 0x20), 2);
+            SetMobyState(self, *(u8 *)(self + 0x20), 2);
         }
         if (*(int *)(vars + 0x204) != 1 && *(s16 *)(vars + 0x2E0) == 0) {
-            func_L09_003F73E8(self);
-            func_L09_003F7518(self, func_001163B0() & 1, 0, func_002A7820(10, 20));
-            func_002A7750(self, 5, 6);
+            ReleaseSharedCounter(self);
+            SetEnemyAnimationState(self, Rand() & 1, 0, RandomIntRange(10, 20));
+            SetMobyState(self, 5, 6);
         }
         break;
     case 6:
         *(float *)(vars + 0x2EC) = *(float *)(self + 0xF8);
         if (*(int *)(vars + 0x204) == 1 || *(s16 *)(vars + 0x2E0) != 0) {
-            func_L09_003F73E8(self);
-            *(s16 *)(vars + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
-            func_L09_003F7518(self, 3, 0, func_002A7820(7, 0xC));
-            func_002A7750(self, 5, 5);
+            ReleaseSharedCounter(self);
+            *(s16 *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
+            SetEnemyAnimationState(self, 3, 0, RandomIntRange(7, 0xC));
+            SetMobyState(self, 5, 5);
         } else if (*(s16 *)(vars + 0x2E8) == 0) {
-            func_L09_003F73E8(self);
-            func_L09_003F7C50(self, *(int *)(vars + 0x2B8), 0);
-            func_L09_003F7518(self, func_001163B0() & 1, 0, func_002A7820(10, 20));
-            func_002A7750(self, 4, 4);
+            ReleaseSharedCounter(self);
+            SelectEnemyPath(self, *(int *)(vars + 0x2B8), 0);
+            SetEnemyAnimationState(self, Rand() & 1, 0, RandomIntRange(10, 20));
+            SetMobyState(self, 4, 4);
         }
         break;
     case 7:
-        *(float *)(vars + 0x2EC) = func_00283248(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
+        *(float *)(vars + 0x2EC) = FastMatrixHelperA(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
                                                  *(float *)(*(char **)(vars + 0x200) + 0x14) - *(float *)(self + 0x14));
         break;
     case 8:
-        *(float *)(vars + 0x2EC) = func_00283B98(*(float *)(vars + 0x2EC),
-            (func_00283198(func_002ABB18(func_00283CE0(D_L09_001B2388) * 0.02f)) + 2.0f) * 0.023271061f);
+        *(float *)(vars + 0x2EC) = FastAddRotations(*(float *)(vars + 0x2EC),
+            (FastSinOrCosB(WrapAngleToPi(IntToFloat(D_L09_001B2388) * 0.02f)) + 2.0f) * 0.023271061f);
         break;
     case 9: {
         int flags;
         *(float *)(vars + 0x2EC) = *(float *)(self + 0xF8);
-        flags = func_002B1C20(self, vars + 0x50);
+        flags = DispatchActionByKind(self, vars + 0x50);
         if (*(float *)(vars + 0x20) <= 0.0f
             && (*(u8 *)(self + 0x42) == 0xF || *(u8 *)(self + 0x43) == 0xF
                 || (*(int *)(vars + 0x2DC) != -1 && *(int *)(vars + 0x2DC) == *(int *)(vars + 0x2B0))))
-            func_002A7750(self, 0xF, -1);
+            SetMobyState(self, 0xF, -1);
         if (flags & 1) {
             if (*(float *)(vars + 0x20) > 0.0f)
-                func_L09_003F8598(self);
-            func_L09_003F73E8(self);
-            func_002A7750(self, 0xF, -1);
+                TransferStateToNearestEligibleObject(self);
+            ReleaseSharedCounter(self);
+            SetMobyState(self, 0xF, -1);
         } else if (flags & 2) {
-            func_L09_003F73E8(self);
-            *(s16 *)(vars + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
+            ReleaseSharedCounter(self);
+            *(s16 *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
             if (*(u8 *)(self + 0x42) == 0xF || *(u8 *)(self + 0x43) == 0xF
                 || (*(int *)(vars + 0x2DC) != -1 && *(int *)(vars + 0x2DC) == *(int *)(vars + 0x2B0))
                 || *(int *)(vars + 0x428) != 0) {
                 if (*(int *)(vars + 0x428) != 2) {
-                    func_L09_003F7C50(self, *(int *)(vars + 0x2B0), -1);
-                    func_002A7750(self, 3, 3);
+                    SelectEnemyPath(self, *(int *)(vars + 0x2B0), -1);
+                    SetMobyState(self, 3, 3);
                 } else {
-                    func_002A7750(self, 0x10, 3);
+                    SetMobyState(self, 0x10, 3);
                 }
-                func_L09_003F7518(self, 0xE, 0, func_002A7820(7, 0xC));
+                SetEnemyAnimationState(self, 0xE, 0, RandomIntRange(7, 0xC));
             } else {
                 if (*(int *)(vars + 0x2DC) != -1)
-                    func_L09_003F7518(self, 0xB, 0, func_002A7820(7, 0xC));
+                    SetEnemyAnimationState(self, 0xB, 0, RandomIntRange(7, 0xC));
                 else
-                    func_L09_003F7518(self, 0, 0, func_002A7820(7, 0xC));
+                    SetEnemyAnimationState(self, 0, 0, RandomIntRange(7, 0xC));
                 if (*(u8 *)(vars + 0x30F) != 0)
-                    func_002A7750(self, 0xD, 8);
+                    SetMobyState(self, 0xD, 8);
                 else
-                    func_002A7750(self, 6, 5);
+                    SetMobyState(self, 6, 5);
             }
         }
         break;
@@ -221,59 +222,59 @@ void func_L09_003FA080(char *self)
         break;
     case 1:
         if (*(u8 *)(self + 0x60) & 2)
-            func_L09_003F7518(self, 0xE, 0, func_002A7820(7, 0xC));
+            SetEnemyAnimationState(self, 0xE, 0, RandomIntRange(7, 0xC));
         break;
     case 2:
         if ((*(char **)(vars + 0x2F8) != 0 && (*(u8 *)(*(char **)(vars + 0x2F8) + 0x60) & 2))
             || (*(u8 *)(self + 0x60) & 2)) {
-            func_L09_003F7518(self, 0xE, 0, func_002A7820(7, 0xC));
-            func_002A7750(self, 3, -1);
+            SetEnemyAnimationState(self, 0xE, 0, RandomIntRange(7, 0xC));
+            SetMobyState(self, 3, -1);
         }
         break;
     case 4:
         if (*(int *)(vars + 0x2DC) != -1) {
             char *p = D_L09_001FE6C0[*(int *)(vars + 0x2DC)] + *(s16 *)(vars + 0x1C8) * 0x10;
-            func_002B5278(self, func_00283248(*(float *)(p + 0x10) - *(float *)(self + 0x10),
+            StepMovementAtOwnPositionWithFactor(self, FastMatrixHelperA(*(float *)(p + 0x10) - *(float *)(self + 0x10),
                                               *(float *)(p + 0x14) - *(float *)(self + 0x14)));
         }
         if (*(u8 *)(self + 0x60) & 2) {
             if (*(int *)(vars + 0x2DC) != -1)
-                func_L09_003F7518(self, 0xB, 0, func_002A7820(7, 0xC));
+                SetEnemyAnimationState(self, 0xB, 0, RandomIntRange(7, 0xC));
             else
-                func_L09_003F7518(self, 0, 0, func_002A7820(7, 0xC));
-            func_002A7750(self, 6, -1);
+                SetEnemyAnimationState(self, 0, 0, RandomIntRange(7, 0xC));
+            SetMobyState(self, 6, -1);
         }
         break;
     case 5:
         if (*(u8 *)(self + 0x60) & 2) {
             if (*(u8 *)(self + 0x95) == 5) {
                 if (*(int *)(vars + 0x2DC) != -1)
-                    func_L09_003F7518(self, 0xB, 0, func_002A7820(7, 0xC));
+                    SetEnemyAnimationState(self, 0xB, 0, RandomIntRange(7, 0xC));
                 else
-                    func_L09_003F7518(self, 0, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 6, -1);
+                    SetEnemyAnimationState(self, 0, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 6, -1);
             } else if (*(int *)(vars + 0x2DC) != -1) {
-                func_L09_003F7518(self, 0xC, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 6, -1);
+                SetEnemyAnimationState(self, 0xC, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 6, -1);
             }
         }
         break;
     case 3:
         if (*(u8 *)(self + 0x60) & 2)
-            func_L09_003F7518(self, 0xE, 0, func_002A7820(7, 0xC));
-        if (func_L09_003F7B28(self, *(int *)(vars + 0x2DC)) != 0) {
+            SetEnemyAnimationState(self, 0xE, 0, RandomIntRange(7, 0xC));
+        if (WalkEnemyToNextPathPoint(self, *(int *)(vars + 0x2DC)) != 0) {
             if (*(int *)(vars + 0x428) == 0) {
                 *(int *)(vars + 0x138) &= ~4;
-                func_L09_003F7C50(self, *(int *)(vars + 0x2BC), -1);
-                func_L09_003F7518(self, 0x10, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 7, 5);
+                SelectEnemyPath(self, *(int *)(vars + 0x2BC), -1);
+                SetEnemyAnimationState(self, 0x10, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 7, 5);
             } else {
-                func_002A7750(self, 0x10, 5);
+                SetMobyState(self, 0x10, 5);
             }
         }
         break;
     case 6:
-        func_L09_003F9A70(self);
+        ChooseEnemyNextAction_L09(self);
         break;
     case 16: {
         int near;
@@ -283,7 +284,7 @@ void func_L09_003FA080(char *self)
         int tried;
         float d;
         near = 1;
-        d = func_00282E80(self + 0x10, *(char **)(vars + 0x200) + 0x10);
+        d = vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10);
         if (!(d <= *(float *)(vars + 0x4BC)))
             near = 0;
         close = 1;
@@ -292,49 +293,49 @@ void func_L09_003FA080(char *self)
             close = 0;
         got = 0;
         tried = 0;
-        if (func_002B3868(self) != 0) {
+        if (SetFirstPendingFlag(self) != 0) {
             *(int *)(vars + 0x428) = 2;
             *(int *)(vars + 0x4B4) = 0;
             *(int *)(vars + 0x138) |= 0x10;
         }
-        if (!close && near && lt && func_002A77E0(D_L09_001B0F34 - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
+        if (!close && near && lt && RandomIntBelow(D_L09_001B0F34 - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
             tried = 1;
-            got = func_L09_003F9568(self, 0, *(u8 *)(vars + 0x30C) != 0, 0);
+            got = CheckLineOfSightBlocked(self, 0, *(u8 *)(vars + 0x30C) != 0, 0);
         }
         if ((close || got) && lt) {
-            if (func_L09_003F9568(self, 0, *(u8 *)(vars + 0x30C) != 0, 1) != 0)
+            if (CheckLineOfSightBlocked(self, 0, *(u8 *)(vars + 0x30C) != 0, 1) != 0)
                 *(u8 *)(vars + 0x30D) = 1;
             *(int *)(vars + 0x138) &= ~0x10;
-            func_L09_003F7430(self);
-            func_L09_003F7518(self, 8, 0, 7);
-            func_0026FEB8(D_L09_001B1128);
-            func_002A7750(self, 0xA, -1);
+            AcquireSharedCounter(self);
+            SetEnemyAnimationState(self, 8, 0, 7);
+            STUB_printf(D_L09_001B1128);
+            SetMobyState(self, 0xA, -1);
         }
         if (tried && !got)
             *(u8 *)(vars + 0x30C) = ~*(u8 *)(vars + 0x30C);
-        func_L09_003F9970(self);
+        MoveEnemyAlongPath(self);
         break;
     }
     case 7:
         if (*(u8 *)(self + 0x60) & 2) {
             if (*(u8 *)(vars + 0x30E) != 0) {
-                func_L09_003F7518(self, 4, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 4, 5);
+                SetEnemyAnimationState(self, 4, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 4, 5);
             } else {
-                func_L09_003F7518(self, 0xC, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 8, 5);
+                SetEnemyAnimationState(self, 0xC, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 8, 5);
             }
         }
         break;
     case 8: {
-        float a = func_00283248(*(float *)(vars + 0x1F0) - *(float *)(self + 0x10),
+        float a = FastMatrixHelperA(*(float *)(vars + 0x1F0) - *(float *)(self + 0x10),
                                 *(float *)(vars + 0x1F4) - *(float *)(self + 0x14));
-        func_002B5278(self, a);
-        if (func_00283C80(a, *(float *)(self + 0xF8)) < 0.17453295f) {
-            func_L09_003F7518(self, 5, 0, func_002A7820(7, 0xC));
+        StepMovementAtOwnPositionWithFactor(self, a);
+        if (FastDiffRots(a, *(float *)(self + 0xF8)) < 0.17453295f) {
+            SetEnemyAnimationState(self, 5, 0, RandomIntRange(7, 0xC));
             *(u8 *)(vars + 0x30C) = 0;
             *(u8 *)(vars + 0x30D) = 0;
-            func_002A7750(self, 9, -1);
+            SetMobyState(self, 9, -1);
         }
         break;
     }
@@ -344,7 +345,7 @@ void func_L09_003FA080(char *self)
         int lt;
         float d;
         near = 1;
-        d = func_00282E80(self + 0x10, *(char **)(vars + 0x200) + 0x10);
+        d = vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10);
         if (!(d <= *(float *)(vars + 0x4BC)))
             near = 0;
         close = 1;
@@ -354,30 +355,30 @@ void func_L09_003FA080(char *self)
         if (*(u8 *)(vars + 0x303) == 0) {
             int got = 0;
             int tried = 0;
-            if (!close && near && lt && func_002A77E0(D_L09_001B0F34 - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
+            if (!close && near && lt && RandomIntBelow(D_L09_001B0F34 - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
                 tried = 1;
-                got = func_L09_003F9568(self, 0, *(u8 *)(vars + 0x30C) != 0, 0);
+                got = CheckLineOfSightBlocked(self, 0, *(u8 *)(vars + 0x30C) != 0, 0);
             }
             if (*(u8 *)(vars + 0x30C) != 0 && got && !close) {
-                func_L09_003F7518(self, 0xB, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 6, -1);
+                SetEnemyAnimationState(self, 0xB, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 6, -1);
             } else if (close || got) {
-                if (func_L09_003F9568(self, 0, *(u8 *)(vars + 0x30C) != 0, 1) != 0)
+                if (CheckLineOfSightBlocked(self, 0, *(u8 *)(vars + 0x30C) != 0, 1) != 0)
                     *(u8 *)(vars + 0x30D) = 1;
-                func_L09_003F7430(self);
-                func_L09_003F7518(self, 8, 0, 7);
-                func_002A7750(self, 0xA, -1);
+                AcquireSharedCounter(self);
+                SetEnemyAnimationState(self, 8, 0, 7);
+                SetMobyState(self, 0xA, -1);
             } else if (*(u8 *)(self + 0x60) & 2) {
-                func_L09_003F7518(self, 6, 0, func_002A7820(7, 0xC));
+                SetEnemyAnimationState(self, 6, 0, RandomIntRange(7, 0xC));
             }
             if (tried && !got)
                 *(u8 *)(vars + 0x30C) = ~*(u8 *)(vars + 0x30C);
         } else {
             if (*(u8 *)(self + 0x60) & 2)
-                func_L09_003F7518(self, 6, 0, func_002A7820(7, 0xC));
+                SetEnemyAnimationState(self, 6, 0, RandomIntRange(7, 0xC));
             if (close || (*(s16 *)(vars + 0x2E6) == 0 && near && lt)) {
-                func_L09_003F7518(self, 0xB, 0, func_002A7820(7, 0xC));
-                func_002A7750(self, 6, -1);
+                SetEnemyAnimationState(self, 0xB, 0, RandomIntRange(7, 0xC));
+                SetMobyState(self, 6, -1);
             }
         }
         break;
@@ -385,66 +386,66 @@ void func_L09_003FA080(char *self)
     case 10:
         if (*(u8 *)(self + 0x60) & 2) {
             if (*(u8 *)(vars + 0x30D) != 0)
-                func_L09_003F7518(self, 0xA, 0, 0xA);
+                SetEnemyAnimationState(self, 0xA, 0, 0xA);
             else
-                func_L09_003F7518(self, 0x13, 0, 0xC);
+                SetEnemyAnimationState(self, 0x13, 0, 0xC);
             *(u16 *)(vars + 0x2E4) = D_L09_001B0F40;
-            func_002A7750(self, 0xB, -1);
+            SetMobyState(self, 0xB, -1);
         }
         break;
     case 11:
         if (D_L09_001B0F3C < *(u16 *)(self + 0x96))
-            func_L09_003F9708(self);
+            FireArmShot(self);
         if ((D_L09_001B0F38 < *(u16 *)(self + 0x96)
-             && D_L09_001B0F2C < func_00282E80(self + 0x10, *(char **)(vars + 0x200) + 0x10))
+             && D_L09_001B0F2C < vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10))
             || *(char **)(vars + 0x2F8) == 0) {
-            *(s16 *)(vars + 0x2E6) = func_002A7820(D_L09_001B0F44, D_L09_001B0F48);
-            func_L09_003F73E8(self);
-            func_L09_003F7518(self, 0xC, 0, func_002A7820(7, 0xC));
+            *(s16 *)(vars + 0x2E6) = RandomIntRange(D_L09_001B0F44, D_L09_001B0F48);
+            ReleaseSharedCounter(self);
+            SetEnemyAnimationState(self, 0xC, 0, RandomIntRange(7, 0xC));
             if (*(int *)(vars + 0x428) != 0)
-                func_002A7750(self, 0x10, 5);
+                SetMobyState(self, 0x10, 5);
             else if (*(int *)(vars + 0x2DC) != -1 && *(int *)(vars + 0x2DC) == *(int *)(vars + 0x2B0))
-                func_002A7750(self, 3, 5);
+                SetMobyState(self, 3, 5);
             else
-                func_002A7750(self, 8, 5);
+                SetMobyState(self, 8, 5);
         }
         break;
     case 12:
         if (*(u8 *)(self + 0x60) & 2) {
             if (*(int *)(vars + 0x2DC) != -1)
-                func_L09_003F7518(self, 0xB, 0, func_002A7820(7, 0xC));
+                SetEnemyAnimationState(self, 0xB, 0, RandomIntRange(7, 0xC));
             else
-                func_L09_003F7518(self, 0, 0, func_002A7820(7, 0xC));
-            func_002A7750(self, 6, 5);
+                SetEnemyAnimationState(self, 0, 0, RandomIntRange(7, 0xC));
+            SetMobyState(self, 6, 5);
         }
         break;
     case 13:
         if (*(u8 *)(self + 0x60) & 2)
-            func_L09_003F7518(self, (func_001163B0() & 1) ? 0xA : 0x13, 0, func_002A7820(0x19, 0x2D));
+            SetEnemyAnimationState(self, (Rand() & 1) ? 0xA : 0x13, 0, RandomIntRange(0x19, 0x2D));
         if (*(u8 *)(self + 0x42) == 0xA || *(u8 *)(self + 0x42) == 0x13)
-            func_L09_003F9708(self);
+            FireArmShot(self);
         break;
     case 14:
-        func_L09_003F73E8(self);
+        ReleaseSharedCounter(self);
         break;
     case 15:
         *(float *)(vars + 0x20) = 0.0f;
-        func_002B3380(self, vars + 0x290, vars + 0x20);
-        func_L09_003F73E8(self);
-        func_L09_003F77D0(self);
-        func_002A6C58(self, 0, 3);
-        func_L09_003F7370(self, 0.4f);
-        func_002E5CF8(3, 0, self);
-        func_0029F338(self);
+        SpawnDamageDebrisOnHealthLoss(self, vars + 0x290, vars + 0x20);
+        ReleaseSharedCounter(self);
+        DestroyLinkedMobys(self);
+        SetDeathBits(self, 0, 3);
+        SpawnSmallBurstEffect(self, 0.4f);
+        PlayMobySound(3, 0, self);
+        MarkMobySpawned(self);
         return;
     }
-    func_L09_003F9108(self);
-    func_L09_003F9468(self);
-    func_L09_003F8898(self);
-    func_L09_003F74A8(self);
+    UpdateTrooperTorsoAttachment(self);
+    AttachTrooperArmParts(self);
+    RearmSpawnTimers(self);
+    CopyOwnerValueToSelfAndTorso(self);
     if (*(int *)(vars + 0x1D8) != -1 && *(u8 *)(self + 0x20) != 0 && *(u8 *)(self + 0x20) < 0xE) {
-        func_L09_003F8598(self);
-        func_L09_003F73E8(self);
-        func_002A7750(self, 0xF, 0xA);
+        TransferStateToNearestEligibleObject(self);
+        ReleaseSharedCounter(self);
+        SetMobyState(self, 0xF, 0xA);
     }
 }

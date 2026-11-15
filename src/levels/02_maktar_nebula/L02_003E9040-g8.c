@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003E9040 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -42,31 +43,33 @@ extern void func_00282CC0(void *, void *, void *);
 
 extern void func_00282C88(void *);
 
-void func_L02_003E9040(char *arg0) {
+/* Sets up the tether strand points the first time it runs, laying them out in
+   a straight line and clearing their motion. */
+void func_L02_003E9040(char *actor) {
     char *state;
-    float v0[4];
-    float v1[4];
+    float span[4];
+    float stepVec[4];
     int i;
     int j;
-    short m1;
+    short minusOne;
 
-    state = *(char **)(arg0 + 0x68);
+    state = *(char **)(actor + 0x68);
     if (D_L02_001B0BA4 != 0) {
         D_L02_001B4208 = D_L02_001B0CA8;
         D_L02_001B0BA4 = 0;
         D_L02_001B420C = 0;
-        func_00282CF0(v0, state + 0x30, state + 0x20);
-        func_00282F20(v1, v0, D_L02_001B0BA8 * 0.05f);
+        FastVecSub(span, state + 0x30, state + 0x20);
+        vec_scale_to_length(stepVec, span, D_L02_001B0BA8 * 0.05f);
         *(TI128 *)D_L02_00249090[0] = *(TI128 *)(state + 0x20);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(D_L02_00249090[i], D_L02_00249090[i - 1], v1);
+            FastVecAdd(D_L02_00249090[i], D_L02_00249090[i - 1], stepVec);
             D_L02_00249310[i] = 0;
-            func_00282C88(D_L02_00249360[i]);
+            ClearVector128(D_L02_00249360[i]);
             D_L02_002494A0[i] = 0;
         }
-        m1 = -1;
+        minusOne = -1;
         for (j = 3; j >= 0; j--)
-            D_L02_001B41E8[j] = m1;
+            D_L02_001B41E8[j] = minusOne;
         D_L02_001B41F8[0] = 8;
         D_L02_001B41F8[4] = 4;
         D_L02_001B41F8[1] = 4;

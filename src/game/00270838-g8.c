@@ -44,11 +44,11 @@ int func_00270838(unsigned char *cur, unsigned char *other) {
         case 4: {
             Info70838 *info = D_001B1504[*(short *)(cur+0x84)].info;
             if (other && *(short *)(other+0x7e)==0 && !(state[8]>(unsigned char)other[0x7c])) return 0;
-            if (func_002ACBC8(D_00189EA0, info->clip)) return 1;
+            if (IsPointInCuboid(gHeroPosition, info->clip)) return 1;
             break;
         }
         case 7: {
-            char *base = D_00189E20;
+            char *base = gHeroState;
             short e = *(short *)(cur+0x86);
             if (e!=*(int *)(base+0x24a0)) return 0;
             if (*(short *)(other+0x7e)==0 && !(state[8]>(unsigned char)other[0x7c])) return 0;

@@ -1,34 +1,35 @@
 #include "common.h"
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
-void func_L00_00412110(float *out, float *b, float *c, float *a, float *d, float t)
+/* Works out a smooth in-between point on a curve from a start point to an end point, given how far along it is. */
+void func_L00_00412110(float *out, float *startPoint, float *endPoint, float *before, float *after, float amount)
 {
-    float t2, t3, p, q, r;
+    float t2, t3, cubicTerm, squareTerm, linearTerm;
 
-    if (t == 0.0f) {
-        qcopy(out, b);
+    if (amount == 0.0f) {
+        qcopy(out, startPoint);
         return;
     }
-    if (t == 1.0f) {
-        qcopy(out, c);
+    if (amount == 1.0f) {
+        qcopy(out, endPoint);
         return;
     }
-    t2 = t * t;
-    t3 = t2 * t;
+    t2 = amount * amount;
+    t3 = t2 * amount;
 
-    p = (d[0] - c[0]) - (a[0] - b[0]);
-    q = (a[0] - b[0]) - p;
-    r = c[0] - a[0];
-    out[0] = p * t3 + q * t2 + r * t + b[0];
+    cubicTerm = (after[0] - endPoint[0]) - (before[0] - startPoint[0]);
+    squareTerm = (before[0] - startPoint[0]) - cubicTerm;
+    linearTerm = endPoint[0] - before[0];
+    out[0] = cubicTerm * t3 + squareTerm * t2 + linearTerm * amount + startPoint[0];
 
-    p = (d[1] - c[1]) - (a[1] - b[1]);
-    q = (a[1] - b[1]) - p;
-    r = c[1] - a[1];
-    out[1] = p * t3 + q * t2 + r * t + b[1];
+    cubicTerm = (after[1] - endPoint[1]) - (before[1] - startPoint[1]);
+    squareTerm = (before[1] - startPoint[1]) - cubicTerm;
+    linearTerm = endPoint[1] - before[1];
+    out[1] = cubicTerm * t3 + squareTerm * t2 + linearTerm * amount + startPoint[1];
 
-    p = (d[2] - c[2]) - (a[2] - b[2]);
-    q = (a[2] - b[2]) - p;
-    r = c[2] - a[2];
-    out[2] = p * t3 + q * t2 + r * t + b[2];
+    cubicTerm = (after[2] - endPoint[2]) - (before[2] - startPoint[2]);
+    squareTerm = (before[2] - startPoint[2]) - cubicTerm;
+    linearTerm = endPoint[2] - before[2];
+    out[2] = cubicTerm * t3 + squareTerm * t2 + linearTerm * amount + startPoint[2];
     out[3] = 0.0f;
 }

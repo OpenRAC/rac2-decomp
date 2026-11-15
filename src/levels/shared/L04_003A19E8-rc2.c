@@ -25,20 +25,21 @@
 
 extern void ref_L04_003A19E8_00(s32, s32);
 
-void func_L04_003A19E8(s32 arg0, s32 arg1, s32 arg2) {
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s2;
+/* Runs the same per-patch step on each water patch in turn. */
+void func_L04_003A19E8(s32 patches, s32 rows, s32 count) {
+    s32 remaining;
+    s32 patch;
+    s32 row;
 
-    if (arg2 > 0) {
-        var_s2 = arg1;
-        var_s1 = arg0;
-        var_s0 = arg2;
+    if (count > 0) {
+        row = rows;
+        patch = patches;
+        remaining = count;
         do {
-            ref_L04_003A19E8_00(var_s1, var_s2);
-            var_s2 += 0x10;
-            var_s0 -= 1;
-            var_s1 += 0x1190;
-        } while (var_s0 != 0);
+            ref_L04_003A19E8_00(patch, row);
+            row += 0x10;
+            remaining -= 1;
+            patch += 0x1190;
+        } while (remaining != 0);
     }
 }

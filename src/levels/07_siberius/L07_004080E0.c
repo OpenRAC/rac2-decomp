@@ -21,55 +21,56 @@ extern s32 D_L07_001A903C[] __attribute__((sda));
 extern f32 D_L07_001B3198 __attribute__((sda));
 extern f32 D_L07_001AA698 __attribute__((sda));
 
-void func_L07_004080E0(u8 *obj)
+/* Updates a Siberius trigger object (moby class 3943): waits for a touch, plays an effect and sound once, then removes itself after a timer. */
+void func_L07_004080E0(u8 *moby)
 {
-    f32 a[4], b[4];
-    u8 *state = *(u8 **)(obj + 0x68);
-    u8 *hit;
+    f32 myPos[4], targetPos[4];
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *target;
     s32 blocked;
-    switch (obj[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        func_002A7750(obj, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (!*(s32 *)state) {
-            hit = func_002A9640(obj, 0x4010000, 0);
-            if (hit) {
-                qcopy(a, obj + 0x10);
-                a[2] += 0.5f;
+        if (!*(s32 *)vars) {
+            target = FindOwnedEffectSlot(moby, 0x4010000, 0);
+            if (target) {
+                qcopy(myPos, moby + 0x10);
+                myPos[2] += 0.5f;
                 blocked = 1;
-                if (*(u8 **)(hit + 0x20)) {
-                    qcopy(b, *(u8 **)(hit + 0x20) + 0x10);
-                    b[2] += 0.5f;
-                    if (func_00282E48(b, a) < 64.0f) {
+                if (*(u8 **)(target + 0x20)) {
+                    qcopy(targetPos, *(u8 **)(target + 0x20) + 0x10);
+                    targetPos[2] += 0.5f;
+                    if (fast_vec_dist(targetPos, myPos) < 64.0f) {
                         blocked = 0;
-                        if (!func_002761F8(b, a, 2, obj, 0)) blocked = 1;
+                        if (!CollLine(targetPos, myPos, 2, moby, 0)) blocked = 1;
                     }
                 }
-                if (blocked) func_002A7750(obj, 2, -1);
+                if (blocked) SetMobyState(moby, 2, -1);
             }
         }
-        obj[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        func_002E5CF8(0, 0, obj);
-        func_L00_0032A258(obj, D_L07_001B1540, D_L07_001B1538, D_L07_001B1530, 0xFFF, -1, D_L07_001B1560, 16, 0xFFFF, 0xFF, 0);
-        func_L07_00408338(obj);
-        *(s32 *)(state + 4) = 480;
+        PlayMobySound(0, 0, moby);
+        ExplodeObjectIntoPieces(moby, D_L07_001B1540, D_L07_001B1538, D_L07_001B1530, 0xFFF, -1, D_L07_001B1560, 16, 0xFFFF, 0xFF, 0);
+        SpawnSparkBurst_L07(moby);
+        *(s32 *)(vars + 4) = 480;
         if (!D_001A7A70_read[0]) {
             D_001A7A70 = 1;
-            func_002E5E58(1, 0, 0);
-            func_002B0A18(0x1233, -1);
+            PlaySoundFromGlobalBank(1, 0, 0);
+            SetEntryValueByIndex(0x1233, -1);
             D_L07_001A903C[0] = 1;
         }
-        if (D_L07_001B1560 >= 0) *(u16 *)(obj + 0x7C) = (1 << D_L07_001B1560) | 0x8000;
-        else *(u16 *)(obj + 0x34) |= 0x41;
-        func_002A7750(obj, 3, -1);
+        if (D_L07_001B1560 >= 0) *(u16 *)(moby + 0x7C) = (1 << D_L07_001B1560) | 0x8000;
+        else *(u16 *)(moby + 0x34) |= 0x41;
+        SetMobyState(moby, 3, -1);
         break;
     case 3:
-        if (func_00282948(state + 4)) {
+        if (FastFloatHelperD(vars + 4)) {
             D_L07_001AA698 = D_L07_001B3198;
-            func_0029F338(obj);
+            MarkMobySpawned(moby);
         }
         break;
     }

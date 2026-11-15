@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Draw purchase/back labels according to the selected 12-byte record and funds. */
 extern int D_L00_0022F7C0[];
@@ -16,20 +17,21 @@ typedef struct {
 
 #define L00_003781B0_X ((int)(D_L00_001B25E0 * 312.0f + 0.5f))
 
+/* Draws the buy and back button labels depending on the selected item and the player's bolts. */
 void func_L00_003781B0(void)
 {
-    if (D_L00_0022F7C0[0x84 / 4] != 0) {
-        L00_003781B0_Cell *cell = (L00_003781B0_Cell *)((char *)D_L00_0022F7C0 + 0x144);
-        if (D_001A79F8 >= cell[D_L00_0022F7C0[0x80 / 4]].first) {
-            func_0027F5B8(0x28, L00_003781B0_X, 0x80F0F0F0UL, func_00288FB8(0x113B), -1);
-            func_0027FA10(0x118, L00_003781B0_X, 0x80F0F0F0UL, func_00288FB8(0x1138), -1);
+    if (gPurchaseMenuModel[0x84 / 4] != 0) {
+        L00_003781B0_Cell *cell = (L00_003781B0_Cell *)((char *)gPurchaseMenuModel + 0x144);
+        if (gPlayerBolts >= cell[gPurchaseMenuModel[0x80 / 4]].first) {
+            DrawTextMediumFont(0x28, L00_003781B0_X, 0x80F0F0F0UL, GetLocalizedString(0x113B), -1);
+            DrawTextRightAlignedMediumFont(0x118, L00_003781B0_X, 0x80F0F0F0UL, GetLocalizedString(0x1138), -1);
         } else {
-            func_0027FA10(0x118, L00_003781B0_X, 0x80F0F0F0UL, func_00288FB8(0x1124), -1);
+            DrawTextRightAlignedMediumFont(0x118, L00_003781B0_X, 0x80F0F0F0UL, GetLocalizedString(0x1124), -1);
         }
     } else {
-        L00_003781B0_Cell *cell = (L00_003781B0_Cell *)((char *)D_L00_0022F7C0 + 0x144);
-        if (cell[D_L00_0022F7C0[0x80 / 4]].first > 0)
-            func_0027F5B8(0x28, L00_003781B0_X, 0x80F0F0F0UL, func_00288FB8(0x1125), -1);
-        func_0027FA10(0x118, L00_003781B0_X, 0x80F0F0F0UL, func_00288FB8(0x2D4F), -1);
+        L00_003781B0_Cell *cell = (L00_003781B0_Cell *)((char *)gPurchaseMenuModel + 0x144);
+        if (cell[gPurchaseMenuModel[0x80 / 4]].first > 0)
+            DrawTextMediumFont(0x28, L00_003781B0_X, 0x80F0F0F0UL, GetLocalizedString(0x1125), -1);
+        DrawTextRightAlignedMediumFont(0x118, L00_003781B0_X, 0x80F0F0F0UL, GetLocalizedString(0x2D4F), -1);
     }
 }

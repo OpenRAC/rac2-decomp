@@ -20,6 +20,7 @@ extern int D_L02_001B1350[] __attribute__((sda));
 extern float D_L02_001B3E04[] __attribute__((sda));
 extern int D_001A7B90[] __attribute__((sda));
 
+/* Draws the boss health bar. The bar gets shorter as health drops and changes colour from green toward red. */
 void func_L02_003FE768(float fraction)
 {
     int width;
@@ -29,19 +30,19 @@ void func_L02_003FE768(float fraction)
     int left;
     int right;
     float t;
-    func_002FC560(0x42, 0x8000000044ULL);
+    VU1_addGSregister(0x42, 0x8000000044ULL);
     if (fraction < 0.0f)
         fraction = 0.0f;
-    width = func_00283CF0((float)(D_L02_001B1338[0] - D_L02_001B1330) * fraction);
+    width = FloatToInt((float)(D_L02_001B1338[0] - D_L02_001B1330) * fraction);
     if (fraction > 0.5f)
-        color = func_L00_0031C998(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
+        color = LerpIntegerFraction(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
     else
-        color = func_L00_0031C998(D_L02_001B1350[0], D_L02_001B134C[0], fraction + fraction);
+        color = LerpIntegerFraction(D_L02_001B1350[0], D_L02_001B134C[0], fraction + fraction);
     t = (float)D_L02_001B1334[0] * D_L02_001B3E04[0] + 0.5f;
     do {
         top = t;
     } while (0);
-    if (D_001A7B90[0])
+    if (gIsPalVideo[0])
         top -= D_L02_001B1340;
     left = D_L02_001B1330;
     right = left + width;
@@ -49,7 +50,7 @@ void func_L02_003FE768(float fraction)
     do {
         bottom = t;
     } while (0);
-    if (D_001A7B90[0])
+    if (gIsPalVideo[0])
         bottom -= D_L02_001B1340;
-    func_0028FC48(left, top, right, bottom, color, 0);
+    AppendScreenRectPacket(left, top, right, bottom, color, 0);
 }

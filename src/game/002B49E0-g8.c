@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002B49E0 starts a request for slot `index`. Its result is the first of these that applies:
  * -1 when D_0018C2EC is zero; -3 when index is not negative and D_001A8B88[index] is non-zero; -2
  * when mode is 1 and the stack D_001B1D50 already holds 8 words (D_001AA100); 0 when D_001A8BB8
@@ -31,7 +32,8 @@ extern int D_001A8B88[2];
 extern int D_001B1D50[2];
 extern void func_002858B0(int);
 
-int func_002B49E0(int index, int mode, int a2, int a3, unsigned char *flag)
+/* Starts a request for a slot, unless one is already running or the slot is blocked, and returns a code saying whether it started. */
+int func_002B49E0(int index, int mode, int argA, int argB, unsigned char *flag)
 {
     int result;
     int entry;
@@ -39,7 +41,7 @@ int func_002B49E0(int index, int mode, int a2, int a3, unsigned char *flag)
     if (flag != 0)
         *flag = 0;
     result = -1;
-    if (D_001A8BB8 == -2)
+    if (gRequestedGameMode == -2)
         result = 0;
     if (mode == 1 && !(D_001AA100 < 8))
         result = -2;
@@ -50,26 +52,26 @@ int func_002B49E0(int index, int mode, int a2, int a3, unsigned char *flag)
         result = -1;
     if (result != 0)
         return result;
-    D_001AA0F8 = a2;
-    D_001AA0FC = a3;
+    D_001AA0F8 = argA;
+    D_001AA0FC = argB;
     D_001AA104 = (int)flag;
-    D_001A8BB8 = index;
-    if ((D_001A79F0 == 8 && D_001C4F40 == 1) || (D_001A79F0 == 0x13 && D_001C4F40 == 0)) {
+    gRequestedGameMode = index;
+    if ((gCurrentMapIndex == 8 && D_001C4F40 == 1) || (gCurrentMapIndex == 0x13 && D_001C4F40 == 0)) {
         if ((unsigned)(index - 3) < 2) {
             D_001B170C = 2;
             if (index == 4)
-                func_002858B0(2);
+                SetMenuSetting(2);
         }
     }
-    if ((unsigned)(D_001A79F0 - 22) < 2) {
+    if ((unsigned)(gCurrentMapIndex - 22) < 2) {
         if ((unsigned)(index - 3) < 2) {
             D_001B170C = 3;
             if (index == 4)
-                func_002858B0(3);
+                SetMenuSetting(3);
         }
     }
     if (mode == 1) {
-        D_001B1D50[D_001AA100++] = D_001A8BB0;
+        D_001B1D50[D_001AA100++] = gCurrentGameMode;
     }
     return result;
 }

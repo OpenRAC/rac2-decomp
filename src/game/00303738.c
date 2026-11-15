@@ -7,6 +7,7 @@ extern SurfaceSample ref_00303738_01[];
 #define SURFACE_NOISE(column, row) (ref_00303738_01[((row) % 8) * 8 + (column) % 8].noise)
 
 /* Fill one vertex, color and a pair of perturbed repeating surface coordinates. */
+/* Fills in one corner of a surface square with its position, colour and wobbling texture coordinates. */
 void func_00303738(char *object, SurfacePacketView *packet, int column, int row, int vertex)
 {
     char *state = *(char **)(object + 0x68);

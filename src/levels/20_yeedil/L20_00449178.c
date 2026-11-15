@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -27,17 +28,19 @@ extern void func_002E59F8(int);
 
 /* func_L20_004499E8 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */
 
-u32 func_L20_00449AD8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Returns the flag that says whether this object has been marked as targeted. */
+u32 func_L20_00449AD8(char *moby) {
+    char *state = *(char **)(moby + 0x68);
 
     return *(u32 *)(state + 0xAC);
 }
 
-void func_L20_00449A78(char *arg0) {
-    *(u16 *)(arg0 + 0x34) &= 0xEFFF;
-    func_002A7750(arg0, 1, -1);
-    *(int *)(arg0 + 0x98) = 0;
-    *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
+/* Puts the object back into its quiet idle state and clears its visibility flags. */
+void func_L20_00449A78(char *moby) {
+    *(u16 *)(moby + 0x34) &= 0xEFFF;
+    SetMobyState(moby, 1, -1);
+    *(int *)(moby + 0x98) = 0;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
 }
 
 /* func_L20_00449AE8 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */
@@ -48,13 +51,14 @@ void func_L20_00449A78(char *arg0) {
 
 /* func_L20_00449FD0 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */
 
-void func_L20_0044A108(char *arg0, char *arg1) {
-    func_0032C700(arg0 + 0x10, 0, 5, 4, 4, 4, 7, 0, 0.333f, 20.0f, 0, 0, 0, 0);
-    if (arg1 != 0) {
-        func_002A8C28(*(char **)(arg0 + 0xB8), arg0 + 0x10, (int)arg1, 0, 1.5f,
+/* Blows up the projectile with a burst of sparks, adds an impact mark if it hit something, and removes it. */
+void func_L20_0044A108(char *moby, char *hitKind) {
+    SpawnExplosion(moby + 0x10, 0, 5, 4, 4, 4, 7, 0, 0.333f, 20.0f, 0, 0, 0, 0);
+    if (hitKind != 0) {
+        SweepCollisionFromObject(*(char **)(moby + 0xB8), moby + 0x10, (int)hitKind, 0, 1.5f,
                       4.0f, 1.0f, 1, 0);
     }
-    func_0029F338(arg0);
+    MarkMobySpawned(moby);
 }
 
 /* func_L20_0044A1C8 is defined in L20_0044A1C8-g8.c (it reaches data through $gp). */
@@ -67,22 +71,23 @@ void func_L20_0044A108(char *arg0, char *arg1) {
 
 /* func_L20_0044AA88 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */
 
-void func_L20_0044AB68(char *arg0) {
+/* Plays a burst of particles at the object and stops its sound if one is playing. */
+void func_L20_0044AB68(char *moby) {
     union {
         TI128 q;
         float f[4];
-    } v;
+    } offset;
     char *state;
 
-    v.q = 0;
-    v.f[2] = 0.3f;
-    func_00283098(&v, &v, arg0 + 0xC0);
-    func_00282CC0(&v, &v, arg0 + 0x10);
-    func_0032C700(&v, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, 0.666f, 20.0f, 1, 0,
+    offset.q = 0;
+    offset.f[2] = 0.3f;
+    matrix_mul_vec3(&offset, &offset, moby + 0xC0);
+    FastVecAdd(&offset, &offset, moby + 0x10);
+    SpawnExplosion(&offset, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, 0.666f, 20.0f, 1, 0,
                   0, 0);
-    state = *(char **)(arg0 + 0x68);
+    state = *(char **)(moby + 0x68);
     if (*(int *)(state + 0x1B8) != -1) {
-        func_002E59F8(*(int *)(state + 0x1B8));
+        StopSoundVoice(*(int *)(state + 0x1B8));
         *(int *)(state + 0x1B8) = -1;
     }
 }

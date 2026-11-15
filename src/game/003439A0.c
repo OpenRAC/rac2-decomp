@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void F449e2f67_FUN_003361A8(char *p);
 
@@ -14,23 +15,24 @@ typedef struct {
 
 extern int func_002E5E58(int, unsigned int, void *);
 
-char *func_003439A0(char *p)
+/* Sets up the fourteen parts of the grid menu before they are filled in. */
+char *func_003439A0(char *menu)
 {
-    F449e2f67_FUN_003361A8(p);
-    F449e2f67_FUN_003361A8(p + 76);
-    F449e2f67_FUN_003361A8(p + 152);
-    F449e2f67_FUN_003361A8(p + 228);
-    F449e2f67_FUN_003361A8(p + 304);
-    F449e2f67_FUN_003361A8(p + 380);
-    F449e2f67_FUN_00336968(p + 456);
-    F449e2f67_FUN_00336968(p + 528);
-    F449e2f67_FUN_003366D0(p + 600);
-    F449e2f67_FUN_00336968(p + 664);
-    F449e2f67_FUN_00336968(p + 736);
-    F449e2f67_FUN_00336968(p + 808);
-    F449e2f67_FUN_00336968(p + 880);
-    F449e2f67_FUN_00336968(p + 952);
-    return p;
+    F449e2f67_FUN_003361A8(menu);
+    F449e2f67_FUN_003361A8(menu + 76);
+    F449e2f67_FUN_003361A8(menu + 152);
+    F449e2f67_FUN_003361A8(menu + 228);
+    F449e2f67_FUN_003361A8(menu + 304);
+    F449e2f67_FUN_003361A8(menu + 380);
+    F449e2f67_FUN_00336968(menu + 456);
+    F449e2f67_FUN_00336968(menu + 528);
+    F449e2f67_FUN_003366D0(menu + 600);
+    F449e2f67_FUN_00336968(menu + 664);
+    F449e2f67_FUN_00336968(menu + 736);
+    F449e2f67_FUN_00336968(menu + 808);
+    F449e2f67_FUN_00336968(menu + 880);
+    F449e2f67_FUN_00336968(menu + 952);
+    return menu;
 }
 
 extern int func_00336E40(void *);
@@ -50,102 +52,104 @@ extern char D_001ADF10[], D_001ADF18[], D_001ADF20[], D_001ADD60[], D_001AE250[]
 extern char D_001ADD58[], D_001AE030[], D_001ADFD8[];
 extern char *D_001A8CFC[] __attribute__((sda));
 
-void func_00343A30(char *self, void *arg)
+/* Builds the grid menu: allocates its position, creates all labels and icons, and sets their colours and texts. */
+void func_00343A30(char *self, void *owner)
 {
-    int *buf;
+    int *allocation;
     float zero;
 
-    *(void **)(self + 0x434) = arg;
-    if (arg) {
-        buf = func_00336DA8(16, func_00336E40(arg));
-        *(int **)(self + 0x430) = buf;
-        buf[1] = 0;
-        buf[2] = 0;
-        buf[3] = 0;
-        buf[0] = 0;
+    *(void **)(self + 0x434) = owner;
+    if (owner) {
+        allocation = ReturnSecondArgument(16, AllocPoolCell(owner));
+        *(int **)(self + 0x430) = allocation;
+        allocation[1] = 0;
+        allocation[2] = 0;
+        allocation[3] = 0;
+        allocation[0] = 0;
     }
     zero = 0.0f;
     *(int *)(self + 0x438) = 1;
     (*(float **)(self + 0x430))[0] = 250.0f;
     (*(float **)(self + 0x430))[1] = 207.0f;
-    func_003361E0(self, D_001ADC10, arg);
-    func_003361E0(self + 0x4C, D_001ADC18, arg);
-    func_003361E0(self + 0x98, D_001ADC20, arg);
-    func_003361E0(self + 0xE4, D_001ADC28, arg);
-    func_003361E0(self + 0x130, D_001ADFC0, arg);
-    func_003361E0(self + 0x17C, D_001ADFC8, arg);
-    func_003369A8(self + 0x328, D_001ADF10, arg);
-    func_003369A8(self + 0x370, D_001ADF18, arg);
-    func_003369A8(self + 0x3B8, D_001ADF20, arg);
-    func_003369A8(self + 0x298, D_001ADD60, arg);
-    func_003369A8(self + 0x2E0, D_001AE250, arg);
-    func_003369A8(self + 0x1C8, D_001ADD58, arg);
-    func_003369A8(self + 0x210, D_001AE030, arg);
-    *func_00335E20(self) = 0x60442D00;
-    *func_00335E20(self + 0x4C) = 0x60241700;
-    *func_00335E20(self + 0x98) = 0x55F0C070;
-    *func_00335E20(self + 0xE4) = 0x55F0C070;
-    *func_00335E20(self + 0x17C) = 0x70FFFEED;
-    *func_00335E20(self + 0x130) = 0x55F0C070;
-    *func_00335E20(self + 0x298) = 0x80F0F0F0;
-    *func_00335E20(self + 0x2E0) = 0x80F0F0F0;
-    *func_00335E20(self + 0x1C8) = 0x80F0F0F0;
-    *func_00335E20(self + 0x210) = 0x80F0F0F0;
-    *func_00335E20(self + 0x328) = 0x80F0F0F0;
-    *func_00335E20(self + 0x370) = 0x80F0F0F0;
-    *func_00335E20(self + 0x3B8) = 0x80F0F0F0;
-    func_00336A30(self + 0x298, 1);
-    func_00336A30(self + 0x2E0, 1);
-    func_00335F88(self + 0x2E0, 0.9f, 0.9f, zero, zero);
-    func_00336390(self, D_001A8CFC[0] + 0x8710, 0x9E);
-    func_00336390(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9F);
-    func_00336390(self + 0x98, D_001A8CFC[0] + 0x8710, 0xA0);
-    func_00336390(self + 0xE4, D_001A8CFC[0] + 0x8710, 0xA1);
-    func_00336390(self + 0x130, D_001A8CFC[0] + 0x8710, 0x5D);
-    func_00336390(self + 0x17C, D_001A8CFC[0] + 0x8710, 0x5E);
+    InitDerivedArrays(self, D_001ADC10, owner);
+    InitDerivedArrays(self + 0x4C, D_001ADC18, owner);
+    InitDerivedArrays(self + 0x98, D_001ADC20, owner);
+    InitDerivedArrays(self + 0xE4, D_001ADC28, owner);
+    InitDerivedArrays(self + 0x130, D_001ADFC0, owner);
+    InitDerivedArrays(self + 0x17C, D_001ADFC8, owner);
+    InitWidgetDefaults(self + 0x328, D_001ADF10, owner);
+    InitWidgetDefaults(self + 0x370, D_001ADF18, owner);
+    InitWidgetDefaults(self + 0x3B8, D_001ADF20, owner);
+    InitWidgetDefaults(self + 0x298, D_001ADD60, owner);
+    InitWidgetDefaults(self + 0x2E0, D_001AE250, owner);
+    InitWidgetDefaults(self + 0x1C8, D_001ADD58, owner);
+    InitWidgetDefaults(self + 0x210, D_001AE030, owner);
+    *GetFieldC(self) = 0x60442D00;
+    *GetFieldC(self + 0x4C) = 0x60241700;
+    *GetFieldC(self + 0x98) = 0x55F0C070;
+    *GetFieldC(self + 0xE4) = 0x55F0C070;
+    *GetFieldC(self + 0x17C) = 0x70FFFEED;
+    *GetFieldC(self + 0x130) = 0x55F0C070;
+    *GetFieldC(self + 0x298) = 0x80F0F0F0;
+    *GetFieldC(self + 0x2E0) = 0x80F0F0F0;
+    *GetFieldC(self + 0x1C8) = 0x80F0F0F0;
+    *GetFieldC(self + 0x210) = 0x80F0F0F0;
+    *GetFieldC(self + 0x328) = 0x80F0F0F0;
+    *GetFieldC(self + 0x370) = 0x80F0F0F0;
+    *GetFieldC(self + 0x3B8) = 0x80F0F0F0;
+    SetWidgetField44(self + 0x298, 1);
+    SetWidgetField44(self + 0x2E0, 1);
+    SetSecondFloat4(self + 0x2E0, 0.9f, 0.9f, zero, zero);
+    SetFieldAt40(self, D_001A8CFC[0] + 0x8710, 0x9E);
+    SetFieldAt40(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9F);
+    SetFieldAt40(self + 0x98, D_001A8CFC[0] + 0x8710, 0xA0);
+    SetFieldAt40(self + 0xE4, D_001A8CFC[0] + 0x8710, 0xA1);
+    SetFieldAt40(self + 0x130, D_001A8CFC[0] + 0x8710, 0x5D);
+    SetFieldAt40(self + 0x17C, D_001A8CFC[0] + 0x8710, 0x5E);
     *(int *)(self + 0x43C) = 0;
     *(int *)(self + 0x440) = 0;
     *(int *)(self + 0x448) = 3;
-    func_00336710(self + 0x258, D_001ADFD8, arg);
-    *func_00335E20(self + 0x258) = 0x60F0F0B0;
-    func_00335F88(self + 0x258, 32.0f, 32.0f, zero, zero);
-    *func_00335E20(self + 0x1C8) = 0x80F0F0F0;
-    *func_00335E20(self + 0x210) = 0x80F0F0F0;
-    func_00336A38(self + 0x1C8, func_00288FB8(0x2D54));
-    func_00336A38(self + 0x210, func_00288FB8(0x2D59));
-    func_00336A38(self + 0x328, (int)(self + 0x400));
-    func_00336A38(self + 0x370, (int)(self + 0x410));
-    func_00336A38(self + 0x3B8, (int)(self + 0x420));
-    func_00336A30(self + 0x328, 0);
-    func_00336A30(self + 0x370, 0);
-    func_00336A30(self + 0x3B8, 0);
+    InitDerivedObjectC(self + 0x258, D_001ADFD8, owner);
+    *GetFieldC(self + 0x258) = 0x60F0F0B0;
+    SetSecondFloat4(self + 0x258, 32.0f, 32.0f, zero, zero);
+    *GetFieldC(self + 0x1C8) = 0x80F0F0F0;
+    *GetFieldC(self + 0x210) = 0x80F0F0F0;
+    SetWidgetField40(self + 0x1C8, GetLocalizedString(0x2D54));
+    SetWidgetField40(self + 0x210, GetLocalizedString(0x2D59));
+    SetWidgetField40(self + 0x328, (int)(self + 0x400));
+    SetWidgetField40(self + 0x370, (int)(self + 0x410));
+    SetWidgetField40(self + 0x3B8, (int)(self + 0x420));
+    SetWidgetField44(self + 0x328, 0);
+    SetWidgetField44(self + 0x370, 0);
+    SetWidgetField44(self + 0x3B8, 0);
     *(int *)(self + 0x444) = 0;
-    func_00336A38(self + 0x298, func_00288FB8(0x2D4F));
-    func_00344478(self, 0);
+    SetWidgetField40(self + 0x298, GetLocalizedString(0x2D4F));
+    UpdateGridMenu(self, 0);
 }
 
 typedef struct { unsigned char pad[6]; short id; short tail; } SelectionRow;
 extern SelectionRow D_001AA810[];
 
+/* Handles the direction buttons while the cursor is in the first group of the grid menu. */
 void func_00343EE8(DobboGridState312 *state, unsigned int buttons)
 {
     if (buttons & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         state->row = 1;
         state->mode = 2;
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         state->row = 0;
         state->mode = 2;
     } else if (buttons & 0x8000) {
         --state->column;
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (state->column < 0) {
             state->column = 0;
             state->mode = 1;
         }
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         ++state->column;
         if (state->column >= 2) {
             state->column = 0;
@@ -162,10 +166,11 @@ extern SelectionRow ref_L00_00286D68_00[];
 
 /* The cursor's up/down/left/right move: the button mask picks the direction, the state keeps
    the column (0x43C), the row (0x440), the chosen index (0x444) and the mode (0x448). */
+/* Handles the direction buttons while the cursor is in the main grid of the menu. */
 void func_00343FF8(DobboGridState312 *state, unsigned int buttons)
 {
     if (buttons & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (--state->row < 0) {
             if (state->column < 2) {
                 state->row = 0;
@@ -179,7 +184,7 @@ void func_00343FF8(DobboGridState312 *state, unsigned int buttons)
             }
         }
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (++state->row >= 2) {
             if (state->column < 2) {
                 state->row = 0;
@@ -193,12 +198,12 @@ void func_00343FF8(DobboGridState312 *state, unsigned int buttons)
             }
         }
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (--state->column < 0) {
             state->column = 3;
         }
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (++state->column >= 4) {
             state->column = 0;
             state->mode = 3;
@@ -209,10 +214,11 @@ void func_00343FF8(DobboGridState312 *state, unsigned int buttons)
 }
 
 /* prioritized masks1000/4000/8000/2000 update signedcolumns43C/rows440 and mode448 with originalevent3 flags0/entitynull; index444=column+2row */
+/* Handles the direction buttons while the cursor is in the small two-by-two group of the grid menu. */
 void func_00344160(DobboGridState312 *state, unsigned int buttons)
 {
     if (buttons & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         --state->row;
         if (state->row < 0) {
             if (state->column == 0) {
@@ -225,11 +231,11 @@ void func_00344160(DobboGridState312 *state, unsigned int buttons)
         }
     } else if (buttons & 0x4000) {
         int row;
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         row = state->row + 1;
         state->row = row > 1 ? 0 : row;
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         --state->column;
         if (state->column < 0) {
             state->column = 3;
@@ -237,7 +243,7 @@ void func_00344160(DobboGridState312 *state, unsigned int buttons)
             state->mode = 2;
         }
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         ++state->column;
         if (state->column >= 2)
             state->column = 0;
@@ -246,30 +252,31 @@ void func_00344160(DobboGridState312 *state, unsigned int buttons)
 }
 
 extern short D_L00_001AAB76;
-void func_00344298(char *object, unsigned int buttons)
+/* Handles the direction buttons for the single-choice group, jumping the cursor to a fixed place. */
+void func_00344298(char *menu, unsigned int buttons)
 {
     if (buttons & 0x1000) {
-        func_002E5E58(3, 0, 0);
-        *(int *)(object + 0x448) = 2;
-        *(int *)(object + 0x440) = 1;
-        *(int *)(object + 0x43C) = 3;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        *(int *)(menu + 0x448) = 2;
+        *(int *)(menu + 0x440) = 1;
+        *(int *)(menu + 0x43C) = 3;
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
-        *(int *)(object + 0x448) = 2;
-        *(int *)(object + 0x43C) = 3;
-        *(int *)(object + 0x440) = 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        *(int *)(menu + 0x448) = 2;
+        *(int *)(menu + 0x43C) = 3;
+        *(int *)(menu + 0x440) = 0;
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
-        *(int *)(object + 0x448) = 0;
-        *(int *)(object + 0x43C) = 1;
-        *(int *)(object + 0x440) = 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        *(int *)(menu + 0x448) = 0;
+        *(int *)(menu + 0x43C) = 1;
+        *(int *)(menu + 0x440) = 0;
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
-        *(int *)(object + 0x440) = 0;
-        *(int *)(object + 0x448) = 3;
-        *(int *)(object + 0x43C) = 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        *(int *)(menu + 0x440) = 0;
+        *(int *)(menu + 0x448) = 3;
+        *(int *)(menu + 0x43C) = 0;
     }
-    *(int *)(object + 0x444) = D_L00_001AAB76;
+    *(int *)(menu + 0x444) = D_L00_001AAB76;
 }
 
 /* Per-mode lookup of the selected entry's id (the short at +0x42 of a 0xE0-byte record).
@@ -284,6 +291,7 @@ typedef struct { unsigned char pad[0x42]; short field42; unsigned char rest[0xE0
 typedef struct { int v[4]; } Ids_00344378;
 extern Ids_00344378 D_001AE260;
 
+/* Returns the text id of the entry the cursor is on, or 0 if it cannot be picked. */
 int func_00344378(DobboGridState312 *state)
 {
     Ids_00344378 table = D_001AE260;
@@ -293,15 +301,15 @@ int func_00344378(DobboGridState312 *state)
     case 0:
     case 2: {
         int index = state->index;
-        if (D_001A7AF8[index] != 0) {
-            value = ((Entry224 *)D_00239BA0)[D_00139568[index]].field42;
+        if (gItemOwnedFlags[index] != 0) {
+            value = ((Entry224 *)gWeaponTable_00239BA0)[gItemSlotToRecord[index]].field42;
             break;
         }
         return 0;
     }
     case 1:
         if (D_001A7AFE != 0) {
-            value = ((Entry224 *)D_00239BA0)[D_00139568[6]].field42;
+            value = ((Entry224 *)gWeaponTable_00239BA0)[gItemSlotToRecord[6]].field42;
             break;
         }
         return 0;

@@ -8,52 +8,53 @@ extern s32 ref_L06_00444D00_02(void *, s32);
 extern void ref_L06_00444D00_03(void *, void *, s32, s32);
 extern void ref_L06_00444D00_04(s32, void *, s32);
 
+/* Updates a switch moby (class 3546): works out if it is on, and when that changes it tells the linked objects. */
 void func_L06_00444D00(char *object)
 {
     char *state;
-    s128 buf;
-    s32 flag = 0;
+    s128 testPoint;
+    s32 isOn = 0;
     s32 i;
     s32 j;
     s32 k;
-    s32 *q;
-    s32 found;
+    s32 *secondList;
+    s32 mode;
 
     state = *(char **)(object + 0x68);
     *(u8 *)(object + 0x30) = 0xFF;
     if (state[0x7E])
-        qcopy(&buf, ref_L06_00444D00_00);
+        qcopy(&testPoint, ref_L06_00444D00_00);
     else
-        qcopy(&buf, ref_L06_00444D00_01);
-    found = *(u8 *)(object + 0x95);
-    if (found == 0) {
+        qcopy(&testPoint, ref_L06_00444D00_01);
+    mode = *(u8 *)(object + 0x95);
+    if (mode == 0) {
         for (i = 0; ; i++) {
             if (i >= 4) goto done;
             if (((s32 *)state)[i] == -1) continue;
-            if (ref_L06_00444D00_02(&buf, ((s32 *)state)[i])) break;
+            if (ref_L06_00444D00_02(&testPoint, ((s32 *)state)[i])) break;
         }
         goto set;
-    } else if (found == 1) {
+    } else if (mode == 1) {
 set:
-        flag = 1;
+        isOn = 1;
     } else {
-        flag = 0;
+        isOn = 0;
     }
 done:
-    if ((flag && !*(u8 *)(object + 0xBC)) ||
-        (!flag && *(u8 *)(object + 0xBC)) ||
+    if ((isOn && !*(u8 *)(object + 0xBC)) ||
+        (!isOn && *(u8 *)(object + 0xBC)) ||
         !*(u8 *)(object + 0x20)) {
-        if (flag) *(u8 *)(object + 0xBC) = 1;
+        if (isOn) *(u8 *)(object + 0xBC) = 1;
         else *(u8 *)(object + 0xBC) = 0;
         *(u8 *)(object + 0x20) = *(u8 *)(object + 0xBC) + 1;
-        q = (s32 *)(state + 0x44);
+        secondList = (s32 *)(state + 0x44);
         for (j = 0; j < 13; j++) {
             if (((s32 *)(state + 0x10))[j] != -1)
-                ref_L06_00444D00_03(object, state, ((s32 *)(state + 0x10))[j], flag);
+                ref_L06_00444D00_03(object, state, ((s32 *)(state + 0x10))[j], isOn);
         }
         for (k = 0; k < 14; k++) {
-            if (q[k] != -1)
-                ref_L06_00444D00_04(q[k], state, flag);
+            if (secondList[k] != -1)
+                ref_L06_00444D00_04(secondList[k], state, isOn);
         }
     }
 }

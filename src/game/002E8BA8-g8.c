@@ -47,58 +47,58 @@ void func_002E8BA8(void) {
     float saved;
     char *object;
     int alpha;
-    func_00284F40(0);
-    func_00279D18();
-    func_0029FB20();
-    func_0027B858();
+    AppendDrawListBufferTag(0);
+    BuildViewMatrices();
+    UpdateWatchedObjects();
+    WriteClearColorPackets();
     saved = D_001B9040.value;
     D_001B169C = -1;
     if (saved<0.62f) D_001B9040.value = 0.62f;
-    func_0027AB40();
-    func_00279D18();
-    func_002E35E0();
+    UpdateViewContext();
+    BuildViewMatrices();
+    BuildViewTransformsAndSubmit();
     D_001B9040.value = saved;
-    func_0027AB40();
-    func_00279D18();
-    if (D_00152C00.variant==4) {
-        func_0027C540(1);
-        func_002E8190();
-        func_0027C660();
+    UpdateViewContext();
+    BuildViewMatrices();
+    if (gHeroMoby_00152C00.variant==4) {
+        SetupGifPaging(1);
+        DrawScreenOverlayQuads();
+        DoGifPaging();
     }
-    func_002A03C0();
-    func_002FCF90(0x2080000);
-    func_0027C540(1);
-    if (D_00152C00.variant==4 && D_001B8840.frame>60) {
-        alpha = (D_001B8840.frame-60)*2;
+    UploadMainTextures();
+    append_dma_tag(0x2080000);
+    SetupGifPaging(1);
+    if (gHeroMoby_00152C00.variant==4 && gScenePlaybackState.frame>60) {
+        alpha = (gScenePlaybackState.frame-60)*2;
         if (alpha>128) alpha = 128;
-        func_002E82C8(alpha);
+        DrawFadeOverlayStrip(alpha);
     }
-    if (!D_001B2148 || H(D_001B2148, 0xAA)==0xD54) {
-        object = D_001B8840.first;
+    if (!D_001B2148 || H(D_001B2148, 0xAA)==0xD54 /* moby class 3412 */) {
+        object = gScenePlaybackState.first;
         if (B(object, 0x95)>16) {
-            func_002E7B48(object);
-            func_002ECB70(object);
-            func_002ED4B8();
+            DrawShipEngineFlames(object);
+            render_environment_mapped_object(object);
+            DrawEffectRecords();
         }
-        else func_0026FEB8(D_001AC180, B(object, 0x95), D_001B1598);
+        else STUB_printf(D_001AC180, B(object, 0x95), D_001B1598);
 
-    } else if (B(D_001B8840.first, 0x95)>16) func_002ED4B8();
-    if (D_001B2148 && ((unsigned short)(H(D_001B2148, 0xAA)-0x128C)<2 || H(D_001B2148, 0xAA)==0x1342)) func_002E7BC8(D_001B2148);
-    if ((unsigned int)(D_001393E0.mode-15)<2 || D_001393E0.next==15 || D_001B1490) {
+    } else if (B(gScenePlaybackState.first, 0x95)>16) DrawEffectRecords();
+    if (D_001B2148 && ((unsigned short)(H(D_001B2148, 0xAA)-0x128C /* moby class 4748 */)<2 || H(D_001B2148, 0xAA)==0x1342 /* moby class 4930 */)) SpawnShipThrusterParticles(D_001B2148);
+    if ((unsigned int)(gMemcardState.mode-15)<2 || gMemcardState.next==15 || D_001B1490) {
         float y, angle;
-        func_002FC560(0x47, 0x3004B);
-        func_0027E018(0x2C, D_001A7344-0x60, 64, 64, 0, 0, 64, 64, 0x80808080ULL, func_0027C878(3));
-        y = (float)((D_001A7344-0x40)<<4);
+        VU1_addGSregister(0x47, 0x3004B);
+        DrawTexturedQuad(0x2C, gScreenHeight-0x60, 64, 64, 0, 0, 64, 64, 0x80808080ULL, GetEffectTextureDescriptor(3));
+        y = (float)((gScreenHeight-0x40)<<4);
         angle = (D_001B1598%55)*-0.11423972994f;
-        func_0028F410(1216.0f, y, 272.0f, 272.0f, angle, 64, 64, func_0027C878(4));
-        if ((unsigned int)(D_001393E0.mode-15)<2 || D_001393E0.next==15) D_001B1490 = 30;
+        DrawRotatedSprite(1216.0f, y, 272.0f, 272.0f, angle, 64, 64, GetEffectTextureDescriptor(4));
+        if ((unsigned int)(gMemcardState.mode-15)<2 || gMemcardState.next==15) D_001B1490 = 30;
         else D_001B1490 = D_001B1490-1;
     }
-    func_0027C660();
-    if (D_001B15A0>0.0f) {
-        if (D_001B15A0>1.0f) D_001B15A0 = 1.0f;
-        func_0027DDC0(0, 0, 0, func_00283CF0(D_001B15A0*128.0f));
+    DoGifPaging();
+    if (gScreenFade>0.0f) {
+        if (gScreenFade>1.0f) gScreenFade = 1.0f;
+        SetClearColorPacket(0, 0, 0, FloatToInt(gScreenFade*128.0f));
     }
-    func_002FC3C0(16);
-    func_0029FEE0();
+    WaitForDmaStatusBits(16);
+    PatchMobyGifs();
 }

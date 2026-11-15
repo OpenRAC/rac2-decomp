@@ -25,27 +25,28 @@
 
 extern s8 D_0021F240[];
 
-void func_002FAD68(s32 arg0) {
+/* Marks every entry for the given item in the shop list as owned. */
+void func_002FAD68(s32 itemId) {
     s32 i;
-    s32 n;
-    s32 one;
-    s8 *base;
-    s8 *q;
-    s8 *p;
+    s32 count;
+    s32 ownedValue;
+    s8 *shop;
+    s8 *shopBase;
+    s8 *row;
 
-    base = D_0021F240;
-    if ((*(s32 *)((s8 *)(base) + (0x740))) > 0) {
+    shop = gVendorMenuState;
+    if ((*(s32 *)((s8 *)(shop) + (0x740))) > 0) {
         i = 0;
-        q = base;
-        one = 1;
-        p = q + 0x150;
+        shopBase = shop;
+        ownedValue = 1;
+        row = shopBase + 0x150;
         do {
-            if ((*(s32 *)((s8 *)(p) + (-0x10))) == arg0) {
-                (*(s32 *)((s8 *)(p) + (0))) = one;
+            if ((*(s32 *)((s8 *)(row) + (-0x10))) == itemId) {
+                (*(s32 *)((s8 *)(row) + (0))) = ownedValue;
             }
-            p += 0x18;
-            n = (*(s32 *)((s8 *)(q) + (0x740)));
+            row += 0x18;
+            count = (*(s32 *)((s8 *)(shopBase) + (0x740)));
             i++;
-        } while (i < n);
+        } while (i < count);
     }
 }

@@ -136,16 +136,17 @@ typedef struct {
     u16 fB2;
 } InitObject;
 
+/* Sets up a sheep or herd animal when it loads: picks its starting pose and speeds, and removes it if its save flags say it has already been dealt with. */
 void func_L08_003D8348(InitObject *object)
 {
-    InitState *s = object->f68;
-    float position[4], value;
-    int handle;
-    unsigned short flag;
-    int bits;
-    s->f48 = func_00283CF0(15.0f);
-    s->f4A = func_00283CF0(9.6f);
-    s->f29 = 1;
+    InitState *vars = object->f68;
+    float position[4], depth;
+    int linkedEntry;
+    unsigned short linkedFlag;
+    int flagBits;
+    vars->f48 = FloatToInt(15.0f);
+    vars->f4A = FloatToInt(9.6f);
+    vars->f29 = 1;
     if (D_L08_001CA080.fC) {
         if (object->f18 < D_L08_001CA080.f28 && D_L08_001CA080.f0 == 1)
             return;
@@ -158,106 +159,106 @@ void func_L08_003D8348(InitObject *object)
                 return;
         }
     }
-    handle = s->f404;
-    if (handle != -1) {
+    linkedEntry = vars->f404;
+    if (linkedEntry != -1) {
         /* Entries are 0x100 bytes; the global holds their base address. */
-        handle = D_L08_001B29DC + (handle << 8);
-        if (((InitEntry *)handle)->fB0 != 255) {
-            flag = ((InitEntry *)handle)->fB2;
-            if (D_L08_0021EAF0.flags[(short)flag] ||
-                ((bits = (u8)D_0019B4A8[((short)flag >> 1) + (D_001A79F0 << 10)]),
-                 (flag & 1) ? (bits >> 4) & 7 : bits & 7)) {
-                unsigned short objectFlag = object->fB2;
-                bits = (u8)D_0019B4A8[((short)objectFlag >> 1) + (D_001A79F0 << 10)];
-                if ((objectFlag & 1) ? (bits >> 4) & 7 : bits & 7) {
-                    func_0029F338(object);
+        linkedEntry = D_L08_001B29DC + (linkedEntry << 8);
+        if (((InitEntry *)linkedEntry)->fB0 != 255) {
+            linkedFlag = ((InitEntry *)linkedEntry)->fB2;
+            if (D_L08_0021EAF0.flags[(short)linkedFlag] ||
+                ((flagBits = (u8)D_0019B4A8[((short)linkedFlag >> 1) + (gCurrentMapIndex << 10)]),
+                 (linkedFlag & 1) ? (flagBits >> 4) & 7 : flagBits & 7)) {
+                unsigned short savedFlag = object->fB2;
+                flagBits = (u8)D_0019B4A8[((short)savedFlag >> 1) + (gCurrentMapIndex << 10)];
+                if ((savedFlag & 1) ? (flagBits >> 4) & 7 : flagBits & 7) {
+                    MarkMobySpawned(object);
                     return;
                 }
             }
         }
     }
-    qcopy_nc((char *)s + 0x3E0, (char *)object + 0x10);
-    func_L08_003D82F0(object);
-    s->f408 = object->f30;
+    qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
+    StoreGroundHeightBelowMoby(object);
+    vars->f408 = object->f30;
     *(InitVector *)position = *(InitVector *)((char *)object + 0x10);
-    value = func_L08_0032EF80(position, s->f410, s->f418, s->f414, -1);
-    if (value > 0)
-        object->f30 = func_00283CF0(value + 2.0f);
-    s->f408 = s->f40A = object->f30;
+    depth = ComputePointDepthInVolumes(position, vars->f410, vars->f418, vars->f414, -1);
+    if (depth > 0)
+        object->f30 = FloatToInt(depth + 2.0f);
+    vars->f408 = vars->f40A = object->f30;
     *(InitVector *)position = *(InitVector *)((char *)object + 0x10);
-    value = func_L08_0032EF80(position, s->f41C, s->f424, s->f420, -1);
-    if (value > 0)
-        s->f408 = func_00283CF0(value + 2.0f);
-    if (s->f428 == -1)
-        func_L01_003377C8(D_L08_001FE7BC);
-    s->f88 = 0;
-    s->f6A = 0;
-    s->f98 = -1;
-    s->f10 = (char *)s + 0x50;
-    s->f60 = 9;
-    s->f62 = s->f61 = 12;
-    s->f66 = 13;
-    s->f67 = 10;
-    s->f6C = 0.25f;
-    s->f70 = 0.11666667461395264f;
-    s->f78 = 0.008333333767950535f;
-    s->f7C = s->f74 = 0.004166666883975267f;
-    s->f84 = s->f80 = 0.8f;
-    s->f8C = 0.4f;
-    s->fBE = s->fBC = 2;
-    s->fBF = s->fBD = 8;
-    s->fC2 = 4;
-    s->fC3 = 14;
-    s->fA8 = 0.1f;
-    s->fAC = 0.3f;
-    s->fF8 = 0;
-    s->f28 = 1;
-    s->f30 = 0.2f;
-    s->fC6 = 0;
-    s->fC4 = 0;
-    s->f430 = 0;
-    if (s->f42C != -1)
-        s->f15C = s->f42C;
+    depth = ComputePointDepthInVolumes(position, vars->f41C, vars->f424, vars->f420, -1);
+    if (depth > 0)
+        vars->f408 = FloatToInt(depth + 2.0f);
+    if (vars->f428 == -1)
+        ComputePathSegmentLengths_L01(D_L08_001FE7BC);
+    vars->f88 = 0;
+    vars->f6A = 0;
+    vars->f98 = -1;
+    vars->f10 = (char *)vars + 0x50;
+    vars->f60 = 9;
+    vars->f62 = vars->f61 = 12;
+    vars->f66 = 13;
+    vars->f67 = 10;
+    vars->f6C = 0.25f;
+    vars->f70 = 0.11666667461395264f;
+    vars->f78 = 0.008333333767950535f;
+    vars->f7C = vars->f74 = 0.004166666883975267f;
+    vars->f84 = vars->f80 = 0.8f;
+    vars->f8C = 0.4f;
+    vars->fBE = vars->fBC = 2;
+    vars->fBF = vars->fBD = 8;
+    vars->fC2 = 4;
+    vars->fC3 = 14;
+    vars->fA8 = 0.1f;
+    vars->fAC = 0.3f;
+    vars->fF8 = 0;
+    vars->f28 = 1;
+    vars->f30 = 0.2f;
+    vars->fC6 = 0;
+    vars->fC4 = 0;
+    vars->f430 = 0;
+    if (vars->f42C != -1)
+        vars->f15C = vars->f42C;
     else
-        s->f15C = s->f428;
-    s->f150 = 0.0872664749622345f;
-    s->f120 = 0.7f;
-    s->f130 = 0.7853982448577881f;
-    qcopy((char *)s + 0x3F0, (char *)object + 0x10);
-    s->f450 = 0;
-    switch (s->f40C) {
+        vars->f15C = vars->f428;
+    vars->f150 = 0.0872664749622345f;
+    vars->f120 = 0.7f;
+    vars->f130 = 0.7853982448577881f;
+    qcopy((char *)vars + 0x3F0, (char *)object + 0x10);
+    vars->f450 = 0;
+    switch (vars->f40C) {
     case 0:
-        object->f18 = s->f434;
-        qcopy_nc((char *)s + 0x3E0, (char *)object + 0x10);
-        qzero_nc((char *)s + 0x1C0);
+        object->f18 = vars->f434;
+        qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
+        qzero_nc((char *)vars + 0x1C0);
         if (object->f43 != 11)
-            func_002A7470(object, 11, 0, 2);
-        func_002A7750(object, 1, -1);
+            StartAnimationBlended(object, 11, 0, 2);
+        SetMobyState(object, 1, -1);
         object->f31 = 0;
         object->f98 = 0;
         object->f34 = (object->f34 & 0xEFFF) | 1;
         break;
     case 1:
     case 3:
-        object->f18 = s->f434;
-        qcopy_nc((char *)s + 0x3E0, (char *)object + 0x10);
-        qzero_nc((char *)s + 0x1C0);
-        if (object->f43 != (func_001163B0() & 1))
-            func_002A7470(object, func_001163B0() & 1, 0, 2);
-        func_002A7750(object, 6, -1);
+        object->f18 = vars->f434;
+        qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
+        qzero_nc((char *)vars + 0x1C0);
+        if (object->f43 != (Rand() & 1))
+            StartAnimationBlended(object, Rand() & 1, 0, 2);
+        SetMobyState(object, 6, -1);
         object->f31 = 1;
         object->f34 = (object->f34 | 0x1000) & 0xFFFE;
         break;
     case 2:
-        qzero_nc((char *)s + 0x1C0);
-        func_00282CC0((char *)object + 0x10, (char *)object + 0x10, (char *)s + 0xD0);
-        qcopy_nc((char *)s + 0x3E0, (char *)object + 0x10);
+        qzero_nc((char *)vars + 0x1C0);
+        FastVecAdd((char *)object + 0x10, (char *)object + 0x10, (char *)vars + 0xD0);
+        qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
         if (object->f43 != 14)
-            func_002A7470(object, 14, 0, 2);
+            StartAnimationBlended(object, 14, 0, 2);
         object->f2C = *(float *)(object->f24 + 0x24) * 0.5f;
         object->f31 = 1;
         object->f34 = (object->f34 | 0x1000) & 0xFFFE;
-        func_002A7750(object, 4, -1);
+        SetMobyState(object, 4, -1);
         break;
     }
 }

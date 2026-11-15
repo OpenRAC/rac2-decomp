@@ -1,5 +1,6 @@
 /* func_L00_0039F300 in its own unit (flags in config/cflags.txt: -O2 -G8 -ffunction-sections). */
 #include "include_asm.h"
+#include "names.h"
 
 /* Functions of L00_0038F178.c whose float constants the retail build reached through $gp. */
 
@@ -22,7 +23,7 @@ void func_L00_0039F300(void)
     int i;
 
     for (i = 0; i < 8; i++) {
-        func_002ACEC0(D_L00_0023A670 + i * 0x10, D_L00_0023A670 + i * 0x10, D_L00_0023A6F0 + i * 0x10, D_L00_001AF448);
-        func_00282F20(D_L00_0023A670 + i * 0x10, D_L00_0023A670 + i * 0x10, D_L00_001AF470);
+        ApplyAxisRotationToQuaternion(D_L00_0023A670 + i * 0x10, D_L00_0023A670 + i * 0x10, D_L00_0023A6F0 + i * 0x10, D_L00_001AF448);
+        vec_scale_to_length(D_L00_0023A670 + i * 0x10, D_L00_0023A670 + i * 0x10, D_L00_001AF470);
     }
 }

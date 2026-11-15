@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -38,19 +39,19 @@ void func_L00_00388790(char *owner)
     EffectVector joint;
     EffectVector thinWidth, wideWidth;
     char *state = *(char **)(owner + 0x68);
-    func_0029FCC0(owner, 1, (char *)&joint);
+    TransformMobyJointToWorld(owner, 1, (char *)&joint);
     EFFECT_COPY(&startPoint, &joint);
-    func_00282F20(&endPoint, state + 0x30, func_002A7878(2.0f, 4.0f));
-    func_00283098(&endPoint, &endPoint, owner + 0xC0);
-    func_00282CC0(&endPoint, &endPoint, &joint);
-    func_L00_00388490(owner, (float *)&startPoint);
-    narrow.texture = func_0027C878(23);
+    vec_scale_to_length(&endPoint, state + 0x30, RandomFloatRange(2.0f, 4.0f));
+    matrix_mul_vec3(&endPoint, &endPoint, owner + 0xC0);
+    FastVecAdd(&endPoint, &endPoint, &joint);
+    DrawCameraFacingFlash_L00(owner, (float *)&startPoint);
+    narrow.texture = GetEffectTextureDescriptor(23);
     narrow.mode = 0x0000ff9000000260UL;
     narrow.primitive = 0;
     narrow.registers = 0x0000008000000048UL;
     narrow.color[0] = narrow.color[1] = 0x7f103080;
     narrow.color[2] = narrow.color[3] = 0x00103080;
-    wide.texture = func_0027C878(23);
+    wide.texture = GetEffectTextureDescriptor(23);
     wide.mode = 0x0000ff9000000260UL;
     wide.primitive = 0;
     wide.registers = 0x0000008000000048UL;
@@ -60,11 +61,11 @@ void func_L00_00388790(char *owner)
     *(EffectWord *)&wideWidth = 0;
     thinWidth.w = 1.0f;
     wideWidth.w = 1.0f;
-    thinWidth.z = func_002A7878(0.1f, 0.3f);
+    thinWidth.z = RandomFloatRange(0.1f, 0.3f);
     wideWidth.z = thinWidth.z + thinWidth.z;
-    func_L00_003883B8((char *)&narrow);
-    func_L00_003883B8((char *)&wide);
-    if (!(func_001163B0() & 1)) {
+    InitDefaultBlock((char *)&narrow);
+    InitDefaultBlock((char *)&wide);
+    if (!(Rand() & 1)) {
         narrow.uv[0][0] = 0;
         narrow.uv[0][1] = 0;
         narrow.uv[1][0] = 0;
@@ -99,32 +100,32 @@ void func_L00_00388790(char *owner)
         wide.uv[3][0] = 1.0f;
         wide.uv[3][1] = 0;
     }
-    func_00282CF0(&basis[0], &endPoint, &startPoint);
-    func_00282F20(&basis[0], &basis[0], 1.0f);
-    func_00282CF0(&basis[1], &ref_L00_00388790_00.position, &startPoint);
-    func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], 1.0f);
-    func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecSub(&basis[0], &endPoint, &startPoint);
+    vec_scale_to_length(&basis[0], &basis[0], 1.0f);
+    FastVecSub(&basis[1], &ref_L00_00388790_00.position, &startPoint);
+    FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], 1.0f);
+    FastVecCross(&basis[1], &basis[0], &basis[2]);
     EFFECT_COPY(&basis[3], &startPoint);
     EFFECT_COPY(&narrow.position[0], &thinWidth);
     EFFECT_COPY(&wide.position[0], &wideWidth);
-    func_00282D30(&narrow.position[1], &narrow.position[0], -1.0f);
-    func_00282D30(&wide.position[1], &wide.position[0], -1.0f);
-    func_002830C0(&narrow.position[0], &narrow.position[0], basis);
-    func_002830C0(&narrow.position[1], &narrow.position[1], basis);
-    func_002830C0(&wide.position[0], &wide.position[0], basis);
-    func_002830C0(&wide.position[1], &wide.position[1], basis);
+    FastVecScale(&narrow.position[1], &narrow.position[0], -1.0f);
+    FastVecScale(&wide.position[1], &wide.position[0], -1.0f);
+    transform_vector(&narrow.position[0], &narrow.position[0], basis);
+    transform_vector(&narrow.position[1], &narrow.position[1], basis);
+    transform_vector(&wide.position[0], &wide.position[0], basis);
+    transform_vector(&wide.position[1], &wide.position[1], basis);
     EFFECT_COPY(&basis[3], &endPoint);
     thinWidth.z *= 0.15f;
     wideWidth.z = thinWidth.z + thinWidth.z;
     EFFECT_COPY(&narrow.position[2], &thinWidth);
     EFFECT_COPY(&wide.position[2], &wideWidth);
-    func_00282D30(&narrow.position[3], &narrow.position[2], -1.0f);
-    func_00282D30(&wide.position[3], &wide.position[2], -1.0f);
-    func_002830C0(&narrow.position[2], &narrow.position[2], basis);
-    func_002830C0(&narrow.position[3], &narrow.position[3], basis);
-    func_002830C0(&wide.position[2], &wide.position[2], basis);
-    func_002830C0(&wide.position[3], &wide.position[3], basis);
-    func_00280B90(&narrow, 0, 0);
-    func_00280B90(&wide, 0, 0);
+    FastVecScale(&narrow.position[3], &narrow.position[2], -1.0f);
+    FastVecScale(&wide.position[3], &wide.position[2], -1.0f);
+    transform_vector(&narrow.position[2], &narrow.position[2], basis);
+    transform_vector(&narrow.position[3], &narrow.position[3], basis);
+    transform_vector(&wide.position[2], &wide.position[2], basis);
+    transform_vector(&wide.position[3], &wide.position[3], basis);
+    draw_world_quad(&narrow, 0, 0);
+    draw_world_quad(&wide, 0, 0);
 }

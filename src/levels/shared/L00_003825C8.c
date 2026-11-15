@@ -17,29 +17,30 @@ typedef struct {
 } PlayerTargetView;
 extern CameraTargetView D_001B8C80;
 extern PlayerTargetView D_00189E20;
+/* Updates a marker object that follows the camera's target, and pushes it far away when the player is moving past it. */
 void func_L00_003825C8(char *object)
 {
     Vector4 difference, projected;
     float amount;
     if (D_001B8C80.target) {
         FIELD(Quadword,object,0x10)=FIELD(Quadword,D_001B8C80.target,0x30);
-        func_00282CF0(&difference,object+0x10,&D_00189E20.position);
-        amount=func_00282DB0(&difference,D_00189E20.object+0xE0);
-        func_00282D30(&projected,D_00189E20.object+0xE0,amount);
-        func_00282CF0(&difference,&difference,&projected);
-        if (func_00282C48(amount)<2.5f) {
-            if (func_00282DF0(&difference)<0.1f ||
-                func_00283C80(D_00189E20.heading,D_001B8C80.heading)<2.3561947f ||
-                D_00189E20.speed<0.0016666668f) {
+        FastVecSub(&difference,object+0x10,&gHeroState.position);
+        amount=FastVecDot(&difference,gHeroState.object+0xE0);
+        FastVecScale(&projected,gHeroState.object+0xE0,amount);
+        FastVecSub(&difference,&difference,&projected);
+        if (FloatAbs(amount)<2.5f) {
+            if (FastVecLength(&difference)<0.1f ||
+                FastDiffRots(gHeroState.heading,D_001B8C80.heading)<2.3561947f ||
+                gHeroState.speed<0.0016666668f) {
                 FIELD(float,object,0x10)=FIELD(float,object,0x14)=FIELD(float,object,0x18)=15;
             }
             else {
-                amount=func_00282DB0(object+0x10,D_00189E20.object+0xE0);
-                func_00282D30(&projected,D_00189E20.object+0xE0,amount);
-                func_00282CF0(&difference,object+0x10,&projected);
-                amount=func_00282DB0(&D_00189E20.position,D_00189E20.object+0xE0);
-                func_00282D30(&projected,D_00189E20.object+0xE0,amount);
-                func_00282CC0(object+0x10,&difference,&projected);
+                amount=FastVecDot(object+0x10,gHeroState.object+0xE0);
+                FastVecScale(&projected,gHeroState.object+0xE0,amount);
+                FastVecSub(&difference,object+0x10,&projected);
+                amount=FastVecDot(&gHeroState.position,gHeroState.object+0xE0);
+                FastVecScale(&projected,gHeroState.object+0xE0,amount);
+                FastVecAdd(object+0x10,&difference,&projected);
             }
         }
     } else {

@@ -40,28 +40,28 @@ void func_L11_00446C78(char *object)
         p[-4] += p[0];
         if (p[-4] >= 1.0f) {
             p[-4] = 0;
-            p[0] = func_002A7878(D_L11_001B1590[0], D_L11_001B1590[1]) * (1.0f / 60.0f);
-            p[-8] = func_002A7878(D_L11_001B1598[0], D_L11_001B1598[1]);
+            p[0] = RandomFloatRange(D_L11_001B1590[0], D_L11_001B1590[1]) * (1.0f / 60.0f);
+            p[-8] = RandomFloatRange(D_L11_001B1598[0], D_L11_001B1598[1]);
         }
     }
     for (i = 0; i < D_L11_001B1928; i++) {
         qzero_nc(velocity);
-        velocity[2] = func_002A7878(D_L11_001B1900[0], D_L11_001B1900[1]) * (1.0f / 60.0f);
-        func_00283098(velocity, velocity, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
-        angle = func_002A7940();
-        radius = func_002A7878(D_L11_001B1920, D_L11_001B1924[0]);
-        position[0] = func_00283180(angle) * radius;
-        position[1] = func_00283198(angle) * radius;
+        velocity[2] = RandomFloatRange(D_L11_001B1900[0], D_L11_001B1900[1]) * (1.0f / 60.0f);
+        matrix_mul_vec3(velocity, velocity, gMobyTable_L11[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
+        angle = RandomAngle();
+        radius = RandomFloatRange(D_L11_001B1920, D_L11_001B1924[0]);
+        position[0] = FastSinOrCosA(angle) * radius;
+        position[1] = FastSinOrCosB(angle) * radius;
         position[2] = 0;
-        func_00283098(position, position, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
-        func_00282CC0(position, position, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0x10);
-        func_00282CC0(position, position, D_L11_001B1930);
-        color = func_002A7820(D_L11_001B1918[0], D_L11_001B1918[1]);
-        scale = func_002A7878(D_L11_001B1908, D_L11_001B1900[3]);
-        kind = func_002A77E0(2) ? D_L11_001B1910 : D_L11_001B1914[0];
+        matrix_mul_vec3(position, position, gMobyTable_L11[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
+        FastVecAdd(position, position, gMobyTable_L11[0] + (*(int *)(state + 0x1D0) << 8) + 0x10);
+        FastVecAdd(position, position, D_L11_001B1930);
+        color = RandomIntRange(D_L11_001B1918[0], D_L11_001B1918[1]);
+        scale = RandomFloatRange(D_L11_001B1908, D_L11_001B1900[3]);
+        kind = RandomIntBelow(2) ? D_L11_001B1910 : D_L11_001B1914[0];
 
         life = color;
-        shade = func_002A77E0(255);
-        func_002C3150(position, velocity, kind, scale, life, shade, 0);
+        shade = RandomIntBelow(255);
+        SpawnHeroRelativeParticle(position, velocity, kind, scale, life, shade, 0);
     }
 }

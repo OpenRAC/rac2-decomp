@@ -32,27 +32,27 @@ extern void func_002AAC80(void *, float, float, float, float);
 extern int func_002B4FF0(void *, float *, float);
 
 /* Follow the camera height between the moby's home and the hero, never under the floor. */
-float func_L07_003E5910(Moby_L07_003E5910 *m, float *arg1, float arg2)
+float func_L07_003E5910(Moby_L07_003E5910 *moby, float *goalPos, float turnRate)
 {
-    f32 pos[4] __attribute__((aligned(16)));
-    Vars_L07_003E5910 *v = m->vars;
+    f32 homePos[4] __attribute__((aligned(16)));
+    Vars_L07_003E5910 *vars = moby->vars;
     f32 lo, hi, h, floor;
 
-    if (v->target != 0) {
-        func_00283098(pos, v->home, m->rot);
-        func_00282CC0(pos, pos, v->target + 0x10);
+    if (vars->target != 0) {
+        matrix_mul_vec3(homePos, vars->home, moby->rot);
+        FastVecAdd(homePos, homePos, vars->target + 0x10);
     } else {
-        qcopy(pos, v->home);
+        qcopy(homePos, vars->home);
     }
-    lo = pos[2] - 2.0f;
+    lo = homePos[2] - 2.0f;
     hi = lo + 5.0f;
-    h = ((Hero *)D_00189E20)->f[0x2D8 / 4] + D_L07_001B0AA8;
+    h = ((Hero *)gHeroState)->f[0x2D8 / 4] + D_L07_001B0AA8;
     if (hi < h) h = hi;
     else if (h < lo) h = lo;
-    floor = func_002A89A8(m->pos, 0, 0.5f) + D_L07_001B0AA8;
+    floor = ProbeGroundHeightBelow(moby->pos, 0, 0.5f) + D_L07_001B0AA8;
     if (h < floor) h = floor;
-    func_002AAC80(v->cam, h - m->pos[2], D_L07_001B0AA0 * 0.000277777785f, D_L07_001B0AA0 * 0.000277777785f,
+    ApproachTargetWithBraking(vars->cam, h - moby->pos[2], D_L07_001B0AA0 * 0.000277777785f, D_L07_001B0AA0 * 0.000277777785f,
                   D_L07_001B0AA4 * 0.0166666675f);
-    func_002B4FF0(m, arg1, arg2);
-    return v->f1EC;
+    TurnTowardTargetAndStepMovement(moby, goalPos, turnRate);
+    return vars->f1EC;
 }

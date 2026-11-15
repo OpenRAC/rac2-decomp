@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned short u16;
 
@@ -26,12 +27,12 @@ extern void func_L04_0046CE68(char *);
 
 
 /* Arm one queue entry: seed its timers, scale them when it repeats, and start it. */
-void func_L04_0046CE28(char *a0)
+void func_L04_0046CE28(char *camera)
 {
-    char *s0 = a0;
+    char *cameraCopy = camera;
 
-    func_L04_0046CD68(s0, 0);
-    *(u16 *)(s0 + 0x7E) = 0;
+    InitFollowCameraOffset(cameraCopy, 0);
+    *(u16 *)(cameraCopy + 0x7E) = 0;
     D_L04_001B1CB8 = -1;
     D_L04_001B1CBC = -1;
     D_L04_001B1CCC = -1;

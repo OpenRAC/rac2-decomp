@@ -19,43 +19,44 @@ extern int func_00283D38(int,int,float);
 extern void func_002C2FD8(void *,int,int,int,int,int,int,float);
 extern void func_00282E70(void *,void *,void *);
 
-void func_L12_00402B48(u8 *o) {
-    float pos[4], v[4], delta[4], toward[4], step[4];
+/* Draws a trail of sparks and four fading glowing dots that lead toward the hero. */
+void func_L12_00402B48(u8 *moby) {
+    float pos[4], velocity[4], delta[4], toward[4], step[4];
     int i, j;
 
-    func_00282E70(pos, D_L12_001B1300, o + 0xC0);
-    func_00282CC0(pos, pos, o + 0x10);
-    if (!func_002A77E0(4)) {
-        func_002A7A00(v, D_L12_001B12C4 * 0.0166666675f,
+    func_00282E70(pos, D_L12_001B1300, moby + 0xC0);
+    FastVecAdd(pos, pos, moby + 0x10);
+    if (!RandomIntBelow(4)) {
+        RandomDirectionVector(velocity, D_L12_001B12C4 * 0.0166666675f,
                      D_L12_001B12C8 * 0.0166666675f);
-        func_002C3150(pos, v, D_L12_001B12D8, D_L12_001B12D4,
-                     (u8)func_002A77E0(255), 0, D_L12_001B12E0);
+        SpawnHeroRelativeParticle(pos, velocity, D_L12_001B12D8, D_L12_001B12D4,
+                     (u8)RandomIntBelow(255), 0, D_L12_001B12E0);
         for (j = 2; j >= 0; j--) {
-            func_002A7A00(delta, D_L12_001B12CC * 0.0166666675f,
+            RandomDirectionVector(delta, D_L12_001B12CC * 0.0166666675f,
                          D_L12_001B12D0 * 0.0166666675f);
-            func_00282CC0(v, v, delta);
-            func_002C3150(pos, v, D_L12_001B12DC, D_L12_001B12D4,
-                         (u8)func_002A77E0(255), 0, D_L12_001B12E4);
+            FastVecAdd(velocity, velocity, delta);
+            SpawnHeroRelativeParticle(pos, velocity, D_L12_001B12DC, D_L12_001B12D4,
+                         (u8)RandomIntBelow(255), 0, D_L12_001B12E4);
         }
     }
-    func_00282CF0(toward, D_L12_001B9E00, pos);
-    func_00282F20(toward, toward, -0.3f);
-    func_00282F20(step, toward, 0.1f);
-    func_00282CC0(toward, toward, pos);
+    FastVecSub(toward, D_L12_001B9E00, pos);
+    vec_scale_to_length(toward, toward, -0.3f);
+    vec_scale_to_length(step, toward, 0.1f);
+    FastVecAdd(toward, toward, pos);
     for (i = 0; i < 4; i++) {
         int color, alpha;
 
-        color = func_00283D38(D_L12_001B12E8, D_L12_001B12EC,
-            func_00282C48(0.5f - func_00283CE0(
+        color = FastTweenColor(D_L12_001B12E8, D_L12_001B12EC,
+            FloatAbs(0.5f - IntToFloat(
                 255 - ((D_L12_001B29C8 + i * 20) & 255)) * 0.00392156886f));
         alpha = *(u8 *)&D_L12_001B29C8;
         if (i & 2) alpha *= 2;
         if (i & 1) alpha = 255 - alpha;
-        func_002C2FD8(toward, color, (u8)alpha, D_L12_001B12FC,
+        SpawnFadingParticle_002C2FD8(toward, color, (u8)alpha, D_L12_001B12FC,
                      D_L12_001B12F8, 2, 0,
-                     (D_L12_001B12F0 + func_00283CE0(i) * D_L12_001B12F4) *
-                     (*(float *)(o + 0x2C) /
-                      *(float *)(*(u8 **)(o + 0x24) + 0x24)));
-        func_00282CC0(toward, toward, step);
+                     (D_L12_001B12F0 + IntToFloat(i) * D_L12_001B12F4) *
+                     (*(float *)(moby + 0x2C) /
+                      *(float *)(*(u8 **)(moby + 0x24) + 0x24)));
+        FastVecAdd(toward, toward, step);
     }
 }

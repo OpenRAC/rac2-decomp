@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 typedef signed int s32;
@@ -61,9 +62,9 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
     *point = 0;
     *result = 0;
 
-    route = D_L04_001FE340[state->route];
+    route = gRoutePathTable[state->route];
     for (i = 0; i < route->count - 1; i++) {
-        func_00282CF0(delta, object->pos, route->points[i]);
+        FastVecSub(delta, object->pos, route->points[i]);
         distance = func_L00_002EE290(delta);
         if (distance < best) {
             *point = i;
@@ -73,9 +74,9 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
 
     for (i = 0; i < 4; i++) {
         if (state->links[i] != -1) {
-            route = D_L04_001FE340[state->links[i]];
+            route = gRoutePathTable[state->links[i]];
             for (j = 0; j < route->count - 1; j++) {
-                func_00282CF0(delta, object->pos, route->points[j]);
+                FastVecSub(delta, object->pos, route->points[j]);
                 distance = func_L00_002EE290(delta);
                 if (distance < best) {
                     *point = j;
@@ -86,12 +87,12 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
         }
     }
 
-    route = D_L04_001FE340[state->route];
+    route = gRoutePathTable[state->route];
     i = (int)((float)route->count * 0.5f);
     if (oldLink == -1 && oldPoint == 0 && *link == oldLink && *point > i)
         *point = 0;
 
-    *result = func_L04_0040F8F0(object, state, *link, *point, mode, object->modelId == 0xBBC);
+    *result = ProjectLinkedRouteDistance(object, state, *link, *point, mode, object->modelId == 0xBBC /* moby class 3004 */);
 }
 
 extern s32 func_00283CF0(f32);
@@ -105,7 +106,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
     f32 best = 9999.0f, dist;
     s32 oldLink = *link;
     L04_Route *path;
-    L04_Route *base = D_L04_001FE340[state->route];
+    L04_Route *base = gRoutePathTable[state->route];
     L04_Route *other;
     s32 start, boundary;
     s32 i, j, k, index, n;
@@ -122,10 +123,10 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
             entry = links + i;
             if (*entry == -1)
                 continue;
-            path = D_L04_001FE340[*entry];
+            path = gRoutePathTable[*entry];
 
             end = start + 10;
-            boundary = func_00283CF0(path->points[1][3]);
+            boundary = FloatToInt(path->points[1][3]);
             {
                 s32 count = base->count;
 
@@ -135,7 +136,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
             if ((state->prevLinks[i] == -1 && start < end && boundary >= start && boundary < end) ||
                 (end < start && (boundary >= start || boundary < end))) {
                 for (j = 0; j < 5; j++) {
-                    func_00282CF0(delta, object->pos, path->points[j]);
+                    FastVecSub(delta, object->pos, path->points[j]);
                     dist = func_L00_002EE290(delta);
                     if (dist < best) {
                         best = dist;
@@ -145,7 +146,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                 }
             }
 
-            boundary = func_00283CF0(path->points[2][3]);
+            boundary = FloatToInt(path->points[2][3]);
             nextLinks = state->nextLinks;
             nextEntry = nextLinks + i;
             if ((*nextEntry == -1 && start < end && boundary >= start && boundary < end) ||
@@ -154,7 +155,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                     s32 last = path->count - 1;
 
                     index = last - j;
-                    func_00282CF0(delta, object->pos, path->points[index]);
+                    FastVecSub(delta, object->pos, path->points[index]);
                     dist = func_L00_002EE290(delta);
                     if (dist < best) {
                         best = dist;
@@ -173,7 +174,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                 if (index >= count)
                     index -= count;
             }
-            func_00282CF0(delta, object->pos, base->points[index]);
+            FastVecSub(delta, object->pos, base->points[index]);
             dist = func_L00_002EE290(delta);
             if (dist < best) {
                 best = dist;
@@ -185,11 +186,11 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
         s32 offset = oldLink * 4;
         s32 *links = state->links, *entry, *oldEntry = (s32 *)((u8 *)links + offset);
 
-        path = D_L04_001FE340[*oldEntry];
+        path = gRoutePathTable[*oldEntry];
         start = *point - 5;
         if (start < 0) {
             start = 0;
-            n = func_00283CF0(path->points[1][3]);
+            n = FloatToInt(path->points[1][3]);
             n -= 5;
             if (n < 0) {
                 if (!wrap)
@@ -207,7 +208,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                     if (j >= count)
                         j -= count;
                 }
-                func_00282CF0(delta, object->pos, base->points[j]);
+                FastVecSub(delta, object->pos, base->points[j]);
                 dist = func_L00_002EE290(delta);
                 if (dist < best) {
                     best = dist;
@@ -220,11 +221,11 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                     entry = branches + l;
                     if (*entry == -1 || l == oldLink)
                         continue;
-                    other = D_L04_001FE340[*entry];
-                    if (func_00283CF0(other->points[1][3]) != j)
+                    other = gRoutePathTable[*entry];
+                    if (FloatToInt(other->points[1][3]) != j)
                         continue;
                     for (k = 0; k < 5; k++) {
-                        func_00282CF0(delta, object->pos, other->points[k]);
+                        FastVecSub(delta, object->pos, other->points[k]);
                         dist = func_L00_002EE290(delta);
                         if (dist < best) {
                             best = dist;
@@ -238,14 +239,14 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
             s32 l;
             s32 *nextLinks;
 
-            n = func_00283CF0(path->points[2][3]) - 5;
+            n = FloatToInt(path->points[2][3]) - 5;
             nextLinks = state->nextLinks;
             entry = nextLinks + oldLink;
             l = *entry;
             if (l != -1) {
                 s32 *nextEntry = links + l;
 
-                other = D_L04_001FE340[*nextEntry];
+                other = gRoutePathTable[*nextEntry];
             } else {
                 other = base;
             }
@@ -263,7 +264,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                     if (j >= count)
                         j -= count;
                 }
-                func_00282CF0(delta, object->pos, other->points[j]);
+                FastVecSub(delta, object->pos, other->points[j]);
                 dist = func_L00_002EE290(delta);
                 if (dist < best) {
                     best = dist;
@@ -281,7 +282,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
             index = start + n;
             if (index >= base->count)
                 break;
-            func_00282CF0(delta, object->pos, path->points[index]);
+            FastVecSub(delta, object->pos, path->points[index]);
             dist = func_L00_002EE290(delta);
             if (dist < best) {
                 best = dist;
@@ -291,22 +292,22 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
         }
     }
 
-    return func_L04_0040F8F0(object, state, *link, *point, wrap, object->modelId == 0xBBC);
+    return ProjectLinkedRouteDistance(object, state, *link, *point, wrap, object->modelId == 0xBBC /* moby class 3004 */);
 }
 
 /* Scans the 0x20 slots at +0x110 of the state block for the first whose stored id the
    matcher accepts, and records its index in +0x270. */
-void func_L04_00410F10(u8 *arg0) {
-    u8 *s2 = *(u8 **)(arg0 + 0x68);
-    s32 *p = (s32 *)(s2 + 0x110);
+void func_L04_00410F10(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    s32 *slot = (s32 *)(vars + 0x110);
     s32 i;
 
     for (i = 0; i < 0x20; i++) {
-        if (func_00342228(arg0 + 0x10, *p) != 0) {
-            *(s32 *)(s2 + 0x270) = i;
+        if (func_00342228(moby + 0x10, *slot) != 0) {
+            *(s32 *)(vars + 0x270) = i;
             return;
         }
-        p++;
+        slot++;
     }
 }
 
@@ -356,10 +357,10 @@ void func_L04_00412130(RankObject *object) {
     slot = state->slots;
     for (k = 0; k < 21; k++, slot++) {
         if (*slot != -1) {
-            obj = &D_L04_001B24DC[*slot];
+            obj = &gMobyPool_L04[*slot];
             p = obj->state;
-            p->progress = func_L04_00410788(obj, state, &p->f120, &p->f124, p->lap, p->f244);
-            if (D_L04_001B24DC[*slot].active == 2) {
+            p->progress = UpdateNearestRoutePoint(obj, state, &p->f120, &p->f124, p->lap, p->f244);
+            if (gMobyPool_L04[*slot].active == 2) {
                 *out++ = obj;
                 count++;
             }
@@ -389,17 +390,18 @@ float func_00283180(float);
 float func_00283198(float);
 float func_00283B98(float, float);
 
-void func_L04_00412E38(void *arg0, void *arg1, float fparg0, float fparg1) {
-    float temp_f0;
-    float temp_f1;
-    float temp_f20;
+/* Turns a stored angle by a step and moves the object sideways by a short distance in that direction. */
+void func_L04_00412E38(void *moby, void *vars, float angleStep, float radius) {
+    float angle;
+    float newY;
+    float stepX;
 
-    temp_f0 = func_00283B98((*(float *)((unsigned char *)arg1 + 0x38C)), fparg0);
-    *(float *)((unsigned char *)arg1 + 0x38C) = temp_f0;
-    temp_f20 = func_00283180(temp_f0) * fparg1;
-    temp_f1 = (*(float *)((unsigned char *)arg0 + 0xF4)) + (func_00283198((*(float *)((unsigned char *)arg1 + 0x38C))) * fparg1);
-    *(float *)((unsigned char *)arg0 + 0xF0) = (float) ((*(float *)((unsigned char *)arg0 + 0xF0)) + temp_f20);
-    *(float *)((unsigned char *)arg0 + 0xF4) = temp_f1;
+    angle = FastAddRotations((*(float *)((unsigned char *)vars + 0x38C)), angleStep);
+    *(float *)((unsigned char *)vars + 0x38C) = angle;
+    stepX = FastSinOrCosA(angle) * radius;
+    newY = (*(float *)((unsigned char *)moby + 0xF4)) + (FastSinOrCosB((*(float *)((unsigned char *)vars + 0x38C))) * radius);
+    *(float *)((unsigned char *)moby + 0xF0) = (float) ((*(float *)((unsigned char *)moby + 0xF0)) + stepX);
+    *(float *)((unsigned char *)moby + 0xF4) = newY;
 }
 
 /* func_L04_004135B8 is defined in L04_004135B8-g8.c. */
@@ -440,30 +442,31 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_002830C0(void *, void *, void *);
 extern void func_00283698(void *, void *);
 
+/* Starts a new trail in the first free one of the 140 trail slots and ties it to the owner. */
 void func_L04_00415EE8(u8 *owner, f32 *pos, f32 *to, f32 *from)
 {
     f32 d[4] __attribute__((aligned(16)));
     f32 m[16] __attribute__((aligned(16)));
-    L04_5EE8Bolt *b;
+    L04_5EE8Bolt *trail;
     s32 i;
 
     for (i = 0; i < 140; i++) {
-        b = &((L04_5EE8Bolt *)D_L04_00254E10)[i];
-        if (b->active == 0) {
-            b->active = 1;
-            func_00282CC0(d, from, pos);
-            func_00282CC0(b->start, d, to);
-            func_00283698(m, owner + 0xC0);
-            func_002830C0(b->dir, pos, m);
-            qcopy(b->origin, pos);
-            b->to = to;
-            b->i138 = 1;
-            b->from = from;
-            b->i13C = 0x1E;
-            b->owner = owner;
-            b->color = 0x80858585;
-            b->h128 = 0;
-            b->h118 = 0;
+        trail = &((L04_5EE8Bolt *)gRacerTrailPool)[i];
+        if (trail->active == 0) {
+            trail->active = 1;
+            FastVecAdd(d, from, pos);
+            FastVecAdd(trail->start, d, to);
+            matrix_from_basis_rows(m, owner + 0xC0);
+            transform_vector(trail->dir, pos, m);
+            qcopy(trail->origin, pos);
+            trail->to = to;
+            trail->i138 = 1;
+            trail->from = from;
+            trail->i13C = 0x1E;
+            trail->owner = owner;
+            trail->color = 0x80858585;
+            trail->h128 = 0;
+            trail->h118 = 0;
             return;
         }
     }

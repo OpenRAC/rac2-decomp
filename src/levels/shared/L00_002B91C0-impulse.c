@@ -63,23 +63,23 @@ void func_L00_002B9F00(float amount, float minimum)
     func_00282D30_9f(push, base->velocity, amount);
     if (minimum > 0.0f && func_L00_002D3A58_1(push) < minimum) {
         func_L00_002D3BD8_2(push, push, 0.0f);
-        func_L00_002D3798(push, push, minimum);
+        OffsetPointBySideDirection(push, push, minimum);
     }
     func_L00_002D3B58_1(push, push, 0.0f);
 
-    origin = D_00189EA0;
+    origin = gHeroPosition;
     func_00282CC0_3(push, push, origin);
     qcopy(probe, push);
-    func_L00_002D38A0(push, push, 0.3f);
+    OffsetPointInViewSpace(push, push, 0.3f);
     hero = (ResidentState_9F00 *)(origin - 0x80);
-    func_L00_002D38A0(probe, probe, hero->b22B4 == 2 ? -0.7f : -0.35f);
+    OffsetPointInViewSpace(probe, probe, hero->b22B4 == 2 ? -0.7f : -0.35f);
 
     enabled = 1.0f;
     if (func_002761F8_1(push, probe, 4, hero->i2290, 0)) {
-        if (D_L00_001BF200.count > 0 &&
-            func_L00_002D3EA8(D_L00_001BF200.v) <= 0.8726646900177002f)
+        if (gCollisionResult.count > 0 &&
+            GetViewSpaceAngle(gCollisionResult.v) <= 0.8726646900177002f)
             enabled = 0.0f;
     }
     if (enabled != 0.0f)
-        func_L00_002B6118(0.0f);
+        ScaleHeroSavedVectors(0.0f);
 }

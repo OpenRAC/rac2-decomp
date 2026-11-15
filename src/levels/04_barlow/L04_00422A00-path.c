@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef float f32;
 struct BarlowAnimation { int frames; u8 unused[24]; f32 dustartn; };
@@ -42,6 +43,7 @@ extern f32 D_L04_001B33B0[] __attribute__((sda));
 extern f32 D_L04_001B3468[] __attribute__((sda));
 extern f32 D_L04_001B3488 __attribute__((sda));
 
+/* Finds where on the screen the Barlow walk path is for the current animation and frame, and remembers which path piece it is on. */
 void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *currentPath, int *currentSegment, u8 *data) {
     f32 point[4], movement[4];
     int (*points)[2];
@@ -50,7 +52,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
     f32 progress, start;
     struct BarlowAnimation *timing;
     if (animation == -1 && frame >= 0 && frame <= 151) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1A8)];
+        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 0)) / (timing->dustartn * 151.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -62,7 +64,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 7;
         path = 1;
     } else if (animation == -1 && frame >= 151 && frame <= 174) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1A8)];
+        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 151)) / (timing->dustartn * 23.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -74,7 +76,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 3;
         path = 2;
     } else if (animation == -1 && frame >= 174 && frame <= 312) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1A8)];
+        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 174)) / (timing->dustartn * 138.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -86,7 +88,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 11;
         path = 3;
     } else if (animation == -1 && frame >= 312 && frame <= 500) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1A8)];
+        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 312)) / (timing->dustartn * 186.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -98,7 +100,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 6;
         path = 4;
     } else if (animation == 0) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1AC)];
+        timing = gRoutePathTable[*(int *)(data + 0x1AC)];
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
@@ -110,7 +112,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 9;
         path = 5;
     } else if (animation == 2) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1B4)];
+        timing = gRoutePathTable[*(int *)(data + 0x1B4)];
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
@@ -122,7 +124,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 3;
         path = 6;
     } else if (animation == 1) {
-        timing = D_L04_001FE340[*(int *)(data + 0x1B0)];
+        timing = gRoutePathTable[*(int *)(data + 0x1B0)];
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
@@ -134,7 +136,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 2;
         path = 7;
     } else {
-        func_0026FEB8(D_L04_001B1280);
+        STUB_printf(D_L04_001B1280);
         *currentPath = -1;
         *currentSegment = 0;
         *outX = 0;
@@ -178,8 +180,8 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
     point[0] = (f32)points[segment][0];
     point[1] = (f32)points[segment][1];
     point[2] = 0.0f;
-    func_00282D30(progress - start, movement, vectors[segment]);
-    func_00282CC0(point, point, movement);
+    FastVecScale(progress - start, movement, vectors[segment]);
+    FastVecAdd(point, point, movement);
     *outX = (int)point[0];
     *outY = (int)point[1];
 }

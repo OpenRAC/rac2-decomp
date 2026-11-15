@@ -28,27 +28,28 @@ extern f32 func_00282DF0(f32 *v);
 extern s8 D_00189E20[];
 extern f32 D_001B284C;
 
-void func_0032FDD0(s8 *a0) {
-    s8 *base;
-    s8 *obj;
-    f32 vec[2];
+/* Reads the stick input stored in the hero data, limits each axis to the range -1 to 1, saves it in the object and stores the stick length. */
+void func_0032FDD0(s8 *moby) {
+    s8 *heroData;
+    s8 *vars;
+    f32 stickVec[2];
 
-    obj = *(s8 **)(a0 + 0x68);
-    base = D_00189E20;
-    (*(f32 *)((s8 *)(obj) + (0x54))) = -(*(f32 *)((s8 *)(base) + (0x1FB0)));
-    (*(f32 *)((s8 *)(obj) + (0x50))) = -(*(f32 *)((s8 *)(base) + (0x1FB4)));
-    if ((*(f32 *)((s8 *)(obj) + (0x54))) > 1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x54))) = 1.0f;
-    } else if ((*(f32 *)((s8 *)(obj) + (0x54))) < -1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x54))) = -1.0f;
+    vars = *(s8 **)(moby + 0x68);
+    heroData = gHeroState;
+    (*(f32 *)((s8 *)(vars) + (0x54))) = -(*(f32 *)((s8 *)(heroData) + (0x1FB0)));
+    (*(f32 *)((s8 *)(vars) + (0x50))) = -(*(f32 *)((s8 *)(heroData) + (0x1FB4)));
+    if ((*(f32 *)((s8 *)(vars) + (0x54))) > 1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x54))) = 1.0f;
+    } else if ((*(f32 *)((s8 *)(vars) + (0x54))) < -1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x54))) = -1.0f;
     }
-    if ((*(f32 *)((s8 *)(obj) + (0x50))) > 1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x50))) = 1.0f;
-    } else if ((*(f32 *)((s8 *)(obj) + (0x50))) < -1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x50))) = -1.0f;
+    if ((*(f32 *)((s8 *)(vars) + (0x50))) > 1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x50))) = 1.0f;
+    } else if ((*(f32 *)((s8 *)(vars) + (0x50))) < -1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x50))) = -1.0f;
     }
-    func_00282C88(vec);
-    vec[0] = (*(f32 *)((s8 *)(obj) + (0x50)));
-    vec[1] = (*(f32 *)((s8 *)(obj) + (0x54)));
-    D_001B284C = func_00282DF0(vec);
+    ClearVector128(stickVec);
+    stickVec[0] = (*(f32 *)((s8 *)(vars) + (0x50)));
+    stickVec[1] = (*(f32 *)((s8 *)(vars) + (0x54)));
+    gStickLength = FastVecLength(stickVec);
 }

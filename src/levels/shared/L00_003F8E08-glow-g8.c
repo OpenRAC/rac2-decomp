@@ -106,8 +106,8 @@ static __inline__ void set_edge(f32 *v, s32 i, f32 t, f32 half)
  * takes the last spill slot. It has to stay the first assignment in the function, or cprop folds it back. */
 void func_L00_003FA858(u8 *self)
 {
-    Quad q;
-    V4 m[4];
+    Quad quad;
+    V4 matrix[4];
     V4 dir;
     V4 rot;
     V4 basis[5];
@@ -119,15 +119,15 @@ void func_L00_003FA858(u8 *self)
     V4 v190;
     V4 v1A0;
     V4 v1B0;
-    Pv *pv;
-    f32 d;
+    Pv *vars;
+    f32 distance;
     f32 fade;
     f32 dot;
     f32 size;
     f32 a;
     f32 scale;
     f32 k;
-    s32 c;
+    s32 color;
     s32 t2;
     s32 b;
     s32 i1;
@@ -152,245 +152,245 @@ void func_L00_003FA858(u8 *self)
     s32 alpha;
     u8 *moby = self;
 
-    pv = *(Pv **)(moby + 0x68);
-    func_00282CF0(dir, moby + 0x10, D_L00_001B8DC0);
-    d = func_00282DF0(dir);
-    if (d != 0.0f) {
-        func_00282D30(dir, dir, 1.0f / d);
+    vars = *(Pv **)(moby + 0x68);
+    FastVecSub(dir, moby + 0x10, gCameraPosition_L00);
+    distance = FastVecLength(dir);
+    if (distance != 0.0f) {
+        FastVecScale(dir, dir, 1.0f / distance);
     }
     fade = 1.0f;
-    if (d < 11.0f) {
-        if (d <= 7.0f) {
+    if (distance < 11.0f) {
+        if (distance <= 7.0f) {
             fade = 0.0f;
         } else {
-            fade = (d - 7.0f) * 0.25f;
+            fade = (distance - 7.0f) * 0.25f;
         }
     }
-    dot = func_00282DB0(dir, (f32 *)(moby + 0xC0));
-    a = func_00283CE0(pv->t1C) * pv->k20;
+    dot = FastVecDot(dir, (f32 *)(moby + 0xC0));
+    a = IntToFloat(vars->t1C) * vars->k20;
     size = D_L00_001B0A9C + (D_L00_001B0A98 - D_L00_001B0A9C) * a;
-    if (pv->t1C < pv->n28) {
-        k = func_00283CE0(pv->t1C) * pv->k2C;
-        a = func_00283CE0(D_L00_001B0AA8) * k;
+    if (vars->t1C < vars->n28) {
+        k = IntToFloat(vars->t1C) * vars->k2C;
+        a = IntToFloat(D_L00_001B0AA8) * k;
     } else {
-        a = func_00283CE0(D_L00_001B0AA8);
+        a = IntToFloat(D_L00_001B0AA8);
     }
     a *= dot;
     /* A scheduling barrier: the shift stays ahead of the next call's argument load. */
     do {
-        alpha = func_00283CF0(a * dot) << 24;
+        alpha = FloatToInt(a * dot) << 24;
     } while (0);
 
-    if (func_00282C48(pv->ang[0]) > 0.00001f) {
-        func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[0]);
-        func_002ACDE8(m[1], (f32 *)(moby + 0xD0), rot);
-        func_002ACDE8(m[2], (f32 *)(moby + 0xE0), rot);
+    if (FloatAbs(vars->ang[0]) > 0.00001f) {
+        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[0]);
+        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
-        qcopy(m[1], (f32 *)(moby + 0xD0));
-        qcopy(m[2], (f32 *)(moby + 0xE0));
+        qcopy(matrix[1], (f32 *)(moby + 0xD0));
+        qcopy(matrix[2], (f32 *)(moby + 0xE0));
     }
-    qcopy(m[3], (f32 *)(moby + 0x10));
-    func_00282D30(m[0], (f32 *)(moby + 0xC0), size);
-    func_00282D30(m[1], m[1], size);
-    func_00282D30(m[2], m[2], size);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
-    func_00281DE8(&q, 0x38, 1, 0x80);
-    c = alpha | D_L00_001B0AA4;
-    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
-    q.uv[0][0] = 0.0f;
-    q.uv[0][1] = 0.0f;
-    q.uv[1][0] = 0.0f;
-    q.uv[1][1] = 1.0f;
-    q.uv[2][0] = 1.0f;
-    q.uv[2][1] = 0.0f;
-    q.uv[3][0] = 1.0f;
-    q.uv[3][1] = 1.0f;
+    qcopy(matrix[3], (f32 *)(moby + 0x10));
+    FastVecScale(matrix[0], (f32 *)(moby + 0xC0), size);
+    FastVecScale(matrix[1], matrix[1], size);
+    FastVecScale(matrix[2], matrix[2], size);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
+    InitQuadPacketState(&quad, 0x38, 1, 0x80);
+    color = alpha | D_L00_001B0AA4;
+    quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
+    quad.uv[0][0] = 0.0f;
+    quad.uv[0][1] = 0.0f;
+    quad.uv[1][0] = 0.0f;
+    quad.uv[1][1] = 1.0f;
+    quad.uv[2][0] = 1.0f;
+    quad.uv[2][1] = 0.0f;
+    quad.uv[3][0] = 1.0f;
+    quad.uv[3][1] = 1.0f;
     for (i1 = 0; i1 < 4; i1++) {
-        func_002830C0(&q.corner[i1], &D_L00_001AA310[i1], m);
+        transform_vector(&quad.corner[i1], &D_L00_001AA310[i1], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    if (func_00282C48(pv->ang[0]) > 0.00001f) {
-        func_002AB668(rot, (f32 *)(moby + 0xC0), -pv->ang[0]);
-        func_002ACDE8(m[1], (f32 *)(moby + 0xD0), rot);
-        func_002ACDE8(m[2], (f32 *)(moby + 0xE0), rot);
+    if (FloatAbs(vars->ang[0]) > 0.00001f) {
+        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), -vars->ang[0]);
+        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
-        qcopy(m[1], (f32 *)(moby + 0xD0));
-        qcopy(m[2], (f32 *)(moby + 0xE0));
+        qcopy(matrix[1], (f32 *)(moby + 0xD0));
+        qcopy(matrix[2], (f32 *)(moby + 0xE0));
     }
-    qcopy(m[3], (f32 *)(moby + 0x10));
-    func_00282D30(m[0], (f32 *)(moby + 0xC0), size);
-    func_00282D30(m[1], m[1], size);
-    func_00282D30(m[2], m[2], size);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    qcopy(matrix[3], (f32 *)(moby + 0x10));
+    FastVecScale(matrix[0], (f32 *)(moby + 0xC0), size);
+    FastVecScale(matrix[1], matrix[1], size);
+    FastVecScale(matrix[2], matrix[2], size);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i2 = 0; i2 < 4; i2++) {
-        func_002830C0(&q.corner[i2], &D_L00_001AA310[i2], m);
+        transform_vector(&quad.corner[i2], &D_L00_001AA310[i2], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    a = func_00283CE0(pv->t1E) * pv->k24;
+    a = IntToFloat(vars->t1E) * vars->k24;
     size = D_L00_001B0B5C + (D_L00_001B0B58 - D_L00_001B0B5C) * a;
-    if (pv->t1E < pv->n2A) {
-        a = func_00283CE0(pv->t1E) * pv->k30;
-        k = func_002A7AA8(1.0f, 0.0f, 1.0f, 2.0f, a);
+    if (vars->t1E < vars->n2A) {
+        a = IntToFloat(vars->t1E) * vars->k30;
+        k = cubic_hermite_scalar(1.0f, 0.0f, 1.0f, 2.0f, a);
     } else {
         k = 1.0f;
     }
-    alpha = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade);
-    a = func_00283CE0(alpha) * 0.2f;
+    alpha = FloatToInt(IntToFloat(D_L00_001B0B54) * k * fade);
+    a = IntToFloat(alpha) * 0.2f;
     alpha = pack_alpha(alpha);
-    b = pack_alpha(func_00283CF0(a));
-    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = b | 0xFFFFFF;
-    if (func_00282C48(pv->ang[1]) > 0.00001f) {
-        func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[1]);
-        func_002ACDE8(m[1], (f32 *)(moby + 0xD0), rot);
-        func_002ACDE8(m[2], (f32 *)(moby + 0xE0), rot);
+    b = pack_alpha(FloatToInt(a));
+    quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = b | 0xFFFFFF;
+    if (FloatAbs(vars->ang[1]) > 0.00001f) {
+        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[1]);
+        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
-        qcopy(m[1], (f32 *)(moby + 0xD0));
-        qcopy(m[2], (f32 *)(moby + 0xE0));
+        qcopy(matrix[1], (f32 *)(moby + 0xD0));
+        qcopy(matrix[2], (f32 *)(moby + 0xE0));
     }
     scale = size * 1.5f;
-    func_00282D30(m[0], (f32 *)(moby + 0xC0), scale);
-    func_00282D30(m[1], m[1], scale);
-    func_00282D30(m[2], m[2], scale);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    FastVecScale(matrix[0], (f32 *)(moby + 0xC0), scale);
+    FastVecScale(matrix[1], matrix[1], scale);
+    FastVecScale(matrix[2], matrix[2], scale);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i3 = 0; i3 < 4; i3++) {
-        func_002830C0(&q.corner[i3], &D_L00_001AA310[i3], m);
+        transform_vector(&quad.corner[i3], &D_L00_001AA310[i3], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
     {
-        b = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade * 1.5f);
+        b = FloatToInt(IntToFloat(D_L00_001B0B54) * k * fade * 1.5f);
         if (b >= 0x100) {
             b = 0xFF;
         }
-        func_00281DE8(&q, 0x39, 1, 0x80);
-        q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = pack_alpha(b) | 0xFFFFFF;
+        InitQuadPacketState(&quad, 0x39, 1, 0x80);
+        quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = pack_alpha(b) | 0xFFFFFF;
     }
-    q.uv[0][0] = 0.0f;
-    q.uv[0][1] = 0.0f;
-    q.uv[1][0] = 0.0f;
-    q.uv[1][1] = 1.0f;
-    q.uv[2][0] = 1.0f;
-    q.uv[2][1] = 0.0f;
-    q.uv[3][0] = 1.0f;
-    q.uv[3][1] = 1.0f;
+    quad.uv[0][0] = 0.0f;
+    quad.uv[0][1] = 0.0f;
+    quad.uv[1][0] = 0.0f;
+    quad.uv[1][1] = 1.0f;
+    quad.uv[2][0] = 1.0f;
+    quad.uv[2][1] = 0.0f;
+    quad.uv[3][0] = 1.0f;
+    quad.uv[3][1] = 1.0f;
     qcopy(basis[3], (f32 *)(moby + 0x10));
-    if (func_00282C48(pv->ang[2]) > 0.00001f) {
-        func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[2]);
-        func_002ACDE8(m[1], (f32 *)(moby + 0xD0), rot);
-        func_002ACDE8(m[2], (f32 *)(moby + 0xE0), rot);
+    if (FloatAbs(vars->ang[2]) > 0.00001f) {
+        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[2]);
+        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
-        qcopy(m[1], (f32 *)(moby + 0xD0));
-        qcopy(m[2], (f32 *)(moby + 0xE0));
+        qcopy(matrix[1], (f32 *)(moby + 0xD0));
+        qcopy(matrix[2], (f32 *)(moby + 0xE0));
     }
     scale = size * 1.25f;
-    func_00282D30(m[0], (f32 *)(moby + 0xC0), scale);
-    func_00282D30(m[1], m[1], scale);
-    func_00282D30(m[2], m[2], scale);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    FastVecScale(matrix[0], (f32 *)(moby + 0xC0), scale);
+    FastVecScale(matrix[1], matrix[1], scale);
+    FastVecScale(matrix[2], matrix[2], scale);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i4 = 0; i4 < 4; i4++) {
-        func_002830C0(&q.corner[i4], &D_L00_001AA310[i4], m);
+        transform_vector(&quad.corner[i4], &D_L00_001AA310[i4], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    if (func_00282C48(pv->ang[3]) > 0.00001f) {
-        func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[3]);
-        func_002ACDE8(m[1], (f32 *)(moby + 0xD0), rot);
-        func_002ACDE8(m[2], (f32 *)(moby + 0xE0), rot);
+    if (FloatAbs(vars->ang[3]) > 0.00001f) {
+        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[3]);
+        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
-        qcopy(m[1], (f32 *)(moby + 0xD0));
-        qcopy(m[2], (f32 *)(moby + 0xE0));
+        qcopy(matrix[1], (f32 *)(moby + 0xD0));
+        qcopy(matrix[2], (f32 *)(moby + 0xE0));
     }
-    qcopy(m[3], (f32 *)(moby + 0x10));
-    func_00282D30(m[0], (f32 *)(moby + 0xC0), size);
-    func_00282D30(m[1], m[1], size);
-    func_00282D30(m[2], m[2], size);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    qcopy(matrix[3], (f32 *)(moby + 0x10));
+    FastVecScale(matrix[0], (f32 *)(moby + 0xC0), size);
+    FastVecScale(matrix[1], matrix[1], size);
+    FastVecScale(matrix[2], matrix[2], size);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i5 = 0; i5 < 4; i5++) {
-        func_002830C0(&q.corner[i5], &D_L00_001AA310[i5], m);
+        transform_vector(&quad.corner[i5], &D_L00_001AA310[i5], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    c = alpha | 0xFFFFFF;
-    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
-    func_00282CF0(rot, D_L00_001B8DC0, (f32 *)(moby + 0x10));
-    func_00282F20(rot, rot, 0.25f);
-    func_00282CC0(m[3], (f32 *)(moby + 0x10), rot);
-    func_002AFFD8(basis[3], basis[4], 1);
-    func_00282CF0(basis[0], D_L00_001B8DC0, m[3]);
-    func_00282F20(basis[0], basis[0], 1.0f);
-    func_00282DD8(basis[1], basis[0], basis[4]);
-    func_00282F20(basis[1], basis[1], 1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
+    color = alpha | 0xFFFFFF;
+    quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
+    FastVecSub(rot, gCameraPosition_L00, (f32 *)(moby + 0x10));
+    vec_scale_to_length(rot, rot, 0.25f);
+    FastVecAdd(matrix[3], (f32 *)(moby + 0x10), rot);
+    ComputeViewDirection(basis[3], basis[4], 1);
+    FastVecSub(basis[0], gCameraPosition_L00, matrix[3]);
+    vec_scale_to_length(basis[0], basis[0], 1.0f);
+    FastVecCross(basis[1], basis[0], basis[4]);
+    vec_scale_to_length(basis[1], basis[1], 1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
 
-    if (func_00282C48(pv->ang[4]) > 0.00001f) {
-        func_002AB668(v140, basis[0], pv->ang[4]);
-        func_002ACDE8(m[1], basis[1], v140);
-        func_002ACDE8(m[2], basis[2], v140);
+    if (FloatAbs(vars->ang[4]) > 0.00001f) {
+        BuildAxisAngleQuaternion(v140, basis[0], vars->ang[4]);
+        RotateVectorByQuaternion(matrix[1], basis[1], v140);
+        RotateVectorByQuaternion(matrix[2], basis[2], v140);
     } else {
-        qcopy(m[1], basis[1]);
-        qcopy(m[2], basis[2]);
+        qcopy(matrix[1], basis[1]);
+        qcopy(matrix[2], basis[2]);
     }
-    func_00282D30(m[0], basis[0], size);
-    func_00282D30(m[1], m[1], size);
-    func_00282D30(m[2], m[2], size);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    FastVecScale(matrix[0], basis[0], size);
+    FastVecScale(matrix[1], matrix[1], size);
+    FastVecScale(matrix[2], matrix[2], size);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i6 = 0; i6 < 4; i6++) {
-        func_002830C0(&q.corner[i6], &D_L00_001AA310[i6], m);
+        transform_vector(&quad.corner[i6], &D_L00_001AA310[i6], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    if (func_00282C48(pv->ang[5]) > 0.00001f) {
-        func_002AB668(v140, basis[0], pv->ang[5]);
-        func_002ACDE8(m[1], basis[1], v140);
-        func_002ACDE8(m[2], basis[2], v140);
+    if (FloatAbs(vars->ang[5]) > 0.00001f) {
+        BuildAxisAngleQuaternion(v140, basis[0], vars->ang[5]);
+        RotateVectorByQuaternion(matrix[1], basis[1], v140);
+        RotateVectorByQuaternion(matrix[2], basis[2], v140);
     } else {
-        qcopy(m[1], basis[1]);
-        qcopy(m[2], basis[2]);
+        qcopy(matrix[1], basis[1]);
+        qcopy(matrix[2], basis[2]);
     }
     scale = size * 0.75f;
-    func_00282D30(m[0], basis[0], scale);
-    func_00282D30(m[1], m[1], scale);
-    func_00282D30(m[2], m[2], scale);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    FastVecScale(matrix[0], basis[0], scale);
+    FastVecScale(matrix[1], matrix[1], scale);
+    FastVecScale(matrix[2], matrix[2], scale);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i7 = 0; i7 < 4; i7++) {
-        func_002830C0(&q.corner[i7], &D_L00_001AA310[i7], m);
+        transform_vector(&quad.corner[i7], &D_L00_001AA310[i7], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    t2 = pack_alpha(func_00283CF0(func_00283CE0((u8)(alpha >> 24)) * 0.2f));
-    func_00281DE8(&q, 0x38, 1, 0x80);
-    c = t2 | 0xFFFFFF;
-    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
-    if (func_00282C48(pv->ang[1]) > 0.00001f) {
-        func_002AB668(v140, basis[0], pv->ang[1]);
-        func_002ACDE8(m[1], basis[1], v140);
-        func_002ACDE8(m[2], basis[2], v140);
+    t2 = pack_alpha(FloatToInt(IntToFloat((u8)(alpha >> 24)) * 0.2f));
+    InitQuadPacketState(&quad, 0x38, 1, 0x80);
+    color = t2 | 0xFFFFFF;
+    quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
+    if (FloatAbs(vars->ang[1]) > 0.00001f) {
+        BuildAxisAngleQuaternion(v140, basis[0], vars->ang[1]);
+        RotateVectorByQuaternion(matrix[1], basis[1], v140);
+        RotateVectorByQuaternion(matrix[2], basis[2], v140);
     } else {
-        qcopy(m[1], basis[1]);
-        qcopy(m[2], basis[2]);
+        qcopy(matrix[1], basis[1]);
+        qcopy(matrix[2], basis[2]);
     }
     scale = size * 1.5f;
-    func_00282D30(m[0], basis[0], scale);
-    func_00282D30(m[1], m[1], scale);
-    func_00282D30(m[2], m[2], scale);
-    m[0][3] = m[1][3] = m[2][3] = 0.0f;
-    m[3][3] = 1.0f;
+    FastVecScale(matrix[0], basis[0], scale);
+    FastVecScale(matrix[1], matrix[1], scale);
+    FastVecScale(matrix[2], matrix[2], scale);
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
     for (i8 = 0; i8 < 4; i8++) {
-        func_002830C0(&q.corner[i8], &D_L00_001AA310[i8], m);
+        transform_vector(&quad.corner[i8], &D_L00_001AA310[i8], matrix);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 
-    if (func_00282978(&pv->t36) == 0) {
-        func_00279BD8(v140, (f32 *)(moby + 0x10));
+    if (FastDecTimer(&vars->t36) == 0) {
+        ProjectWorldPointToScreen(v140, (f32 *)(moby + 0x10));
         if (v140[0] >= 28492.0f && v140[0] <= 37082.0f && v140[1] >= 28492.0f && v140[1] <= 37082.0f) {
             f32 h;
             inv = 0.000116414434f;
@@ -398,25 +398,25 @@ void func_L00_003FA858(u8 *self)
             v140[0] -= 28492.0f;
             v140[1] -= 28492.0f;
             span = 8590.0f;
-            k = (f32)pv->t36 * pv->k38;
-            alpha = pack_alpha(func_00283CF0(D_L00_001B0BA0 * k));
-            func_002ACEC0(v150, basis[4], dir, 0.78539824f);
-            func_00281DE8(&q, D_L00_001B0B88, 1, 0x80);
+            k = (f32)vars->t36 * vars->k38;
+            alpha = pack_alpha(FloatToInt(D_L00_001B0BA0 * k));
+            ApplyAxisRotationToQuaternion(v150, basis[4], dir, 0.78539824f);
+            InitQuadPacketState(&quad, D_L00_001B0B88, 1, 0x80);
             least = v140[1] <= v140[0] ? v140[1] : v140[0];
             t = least * inv;
-            c = alpha | D_L00_001B0B98;
-            q.d70 = 5;
+            color = alpha | D_L00_001B0B98;
+            quad.d70 = 5;
             k = D_L00_001B0B94 / D_L00_001B0B90;
-            q.uv[0][0] = 0.0f;
-            q.uv[0][1] = one;
-            q.uv[1][0] = one;
-            q.uv[1][1] = one;
-            q.uv[2][0] = 0.0f;
-            q.uv[2][1] = 0.0f;
-            q.uv[3][0] = one;
-            q.uv[3][1] = 0.0f;
-            q.rgba[0] = q.rgba[1] = D_L00_001B0B9C;
-            q.rgba[2] = q.rgba[3] = c;
+            quad.uv[0][0] = 0.0f;
+            quad.uv[0][1] = one;
+            quad.uv[1][0] = one;
+            quad.uv[1][1] = one;
+            quad.uv[2][0] = 0.0f;
+            quad.uv[2][1] = 0.0f;
+            quad.uv[3][0] = one;
+            quad.uv[3][1] = 0.0f;
+            quad.rgba[0] = quad.rgba[1] = D_L00_001B0B9C;
+            quad.rgba[2] = quad.rgba[3] = color;
             h = 0.5f;
             set_edge(v160, 3, t, h);
             ny = span - v140[1];
@@ -431,117 +431,117 @@ void func_L00_003FA858(u8 *self)
             least = v140[1] <= nx ? v140[1] : nx;
             t = least * inv;
             set_edge(v160, 0, t, 0.5f);
-            func_00282F20(v170, dir, D_L00_001B0B8C);
+            vec_scale_to_length(v170, dir, D_L00_001B0B8C);
             s = v160;
             for (i9 = 0; i9 < 4; i9++) {
-                func_00282F20(v150, v150, *s);
-                func_00282DD8(v180, dir, v150);
-                func_00282F20(v180, v180, D_L00_001B0B90);
-                func_00282CC0(v190, D_L00_001B8DC0, v170);
-                func_00282CF0(v1A0, v190, (f32 *)(moby + 0x10));
-                func_00282CC0(&q.corner[0], v190, v180);
-                func_00282CF0(&q.corner[1], v190, v180);
-                func_00282CC0(v190, (f32 *)(moby + 0x10), v150);
-                func_00282CC0(v190, v1A0, v190);
-                func_00282D30(v180, v180, k);
-                func_00282CC0(&q.corner[2], v190, v180);
-                func_00282CF0(&q.corner[3], v190, v180);
-                func_00280B90(&q, 0, 0);
+                vec_scale_to_length(v150, v150, *s);
+                FastVecCross(v180, dir, v150);
+                vec_scale_to_length(v180, v180, D_L00_001B0B90);
+                FastVecAdd(v190, gCameraPosition_L00, v170);
+                FastVecSub(v1A0, v190, (f32 *)(moby + 0x10));
+                FastVecAdd(&quad.corner[0], v190, v180);
+                FastVecSub(&quad.corner[1], v190, v180);
+                FastVecAdd(v190, (f32 *)(moby + 0x10), v150);
+                FastVecAdd(v190, v1A0, v190);
+                FastVecScale(v180, v180, k);
+                FastVecAdd(&quad.corner[2], v190, v180);
+                FastVecSub(&quad.corner[3], v190, v180);
+                draw_world_quad(&quad, 0, 0);
                 if (i9 < 3) {
-                    func_002ACEC0(v150, v150, dir, 1.5707965f);
+                    ApplyAxisRotationToQuaternion(v150, v150, dir, 1.5707965f);
                 }
                 s++;
             }
         }
     }
 
-    if (pv->t34 != 0) {
-        k = func_00283CE0(pv->t34) * pv->k3C;
-        func_00281DE8(&q, 0xB, 4, 0x80);
-        c = pack_alpha(func_00283CF0(k * 255.0f)) | 0x808080;
-        q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
-        q.uv[0][0] = 0.0f;
-        q.uv[0][1] = 0.0f;
-        q.uv[1][0] = 0.0f;
-        q.uv[1][1] = 1.0f;
-        q.uv[2][0] = 1.0f;
-        q.uv[2][1] = 0.0f;
-        q.uv[3][0] = 1.0f;
-        q.uv[3][1] = 1.0f;
-        func_00282CF0(v140, (f32 *)(moby + 0x10), D_L00_001B8DC0);
-        func_00282F20(v150, v140, 0.1f);
-        func_00282CC0(v160, D_L00_001B8DC0, v150);
-        func_00282DD8(v170, v140, basis[4]);
-        func_00282F20(v170, v170, D_L00_001B0B70);
-        func_00282DD8(v180, v170, v140);
-        func_00282F20(v180, v180, D_L00_001B0B70);
-        func_00282CC0(v190, v160, v180);
-        func_00282CC0(&q.corner[0], v190, v170);
-        func_00282CF0(&q.corner[1], v190, v170);
-        func_00282CF0(v190, v160, v180);
-        func_00282CC0(&q.corner[2], v190, v170);
-        func_00282CF0(&q.corner[3], v190, v170);
-        func_00280B90(&q, 0, 0);
+    if (vars->t34 != 0) {
+        k = IntToFloat(vars->t34) * vars->k3C;
+        InitQuadPacketState(&quad, 0xB, 4, 0x80);
+        color = pack_alpha(FloatToInt(k * 255.0f)) | 0x808080;
+        quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
+        quad.uv[0][0] = 0.0f;
+        quad.uv[0][1] = 0.0f;
+        quad.uv[1][0] = 0.0f;
+        quad.uv[1][1] = 1.0f;
+        quad.uv[2][0] = 1.0f;
+        quad.uv[2][1] = 0.0f;
+        quad.uv[3][0] = 1.0f;
+        quad.uv[3][1] = 1.0f;
+        FastVecSub(v140, (f32 *)(moby + 0x10), gCameraPosition_L00);
+        vec_scale_to_length(v150, v140, 0.1f);
+        FastVecAdd(v160, gCameraPosition_L00, v150);
+        FastVecCross(v170, v140, basis[4]);
+        vec_scale_to_length(v170, v170, D_L00_001B0B70);
+        FastVecCross(v180, v170, v140);
+        vec_scale_to_length(v180, v180, D_L00_001B0B70);
+        FastVecAdd(v190, v160, v180);
+        FastVecAdd(&quad.corner[0], v190, v170);
+        FastVecSub(&quad.corner[1], v190, v170);
+        FastVecSub(v190, v160, v180);
+        FastVecAdd(&quad.corner[2], v190, v170);
+        FastVecSub(&quad.corner[3], v190, v170);
+        draw_world_quad(&quad, 0, 0);
     }
 
-    if (pv->t40 != 0 && pv->t40 <= D_L00_001B0B74) {
+    if (vars->t40 != 0 && vars->t40 <= D_L00_001B0B74) {
         f32 sz;
-        k = func_00283CE0(pv->t40) * pv->k44;
+        k = IntToFloat(vars->t40) * vars->k44;
         sz = D_L00_001B0B80 + (D_L00_001B0B7C - D_L00_001B0B80) * k;
-        func_00282CF0(v140, (f32 *)(moby + 0x10), D_L00_001B8DC0);
-        func_00282F20(v140, v140, 0.3f);
-        func_00282CC0(v150, D_L00_001B8DC0, v140);
-        func_00281DE8(&q, D_L00_001B0B84, 1, 0x80);
-        q.d88 = (0x8000LL << 24) | 0x4A;
-        c = pack_alpha(func_00283CF0(k * 255.0f)) | 0x808080;
-        q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
-        q.uv[0][0] = 0.0f;
-        q.uv[0][1] = 0.0f;
-        q.uv[1][0] = 0.0f;
-        q.uv[1][1] = 1.0f;
-        q.uv[2][0] = 1.0f;
-        q.uv[2][1] = 0.0f;
-        q.uv[3][0] = 1.0f;
-        q.uv[3][1] = 1.0f;
+        FastVecSub(v140, (f32 *)(moby + 0x10), gCameraPosition_L00);
+        vec_scale_to_length(v140, v140, 0.3f);
+        FastVecAdd(v150, gCameraPosition_L00, v140);
+        InitQuadPacketState(&quad, D_L00_001B0B84, 1, 0x80);
+        quad.d88 = (0x8000LL << 24) | 0x4A;
+        color = pack_alpha(FloatToInt(k * 255.0f)) | 0x808080;
+        quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
+        quad.uv[0][0] = 0.0f;
+        quad.uv[0][1] = 0.0f;
+        quad.uv[1][0] = 0.0f;
+        quad.uv[1][1] = 1.0f;
+        quad.uv[2][0] = 1.0f;
+        quad.uv[2][1] = 0.0f;
+        quad.uv[3][0] = 1.0f;
+        quad.uv[3][1] = 1.0f;
         qcopy(v160, basis[4]);
-        func_00282DD8(v170, v140, v160);
-        func_00282F20(v170, v170, sz);
-        func_00282DD8(v180, v170, v140);
-        func_00282F20(v180, v180, sz);
-        func_00282CC0(v190, v150, v180);
-        func_00282CC0(&q.corner[0], v190, v170);
-        func_00282CF0(&q.corner[1], v190, v170);
-        func_00282CF0(v190, v150, v180);
-        func_00282CC0(&q.corner[2], v190, v170);
-        func_00282CF0(&q.corner[3], v190, v170);
-        func_002FC560(0x47, 0x31001);
-        func_00280B90(&q, 0, 0);
-        func_002FC560(0x47, 0x33001);
+        FastVecCross(v170, v140, v160);
+        vec_scale_to_length(v170, v170, sz);
+        FastVecCross(v180, v170, v140);
+        vec_scale_to_length(v180, v180, sz);
+        FastVecAdd(v190, v150, v180);
+        FastVecAdd(&quad.corner[0], v190, v170);
+        FastVecSub(&quad.corner[1], v190, v170);
+        FastVecSub(v190, v150, v180);
+        FastVecAdd(&quad.corner[2], v190, v170);
+        FastVecSub(&quad.corner[3], v190, v170);
+        VU1_addGSregister(0x47, 0x31001);
+        draw_world_quad(&quad, 0, 0);
+        VU1_addGSregister(0x47, 0x33001);
         qzero_nc(v1A0);
         for (i10 = 0; i10 < 4; i10++) {
-            func_00282CC0(v1A0, v1A0, &q.corner[i10]);
+            FastVecAdd(v1A0, v1A0, &quad.corner[i10]);
         }
-        func_00282D30(v1A0, v1A0, 0.25f);
+        FastVecScale(v1A0, v1A0, 0.25f);
         for (i11 = 0; i11 < 4; i11++) {
-            func_00282CF0(v1B0, &q.corner[i11], v1A0);
-            func_00282D30(v1B0, v1B0, 0.8f);
-            func_00282CC0(v1B0, v1A0, v1B0);
-            func_0027C768(&q.corner[i11], &q.uv[i11][0], &q.uv[i11][1]);
-            if (q.uv[i11][0] > 0.9f) {
-                q.uv[i11][0] = 0.9f;
-            } else if (q.uv[i11][0] < 0.0f) {
-                q.uv[i11][0] = 0.0f;
+            FastVecSub(v1B0, &quad.corner[i11], v1A0);
+            FastVecScale(v1B0, v1B0, 0.8f);
+            FastVecAdd(v1B0, v1A0, v1B0);
+            ProjectWorldToScreen(&quad.corner[i11], &quad.uv[i11][0], &quad.uv[i11][1]);
+            if (quad.uv[i11][0] > 0.9f) {
+                quad.uv[i11][0] = 0.9f;
+            } else if (quad.uv[i11][0] < 0.0f) {
+                quad.uv[i11][0] = 0.0f;
             }
-            if (q.uv[i11][1] > 0.9f) {
-                q.uv[i11][1] = 0.9f;
-            } else if (q.uv[i11][1] < 0.0f) {
-                q.uv[i11][1] = 0.0f;
+            if (quad.uv[i11][1] > 0.9f) {
+                quad.uv[i11][1] = 0.9f;
+            } else if (quad.uv[i11][1] < 0.0f) {
+                quad.uv[i11][1] = 0.0f;
             }
         }
-        q.d78 = func_0027C878(-7);
-        q.d80 = (0xFF90LL << 32) | 0x260;
-        q.d88 = (0x8000LL << 24) | 0x54;
-        q.d70 = 0;
-        func_00280B90(&q, 0, 0);
+        quad.d78 = GetEffectTextureDescriptor(-7);
+        quad.d80 = (0xFF90LL << 32) | 0x260;
+        quad.d88 = (0x8000LL << 24) | 0x54;
+        quad.d70 = 0;
+        draw_world_quad(&quad, 0, 0);
     }
 }

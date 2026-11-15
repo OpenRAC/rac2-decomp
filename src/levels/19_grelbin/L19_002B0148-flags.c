@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
@@ -57,55 +58,56 @@ typedef struct {
 extern PlayerInputView D_00189E20;
 
 /* Same body as func_L09_002AFC90, with this function's own callees. */
+/* Reads the newest button command and sets the hero's jump, attack, hover and grab requests, starting an attack state when allowed. */
 void func_L19_002B0148(void)
 {
-    short command = D_00189E20.command;
-    u8 saved = D_00189E20.saved;
+    short command = gHeroState.command;
+    u8 saved = gHeroState.saved;
     int active;
 
-    func_00282A88(&D_00189E20.command, 16);
-    D_00189E20.command = command;
-    D_00189E20.saved = saved;
-    D_00189E20.request = 0;
-    D_00189E20.pendingJump = 0;
-    if (D_00189E20.disabled) return;
+    FastMemoryHelperB(&gHeroState.command, 16);
+    gHeroState.command = command;
+    gHeroState.saved = saved;
+    gHeroState.request = 0;
+    gHeroState.pendingJump = 0;
+    if (gHeroState.disabled) return;
     active = 0;
-    if (D_00189E20.busy || (D_00189E20.state == 0x7b && D_00189E20.elapsed < 0.4f)) active = 1;
+    if (gHeroState.busy || (gHeroState.state == 0x7b && gHeroState.elapsed < 0.4f)) active = 1;
     if (command == -1) return;
-    if (command == 2 && !D_00189E20.inputLock &&
-        (!D_00189E20.jumpCount || D_00189E20.elapsed < 2.5f)) {
-        D_00189E20.jumpPressed = 1;
-        if (!D_00189E20.mode && D_001A7B0B) D_00189E20.pendingJump = 1;
+    if (command == 2 && !gHeroState.inputLock &&
+        (!gHeroState.jumpCount || gHeroState.elapsed < 2.5f)) {
+        gHeroState.jumpPressed = 1;
+        if (!gHeroState.mode && D_001A7B0B) gHeroState.pendingJump = 1;
     }
     if (command == 14) {
-        D_00189E20.flag1494 = 1;
-        D_00189E20.t24c4 = 0.2f;
-        D_00189E20.t330 = D_00189E20.t318 + 0.2f;
+        gHeroState.flag1494 = 1;
+        gHeroState.t24c4 = 0.2f;
+        gHeroState.t330 = gHeroState.t318 + 0.2f;
     }
     if (command == 0) {
-        float d = D_00189E20.t330 - D_00189E20.t318;
+        float d = gHeroState.t330 - gHeroState.t318;
 
-        D_00189E20.t24c4 = d;
-        if (d < 0.85f && 0.25f < d) D_00189E20.request = 1;
-        D_00189E20.flag1494 = 1;
+        gHeroState.t24c4 = d;
+        if (d < 0.85f && 0.25f < d) gHeroState.request = 1;
+        gHeroState.flag1494 = 1;
     }
-    if (command == 13) D_00189E20.flag149c = 1;
-    if (command == 1) D_00189E20.attack = 1;
-    if (command == 8) D_00189E20.hover = 1;
-    if (command == 12) D_00189E20.hover = 1;
-    if (D_00189E20.attack) {
-        if (D_00189E20.attack && active &&
-            (D_00189E20.state != 0x38 || D_00189E20.animationDone)) {
-            if (D_00189E20.health) { func_L19_002C44F8(0x38,1); return; }
-            if (D_001A79F0 == 2 && D_L19_001A9010) { func_L19_002C44F8(0x7d,1); return; }
-            if (*(int *)(*(u8 **)(D_00189E20.object + 0x24) + 0x1f0)) { func_L19_002C44F8(0x79,1); return; }
-            func_L19_002C44F8(0x39,1); return;
+    if (command == 13) gHeroState.flag149c = 1;
+    if (command == 1) gHeroState.attack = 1;
+    if (command == 8) gHeroState.hover = 1;
+    if (command == 12) gHeroState.hover = 1;
+    if (gHeroState.attack) {
+        if (gHeroState.attack && active &&
+            (gHeroState.state != 0x38 || gHeroState.animationDone)) {
+            if (gHeroState.health) { SetHeroState(0x38,1); return; }
+            if (gCurrentMapIndex == 2 && D_L19_001A9010) { SetHeroState(0x7d,1); return; }
+            if (*(int *)(*(u8 **)(gHeroState.object + 0x24) + 0x1f0)) { SetHeroState(0x79,1); return; }
+            SetHeroState(0x39,1); return;
         }
     }
-    if (D_00189E20.flag149c && D_00189E20.state != 0x7c &&
-        func_00282C48(D_00189E20.t330-(D_00189E20.position.f[2]+0.25f)) < 1.0f &&
-        D_00189E20.t330-D_00189E20.position.f[2] > 0.0f &&
-        (D_00189E20.motion.f[2] < 0.0f || D_00189E20.state == 0x7b)) {
-        func_L19_002C44F8(0x7c,1);
+    if (gHeroState.flag149c && gHeroState.state != 0x7c &&
+        FloatAbs(gHeroState.t330-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
+        gHeroState.t330-gHeroState.position.f[2] > 0.0f &&
+        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
+        SetHeroState(0x7c,1);
     }
 }

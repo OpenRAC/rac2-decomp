@@ -64,25 +64,25 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 
 s32 func_L05_00420360(void) {
     char buf[128];
-    f32 center = func_00283CE0(D_001A7340) * 0.5f;
+    f32 center = IntToFloat(gScreenWidth) * 0.5f;
     void *sprite;
     char *text;
     s32 x, y, count, index;
 
     if (D_L05_001A904C != 0) {
-        sprite = func_00336D50(D_L05_001A904C + 0x8710, 0x45);
-        func_00300968(sprite, center, (f32)label_y(sprite, 200.0f, D_L05_001B2D84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
-        sprite = func_00336D50(D_L05_001A904C + 0x8710, 0x44);
-        func_00300968(sprite, center, (f32)label_y(sprite, 200.0f, D_L05_001B2D84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
-        func_00115DA8(buf, func_00288FB8(0x2F72), D_L05_001B13EC + 1);
-        text = func_00288FB8(0x2F93);
-        x = func_00283CF0(center);
+        sprite = FindTableEntryById(D_L05_001A904C + 0x8710, 0x45);
+        DrawScaledObjectUniform(sprite, center, (f32)label_y(sprite, 200.0f, D_L05_001B2D84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
+        sprite = FindTableEntryById(D_L05_001A904C + 0x8710, 0x44);
+        DrawScaledObjectUniform(sprite, center, (f32)label_y(sprite, 200.0f, D_L05_001B2D84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
+        Sprintf(buf, GetLocalizedString(0x2F72), D_L05_001B13EC + 1);
+        text = GetLocalizedString(0x2F93);
+        x = FloatToInt(center);
         y = screen_coord(D_L05_001B2D80, 46.0f, -2.0f);
-        func_0027FB40(x, y, 0x80F0F0F0, text, func_001157AC(text));
-        text = func_00288FB8(0x31CB);
+        DrawTextCenteredMediumFont(x, y, 0x80F0F0F0, text, strlen_001157AC(text));
+        text = GetLocalizedString(0x31CB);
         {
             s32 ty = label_y(text, 131.0f, D_L05_001B2D84, 0.5f, 1);
-            func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
+            FontPrintWrappedDefault(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, strlen_001157AC(text));
         }
         index = D_L05_001B1350[D_L05_001B3578] - 1;
         if (index >= 3)
@@ -92,17 +92,17 @@ s32 func_L05_00420360(void) {
             count *= 10;
         text = buf;
         if (count == 0)
-            func_00115DA8(buf, func_00288FB8(0x11F5));
+            Sprintf(buf, GetLocalizedString(0x11F5));
         else
-            func_00115DA8(buf, func_00288FB8(0x2FC6), count);
+            Sprintf(buf, GetLocalizedString(0x2FC6), count);
         {
             s32 ty = label_y(text, 210.0f, D_L05_001B2D84, 0.5f, 1);
-            func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
+            FontPrintWrappedDefault(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, strlen_001157AC(text));
         }
         y = screen_coord(D_L05_001B2D80, 294.0f, 3.0f);
-        func_0027F5B8(117, y, 0x80F0F0F0, func_00288FB8(0x31CC), -1);
+        DrawTextMediumFont(117, y, 0x80F0F0F0, GetLocalizedString(0x31CC), -1);
         y = screen_coord(D_L05_001B2D80, 294.0f, 3.0f);
-        func_0027F5B8(274, y, 0x80F0F0F0, func_00288FB8(0x31CD), -1);
+        DrawTextMediumFont(274, y, 0x80F0F0F0, GetLocalizedString(0x31CD), -1);
     }
     return 1;
 }
@@ -128,21 +128,21 @@ extern s32 D_L05_001B13E4 __attribute__((sda));
 
 /* Either shuts the level's spawn state down and marks the reset flag, or asks the shared
    gadget lookup for one of the two fixed item strings and forwards it to the dispatcher. */
-void func_L05_004209D8(u8 *a0, s32 a1)
+void func_L05_004209D8(u8 *actor, s32 mission)
 {
-    u8 *p = *(u8 **)(a0 + 0x68);
+    u8 *vars = *(u8 **)(actor + 0x68);
 
-    if (func_003062A0(p + 0x48) == 0) {
-        if (a1 == 1)
-            func_00326198(func_0030CBA8(0x31C9), -1);
-        else if (a1 == 3)
-            func_00326198(func_0030CBA8(0x31DE), -1);
+    if (func_003062A0(vars + 0x48) == 0) {
+        if (mission == 1)
+            UpdateThrownObject(func_0030CBA8(0x31C9), -1);
+        else if (mission == 3)
+            UpdateThrownObject(func_0030CBA8(0x31DE), -1);
     } else {
         /* The two stores are written against the retail order: 0x48 first. */
-        *(s32 *)(p + 0x48) = 0x96;
-        *(s32 *)(p + 0x44) = 0x1C20;
+        *(s32 *)(vars + 0x48) = 0x96;
+        *(s32 *)(vars + 0x44) = 0x1C20;
         func_002FF9F8(0x1E);
-        func_L05_0041FC60(a0);
+        ResetFeltzinChallengeState(actor);
         func_0037B210();
         D_L05_001B13E4 = 0;
     }

@@ -25,8 +25,8 @@
 
 typedef int TI __attribute__((mode(TI)));
 typedef struct {
-    TI sp0;
-    TI sp10;
+    TI toTarget;
+    TI movedPosition;
 } Scratch;
 
 extern void ref_L02_00321C30_00(void *, void *, void *);
@@ -34,24 +34,25 @@ extern void ref_L02_00321C30_01(void *, void *, void *);
 extern f32 ref_L02_00321C30_02(void *);
 extern void ref_L02_00321C30_03(void *, void *, f32);
 
-f32 func_L02_00321C30(void *arg0, void *arg1, f32 fparg0) {
+/* Moves a position toward a target, but by no more than a given limit. Returns how much of the distance was left over. */
+f32 func_L02_00321C30(void *position, void *target, f32 maxStep) {
     Scratch scratch;
-    f32 temp_f22;
-    f32 var_f20;
-    f32 neg_limit;
+    f32 distance;
+    f32 stepLength;
+    f32 negMaxStep;
 
-    ref_L02_00321C30_01(&scratch.sp0, arg1, arg0);
-    var_f20 = ref_L02_00321C30_02(&scratch.sp0);
-    temp_f22 = var_f20;
-    if (fparg0 < var_f20) {
-        var_f20 = fparg0;
+    ref_L02_00321C30_01(&scratch.toTarget, target, position);
+    stepLength = ref_L02_00321C30_02(&scratch.toTarget);
+    distance = stepLength;
+    if (maxStep < stepLength) {
+        stepLength = maxStep;
     } else {
-        neg_limit = -fparg0;
-        if (var_f20 < neg_limit) {
-            var_f20 = neg_limit;
+        negMaxStep = -maxStep;
+        if (stepLength < negMaxStep) {
+            stepLength = negMaxStep;
         }
     }
-    ref_L02_00321C30_03(&scratch.sp0, &scratch.sp0, var_f20);
-    ref_L02_00321C30_00(&scratch.sp10, arg0, &scratch.sp0);
-    return temp_f22 - var_f20;
+    ref_L02_00321C30_03(&scratch.toTarget, &scratch.toTarget, stepLength);
+    ref_L02_00321C30_00(&scratch.movedPosition, position, &scratch.toTarget);
+    return distance - stepLength;
 }

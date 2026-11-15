@@ -57,16 +57,16 @@ void func_L00_002ABBA0(void)
     float distance, angle, score, priority, bestScore, bestPriority;
     float yaw, pitch;
 
-    if (D_00189E20.special)
-        special = D_00189E20.flag == 0;
-    mode = D_00189E20.mode;
+    if (gHeroState.special)
+        special = gHeroState.flag == 0;
+    mode = gHeroState.mode;
     if (mode != 1 && mode != 4 && mode != 2 && mode != 7 && mode != 0) {
-        D_00189E20.special = 0;
-        D_00189E20.target = 0;
+        gHeroState.special = 0;
+        gHeroState.target = 0;
         return;
     }
     if (!special) {
-        if ((unsigned char)(D_00189E20.object)[0x43] == 81)
+        if ((unsigned char)(gHeroState.object)[0x43] == 81)
             return;
         if (D_001B19C8 % 7 == 0) {
             bestScore = 100000000.0f;
@@ -74,24 +74,24 @@ void func_L00_002ABBA0(void)
             obj = D_L00_001FACE0[0];
             best = 0;
             for (i = 0; obj != 0; obj = D_L00_001FACE0[++i]) {
-                info = func_002AB1F0(obj);
+                info = GetMobyPrivateValue0(obj);
                 if (!info)
                     continue;
-                distance = func_00282E80(D_00189E20.pos, obj + 0x10);
+                distance = vec_distance_xy(gHeroState.pos, obj + 0x10);
                 if ((unsigned char)info[0x28] < distance)
                     continue;
-                angle = func_00283248(*(float *)(obj + 0x10) - D_00189E20.pos[0],
-                                     *(float *)(obj + 0x14) - D_00189E20.pos[1]);
-                angle = func_00283C80(angle, D_00189E20.heading);
+                angle = FastMatrixHelperA(*(float *)(obj + 0x10) - gHeroState.pos[0],
+                                     *(float *)(obj + 0x14) - gHeroState.pos[1]);
+                angle = FastDiffRots(angle, gHeroState.heading);
                 if (angle > 1.9198623895645142f)
                     continue;
-                pitch = func_00282E80(obj + 0x10, D_00189E20.pos);
-                pitch = func_00283248(pitch, D_00189E20.pos[2] - *(float *)(obj + 0x18));
-                pitch = func_00282C48(pitch);
+                pitch = vec_distance_xy(obj + 0x10, gHeroState.pos);
+                pitch = FastMatrixHelperA(pitch, gHeroState.pos[2] - *(float *)(obj + 0x18));
+                pitch = FloatAbs(pitch);
                 if (pitch > 1.047197699546814f)
                     continue;
                 score = angle * distance + distance;
-                if (obj == D_00189E20.target) {
+                if (obj == gHeroState.target) {
                     score -= 1.5f;
                     if (score < 0.0f)
                         score = 0.0f;
@@ -104,24 +104,24 @@ void func_L00_002ABBA0(void)
                     best = obj;
                 }
             }
-            D_00189E20.target = best;
+            gHeroState.target = best;
         }
-        if (D_00189E20.target) {
-            func_L00_002D36E0(0, 0, 1.2f, a, 1);
-            qcopy(b, D_00189E20.target + 0x10);
-            func_L00_002D3778(b, b, 0.5f);
-            if (func_002761F8(a, b, 2, 0, 0))
-                D_00189E20.target = 0;
+        if (gHeroState.target) {
+            BuildHeroRelativePoint(0, 0, 1.2f, a, 1);
+            qcopy(b, gHeroState.target + 0x10);
+            ApplyHeroModeTransformReversed(b, b, 0.5f);
+            if (CollLine(a, b, 2, 0, 0))
+                gHeroState.target = 0;
         }
     }
-    if (D_00189E20.target || special) {
+    if (gHeroState.target || special) {
         char *target, *targetInfo;
 
-        target = D_00189E20.target;
+        target = gHeroState.target;
         if (special)
-            target = D_00189E20.special;
+            target = gHeroState.special;
         qcopy(a, target + 0x10);
-        targetInfo = func_002AB1F0(target);
+        targetInfo = GetMobyPrivateValue0(target);
         if (targetInfo) {
             if (special)
                 a[2] += *(float *)(targetInfo + 0x10);
@@ -129,13 +129,13 @@ void func_L00_002ABBA0(void)
                 a[2] += (unsigned char)targetInfo[0x2a] * 0.125f;
         }
         if (special)
-            func_L00_002D36E0(0.5f, 0, 0.55f, b, 1);
+            BuildHeroRelativePoint(0.5f, 0, 0.55f, b, 1);
         else
-            func_L00_002D36E0(0.3f, 0, 0.85f, b, 1);
-        yaw = func_00283248(a[0] - b[0], a[1] - b[1]);
-        yaw = func_00283BE0(yaw, D_00189E20.heading);
-        pitch = func_00282E80(a, b);
-        pitch = func_00283248(pitch, b[2] - a[2]);
+            BuildHeroRelativePoint(0.3f, 0, 0.85f, b, 1);
+        yaw = FastMatrixHelperA(a[0] - b[0], a[1] - b[1]);
+        yaw = fast_subtract_rotations(yaw, gHeroState.heading);
+        pitch = vec_distance_xy(a, b);
+        pitch = FastMatrixHelperA(pitch, b[2] - a[2]);
         if (yaw > 1.0297443866729736f)
             yaw = 1.0297443866729736f;
         else if (yaw < -1.0297443866729736f)
@@ -144,7 +144,7 @@ void func_L00_002ABBA0(void)
             pitch = 0.6108652949333191f;
         if (pitch < -0.4363323450088501f)
             pitch = -0.4363323450088501f;
-        if (D_00189E20.count >= 28) {
+        if (gHeroState.count >= 28) {
             if (yaw > 0.2967059910297394f)
                 yaw = 0.2967059910297394f;
             else if (yaw < -0.2967059910297394f)
@@ -152,17 +152,17 @@ void func_L00_002ABBA0(void)
             pitch = 0;
         }
         if (special) {
-            func_L00_002AB0D8(0.037f, 0.3f);
+            SetCameraLimitsSlot2(0.037f, 0.3f);
             D_L00_0025BE10.yaw1c8 = yaw;
-            func_L00_002AB0C0(0.037f, 0.3f);
+            SetCameraLimitsSlot1(0.037f, 0.3f);
             D_L00_0025BE10.pitch114 = pitch;
         } else {
-            func_L00_002AB0F0(0.021f, 0.27f);
+            SetCameraLimitsSlot3(0.021f, 0.27f);
             D_L00_0025BE10.pitch274 = pitch;
             D_L00_0025BE10.yaw278 = yaw * 0.7f;
-            func_L00_002AB0D8(0.014f, 0.3f);
+            SetCameraLimitsSlot2(0.014f, 0.3f);
             D_L00_0025BE10.yaw1c8 = D_L00_0025BE10.yaw278 * 0.55f;
         }
     }
-    D_00189E20.special = 0;
+    gHeroState.special = 0;
 }

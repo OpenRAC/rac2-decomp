@@ -26,63 +26,64 @@ extern int func_00282978(char *);
 extern int D_001A79F0 MACRO_ADDR;
 extern short *D_L00_001FA920[];
 extern char *D_L00_001B1E9C MACRO_ADDR;
-void func_L00_004287E8(char *a)
+/* Updates the swingshot camera each frame. It turns towards the nearest swingshot node the hero is facing, then places the camera behind the hero. */
+void func_L00_004287E8(char *camera)
 {
  char out[16] __attribute__((aligned(16)));
  char diff[16] __attribute__((aligned(16)));
  char unit[16] __attribute__((aligned(16)));
  float axis[4] __attribute__((aligned(16)));
- char *s=*(char **)(a+0x70),*cfg=s+0xA0,*part=s+0x40,*angle=s+0xB8;
- char *p,*best,*obj,*turn;
- float height,dist,v,score,closest;
+ char *vars=*(char **)(camera+0x70),*cfg=vars+0xA0,*part=vars+0x40,*angle=vars+0xB8;
+ char *swing,*bestNode,*node,*turn;
+ float height,dist,aimDot,score,closest;
  short *list;
  if(D_00189E20_6.swing && D_00189E20_6.state==0x2B) {
-  float v=*(float *)(D_00189E20_6.swing+0x18)-D_00189E20_6.z;
-  if(v>D_00189E20_6.max_height) v=D_00189E20_6.max_height;
-  else if(v<0.0f) v=0.0f;
-  v/=D_00189E20_6.max_height;
-  height=v+3.65f; dist=v+v;
+  float aimDot=*(float *)(D_00189E20_6.swing+0x18)-D_00189E20_6.z;
+  if(aimDot>D_00189E20_6.max_height) aimDot=D_00189E20_6.max_height;
+  else if(aimDot<0.0f) aimDot=0.0f;
+  aimDot/=D_00189E20_6.max_height;
+  height=aimDot+3.65f; dist=aimDot+aimDot;
  } else {height=4.64f;dist=2.0f;}
- func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xA0,height,0.13333334f);
- func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xB0,dist,0.06666667f);
- func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0x8C,dist-0.5f,0.13333334f);
+ ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xA0,height,0.13333334f);
+ ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xB0,dist,0.06666667f);
+ ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0x8C,dist-0.5f,0.13333334f);
  if(D_00189E20_6.state==0x2B) {
-  if((D_001A79F0!=14 && D_001A79F0!=7 && D_001A79F0!=9) || (D_00189E20_6.swing && *(unsigned char *)(D_00189E20_6.swing+0x21)==255)) {
-   *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
+  if((gCurrentMapIndex!=14 && gCurrentMapIndex!=7 && gCurrentMapIndex!=9) || (D_00189E20_6.swing && *(unsigned char *)(D_00189E20_6.swing+0x21)==255)) {
+   *(float *)angle=StepSpringDamperStored(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
   } else {
-   turn=angle+4; best=0; closest=1000.0f;
-   p=D_00189E20_6.swing;
-   list=D_L00_001FA920[*(unsigned char *)(p+0x21)];
+   turn=angle+4; bestNode=0; closest=1000.0f;
+   swing=D_00189E20_6.swing;
+   list=D_L00_001FA920[*(unsigned char *)(swing+0x21)];
    if(list) do {
-    obj=D_L00_001B1E9C+(*list&0x7FFF)*0x100;
-    if(obj!=p && (*(short *)(obj+0xAA)==0x323 || *(short *)(obj+0xAA)==0x2F6)) {
-     func_00282CF0(diff,obj+0x10,p+0x10);
-     func_00282F20(unit,diff,1.0f);
-     axis[0]=func_00283180(D_00189E20_6.yaw);
-     axis[1]=func_00283198(D_00189E20_6.yaw);axis[2]=0.0f;
-     v=func_00282DB0(unit,(char *)axis);
-     if(v>0.0f) {score=func_00282DF0(diff)-v*10.0f;if(score<closest){best=obj;closest=score;}}
+    node=D_L00_001B1E9C+(*list&0x7FFF)*0x100;
+    if(node!=swing && (*(short *)(node+0xAA)==0x323 /* Swingshot Node */ || *(short *)(node+0xAA)==0x2F6 /* Swingshot Node */)) {
+     FastVecSub(diff,node+0x10,swing+0x10);
+     vec_scale_to_length(unit,diff,1.0f);
+     axis[0]=FastSinOrCosA(D_00189E20_6.yaw);
+     axis[1]=FastSinOrCosB(D_00189E20_6.yaw);axis[2]=0.0f;
+     aimDot=FastVecDot(unit,(char *)axis);
+     if(aimDot>0.0f) {score=FastVecLength(diff)-aimDot*10.0f;if(score<closest){bestNode=node;closest=score;}}
     }
    } while(*list++>=0);
-   if(best) {
-    func_00282CF0(diff,best+0x10,p+0x10);
-    *(float *)angle=func_002703B0(*(float *)angle,func_00283248(*(float *)diff,*(float *)(diff+4)),turn,0.00125f,0.175f,0.0f);
+   if(bestNode) {
+    FastVecSub(diff,bestNode+0x10,swing+0x10);
+    *(float *)angle=StepSpringDamperStored(*(float *)angle,FastMatrixHelperA(*(float *)diff,*(float *)(diff+4)),turn,0.00125f,0.175f,0.0f);
    } else if(*(int *)(part+0x40)==1)
-    *(float *)angle=func_002703B0(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),turn,0.00125f,0.175f,0.0f);
+    *(float *)angle=StepSpringDamperStored(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),turn,0.00125f,0.175f,0.0f);
    else
-    *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,turn,0.00125f,0.175f,0.0f);
+    *(float *)angle=StepSpringDamperStored(*(float *)angle,D_00189E20_6.yaw,turn,0.00125f,0.175f,0.0f);
   }
  } else if(D_00189E20_6.state==0x24) {
   if(*(int *)(part+0x40)==1)
-   *(float *)angle=func_002703B0(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),angle+4,0.00125f,0.175f,0.0f);
+   *(float *)angle=StepSpringDamperStored(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),angle+4,0.00125f,0.175f,0.0f);
   else
-   *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
+   *(float *)angle=StepSpringDamperStored(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
  }
- *(float *)(part+0x30)=func_00283180(*(float *)angle);
- *(float *)(part+0x34)=func_00283198(*(float *)angle);
+ *(float *)(part+0x30)=FastSinOrCosA(*(float *)angle);
+ *(float *)(part+0x34)=FastSinOrCosB(*(float *)angle);
  *(float *)(part+0x38)=0.0f;*(float *)(part+0x3C)=*(float *)(part+0x38);
- func_00282F20(out,part+0x30,-*(float *)cfg);
+ vec_scale_to_length(out,part+0x30,-*(float *)cfg);
  *(float *)(out+8)+=*(float *)(cfg+0x10);
- func_00282CC0_4(out,out,D_00189EA0);
- if(func_00282978(s+0x1E)) {qcopy(a+0x30,out);} else {qcopy(a+0x30,out);}
+ func_00282CC0_4(out,out,gHeroPosition);
+ if(FastDecTimer(vars+0x1E)) {qcopy(camera+0x30,out);} else {qcopy(camera+0x30,out);}
 }

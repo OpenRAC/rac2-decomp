@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -36,58 +37,60 @@ SOFTWARE.
 struct M2c_arg0
 {
   u8 pad_0[0x150];
-  s32 unk150;
+  s32 pictureCodingType;
   u8 pad_154[0x58];
-  s32 unk1AC;
+  s32 tempRefAdjusted;
   u8 pad_1B0[0x69C];
-  s32 unk84C;
-  s32 unk850;
-  s32 unk854;
+  s32 tempRefBase;
+  s32 tempRefMax;
+  s32 gopStartFlag;
 };
 
-void func_0012CFE8(struct M2c_arg0 *arg0, s32 arg1)
+/* Keeps track of the frame order numbers of pictures so they stay in step when a new group starts. */
+void func_0012CFE8(struct M2c_arg0 *decoder, s32 tempRefDelta)
 {
-  s32 temp_2_30;
-  s32 temp_3_21;
-  s32 temp_4_32;
-  s32 var_4_8;
-  s32 var_7_4;
-  var_7_4 = 0;
-  var_4_8 = 0;
-  if ((arg0->unk150 != 3) && (arg1 != 0))
+  s32 unusedTemp;
+  s32 adjustedRef;
+  s32 currentRef;
+  s32 deltaRef;
+  s32 needsWrapFix;
+  needsWrapFix = 0;
+  deltaRef = 0;
+  if ((decoder->pictureCodingType != 3) && (tempRefDelta != 0))
   {
-    if (arg1 < 0)
+    if (tempRefDelta < 0)
     {
-      var_7_4 = arg0->unk854 == 0;
+      needsWrapFix = decoder->gopStartFlag == 0;
     }
-    arg0->unk854 = 0;
-    var_4_8 = arg1;
+    decoder->gopStartFlag = 0;
+    deltaRef = tempRefDelta;
   }
-  temp_3_21 = arg0->unk84C + arg1;
-  arg0->unk1AC = temp_3_21;
-  if ((var_7_4 != 0) && (var_4_8 >= arg1))
+  adjustedRef = decoder->tempRefBase + tempRefDelta;
+  decoder->tempRefAdjusted = adjustedRef;
+  if ((needsWrapFix != 0) && (deltaRef >= tempRefDelta))
   {
-    arg0->unk1AC = (s32) (temp_3_21 + 0x400);
+    decoder->tempRefAdjusted = (s32) (adjustedRef + 0x400);
   }
   ;
-  temp_4_32 = arg0->unk1AC;
-  arg0->unk850 = (s32) ((arg0->unk850 < temp_4_32) ? (temp_4_32) : (arg0->unk850));
+  currentRef = decoder->tempRefAdjusted;
+  decoder->tempRefMax = (s32) ((decoder->tempRefMax < currentRef) ? (currentRef) : (decoder->tempRefMax));
 }
 
 extern int func_0012C878(void *, int);
 extern void func_0012CC88(void *);
 
-void func_0012D060(char *object) {
-    *(int *)(object + 0xE8) = 0;
-    *(int *)(object + 0x854) = 1;
-    *(int *)(object + 0x84C) = *(int *)(object + 0x850) + 1;
-    func_0012C878(object, 1);
-    func_0012C878(object, 5);
-    func_0012C878(object, 6);
-    func_0012C878(object, 1);
-    func_0012C878(object, 6);
-    func_0012C878(object, 6);
-    *(int *)(object + 0x1A4) = func_0012C878(object, 1);
-    *(int *)(object + 0x1A8) = func_0012C878(object, 1);
-    func_0012CC88(object);
+/* Reads a group of pictures header and resets the frame order tracking. */
+void func_0012D060(char *decoderBytes) {
+    *(int *)(decoderBytes + 0xE8) = 0;
+    *(int *)(decoderBytes + 0x854) = 1;
+    *(int *)(decoderBytes + 0x84C) = *(int *)(decoderBytes + 0x850) + 1;
+    ReadMpegBits(decoderBytes, 1);
+    ReadMpegBits(decoderBytes, 5);
+    ReadMpegBits(decoderBytes, 6);
+    ReadMpegBits(decoderBytes, 1);
+    ReadMpegBits(decoderBytes, 6);
+    ReadMpegBits(decoderBytes, 6);
+    *(int *)(decoderBytes + 0x1A4) = ReadMpegBits(decoderBytes, 1);
+    *(int *)(decoderBytes + 0x1A8) = ReadMpegBits(decoderBytes, 1);
+    ReadMpegExtensionData(decoderBytes);
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_L00_0032EF10(int, int, int *);
 
@@ -25,15 +26,16 @@ extern int func_00282CC0_3(void *, void *, void *);
 extern int func_002B9180_1(void *);
 
 /* Calls one routine twice with two different ids and a two-int scratch area, short-circuiting to a zero result if either fails, and otherwise returns whether a third routine's difference of the two ints is below a fourth incoming integer. */
+/* Tells whether two pad buttons were pressed within a few frames of each other. */
 int func_L00_0032EFB0(int a0, int a1, int a2, int a3)
 {
 	int r = 0;
 	int a;
 	int b;
 
-	if (func_L00_0032EF10(a0, a2, &a)) {
-		if (func_L00_0032EF10(a1, a2, &b))
-			r = func_00282C30(a - b) < a3;
+	if (PadPressedWithin(a0, a2, &a)) {
+		if (PadPressedWithin(a1, a2, &b))
+			r = subtract_integer_with_clamp(a - b) < a3;
 	}
 	return r;
 }
@@ -53,16 +55,18 @@ extern Table_L00_0032F038 D_00138180;
    ring's count); RAC1's read_pad_float_history. */
 float func_L00_0032F038(int n)
 {
-    if (D_00138180.count < n)
-        n = D_00138180.count;
-    return D_00138180.v[(D_00138180.head - n + 30) % 30];
+    if (gPadState.count < n)
+        n = gPadState.count;
+    return gPadState.v[(gPadState.head - n + 30) % 30];
 }
 
 
+/* Does nothing. */
 void func_L00_003318D8(void)
 {
 }
 
+/* Does nothing. */
 void func_L00_00333E20(void) {
 }
 
@@ -78,9 +82,9 @@ void func_L00_003340A8(char *a)
 
     func_00282CC0_2(p1, p1, p3);
     func_00282CC0_2(p2, p2, p3);
-    func_00300190(p1, p1);
-    func_00300190(p2, p2);
-    v = *(int *)(a + 4) - (func_00283CF0(*(float *)(p3 + 12)) << 24);
+    TransformVectorOrCopy(p1, p1);
+    TransformVectorOrCopy(p2, p2);
+    v = *(int *)(a + 4) - (FloatToInt(*(float *)(p3 + 12)) << 24);
     *(int *)(a + 4) = v;
     *(int *)(a + 12) = v;
     if (v < 0)

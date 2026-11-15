@@ -6,8 +6,10 @@ extern void func_2EE108(void *, void *, void *);
 
 extern int D_L00_001B0BE0 __attribute__((sda));
 
-void func_L00_003FE280(char *a0, char *a1)
+/* Turns a fixed offset by the moby's facing and moves it to the moby's position, giving a
+   point in the world. */
+void func_L00_003FE280(char *sourceMoby, char *worldPoint)
 {
-    func_2EE5B0(a1, &D_L00_001B0BE0, a0 + 0xC0);
-    func_2EE108(a1, a1, a0 + 0x10);
+    func_2EE5B0(worldPoint, &D_L00_001B0BE0, sourceMoby + 0xC0);
+    func_2EE108(worldPoint, worldPoint, sourceMoby + 0x10);
 }

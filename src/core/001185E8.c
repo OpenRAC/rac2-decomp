@@ -17,6 +17,7 @@ extern double func_00117650(double);
 
 extern double func_00117848(double, double);
 
+/* Turns a decimal number into a string of digits for printing. */
 char *func_001185E8(double value, int ndigits, char ch, int dot) {
     union {
         double d;
@@ -66,10 +67,10 @@ char *func_001185E8(double value, int ndigits, char ch, int dot) {
     }
 
     if (value >= 1.0) {
-        f = func_00117650(value);
+        f = floor(value);
         value = value - f;
         while (++integer_count < 163) {
-            digit = (int)func_00117848(f, 10.0);
+            digit = (int)__ieee754_fmod(f, 10.0);
             /* Encode and emit the digit before the next numeric conversion. */
             do {
                 c = digit + '0';
@@ -132,7 +133,7 @@ round:
         p[n] = '0';
         n++;
     }
-    if (func_00118460(p, len + 1) == 0) {
+    if (RoundDecimalDigits(p, len + 1) == 0) {
         p[0] = '1';
         e = e + 1;
         len = len + 1;
@@ -163,7 +164,7 @@ skip:
             if (e > -10) p[++len] = '0';
             e = -e;
         }
-        func_00118548(e, p + ++len, 10);
+        IntegerToAscii(e, p + ++len, 10);
     } else {
         p[len + 1] = 0;
     }

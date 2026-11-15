@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Small-data file: these bodies reach their globals through $gp / the
  * one-instruction model, so they only reproduce at -G8. */
@@ -11,22 +12,24 @@ extern void ref_L22_003A1E50_00(char *, char *);
 extern void ref_L22_003A1E50_01(void *);
 extern void ref_L22_003A3C70_00(void *, int, int, int);
 
-void func_L22_003A1E50(char *a0) {
-    char *sub = *(char **)(a0 + 0x68);
-    unsigned short *counter;
-    ref_L22_003A1E50_00(a0, sub + 0x50);
-    counter = (unsigned short *)(a0 + 0x96);
-    if (*counter <= 0xFFFE) (*counter)++;
-    if (*(int *)(sub + 0x37C) != 0) *(int *)(sub + 0x37C) = *(int *)(sub + 0x37C) - 1;
-    ref_L22_003A1E50_01(sub + 0x464);
+void func_L22_003A1E50(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    unsigned short *ageCounter;
+    ref_L22_003A1E50_00(moby, vars + 0x50);
+    ageCounter = (unsigned short *)(moby + 0x96);
+    if (*ageCounter <= 0xFFFE) (*ageCounter)++;
+    if (*(int *)(vars + 0x37C) != 0) *(int *)(vars + 0x37C) = *(int *)(vars + 0x37C) - 1;
+    ref_L22_003A1E50_01(vars + 0x464);
     ref_L22_003A1E50_01(D_L22_001B2A90);
 }
 
+/* Counts down a timer in the first entry of a small table until it reaches zero. */
 void func_L22_003A2A08(void) {
     int *p = D_L22_001B2AB4[0];
     if (p[3] > 0) p[3] = p[3] - 1;
 }
 
+/* Forwards two values, with a fixed zero, to a helper on the stored object. */
 void func_L22_003A3C70(int a0, int a1) {
     ref_L22_003A3C70_00(D_L22_001AF314, a0, a1, 0);
 }
@@ -40,6 +43,7 @@ void func_L22_003A3C70(int a0, int a1) {
 extern int D_L22_001B2AD4 __attribute__((nosda));
 extern int D_L22_001AF3B0[1] __attribute__((sda));
 
+/* Returns 0 when the key is in the list, 1 when it is not. */
 int func_L22_003A48F8(int key) {
     int i;
     for (i = 0; i < D_L22_001B2AD4; i++) {
@@ -76,11 +80,11 @@ extern void ref_L22_003A45F0_01(void *, int, int, int);               /* func_00
 
 /* One turn of the orbit: the first flag bit runs the object's own update, the
  * second one hands the result over to the child object. */
-void func_L22_003A45F0(char *a0, int a1, int a2, int a3, int a4, float a5) {
-    char *obj = a0;
-    char *sub = *(char **)(a0 + 0x68);
+void func_L22_003A45F0(char *moby, int newState, int stateArg1, int stateArg2, int flags, float defaultScale) {
+    char *obj = moby;
+    char *vars = *(char **)(moby + 0x68);
     char *child;
-    float f;
+    float scale;
     float p0;
     float p1;
     float p2;
@@ -88,17 +92,17 @@ void func_L22_003A45F0(char *a0, int a1, int a2, int a3, int a4, float a5) {
     float g0;
     float g1;
 
-    if (a4 & 1) {
-        if (*(short *)(sub + 0x34E) == 0) {
-            *(int *)(sub + 0x3EC) = *(unsigned char *)(obj + 0x43);
-            if (a1 == 11) {
+    if (flags & 1) {
+        if (*(short *)(vars + 0x34E) == 0) {
+            *(int *)(vars + 0x3EC) = *(unsigned char *)(obj + 0x43);
+            if (newState == 11) {
                 p0 = D_L22_001AF3D0 * 0.00027777778f;
                 p1 = D_L22_001AF3D4 * 0.016666668f;
                 p2 = D_L22_001AF3D8 * 4.8481374e-06f;
                 p3 = D_L22_001AF3DC * 0.00029088825f;
                 ref_L22_003A45F0_00(obj, p0, p1, p2, p3);
                 *(float *)(obj + 0x48) = 1.5f;
-                *(float *)(sub + 0x138) = 0.5f;
+                *(float *)(vars + 0x138) = 0.5f;
             } else {
                 p0 = D_L22_001AF3C8 * 0.00027777778f;
                 p1 = D_L22_001AF3CC * 0.016666668f;
@@ -106,32 +110,32 @@ void func_L22_003A45F0(char *a0, int a1, int a2, int a3, int a4, float a5) {
                 p3 = D_L22_001AF3DC * 0.00029088825f;
                 ref_L22_003A45F0_00(obj, p0, p1, p2, p3);
                 *(float *)(obj + 0x48) = 1.3f;
-                *(float *)(sub + 0x138) = 0.33333334f;
+                *(float *)(vars + 0x138) = 0.33333334f;
             }
 
-            g0 = *(float *)(sub + 0x128);
-            g1 = *(float *)(sub + 0x134);
+            g0 = *(float *)(vars + 0x128);
+            g1 = *(float *)(vars + 0x134);
             g0 = g0 + g0;
             g1 = g1 * 8.0f;
-            *(float *)(sub + 0x128) = g0;
-            *(float *)(sub + 0x134) = g1;
-            if (*(unsigned char *)(obj + 0x43) != a1) {
-                ref_L22_003A45F0_01(obj, a1, a2, a3);
+            *(float *)(vars + 0x128) = g0;
+            *(float *)(vars + 0x134) = g1;
+            if (*(unsigned char *)(obj + 0x43) != newState) {
+                ref_L22_003A45F0_01(obj, newState, stateArg1, stateArg2);
             }
         }
     }
-    if (*(short *)(sub + 0x34C) != 0) {
+    if (*(short *)(vars + 0x34C) != 0) {
         return;
     }
     if (*(unsigned char *)(obj + 0x43) < 11 || *(unsigned char *)(obj + 0x43) > 12) {
-        *(float *)(obj + 0x48) = a5;
+        *(float *)(obj + 0x48) = defaultScale;
     }
-    f = *(float *)(obj + 0x48);
-    *(float *)(*(char **)(sub + 0x440) + 0x48) = f;
-    if (a4 & 2) {
-        child = *(char **)(sub + 0x440);
+    scale = *(float *)(obj + 0x48);
+    *(float *)(*(char **)(vars + 0x440) + 0x48) = scale;
+    if (flags & 2) {
+        child = *(char **)(vars + 0x440);
         if (child != 0) {
-            ref_L22_003A45F0_01(child, a1, a2, a3);
+            ref_L22_003A45F0_01(child, newState, stateArg1, stateArg2);
         }
     }
 }
@@ -154,14 +158,14 @@ extern int func_L22_003A39C8(char *, char *, int, int);
 /* Picks a kind at random (one of two when the hero's or the target's state says so), scans that
  * kind's row of 50 slots and spawns the object at POS. */
 void func_L22_003A3B50(char *pos, int arg) {
-    int n;
+    int kindCount;
     int mode = 0;
     int i;
     int *row;
 
-    n = 3;
-    if (D_0018C0B0->state == 6 || ((Hero3B50 *)ref_L22_003A3B50_00)->state == 4) n = 2;
-    switch (func_002A77E0(n)) {
+    kindCount = 3;
+    if (gHeroMoby_0018C0B0->state == 6 || ((Hero3B50 *)ref_L22_003A3B50_00)->state == 4) kindCount = 2;
+    switch (RandomIntBelow(kindCount)) {
     case 0:
         mode = 1;
         break;
@@ -175,13 +179,13 @@ void func_L22_003A3B50(char *pos, int arg) {
     row = D_L22_0023B530[mode];
     i = 0;
     if (*row != 0) {
-        int *walk = row;
+        int *slot = row;
         do {
             i++;
             if (i > 0x31) break;
-            walk++;
-            if (*walk == 0) break;
+            slot++;
+            if (*slot == 0) break;
         } while (i != 0x31);
     }
-    func_L22_003A39C8((char *)ref_L22_003A3B50_00, pos, mode, arg);
+    SpawnPickupInFreeSlot((char *)ref_L22_003A3B50_00, pos, mode, arg);
 }

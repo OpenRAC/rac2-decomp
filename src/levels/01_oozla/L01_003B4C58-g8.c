@@ -22,6 +22,7 @@ extern void func_002A7470(void *,int,int,int);
 extern float func_002A89A8(void *,int,float);
 extern void *func_L01_003A6280(u8 *,void *,u32,float,float);
 
+/* Sets up a swimming creature when it appears: fixes its water height, speeds, turn rates and starting animation. */
 void func_L01_003B4C58(u8 *object)
 {
     u8 *state = *(u8 **)(object+0x68);
@@ -29,7 +30,7 @@ void func_L01_003B4C58(u8 *object)
     float acceleration, velocity, angularAcceleration, angularVelocity;
     int handle;
     if (D_L01_001B2088 == 0 && object[0x21] != 255) *P(state,0x33C) = 0;
-    height = func_L01_003BAFB0();
+    height = GetWaterHeight();
     if (height > 0.0f) F(state,0x34C) = height;
     if (!(height > 0.0f) && D_L01_001B2088 < 4) return;
     I(state,0x378) = 0;
@@ -39,8 +40,8 @@ void func_L01_003B4C58(u8 *object)
         *P(state,0x370) = -1;
     }
     qcopy((state+0x2D0), (object+0x10));
-    state[0x48] = func_00283CF0(10.0f);
-    state[0x4A] = func_00283CF0(8.0f);
+    state[0x48] = FloatToInt(10.0f);
+    state[0x4A] = FloatToInt(8.0f);
     I(state,0xA8) = 5;
     F(state,0x9C) = 0.4f;
     state[0x79] = 1;
@@ -58,7 +59,7 @@ void func_L01_003B4C58(u8 *object)
     F(state,0x220) = 6.0f;
     F(state,0x218) = angularStep;
     F(state,0x214) = movementStep;
-    handle = func_002A7820(120,0);
+    handle = RandomIntRange(120,0);
     scale = F(state,0x37C);
     acceleration = D_L01_001AFDB4*(scale*0.00027777778f);
     velocity = D_L01_001AFDB8*(scale*0.016666668f);
@@ -72,26 +73,26 @@ void func_L01_003B4C58(u8 *object)
     F(state,0x11C) = 0.25f;
     F(state,0x140) = 0.52359885f;
     F(state,0x13C) = 0.005f;
-    func_002B60B0(object,acceleration,velocity,angularAcceleration,angularVelocity);
-    if (I(state,0x30C) != -1) func_L01_003377C8(D_L01_001FE180[I(state,0x30C)]);
-    if (I(state,0x364) != -1) func_L01_003377C8(D_L01_001FE180[I(state,0x364)]);
+    SetControllerSpeedLimits(object,acceleration,velocity,angularAcceleration,angularVelocity);
+    if (I(state,0x30C) != -1) ComputePathSegmentLengths_L01(D_L01_001FE180[I(state,0x30C)]);
+    if (I(state,0x364) != -1) ComputePathSegmentLengths_L01(D_L01_001FE180[I(state,0x364)]);
     if (I(state,0x308) == -1) {
         if (I(state,0x374) == 0) goto grounded;
     } else {
-        func_L01_003377C8(D_L01_001FE180[I(state,0x308)]);
+        ComputePathSegmentLengths_L01(D_L01_001FE180[I(state,0x308)]);
         I(state,0x14C) = I(state,0x308);
-        func_002A7750(object,1,1);
+        SetMobyState(object,1,1);
         F(object,0x18) = F(state,0x34C);
     }
     if (I(state,0x374) != 0) {
-        func_002A7750(object,5,1);
+        SetMobyState(object,5,1);
         F(object,0x18) = F(state,0x34C) + -2.0f;
     }
     I(object,0x98) = 0;
-    if (object[0x43] != 4) func_002A7470(object,4,0,2);
+    if (object[0x43] != 4) StartAnimationBlended(object,4,0,2);
     goto next;
 grounded:
-    F(object,0x18) = func_002A89A8(object+0x10,0,0.5f);
+    F(object,0x18) = ProbeGroundHeightBelow(object+0x10,0,0.5f);
     if (I(state,0x364) != -1)
         I(state,0x14C) = I(state,0x364);
     else
@@ -99,18 +100,18 @@ grounded:
     object[0xBC] = 0;
     I(state,0x398) = I(state,0x394);
     F(state,0x39C) = F(state,0x388);
-    func_002A7750(object,1,3);
-    if (object[0x43] != 0) func_002A7470(object,0,0,2);
+    SetMobyState(object,1,3);
+    if (object[0x43] != 0) StartAnimationBlended(object,0,0,2);
 next:
     if (I(state,0x380) != -1) {
-        if (object[0x43] != 20) func_002A7470(object,20,0,2);
+        if (object[0x43] != 20) StartAnimationBlended(object,20,0,2);
         I(state,0x14C) = I(state,0x30C);
         I(state,0x398) = I(state,0x390);
         F(state,0x39C) = F(state,0x388);
-        func_002A7750(object,6,3);
+        SetMobyState(object,6,3);
     }
     qcopy((state+0x200), (object+0x10));
-    func_L01_003A6280(object,object+0x10,5,0.2f,2.0f);
+    SpawnLinkedHelperMoby(object,object+0x10,5,0.2f,2.0f);
     I(state,0x39C) = 0;
     I(state,0x398) = I(state,0x390);
 }

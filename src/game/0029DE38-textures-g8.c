@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int ref_0029FDF0_00[] __attribute__((sda));
 extern int ref_0029FDF0_01[] __attribute__((sda));
@@ -36,8 +37,8 @@ void func_0029FDF0(void)
     ((unsigned int *)ref_0029FDF0_01[0])[1] = (unsigned int)ref_0029FDF0_00[0];
     ((unsigned int *)ref_0029FDF0_01[0])[2] = 0;
     ((unsigned int *)ref_0029FDF0_01[0])[3] = 0;
-    func_002A4AD8(ref_0029FDF0_02[0]);
-    func_002FC748();
+    upload_used_moby_textures(ref_0029FDF0_02[0]);
+    AppendVu1DmaChainTable1();
     ((unsigned int *)ref_0029FDF0_00[0])[0] = 0x20000000;
     ((unsigned int *)ref_0029FDF0_00[0])[1] = (unsigned int)(ref_0029FDF0_01[0] + 16);
     ((unsigned int *)ref_0029FDF0_00[0])[2] = 0;
@@ -57,10 +58,10 @@ void func_002A0250(void)
     int frame;
     int anim;
 
-    func_002FC410((unsigned int)D_0010FFC0, D_0010FFB0[0]);
+    VU1_addDataRef((unsigned int)D_0010FFC0, D_0010FFB0[0]);
     ref_002A0250_00[0] = 6;
-    func_002FC070((int)D_00100080);
-    func_002FC560(0x47, 0x5360B);
+    StartDmaChannel0AndWait((int)D_00100080);
+    VU1_addGSregister(0x47, 0x5360B);
     p = ref_002A0250_01[0];
     limit = ref_002A0250_02[0] + 0xFFFF0000;
     frame = D_001A72D4;

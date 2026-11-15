@@ -83,70 +83,73 @@ struct TtyInitState {
 extern struct TtyInitState r1_D_00154B50;
 
 /* rac1-decomp src/core/00119868.c: func_00119890 */
-void func_0011BAF0(char *self) {
-    char *p;
-    *(int *)(self + 0x4) += 1;
-    p = *(char **)(self + 0xC) + 1;
-    *(char **)(self + 0xC) = p;
-    if (p == self + (*(int *)self + 0x10)) {
-        *(char **)(self + 0xC) = self + 0x10;
+/* Moves the ring buffer write position forward by one and wraps it at the end. */
+void func_0011BAF0(char *ring) {
+    char *writePtr;
+    *(int *)(ring + 0x4) += 1;
+    writePtr = *(char **)(ring + 0xC) + 1;
+    *(char **)(ring + 0xC) = writePtr;
+    if (writePtr == ring + (*(int *)ring + 0x10)) {
+        *(char **)(ring + 0xC) = ring + 0x10;
     }
 }
 
 /* rac1-decomp src/core/00119868.c: func_00119910 */
 /* sceTtyHandler: the DECI2 event callback (1/2 read, 3 write, 4 write done). */
-void func_0011BB38(int event, int param, TtyHandlerState *ti) {
-    int n;
+/* Handles debug-network events for the text console: receives typed text and sends queued output. */
+void func_0011BB38(int event, int param, TtyHandlerState *state) {
+    int count;
 
     switch (event) {
     case 1:
     case 2:
         if (param != 0) {
-            if ((unsigned int)(ti->rlen + param) > 0x140) {
+            if ((unsigned int)(state->rlen + param) > 0x140) {
                 r1_func_0011A690(r1_D_00152810);
             }
             {
-                int off = ti->rlen;
+                int offset = state->rlen;
 
-                n = r1_func_001197C0_r(ti->sock, ti->rbuf + off, param);
+                count = r1_func_001197C0_r(state->sock, state->rbuf + offset, param);
             }
-            if (n < 0) {
+            if (count < 0) {
                 r1_func_0011A690(r1_D_00152838);
             }
-            ti->rlen += n;
+            state->rlen += count;
         } else {
-            TtyHdr *h = (TtyHdr *)ti->rbuf;
+            TtyHdr *header = (TtyHdr *)state->rbuf;
 
-            for (n = 0xC; n < h->len; n++) {
-                *ti->queue->wp = ti->rbuf[n];
-                func_0011BAF0((char *)ti->queue);
+            for (count = 0xC; count < header->len; count++) {
+                *state->queue->wp = state->rbuf[count];
+                AdvanceCharRingWritePtr((char *)state->queue);
             }
-            ti->rlen = 0;
+            state->rlen = 0;
         }
         break;
     case 3: {
-        int w = r1_func_001197F8_r(ti->sock, ti->wbuf, ti->wlen);
+        int written = r1_func_001197F8_r(state->sock, state->wbuf, state->wlen);
 
-        if (w < 0) {
-            r1_func_0011A690(r1_D_00152850, w);
-            ti->busy = 0;
+        if (written < 0) {
+            r1_func_0011A690(r1_D_00152850, written);
+            state->busy = 0;
         } else {
-            ti->wbuf += w;
-            ti->wlen -= w;
+            state->wbuf += written;
+            state->wlen -= written;
         }
         break;
     }
     case 4:
-        if (ti->wlen != 0) {
-            r1_func_0011A690(r1_D_00152868, ti->wlen);
+        if (state->wlen != 0) {
+            r1_func_0011A690(r1_D_00152868, state->wlen);
         }
-        ti->busy = 0;
+        state->busy = 0;
         break;
     }
 }
 
 /* rac1-decomp src/core/00119868.c: func_00119AA8 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/debug/sce_tty_write.c, sceTtyWrite. */
+/* Sends a block of text to the debug console. Newlines become carriage return plus newline. Returns how many characters were sent, or -1 if busy or failed. */
 s32 func_0011BCD0(s8 *text, s32 text_len) {
     s32 written_count; /* characters consumed -> return value */
     s32 remaining; /* countdown, hits -1 after len+1 tests */

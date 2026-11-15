@@ -29,69 +29,70 @@ extern void func_002B0408(void *, void *, void *);
 extern int func_00282978(short *);
 extern void func_00282CF0(void *, void *, void *);
 
-void func_L23_003C16D8(char *obj) {
-    TI128 v0[1], v1[3], t[1], u[1], r3[3], r4[1];
-    float fz0, fz1;
-    char *state = *(char **)(obj + 0x68);
-    float r;
-    float a1;
-    float b1;
-    float c1;
+/* Turns the helper object to face the right way each frame, twisting it by a timed amount. */
+void func_L23_003C16D8(char *moby) {
+    TI128 baseVec[1], matrix[3], twistVec[1], scratchVec[1], matrix2[3], pushVec[1];
+    float unusedOut0, unusedOut1;
+    char *vars = *(char **)(moby + 0x68);
+    float angle;
+    float rateA;
+    float rateB;
+    float rateC;
 
-    if (*(unsigned char *)(obj + 0x95) == 2 || *(short *)(state + 0x2A6) != 0)
-        func_0029FCC0(obj, 1, *(char **)(state + 0x2A0) + 0x10);
+    if (*(unsigned char *)(moby + 0x95) == 2 || *(short *)(vars + 0x2A6) != 0)
+        TransformMobyJointToWorld(moby, 1, *(char **)(vars + 0x2A0) + 0x10);
     else
-        func_002AF1D0(obj, *(char **)(state + 0x2A0), 1, 0);
-    if (*(unsigned char *)(obj + 0x95) == 2) {
-        if (*(short *)(state + 0x2A6) == 0)
-            *(int *)(state + 0x2AC) = 0;
-        func_00282CF0(v0, D_00189EA0, *(char **)(state + 0x2A0) + 0x10);
-        r = func_002B04E0(*(char **)(state + 0x2A0), v0, 0);
-        b1 = *(float *)(state + 0x68) + *(float *)(state + 0x68);
-        a1 = *(float *)(state + 0x64);
-        c1 = *(float *)(state + 0x6C);
-        fz0 = 0;
-        func_002AAA00(&fz0, r, a1, b1, c1, state + 0x2AC, 0);
-        qzero_nc(t);
-        ((float *)t)[2] = *(float *)(state + 0x2AC);
-        func_002833F0(v1, t);
-        func_00283738(*(char **)(state + 0x2A0) + 0xC0, *(char **)(state + 0x2A0) + 0xC0, v1);
-        func_002A05A8(*(char **)(state + 0x2A0));
-        *(unsigned short *)(*(char **)(state + 0x2A0) + 0x34) |= 0x106;
-        func_002A0F48(*(char **)(state + 0x2A0));
-        func_00282D30(u, state + 0x280, -1.0f);
-        func_002B0408(*(char **)(state + 0x2A0) + 0xC0, u, 0);
-        *(short *)(state + 0x2A6) = D_L23_001AFA64;
+        CopyJointTransformToObject(moby, *(char **)(vars + 0x2A0), 1, 0);
+    if (*(unsigned char *)(moby + 0x95) == 2) {
+        if (*(short *)(vars + 0x2A6) == 0)
+            *(int *)(vars + 0x2AC) = 0;
+        FastVecSub(baseVec, gHeroPosition, *(char **)(vars + 0x2A0) + 0x10);
+        angle = GetHeadingAngleOfVector(*(char **)(vars + 0x2A0), baseVec, 0);
+        rateB = *(float *)(vars + 0x68) + *(float *)(vars + 0x68);
+        rateA = *(float *)(vars + 0x64);
+        rateC = *(float *)(vars + 0x6C);
+        unusedOut0 = 0;
+        ApproachTargetWithDirectionMode(&unusedOut0, angle, rateA, rateB, rateC, vars + 0x2AC, 0);
+        qzero_nc(twistVec);
+        ((float *)twistVec)[2] = *(float *)(vars + 0x2AC);
+        euler_rotation_basis(matrix, twistVec);
+        multiply_matrix3x3(*(char **)(vars + 0x2A0) + 0xC0, *(char **)(vars + 0x2A0) + 0xC0, matrix);
+        func_002A05A8(*(char **)(vars + 0x2A0));
+        *(unsigned short *)(*(char **)(vars + 0x2A0) + 0x34) |= 0x106;
+        func_002A0F48(*(char **)(vars + 0x2A0));
+        FastVecScale(scratchVec, vars + 0x280, -1.0f);
+        AlignRotationToDirection(*(char **)(vars + 0x2A0) + 0xC0, scratchVec, 0);
+        *(short *)(vars + 0x2A6) = D_L23_001AFA64;
         return;
     }
     {
-        short v = *(short *)(state + 0x2A6);
+        short timer = *(short *)(vars + 0x2A6);
 
-        if (v != 0) {
-            if (v == D_L23_001AFA64)
-                *(int *)(state + 0x2AC) = 0;
-            *v0 = 0;
-            ((float *)v0)[0] = 1.0f;
-            ((float *)v0)[3] = 1.0f;
-            func_0029FC20(obj, 1, v1);
-            qzero_nc(t);
-            func_00283098(v0, v0, v1);
-            r = func_002B04E0(*(char **)(state + 0x2A0), v0, 0);
-            a1 = *(float *)(state + 0x64) + *(float *)(state + 0x64);
-            c1 = *(float *)(state + 0x6C);
-            b1 = *(float *)(state + 0x68) * 4.0f;
-            fz1 = 0;
-            func_002AAA00(&fz1, r, a1, b1, c1, state + 0x2AC, 0);
-            qzero_nc(u);
-            ((float *)u)[2] = *(float *)(state + 0x2AC);
-            func_002833F0(r3, u);
-            func_00283738(*(char **)(state + 0x2A0) + 0xC0, *(char **)(state + 0x2A0) + 0xC0, r3);
-            func_002A05A8(*(char **)(state + 0x2A0));
-            *(unsigned short *)(*(char **)(state + 0x2A0) + 0x34) |= 0x106;
-            func_002A0F48(*(char **)(state + 0x2A0));
-            func_00282D30(r4, state + 0x280, -1.0f);
-            func_002B0408(*(char **)(state + 0x2A0) + 0xC0, r4, 0);
-            func_00282978((short *)(state + 0x2A6));
+        if (timer != 0) {
+            if (timer == D_L23_001AFA64)
+                *(int *)(vars + 0x2AC) = 0;
+            *baseVec = 0;
+            ((float *)baseVec)[0] = 1.0f;
+            ((float *)baseVec)[3] = 1.0f;
+            TransformMobyJointPoint(moby, 1, matrix);
+            qzero_nc(twistVec);
+            matrix_mul_vec3(baseVec, baseVec, matrix);
+            angle = GetHeadingAngleOfVector(*(char **)(vars + 0x2A0), baseVec, 0);
+            rateA = *(float *)(vars + 0x64) + *(float *)(vars + 0x64);
+            rateC = *(float *)(vars + 0x6C);
+            rateB = *(float *)(vars + 0x68) * 4.0f;
+            unusedOut1 = 0;
+            ApproachTargetWithDirectionMode(&unusedOut1, angle, rateA, rateB, rateC, vars + 0x2AC, 0);
+            qzero_nc(scratchVec);
+            ((float *)scratchVec)[2] = *(float *)(vars + 0x2AC);
+            euler_rotation_basis(matrix2, scratchVec);
+            multiply_matrix3x3(*(char **)(vars + 0x2A0) + 0xC0, *(char **)(vars + 0x2A0) + 0xC0, matrix2);
+            func_002A05A8(*(char **)(vars + 0x2A0));
+            *(unsigned short *)(*(char **)(vars + 0x2A0) + 0x34) |= 0x106;
+            func_002A0F48(*(char **)(vars + 0x2A0));
+            FastVecScale(pushVec, vars + 0x280, -1.0f);
+            AlignRotationToDirection(*(char **)(vars + 0x2A0) + 0xC0, pushVec, 0);
+            FastDecTimer((short *)(vars + 0x2A6));
         }
     }
 }

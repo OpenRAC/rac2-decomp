@@ -96,66 +96,66 @@ void func_L23_0041B9F0(unsigned char *moby) {
     char tmp[16];
     float vec[4];
     float mtx[16];
-    unsigned char *st = *(unsigned char **)(D_L23_001B1484 + 0x68);
+    unsigned char *st = *(unsigned char **)(gMothershipBossMoby + 0x68);
     char *hit;
     float total;
     int i;
 
-    func_L23_0041B968();
-    func_00282948(&D_L23_001B3714);
+    PickStrongestGenerator();
+    FastFloatHelperD(&D_L23_001B3714);
     if (*(int *)(st + 0x60C) == -1 && *(char **)(st + 0x610) == 0) {
-        func_00282D30(tmp, moby + 0xE0, D_L23_001B16BC);
-        func_00282CC0(tmp, tmp, moby + 0x10);
+        FastVecScale(tmp, moby + 0xE0, D_L23_001B16BC);
+        FastVecAdd(tmp, tmp, moby + 0x10);
         qcopy(&D_L23_001B36E0, tmp);
-        hit = func_002A9640(moby, 0x30000, 0);
+        hit = FindOwnedEffectSlot(moby, 0x30000, 0);
         moby[0xA8] = 0xFF;
-        func_00282978(st + 0x26);
+        FastDecTimer(st + 0x26);
         if (hit != 0) {
             if (*(short *)(st + 0x26) != 0 || *(int *)(st + 0x604) != 0
-                || (*(int *)(hit + 0x20) == D_0018C0B0 && D_L23_001B1694 < 0)) {
+                || (*(int *)(hit + 0x20) == gHeroMoby_0018C0B0 && D_L23_001B1694 < 0)) {
                 hit = 0;
                 if (*(int *)(st + 0x604) != 0 && *(unsigned short *)(st + 0x26) == 0)
-                    func_L23_0041E570();
+                    StartBossFightOnce();
             }
             if (hit != 0) {
                 st[0x147] = 0xFF;
-                func_002AB800(moby, st + 0x140);
+                StartColorFade(moby, st + 0x140);
                 if (*(unsigned short *)(moby + 0x7C) != 0) {
                     for (i = 0; i < 4; i++) {
                         float angle;
                         float speed;
                         char *child;
 
-                        angle = func_00283B98(func_002A78D8(90.0f, 120.0f) * 0.017453294f,
+                        angle = FastAddRotations(RandomSignedFloatRange(90.0f, 120.0f) * 0.017453294f,
                                               D_L23_001BA500.f158);
-                        speed = func_002A7878(2.0f, 4.0f) * 0.016666668f;
-                        vec[0] = func_00283180(angle) * speed;
-                        vec[1] = func_00283198(angle) * speed;
+                        speed = RandomFloatRange(2.0f, 4.0f) * 0.016666668f;
+                        vec[0] = FastSinOrCosA(angle) * speed;
+                        vec[1] = FastSinOrCosB(angle) * speed;
                         vec[2] = 0.0f;
-                        vec[2] = func_002A7878(5.0f, 8.0f) * 0.016666668f;
-                        child = func_00273730(moby, 1, *(short *)(moby + 0xAA), i, moby + 0x10,
+                        vec[2] = RandomFloatRange(5.0f, 8.0f) * 0.016666668f;
+                        child = CreateCameraMoby(moby, 1, *(short *)(moby + 0xAA), i, moby + 0x10,
                                               moby + 0xF0, vec, 90.0f, 15.0f, 0xFF);
                         if (child != 0)
-                            *(void **)(child + 0x64) = (void *)func_00310C88;
+                            *(void **)(child + 0x64) = (void *)UpdateFadeOutMoby;
                     }
                     *(unsigned short *)(moby + 0x7C) = 0;
                 }
-                func_L23_0041C578(*(char **)(hit + 0x20));
+                SpawnHitSparks_L23(*(char **)(hit + 0x20));
                 *(float *)(st + 0x20) -= *(float *)(hit + 0x2C);
                 *(short *)(st + 0x26) = 20;
                 if (*(float *)(st + 0x20) <= 0.0f) {
-                    func_002A7750(moby, 4, 0);
-                    D_00189E20.f2294 = 0;
-                    func_L00_002AF7D0();
-                    func_L00_00310C88(D_00189E20.f2290, D_00189E20.f1870);
-                    D_00189E20.f187C = 0;
-                    func_L22_002C9898(0, 1);
+                    SetMobyState(moby, 4, 0);
+                    gHeroState.f2294 = 0;
+                    cancel_hero_item_animation();
+                    release_moby_animation_slot(gHeroState.f2290, gHeroState.f1870);
+                    gHeroState.f187C = 0;
+                    SetHeroAction_L22(0, 1);
                     return;
                 }
             }
         }
-        func_002AB8C0(moby, st + 0x140);
-        func_002B3380(moby, st + 0x210, st + 0x20);
+        UpdateColorFade(moby, st + 0x140);
+        SpawnDamageDebrisOnHealthLoss(moby, st + 0x210, st + 0x20);
     } else {
         char *held;
 
@@ -163,9 +163,9 @@ void func_L23_0041B9F0(unsigned char *moby) {
         if (*(int *)(st + 0x60C) != -1) {
             int k;
 
-            func_0029FC20(moby, *(int *)(st + 0x60C) + 1, mtx);
-            func_00282D30(tmp, (char *)(mtx + 4), D_L23_001B16C0);
-            func_00282CC0(tmp, tmp, moby + 0x10);
+            TransformMobyJointPoint(moby, *(int *)(st + 0x60C) + 1, mtx);
+            FastVecScale(tmp, (char *)(mtx + 4), D_L23_001B16C0);
+            FastVecAdd(tmp, tmp, moby + 0x10);
             qcopy(&D_L23_001B36E0, tmp);
             for (k = 0; k < 5; k++) {
                 char *gen = ((char **)(st + 0x358))[k];
@@ -178,8 +178,8 @@ void func_L23_0041B9F0(unsigned char *moby) {
                 }
             }
         } else {
-            func_00282D30(tmp, moby + 0xE0, D_L23_001B16BC);
-            func_00282CC0(tmp, tmp, moby + 0x10);
+            FastVecScale(tmp, moby + 0xE0, D_L23_001B16BC);
+            FastVecAdd(tmp, tmp, moby + 0x10);
             qcopy(&D_L23_001B36E0, tmp);
         }
         held = *(char **)(st + 0x610);
@@ -189,7 +189,7 @@ void func_L23_0041B9F0(unsigned char *moby) {
             if (h >= 0.0f) {
                 total += h;
             } else {
-                func_0029F338(held);
+                MarkMobySpawned(held);
                 *(char **)(st + 0x610) = 0;
                 *(short *)(st + 0x26) = 30;
             }

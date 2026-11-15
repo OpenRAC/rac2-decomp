@@ -31,11 +31,11 @@ void func_L00_003D2C00(void *object, void *position, int unused)
     char delta[16] __attribute__((aligned(16)));
     char end[16] __attribute__((aligned(16)));
     char jitter[16] __attribute__((aligned(16)));
-    int i, j, k;
-    float angle, t;
+    int strip, point, index;
+    float angle, fraction;
 
-    for (k = 0; k < 4; k++)
-        D_L00_001B2AE0[k] = -1;
+    for (index = 0; index < 4; index++)
+        D_L00_001B2AE0[index] = -1;
 
     D_L00_001B2B00[0] = 8;
     D_L00_001B2B10[0] = 4;
@@ -50,26 +50,26 @@ void func_L00_003D2C00(void *object, void *position, int unused)
     D_L00_001B2B00[5] = 4;
     D_L00_001B2B10[5] = 3;
 
-    for (i = 4; i < 6; i++) {
-        D_L00_001B2AE0[i] = 8;
-        D_L00_001B2AF0[i] = 255;
+    for (strip = 4; strip < 6; strip++) {
+        D_L00_001B2AE0[strip] = 8;
+        D_L00_001B2AF0[strip] = 255;
 
-        qcopy(D_L00_00247310 + i * 80, position);
-        func_00282D30(delta, D_0018A580, 32.0f);
-        func_002ACEC0(delta, delta, D_0018A580 - 32, -(func_002A7878(10.0f, 24.0f) * 0.017453294f));
-        angle = func_002A7878(22.0f, 30.0f) * 0.017453294f;
-        if (i == 5)
-            func_002ACEC0(delta, delta, D_0018A580 - 16, -angle);
+        qcopy(D_L00_00247310 + strip * 80, position);
+        FastVecScale(delta, D_0018A580, 32.0f);
+        ApplyAxisRotationToQuaternion(delta, delta, D_0018A580 - 32, -(RandomFloatRange(10.0f, 24.0f) * 0.017453294f));
+        angle = RandomFloatRange(22.0f, 30.0f) * 0.017453294f;
+        if (strip == 5)
+            ApplyAxisRotationToQuaternion(delta, delta, D_0018A580 - 16, -angle);
         else
-            func_002ACEC0(delta, delta, D_0018A580 - 16, angle);
+            ApplyAxisRotationToQuaternion(delta, delta, D_0018A580 - 16, angle);
 
-        func_00282CC0(end, position, delta);
-        qcopy(D_L00_00247350 + i * 80, end);
-        for (j = 1; j < 4; j++) {
-            t = func_00283CE0(j) / func_00283CE0(4);
-            func_00282D08(D_L00_00247310 + i * 80 + j * 16, position, end, t);
-            func_002A7A00(jitter, t * 2.0f, t * 2.0f);
-            func_00282CC0(D_L00_00247310 + i * 80 + j * 16, D_L00_00247310 + i * 80 + j * 16, jitter);
+        FastVecAdd(end, position, delta);
+        qcopy(D_L00_00247350 + strip * 80, end);
+        for (point = 1; point < 4; point++) {
+            fraction = IntToFloat(point) / IntToFloat(4);
+            lerp_vector(D_L00_00247310 + strip * 80 + point * 16, position, end, fraction);
+            RandomDirectionVector(jitter, fraction * 2.0f, fraction * 2.0f);
+            FastVecAdd(D_L00_00247310 + strip * 80 + point * 16, D_L00_00247310 + strip * 80 + point * 16, jitter);
         }
     }
 }

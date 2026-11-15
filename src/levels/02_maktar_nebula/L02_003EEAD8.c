@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *D_L02_001FF1C0[];
 extern void func_00282C88(void *);
@@ -15,36 +16,37 @@ extern int func_00283CF0(float);
    centre plus the margin at +4 becomes the radius at +0x2C, and two ratios of the entry's float
    at +0x1C become the words at +0x3C and +0x40. The guarded do-while with a second pointer walked beside
    the point index is the loop shape retail has. */
-void func_L02_003EEAD8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *entry = D_L02_001FF1C0[*(int *)state];
-    float sum[4];
+/* Works out the middle and size of a path of points, plus two timing counts, when the actor is set up. */
+void func_L02_003EEAD8(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    char *entry = gRoutePolygons[*(int *)state];
+    float pointSum[4];
     int i;
     int j;
 
-    func_00282C88(sum);
+    ClearVector128(pointSum);
     i = 0;
     if (*(int *)entry - 1 > 0) {
-        char *q = entry + 0x20;
+        char *nextPoint = entry + 0x20;
 
         do {
-            char *p = entry + i * 16 + 0x10;
+            char *point = entry + i * 16 + 0x10;
 
-            *(float *)(p + 0xC) = func_00282E80(p, q);
-            func_00282CC0(sum, sum, p);
-            q += 0x10;
+            *(float *)(point + 0xC) = vec_distance_xy(point, nextPoint);
+            FastVecAdd(pointSum, pointSum, point);
+            nextPoint += 0x10;
             i++;
         } while (i < *(int *)entry - 1);
     }
-    func_00282D30(state + 0x20, sum, 1.0f / (float)(*(int *)entry - 1));
+    FastVecScale(state + 0x20, pointSum, 1.0f / (float)(*(int *)entry - 1));
     *(float *)(state + 0x2C) = 0.0f;
     for (j = 0; j < *(int *)entry; j++) {
-        float f = func_00282E48(entry + j * 16 + 0x10, state + 0x20);
+        float distance = fast_vec_dist(entry + j * 16 + 0x10, state + 0x20);
 
-        if (*(float *)(state + 0x2C) < f)
-            *(float *)(state + 0x2C) = f;
+        if (*(float *)(state + 0x2C) < distance)
+            *(float *)(state + 0x2C) = distance;
     }
     *(float *)(state + 0x2C) += *(float *)(state + 4);
-    *(int *)(state + 0x3C) = func_00283CF0(*(float *)(state + 8) / *(float *)(entry + 0x1C));
-    *(int *)(state + 0x40) = func_00283CF0(*(float *)(state + 4) / *(float *)(entry + 0x1C));
+    *(int *)(state + 0x3C) = FloatToInt(*(float *)(state + 8) / *(float *)(entry + 0x1C));
+    *(int *)(state + 0x40) = FloatToInt(*(float *)(state + 4) / *(float *)(entry + 0x1C));
 }

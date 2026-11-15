@@ -14,6 +14,7 @@ extern void func_00282CF0(void *, void *, void *);
 extern void func_002830C0(void *, void *, void *);
 extern float func_00282E20(void *);
 
+/* Gives a target a score (lower is better) from its distance and angle, and flags it if it is out of range. */
 float func_L00_002AE388(char *object, float heading, float range, int *blocked, float hlimit, float vlimit)
 {
     float position[4] __attribute__((aligned(16)));
@@ -22,21 +23,21 @@ float func_L00_002AE388(char *object, float heading, float range, int *blocked, 
     qcopy_nc(position, D_00189E20_26.position);
     if (D_00189E20_26.mode == 20)
         position[2] = D_00189E20_26.height;
-    distance = func_00282E48(position, object + 0x10);
+    distance = fast_vec_dist(position, object + 0x10);
     if (range < distance) *blocked = 1;
-    sum = func_00283C80(func_00283248(F(object,0x10)-position[0], F(object,0x14)-position[1]),heading);
+    sum = FastDiffRots(FastMatrixHelperA(F(object,0x10)-position[0], F(object,0x14)-position[1]),heading);
     horizontal = sum;
-    vertical = func_00283C80(func_00283248(func_00282E80(position,object+0x10),F(object,0x18)-position[2]),0.0f);
+    vertical = FastDiffRots(FastMatrixHelperA(vec_distance_xy(position,object+0x10),F(object,0x18)-position[2]),0.0f);
     if (D_00189E20_26.mode==1 || D_00189E20_26.mode==29) {
-        horizontal = func_00283C80(func_00283248(F(object,0x10)-D_L00_001B8C80.position[0],F(object,0x14)-D_L00_001B8C80.position[1]),D_L00_001B8C80.heading);
-        vertical = func_00283C80(func_00283248(func_00282E80(D_L00_001B8C80.position,object+0x10),F(object,0x18)-D_L00_001B8C80.position[2]),-D_L00_001B8C80.pitch);
+        horizontal = FastDiffRots(FastMatrixHelperA(F(object,0x10)-D_L00_001B8C80.position[0],F(object,0x14)-D_L00_001B8C80.position[1]),D_L00_001B8C80.heading);
+        vertical = FastDiffRots(FastMatrixHelperA(vec_distance_xy(D_L00_001B8C80.position,object+0x10),F(object,0x18)-D_L00_001B8C80.position[2]),-D_L00_001B8C80.pitch);
         sum = horizontal + vertical;
         horizontal = (horizontal > vertical ? horizontal : vertical);
     }
     if (hlimit > 0.0f) { if (hlimit < horizontal) *blocked=1; }
     if (vlimit > 0.0f) { if (vlimit < vertical) *blocked=1; }
     score = distance + sum * distance;
-    if (func_002ABB78(object)) score += range * 0.8f;
+    if (IsMobyInSpecialClassRange(object)) score += range * 0.8f;
     else if (object && *(char **)(object+0x24) && *(short *)(*(char **)(object+0x24)+0x46)==22) score += range * 0.8f;
     return score;
 }

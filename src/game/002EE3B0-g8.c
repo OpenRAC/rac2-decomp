@@ -6,17 +6,18 @@ extern float D_001AC248 __attribute__((sda));
 extern float D_001AC240 __attribute__((sda));
 extern float D_001AC244 __attribute__((sda));
 
+/* Loads the follow speed, pull and range settings that match the follower's current state. */
 void func_002EE3B0(unsigned char *owner)
 {
-    char *object = func_002ED688(owner);
+    char *object = GetMobyMotionData(owner);
     int state;
 
     if (!object)
         return;
     if (*(unsigned char **)(object + 0x10))
-        state = func_002EE6A8(*(unsigned char **)(object + 0x10));
+        state = GetFollowerState(*(unsigned char **)(object + 0x10));
     else
-        state = func_002EE6A8(owner);
+        state = GetFollowerState(owner);
     if (state == 3) {
         D_001AC248 = 0.416666687f;
         D_001AC240 = 0.02f;

@@ -148,6 +148,7 @@ frame_heapsort (fde_vector *erratic)
 }
 
 /* end_fde_sort */
+/* Sorts all frame records by address and gives back the sorted list. */
 fde ** func_001236C8 (fde_accumulator *accu, size_t count)
 {
   if (accu->linear.count != count)

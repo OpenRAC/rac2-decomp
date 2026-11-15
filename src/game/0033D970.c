@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 /* Draws the two-line option row: each line is the shared "%s: %s" format over a label and the
  * variant text picked by one of two resident flags; the line matching the current selection
  * takes the bright color. */
@@ -22,18 +23,18 @@ void func_0033D970(char *object)
     char *format;
     int color;
 
-    func_0033AF48(object + 8);
+    DrawButtonPromptBar(object + 8);
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
-    first = func_00288FB8(0x2D9A);
-    second = func_00288FB8(pair.ids[D_001A7BB2 != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FAA8(0x100, 0x96, color, buffer, -1);
+    first = GetLocalizedString(0x2D9A);
+    second = GetLocalizedString(pair.ids[D_001A7BB2 != 0]);
+    Sprintf(buffer, format, first, second);
+    DrawTextCenteredSmallFont(0x100, 0x96, color, buffer, -1);
 
     color = *(int *)(object + 0x2A8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
-    label = func_00288FB8(0x31E3);
-    second = func_00288FB8(pair.ids[D_001A7BB3 != 0]);
-    func_00115DA8(buffer, format, label, second);
-    func_0027FAA8(0x100, 0xBE, color, buffer, -1);
+    label = GetLocalizedString(0x31E3);
+    second = GetLocalizedString(pair.ids[D_001A7BB3 != 0]);
+    Sprintf(buffer, format, label, second);
+    DrawTextCenteredSmallFont(0x100, 0xBE, color, buffer, -1);
 }

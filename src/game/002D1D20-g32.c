@@ -14,41 +14,42 @@ extern int D_0025C960[];
 extern int D_0025C8E4[];
 extern short D_001ABD40[] MACRO_ADDR;
 
+/* Handles left and right on the 18-page viewer and shows the page for the current index. */
 int func_002D1D20(void)
 {
     int result = 0;
-    int flags = D_00138180.flags;
+    int flags = gPadState.flags;
 
     if (flags & 0x10) {
         int value;
-        int status;
+        int returnCode;
         D_001ABA58 = 0;
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
+            returnCode = -1;
             goto finish;
         }
-        status = 0;
+        returnCode = 0;
 finish:
-        return status;
+        return returnCode;
     }
     if (flags & 0x900) {
         D_001ABA58 = 0;
         result = 1;
     } else if (flags & 0x8000) {
         if (D_001ABA58 > 0)
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
         else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         if (--D_001ABA58 < 0)
             D_001ABA58 = 0;
     } else if (flags & 0x2000) {
         if (D_001ABA58 < 17)
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
         else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         if (++D_001ABA58 > 17)
             D_001ABA58 = 17;
     }

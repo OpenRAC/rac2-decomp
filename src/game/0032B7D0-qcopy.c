@@ -11,46 +11,47 @@ extern float func_00283CE0(int);
 extern void func_00282D08(void *, void *, void *, float);
 extern int func_00282948(int *);
 
+/* Updates the spinning pieces of an owner: they turn, blend from one position to another, and are freed when their time is over. */
 void func_0032B7D0(char *owner)
 {
     float delta[4];
     int i;
-    char *records = D_002351A0;
-    char *center = D_L00_00189F00;
+    char *table = gRingPieces;
+    char *origin = D_L00_00189F00;
     for (i = 0; i < 12; i++) {
-        char *p = records + i * 0xB0;
+        char *piece = table + i * 0xB0;
         float ratio;
-        if (*(char **)(p + 0x9C) != owner) continue;
-        func_00282CF0(delta, (float *)(p + 0x40), p + 0x20);
-        *(EffectQuad *)(p + 0x20) = *(EffectQuad *)center;
-        func_00282CC0(p + 0x40, p + 0x20, delta);
-        if (*(int *)(p + 0xA0)) {
-            *(float *)(p + 0x50) = func_00283B98(*(float *)(p + 0x50), *(float *)(p + 0x5C) * 100.0f);
-            *(float *)(p + 0x54) = func_00283B98(*(float *)(p + 0x54), *(float *)(p + 0x60) * 100.0f);
-            *(float *)(p + 0x58) = func_00283B98(*(float *)(p + 0x58), *(float *)(p + 0x64) * 100.0f);
-            *(float *)(p + 0x74) = func_00283B98(*(float *)(p + 0x74), *(float *)(p + 0x80) * 100.0f);
-            *(float *)(p + 0x78) = func_00283B98(*(float *)(p + 0x78), *(float *)(p + 0x84) * 100.0f);
-            *(float *)(p + 0x7C) = func_00283B98(*(float *)(p + 0x7C), *(float *)(p + 0x88) * 100.0f);
+        if (*(char **)(piece + 0x9C) != owner) continue;
+        FastVecSub(delta, (float *)(piece + 0x40), piece + 0x20);
+        *(EffectQuad *)(piece + 0x20) = *(EffectQuad *)origin;
+        FastVecAdd(piece + 0x40, piece + 0x20, delta);
+        if (*(int *)(piece + 0xA0)) {
+            *(float *)(piece + 0x50) = FastAddRotations(*(float *)(piece + 0x50), *(float *)(piece + 0x5C) * 100.0f);
+            *(float *)(piece + 0x54) = FastAddRotations(*(float *)(piece + 0x54), *(float *)(piece + 0x60) * 100.0f);
+            *(float *)(piece + 0x58) = FastAddRotations(*(float *)(piece + 0x58), *(float *)(piece + 0x64) * 100.0f);
+            *(float *)(piece + 0x74) = FastAddRotations(*(float *)(piece + 0x74), *(float *)(piece + 0x80) * 100.0f);
+            *(float *)(piece + 0x78) = FastAddRotations(*(float *)(piece + 0x78), *(float *)(piece + 0x84) * 100.0f);
+            *(float *)(piece + 0x7C) = FastAddRotations(*(float *)(piece + 0x7C), *(float *)(piece + 0x88) * 100.0f);
         } else {
-            *(float *)(p + 0x50) = func_00283B98(*(float *)(p + 0x50), *(float *)(p + 0x5C) * 50.0f);
-            *(float *)(p + 0x54) = func_00283B98(*(float *)(p + 0x54), *(float *)(p + 0x60) * 50.0f);
-            *(float *)(p + 0x58) = func_00283B98(*(float *)(p + 0x58), *(float *)(p + 0x64) * 50.0f);
-            *(float *)(p + 0x74) = func_00283B98(*(float *)(p + 0x74), *(float *)(p + 0x80) * 50.0f);
-            *(float *)(p + 0x78) = func_00283B98(*(float *)(p + 0x78), *(float *)(p + 0x84) * 50.0f);
-            *(float *)(p + 0x7C) = func_00283B98(*(float *)(p + 0x7C), *(float *)(p + 0x88) * 50.0f);
+            *(float *)(piece + 0x50) = FastAddRotations(*(float *)(piece + 0x50), *(float *)(piece + 0x5C) * 50.0f);
+            *(float *)(piece + 0x54) = FastAddRotations(*(float *)(piece + 0x54), *(float *)(piece + 0x60) * 50.0f);
+            *(float *)(piece + 0x58) = FastAddRotations(*(float *)(piece + 0x58), *(float *)(piece + 0x64) * 50.0f);
+            *(float *)(piece + 0x74) = FastAddRotations(*(float *)(piece + 0x74), *(float *)(piece + 0x80) * 50.0f);
+            *(float *)(piece + 0x78) = FastAddRotations(*(float *)(piece + 0x78), *(float *)(piece + 0x84) * 50.0f);
+            *(float *)(piece + 0x7C) = FastAddRotations(*(float *)(piece + 0x7C), *(float *)(piece + 0x88) * 50.0f);
         }
-        *(float *)(p + 0) = func_00283180(*(float *)(p + 0x50)) * *(float *)(p + 0x68);
-        *(float *)(p + 4) = func_00283198(*(float *)(p + 0x54)) * *(float *)(p + 0x6C);
-        *(float *)(p + 8) = -func_00283198(*(float *)(p + 0x58)) * *(float *)(p + 0x70);
-        *(float *)(p + 0x10) = func_00283180(*(float *)(p + 0x74)) * *(float *)(p + 0x8C);
-        *(float *)(p + 0x14) = func_00283198(*(float *)(p + 0x78)) * *(float *)(p + 0x90);
-        *(float *)(p + 0x18) = -func_00283198(*(float *)(p + 0x7C)) * *(float *)(p + 0x94);
-        ratio = func_00283CE0(*(int *)(p + 0xA0));
-        ratio /= func_00283CE0(*(int *)(p + 0xA4));
-        func_00282D08(p + 0x30, p + 0x20, p + 0x40, 1.0f - ratio);
-        if (func_00282948((int *)(p + 0xA0))) {
-            if (*(int *)(p + 0xA8) == 0) *(int *)(p + 0xA8) = 1;
-            if (func_00282948((int *)(p + 0x98))) *(int *)(p + 0x9C) = 0;
+        *(float *)(piece + 0) = FastSinOrCosA(*(float *)(piece + 0x50)) * *(float *)(piece + 0x68);
+        *(float *)(piece + 4) = FastSinOrCosB(*(float *)(piece + 0x54)) * *(float *)(piece + 0x6C);
+        *(float *)(piece + 8) = -FastSinOrCosB(*(float *)(piece + 0x58)) * *(float *)(piece + 0x70);
+        *(float *)(piece + 0x10) = FastSinOrCosA(*(float *)(piece + 0x74)) * *(float *)(piece + 0x8C);
+        *(float *)(piece + 0x14) = FastSinOrCosB(*(float *)(piece + 0x78)) * *(float *)(piece + 0x90);
+        *(float *)(piece + 0x18) = -FastSinOrCosB(*(float *)(piece + 0x7C)) * *(float *)(piece + 0x94);
+        ratio = IntToFloat(*(int *)(piece + 0xA0));
+        ratio /= IntToFloat(*(int *)(piece + 0xA4));
+        lerp_vector(piece + 0x30, piece + 0x20, piece + 0x40, 1.0f - ratio);
+        if (FastFloatHelperD((int *)(piece + 0xA0))) {
+            if (*(int *)(piece + 0xA8) == 0) *(int *)(piece + 0xA8) = 1;
+            if (FastFloatHelperD((int *)(piece + 0x98))) *(int *)(piece + 0x9C) = 0;
         }
     }
 }

@@ -57,6 +57,7 @@ extern char *D_L11_001FF580[];
 extern char D_L11_001B1DD0[], D_L11_001B1E00[], D_L11_001B1E28[];
 extern void func_0026FEB8(char *, ...);
 
+/* Works out where something moving along a path made of curve pieces is at a given frame, and gives back its x and y. */
 void func_L11_004577F8(int *outX, int *outY, int selector, int frame,
                        int *previousCurve, int *segment, char *object)
 {
@@ -188,7 +189,7 @@ void func_L11_004577F8(int *outX, int *outY, int selector, int frame,
         count = 2;
         curve = 10;
     } else {
-        func_0026FEB8(D_L11_001B1DD0);
+        STUB_printf(D_L11_001B1DD0);
         *previousCurve = -1;
         *segment = 0;
         *outX = 0;
@@ -215,7 +216,7 @@ void func_L11_004577F8(int *outX, int *outY, int selector, int frame,
                 i--;
                 if (i < 0) {
                     i = count;
-                    func_0026FEB8(D_L11_001B1E00);
+                    STUB_printf(D_L11_001B1E00);
                 }
                 start -= durations[i];
             }
@@ -225,7 +226,7 @@ void func_L11_004577F8(int *outX, int *outY, int selector, int frame,
                 if (start < time) {
                     i++;
                     if (i >= count) {
-                        func_0026FEB8(D_L11_001B1E28);
+                        STUB_printf(D_L11_001B1E28);
                         i = 0;
                     }
                 }
@@ -238,7 +239,7 @@ void func_L11_004577F8(int *outX, int *outY, int selector, int frame,
     point[1] = (float)origins[i * 2 + 1];
     point[2] = 0.0f;
     func_00282D30_2((char *)delta, (char *)(velocities + i * 4), time - start);
-    func_00282CC0(point, point, delta);
+    FastVecAdd(point, point, delta);
     *outX = (int)point[0];
     *outY = (int)point[1];
 }

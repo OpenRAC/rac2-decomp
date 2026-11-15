@@ -6,66 +6,67 @@ extern f32 D_L03_001B0054 __attribute__((sda));
 extern f32 D_L03_001B0058[2] __attribute__((sda));
 extern char D_L03_00188660[];
 typedef struct { f32 scale; f32 spin; f32 wobble[2]; f32 roll; f32 fade; s32 slot; } SpinState;
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
-extern f32  func_00283B98(f32 a0, f32 a1);
-extern void func_L00_002E6CF0(void *a0, void *a1);
+extern void func_002A7750(char *moby, s32 a1, s32 a2);
+extern f32  func_00283B98(f32 moby, f32 a1);
+extern void func_L00_002E6CF0(void *moby, void *a1);
 extern void func_L03_003C6208(void);
-extern s32  func_002B38B8(char *a0);
-extern f32  func_002AA2E8(f32 *a0, f32 a1, f32 a2);
-extern void func_002E59F8(s32 a0);
-extern s32  func_002E5CF8(s32 a0, s32 a1, char *a2);
+extern s32  func_002B38B8(char *moby);
+extern f32  func_002AA2E8(f32 *moby, f32 a1, f32 a2);
+extern void func_002E59F8(s32 moby);
+extern s32  func_002E5CF8(s32 moby, s32 a1, char *a2);
 
-void func_L03_003C5FE8(char *a0)
+/* Updates the spinning, wobbling rotor object. It keeps turning, fades out when its trigger is on, and looks after its looping sound. */
+void func_L03_003C5FE8(char *moby)
 {
-    char *s1 = a0;
-    SpinState *s2 = *(SpinState **)(s1 + 0x68);
+    char *self = moby;
+    SpinState *state = *(SpinState **)(self + 0x68);
 
-    switch (*(u8 *)(s1 + 0x20)) {
+    switch (*(u8 *)(self + 0x20)) {
     case 0:
-        *(f32 *)(s1 + 0x2C) = *(f32 *)(*(s32 *)(s1 + 0x24) + 0x24) * s2->scale;
-        func_002A7750(s1, 1, -1);
-        *(u16 *)(s1 + 0x34) |= 1;
-        *(u8 *)(s1 + 0x31) = 0;
-        s2->fade = 1.0f;
+        *(f32 *)(self + 0x2C) = *(f32 *)(*(s32 *)(self + 0x24) + 0x24) * state->scale;
+        SetMobyState(self, 1, -1);
+        *(u16 *)(self + 0x34) |= 1;
+        *(u8 *)(self + 0x31) = 0;
+        state->fade = 1.0f;
         break;
     case 1: {
-        f32 k = 0.000290888245f;
-        f32 *c = D_L03_001B0058;
-        f32 *p = s2->wobble;
+        f32 angleScale = 0.000290888245f;
+        f32 *speedTable = D_L03_001B0058;
+        f32 *wobbleAngle = state->wobble;
         s32 i;
 
-        s2->spin = func_00283B98(s2->spin, D_L03_001B0050 * k);
-        s2->roll = func_00283B98(s2->roll, D_L03_001B0054 * k);
+        state->spin = FastAddRotations(state->spin, D_L03_001B0050 * angleScale);
+        state->roll = FastAddRotations(state->roll, D_L03_001B0054 * angleScale);
         for (i = 1; i >= 0; i--) {
-            *p = func_00283B98(*p, *c * 0.000290888245f);
-            p++;
-            c++;
+            *wobbleAngle = FastAddRotations(*wobbleAngle, *speedTable * 0.000290888245f);
+            wobbleAngle++;
+            speedTable++;
         }
-        func_L00_002E6CF0(func_L03_003C6208, s1);
-        if (func_002B38B8(s1) != 0) {
-            func_002AA2E8(&s2->fade, 0.0f, 0.0333333351f);
-            if (s2->fade <= 0.0f) {
-                func_002A7750(s1, 2, -1);
-                *(s32 *)(s1 + 0x98) = 0;
+        AddDrawCallbackToList1(DrawSpinningRotor, self);
+        if (IsThirdPendingFlagSet(self) != 0) {
+            ApproachValue(&state->fade, 0.0f, 0.0333333351f);
+            if (state->fade <= 0.0f) {
+                SetMobyState(self, 2, -1);
+                *(s32 *)(self + 0x98) = 0;
             }
         }
         break;
     }
     }
-    if (*(u8 *)(s1 + 0x20) == 1) {
-        char *p = D_L03_00188660 + s2->slot * 0x70;
+    if (*(u8 *)(self + 0x20) == 1) {
+        char *soundSlot = D_L03_00188660 + state->slot * 0x70;
 
-        if (*(char **)(p + 0x88) != s1 || *(u8 *)(p + 0x74) == 0)
-            s2->slot = func_002E5CF8(0, 4, s1);
+        if (*(char **)(soundSlot + 0x88) != self || *(u8 *)(soundSlot + 0x74) == 0)
+            state->slot = PlayMobySound(0, 4, self);
     } else {
-        s32 v = s2->slot;
+        s32 slotIndex = state->slot;
 
-        if (v != -1) {
-            char *p = D_L03_00188660 + v * 0x70;
+        if (slotIndex != -1) {
+            char *soundSlot = D_L03_00188660 + slotIndex * 0x70;
 
-            if (*(char **)(p + 0x88) == s1 && *(u8 *)(p + 0x74) != 0)
-                func_002E59F8(v);
+            if (*(char **)(soundSlot + 0x88) == self && *(u8 *)(soundSlot + 0x74) != 0)
+                StopSoundVoice(slotIndex);
         }
-        s2->slot = -1;
+        state->slot = -1;
     }
 }

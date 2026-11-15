@@ -20,33 +20,33 @@ char *func_L00_003AA4C8(void *position,void *velocity,void *unused,void *owner)
 {
  float axis[4];
  int r,g,b;
- char *m=func_0029EFD0(0xD01),*d;
+ char *moby=CreateMoby(0xD01 /* moby class 3329 */),*vars;
  float duration, inverse, denominator;
  int ticks;
- if(m) {
- FIELD_U8(m,0x30)=255; FIELD_S16(m,0x32)=255; FIELD_U8(m,0x31)=1; FIELD_U8(m,0x20)=0;
- d=*(char **)(m+0x68);
- denominator=((EffectTiming *)((char *)D_L00_00262570+D_00139580*sizeof(EffectTiming)))->scale*(1.0f/60.0f);
+ if(moby) {
+ FIELD_U8(moby,0x30)=255; FIELD_S16(moby,0x32)=255; FIELD_U8(moby,0x31)=1; FIELD_U8(moby,0x20)=0;
+ vars=*(char **)(moby+0x68);
+ denominator=((EffectTiming *)((char *)gWeaponTable_L00+D_00139580*sizeof(EffectTiming)))->scale*(1.0f/60.0f);
  duration=40.0f/denominator;
- ticks=func_00283CF0(duration);
+ ticks=FloatToInt(duration);
  inverse=1.0f/duration;
- FIELD_S32(d,0x74)=(int)owner; FIELD_S32(d,0x14)=0;FIELD_S32(d,0x30)=0; FIELD_S32(d,0x24)=0;FIELD_S32(d,0x28)=0;FIELD_S32(d,0x2C)=0;
- FIELD_S32(d,0x78)=5; FIELD_F32(d,0x20)=3.141592741f;FIELD_S16(d,0x18)=ticks;FIELD_F32(d,0x34)=inverse;
- FIELD_S16(d,0x1A)=func_002A77E0(255);
- FIELD_S32(d,0x3C)=0;FIELD_S32(d,0x1C)=0;FIELD_S32(d,0x7C)=0;FIELD_S32(d,0x58)=0;FIELD_F32(d,0x50)=0.5f;FIELD_S32(d,0x5C)=-1;
- func_002A04B8(m,&r,&g,&b);
- FIELD_S32(d,0x38)=(b<<16)|(g<<8)|r;
- FIELD_F32(m,0x2C)*=1.5f;
- qcopy(m+0x10,position);
- qcopy(d,velocity);
- FIELD_S16(m,0x34)|=0x100;
- func_002AFFD8(m+0x10,axis,1);
- func_00282F20(m+0xC0,d,1.0f);
- func_00282DD8(m+0xD0,m+0xC0,axis);
- func_00282F20(m+0xD0,m+0xD0,1.0f);
- func_00282DD8(m+0xE0,m+0xD0,m+0xC0);
- func_002A7398(m,2,0);
- FIELD_S32(d,0x70)=func_002FED90(m,1.0f,1.0f,1.0f,0);
+ FIELD_S32(vars,0x74)=(int)owner; FIELD_S32(vars,0x14)=0;FIELD_S32(vars,0x30)=0; FIELD_S32(vars,0x24)=0;FIELD_S32(vars,0x28)=0;FIELD_S32(vars,0x2C)=0;
+ FIELD_S32(vars,0x78)=5; FIELD_F32(vars,0x20)=3.141592741f;FIELD_S16(vars,0x18)=ticks;FIELD_F32(vars,0x34)=inverse;
+ FIELD_S16(vars,0x1A)=RandomIntBelow(255);
+ FIELD_S32(vars,0x3C)=0;FIELD_S32(vars,0x1C)=0;FIELD_S32(vars,0x7C)=0;FIELD_S32(vars,0x58)=0;FIELD_F32(vars,0x50)=0.5f;FIELD_S32(vars,0x5C)=-1;
+ get_moby_color(moby,&r,&g,&b);
+ FIELD_S32(vars,0x38)=(b<<16)|(g<<8)|r;
+ FIELD_F32(moby,0x2C)*=1.5f;
+ qcopy(moby+0x10,position);
+ qcopy(vars,velocity);
+ FIELD_S16(moby,0x34)|=0x100;
+ ComputeViewDirection(moby+0x10,axis,1);
+ vec_scale_to_length(moby+0xC0,vars,1.0f);
+ FastVecCross(moby+0xD0,moby+0xC0,axis);
+ vec_scale_to_length(moby+0xD0,moby+0xD0,1.0f);
+ FastVecCross(moby+0xE0,moby+0xD0,moby+0xC0);
+ StartAnimationImmediate(moby,2,0);
+ FIELD_S32(vars,0x70)=AllocEffectSlot_002FED90(moby,1.0f,1.0f,1.0f,0);
  }
- return m;
+ return moby;
 }

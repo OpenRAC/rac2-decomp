@@ -1,3 +1,4 @@
+#include "names.h"
 /* Samples a keyframe track at time t with keys every step: the key index (clamped to
    the track, with the fraction zeroed at either end) goes to *idx and the fraction past
    it to *frac, and *out gets the key or the blend toward the next one. Retail compiles
@@ -14,27 +15,27 @@ extern void func_00282CF0(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 
-void func_002C96F8(float t, float step, KeyTrack2C96F8 *track, int *idx, float *frac, float *out)
+void func_002C96F8(float time, float step, KeyTrack2C96F8 *track, int *keyIndex, float *fraction, float *result)
 {
     float delta[4];
     int i;
 
-    i = func_00283CF0(t / step);
-    *idx = i;
+    i = FloatToInt(time / step);
+    *keyIndex = i;
     if (i >= track->count - 1) {
-        *idx = track->count - 1;
-        *frac = 0.0f;
-        *(TI128_2C96F8 *)out = *(TI128_2C96F8 *)track->keys[*idx];
+        *keyIndex = track->count - 1;
+        *fraction = 0.0f;
+        *(TI128_2C96F8 *)result = *(TI128_2C96F8 *)track->keys[*keyIndex];
     } else if (i < 0) {
-        *idx = 0;
-        *frac = 0.0f;
-        *(TI128_2C96F8 *)out = *(TI128_2C96F8 *)track->keys[*idx];
+        *keyIndex = 0;
+        *fraction = 0.0f;
+        *(TI128_2C96F8 *)result = *(TI128_2C96F8 *)track->keys[*keyIndex];
     } else {
-        *frac = t - func_00283CE0(i) * step;
-        func_00282CF0(delta, track->keys[*idx + 1], track->keys[*idx]);
-        *(TI128_2C96F8 *)out = *(TI128_2C96F8 *)delta;
-        func_00282F20(out, out, *frac);
-        func_00282CC0(delta, out, track->keys[*idx]);
-        *(TI128_2C96F8 *)out = *(TI128_2C96F8 *)delta;
+        *fraction = time - IntToFloat(i) * step;
+        FastVecSub(delta, track->keys[*keyIndex + 1], track->keys[*keyIndex]);
+        *(TI128_2C96F8 *)result = *(TI128_2C96F8 *)delta;
+        vec_scale_to_length(result, result, *fraction);
+        FastVecAdd(delta, result, track->keys[*keyIndex]);
+        *(TI128_2C96F8 *)result = *(TI128_2C96F8 *)delta;
     }
 }

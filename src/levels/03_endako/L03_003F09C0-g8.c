@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -71,16 +72,16 @@ void func_L03_003F62C8(u8 *entity) {
         state[0x30B]--;
         sel = 2;
     } else {
-        sel = func_002A77E0(state[0x308] + 1);
+        sel = RandomIntBelow(state[0x308] + 1);
     }
 
     switch (sel) {
     case 0:
-        func_002A7750(entity, 7, 3);
+        SetMobyState(entity, 7, 3);
         if (state[0x308] >= 2) {
             *(float *)(state + 0x2F8) = 0.6981318f;
             *(float *)(state + 0x2FC) = -0.6981318f;
-        } else if (func_002A77E0(2) != 0) {
+        } else if (RandomIntBelow(2) != 0) {
             *(float *)(state + 0x2F8) = 0.6981318f;
         } else {
             *(float *)(state + 0x2FC) = -0.6981318f;
@@ -89,12 +90,12 @@ void func_L03_003F62C8(u8 *entity) {
         break;
     case 1:
         *(u32 *)(state + 0x2E4) = 300;
-        func_002A7750(entity, 9, 4);
-        state[0x309] = func_002A77E0(2) + 1;
+        SetMobyState(entity, 9, 4);
+        state[0x309] = RandomIntBelow(2) + 1;
         break;
     case 2:
         *(u32 *)(state + 0x2E4) = D_L03_001B1058;
-        func_002A7750(entity, 12, 5);
+        SetMobyState(entity, 12, 5);
         state[0x309] = 1;
         break;
     }
@@ -118,7 +119,7 @@ void func_L03_0041D0A8(u8 *entity) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 
         if (*(signed char *)(q + 0x20) >= 0) {
-            if (*(short *)(q + 0xAA) == 0xFF3) {
+            if (*(short *)(q + 0xAA) == 0xFF3 /* Megacorp Sweeper Bot */) {
                 *(short *)(*(u8 **)(q + 0x68) + 0x2D6) = 1;
             }
         }
@@ -148,7 +149,7 @@ void func_L03_0041E240(u8 *entity) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 
         if (*(signed char *)(q + 0x20) >= 0) {
-            if (*(short *)(q + 0xAA) == 0xFFC) {
+            if (*(short *)(q + 0xAA) == 0xFFC /* Megacorp Rivet Bot */) {
                 *(short *)(*(u8 **)(q + 0x68) + 0x336) = 1;
             }
         }
@@ -176,15 +177,15 @@ void func_L03_0041DFA8(u8 *entity) {
     u8 *data;
     u8 *data2;
 
-    func_00282948(state + 0x34C);
-    func_00282978(state + 0x330);
-    func_00282978(state + 0x332);
-    func_002AEC48(entity, state + 0x220, 0, 0.03f, 0.3f);
-    func_002AEC48(entity, state + 0x2A0, 1, 0.03f, 0.3f);
+    FastFloatHelperD(state + 0x34C);
+    FastDecTimer(state + 0x330);
+    FastDecTimer(state + 0x332);
+    UpdateEasedNode(entity, state + 0x220, 0, 0.03f, 0.3f);
+    UpdateEasedNode(entity, state + 0x2A0, 1, 0.03f, 0.3f);
     timer = *(u16 *)(entity + 0x96);
     if (timer <= 0xFFFE)
         *(u16 *)(entity + 0x96) = timer + 1;
-    func_002AFDD8(entity, buf, state + 0x1A0, 0);
+    TransformVectorByObjectOrGiven(entity, buf, state + 0x1A0, 0);
     f = buf[1] * D_L03_001B1BF0;
     *(float *)(entity + 0xF0) = f;
     /* The four words the engine reads the particle's setup from, in the order the
@@ -193,34 +194,34 @@ void func_L03_0041DFA8(u8 *entity) {
     setup.c = -0.02f;
     setup.d = 1.0f;
     setup.b = 0;
-    count = func_002A77E0(16);
-    if (func_002A77E0(2))
+    count = RandomIntBelow(16);
+    if (RandomIntBelow(2))
         count = -count;
-    func_0029FCC0(entity, 4, vec);
+    TransformMobyJointToWorld(entity, 4, vec);
     vec[2] += 0.1f;
-    particle = func_002BDCE8(vec, 0.1f, 1.0f, 0.9f, count, &setup,
+    particle = SpawnSpinningSparkParticle(vec, 0.1f, 1.0f, 0.9f, count, &setup,
                              105000.0f, 0xDF204080, 0);
     if (particle != 0) {
         data = particle + 0x20;
         *(u16 *)(particle + 0xA) = 5;
-        particle[9] = func_00283CF0(4.0f) + 0x70;
+        particle[9] = FloatToInt(4.0f) + 0x70;
         *(u32 *)(data + 4) = 2;
         data[0xA] = 0xDF;
         data[0xB] = particle[0xA];
     }
-    particle2 = func_002BDCE8(vec, 0.1f, 1.0f, 0.9f, count, &setup,
+    particle2 = SpawnSpinningSparkParticle(vec, 0.1f, 1.0f, 0.9f, count, &setup,
                               105000.0f, 0xDF204080, 0);
     data2 = particle2;
     if (data2 != 0) {
         *(u16 *)(particle + 0xA) = 5;
         data2 += 0x20;
-        particle[9] = func_00283CF0(4.0f) + 0x70;
+        particle[9] = FloatToInt(4.0f) + 0x70;
         *(u32 *)(data2 + 4) = 2;
         data2[0xA] = 0xDF;
         data2[0xB] = particle[0xA];
     }
     if (entity[0x31] != 0)
-        func_002B0990(entity, (float *)(state + 0x360), 2.5f, 5, 1);
+        SetValueAndStartSmoothChange(entity, (float *)(state + 0x360), 2.5f, 5, 1);
 }
 
 /* Sets the entity up for a shot: the state's own counter, its two blend rates and the
@@ -234,7 +235,7 @@ s32 func_L03_0041F090(u8 *entity) {
     if (*(s32 *)(state + 0x284) == -1) return 0;
     if (entity[0x20] != 9) return 0;
 
-    if (func_002B38B8() == 0) {
+    if (IsThirdPendingFlagSet() == 0) {
         entity[0xA8] = 0xFF;
         f1 = D_L03_001B1C00 * 0.00027777778450399637f;
         f0 = D_L03_001B1C04 * 0.016666668f;
@@ -247,8 +248,8 @@ s32 func_L03_0041F090(u8 *entity) {
         *(f32 *)(state + 0x20) = (f32)v0;
         entity[0xA8] = 0xFF;
         *(u32 *)(entity + 0x98) = *(u32 *)(*(u8 **)(entity + 0x24) + 0x10);
-        func_002AB650(entity);
-        func_L00_003294F0(entity, 1);
+        CopyHeroField38ToMoby(entity);
+        SetObjectFlagBit(entity, 1);
         return 1;
     }
     return 0;
@@ -274,6 +275,7 @@ extern void func_3133D0(u8 *a0, s32 a1, s32 a2, s32 a3);
 extern s32 func_3240F0(u8 *a0);
 extern void func_324138(u8 *a0, s32 a1);
 
+/* Per-frame update of a scripted light moby: when the level is in mode 2 it flashes a colour and follows a timed cutscene step. */
 void func_L03_004198B0(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 old, next, base, rem;

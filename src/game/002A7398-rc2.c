@@ -25,41 +25,42 @@
 
 extern void func_0029F390(s8 *);
 
-void func_002A7398(s8 *arg0, s32 arg1, s32 arg2) {
-    s32 s1;
-    s8 *a0;
-    s8 *a2;
-    s8 *p2;
-    s32 v0;
-    s32 v1;
-    s32 a1b;
-    u8 a1c;
-    f32 f0;
+/* Starts an animation on an object right away, with no blending. */
+void func_002A7398(s8 *moby, s32 animation, s32 frame) {
+    s32 animOffset;
+    s8 *animEntry;
+    s8 *animPtr;
+    s8 *animData;
+    s32 startFrame;
+    s32 lastFrame;
+    s32 nextFrame;
+    u8 frameCount;
+    f32 rate;
 
-    s1 = arg1 * 4;
-    a0 = (*(s8 **)((s8 *)(arg0) + (0x24)));
-    a0 = a0 + 0x48;
-    a0 = a0 + s1;
-    a1c = (*(u8 *)((s8 *)(*(s8 **)a0) + (0x10)));
-    (*(s8 *)((s8 *)(arg0) + (0x42))) = arg1;
-    v0 = (arg2 < (s32) a1c) ? arg2 : (a1c - 1);
-    a1b = v0 + 1;
-    (*(s8 *)((s8 *)(arg0) + (0x40))) = v0;
-    (*(s8 *)((s8 *)(arg0) + (0x41))) = a1b;
-    a2 = *(s8 **)a0;
-    v1 = (*(u8 *)((s8 *)(a2) + (0x10))) - 1;
-    if (v1 < (s32) (u8) (*(s8 *)((s8 *)(arg0) + (0x41)))) {
-        (*(s8 *)((s8 *)(arg0) + (0x41))) = v1;
+    animOffset = animation * 4;
+    animEntry = (*(s8 **)((s8 *)(moby) + (0x24)));
+    animEntry = animEntry + 0x48;
+    animEntry = animEntry + animOffset;
+    frameCount = (*(u8 *)((s8 *)(*(s8 **)animEntry) + (0x10)));
+    (*(s8 *)((s8 *)(moby) + (0x42))) = animation;
+    startFrame = (frame < (s32) frameCount) ? frame : (frameCount - 1);
+    nextFrame = startFrame + 1;
+    (*(s8 *)((s8 *)(moby) + (0x40))) = startFrame;
+    (*(s8 *)((s8 *)(moby) + (0x41))) = nextFrame;
+    animPtr = *(s8 **)animEntry;
+    lastFrame = (*(u8 *)((s8 *)(animPtr) + (0x10))) - 1;
+    if (lastFrame < (s32) (u8) (*(s8 *)((s8 *)(moby) + (0x41)))) {
+        (*(s8 *)((s8 *)(moby) + (0x41))) = lastFrame;
     }
-    (*(s8 *)((s8 *)(arg0) + (0x43))) = arg1;
-    p2 = *(s8 **)((*(s8 **)((s8 *)(arg0) + (0x24))) + s1 + 0x48);
-    a1c = (*(u8 *)((s8 *)(p2) + (0x10)));
-    if ((u8) (*(u8 *)((s8 *)(arg0) + (0x41))) >= a1c) {
-        (*(s8 *)((s8 *)(arg0) + (0x41))) = 0;
+    (*(s8 *)((s8 *)(moby) + (0x43))) = animation;
+    animData = *(s8 **)((*(s8 **)((s8 *)(moby) + (0x24))) + animOffset + 0x48);
+    frameCount = (*(u8 *)((s8 *)(animData) + (0x10)));
+    if ((u8) (*(u8 *)((s8 *)(moby) + (0x41))) >= frameCount) {
+        (*(s8 *)((s8 *)(moby) + (0x41))) = 0;
     }
-    func_0029F390(arg0);
-    f0 = *(*(f32 **)((s8 *)(arg0) + (0x58)));
-    (*(f32 *)((s8 *)(arg0) + (0x4C))) = f0;
-    (*(u8 *)((s8 *)(arg0) + (0x60))) = (*(u8 *)((s8 *)(arg0) + (0x60))) & 0xFD;
-    (*(s8 *)((s8 *)(arg0) + (0x6C))) = (*(u8 *)((s8 *)(*(s8 **)((*(s8 **)((s8 *)(arg0) + (0x24))) + s1 + 0x48)) + (0x11)));
+    update_moby_animation_state(moby);
+    rate = *(*(f32 **)((s8 *)(moby) + (0x58)));
+    (*(f32 *)((s8 *)(moby) + (0x4C))) = rate;
+    (*(u8 *)((s8 *)(moby) + (0x60))) = (*(u8 *)((s8 *)(moby) + (0x60))) & 0xFD;
+    (*(s8 *)((s8 *)(moby) + (0x6C))) = (*(u8 *)((s8 *)(*(s8 **)((*(s8 **)((s8 *)(moby) + (0x24))) + animOffset + 0x48)) + (0x11)));
 }

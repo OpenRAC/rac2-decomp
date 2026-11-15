@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_001A8C88[] __attribute__((sda));
 extern int D_001A8C8C[] __attribute__((sda));
@@ -95,18 +96,18 @@ extern const unsigned char *func_00288FB8(int);
 extern void func_00115DA8(char *, const char *, ...);
 
 /* scans a 48-entry table of 20-byte records for a record whose first word equals an argument, and when the scan succeeds stores the found index into a short counter and calls a helper with (index, -1, second argument, 1). */
-void func_00294BC8(int id, int arg)
+void func_00294BC8(int id, int destBuffer)
 {
     int i;
-    int *p = (int *)D_0014B540_1;
+    int *table = (int *)D_0014B540_1;
 
     for (i = 0; i < 48; i++) {
-        if (p[i * 5 + 4816] == id)
+        if (table[i * 5 + 4816] == id)
             break;
     }
     if (i != 48) {
         D_00152CE4[0] = (short)i;
-        func_002942A0(i, -1, arg, 1);
+        StartDiscEntryLoad(i, -1, destBuffer, 1);
     }
 }
 
@@ -155,8 +156,8 @@ long func_00294C40(char *p)
 
     t.clut = p + 0x20;
     t.clutSize = 0x400;
-    t.tw = func_00282A18(*(int *)(p + 8));
-    t.th = func_00282A18(*(int *)(p + 0xC));
+    t.tw = log2dim(*(int *)(p + 8));
+    t.th = log2dim(*(int *)(p + 0xC));
     t.pix = p + 0x20 + t.clutSize;
     addr = D_001A72D0[0];
     cbp = addr >> 8;
@@ -187,30 +188,31 @@ long func_00294C40(char *p)
 }
 
 
+/* Sets one bit in the saved-flags bitmap and returns whether it was already set. */
 s32 func_00294E48(s32 index)
 {
-    s32 byte = index / 8;
+    s32 byteIndex = index / 8;
     s32 bit = index % 8;
-    s32 old;
+    s32 wasSet;
 
     if ((u32)bit < 8) {
-        old = (BOOT_D_001395B8[byte + 0xA7] >> bit) & 1;
+        wasSet = (BOOT_D_001395B8[byteIndex + 0xA7] >> bit) & 1;
     } else {
-        old = 0;
+        wasSet = 0;
     }
     if ((u32)bit < 8) {
-        BOOT_D_001395B8[byte + 0xA7] |= 1 << bit;
+        BOOT_D_001395B8[byteIndex + 0xA7] |= 1 << bit;
     }
-    return old;
+    return wasSet;
 }
 
 /* returns the indexed resident bit using signed division by eight and an unsigned remainder validity guard */
 u32 func_00294EC8(s32 index) {
-    s32 slot=index/8;
+    s32 byteIndex=index/8;
     u32 bit=index%8;
     u32 previous=0;
     if(bit<8) {
-        OrbitalBitmapView *state=(OrbitalBitmapView *)(D_001395B8+slot);
+        OrbitalBitmapView *state=(OrbitalBitmapView *)(D_001395B8+byteIndex);
         previous=((s32)state->fielda7>>bit)&1;
     }
     return previous;
@@ -219,43 +221,46 @@ u32 func_00294EC8(s32 index) {
 /* func_00294F10 is defined in 00294BC8-map-setup-g64.c. */
 
 /* shared native body of family 9306cc1f965a5c85 */
-int func_00295680(int arg)
+/* Finds the first used map slot out of five that is still unassigned, scanning forward or backward. */
+int func_00295680(int reverse)
 {
-    int *t = D_L03_001CA2A8;
-    int *u = t + 5;
+    int *usedTable = D_L03_001CA2A8;
+    int *assignTable = usedTable + 5;
     int i;
 
     for (i = 0; i < 5; i++) {
-        int k = arg ? 4 - i : i;
-        if (t[k] == 0)
+        int slot = reverse ? 4 - i : i;
+        if (usedTable[slot] == 0)
             continue;
-        if (u[k] != -1)
+        if (assignTable[slot] != -1)
             continue;
-        return k;
+        return slot;
     }
     return -1;
 }
 
 
-void func_00295788(int a0, int a1)
+/* Moves the cached map data from one of the five slots into another and frees the first one. */
+void func_00295788(int dstSlot, int srcSlot)
 {
     extern int D_001C4FA0[];
     extern void func_00282B50(void *, void *, int);
-    int *base = D_001C4FA0;
-    int *lo = (int *)((char *)base + 0x288);
-    int *hi = (int *)((char *)base + 0x2B4);
-    int *out;
+    int *base = gMapOverlayState;
+    int *bufferPtrs = (int *)((char *)base + 0x288);
+    int *sizes = (int *)((char *)base + 0x2B4);
+    int *ids;
 
-    func_00282B50((void *)lo[a0], (void *)lo[a1], hi[a1] << 4);
-    out = (int *)((char *)base + 0x29C);
-    out[a0] = out[a1];
-    hi[a0] = hi[a1];
-    out[a1] = -1;
+    FastMemoryHelperC((void *)bufferPtrs[dstSlot], (void *)bufferPtrs[srcSlot], sizes[srcSlot] << 4);
+    ids = (int *)((char *)base + 0x29C);
+    ids[dstSlot] = ids[srcSlot];
+    sizes[dstSlot] = sizes[srcSlot];
+    ids[srcSlot] = -1;
 }
 
+/* Returns which of the five map cache slots holds the given map id, or -1. */
 int func_00295828(int id) {
     extern int D_001C4FA0[];
-    int *base = D_001C4FA0;
+    int *base = gMapOverlayState;
     int *p = base + 0x29C / 4;
     int i = 0;
     do {
@@ -270,7 +275,7 @@ int func_00295828(int id) {
 int func_002958B8(void)
 {
     int flag = D_001A7AFD ? 0x100 : 0;
-    unsigned int id = D_001C4FA0[0x230 / 4] + flag;
+    unsigned int id = gMapOverlayState[0x230 / 4] + flag;
     int level;
     int *p;
     int index;
@@ -281,11 +286,11 @@ int func_002958B8(void)
     int offset;
     int entry;
 
-    if ((int)func_00295828(id) == -1) {
-        if (func_00295870(id) != 0)
+    if ((int)FindMapCacheSlotById(id) == -1) {
+        if (IsMapEntryAvailable(id) != 0)
             return id;
     }
-    level = D_001C4FA0[0x230 / 4];
+    level = gMapOverlayState[0x230 / 4];
     index = 0;
     if (level < 0x1C) {
         p = D_001AA4F0;
@@ -306,7 +311,7 @@ int func_002958B8(void)
             entry = D_001AA4F0_1[offset];
             if (entry != 0) {
                 id = entry + flag;
-                if (func_00295828(id) == notfound && func_00295870(id) != 0)
+                if (FindMapCacheSlotById(id) == notfound && IsMapEntryAvailable(id) != 0)
                     return id;
             }
         }
@@ -317,13 +322,14 @@ update:
 }
 
 /* shared native body of family 490e2c59eb9d7105 */
-int func_00295A10(int param_1)
+/* Looks up a map's position in the 28-entry level table, or -1 if it is not there. */
+int func_00295A10(int mapId)
 {
     int index = -1;
     int i;
 
     for (i = 0; i < 28; i++)
-        if (D_L01_001AA7F0[i] == param_1) { index = i; break; }
+        if (D_L01_001AA7F0[i] == mapId) { index = i; break; }
 
     if (D_L01_001AA7F0[index] == 0)
         index = D_001A79F0_3 ? -1 : index;
@@ -335,38 +341,39 @@ extern int func_00295A10(int);
 
 extern int func_00282C30(int);
 
+/* Chooses which of the five map cache slots to reuse: a free one if there is one, otherwise the one farthest from the current map. */
 int func_00295A80(void)
 {
     int i;
-    int t;
-    int bestdiff = 0;
+    int currentIndex;
+    int bestDistance = 0;
     int best = -1;
 
-    if (D_001C4FA0[0x8C] == 0) {
+    if (gMapOverlayState[0x8C] == 0) {
         int j;
 
         for (j = 4; j >= 0; j--) {
-            if (D_001C4FA0[0xA2 + j] != 0 &&
-                j != D_001C4FA0[0xAC] &&
-                D_001C4FA0[0xA7 + j] == -1)
+            if (gMapOverlayState[0xA2 + j] != 0 &&
+                j != gMapOverlayState[0xAC] &&
+                gMapOverlayState[0xA7 + j] == -1)
                 return j;
         }
     }
-    t = func_00295A10(D_001C4FA0[0x8C]);
-    if (t == -1)
+    currentIndex = FindMapTableIndex(gMapOverlayState[0x8C]);
+    if (currentIndex == -1)
         return 1;
     for (i = 0; i < 5; i++) {
-        int d;
+        int distance;
 
-        if (D_001C4FA0[0xA2 + i] == 0)
+        if (gMapOverlayState[0xA2 + i] == 0)
             continue;
-        if (i == D_001C4FA0[0xAC])
+        if (i == gMapOverlayState[0xAC])
             continue;
-        if (D_001C4FA0[0xA7 + i] == -1)
+        if (gMapOverlayState[0xA7 + i] == -1)
             return i;
-        d = func_00282C30(func_00295A10(D_001C4FA0[0xA7 + i] & 0xFF) - t);
-        if (bestdiff < d) {
-            bestdiff = d;
+        distance = subtract_integer_with_clamp(FindMapTableIndex(gMapOverlayState[0xA7 + i] & 0xFF) - currentIndex);
+        if (bestDistance < distance) {
+            bestDistance = distance;
             best = i;
         }
     }
@@ -374,7 +381,7 @@ int func_00295A80(void)
         best = 0;
     {
         int off = 0x29C;
-        char *base = (char *)D_001C4FA0;
+        char *base = (char *)gMapOverlayState;
         *(int *)(base + off + best * 4) = -1;
     }
     return best;
@@ -382,32 +389,34 @@ int func_00295A80(void)
 
 
 
-void func_00295BE8(u8 *a0,u8 *a1,u8 *a2,u8 *a3) {
+/* Builds a bitmap by taking each byte from one of two sources depending on the bits of a mask. */
+void func_00295BE8(u8 *out,u8 *sourceSet,u8 *sourceClear,u8 *maskBits) {
  s32 i=0;
  do {
   s32 next=i+1;
   u32 mask=1;
-  u8 *nextp=a3+1;
+  u8 *nextp=maskBits+1;
   s32 j=7;
   do {
    u8 value;
    j--;
-   if(*a3&mask) value=*a1; else value=*a2;
+   if(*maskBits&mask) value=*sourceSet; else value=*sourceClear;
    mask<<=1;
-   *a0=value;
-   a1++;a2++;a0++;
+   *out=value;
+   sourceSet++;sourceClear++;out++;
   } while(j>=0);
   i=next;
-  a3=nextp;
+  maskBits=nextp;
  } while(i<0x8000);
 }
 
 extern int D_001C51D0;
 extern int func_00295C70(void);
 
-void func_00295C50(int value) {
-    D_001C51D0 = value;
-    func_00295C70();
+/* Stores the current map number and refreshes the map-ready flag. */
+void func_00295C50(int mapId) {
+    D_001C51D0 = mapId;
+    RefreshMapReadyFlag();
 }
 
 extern int func_00295870(int);
@@ -419,17 +428,17 @@ extern int func_00295870(int);
    base the retail uses (the array's indices 0x8C and 0x9). */
 int func_00295C70(void)
 {
-    if (D_001C4FA0[0x8C] >= 0x1C)
-        D_001C4FA0[0x8C] = 0x1B;
-    if (func_00295870(D_001C4FA0[0x8C]))
-        D_001C4FA0[0x9] = 1;
+    if (gMapOverlayState[0x8C] >= 0x1C)
+        gMapOverlayState[0x8C] = 0x1B;
+    if (IsMapEntryAvailable(gMapOverlayState[0x8C]))
+        gMapOverlayState[0x9] = 1;
     else
-        D_001C4FA0[0x9] = 0;
-    if (D_001C4FA0[0x8C] == 0) {
+        gMapOverlayState[0x9] = 0;
+    if (gMapOverlayState[0x8C] == 0) {
         if (D_001A79F0_3 != 0)
-            D_001C4FA0[0x9] = 0;
+            gMapOverlayState[0x9] = 0;
     }
-    return D_001C4FA0[0x9] != 0;
+    return gMapOverlayState[0x9] != 0;
 }
 
 /* func_00295D00 is defined in 00295D00-g8.c (-G8 -g). */
@@ -447,16 +456,16 @@ void func_00297400(u8 *out, u8 *base, short *offsets)
     int i;
     int group;
     int bit;
-    int r;
-    int t;
+    int tileX;
+    int tileRowOffset;
     u32 *dst;
     u8 *src = (u8 *)0x70000000;
 
     for (i = 0; i < 0x100; i++) {
-        func_00297550((u8 *)0x70000000, i, base, offsets);
-        r = i % 16;
-        t = (i / 16) << 9;
-        dst = (u32 *)(out + ((r + t) << 2));
+        decode_map_rle_row((u8 *)0x70000000, i, base, offsets);
+        tileX = i % 16;
+        tileRowOffset = (i / 16) << 9;
+        dst = (u32 *)(out + ((tileX + tileRowOffset) << 2));
         for (group = 0; group < 0x20; group++) {
             u32 mask = 0;
             for (bit = 0; bit < 0x20; bit++) {
@@ -475,6 +484,7 @@ void func_00297400(u8 *out, u8 *base, short *offsets)
     }
 }
 
+/* Unpacks one run-length coded row of the map picture into 4-bit pixels. */
 void func_00297550(u8 *out,s32 index,u8 *base,short *offsets) {
     s32 pending=0;
     u8 *start;
@@ -526,19 +536,19 @@ extern void func_00297BB0(void *);
    a macro load: $gp in a delay slot, absolute elsewhere. */
 void func_00297670(void *buffer)
 {
-    int *table = D_001C4FA0;
+    int *table = gMapOverlayState;
     int count;
 
     if (table[0x10 / 4] == 0)
         return;
     if (table[0x28 / 4] == 0 || table[0x238 / 4] < 0) {
-        func_00282A60(buffer, 0, 0x800);
+        ClearMemory(buffer, 0, 0x800);
         return;
     }
-    func_00294E48(D_001A79F0_4[0]);
-    count = func_00283EF0(buffer, 0x800, table[0x14 / 4], table[0xC / 4]);
+    TestAndSetSavedFlagBit(D_001A79F0_4[0]);
+    count = FastMathHelperC(buffer, 0x800, table[0x14 / 4], table[0xC / 4]);
     if (count == -1)
-        func_00297BB0(buffer);
+        BuildOcclusionMapFromImage(buffer);
     if (D_001399B8[D_001A79F0_4[0]] < count)
         D_001399B8[D_001A79F0_4[0]] = count;
 }
@@ -551,38 +561,39 @@ void func_00297670(void *buffer)
 
 /* func_002977A8 is defined in its sibling unit. */
 
+/* Expands a 1-bit mask picture into 4-bit pixels and writes it out in repeated 64-byte pieces. */
 void func_002979D8(char *dst, unsigned char *src)
 {
-    int table[256];
-    int tmp[16];
-    int *q;
+    int nibbleTable[256];
+    int chunk[16];
+    int *chunkPtr;
     int i, j, k;
 
     for (i = 0; i < 256; i++) {
-        table[i] = 0;
-        if (i & 0x01) table[i] = 0x0000000f;
-        if (i & 0x02) table[i] |= 0x000000f0;
-        if (i & 0x04) table[i] |= 0x00000f00;
-        if (i & 0x08) table[i] |= 0x0000f000;
-        if (i & 0x10) table[i] |= 0x000f0000;
-        if (i & 0x20) table[i] |= 0x00f00000;
-        if (i & 0x40) table[i] |= 0x0f000000;
-        if (i & 0x80) table[i] |= 0xf0000000;
+        nibbleTable[i] = 0;
+        if (i & 0x01) nibbleTable[i] = 0x0000000f;
+        if (i & 0x02) nibbleTable[i] |= 0x000000f0;
+        if (i & 0x04) nibbleTable[i] |= 0x00000f00;
+        if (i & 0x08) nibbleTable[i] |= 0x0000f000;
+        if (i & 0x10) nibbleTable[i] |= 0x000f0000;
+        if (i & 0x20) nibbleTable[i] |= 0x00f00000;
+        if (i & 0x40) nibbleTable[i] |= 0x0f000000;
+        if (i & 0x80) nibbleTable[i] |= 0xf0000000;
     }
     for (j = 0; j < 128; j++) {
         char *next;
-        q = tmp;
+        chunkPtr = chunk;
         next = dst + 64;
         for (k = 15; k >= 0; k--) {
-            *q++ = table[*src++];
+            *chunkPtr++ = nibbleTable[*src++];
         }
-        F6df9730c_FUN_00282B50(dst, tmp, 64);
+        F6df9730c_FUN_00282B50(dst, chunk, 64);
         dst = next;
-        F6df9730c_FUN_00282B50(dst, tmp, 64);
+        F6df9730c_FUN_00282B50(dst, chunk, 64);
         dst += 64;
-        F6df9730c_FUN_00282B50(dst, tmp, 64);
+        F6df9730c_FUN_00282B50(dst, chunk, 64);
         dst += 64;
-        F6df9730c_FUN_00282B50(dst, tmp, 64);
+        F6df9730c_FUN_00282B50(dst, chunk, 64);
         dst += 64;
     }
 }
@@ -593,7 +604,7 @@ void func_002979D8(char *dst, unsigned char *src)
 void func_00297E00(int index, unsigned char *output)
 {
     unsigned char temporary[80];
-    const unsigned char *source = func_00288FB8(D_L00_001C93A0.rows[index].text_id);
+    const unsigned char *source = GetLocalizedString(D_L00_001C93A0.rows[index].text_id);
     unsigned char *p = temporary;
     if (!source)
         return;
@@ -606,10 +617,10 @@ void func_00297E00(int index, unsigned char *output)
     ++source;
     if (*source == 'b') {
         int key = D_L00_001C93A0.rows[index].mapped_key;
-        DobboFormatMapped396 *record = (DobboFormatMapped396 *)&D_L00_00262570[D_00139568[key]];
-        func_00115DA8((char *)temporary, D_L00_001A9AA0, record->amount);
+        DobboFormatMapped396 *record = (DobboFormatMapped396 *)&gWeaponTable_L00[gItemSlotToRecord[key]];
+        Sprintf((char *)temporary, D_L00_001A9AA0, record->amount);
     } else {
-        func_00115DA8((char *)temporary, D_L00_001A9AA8);
+        Sprintf((char *)temporary, D_L00_001A9AA8);
     }
     ++source;
     while (*p)
@@ -663,6 +674,7 @@ void func_002980D0(void)
     } while (--first != 0);
 }
 
+/* Does nothing. */
 void func_00298170(void)
 {
 }
@@ -683,67 +695,69 @@ extern unsigned int D_001A7424[] __attribute__((sda));
 extern int D_001B1A3C __attribute__((sda));
 extern int D_001B1A38 __attribute__((sda));
 extern void (*D_002560D0[])(void);
+/* Runs the current state's update function once per frame and counts how long the state has lasted; flag bits can first switch to state 20 or 21. */
 void func_00298178(void)
 {
-    int old;
+    int prevState;
     int flags;
-    char *state = (char *)&D_001393E0;
+    char *state = (char *)&gMemcardState;
     if (*(int *)(state + 0x16c) != 0 ||
         *(int *)(state + 0x10) != 0 || *(int *)(state + 0x24) > 0)
         D_001B1A3C = 1;
-    flags = *(int *)D_001A7424;
-    old = D_001A7420[0];
+    flags = *(int *)gSaveMenuFlags;
+    prevState = gSaveMenuScreen[0];
     if (flags & 0x80) {
-        D_001A7420[0] = 21;
-        *(int *)D_001A7424 = (flags & ~0x80) | 0x40;
+        gSaveMenuScreen[0] = 21;
+        *(int *)gSaveMenuFlags = (flags & ~0x80) | 0x40;
     }
-    flags = *(int *)D_001A7424;
+    flags = *(int *)gSaveMenuFlags;
     if (flags & 0x100) {
-        D_001A7420[0] = 20;
-        *(int *)D_001A7424 = (flags & ~0x100) | 0x40;
+        gSaveMenuScreen[0] = 20;
+        *(int *)gSaveMenuFlags = (flags & ~0x100) | 0x40;
     }
-    D_002560D0[D_001A7420[0]]();
+    D_002560D0[gSaveMenuScreen[0]]();
     D_001B1A38++;
-    if (D_001A7420[0] != old)
+    if (gSaveMenuScreen[0] != prevState)
         D_001B1A38 = 0;
 }
 
+/* Goes back to the default state 3 and clears the shared state fields. */
 void func_00298278(void) {
-    D_001A7420[0] = 3;
-    D_001393E0.field17c = 0;
-    D_001393E0.field10 = 0;
+    gSaveMenuScreen[0] = 3;
+    gMemcardState.field17c = 0;
+    gMemcardState.field10 = 0;
 }
 
 /* Resolve pending state requests after clearing the two transient flag bits. */
 void func_00298298(void)
 {
-    int flags = D_001A7424[0];
+    int flags = gSaveMenuFlags[0];
     int cleared = flags & ~4;
     int mask = cleared & ~2;
     int v0, v1;
-    SharedState *state = &D_001393E0;
+    SharedState *state = &gMemcardState;
 
-    D_001A7424[0] = mask;
+    gSaveMenuFlags[0] = mask;
     if (state->field17c == 0) {
-        D_001A7420[0] = 3;
+        gSaveMenuScreen[0] = 3;
         return;
     }
     if ((flags & 0x80) || *(int *)((char *)state + 0x16C) != 0) {
         int v = mask & ~0x80;
-        D_001A7420[0] = 21;
-        D_001A7424[0] = v | 0x40;
+        gSaveMenuScreen[0] = 21;
+        gSaveMenuFlags[0] = v | 0x40;
         return;
     }
     if (flags & 0x100) {
         int w = (mask ^ 0x100) | 0x40;
-        D_001A7420[0] = 20;
-        D_001A7424[0] = w;
+        gSaveMenuScreen[0] = 20;
+        gSaveMenuFlags[0] = w;
         return;
     }
     if (state->field10 != 0) {
         state->field17c = 0;
         if (D_001A8C88[0] != 0 || D_001A8C8C[0] != 0) {
-            D_001A7420[0] = 3;
+            gSaveMenuScreen[0] = 3;
             return;
         }
         v0 = mask | 1;
@@ -754,21 +768,23 @@ void func_00298298(void)
     } else {
         return;
     }
-    D_001A7424[0] = v0;
-    D_001A7420[0] = v1;
+    gSaveMenuFlags[0] = v0;
+    gSaveMenuScreen[0] = v1;
 }
 
 
 extern unsigned int D_001A7424[] __attribute__((sda));
 extern int D_001A7420[] __attribute__((sda));
 
+/* Goes to state 3 when bit 0 of the flags is clear. */
 void func_00298380(void) {
-    if (((D_001A7424[0] ^ 1) & 1) != 0)
-        D_001A7420[0] = 3;
+    if (((gSaveMenuFlags[0] ^ 1) & 1) != 0)
+        gSaveMenuScreen[0] = 3;
 }
 
+/* Enters state 4 and sets two shared fields to -1. */
 void func_002983A8(void) {
-    D_001393E0.field164 = -1;
-    D_001A7420[0] = 4;
-    D_001393E0.field168 = -1;
+    gMemcardState.field164 = -1;
+    gSaveMenuScreen[0] = 4;
+    gMemcardState.field168 = -1;
 }

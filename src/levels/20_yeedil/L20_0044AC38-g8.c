@@ -24,14 +24,15 @@ extern void func_00282CC0(void *, void *, void *);
 extern float func_00283248(float, float);
 extern float func_002A7940(void);
 
-char *func_L20_0044AC38(int arg0, int arg1, float *arg2, float *arg3) {
-    char *idp = D_L20_001FBB20[arg1];
+/* Wakes an idle turret from a group of objects, places it at a position facing a direction, and returns it (or null if none is free). */
+char *func_L20_0044AC38(int parent, int groupIndex, float *position, float *direction) {
+    char *idp = D_L20_001FBB20[groupIndex];
     char *found = 0;
 
-    if ((arg1 & 0xFF) == 0xFF) {
+    if ((groupIndex & 0xFF) == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8[0] < arg1) {
+    if (D_L20_001B2FB8[0] < groupIndex) {
         goto end;
     }
     if (idp == 0) {
@@ -48,10 +49,10 @@ char *func_L20_0044AC38(int arg0, int arg1, float *arg2, float *arg3) {
             goto end;
         }
         idp += 2;
-        if ((arg1 & 0xFF) == 0xFF) {
+        if ((groupIndex & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8[0] < arg1) {
+        if (D_L20_001B2FB8[0] < groupIndex) {
             goto end;
         }
         if (idp == 0) {
@@ -60,7 +61,7 @@ char *func_L20_0044AC38(int arg0, int arg1, float *arg2, float *arg3) {
         if (*(s16 *)(idp - 2) >= 0) {
             continue;
         }
-        if (idp == D_L20_001FBB20[arg1]) {
+        if (idp == D_L20_001FBB20[groupIndex]) {
             continue;
         }
         break;
@@ -72,26 +73,26 @@ end:
 
         *(u16 *)(found + 0x34) = (*(u16 *)(found + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(found + 0x98) = *(int *)(*(char **)(found + 0x24) + 0x10);
-        func_002A7470(found, 0, 0, 0xF);
-        func_002AEC18(found, D_L20_001B2440);
-        if (func_002A77E0(2) != 0) {
+        StartAnimationBlended(found, 0, 0, 0xF);
+        SetMobyLightColor(found, D_L20_001B2440);
+        if (RandomIntBelow(2) != 0) {
             *(u16 *)(found + 0x34) |= 0x8000;
         } else {
             *(u16 *)(found + 0x34) &= 0x7FFF;
         }
         state = *(char **)(found + 0x68);
         pos = found + 0x10;
-        qcopy(pos, arg2);
-        qcopy(state + 0x180, arg2);
-        qcopy(state + 0x170, arg3);
-        *(int *)(found + 0xB8) = arg0;
-        func_002A7750(found, 2, -1);
-        func_00282F20(state + 0x190, arg3, func_002A7878(20.0f, 30.0f));
-        func_00282CC0(state + 0x190, state + 0x190, pos);
-        *(float *)(state + 0x198) = arg2[2];
+        qcopy(pos, position);
+        qcopy(state + 0x180, position);
+        qcopy(state + 0x170, direction);
+        *(int *)(found + 0xB8) = parent;
+        SetMobyState(found, 2, -1);
+        vec_scale_to_length(state + 0x190, direction, RandomFloatRange(20.0f, 30.0f));
+        FastVecAdd(state + 0x190, state + 0x190, pos);
+        *(float *)(state + 0x198) = position[2];
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
-        *(float *)(found + 0xF8) = func_00283248(arg3[0], arg3[1]);
-        *(float *)(state + 0x1A0) = func_002A7940();
+        *(float *)(found + 0xF8) = FastMatrixHelperA(direction[0], direction[1]);
+        *(float *)(state + 0x1A0) = RandomAngle();
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
     }
     return found;

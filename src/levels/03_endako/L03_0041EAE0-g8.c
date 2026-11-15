@@ -84,6 +84,7 @@ typedef struct {
     float f33C;
     int f340;
 } StateEAE0;
+/* Sets up the laser bot on its first frame and handles its death. */
 void func_L03_0041EAE0(u8 *entity) {
     StateEAE0 *st=*(StateEAE0 **)(entity+0x68);
     float point[4],velocity[4];
@@ -92,13 +93,13 @@ void func_L03_0041EAE0(u8 *entity) {
     float a,b;
     if(entity[0x20]==0) {
         if(st->f340!=-1) {
-            func_002E59F8(st->f340);
+            StopSoundVoice(st->f340);
             st->f340=-1;
         }
         *(s16 *)(*(u8 **)(entity+0x24)+0x46)=5;
         if(st->f288) {
-            func_002A7750(entity,4,1);
-            func_002A7398(entity,0,0);
+            SetMobyState(entity,4,1);
+            StartAnimationImmediate(entity,0,0);
             st->f20=3;
             st->f24=3;
             st->f33C=4.5f;
@@ -106,29 +107,29 @@ void func_L03_0041EAE0(u8 *entity) {
             pathIndex=st->f280;
             if(pathIndex==-1) {
                 if(st->f340!=-1) {
-                    func_002E59F8(st->f340);
+                    StopSoundVoice(st->f340);
                     st->f340=-1;
                 }
-                func_0029F338(entity);
+                MarkMobySpawned(entity);
                 return;
             }
             qcopy(entity+0x10,D_L03_001FE700[pathIndex]+16);
             st->f148|=0x210;
             st->f32C=1;
             if(st->f28C) {
-                func_002A7750(entity,9,4);
-                func_002A7398(entity,0,0);
+                SetMobyState(entity,9,4);
+                StartAnimationImmediate(entity,0,0);
                 st->f33C=0;
                 *(int *)(entity+0x98)=0;
                 *(u16 *)(entity+0x34)=(*(u16 *)(entity+0x34)|0x41)&0xEFFF;
             } else {
-                func_002A7750(entity,3,0);
-                func_002A7398(entity,0,0);
+                SetMobyState(entity,3,0);
+                StartAnimationImmediate(entity,0,0);
                 st->f33C=6;
             }
         }
-        st->f48=func_00283CF0(20);
-        st->f4A=func_00283CF0(17.6f);
+        st->f48=FloatToInt(20);
+        st->f4A=FloatToInt(17.6f);
         st->f70=8;
         st->fA8=3;
         st->f90=0.5f;
@@ -152,37 +153,37 @@ void func_L03_0041EAE0(u8 *entity) {
         *(float *)(entity+0x2C)=*(float *)(*(u8 **)(entity+0x24)+0x24)*D_L03_001B1C0C;
         st->f290=0;
     }
-    hit=func_002A9640(entity,0x10000,0);
+    hit=FindOwnedEffectSlot(entity,0x10000,0);
     if(hit && *(u8 **)((u8 *)hit+0x20)) {
         u8 *other=*(u8 **)((u8 *)hit+0x20);
-        if(*(s16 *)(other+0xAA)==0xFFD && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
+        if(*(s16 *)(other+0xAA)==0xFFD /* Megacorp Laser Bot */ && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
     }
-    if(func_002B0ED8(entity,st->f60,0) && st->f20<=0) {
-        func_00283098(point,D_L03_001B1C30,entity+0xC0);
-        func_00282CC0(point,point,entity+0x10);
-        func_0032C700(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-        func_00282F20(velocity,st->fE0,0.06666667f);
-        func_002B0A68(entity,31,velocity,3,6,3,6,255);
+    if(ApplyDamageToObject(entity,st->f60,0) && st->f20<=0) {
+        matrix_mul_vec3(point,D_L03_001B1C30,entity+0xC0);
+        FastVecAdd(point,point,entity+0x10);
+        SpawnExplosion(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
+        vec_scale_to_length(velocity,st->fE0,0.06666667f);
+        SpawnDebrisForMaskedParts(entity,31,velocity,3,6,3,6,255);
         if(D_0018C0B4==49) {
             D_L03_001A9044_gp=D_L03_001A9044[0]+1;
             if(D_L03_001A9044_gp>=10 && !D_001A7A60[0x1C]) {
                 D_001A7A60[0x1C]=1;
-                func_002E5E58(1,0,0);
-                func_002B0A18(0x1233,-1);
+                PlaySoundFromGlobalBank(1,0,0);
+                SetEntryValueByIndex(0x1233,-1);
                 D_L03_001A903C[0]=1;
             }
         }
-        func_002E5CF8(3,0,entity);
-        func_002A6C58(entity,0,3);
+        PlayMobySound(3,0,entity);
+        SetDeathBits(entity,0,3);
         if(st->f340!=-1) {
-            func_002E59F8(st->f340);
+            StopSoundVoice(st->f340);
             st->f340=-1;
         }
-        func_0029F338(entity);
+        MarkMobySpawned(entity);
         return;
     }
-    if(entity[0x31] && func_00282E48(entity+0x10,D_L03_001B9980)<24) {
-        func_002A93B0(entity);
+    if(entity[0x31] && fast_vec_dist(entity+0x10,D_L03_001B9980)<24) {
+        UpdateMobyGroundCheck(entity);
         entity[0x6F]=22;
     }
 }

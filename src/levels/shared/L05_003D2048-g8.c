@@ -17,6 +17,7 @@ extern void func_002FF698(void *,void *),func_L05_003D2618(void);
 extern int D_L05_001B3000[] __attribute__((sda));
 extern char D_L05_001B96C0[],D_L05_001B98F0[],D_L05_0024D020[];
 extern float D_L05_001AFC94 __attribute__((sda));
+/* On its first frame sets up and then bursts out debris, sparks and smoke, and draws its effect. */
 void func_L05_003D2048(char *obj)
 {
  BurstVector v,small,offset,pos,velocity;
@@ -25,7 +26,7 @@ void func_L05_003D2048(char *obj)
  int color1,color2,duration;
  float scale,a,b;
  if (*(unsigned char *)(obj+0x20)==0) {
-  func_L05_003D33E8(obj);*(unsigned char *)(obj+0x20)=1;
+  ResetEmitterSlotEffect(obj);*(unsigned char *)(obj+0x20)=1;
   timers[*(int *)s]=5;
   if(func_003067D8(obj+0x10,D_L05_001B96C0)>200.0f) *(float *)(s+4)=4;
   else if(func_003067D8(obj+0x10,D_L05_001B96C0)>100.0f) *(float *)(s+4)=2;
@@ -93,5 +94,5 @@ void func_L05_003D2048(char *obj)
    }
   }
  }
- func_002FF698(func_L05_003D2618,obj);
+ func_002FF698(DrawAnimatedMeshAndGlowEffect,obj);
 }

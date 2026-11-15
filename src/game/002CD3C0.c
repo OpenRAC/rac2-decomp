@@ -31,34 +31,35 @@ extern void func_002FC3C0(u64);
 
 extern void func_0029FEE0(void);
 
+/* Draws a line of menu text near the bottom of the screen, then updates and draws the menu's attached panel if there is one. */
 int func_002CD3C0(void)
 {
     int y;
     float position;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C1A8();
     position = 367.0f;
     y = (int)(D_001B23A4[0] * position + 0.5f);
     do {
-        func_0027FAA8(0x1B5, y, 0x80F0F0F0ULL, (char *)func_00288FB8(0x2D4F), -1);
+        DrawTextCenteredSmallFont(0x1B5, y, 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2D4F), -1);
     } while (0);
-    func_0027C660();
+    DoGifPaging();
     if (D_001A8CFC[0] != 0) {
         if (*(int *)((char *)D_001A8CFC[0] + 0x38000 + 0x7364) != 0) {
             char *owner;
-            func_002A0250();
-            func_002A01C8();
-            func_002A01F0();
+            DrawMobysSetup();
+            FillScratchArea();
+            SaveScratchArea();
             owner = *(char **)(D_001A8CFC[0] + 0x38000 + 0x7364);
-            func_0034EBE0(owner);
-            func_0034EC70(owner);
-            func_0034ECB0(owner);
-            func_0034EDB0(owner, owner + 0xC00);
-            func_002A0220();
-            func_002A0380();
-            func_002FC3C0(0x10);
-            func_0029FEE0();
+            InitHudLightingColors(owner);
+            ResetHudRenderState(owner);
+            AttachSlotPackets(owner);
+            DrawShadowedSprite(owner, owner + 0xC00);
+            RestoreScratchArea();
+            RunTextureUploadAndSetup();
+            WaitForDmaStatusBits(0x10);
+            PatchMobyGifs();
         }
     }
     return 0;

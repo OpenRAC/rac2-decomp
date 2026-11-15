@@ -6,20 +6,21 @@
 extern char *func_001240C8(int, int);
 extern void *func_00120A30(int, void *, int);
 
-char *func_00120B38(int arg0, char *arg1, int arg2) {
-    char *s0 = func_001240C8(arg0, arg2);
-    int a0;
+/* Works out the stack frame of the caller, filling in its saved register data. */
+char *func_00120B38(int pc, char *udata, int subUdata) {
+    char *nextFrame = GetFrameStateForPc(pc, subUdata);
+    int reg;
     s64 value;
 
-    if (s0 == 0)
+    if (nextFrame == 0)
         return 0;
-    a0 = *(u16 *)(s0 + 0x298);
-    if (*(s8 *)(arg1 + a0 + 0x29C) != 0) {
-        value = *(s64 *)func_00120A30(a0, arg1, 0);
-        *(int *)s0 = value;
+    reg = *(u16 *)(nextFrame + 0x298);
+    if (*(s8 *)(udata + reg + 0x29C) != 0) {
+        value = *(s64 *)GetSavedRegisterAddress(reg, udata, 0);
+        *(int *)nextFrame = value;
     } else {
-        *(int *)s0 = *(int *)arg1;
+        *(int *)nextFrame = *(int *)udata;
     }
-    *(int *)s0 += *(int *)(s0 + 8);
-    return s0;
+    *(int *)nextFrame += *(int *)(nextFrame + 8);
+    return nextFrame;
 }

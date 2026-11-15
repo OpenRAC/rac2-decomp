@@ -21,18 +21,18 @@ extern void func_00283098(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 
 /* Builds the local vector {scale, 0, 0, 1}, transforms its copy, then adds the object position. */
-void func_L00_003ACC88(char *a0, char *a1)
+void func_L00_003ACC88(char *moby, char *out)
 {
-    float other[4];
-    float local[4];
+    float rotated[4];
+    float offset[4];
     TI128 zero = 0;
 
-    *(TI128 *)local = zero;
-    local[0] = D_L00_001AF7A4;
-    local[3] = 1.0f;
-    *(TI128 *)other = *(TI128 *)local;
-    func_00283098(other, other, a0 + 0xC0);
-    func_00282CC0(a1, other, a0 + 0x10);
+    *(TI128 *)offset = zero;
+    offset[0] = D_L00_001AF7A4;
+    offset[3] = 1.0f;
+    *(TI128 *)rotated = *(TI128 *)offset;
+    matrix_mul_vec3(rotated, rotated, moby + 0xC0);
+    FastVecAdd(out, rotated, moby + 0x10);
 }
 
 /* Resets the two slot cursors, then releases the 256-entry slot table. */
@@ -80,11 +80,12 @@ extern int ref_L00_003A9000_00(void *);
 extern void func_2EE3D0(void *, void *, float);
 extern void func_2EE108(void *, void *, void *);
 
+/* Moves one trail slot along with its owner and keeps its two spin timers wrapping. */
 int func_L00_003A9000(TrailActor *self)
 {
     TrailSource *source = self->source;
-    char *base = func_L00_0032A088(0x5CB, source->id);
-    char *data = base + *func_L00_0032A0B8(0x5CB, source->id);
+    char *base = GetSlotBody(0x5CB /* Pulse Rifle */, source->id);
+    char *data = base + *GetSlotHeader(0x5CB /* Pulse Rifle */, source->id);
     TrailSlot *slots = (TrailSlot *)data;
     Qword rot[1];
 
@@ -135,7 +136,8 @@ extern void ref_L00_003B1270_0(int,int,int,void *,int);
    state 2 spawns a particle at the hero when the hero's button word has a bit of D_00138320 set
    (recording it in a new slot when func_L00_003B0DA0 gives one); then hands both slot cursors to
    ref_L00_003B1270_0. */
-void func_L00_003B1270(char *m)
+/* Per-frame update for the Fireboot Weapon moby: spawns trail particles at the hero while the button is held. */
+void func_L00_003B1270(char *moby)
 {
     int stop = 0, result;
     short random;
@@ -144,29 +146,29 @@ void func_L00_003B1270(char *m)
     char *entry;
 
     while (!stop && D_L00_001AF811 != D_L00_001AF810) {
-        if (D_L00_001B19C8 - ((SlotEntry1270 *)D_L00_0023BB78)[D_L00_001AF811].used < 480)
+        if (gFrameCounter_L00 - ((SlotEntry1270 *)D_L00_0023BB78)[D_L00_001AF811].used < 480)
             stop = 1;
         else
-            func_L00_003B0CE8(D_L00_001AF811);
+            FreeNodeSlot(D_L00_001AF811);
     }
-    switch ((unsigned char)m[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        m[0x20] = 1;
+        moby[0x20] = 1;
         break;
     case 1:
-        m[0x20] = 2;
+        moby[0x20] = 2;
         break;
     case 2:
-        if (D_00138320 & D_00189E20.buttons) {
-            entry = func_L00_003B0DA0(D_00189E20.position);
+        if (D_00138320 & gHeroState.buttons) {
+            entry = RecordHeroTrailNode(gHeroState.position);
             if (entry) {
                 slot = D_L00_001AF810 - 1;
-                random = D_L00_001AF82C + (func_001163B0() & 7);
-                result = func_002C56B0(D_00189E20.position, slot, 0, random, 1, (unsigned char)(D_L00_001AF830 + (func_001163B0() & 3)), m, 1, 1);
+                random = D_L00_001AF82C + (Rand() & 7);
+                result = SpawnDebrisParticleTwoMode(gHeroState.position, slot, 0, random, 1, (unsigned char)(D_L00_001AF830 + (Rand() & 3)), moby, 1, 1);
                 *(int *)(entry + 0x10) = result;
             } else {
-                random2 = D_L00_001AF82C + (func_001163B0() & 7);
-                func_002C56B0(D_00189E20.position, 0, 1, random2, 1, (unsigned char)(D_L00_001AF830 + (func_001163B0() & 3)), m, 1, 1);
+                random2 = D_L00_001AF82C + (Rand() & 7);
+                SpawnDebrisParticleTwoMode(gHeroState.position, 0, 1, random2, 1, (unsigned char)(D_L00_001AF830 + (Rand() & 3)), moby, 1, 1);
             }
         }
         break;
@@ -216,38 +218,38 @@ void func_L00_003ADEA0(void)
             *(short *)(first + 0x4A) = i - 1;
         }
         if (i >= 11)
-            func_00282A28();
+            TrapAlways();
         row = i - 1;
         if (*(unsigned char *)(moby + 0x20) != 6)
             continue;
         n = 0;
         for (j = 1; j <= ref_L00_003ADEA0_0[0]; j++) {
             other = ref_L00_003ADEA0_1 + (ref_L00_003ADEA0_0[j] << 8);
-            if (*(unsigned char *)(other + 0x20) != 6 || other == moby || *(short *)(other + 0xAA) != 0x81F)
+            if (*(unsigned char *)(other + 0x20) != 6 || other == moby || *(short *)(other + 0xAA) != 0x81F /* moby class 2079 */)
                 continue;
-            if (!(func_00282E48(moby + 0x10, other + 0x10) < 12.0f))
+            if (!(fast_vec_dist(moby + 0x10, other + 0x10) < 12.0f))
                 continue;
             if (*(int *)(*(char **)(other + 0x68) + 0x7C) == ref_L00_003ADEA0_2)
                 continue;
-            if (func_002761F8(other + 0x10, moby + 0x10, 2, 0, 0))
+            if (CollLine(other + 0x10, moby + 0x10, 2, 0, 0))
                 continue;
-            func_L00_003ADCD8(moby, other);
+            SpawnSparksBetweenMobys(moby, other);
             if (n >= 8)
-                func_00282A28();
+                TrapAlways();
             ref_L00_003ADEA0_3[row][n++] = other;
             ref_L00_003ADEA0_3[row][n] = 0;
-            if (!func_002761F8(moby + 0x10, other + 0x10, 0, moby, 0))
+            if (!CollLine(moby + 0x10, other + 0x10, 0, moby, 0))
                 continue;
             hit = ref_L00_003ADEA0_4.hit;
-            if (!hit || *(short *)(hit + 0xAA) == *(short *)(moby + 0xAA) || hit == D_00189E20.moby
+            if (!hit || *(short *)(hit + 0xAA) == *(short *)(moby + 0xAA) || hit == gHeroState.moby
                 || !(*(unsigned short *)(hit + 0x34) & 0x1000))
                 continue;
-            if (func_00282E48(hit + 0x10, moby + 0x10) < func_00282E48(hit + 0x10, other + 0x10))
+            if (fast_vec_dist(hit + 0x10, moby + 0x10) < fast_vec_dist(hit + 0x10, other + 0x10))
                 other = moby;
             *(unsigned char *)(other + 0x20) |= 8;
             vars = *(char **)(other + 0x68);
-            func_002A7470(other, 1, 0, 3);
-            func_002E5CF8(0, 0, other);
+            StartAnimationBlended(other, 1, 0, 3);
+            PlayMobySound(0, 0, other);
             *(char **)(vars + 0x54) = hit;
             *(int *)(vars + 0x58) = 600;
             *(short *)(vars + 0x52) = 1;
@@ -255,6 +257,6 @@ void func_L00_003ADEA0(void)
             *(int *)(vars + 0x40) = 0;
         }
         if (n)
-            func_L00_002E6CF0(func_L00_003ADA30, moby);
+            AddDrawCallbackToList1(DrawMobyLinkQuads, moby);
     }
 }

@@ -52,8 +52,9 @@ extern int func_00127508(int, int, int, int);
 
 /* rac1-decomp src/core/00123168.c: func_001233E8 */
 /* sceDmaPutEnv. Adapted from Lombyte (GPL-3.0) for PAL. */
-int func_00127040(void *arg0) {
-    sceDmaEnv *env = arg0;
+/* Applies a DMA settings block to the DMA controller registers, and returns a negative number if any value is out of range. */
+int func_00127040(void *envPtr) {
+    sceDmaEnv *env = envPtr;
     unsigned int ctrl;
     unsigned int pcr;
     unsigned int sqwc;
@@ -103,15 +104,16 @@ extern int func_00126ED8(int);
 
 extern void func_00126E60(void *);
 
-void func_00127218(int *p, int arg1) {
-    int r = func_00126ED8(arg1);
+/* Resets a DMA channel record and stores a converted value in it. */
+void func_00127218(int *channel, int input) {
+    int converted = ConvertScratchpadDmaAddress(input);
 
-    func_00126E60(p);
-    if ((unsigned int)p[12] != 0xFFFFFFFFU) {
-        p[12] = r;
+    WaitDmaChannelDone(channel);
+    if ((unsigned int)channel[12] != 0xFFFFFFFFU) {
+        channel[12] = converted;
     }
-    p[8] = 0;
-    p[0] = (p[0] & ~0xC) | 0x105;
+    channel[8] = 0;
+    channel[0] = (channel[0] & ~0xC) | 0x105;
 }
 
 
@@ -129,20 +131,21 @@ void func_00127218(int *p, int arg1) {
  * after the D_CTRL read and gives retail's $4-$7 allocation. Under
  * 2.95.3 the same C differs in the prologue order only (8/152).
  */
-int func_001272A8(void *arg0) {
-    volatile unsigned int *d = arg0;
-    int en;
-    unsigned int prev, old;
-    en = r1_func_0011D960();
-    prev = D_ENABLER;
-    if ((prev & 0x10000) == 0)
-        D_ENABLEW = prev | 0x10000;
+/* Pauses a DMA channel with interrupts off and returns its old control value. */
+int func_001272A8(void *channelAddr) {
+    volatile unsigned int *chcr = channelAddr;
+    int intWasOn;
+    unsigned int savedEnable, oldChcr;
+    intWasOn = r1_func_0011D960();
+    savedEnable = D_ENABLER;
+    if ((savedEnable & 0x10000) == 0)
+        D_ENABLEW = savedEnable | 0x10000;
     D_CTRL;
-    old = *d;
-    *d = old & 0xFFFFFEFF;
-    D_ENABLEW = prev;
-    if (en != 0) r1_func_0011D9A8();
-    return old;
+    oldChcr = *chcr;
+    *chcr = oldChcr & 0xFFFFFEFF;
+    D_ENABLEW = savedEnable;
+    if (intWasOn != 0) r1_func_0011D9A8();
+    return oldChcr;
 }
 
 typedef struct {
@@ -169,17 +172,18 @@ extern char r1_D_00153590[];
    bind failure prints and hangs forever. Once bound, issues RPC 0xFE (a
    handshake/version query) and validates the two version words in the reply,
    printing and clearing serve on any failure. */
+/* Starts up the memory card library: finds the memory card server and checks its version. */
 int func_00127340(void) {
-    int buf[8];
-    int *rbuf;
+    int semaParam[8];
+    int *reply;
     int i;
-    int r;
+    int result;
 
     if (r1_D_00132EAC < 0) {
-        buf[5] = 0;
-        buf[2] = 1;
-        buf[1] = 1;
-        r1_D_00132EAC = r1_func_00118C70(buf);
+        semaParam[5] = 0;
+        semaParam[2] = 1;
+        semaParam[1] = 1;
+        r1_D_00132EAC = r1_func_00118C70(semaParam);
     }
     r1_func_00123F30(0, 0, 0);
     r1_func_00118CB0(r1_D_00132EAC);
@@ -192,19 +196,19 @@ int func_00127340(void) {
         if (((SifRpcClientData *)r1_D_00159B00)->serve != 0) break;
         for (i = 0x100000; i != 0; i--) ;
     }
-    r = r1_func_0011B4C8(r1_D_00159B00, 0xFE, 0, r1_D_00159B80, 0x30, r1_D_0015B0C0, 0xC, 0, 0);
+    result = r1_func_0011B4C8(r1_D_00159B00, 0xFE, 0, r1_D_00159B80, 0x30, r1_D_0015B0C0, 0xC, 0, 0);
     r1_func_00118C90(r1_D_00132EAC);
-    if (r < 0) {
+    if (result < 0) {
         ((SifRpcClientData *)r1_D_00159B00)->serve = 0;
-        return r - 100;
+        return result - 100;
     }
-    rbuf = (int *)r1_D_0015B0C0;
-    if (rbuf[1] < 0x20A) {
+    reply = (int *)r1_D_0015B0C0;
+    if (reply[1] < 0x20A) {
         r1_func_0011A6C8(r1_D_00153568);
         ((SifRpcClientData *)r1_D_00159B00)->serve = 0;
         return -0x78;
     }
-    if (rbuf[2] < 0x20E) {
+    if (reply[2] < 0x20E) {
         r1_func_0011A6C8(r1_D_00153590);
         ((SifRpcClientData *)r1_D_00159B00)->serve = 0;
         return -0x79;
@@ -217,13 +221,14 @@ int func_00127340(void) {
 /* sceMcOpen(port, slot, fname, mode) (libmc): same RPC-wrapper shape as
    sceMcDelete (func_00128068) but with the flags/mode argument stored to
    the descriptor's +0x8 word instead of a hardcoded 0, and RPC command 2. */
-int func_00127508(int port, int slot, int fname_, int mode) {
-    char *cd = r1_D_00159B00;
-    char *fname = (char *)fname_;
-    char *fp;
-    int r;
+/* Opens a file on a memory card and returns a request handle, or a negative error. */
+int func_00127508(int port, int slot, int fnameAddr, int mode) {
+    char *client = r1_D_00159B00;
+    char *fname = (char *)fnameAddr;
+    char *request;
+    int result;
 
-    if (*(int *)(cd + 0x24) == 0) {
+    if (*(int *)(client + 0x24) == 0) {
         return -100;
     }
     if (r1_func_00118CC0(r1_D_00132EAC) < 0) {
@@ -234,16 +239,16 @@ int func_00127508(int port, int slot, int fname_, int mode) {
         return -210;
     }
     r1_func_00116B00(r1_D_00159BB0 + 0x14, fname, 0x3FF);
-    fp = r1_D_00159BB0;
-    *(int *)(fp + 0x0) = port;
-    fp[0x413] = 0;
-    *(int *)(fp + 0x8) = mode;
-    *(int *)(fp + 0x4) = slot;
-    r = r1_func_0011B4C8(cd, 2, 1, fp, 0x414, r1_D_0015B0C0, 4, 0, 0);
-    if (r == 0) {
+    request = r1_D_00159BB0;
+    *(int *)(request + 0x0) = port;
+    request[0x413] = 0;
+    *(int *)(request + 0x8) = mode;
+    *(int *)(request + 0x4) = slot;
+    result = r1_func_0011B4C8(client, 2, 1, request, 0x414, r1_D_0015B0C0, 4, 0, 0);
+    if (result == 0) {
         r1_D_00132EA8 = 2;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return result;
 }

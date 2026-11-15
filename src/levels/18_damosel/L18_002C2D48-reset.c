@@ -11,59 +11,59 @@ extern u8 D_L18_001A7B0B MACRO_ADDR;
 /* Re-initialises the 16-byte block at 0x1490 and then, from the saved mode in it, raises the matching flags. */
 void func_L18_002CA350(void)
 {
-    char *p = D_00189E20;
-    s16 mode = *(s16 *)(p + 0x1490);
-    u8 keep = *(u8 *)(p + 0x149D);
-    func_00282A88(p + 0x1490, 16);
-    *(u8 *)(p + 0x149D) = keep;
-    *(s16 *)(p + 0x1490) = mode;
-    *(u8 *)(p + 0x22B9) = 0;
-    *(s16 *)(p + 0x348) = 0;
-    if (*(u8 *)(p + 0x22BD) != 0)
+    char *heroBase = gHeroState;
+    s16 savedMode = *(s16 *)(heroBase + 0x1490);
+    u8 savedFlag = *(u8 *)(heroBase + 0x149D);
+    FastMemoryHelperB(heroBase + 0x1490, 16);
+    *(u8 *)(heroBase + 0x149D) = savedFlag;
+    *(s16 *)(heroBase + 0x1490) = savedMode;
+    *(u8 *)(heroBase + 0x22B9) = 0;
+    *(s16 *)(heroBase + 0x348) = 0;
+    if (*(u8 *)(heroBase + 0x22BD) != 0)
         return;
-    if (*(int *)(p + 0x340) != 0) {
-        if (mode == -1)
+    if (*(int *)(heroBase + 0x340) != 0) {
+        if (savedMode == -1)
             return;
     } else {
-        if (mode == -1)
+        if (savedMode == -1)
             return;
     }
     {
-        if (mode == 2) {
-            char *m = D_00189E20;
-            if (*(s16 *)(m + 0x1DE) == 0 && (*(s16 *)(m + 0x34C) == 0 || *(float *)(m + 0x31C) < 2.5f)) {
-                *(u8 *)(m + 0x1497) = 1;
-                if (*(u8 *)(m + 0x22B4) == 0 && D_L18_001A7B0B != 0)
-                    *(s16 *)(m + 0x348) = 1;
+        if (savedMode == 2) {
+            char *hero = gHeroState;
+            if (*(s16 *)(hero + 0x1DE) == 0 && (*(s16 *)(hero + 0x34C) == 0 || *(float *)(hero + 0x31C) < 2.5f)) {
+                *(u8 *)(hero + 0x1497) = 1;
+                if (*(u8 *)(hero + 0x22B4) == 0 && D_L18_001A7B0B != 0)
+                    *(s16 *)(hero + 0x348) = 1;
             }
         }
-        if (mode == 0xE) {
-            char *h = D_00189E20;
-            *(u8 *)(h + 0x1494) = 1;
-            *(float *)(h + 0x24C4) = 0.2f;
-            *(float *)(h + 0x330) = *(float *)(h + 0x318) + 0.2f;
+        if (savedMode == 0xE) {
+            char *hero = gHeroState;
+            *(u8 *)(hero + 0x1494) = 1;
+            *(float *)(hero + 0x24C4) = 0.2f;
+            *(float *)(hero + 0x330) = *(float *)(hero + 0x318) + 0.2f;
         }
-        if (mode == 0) {
-            float d;
-            char *h = D_00189E20;
-            d = *(float *)(h + 0x330) - *(float *)(h + 0x318);
-            *(float *)(h + 0x24C4) = d;
-            if (d < 0.85f && d > 0.25f)
-                *(u8 *)(h + 0x22B9) = 1;
-            h = D_00189E20;
-            *(u8 *)(h + 0x1494) = 1;
+        if (savedMode == 0) {
+            float comboTime;
+            char *hero = gHeroState;
+            comboTime = *(float *)(hero + 0x330) - *(float *)(hero + 0x318);
+            *(float *)(hero + 0x24C4) = comboTime;
+            if (comboTime < 0.85f && comboTime > 0.25f)
+                *(u8 *)(hero + 0x22B9) = 1;
+            hero = gHeroState;
+            *(u8 *)(hero + 0x1494) = 1;
         }
-        if (mode == 7) {
-            char *h = D_00189E20;
-            *(u8 *)(h + 0x1492) = 1;
+        if (savedMode == 7) {
+            char *hero = gHeroState;
+            *(u8 *)(hero + 0x1492) = 1;
         }
-        if (mode == 8) {
-            char *h = D_00189E20;
-            *(u8 *)(h + 0x149A) = 1;
+        if (savedMode == 8) {
+            char *hero = gHeroState;
+            *(u8 *)(hero + 0x149A) = 1;
         }
-        if (mode == 0xC) {
-            char *h = D_00189E20;
-            *(u8 *)(h + 0x149A) = 1;
+        if (savedMode == 0xC) {
+            char *hero = gHeroState;
+            *(u8 *)(hero + 0x149A) = 1;
         }
     }
 }

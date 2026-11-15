@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_L00_002AF7D0(void);
 extern void func_L00_002B1F90(void);
@@ -189,10 +190,11 @@ extern void func_00282A60(void *, int, int);
 extern void func_L00_00390938(int);
 
 /* calls three measured no-argument functions in sequence */
+/* Runs the three per-frame hero item updates one after another. */
 void func_L00_002AFBC0(void) {
- func_L00_002AED68();
- func_L00_002AF860();
- func_L00_002AEB18();
+ update_hero_item_slot_animation_blends();
+ update_hero_held_items_and_orientation();
+ UpdateHeroStatusIconOverlay();
 }
 
 #define ITEM_DEF(id) (&D_L00_00262570[D_00139568[id]])
@@ -215,13 +217,13 @@ void func_L00_002AFBF0(void)
             else
                 id = saved;
         }
-        func_00294988(ITEM_DEF(id)->object);
+        SwitchCachedDiscAsset(ITEM_DEF(id)->object);
         for (i = 0; i < 3; i++) {
-            func_00282A60(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
+            ClearMemory(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
             D_0018B9A0[i].joint = -1;
         }
         HERO_ITEMS->slots[0].id = id;
-        moby = func_0029EFD0(ITEM_DEF(id)->object);
+        moby = CreateMoby(ITEM_DEF(id)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -231,12 +233,12 @@ void func_L00_002AFBF0(void)
             HERO_ITEMS->slots[0].state = 2;
             HERO_ITEMS->slots[0].moby = moby;
             HERO_ITEMS->slots[0].ammoFlag = 0;
-            if (ITEM_DEF(id)->ammo && !D_00139688[id])
+            if (ITEM_DEF(id)->ammo && !gItemAmmoCounts[id])
                 HERO_ITEMS->slots[0].ammoFlag = 255;
             if (id == 10) {
                 HERO_ITEMS->slots[0].buttonMask = 128;
                 HERO_ITEMS->slots[0].state = 2;
-                func_002A7470(moby, 1, 0, 1);
+                StartAnimationBlended(moby, 1, 0, 1);
             } else {
                 HERO_ITEMS->slots[0].buttonMask = 32;
             }
@@ -256,7 +258,7 @@ void func_L00_002AFBF0(void)
             }
         }
         HERO_ITEMS->slots[3].id = id;
-        moby = func_0029EFD0(ITEM_DEF(id)->object);
+        moby = CreateMoby(ITEM_DEF(id)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -268,14 +270,14 @@ void func_L00_002AFBF0(void)
             if (HERO_ITEMS->packDisabled)
                 moby->flags |= 0x41;
             if (!HERO_ITEMS->packDisabled && (HERO_ITEMS->slots[3].id == 3 || HERO_ITEMS->slots[3].id == 8)) {
-                func_L00_00390938(0);
-                func_L00_00390938(1);
+                CreateTetherHolder(0);
+                CreateTetherHolder(1);
             }
         }
     }
 
     if (!HERO_ITEMS->slots[3].other) {
-        moby = func_0029EFD0(ITEM_DEF(1)->object);
+        moby = CreateMoby(ITEM_DEF(1)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -304,7 +306,7 @@ void func_L00_002AFBF0(void)
         if (!id)
             id = 47;
         HERO_ITEMS->slots[2].id = id;
-        slotMoby = func_0029EFD0(ITEM_DEF(id)->object);
+        slotMoby = CreateMoby(ITEM_DEF(id)->object);
         if (slotMoby) {
             slotMoby->drawDistance = 32;
             slotMoby->visible = 1;
@@ -334,13 +336,13 @@ void func_L00_002AFBF0(void)
         }
     }
     if (!HERO_ITEMS->slots[1].moby && !disabled) {
-        if (D_L00_001B19C8[0] < 3)
+        if (gFrameCounter_L00[0] < 3)
             HERO_ITEMS->slots[1].id = D_001A7398[1] = (*(short *)(D_001A7A00 + 0x24));
         else
             HERO_ITEMS->slots[1].id = D_001A7398[1];
         if (!HERO_ITEMS->slots[1].id)
             HERO_ITEMS->slots[1].id = 52;
-        moby = func_0029EFD0(ITEM_DEF(HERO_ITEMS->slots[1].id)->object);
+        moby = CreateMoby(ITEM_DEF(HERO_ITEMS->slots[1].id)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -351,7 +353,7 @@ void func_L00_002AFBF0(void)
             HERO_ITEMS->slots[1].moby = moby;
             HERO_ITEMS->slots[1].state = 2;
         }
-        moby = func_0029EFD0(ITEM_DEF(HERO_ITEMS->slots[1].id)->other);
+        moby = CreateMoby(ITEM_DEF(HERO_ITEMS->slots[1].id)->other);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -367,7 +369,7 @@ void func_L00_002AFBF0(void)
     if (!HERO_ITEMS->slots[4].moby && D_001A7A00[0xFD]) {
         HeroItemMoby *slotMoby;
 
-        slotMoby = func_0029EFD0(ITEM_DEF(5)->object);
+        slotMoby = CreateMoby(ITEM_DEF(5)->object);
         HERO_ITEMS->slots[4].id = 5;
         if (slotMoby) {
             slotMoby->drawDistance = 32;
@@ -382,7 +384,7 @@ void func_L00_002AFBF0(void)
     if (!HERO_ITEMS->slots[4].other && D_001A7A00[0x12A]) {
         HeroItemMoby *slotMoby;
 
-        slotMoby = func_0029EFD0(ITEM_DEF(50)->object);
+        slotMoby = CreateMoby(ITEM_DEF(50)->object);
         HERO_ITEMS->slots[4].id = 50;
         if (slotMoby) {
             slotMoby->drawDistance = 32;
@@ -395,7 +397,7 @@ void func_L00_002AFBF0(void)
     if (!HERO_ITEMS->slots[4].extra && D_001A7A00[0xFF]) {
         HeroItemMoby *slotMoby;
 
-        slotMoby = func_0029EFD0(ITEM_DEF(7)->object);
+        slotMoby = CreateMoby(ITEM_DEF(7)->object);
         HERO_ITEMS->slots[4].id = 7;
         if (slotMoby) {
             slotMoby->drawDistance = 32;
@@ -412,14 +414,15 @@ void func_L00_002AFBF0(void)
 
 
 /* Nested 3x3 sweep over two rows-of-four arrays: sums the results of calling the same routine with the difference of each of the nine element pairs, returns the sum. */
-float func_L00_002B0480(Row_F3392e4bc *a, Row_F3392e4bc *b)
+/* Measures how different two sets of rotation numbers are by adding up the gaps between matching entries. */
+float func_L00_002B0480(Row_F3392e4bc *matrixA, Row_F3392e4bc *matrixB)
 {
     float sum = 0.0f;
     int i, j;
 
     for (i = 0; i < 3; i++)
         for (j = 0; j < 3; j++)
-            sum += func_00282C48_2(a[i][j] - b[i][j]);
+            sum += func_00282C48_2(matrixA[i][j] - matrixB[i][j]);
     return sum;
 }
 
@@ -428,43 +431,44 @@ float func_L00_002B0480(Row_F3392e4bc *a, Row_F3392e4bc *b)
 /* func_L00_002B0968 is in L00_002AFBC0-attach-g8.c. */
 
 /* for one fixed 80-byte slot: stores a value, rewrites a state word, dispatches through a function pointer at entry+100 unless the entry is null or carries a 253/254 sentinel, then releases two stored entry pointers, skipping the second when the slot index is 3 */
+/* Frees one hero item slot: lets the item run its last callback, then removes its game objects. */
 void func_L00_002B1230(int slot, int value)
 {
-    char *e;
-    void (*fn)(char *);
+    char *entry;
+    void (*callback)(char *);
 
     {
-        char *p = D_00189E20_12 + slot * 80;
+        char *slotBase = D_00189E20_12 + slot * 80;
 
-        *(int *)(p + 4660) = value;
-        if (*(int *)(p + 4676) != 3) {
-            *(int *)(p + 4676) = 3;
-            e = *(char **)(p + 4640);
-            if (e != 0) {
-                if (*(unsigned char *)(e + 32) != 254) {
-                    if (*(unsigned char *)(e + 32) != 253) {
-                        fn = *(void (**)(char *))(e + 100);
-                        if (fn != 0)
-                            fn(e);
+        *(int *)(slotBase + 4660) = value;
+        if (*(int *)(slotBase + 4676) != 3) {
+            *(int *)(slotBase + 4676) = 3;
+            entry = *(char **)(slotBase + 4640);
+            if (entry != 0) {
+                if (*(unsigned char *)(entry + 32) != 254) {
+                    if (*(unsigned char *)(entry + 32) != 253) {
+                        callback = *(void (**)(char *))(entry + 100);
+                        if (callback != 0)
+                            callback(entry);
                     }
                 }
             }
         }
     }
     {
-        char *q = D_00189E20_12 + slot * 80;
+        char *slotBase = D_00189E20_12 + slot * 80;
 
-        e = *(char **)(q + 4640);
-        *(int *)(q + 4676) = 0;
-        *(int *)(q + 4680) = 0;
-        if (e != 0) {
-            func_0029F338_1(e);
-            *(char **)(q + 4640) = 0;
+        entry = *(char **)(slotBase + 4640);
+        *(int *)(slotBase + 4676) = 0;
+        *(int *)(slotBase + 4680) = 0;
+        if (entry != 0) {
+            func_0029F338_1(entry);
+            *(char **)(slotBase + 4640) = 0;
         }
-        e = *(char **)(q + 4644);
-        if (e != 0 && slot != 3) {
-            func_0029F338_1(e);
-            *(char **)(q + 4644) = 0;
+        entry = *(char **)(slotBase + 4644);
+        if (entry != 0 && slot != 3) {
+            func_0029F338_1(entry);
+            *(char **)(slotBase + 4644) = 0;
         }
     }
 }
@@ -506,7 +510,8 @@ extern void *D_L00_002A00A0[31];
 /* Dispatches on the argument through the level's table: the five listed cases write
  * 0x46 at +0x1FC and 3 at +0x24F4 of the resident block, the other twenty-six and every
  * argument out of the range only return. */
-void func_L00_002B1308(int a0)
+/* For a few special hero modes, sets a short timer and a state value. Other modes do nothing. */
+void func_L00_002B1308(int mode)
 {
     /* Keeps the two arms alive: the addresses land in the discarded .data. */
     static void *cases[31] = {
@@ -516,14 +521,14 @@ void func_L00_002B1308(int a0)
         &&ret, &&ret, &&ret, &&ret, &&ret, &&arm, &&arm
     };
 
-    if ((unsigned int)(a0 - 14) < 31) {
-        goto *D_L00_002A00A0[a0 - 14];
+    if ((unsigned int)(mode - 14) < 31) {
+        goto *D_L00_002A00A0[mode - 14];
     } else {
         goto ret;
     }
 arm:
-    D_00189E20.b = 3;
-    D_00189E20.a = 0x46;
+    gHeroState.b = 3;
+    gHeroState.a = 0x46;
 ret:
     return;
 }
@@ -553,15 +558,15 @@ void func_L00_002B1F90(void)
             switch (*(int *)(slot + 0x1244)) {
             case 2:
                 ++*(int *)(slot + 0x1240);
-                func_L00_002B1350(i);
+                ApplyHeroEquipmentRequest(i);
                 if ((entry[0x60] & 2) && entry[0x43] == 0
                     && (*(u8 **)(entry + 0x24))[0xC] >= 2)
-                    func_002A7470(entry, 1, 0, 2);
+                    StartAnimationBlended(entry, 1, 0, 2);
                 break;
             case 3:
                 ++slot[0x123B];
                 if ((entry[0x60] & 2) || i == 1 || i == 0)
-                    func_L00_002B1230(i, D_L00_001B18D8[0] + 2);
+                    ReleaseHeroItemSlot(i, D_L00_001B18D8[0] + 2);
                 break;
             }
             {
@@ -577,7 +582,7 @@ void func_L00_002B1F90(void)
                     callback((char *)entry);
             }
         } else {
-            func_L00_002B1350(i);
+            ApplyHeroEquipmentRequest(i);
         }
     }
 }
@@ -589,89 +594,91 @@ void func_L00_002B1F90(void)
 /* Reset the hero update state, install the requested mode and object, and update the mode-one counters. */
 void func_L00_002B2A40(int mode, int value, char *object)
 {
-    char *p;
-    char *current;
-    int count;
+    char *hero;
+    char *currentMoby;
+    int newHealth;
 
-    func_L00_002AF7D0();
-    p = (char *)D_00189E20_1;
-    p[0x22B6] = 1;
-    func_L00_002B1F90();
-    *(int *)(p + 0x2290) = *(int *)(p + 0xC18);
-    func_L00_00322EC8(p + 0x18E0);
-    func_L00_00322EC8(p + 0x1A30);
-    current = *(char **)(p + 0x2290);
-    *(int *)(current + 0x9C) = -1;
-    if (mode != 4 || (unsigned char)p[0x22B4] != mode)
-        func_L00_002D2E68();
-    func_L00_002A6708();
-    func_L00_002A53B8();
+    cancel_hero_item_animation();
+    hero = (char *)D_00189E20_1;
+    hero[0x22B6] = 1;
+    UpdateHeroSlotCallbacks();
+    *(int *)(hero + 0x2290) = *(int *)(hero + 0xC18);
+    ReleaseSlotList(hero + 0x18E0);
+    ReleaseSlotList(hero + 0x1A30);
+    currentMoby = *(char **)(hero + 0x2290);
+    *(int *)(currentMoby + 0x9C) = -1;
+    if (mode != 4 || (unsigned char)hero[0x22B4] != mode)
+        SetHeroObjectsFlagBit();
+    ClearTrackedSlots();
+    ResetAllAttachmentRecords();
     {
-        char *q = (char *)D_00189E20_1;
+        char *heroAlias = (char *)D_00189E20_1;
 
-        q[0x22B4] = (char)mode;
-        *(int *)(q + 0xC14) = (int)object;
-        *(int *)(q + 0x2290) = (int)object;
+        heroAlias[0x22B4] = (char)mode;
+        *(int *)(heroAlias + 0xC14) = (int)object;
+        *(int *)(heroAlias + 0x2290) = (int)object;
         if ((unsigned char)mode == 1 && (D_00138320[0] & 0x10) != 0) {
             func_L00_002F6BE0(0x23, 0, D_L00_002F8588,
                              D_L00_002F85D0, D_L00_002F8AD8, 0, 0);
-            func_L00_002F6B90(3);
+            RunSlotCallback(3);
         }
         {
-            char *r = (char *)D_00189E20_1;
+            char *heroBlock = (char *)D_00189E20_1;
 
-            func_L00_002B32F8();
-            *(float *)(r + 0x250) = *(float *)(r + 0x258);
-            *(float *)(r + 0x254) = *(float *)(r + 0x25C);
-            *(unsigned short *)(*(char **)(r + 0x2290) + 0x34) |= 6;
-            *(float *)(r + 0xC24) = *(float *)(r + 0xC20) = 1.0f;
-            func_L00_002D24B8();
-            func_002A677C(*(char **)(r + 0x2290));
-            *(short *)(r + 0x24F2) = (short)value;
+            UpdateHeroCollisionCapsule();
+            *(float *)(heroBlock + 0x250) = *(float *)(heroBlock + 0x258);
+            *(float *)(heroBlock + 0x254) = *(float *)(heroBlock + 0x25C);
+            *(unsigned short *)(*(char **)(heroBlock + 0x2290) + 0x34) |= 6;
+            *(float *)(heroBlock + 0xC24) = *(float *)(heroBlock + 0xC20) = 1.0f;
+            ClearHeroQueuedAnimation();
+            func_002A677C(*(char **)(heroBlock + 0x2290));
+            *(short *)(heroBlock + 0x24F2) = (short)value;
             if (mode == 1) {
-                *(short *)(r + 0x24D4) = *(short *)(r + 0x24CC);
-                count = *(int *)(r + 0x24D0);
-                *(int *)(r + 0x24CC) = count;
-                if (count >= 5)
-                    *(int *)(r + 0x24CC) = 4;
+                *(short *)(heroBlock + 0x24D4) = *(short *)(heroBlock + 0x24CC);
+                newHealth = *(int *)(heroBlock + 0x24D0);
+                *(int *)(heroBlock + 0x24CC) = newHealth;
+                if (newHealth >= 5)
+                    *(int *)(heroBlock + 0x24CC) = 4;
             }
-            func_L00_002C42E0(value, 2);
+            SetHeroAction_L00(value, 2);
         }
     }
 }
 
 /* Zeroes a 16-byte global block, calls a setup helper, runs a per-slot reset helper over seven 16-byte units of a global table, then clears three word fields of a block 256 bytes below the table base. */
+/* Clears the hero speed values and a group of saved vectors. */
 void func_L00_002B2BD0(void)
 {
-    char *p;
+    char *block;
 
     *(volatile V4_Fa012328c *)D_00189F30 = 0;
-    func_L00_002B39D8();
-    p = D_00189F20;
-    func_00282C88_4(p);
-    func_00282C88_4(p - 16);
-    func_00282C88_4(p + 16);
-    func_00282C88_4(p + 32);
-    func_00282C88_4(p + 48);
-    func_00282C88_4(p + 96);
-    func_00282C88_4(p - 96);
-    p = p - 256;
-    *(int *)(p + 420) = 0;
-    *(int *)(p + 376) = 0;
-    *(int *)(p + 368) = 0;
-    func_002B8518();
+    ClearHeroSpeeds();
+    block = D_00189F20;
+    func_00282C88_4(block);
+    func_00282C88_4(block - 16);
+    func_00282C88_4(block + 16);
+    func_00282C88_4(block + 32);
+    func_00282C88_4(block + 48);
+    func_00282C88_4(block + 96);
+    func_00282C88_4(block - 96);
+    block = block - 256;
+    *(int *)(block + 420) = 0;
+    *(int *)(block + 376) = 0;
+    *(int *)(block + 368) = 0;
+    ClearPadPortState();
 }
 
 
 /* dispatch on the second integer argument: each arm runs a pair of sub-calls passing the first argument twice, the second call also forwarding the float argument */
-void func_L00_002B2C58(int a, int b, float x, float y)
+/* Flattens a push vector in one of two ways and then sets its strength. */
+void func_L00_002B2C58(int vec, int useAlternate, float unusedScale, float scale)
 {
-    if (b != 0) {
-        func_L00_002D3CF8_1(a, a);
-        func_L00_002D3C68_1(a, a, y);
+    if (useAlternate != 0) {
+        func_L00_002D3CF8_1(vec, vec);
+        func_L00_002D3C68_1(vec, vec, scale);
     } else {
-        func_L00_002D3BD8_1(a, a);
-        func_L00_002D3B58(a, a, y);
+        func_L00_002D3BD8_1(vec, vec);
+        SetViewSpaceHeight(vec, vec, scale);
     }
 }
 
@@ -699,22 +706,23 @@ extern void func_0027D330(int);
  * per-level per-slot counter (only once the counter at D_L00_001B19C8 reaches 900, or 1800 in modes 0x74 and 0x79,
  * and while the slot's 0x80 flag is clear) and a 16-entry counter; always bumps the per-slot counter, calls
  * func_0027D330(0x10) and sets the byte at 0x22C1. */
+/* Adds one to the play counters for the current level and slot, and marks the hero as having visited. */
 void func_L00_002B30E8(void)
 {
     int threshold;
     int mode;
 
-    D_0013A148[D_001A79F0[0]]++;
+    D_0013A148[gCurrentMapIndex[0]]++;
     D_001A73D8[0]++;
-    func_L00_002F45B8();
+    ClearEntryTopBits();
     if (((HeroSlotState *)D_00189E20_1)->slot != 0xFF) {
         mode = ((HeroSlotState *)D_00189E20_1)->mode;
         if (mode == 0x74 || mode == 0x79)
             threshold = 0x708;
         else
             threshold = 0x384;
-        if (D_L00_001B19C8[0] >= threshold) {
-            int level = D_001A79F0[0];
+        if (gFrameCounter_L00[0] >= threshold) {
+            int level = gCurrentMapIndex[0];
             int slot = ((HeroSlotState *)D_00189E20_1)->slot;
             if ((D_0019B2E8[level][slot] & 0x80) == 0)
                 D_001A24A8[level][slot & 0xF]++;
@@ -722,14 +730,15 @@ void func_L00_002B30E8(void)
         D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
     }
     D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot]++;
-    func_0027D330(0x10);
+    FadeToBlack(0x10);
     ((HeroSlotState *)D_00189E20_1)->visited = 1;
 }
 
 /* tests the signed short identifier at offset 0xaa of a nonnull object against 71 */
+/* Tells whether a game object exists and is of class 71. */
 s32 func_L00_002B3248(u8 *object) {
  if(object==0) return 0;
- return *(short *)(object+0xaa)==71;
+ return *(short *)(object+0xaa)==71 /* moby class 71 */;
 }
 
 extern int D_00138320[];
@@ -744,15 +753,16 @@ extern float func_00282C48(float);
 
 extern float func_00283C80(float, float);
 
-int func_L00_002B3268(float x) {
-    float r;
+/* Checks whether the hero is turned far enough away (at least the given angle) while a button is held. */
+int func_L00_002B3268(float minAngle) {
+    float angle;
 
     if ((D_00138320[0] & 3) != 0) {
-        if (D_00189E20.flag != 0)
-            r = func_00282C48(func_L00_002B9B38(D_L00_001B8FF0, 0));
+        if (gHeroState.flag != 0)
+            angle = FloatAbs(GetDirectionAngleDelta(D_L00_001B8FF0, 0));
         else
-            r = func_00283C80(D_00189E20.f98, D_L00_001B8DD8);
-        if (r < x)
+            angle = FastDiffRots(gHeroState.f98, D_L00_001B8DD8);
+        if (angle < minAngle)
             return 0;
         return 1;
     }
@@ -769,23 +779,25 @@ extern char D_0018BDD0[];
 
 extern float func_00282DF0(char *);
 
+/* Works out how hard the player is pushing the stick, from 0 to 1. */
 float func_L00_002B3900(void) {
-    float a = func_00282C48(D_00189E20.f1FB0);
-    float b = func_00282C48(D_00189E20.f1FB4);
-    float c;
-    float v;
+    float absX = FloatAbs(gHeroState.f1FB0);
+    float absY = FloatAbs(gHeroState.f1FB4);
+    float largest;
+    float magnitude;
 
-    if (b < a)
-        c = func_00282C48(D_00189E20.f1FB0);
+    if (absY < absX)
+        largest = FloatAbs(gHeroState.f1FB0);
     else
-        c = func_00282C48(D_00189E20.f1FB4);
-    v = (c + func_00282DF0(D_0018BDD0)) * 0.5f;
-    if (1.0f < v)
-        v = 1.0f;
-    return v;
+        largest = FloatAbs(gHeroState.f1FB4);
+    magnitude = (largest + FastVecLength(D_0018BDD0)) * 0.5f;
+    if (1.0f < magnitude)
+        magnitude = 1.0f;
+    return magnitude;
 }
 
 /* Test whether a scalar lies below a plane within its configured depth, rejecting unordered values */
+/* Tells whether a value is just below a flat limit, no further than the allowed depth. */
 int func_L00_002B3998(f32 value)
 {
     GornFloatInterval64 *root = (GornFloatInterval64 *)D_00189E20_1;
@@ -798,56 +810,61 @@ int func_L00_002B3998(f32 value)
 
 /* clears the two floats at the head of the window block; the second store is the one the
    scheduler parks in the jr delay slot, so it is written second */
+/* Sets the hero target speed and current speed to zero. */
 void func_L00_002B39D8(void)
 {
-    D_00189E20.f1B0 = 0.0f;
-    D_00189E20.f1B4 = 0.0f;
+    gHeroState.f1B0 = 0.0f;
+    gHeroState.f1B4 = 0.0f;
 }
 
 /* builds one 64-byte block from a 3-float vector of the incoming scalars and another from a static table record one element in, combines them, then scales the result again from that record */
-void func_L00_002B3DC0(f32 a1, f32 a2, f32 a3) {
-    V4_F6b9e759f in;
-    M4_F6b9e759f m1;
-    M4_F6b9e759f m2;
-    in.x = a1;
-    in.y = a2;
-    in.z = a3;
-    func_00283410_5(&m1, &in);
-    func_00283410_5(&m2, &D_00189EA0_1[1]);
-    func_00283788_3(&m2, &m2, &m1);
-    func_002AB6D8_3(&m2, &D_00189EA0_1[1]);
+/* Turns the hero matrix by a rotation given as three numbers. */
+void func_L00_002B3DC0(f32 x, f32 y, f32 z) {
+    V4_F6b9e759f rotation;
+    M4_F6b9e759f rotationMatrix;
+    M4_F6b9e759f heroMatrix;
+    rotation.x = x;
+    rotation.y = y;
+    rotation.z = z;
+    func_00283410_5(&rotationMatrix, &rotation);
+    func_00283410_5(&heroMatrix, &D_00189EA0_1[1]);
+    func_00283788_3(&heroMatrix, &heroMatrix, &rotationMatrix);
+    func_002AB6D8_3(&heroMatrix, &D_00189EA0_1[1]);
 }
 
 /* Fills a two-float scratch buffer from one region of a fixed global, passes it with three forwarded floats and an out-parameter to another callee, stores the returned float back into the global, then feeds that out value to a final callee. */
-void func_L00_002B3E40(int a0, float a1, float a2, float a3)
+/* Smoothly turns the hero toward a direction in the special movement mode. */
+void func_L00_002B3E40(int index, float first, float second, float third)
 {
-    float tmp[2];
-    char *p = D_00189FB0;
-    float out;
-    float r;
+    float offsetXY[2];
+    char *block = D_00189FB0;
+    float turnOut;
+    float angleToTarget;
 
-    func_002830C0(tmp, p, p - 336);
-    r = func_00283248_1(tmp[0], tmp[1]);
-    out = 0.0f;
-    *(float *)(p + 24) = func_002AA898(&out, r, p + 20, a1, a2, a3, a0);
-    func_L00_002B3DC0_1(0.0f, 0.0f, out);
+    transform_vector(offsetXY, block, block - 336);
+    angleToTarget = func_00283248_1(offsetXY[0], offsetXY[1]);
+    turnOut = 0.0f;
+    *(float *)(block + 24) = ApproachWithVelocity(&turnOut, angleToTarget, block + 20, first, second, third, index);
+    func_L00_002B3DC0_1(0.0f, 0.0f, turnOut);
 }
 
-void func_L00_002B3EF8(int a0, float x, float y, float z) {
-    if (D_00189E20.flag != 0)
-        func_L00_002B3E40(a0, x, y, z);
+/* Smoothly turns the hero toward the wanted direction, using the normal or the special method. */
+void func_L00_002B3EF8(int index, float first, float second, float third) {
+    if (gHeroState.flag != 0)
+        SteerHeroHeadingSpecialMode(index, first, second, third);
     else
-        D_00189E20.f1A8 = func_002AA898(&D_00189E20.f98, D_00189E20.f1A0, (char *)&D_00189E20.f1A4, x, y, z, a0);
+        gHeroState.f1A8 = ApproachWithVelocity(&gHeroState.f98, gHeroState.f1A0, (char *)&gHeroState.f1A4, first, second, third, index);
 }
 
 
 /* func_L00_002B3F68 is in L00_002B3F68.c. */
 
-void func_L00_002B41B8(float x, float y) {
-    if (D_00189E20.f1B4 < D_00189E20.f1B0)
-        func_002AA2E8(&D_00189E20.f1B4, D_00189E20.f1B0, x);
+/* Moves the hero current speed toward the wanted speed, faster when speeding up than when slowing down. */
+void func_L00_002B41B8(float riseRate, float fallRate) {
+    if (gHeroState.f1B4 < gHeroState.f1B0)
+        ApproachValue(&gHeroState.f1B4, gHeroState.f1B0, riseRate);
     else
-        func_002AA2E8(&D_00189E20.f1B4, D_00189E20.f1B0, y);
+        ApproachValue(&gHeroState.f1B4, gHeroState.f1B0, fallRate);
 }
 
 
@@ -855,8 +872,9 @@ extern char D_00189F10[];
 
 extern void func_00282F20(char *, void *, float);
 
-void func_L00_002B42D8(void *obj) {
-    func_00282F20(D_00189F10, obj, *(float *)(D_00189F10 + 0xC4));
+/* Copies a direction into the hero push vector and gives it the stored push length. */
+void func_L00_002B42D8(void *direction) {
+    vec_scale_to_length(D_00189F10, direction, *(float *)(D_00189F10 + 0xC4));
 }
 
 /* func_L00_002B4308 is in L00_002B4308.c. */
@@ -873,17 +891,18 @@ extern void func_00282D30(char *, char *, float);
 
 extern void func_00282C88(char *);
 
-void func_L00_002B54F8(float x, float y) {
-    char *p = (char *)&D_00189E20 + 0xA60;
-    float r;
+/* Builds the hero movement push from the stick values and shrinks it, or clears it when it is very small. */
+void func_L00_002B54F8(float scale, float deadZone) {
+    char *impulse = (char *)&gHeroState + 0xA60;
+    float length;
 
-    func_002AF000(p, D_00189E20.fA70, D_00189E20.fA78, D_00189E20.fA74);
-    func_00282D30(p, p, x);
-    r = func_00282DF0(p);
-    if (r <= y)
-        func_00282C88(p);
+    BuildSphericalOffset(impulse, gHeroState.fA70, gHeroState.fA78, gHeroState.fA74);
+    FastVecScale(impulse, impulse, scale);
+    length = FastVecLength(impulse);
+    if (length <= deadZone)
+        ClearVector128(impulse);
     else
-        func_00282F20(p, p, r - y);
+        vec_scale_to_length(impulse, impulse, length - deadZone);
 }
 
 
@@ -892,13 +911,14 @@ void func_L00_002B54F8(float x, float y) {
 /* func_L00_002B5B60 is in L00_002B5B60-motion.c. */
 
 /* scales four 16-byte records of a static table in place by a scalar, then multiplies one float field of a later record by the same scalar */
-void func_L00_002B6118(f32 a0) {
-    V4S_F31e44309 *p = &D_00189E20_10[17];
-    func_00282D30_6(p, p, a0);
-    func_00282D30_6(p + 1, p + 1, a0);
-    func_00282D30_6(p - 2, p - 2, a0);
-    func_00282D30_6(p + 5, p + 5, a0);
-    D_00189E20_10[27].y = D_00189E20_10[27].y * a0;
+/* Scales a few saved hero vectors by the same amount. */
+void func_L00_002B6118(f32 scale) {
+    V4S_F31e44309 *vectors = &D_00189E20_10[17];
+    func_00282D30_6(vectors, vectors, scale);
+    func_00282D30_6(vectors + 1, vectors + 1, scale);
+    func_00282D30_6(vectors - 2, vectors - 2, scale);
+    func_00282D30_6(vectors + 5, vectors + 5, scale);
+    D_00189E20_10[27].y = D_00189E20_10[27].y * scale;
 }
 
 /* func_L00_002B6198 is in L00_002AFBC0-velocity.c. */

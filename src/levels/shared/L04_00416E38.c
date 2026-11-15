@@ -47,6 +47,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* Draws a menu box with two text labels on it. */
 void func_L04_00416E38(void) {
     char box[32];
     float s, half, ky, kx;
@@ -59,16 +60,16 @@ void func_L04_00416E38(void) {
     x1 = menu_coord(kx, s, half, on);
     ky = 371.0f;
     y1 = menu_coord(ky, s, half, on);
-    func_0027EB88(x1, y1, 130, 384, 96, 0x60442D00);
+    DrawRoundedBox(x1, y1, 130, 384, 96, 0x60442D00);
     s = D_L04_001B2D44;
-    func_0029B658((float)menu_coord(kx, s, half, on), (float)menu_coord(ky, s, half, on),
+    SetLevelObjectRect((float)menu_coord(kx, s, half, on), (float)menu_coord(ky, s, half, on),
                   130.0f, 384.0f, 96, 0x55F0C070);
     s = D_L04_001B2D44;
     x3 = menu_coord(222.0f, s, half, on);
     y3 = label_y((void *)x3, 479.0f, s, half, 1);
-    func_002802E0(box, x3, y3, 44, 468, 256, 299, 16, 3);
-    func_00280200(box, (int)0x80F0F0F0, func_00288FB8(0xA41), -1);
-    x4 = D_001A7340 / 2;
+    FontSetWindow(box, x3, y3, 44, 468, 256, 299, 16, 3);
+    DrawTextWindowMediumFont(box, (int)0x80F0F0F0, GetLocalizedString(0xA41), -1);
+    x4 = gScreenWidth / 2;
     y4 = label_y((void *)x4, 349.0f, D_L04_001B2D44, half, 1);
-    func_0027FB40(x4, y4, (int)0x80F0F0F0, func_00288FB8(0x2F2C), -1);
+    DrawTextCenteredMediumFont(x4, y4, (int)0x80F0F0F0, GetLocalizedString(0x2F2C), -1);
 }

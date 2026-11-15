@@ -34,10 +34,11 @@ extern int func_0027FAA8(int,int,u64,char *,int);
 
 static __inline__ void draw_background(char *tex, int color, float sx, float sy, float rot, float scale, float half)
 {
-    func_00300A00(tex, color, 129.0f, (float)(int)(D_001B23A4 * scale + half), sx, sy, rot);
+    DrawScaledObjectTwoAxes(tex, color, 129.0f, (float)(int)(D_001B23A4 * scale + half), sx, sy, rot);
 }
 
-int func_0028D1E8(unsigned char *o)
+/* Draws the round weapon-select menu with its background, weapon icons and the name of the chosen weapon. */
+int func_0028D1E8(unsigned char *menu)
 {
     int total = D_001B189C[2] + D_001B189C[4] + D_001B189C[3];
     RadialPositions positions = D_001A8E30;
@@ -50,15 +51,15 @@ int func_0028D1E8(unsigned char *o)
     int sel;
     char *label;
     int i, selectedAvailable, x, y, frame, available, color, previous;
-    unsigned char *fade = o + 0x70;
-    open = func_00283CE0(o[0x70]) / func_00283CE0(8);
+    unsigned char *fade = menu + 0x70;
+    open = IntToFloat(menu[0x70]) / IntToFloat(8);
     if (open > 1.0f) open = 1.0f;
     else if (open < 0.0f) open = 0.0f;
-    text = func_00283CE0(fade[1]) / func_00283CE0(8);
+    text = IntToFloat(fade[1]) / IntToFloat(8);
     if (text > 1.0f) text = 1.0f;
     else if (text < 0.0f) text = 0.0f;
     b0 = 0x8710;
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 8);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 8);
     do {
         scale = 208.0f;
         half = 0.5f;
@@ -69,114 +70,114 @@ int func_0028D1E8(unsigned char *o)
         b1 = 0x8710;
         b2 = 0x8710;
     } while (0);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 9);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 9);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 10);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 10);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 11);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 11);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 12);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 12);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 13);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 13);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 14);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 14);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 15);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 15);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 7);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 7);
     draw_background(tex, 0x60442D00, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b0, 7);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b0, 7);
     draw_background(tex, 0x60442D00, minus, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b1, 134);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b1, 134);
     draw_background(tex, 0x55F0C070, one, one, zero, scale, half);
-    tex = (char *)func_00336D50(D_001A8CFC + b2, 134);
+    tex = (char *)FindTableEntryById(D_001A8CFC + b2, 134);
     draw_background(tex, 0x55F0C070, minus, one, zero, scale, half);
-    if (*(int *)(o+0x74) >= 0) {
-        colors[0] = func_002A9588(0x80442D00,0x80FFDE8D,25,0,0);
-        previous = *(int *)(o+0x74)-1;
+    if (*(int *)(menu+0x74) >= 0) {
+        colors[0] = PingPongBlendValues(0x80442D00,0x80FFDE8D,25,0,0);
+        previous = *(int *)(menu+0x74)-1;
         if (previous < 0) previous = 7;
-        draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], one, one, (float)previous, scale, half);
+        draw_background((char *)FindTableEntryById(D_001A8CFC + b3, 16), colors[0], one, one, (float)previous, scale, half);
         {
-            int k = *(int *)(o+0x74);
-            func_0028FC48(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+half),
+            int k = *(int *)(menu+0x74);
+            AppendScreenRectPacket(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+half),
                 positions.xy[k][0]+33,(int)((float)(positions.xy[k][1]+7)*D_001B23A4+half),colors[0],0);
         }
     }
     selectedAvailable = 0;
-    for (i=0;i<D_001B18D0;i++) {
-        angle = func_00283B98((float)i * 2.0f * 3.1415927f / (float)D_001B18D0 - 3.1415927f,1.5707964f);
-        x = (int)(func_00283180(angle)*80.0f)+114;
-        y = (int)(func_00283198(angle)*75.0f)+192;
-        if (!D_001B18D4[D_001A8D48][i].icon) continue;
-        frame = D_001B18D4[D_001A8D48][i].frame;
+    for (i=0;i<gRadialSlotCount;i++) {
+        angle = FastAddRotations((float)i * 2.0f * 3.1415927f / (float)gRadialSlotCount - 3.1415927f,1.5707964f);
+        x = (int)(FastSinOrCosA(angle)*80.0f)+114;
+        y = (int)(FastSinOrCosB(angle)*75.0f)+192;
+        if (!gRadialMenuPages[gRadialMenuPageIndex][i].icon) continue;
+        frame = gRadialMenuPages[gRadialMenuPageIndex][i].frame;
         previous = 0;
         if (frame == 6 && !D_001B189C[1]) frame = 7;
         available = 0;
         switch (frame) {
         case 2:
             if (D_001B189C[0]) {
-                if (i == *(int *)(o+0x74)) selectedAvailable=1;
+                if (i == *(int *)(menu+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x6000FF00;
                 available=1; previous=1;
             }
             break;
         case 3:
             if (D_001B189C[0]) {
-                if (i == *(int *)(o+0x74)) selectedAvailable=1;
+                if (i == *(int *)(menu+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x6029A1FF;
                 previous=1; available=1;
             }
             break;
         case 0:
             if (D_001B189C[0] && total < D_001B189C[0]) {
-                if (i == *(int *)(o+0x74)) selectedAvailable=1;
+                if (i == *(int *)(menu+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x600000FF;
                 previous=1; available=1;
             }
             break;
         case 1:
             if (D_001B189C[0] && total < D_001B189C[0]) {
-                if (i == *(int *)(o+0x74)) selectedAvailable=1;
+                if (i == *(int *)(menu+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x60FF0000;
                 previous=1; available=1;
             }
             break;
         case 6: case 7:
-            if (D_001B189C[2]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[2]) { if (i == *(int *)(menu+0x74)) selectedAvailable=1; available=1; }
             break;
         case 4:
-            if (D_001B189C[3]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[3]) { if (i == *(int *)(menu+0x74)) selectedAvailable=1; available=1; }
             break;
         case 8:
-            if (D_001B189C[4]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[4]) { if (i == *(int *)(menu+0x74)) selectedAvailable=1; available=1; }
             break;
         case 9:
-            if (D_001B189C[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[0]) { if (i == *(int *)(menu+0x74)) selectedAvailable=1; available=1; }
             break;
         }
-        if (previous) func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,10),x+2,y+2,28,26,colors);
+        if (previous) DrawHudSpriteGradient(GetIconFrame(gRadialMenuPages[gRadialMenuPageIndex][i].icon,10),x+2,y+2,28,26,colors);
         if (available) {
             colors2[3]=colors2[2]=colors2[1]=colors2[0]=0x80FFDE8D;
         } else {
             colors2[3]=colors2[2]=colors2[1]=colors2[0]=0x40808080;
         }
-        func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,frame),x,y,30,28,colors2);
+        DrawHudSpriteGradient(GetIconFrame(gRadialMenuPages[gRadialMenuPageIndex][i].icon,frame),x,y,30,28,colors2);
     }
-    sel = *(int *)(o+0x74);
+    sel = *(int *)(menu+0x74);
     if (selectedAvailable && sel>=0 && sel<8) {
         RadialLabels labels=D_001A8E70;
         int id=labels.ids[sel];
         if (id==0x2F34 && D_001B189C[1]) id=0x2F35;
-        label=(char *)func_00288FB8(id);
-        if (label && func_001157AC(label)) {
+        label=(char *)GetLocalizedString(id);
+        if (label && strlen_001157AC(label)) {
             float alpha = text * open;
             do {
-                color=func_00283D38(0x00E0C0A0,0x80E0C0A0,alpha);
-                previous=func_00283D38(0,0x80000000,alpha);
-                func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
-                func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
+                color=FastTweenColor(0x00E0C0A0,0x80E0C0A0,alpha);
+                previous=FastTweenColor(0,0x80000000,alpha);
+                DrawTextCenteredSmallFont(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
+                DrawTextCenteredSmallFont(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
             } while (0);
         }
     }
-    return *(int *)(o+0x58);
+    return *(int *)(menu+0x58);
 }

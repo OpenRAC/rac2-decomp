@@ -12,16 +12,17 @@ extern float ref_L00_002A7958_03[] __attribute__((sda));
 
 extern float func_0031D8A0(float *dst, float value, float scale);
 
+/* Fades an effect value up to full, waits one frame, then fades it back down to zero and switches the effect off. */
 void func_L00_002A7958(void)
 {
-    float f;
+    float target;
 
     if (D_001A7CD0 == 0)
         return;
     if (D_001A7CD4 == 0) {
-        f = 1.0f;
-        func_0031D8A0(ref_L00_002A7958_00, f, D_001A7CCC);
-        if (ref_L00_002A7958_01[0] == f)
+        target = 1.0f;
+        func_0031D8A0(ref_L00_002A7958_00, target, D_001A7CCC);
+        if (ref_L00_002A7958_01[0] == target)
             D_001A7CD4 = 1;
         return;
     }
@@ -30,9 +31,9 @@ void func_L00_002A7958(void)
         return;
     }
     if (D_001A7CD4 == 2) {
-        f = 0.0f;
-        func_0031D8A0(ref_L00_002A7958_02, f, D_001A7CCC);
-        if (ref_L00_002A7958_03[0] == f)
+        target = 0.0f;
+        func_0031D8A0(ref_L00_002A7958_02, target, D_001A7CCC);
+        if (ref_L00_002A7958_03[0] == target)
             D_001A7CD0 = 0;
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -12,42 +13,43 @@ extern int func_00283D38(int, int, float);
 extern int func_00283CF0(float);
 extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
 
-void func_L08_00422578(char *arg0, char *arg1) {
-    float a[4];
-    float b[4];
-    float c[4];
-    int n;
+/* Shoots a shower of small yellow sparks out of a point, moving along with the given speed. */
+void func_L08_00422578(char *moby, char *baseVelocity) {
+    float position[4];
+    float velocity[4];
+    float accel[4];
+    int burst;
     int i;
     float angle;
-    float r;
-    float z;
-    int col1;
-    int col2;
-    char *src = arg0 + 0x10;
+    float radius;
+    float rise;
+    int startColor;
+    int endColor;
+    char *src = moby + 0x10;
 
-    for (n = 0; n < 20; n++) {
-        *(TI128 *)a = *(TI128 *)src;
-        func_002ACB48(a, 0.25f);
-        a[2] += 0.25f;
-        angle = func_002A7940();
-        r = func_002A7878(1.0f, 8.0f);
-        z = func_002A7878(2.0f, 6.0f);
-        func_00282D30(b, arg1, func_002A7878(0.0f, 0.0f) * 0.016666668f);
-        b[0] += func_00283180(angle) * 0.016666668f * r;
-        b[1] += func_00283198(angle) * 0.016666668f * r;
-        b[2] += z * 0.016666668f;
-        *(TI128 *)c = *(TI128 *)b;
-        c[2] -= 0.16666667f;
+    for (burst = 0; burst < 20; burst++) {
+        *(TI128 *)position = *(TI128 *)src;
+        AddRandomOffsetToVector(position, 0.25f);
+        position[2] += 0.25f;
+        angle = RandomAngle();
+        radius = RandomFloatRange(1.0f, 8.0f);
+        rise = RandomFloatRange(2.0f, 6.0f);
+        FastVecScale(velocity, baseVelocity, RandomFloatRange(0.0f, 0.0f) * 0.016666668f);
+        velocity[0] += FastSinOrCosA(angle) * 0.016666668f * radius;
+        velocity[1] += FastSinOrCosB(angle) * 0.016666668f * radius;
+        velocity[2] += rise * 0.016666668f;
+        *(TI128 *)accel = *(TI128 *)velocity;
+        accel[2] -= 0.16666667f;
         for (i = 0; i < 10; i++) {
-            float k = func_002A7878(0.5f, 1.5f);
+            float k = RandomFloatRange(0.5f, 1.5f);
 
-            b[3] = k * 0.125f;
-            c[3] = k * 0.065f;
-            func_002ACB48(a, 0.125f);
-            func_002ACB48(c, 0.0083333338f);
-            col1 = func_00283D38(0x8000EEEE, 0x8000FF90, func_002A7878(0.0f, 1.0f));
-            col2 = func_00283D38(0xFFEE, 0xFFEE, func_002A7878(0.0f, 1.0f));
-            func_002BAA28(a, b, c, col1, col2, 10, 30, func_00283CF0(func_002A7878(5.0f, 25.0f)), -1);
+            velocity[3] = k * 0.125f;
+            accel[3] = k * 0.065f;
+            AddRandomOffsetToVector(position, 0.125f);
+            AddRandomOffsetToVector(accel, 0.0083333338f);
+            startColor = FastTweenColor(0x8000EEEE, 0x8000FF90, RandomFloatRange(0.0f, 1.0f));
+            endColor = FastTweenColor(0xFFEE, 0xFFEE, RandomFloatRange(0.0f, 1.0f));
+            SpawnTrailParticle_002BAA28(position, velocity, accel, startColor, endColor, 10, 30, FloatToInt(RandomFloatRange(5.0f, 25.0f)), -1);
         }
     }
 }

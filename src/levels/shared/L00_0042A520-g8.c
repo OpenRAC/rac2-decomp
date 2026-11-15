@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 typedef struct {
@@ -46,34 +47,35 @@ extern float D_L00_001B163C __attribute__((sda));
 extern float D_L00_001B1640 __attribute__((sda));
 extern int D_L00_001B164C __attribute__((sda));
 
+/* Sets the camera's position and direction from the trigger's model and fixed offsets. */
 void func_L00_0042A520(Self_42A520 *self)
 {
     float m0[4];
     float m1[4];
     float m2[4];
     float v[4];
-    Ent_42A520 *e;
-    Model_42A520 *m;
+    Ent_42A520 *entry;
+    Model_42A520 *model;
 
-    e = D_L00_001B1844[self->idx].ent;
-    e->f28 = D_L00_001B163C;
-    e->f2C = D_L00_001B1640;
-    e->f30 = func_00282C48(D_L00_001B163C);
-    e->f34 = D_L00_001B1640;
-    m = e->model;
-    *(TI128 *)e->v60 = *(TI128 *)m->mE0;
-    func_00282F20(m0, m->mC0, e->f28);
-    func_00282F20(m1, e->model->mE0, e->f2C);
-    func_00282CC0(m2, m1, m0);
-    func_00282CC0(self->m30, m2, e->model->m10);
-    func_00282CC0(m2, self->m30, m0);
+    entry = D_L00_001B1844[self->idx].ent;
+    entry->f28 = D_L00_001B163C;
+    entry->f2C = D_L00_001B1640;
+    entry->f30 = FloatAbs(D_L00_001B163C);
+    entry->f34 = D_L00_001B1640;
+    model = entry->model;
+    *(TI128 *)entry->v60 = *(TI128 *)model->mE0;
+    vec_scale_to_length(m0, model->mC0, entry->f28);
+    vec_scale_to_length(m1, entry->model->mE0, entry->f2C);
+    FastVecAdd(m2, m1, m0);
+    FastVecAdd(self->m30, m2, entry->model->m10);
+    FastVecAdd(m2, self->m30, m0);
     *(TI128 *)v = 0;
     v[2] = 1.0f;
     v[3] = 1.0f;
-    func_00282CF0(self->m0, self->m30, m2);
-    func_00282F20(self->m0, self->m0, 1.0f);
-    func_00282DD8(self->m10, self->m0, v);
-    func_00282F20(self->m10, self->m10, 1.0f);
-    func_00282DD8(self->m20, self->m10, self->m0);
-    e->f24 = D_L00_001B164C;
+    FastVecSub(self->m0, self->m30, m2);
+    vec_scale_to_length(self->m0, self->m0, 1.0f);
+    FastVecCross(self->m10, self->m0, v);
+    vec_scale_to_length(self->m10, self->m10, 1.0f);
+    FastVecCross(self->m20, self->m10, self->m0);
+    entry->f24 = D_L00_001B164C;
 }

@@ -10,42 +10,43 @@ extern void func_002B0A68(char *, int, float *, unsigned char, float, float, flo
 extern int func_002E5CF8(int, int, char *);
 extern void func_0029F338(void *);
 
-void func_L06_00457270(unsigned char *m)
+/* A trigger that waits to be hit, remembers if a certain object hit it, then bursts and removes itself. */
+void func_L06_00457270(unsigned char *obj)
 {
-    int *v = *(int **)(m + 0x68);
-    int state = m[0x20];
-    float t[4] __attribute__((aligned(16)));
-    unsigned char *r;
-    unsigned char *o;
+    int *vars = *(int **)(obj + 0x68);
+    int stateId = obj[0x20];
+    float offset[4] __attribute__((aligned(16)));
+    unsigned char *hit;
+    unsigned char *hitMoby;
 
-    switch (state) {
+    switch (stateId) {
     case 0:
-        *v = 0;
-        func_002A7750(m, 1, -1);
+        *vars = 0;
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        func_L00_00322A18(m, 0.0f, 0.0f, 0.017453296f);
-        r = func_002A9640(m, 0x4010000, 0);
-        if (r != 0) {
-            o = *(unsigned char **)(r + 0x20);
-            if (o != 0 && *(short *)(o + 0xAA) == 0x12C4) {
-                *v = state;
+        ApplyOffsetToObjectMatrix(obj, 0.0f, 0.0f, 0.017453296f);
+        hit = FindOwnedEffectSlot(obj, 0x4010000, 0);
+        if (hit != 0) {
+            hitMoby = *(unsigned char **)(hit + 0x20);
+            if (hitMoby != 0 && *(short *)(hitMoby + 0xAA) == 0x12C4 /* moby class 4804 */) {
+                *vars = stateId;
             }
-            func_002A7750(m, 2, -1);
+            SetMobyState(obj, 2, -1);
         }
-        m[0xA8] = 0xFF;
+        obj[0xA8] = 0xFF;
         break;
     case 2:
-        *(L06_7270TI *)t = 0;
-        if (*v != 0) {
-            t[0] = -0.16666667f;
+        *(L06_7270TI *)offset = 0;
+        if (*vars != 0) {
+            offset[0] = -0.16666667f;
         } else {
-            t[0] = 0.16666667f;
+            offset[0] = 0.16666667f;
         }
-        func_00283098(t, t, m + 0xC0);
-        func_002B0A68((char *)m, 7, t, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_002E5CF8(0, 0, (char *)m);
-        func_0029F338(m);
+        matrix_mul_vec3(offset, offset, obj + 0xC0);
+        SpawnDebrisForMaskedParts((char *)obj, 7, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        PlayMobySound(0, 0, (char *)obj);
+        MarkMobySpawned(obj);
         break;
     }
 }

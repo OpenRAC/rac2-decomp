@@ -36,6 +36,7 @@ extern void func_L04_003C4858(void *,int);
 extern void func_L04_003C49C0(void *,int);
 extern u32 func_L04_003C70C8(u32);
 typedef struct { short first,count; int matrix; char pad08[0x40]; float radius; } EmitterView;
+/* Updates a particle emitter (moby class 760): sets up its particles, then spawns new ones and draws them. */
 void func_L04_003C3BA0(char *self) {
     EVec bound, velocity, position;
     char *state = *(char **)(self+0x68), *matrix;
@@ -45,25 +46,25 @@ void func_L04_003C3BA0(char *self) {
     switch (EB(self,0x20)) {
     case 0:
         EB(self,0x20)=1; EB(self,0x30)=255;
-        if (((EmitterView *)state)->matrix==-1) { func_0029F338(self); return; }
-        ((EmitterView *)state)->radius=func_00282DF0(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x10);
-        r=func_00282DF0(D_L04_001B25CC+((EmitterView *)state)->matrix*128);
+        if (((EmitterView *)state)->matrix==-1) { MarkMobySpawned(self); return; }
+        ((EmitterView *)state)->radius=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x10);
+        r=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128);
         if (((EmitterView *)state)->radius<r) ((EmitterView *)state)->radius=r;
         EF(state,0x44)=EH(state,0x40) ? ((EmitterView *)state)->radius : 3.0f;
-        EF(state,0x50)=func_00282DF0(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x20)*0.5f;
-        EH(state,0)=func_L04_003C70C8(EH(state,2)+EH(state,0x40));
+        EF(state,0x50)=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x20)*0.5f;
+        EH(state,0)=AddToRunningTotal(EH(state,2)+EH(state,0x40));
         end=EH(state,0)+EH(state,2);
         for(i=EH(state,0);i<end;i++) {
-            D_L04_0023D090[i]=func_002A77E0(2);
+            D_L04_0023D090[i]=RandomIntBelow(2);
             D_L04_0023BDD0[i].f[3]=1.0f;
-            func_L04_003C4858(self,i);
+            InitParticleFromRanges(self,i);
             D_L04_0023D860[i]=0;
         }
         { int start=end; end+=EH(state,0x40);
         for(i=start;i<end;i++) {
-            D_L04_0023D090[i]=func_002A77E0(2);
+            D_L04_0023D090[i]=RandomIntBelow(2);
             D_L04_0023BDD0[i].f[3]=1.0f;
-            func_L04_003C49C0(self,i);
+            InitSimpleParticle(self,i);
         }
         }
         EF(D_L04_001B25CC+((EmitterView *)state)->matrix*128,0x3C)=1.0f;
@@ -74,30 +75,30 @@ void func_L04_003C3BA0(char *self) {
         matrix=D_L04_001B25CC+((EmitterView *)state)->matrix*128;
         qcopy(&bound,matrix+0x30);
         bound.f[2]+=9.0f; bound.f[3]=10.0f;
-        if (func_00283DB8(&bound,D_L04_001AF3E0)<0) return;
-        if (EH(state,0x42) && func_00282E80(D_L04_001B9680,self+0x10)<128.0f) {
+        if (FastMathHelperA(&bound,D_L04_001AF3E0)<0) return;
+        if (EH(state,0x42) && vec_distance_xy(D_L04_001B9680,self+0x10)<128.0f) {
             for(j=0;j<D_L04_001AF3BC;j++) {
-                velocity.f[0]=func_002A78D8(0.0f,1.0f);
-                velocity.f[1]=func_002A78D8(0.0f,1.0f);
+                velocity.f[0]=RandomSignedFloatRange(0.0f,1.0f);
+                velocity.f[1]=RandomSignedFloatRange(0.0f,1.0f);
                 velocity.f[2]=1.0f; velocity.f[3]=1.0f;
-                func_002830C0(&position,&velocity,matrix);
+                transform_vector(&position,&velocity,matrix);
                 position.f[2]+=0.5f;
-                velocity.f[0]=func_002A78D8(0.0f,0.004166667f);
-                velocity.f[1]=func_002A78D8(0.0f,0.004166667f);
+                velocity.f[0]=RandomSignedFloatRange(0.0f,0.004166667f);
+                velocity.f[1]=RandomSignedFloatRange(0.0f,0.004166667f);
                 velocity.f[2]=EF(state,0x20)*0.016666668f;
-                size=func_002A7878(EF(state,0x24),EF(state,0x28));
-                color=(func_002A7820(EH(state,0x2C),EH(state,0x2E))<<24)|D_L04_001AF3C8;
-                kind=func_002A7820(D_L04_001AF3C0,D_L04_001AF3C4);
-                particle=func_002BDCE8(D_L04_001AF3B4,&position,kind,1.0f,&velocity,D_L04_001AF3B8,color,size,0);
+                size=RandomFloatRange(EF(state,0x24),EF(state,0x28));
+                color=(RandomIntRange(EH(state,0x2C),EH(state,0x2E))<<24)|D_L04_001AF3C8;
+                kind=RandomIntRange(D_L04_001AF3C0,D_L04_001AF3C4);
+                particle=SpawnSpinningSparkParticle(D_L04_001AF3B4,&position,kind,1.0f,&velocity,D_L04_001AF3B8,color,size,0);
                 if (particle) {
                     data=particle+0x20;
-                    EH(particle,0xA)=func_002A7820(EI(state,0x30),EI(state,0x34));
+                    EH(particle,0xA)=RandomIntRange(EI(state,0x30),EI(state,0x34));
                     EI(data,4)=3; EB(data,0xA)=color>>24; EB(data,0xB)=EB(particle,0xA);
-                    if(func_002A77E0(2)) EB(particle,3)=0x44;
+                    if(RandomIntBelow(2)) EB(particle,3)=0x44;
                 }
             }
         }
-        ref_L04_003C3BA0_00(func_L04_003C4050,self);
+        ref_L04_003C3BA0_00(DrawEmitterParticles,self);
         break;
     }
     }

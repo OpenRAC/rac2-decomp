@@ -38,60 +38,60 @@ void func_L00_002CA0B0(void)
 {
     float limit;
     int old;
-    if (D_00189E20.mode_22b4 == 1) {
-        D_00189E20.animation_scale = D_00189E20.field_170 * 90.0f;
-        if (D_00189E20.animation_scale < 0.5f) D_00189E20.animation_scale = 0.5f;
+    if (gHeroState.mode_22b4 == 1) {
+        gHeroState.animation_scale = gHeroState.field_170 * 90.0f;
+        if (gHeroState.animation_scale < 0.5f) gHeroState.animation_scale = 0.5f;
         return;
     }
-    if (D_00189E20.flag_1454 != 0 && D_00189E20.flag_1456 != 0) {
-        if (((unsigned char *)D_00189E20.object)[0x43] != 20)
-            func_L00_002D2168(20, 0, 11.0f);
-        D_00189E20.animation_scale = D_00189E20.animation_time * 25.0f;
-        if (D_00189E20.animation_scale < 0.7f) D_00189E20.animation_scale = 0.7f;
-        if (2.2f < D_00189E20.animation_scale) D_00189E20.animation_scale = 2.2f;
+    if (gHeroState.flag_1454 != 0 && gHeroState.flag_1456 != 0) {
+        if (((unsigned char *)gHeroState.object)[0x43] != 20)
+            set_hero_animation(20, 0, 11.0f);
+        gHeroState.animation_scale = gHeroState.animation_time * 25.0f;
+        if (gHeroState.animation_scale < 0.7f) gHeroState.animation_scale = 0.7f;
+        if (2.2f < gHeroState.animation_scale) gHeroState.animation_scale = 2.2f;
         return;
     }
-    if (((unsigned char *)D_00189E20.object)[0x43] == 20) {
-        func_L00_002D2168(D_00189E20.frame + 3, 0, 7.0f);
-    } else if (D_00189E20.count_1c0 > 4 && D_00189E20.flag_40e == 0) {
-        float time = D_00189E20.animation_time;
+    if (((unsigned char *)gHeroState.object)[0x43] == 20) {
+        set_hero_animation(gHeroState.frame + 3, 0, 7.0f);
+    } else if (gHeroState.count_1c0 > 4 && gHeroState.flag_40e == 0) {
+        float time = gHeroState.animation_time;
         float start;
         int before_range;
-        old = D_00189E20.frame;
+        old = gHeroState.frame;
         start = animation_ranges[old].start * 0.01666666753590107f;
         before_range = time < start;
         if (before_range || D_L00_001A7DAC[old][0] * 0.01666666753590107f < time) {
             if (before_range) {
                 if (time < start) {
                     do {
-                        --D_00189E20.frame;
-                    } while (time < animation_ranges[D_00189E20.frame].start * 0.01666666753590107f);
+                        --gHeroState.frame;
+                    } while (time < animation_ranges[gHeroState.frame].start * 0.01666666753590107f);
                 }
             } else {
-                while (D_L00_001A7DAC[D_00189E20.frame][0] * 0.01666666753590107f < time) D_00189E20.frame++;
+                while (D_L00_001A7DAC[gHeroState.frame][0] * 0.01666666753590107f < time) gHeroState.frame++;
             }
-            if (D_00189E20.frame < 0) D_00189E20.frame = 0;
-            if (D_00189E20.frame > 1) D_00189E20.frame = 1;
-            if (old != D_00189E20.frame) {
-                char *object = D_00189E20.object;
+            if (gHeroState.frame < 0) gHeroState.frame = 0;
+            if (gHeroState.frame > 1) gHeroState.frame = 1;
+            if (old != gHeroState.frame) {
+                char *object = gHeroState.object;
                 struct { char pad[0x48]; unsigned char *entry[1]; } *frames = *(void **)(object + 0x24);
                 int before = frames->entry[old + 3][0x10];
-                int after = frames->entry[D_00189E20.frame + 3][0x10];
-                int offset = D_L00_001A7DC8[old][D_00189E20.frame];
-                func_L00_002D2168(D_00189E20.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
+                int after = frames->entry[gHeroState.frame + 3][0x10];
+                int offset = D_L00_001A7DC8[old][gHeroState.frame];
+                set_hero_animation(gHeroState.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
             }
         }
     }
-    switch (D_00189E20.frame) {
+    switch (gHeroState.frame) {
     case 0:
-        D_00189E20.animation_scale = D_00189E20.animation_time * 157.0f;
-        if (D_00189E20.animation_scale < 0.6f) D_00189E20.animation_scale = 0.6f;
-        if (4.0f < D_00189E20.animation_scale) D_00189E20.animation_scale = 4.0f;
+        gHeroState.animation_scale = gHeroState.animation_time * 157.0f;
+        if (gHeroState.animation_scale < 0.6f) gHeroState.animation_scale = 0.6f;
+        if (4.0f < gHeroState.animation_scale) gHeroState.animation_scale = 4.0f;
         break;
     case 1:
-        D_00189E20.animation_scale = D_00189E20.animation_time * 14.0f;
-        if (D_00189E20.animation_scale < 0.6f) D_00189E20.animation_scale = 0.6f;
-        if (2.2f < D_00189E20.animation_scale) D_00189E20.animation_scale = 2.2f;
+        gHeroState.animation_scale = gHeroState.animation_time * 14.0f;
+        if (gHeroState.animation_scale < 0.6f) gHeroState.animation_scale = 0.6f;
+        if (2.2f < gHeroState.animation_scale) gHeroState.animation_scale = 2.2f;
         break;
     }
 }

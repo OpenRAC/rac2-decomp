@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef union { Quadword whole; float f[4]; } Vector;
 extern Vector D_L01_001B94C0;
@@ -18,17 +19,17 @@ void func_L01_003DD3A0(unsigned char *object)
     char *cursor;
     float nearest, distance, floor;
     *(float *)(object + 0x2c) = *(float *)(*(char **)(object + 0x24) + 0x24) * 1.5f;
-    if (object[0x31] && func_00282E48(object + 0x10, &D_L01_001B94C0) < 24.0f) {
-        func_002A93B0(object);
+    if (object[0x31] && fast_vec_dist(object + 0x10, &D_L01_001B94C0) < 24.0f) {
+        UpdateMobyGroundCheck(object);
         object[0x6f] = 0x16;
     }
-    if (func_002B0ED8(object, state + 0x110, 0)) {
+    if (ApplyDamageToObject(object, state + 0x110, 0)) {
         *(int *)(state + 0x18c) = *(float *)(state + 0x20) <= 0 ? -1 : *(int *)(state + 0x1fc);
-        func_L01_003DC838((int)object);
+        AlertGroupMuckdwellers((int)object);
     }
-    func_002B3BA8(object, *(int *)(state + 0x3f8), 0, 0, 0, 0);
+    SelectAimTarget_002B3BA8(object, *(int *)(state + 0x3f8), 0, 0, 0, 0);
     if (*(int *)(state + 0x408) != -1) {
-        linked = D_L01_001B255C + (*(int *)(state + 0x408) << 8);
+        linked = gMobyTable_L01 + (*(int *)(state + 0x408) << 8);
         if (linked && *(unsigned char *)(linked + 0x20) != 0xfe && *(unsigned char *)(linked + 0x20) != 0xfd)
             *(char **)(state + 0x2f0) = linked;
     }
@@ -41,23 +42,23 @@ void func_L01_003DD3A0(unsigned char *object)
         if (**(int **)(state + 0x400) != -1 && D_L01_001B2088 - 10 <= **(int **)(state + 0x3fc)) goto ground;
         **(int **)(state + 0x400) = -1;
         nearest = 100000.0f;
-        func_002A8600(&cursor, object[0x21], 0, 0);
+        GetFirstMobyInGroup(&cursor, object[0x21], 0, 0);
         while (cursor) {
             if (*(short *)(cursor + 0xaa) == *(short *)(object + 0xaa)) {
-                distance = func_00282E80(cursor + 0x10, &D_00189E20.position);
+                distance = vec_distance_xy(cursor + 0x10, &gHeroState.position);
                 if (distance < nearest && *(unsigned char *)(cursor + 0x95) == 3 && *(unsigned char *)(cursor + 0x20) != 4) {
                     **(int **)(state + 0x400) = *(short *)(cursor + 0xb2);
                     nearest = distance;
                 }
             }
-            func_002A86E8(&cursor, cursor, 0, 0);
+            GetNextMobyInGroup(&cursor, cursor, 0, 0);
         }
         **(int **)(state + 0x3fc) = D_L01_001B2088;
     }
 ground:
     if (object[0x31]) {
-        floor = func_L01_003BAFB0();
-        if (*(float *)(object + 0x18) <= floor - 0.3f && (object[0x95] > 1 || func_002A77E0(9) == 0))
-            func_L01_003DBF38(object);
+        floor = GetWaterHeight();
+        if (*(float *)(object + 0x18) <= floor - 0.3f && (object[0x95] > 1 || RandomIntBelow(9) == 0))
+            SpawnBubblesWhileMoving(object);
     }
 }

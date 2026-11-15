@@ -37,7 +37,7 @@ void func_L00_003FEAC8(char *obj, char *pos, void *direction, int slot)
     char *spawned;
 
     qcopy(dir, direction);
-    entry = D_L00_00262570 + D_00139581[0];
+    entry = gWeaponTable_L00 + D_00139581[0];
     scale = entry->scale;
     ref_L00_003FEAC8_00(obj, pos, direction);
     length = ref_L00_003FEAC8_01(dir);

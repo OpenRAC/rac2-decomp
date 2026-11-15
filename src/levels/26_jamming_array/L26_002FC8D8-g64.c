@@ -20,6 +20,8 @@ extern void func_00283098(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 
+/* Places the four corner points of a quad on the hero's part so the quad follows it, and removes
+   the quad after a fixed time. */
 void func_L26_002FC8D8(void) {
     float matrix[12];
     float rotation[12];
@@ -30,7 +32,7 @@ void func_L26_002FC8D8(void) {
     float *vertex;
     float scale;
     int count;
-    if (D_001A79F0[0] != 26) return;
+    if (gCurrentMapIndex[0] != 26) return;
     child = 0;
     index = -1;
     switch (D_L26_001BC880.mode) {
@@ -47,15 +49,15 @@ void func_L26_002FC8D8(void) {
         D_L26_001BC880.output = D_L26_0027E310;
         out = (float *)(D_L26_0027E310 + 0x20);
         vertex = D_L26_001A93E0[0];
-        func_00283AF0(*(char **)(child + 0x58) + 0x10, rotation);
-        func_00283958(rotation, matrix);
+        FastVectorToIntHelper(*(char **)(child + 0x58) + 0x10, rotation);
+        quaternion_to_rotation_basis(rotation, matrix);
         scale = *(float *)(child + 0x2C) / *(float *)(*(char **)(child + 0x24) + 0x24);
         count = 3;
         do {
-            func_00283098(out, vertex, matrix);
+            matrix_mul_vec3(out, vertex, matrix);
             vertex += 4;
-            func_00282D30(out, out, scale);
-            func_00282CC0(out, out, child + 0x10);
+            FastVecScale(out, out, scale);
+            FastVecAdd(out, out, child + 0x10);
             out += 4;
         } while (--count >= 0);
         *(char **)(D_L26_001BC880.output + 0x68) = D_L26_001BC880.parts[index];

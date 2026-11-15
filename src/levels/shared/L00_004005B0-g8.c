@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_004005B0 is a unit of its own: it needs the opt-in quadword-copy profile and
    its scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which
@@ -20,9 +21,10 @@ extern int D_L00_001B2C28;
 
 /* Looks the actor up, resets its two state fields, copies the two 16-byte vectors it was
    given, then sets the record's vector and flags. */
-char *func_L00_004005B0(char *arg0, char *arg1)
+/* Creates the Turret Spider Bot (moby class 3705) at the given position with the given starting speed, and returns it. */
+char *func_L00_004005B0(char *position, char *velocity)
 {
-    char *obj = func_0029EFD0(0xE79);
+    char *obj = CreateMoby(0xE79 /* Turret Spider Bot */);
     char *rec;
     TI128 tmp;
     int iv;
@@ -34,30 +36,30 @@ char *func_L00_004005B0(char *arg0, char *arg1)
         v = 0xFF;
         *(unsigned short *)(obj + 0x32) = v;
         *(unsigned char *)(obj + 0x30) = v;
-        *(TI128 *)(obj + 0x10) = *(TI128 *)arg0;
-        *(TI128 *)rec = *(TI128 *)arg1;
+        *(TI128 *)(obj + 0x10) = *(TI128 *)position;
+        *(TI128 *)rec = *(TI128 *)velocity;
 
         *(float *)(obj + 0x2C) = *(float *)(obj + 0x2C) * 0.25f;
         *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
         obj[0x20] = 0;
 
-        *(float *)(obj + 0xF0) = D_00189E20[0x24];
-        *(float *)(obj + 0xF4) = D_00189E20[0x25];
-        *(float *)(obj + 0xF8) = D_00189E20[0x26];
-        func_002833F0(obj + 0xC0, obj + 0xF0);
+        *(float *)(obj + 0xF0) = gHeroState[0x24];
+        *(float *)(obj + 0xF4) = gHeroState[0x25];
+        *(float *)(obj + 0xF8) = gHeroState[0x26];
+        euler_rotation_basis(obj + 0xC0, obj + 0xF0);
 
         *(int *)(rec + 0x5C) = 0x7F000000;
         D_L00_001B0CA0 = obj;
-        iv = func_002FEC78(obj, 0);
+        iv = AllocateSlotForObject(obj, 0);
         *(int *)(rec + 0x6C) = iv;
-        *(int *)(rec + 0x70) = func_002FEC78(obj, 4);
-        *(int *)(rec + 0x74) = func_002FEC78(obj, 3);
+        *(int *)(rec + 0x70) = AllocateSlotForObject(obj, 4);
+        *(int *)(rec + 0x74) = AllocateSlotForObject(obj, 3);
 
-        func_00282C88(rec + 0x10);
+        ClearVector128(rec + 0x10);
         *(float *)(rec + 0x10) = 1.0f;
         *(TI128 *)(rec + 0x20) = *(TI128 *)(rec + 0x10);
 
-        D_L00_001B2C28 = func_002FED90(obj, 0, 1.0f, 1.0f, 1.0f);
+        D_L00_001B2C28 = AllocEffectSlot_002FED90(obj, 0, 1.0f, 1.0f, 1.0f);
         *(float *)(rec + 0x7C) = 1.75f;
         func_002A0F48(obj);
     }

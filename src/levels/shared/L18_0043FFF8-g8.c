@@ -11,10 +11,11 @@ extern int func_00283CF0(float);
 extern int func_002E5CF8(int, int, char *);
 extern char D_0018A0E0[];
 
+/* Creates a streaking projectile that flies along a direction with a trail, and tells the Receiver Bot owner that it fired. */
 char *func_L18_0043FFF8(void *position, char *owner, float *direction,
                        int kind, int flags, float x, float y, float z)
 {
-    char *object = func_0029EFD0(0x1263);
+    char *object = CreateMoby(0x1263 /* moby class 4707 */);
     char *state;
     float angle;
     int lifetime;
@@ -31,26 +32,26 @@ char *func_L18_0043FFF8(void *position, char *owner, float *direction,
         object[0x20] = 0;
         qcopy(state, direction);
         qcopy(object + 0x10, position);
-        *(float *)(object + 0xf8) = func_00283248(direction[0], direction[1]);
-        angle = func_00282E20(direction);
-        *(float *)(object + 0xf4) = -func_00283248(angle, direction[2]);
-        *(char **)(state + 0x30) = func_L09_003364E0(object, -1, 0.1f, 0xf0208080, 0.01f, 0x60);
+        *(float *)(object + 0xf8) = FastMatrixHelperA(direction[0], direction[1]);
+        angle = vec_length_xy(direction);
+        *(float *)(object + 0xf4) = -FastMatrixHelperA(angle, direction[2]);
+        *(char **)(state + 0x30) = SpawnSizedParticle(object, -1, 0.1f, 0xf0208080, 0.01f, 0x60);
         *(float *)(state + 0x1c) = y;
         qcopy(object + 0xc0, state);
-        func_00282DD8(object + 0xd0, object + 0xc0, D_0018A0E0);
-        func_00282F20(object + 0xd0, object + 0xd0, -1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
-        angle = func_00282DF0(direction);
+        FastVecCross(object + 0xd0, object + 0xc0, D_0018A0E0);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, -1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
+        angle = FastVecLength(direction);
         angle = *(float *)(state + 0x1c) / angle;
-        lifetime = func_00283CF0(angle);
+        lifetime = FloatToInt(angle);
         *(float *)(state + 0x24) = z;
         *(int *)(state + 0x34) = lifetime;
         *(float *)(state + 0x20) = x;
         *(int *)(state + 0x28) = kind;
         *(int *)(state + 0x2c) = flags;
         *(char **)(state + 0x10) = owner;
-        if (*(short *)(owner + 0xaa) == 0xee1)
-            func_002E5CF8(5, 0, owner);
+        if (*(short *)(owner + 0xaa) == 0xee1 /* Receiver Bot */)
+            PlayMobySound(5, 0, owner);
         object[0x31] = 0;
         *(unsigned short *)(object + 0x34) |= 1;
     }

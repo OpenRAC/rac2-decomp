@@ -15,39 +15,40 @@ extern void func_00282D30(void *,void *,float);
 extern int func_002A7820(int,int);
 extern int func_00283CF0(float);
 extern void func_002BCB00(void *,void *,int,int,int,int,int,int,int,float);
+/* Fades a trail particle along its colour ramp and drifts it forward. Now and then it throws off a small spark that flies away. */
 void func_002C7050(char *self) {
     SplitVector saved, motion, random;
-    char *p = self + 0x20;
+    char *data = self + 0x20;
     float ratio, speed;
     int life;
-    if (func_00282978((short *)(self + 0xA))) {
-        func_002B9180(self);
+    if (FastDecTimer((short *)(self + 0xA))) {
+        KillParticle(self);
         return;
     }
-    ratio = func_00283CE0(*(short *)(self+0xA));
-    ratio /= func_00283CE0(*(short *)(p+0x18));
-    *(int *)(self+4) = func_002A9568(*(int *)(p+0x14),*(int *)(p+0x10),ratio);
-    func_00282CC0(self+0x10,self+0x10,p);
-    *(float *)(p+8) -= *(float *)(p+0xC);
+    ratio = IntToFloat(*(short *)(self+0xA));
+    ratio /= IntToFloat(*(short *)(data+0x18));
+    *(int *)(self+4) = ForwardTwoValuesAndAmount(*(int *)(data+0x14),*(int *)(data+0x10),ratio);
+    FastVecAdd(self+0x10,self+0x10,data);
+    *(float *)(data+8) -= *(float *)(data+0xC);
     qcopy(&saved,self+0x10);
     if (*(float *)(self+0x1C) != 0.0f) {
         if (*(float *)(self+0x1C) == 2.0f)
-            func_00300190(self+0x10,self+0x10);
+            TransformVectorOrCopy(self+0x10,self+0x10);
         *(float *)(self+0x1C) = 2.0f;
     }
-    if (*(short *)(p+0x1A) && (D_001B1688[0]&1)) {
+    if (*(short *)(data+0x1A) && (gGameTime[0]&1)) {
         random.q = 0;
-        random.f[0] = func_002A7878(-1.0f,1.0f);
-        random.f[1] = func_002A7878(-1.0f,1.0f);
-        random.f[2] = func_002A7878(-1.0f,1.0f);
+        random.f[0] = RandomFloatRange(-1.0f,1.0f);
+        random.f[1] = RandomFloatRange(-1.0f,1.0f);
+        random.f[2] = RandomFloatRange(-1.0f,1.0f);
         motion.q = random.q;
-        speed = func_00282DF0(p);
-        func_00282F20(&motion,&motion,speed*func_002A7878(0.15f,0.25f));
-        func_00282CC0(&motion,&motion,p);
-        func_00282D30(&motion,&motion,func_002A7878(0.75f,0.95f));
-        life = func_002A7820(15,30);
-        func_002BCB00(self+0x10,&motion,*(int *)(self+4),*(int *)(p+0x14),life,0,*(unsigned char *)(self+2),*(unsigned char *)(self+3),func_00283CF0(*(float *)(self+0x1C)),*(float *)(self+0xC));
+        speed = FastVecLength(data);
+        vec_scale_to_length(&motion,&motion,speed*RandomFloatRange(0.15f,0.25f));
+        FastVecAdd(&motion,&motion,data);
+        FastVecScale(&motion,&motion,RandomFloatRange(0.75f,0.95f));
+        life = RandomIntRange(15,30);
+        SpawnSparkParticle_002BCB00(self+0x10,&motion,*(int *)(self+4),*(int *)(data+0x14),life,0,*(unsigned char *)(self+2),*(unsigned char *)(self+3),FloatToInt(*(float *)(self+0x1C)),*(float *)(self+0xC));
     } else {
-        func_00282D30(p,p,0.96f);
+        FastVecScale(data,data,0.96f);
     }
 }

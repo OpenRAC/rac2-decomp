@@ -27,48 +27,48 @@ extern char D_L07_001A8F20[] __attribute__((sda));
    11 use func_002AD470) and, in mode 3, recompute its height on it. In that branch the position
    and +0xF0 vector are written `arg + 0x10` / `arg + 0xF0` at each use, without a variable:
    gcse then shares them through the copies retail has. */
-void func_L07_003EB838(char *arg)
+void func_L07_003EB838(char *moby)
 {
-    char *o = *(char **)(arg + 0x68);
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    char *platform = *(char **)(o + 0x314);
+    char *vars = *(char **)(moby + 0x68);
+    float probeStart[4] __attribute__((aligned(16)));
+    float probeEnd[4] __attribute__((aligned(16)));
+    float localOffset[4] __attribute__((aligned(16)));
+    char *platform = *(char **)(vars + 0x314);
     char *pos;
 
     if (platform == 0) {
-        pos = arg + 0x10;
-        *(Quad *)a = *(Quad *)pos;
-        *(Quad *)b = *(Quad *)pos;
-        a[2] += 2.0f;
-        b[2] -= 3.0f;
-        if (func_002761F8(a, b, 0, arg, 0) && D_L07_001BF640.object != 0) {
-            if (*(int *)(func_002AD0B0(D_L07_001BF640.object) + 0x3C) & 2) {
-                *(char **)(o + 0x314) = D_L07_001BF640.object;
-                func_00282CF0(c, pos, *(char **)(o + 0x314) + 0x10);
-                func_002AFDD8(*(char **)(o + 0x314), c, c, 0);
-                *(float *)(o + 0x318) = c[2] - 1.0f;
-                func_002AD5F8(arg, *(char **)(o + 0x314), pos, arg + 0xF0, o + 0x2F0, o + 0x300);
+        pos = moby + 0x10;
+        *(Quad *)probeStart = *(Quad *)pos;
+        *(Quad *)probeEnd = *(Quad *)pos;
+        probeStart[2] += 2.0f;
+        probeEnd[2] -= 3.0f;
+        if (CollLine(probeStart, probeEnd, 0, moby, 0) && D_L07_001BF640.object != 0) {
+            if (*(int *)(GetMobyPrivateValue2(D_L07_001BF640.object) + 0x3C) & 2) {
+                *(char **)(vars + 0x314) = D_L07_001BF640.object;
+                FastVecSub(localOffset, pos, *(char **)(vars + 0x314) + 0x10);
+                TransformVectorByObjectOrGiven(*(char **)(vars + 0x314), localOffset, localOffset, 0);
+                *(float *)(vars + 0x318) = localOffset[2] - 1.0f;
+                GetAttachmentRotationAngles(moby, *(char **)(vars + 0x314), pos, moby + 0xF0, vars + 0x2F0, vars + 0x300);
             }
-            *(int *)(o + 0x88) |= 0x100;
+            *(int *)(vars + 0x88) |= 0x100;
         }
     } else {
-        *(Quad *)(o + 0x2E0) = *(Quad *)(arg + 0x10);
-        if (*(unsigned char *)(arg + 0x20) == 7 || *(unsigned char *)(arg + 0x20) == 11)
-            func_002AD470(arg, platform, o + 0x2F0, o + 0x300, arg + 0x10, arg + 0xF0);
+        *(Quad *)(vars + 0x2E0) = *(Quad *)(moby + 0x10);
+        if (*(unsigned char *)(moby + 0x20) == 7 || *(unsigned char *)(moby + 0x20) == 11)
+            ApplyCollisionPushToObject(moby, platform, vars + 0x2F0, vars + 0x300, moby + 0x10, moby + 0xF0);
         else
-            func_002AD0E0(arg, platform, arg + 0x10, arg + 0xF0, arg + 0x10, arg + 0xF0);
-        func_002833F0(arg + 0xC0, arg + 0xF0);
-        func_002B0408(arg + 0xC0, *(char **)(o + 0x314) + 0xE0, 0);
-        func_002AB6D8(arg + 0xC0, arg + 0xF0);
-        if (*(unsigned char *)(arg + 0x95) == 3) {
-            func_00282CF0(a, arg + 0x10, *(char **)(o + 0x314) + 0x10);
-            func_002AFDD8(*(char **)(o + 0x314), a, a, 0);
-            a[2] = *(float *)(o + 0x318);
-            func_00283098(a, a, *(char **)(o + 0x314) + 0xC0);
-            *(float *)(o + 0x180) = a[2] + *(float *)(*(char **)(o + 0x314) + 0x18);
-            if (*(float *)(arg + 0x18) < *(float *)(o + 0x180))
-                func_002A8F70(arg, D_0018C0B0, 0x10000, arg + 0x10, D_L07_001A8F20, 7.0f);
+            TransformPointAndRotationByParent(moby, platform, moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
+        euler_rotation_basis(moby + 0xC0, moby + 0xF0);
+        AlignRotationToDirection(moby + 0xC0, *(char **)(vars + 0x314) + 0xE0, 0);
+        GetEulerAnglesFromMatrix(moby + 0xC0, moby + 0xF0);
+        if (*(unsigned char *)(moby + 0x95) == 3) {
+            FastVecSub(probeStart, moby + 0x10, *(char **)(vars + 0x314) + 0x10);
+            TransformVectorByObjectOrGiven(*(char **)(vars + 0x314), probeStart, probeStart, 0);
+            probeStart[2] = *(float *)(vars + 0x318);
+            matrix_mul_vec3(probeStart, probeStart, *(char **)(vars + 0x314) + 0xC0);
+            *(float *)(vars + 0x180) = probeStart[2] + *(float *)(*(char **)(vars + 0x314) + 0x18);
+            if (*(float *)(moby + 0x18) < *(float *)(vars + 0x180))
+                QueueImpactEffect(moby, gHeroMoby_0018C0B0, 0x10000, moby + 0x10, D_L07_001A8F20, 7.0f);
         }
     }
 }

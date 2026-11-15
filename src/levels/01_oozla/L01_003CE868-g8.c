@@ -18,53 +18,54 @@ extern void func_00282CF0(void *,void *,void *);
 extern void func_00282F20(void *,void *,float);
 extern void func_00282CC0(void *,void *,void *);
 /* Initializes a floating object and keeps its motion above the water surface. */
-void func_L01_003CE868(u8 *a0)
+/* Drifts on the water, bobbing with the waves. It is nudged aside when the hero gets close. */
+void func_L01_003CE868(u8 *moby)
 {
-    u8 *p = *(u8 **)(a0 + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     float snapshots[2][4] __attribute__((aligned(16)));
-    float d[4] __attribute__((aligned(16)));
-    float h, dist, delta;
+    float pushVec[4] __attribute__((aligned(16)));
+    float waterHeight, heroDistance, delta;
 
-    if (!p) {
-        func_0026FEB8(D_L01_002A4D50, *(s16 *)(a0 + 0xAA), *(s16 *)(a0 + 0xB2));
+    if (!vars) {
+        STUB_printf(D_L01_002A4D50, *(s16 *)(moby + 0xAA), *(s16 *)(moby + 0xB2));
         return;
     }
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        if (func_L01_003BAFB0() > 0.0f) {
-            *(float *)(p + 0x20) = func_002A7940();
-            *(float *)(p + 0x24) = func_002A7940();
-            *(float *)(p + 0x28) = 0.02f;
-            qcopy(p, a0 + 0x10);
-            func_002A7750(a0, 1, -1);
+        if (GetWaterHeight() > 0.0f) {
+            *(float *)(vars + 0x20) = RandomAngle();
+            *(float *)(vars + 0x24) = RandomAngle();
+            *(float *)(vars + 0x28) = 0.02f;
+            qcopy(vars, moby + 0x10);
+            SetMobyState(moby, 1, -1);
         }
         break;
     case 1:
         /* Retail takes two position snapshots before updating movement. */
-        *(Snapshot128 *)snapshots[0] = *(Snapshot128 *)(a0 + 0x10);
+        *(Snapshot128 *)snapshots[0] = *(Snapshot128 *)(moby + 0x10);
         *(Snapshot128 *)snapshots[1] = *(Snapshot128 *)snapshots[0];
-        h = func_L01_003BAFB0();
-        func_002AEF28(a0, p + 0x20, p + 0x24, D_L01_001B0420,
+        waterHeight = GetWaterHeight();
+        ScaleOwnerWordsByAngles(moby, vars + 0x20, vars + 0x24, D_L01_001B0420,
                       D_L01_001B0424 * 0.00029088825f,
                       D_L01_001B0428 * 0.00029088825f);
-        func_L01_003CE7D8((float *)(a0 + 0x10), (float *)(p + 0x10), *(float *)p,
+        StepDampedSpring((float *)(moby + 0x10), (float *)(vars + 0x10), *(float *)vars,
                           D_L01_001B042C * 0.00027777778f, D_L01_001B0430, 3.0f);
-        func_L01_003CE7D8((float *)(a0 + 0x14), (float *)(p + 0x14), *(float *)(p + 4),
+        StepDampedSpring((float *)(moby + 0x14), (float *)(vars + 0x14), *(float *)(vars + 4),
                           D_L01_001B042C * 0.00027777778f, D_L01_001B0430, 3.0f);
-        dist = func_00282E80(a0 + 0x10, D_00189EA0);
-        if (dist < D_L01_001B0434 &&
-            *(float *)(D_00189EA0 + 8) < *(float *)(a0 + 0x18) + 0.8f) {
-            func_00282CF0(d, a0 + 0x10, D_00189EA0);
-            d[2] = 0;
-            func_00282F20(d, d, (D_L01_001B0434 - dist) * 0.08f);
-            func_00282CC0(a0 + 0x10, a0 + 0x10, d);
+        heroDistance = vec_distance_xy(moby + 0x10, gHeroPosition);
+        if (heroDistance < D_L01_001B0434 &&
+            *(float *)(gHeroPosition + 8) < *(float *)(moby + 0x18) + 0.8f) {
+            FastVecSub(pushVec, moby + 0x10, gHeroPosition);
+            pushVec[2] = 0;
+            vec_scale_to_length(pushVec, pushVec, (D_L01_001B0434 - heroDistance) * 0.08f);
+            FastVecAdd(moby + 0x10, moby + 0x10, pushVec);
         }
-        delta = h + *(float *)(p + 0x28) - *(float *)(a0 + 0x18);
+        delta = waterHeight + *(float *)(vars + 0x28) - *(float *)(moby + 0x18);
         if (delta > 0.050000004f)
             delta = 0.050000004f;
         else if (delta < -0.050000004f)
             delta = -0.050000004f;
-        *(float *)(a0 + 0x18) += delta;
+        *(float *)(moby + 0x18) += delta;
         break;
     }
 }

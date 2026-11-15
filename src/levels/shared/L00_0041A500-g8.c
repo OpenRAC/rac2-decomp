@@ -20,13 +20,13 @@ void func_L00_0041A500(char *object)
     if (index <= -1)
         index += 0x23;
 
-    random = func_001163B0();
+    random = Rand();
     if (random % 7 == 0)
-        func_L00_0041ACA0(object, D_L00_001B144C + (index << 6));
+        SpawnLavaGunEntryEffect(object, gLavaGunRingEntries + (index << 6));
 
-    random = func_001163B0();
+    random = Rand();
     if (random % 0x16 == 0) {
-        char *entry = D_L00_001B144C + (index << 6);
-        func_002BE278(entry, entry + 0x10, 0, -1.0f);
+        char *entry = gLavaGunRingEntries + (index << 6);
+        SpawnWhiteFlashParticle(entry, entry + 0x10, 0, -1.0f);
     }
 }

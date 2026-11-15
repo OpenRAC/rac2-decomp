@@ -78,23 +78,25 @@ typedef struct {
 
 /* func_L03_003C72A8 is defined in L03_003C72A8-g8.c. */
 
-void func_L03_003C7A40(char *a0)
+/* Starts the console's remote view: clears its counters and moves it to state 2. */
+void func_L03_003C7A40(char *moby)
 {
-    char *v1 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    *(u16 *)(v1 + 0x106) = 0;
-    *(s32 *)(v1 + 0x100) = 0;
-    *(u16 *)(a0 + 0x34) |= 0x400;
-    func_002A7750(a0, 2, -1);
-    *(s32 *)(a0 + 0x9C) = 0;
+    *(u16 *)(vars + 0x106) = 0;
+    *(s32 *)(vars + 0x100) = 0;
+    *(u16 *)(moby + 0x34) |= 0x400;
+    SetMobyState(moby, 2, -1);
+    *(s32 *)(moby + 0x9C) = 0;
 }
 
-void func_L03_003C7A88(char *a0)
+/* Marks the console as finished with its remote view. */
+void func_L03_003C7A88(char *moby)
 {
-    char *v0 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    *(u16 *)(v0 + 0x106) = 1;
-    *(s32 *)(a0 + 0x9C) = 1;
+    *(u16 *)(vars + 0x106) = 1;
+    *(s32 *)(moby + 0x9C) = 1;
 }
 
 /* func_L03_003C7AA0 is matched in its own unit, src/levels/03_endako/L03_003C7AA0-qcopy.c (-frac2-qcopy). */
@@ -107,15 +109,16 @@ void func_L03_003C7A88(char *a0)
    the mode record is made from the caller's +0x10 and the object is released.
    The mode is kept in $v0 across the call, so the store lands in the call's
    delay slot. */
-void func_L03_003C85F8(char *a0, s32 a1)
+/* Stores a mode in the object, builds its mode record and then releases the object. */
+void func_L03_003C85F8(char *moby, s32 mode)
 {
     char buf[0x10];
-    char *s1 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    *(s32 *)(s1 + 0xA0) = a1;
-    func_312898(a1, 2, buf);
-    func_2EEFE0(s1 + 0x90, a0 + 0x10, buf);
-    func_31B920(a0, 2, -1);
+    *(s32 *)(vars + 0xA0) = mode;
+    func_312898(mode, 2, buf);
+    func_2EEFE0(vars + 0x90, moby + 0x10, buf);
+    func_31B920(moby, 2, -1);
 }
 
 /* func_L03_003C8660 is matched in its own unit, src/levels/03_endako/L03_003C8660-qcopy.c (-frac2-qcopy). */
@@ -133,28 +136,29 @@ void func_L03_003C85F8(char *a0, s32 a1)
 
 /* Picks the actor's next motion slot: case 0 draws a random turn rate, case 1
    re-checks the 0x70-stride table entry before refreshing the aim. */
-void func_L03_003CBD70(char *a0)
+/* Turns a spinning object toward a random heading and keeps its sound playing while it is active. */
+void func_L03_003CBD70(char *moby)
 {
-    char *s0 = a0;
-    char *s1 = *(char **)(s0 + 0x68);
+    char *self = moby;
+    char *vars = *(char **)(self + 0x68);
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(self + 0x20)) {
     case 0:
-        func_31B920(s0, 1, -1);
-        *(f32 *)(s1 + 4) = func_31BAE8(60.0f, 90.0f) * 0.000290888245f;
-        *(s32 *)(s1 + 8) = -1;
+        func_31B920(self, 1, -1);
+        *(f32 *)(vars + 4) = func_31BAE8(60.0f, 90.0f) * 0.000290888245f;
+        *(s32 *)(vars + 8) = -1;
         break;
     case 1: {
-        s32 v = *(s32 *)s1;
+        s32 active = *(s32 *)vars;
 
-        if (v != 0) {
-            char *p = D_L03_00188660 + *(s32 *)(s1 + 8) * 0x70;
+        if (active != 0) {
+            char *soundSlot = D_L03_00188660 + *(s32 *)(vars + 8) * 0x70;
 
-            if (*(char **)(p + 0x88) != s0 || *(u8 *)(p + 0x74) == 0)
-                *(s32 *)(s1 + 8) = func_360A80(0, 4, s0);
+            if (*(char **)(soundSlot + 0x88) != self || *(u8 *)(soundSlot + 0x74) == 0)
+                *(s32 *)(vars + 8) = func_360A80(0, 4, self);
         }
-        *(f32 *)(s0 + 0xF8) = func_2F0000(*(f32 *)(s0 + 0xF8),
-            *(f32 *)(s1 + 4));
+        *(f32 *)(self + 0xF8) = func_2F0000(*(f32 *)(self + 0xF8),
+            *(f32 *)(vars + 4));
         break;
     }
     }
@@ -164,52 +168,55 @@ void func_L03_003CBD70(char *a0)
 
 /* func_L03_003CF0C0 is defined in L03_003CF0C0-g8.c. */
 
-s32 func_L03_003CF7B8(u8 *a0)
+/* Tells whether the object is in state 2, 3 or 4. */
+s32 func_L03_003CF7B8(u8 *moby)
 {
-    return (u8)(a0[0x20] - 2) < 3;
+    return (u8)(moby[0x20] - 2) < 3;
 }
 
 /* func_L03_003CF7C8 is in L03_003CF7C8.c. */
 
-void func_L03_003CFB30(char *a0)
+/* Sets up an object on its first frame and then keeps updating its attached effect. */
+void func_L03_003CFB30(char *moby)
 {
-    char *moby = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(s32 *)(moby + 0x5C) |= 1;
-        func_32C010(a0, moby + 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        func_002A7750(a0, 1, -1);
+        *(s32 *)(vars + 0x5C) |= 1;
+        func_32C010(moby, vars + 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        func_32C328(a0, moby + 0x60, 0);
+        func_32C328(moby, vars + 0x60, 0);
         break;
     }
 }
 
 /* func_L03_003D0300 is defined in L03_003D0300-g8.c. */
 
-void func_L03_003D1100(char *a0)
+/* Waits until the object is hit or triggered, then runs its break routine and releases it. */
+void func_L03_003D1100(char *moby)
 {
-    char *a3 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(s32 *)(a3 + 0x5C) |= 8;
-        func_002A7750(a0, 1, -1);
+        *(s32 *)(vars + 0x5C) |= 8;
+        SetMobyState(moby, 1, -1);
         break;
     case 1: {
-        char *s1 = (char *)func_31DD78(a0, 0x10000, 0);
-        s32 v;
+        char *hit = (char *)func_31DD78(moby, 0x10000, 0);
+        s32 hitMoby;
 
-        if (func_32AB10(a0) != 0
-            || (s1 != 0 && (v = *(s32 *)(s1 + 0x20)) != 0
-                && *(s16 *)(v + 0xAA) == 0xB1B)) {
-            func_L03_003D11E0(a0);
-            func_360A80(0, 0, a0);
-            func_311758(a0);
+        if (func_32AB10(moby) != 0
+            || (hit != 0 && (hitMoby = *(s32 *)(hit + 0x20)) != 0
+                && *(s16 *)(hitMoby + 0xAA) == 0xB1B /* moby class 2843 */)) {
+            EmitDebrisAndParticleBurst(moby);
+            func_360A80(0, 0, moby);
+            func_311758(moby);
         } else {
-            *(u8 *)(a0 + 0xA8) = 0xFF;
+            *(u8 *)(moby + 0xA8) = 0xFF;
         }
         break;
     }
@@ -223,33 +230,35 @@ void func_L03_003D1100(char *a0)
 /* func_L03_003D19C8 is in L03_003D19C8-g8.c. */
 
 
-void func_L03_003D1FB0(char *a0)
+/* Ends a scripted scene: restores the linked object so it shows and can be hit again. */
+void func_L03_003D1FB0(char *moby)
 {
-    char *s0 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    func_324168(*(s32 *)(s0 + 0x18), *(s32 *)(s0 + 0x1C));
+    func_324168(*(s32 *)(vars + 0x18), *(s32 *)(vars + 0x1C));
     func_30D710(0, -1);
-    *(u16 *)(*(s32 *)(s0 + 0x2C) + 0x34) |= 0x41;
-    *(u16 *)(*(s32 *)(s0 + 0x2C) + 0x34) &= ~0x1000;
-    *(s32 *)(*(s32 *)(s0 + 0x2C) + 0x98) = 0;
-    *(u16 *)(*(s32 *)(s0 + 0x2C) + 0x96) = 0;
+    *(u16 *)(*(s32 *)(vars + 0x2C) + 0x34) |= 0x41;
+    *(u16 *)(*(s32 *)(vars + 0x2C) + 0x34) &= ~0x1000;
+    *(s32 *)(*(s32 *)(vars + 0x2C) + 0x98) = 0;
+    *(u16 *)(*(s32 *)(vars + 0x2C) + 0x96) = 0;
 }
 
 /* func_L03_003D2018 is defined in L03_003D2018.c. */
 
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
-void func_L03_003D20F8(char *a0)
+/* Cleans up when the remote view ends: gives control back to the player and resets the camera. */
+void func_L03_003D20F8(char *moby)
 {
-    char *s0 = a0;
-    char *s1 = *(char **)(s0 + 0x68);
-    char *s2;
-    void *p;
+    char *self = moby;
+    char *vars = *(char **)(self + 0x68);
+    char *hero;
+    void *linked;
 
     func_2B8510(0);
-    s2 = D_00189E20_11;
-    *(u16 *)(s2 + 0x24FC) = 0;
-    func_313378(*(u8 *)(s0 + 0xB0));
+    hero = D_00189E20_11;
+    *(u16 *)(hero + 0x24FC) = 0;
+    func_313378(*(u8 *)(self + 0xB0));
     D_001395C0 = 1;
     /* Resident bytes shared by all programs, written at their constant addresses
        (retail's lui $at,0x1A; sb form), as in 0033CB18.c. */
@@ -259,15 +268,15 @@ void func_L03_003D20F8(char *a0)
     *(u8 *)0x001A7AFC = 1;
     *(u8 *)0x001A7B34 = 1;
     *(u8 *)0x001A7AFA = 1;
-    func_2BEE78(s0 + 0x10, s0 + 0xF0, 0, 1);
-    p = *(void **)(s1 + 0x2C);
-    if (p != 0) {
-        func_311758(p);
+    func_2BEE78(self + 0x10, self + 0xF0, 0, 1);
+    linked = *(void **)(vars + 0x2C);
+    if (linked != 0) {
+        func_311758(linked);
     }
-    func_311758(D_L03_001B2A1C_tbl[0] + (*(s32 *)s1 << 8));
-    *(s32 *)(s0 + 0x78) = 0x80468CDC;
-    func_32F140(*(s32 *)(s1 + 0x24), -1);
-    func_359FD0(s2 + 0x80, s2 + 0x90);
+    func_311758(D_L03_001B2A1C_tbl[0] + (*(s32 *)vars << 8));
+    *(s32 *)(self + 0x78) = 0x80468CDC;
+    func_32F140(*(s32 *)(vars + 0x24), -1);
+    func_359FD0(hero + 0x80, hero + 0x90);
     func_30D710(0, -1);
 }
 
@@ -283,13 +292,14 @@ extern void func_002A0F48(void *);
 /* Spawns a kind-0xB1B object owned by OWNER at POSITION: opaque, a 0.015 rate, its state
    taking the two vectors, the three floats (in reverse order), a 0x10E word and the
    three bytes (the last twice). Returns the object, or 0. */
+/* Creates a new object of one kind and fills in its start values. Returns it, or 0 if none could be made. */
 u8 *func_L03_003E18D8(char *owner, void *position, void *first, void *second,
                         u8 a, u8 b, u8 c, f32 x, f32 y, f32 z)
 {
     u8 *object;
     u8 *state;
 
-    object = func_0029EFD0(0xB1B);
+    object = CreateMoby(0xB1B /* moby class 2843 */);
     if (object != 0) {
         qcopy(object + 0x10, position);
         object[0x30] = *(u16 *)(object + 0x32) = 0xFF;

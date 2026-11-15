@@ -82,7 +82,8 @@ extern void func_L22_003FA1D0(s32, s32, s32);
 
 /* func_L22_00385F40 is in L22_00385F40.c. */
 
-void func_L22_0038FBE0(unsigned char *obj) {
+/* Moves a thrown projectile one step. It bounces off what it hits and sprays sparks when it lands in the water or hits the ground. */
+void func_L22_0038FBE0(unsigned char *moby) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -95,63 +96,63 @@ void func_L22_0038FBE0(unsigned char *obj) {
             int enabled;
         } packet;
         Vec position, spread;
-    } frame;
-    char *ctx = *(char **)(obj + 0x68), *position = (char *)obj + 0x10;
-    int i, lifetime;
+    } work;
+    char *vars = *(char **)(moby + 0x68), *position = (char *)moby + 0x10;
+    int sparkCount, sparkLife;
     float angle, speed;
 
-    frame.velocity.q = 0;
-    frame.velocity.f[2] = 0.033333335f;
-    frame.normal.q = 0;
-    frame.normal.f[2] = 1.0f;
-    qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
-    func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
-    func_00300190(position, position);
-    func_00300248(ctx, ctx);
-    func_002FE880(position, ctx, 0.0030555557f);
-    func_L00_0038F178(obj);
-    frame.packet.moby = obj;
-    frame.packet.flags = 0x830000;
-    if (*(int *)(ctx + 0x18) < 0x122)
-        frame.packet.flags = 0x830001;
-    frame.packet.enabled = 1;
-    frame.packet.material =
-        ((Material *)((u32)D_L22_002645F0 + D_00139568[12] * sizeof(Material)))->material;
-    qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
-    frame.packet.vector.f[2] = 1.0f;
-    frame.packet.vector.f[3] = 5627.925f;
-    frame.packet.kind = 2;
-    frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
-    frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, (int)&frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
-            char *effect;
+    work.velocity.q = 0;
+    work.velocity.f[2] = 0.033333335f;
+    work.normal.q = 0;
+    work.normal.f[2] = 1.0f;
+    qcopy(&work.old, position);
+    FastVecAdd(position, vars, position);
+    SteerEffectDirection(*(int *)(vars + 0x1C), vars, 0);
+    TransformVectorOrCopy(position, position);
+    TriggerCurrentStateEffect(vars, vars);
+    AddObjectDirectionScaled(position, vars, 0.0030555557f);
+    EmitSparkleParticles(moby);
+    work.packet.moby = moby;
+    work.packet.flags = 0x830000;
+    if (*(int *)(vars + 0x18) < 0x122)
+        work.packet.flags = 0x830001;
+    work.packet.enabled = 1;
+    work.packet.material =
+        ((Material *)((u32)D_L22_002645F0 + gItemSlotToRecord[12] * sizeof(Material)))->material;
+    qcopy(&work.packet.vector, vars);
+    FastVectorNormalizeHelper(&work.packet.vector, &work.packet.vector, 1.0f);
+    work.packet.vector.f[2] = 1.0f;
+    work.packet.vector.f[3] = 5627.925f;
+    work.packet.kind = 2;
+    work.packet.class_id = *(unsigned short *)(moby + 0xAA);
+    work.packet.active = 1;
+    if (CollLine(&work.old, position, 0x10, moby, (int)&work.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
+            char *splash;
             Vec *spread;
-            func_002FD1B8(D_L22_001B28B0, D_L22_001B28B8, 1,
-                *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
-            *(int *)(ctx + 0x14) = 1;
-            func_00282C88(ctx);
-            *(float *)(ctx + 8) = -0.025000002f;
-            frame.position.f[0] = *(float *)(obj + 0x10);
-            frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = ((Collision *)&D_L22_001C00C0)->point.f[2];
-            effect = func_00312D58(&frame.position, 2.0f);
-            if (effect)
-                effect[0x23] = 0x70;
-            spread = &frame.spread;
-            i = 15;
+            RippleDisturb(D_L22_001B28B0, D_L22_001B28B8, 1,
+                *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
+            *(int *)(vars + 0x14) = 1;
+            ClearVector128(vars);
+            *(float *)(vars + 8) = -0.025000002f;
+            work.position.f[0] = *(float *)(moby + 0x10);
+            work.position.f[1] = *(float *)(moby + 0x14);
+            work.position.f[2] = ((Collision *)&D_L22_001C00C0)->point.f[2];
+            splash = SpawnScaledEffectMoby(&work.position, 2.0f);
+            if (splash)
+                splash[0x23] = 0x70;
+            spread = &work.spread;
+            sparkCount = 15;
             do {
-                --i;
-                angle = func_002A7940();
-                speed = func_002A7878(0.0f, 0.050000004f);
-                frame.spread.f[0] = func_00283180(angle) * speed;
-                frame.spread.f[1] = func_00283198(angle) * speed;
-                frame.spread.f[2] = func_002A7878(0.050000004f, 0.10833334f);
-                lifetime = func_002A7820(90, 120);
-                func_002BFB38(&frame.position, spread, func_002A77E0(2), lifetime);
-            } while (i >= 0);
+                --sparkCount;
+                angle = RandomAngle();
+                speed = RandomFloatRange(0.0f, 0.050000004f);
+                work.spread.f[0] = FastSinOrCosA(angle) * speed;
+                work.spread.f[1] = FastSinOrCosB(angle) * speed;
+                work.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
+                sparkLife = RandomIntRange(90, 120);
+                SpawnSparkParticle_002BFB38(&work.position, spread, RandomIntBelow(2), sparkLife);
+            } while (sparkCount >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
@@ -161,40 +162,41 @@ void func_L22_0038FBE0(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = ((Collision *)&D_L22_001C00C0);
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L22_001AC790 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == D_L22_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
-                obj[0xBC] = 1;
-                qcopy(obj + 0x10, &reread->point);
-                func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                moby[0xBC] = 1;
+                qcopy(moby + 0x10, &reread->point);
+                FastVectorNormalize(&work.velocity, vars, &reread->normal);
+                vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
+                vec_scale_to_length(&work.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
-                obj[0xBC] = 1;
-                qcopy(obj + 0x10, &collision->point);
-                func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                moby[0xBC] = 1;
+                qcopy(moby + 0x10, &collision->point);
+                FastVectorNormalize(&work.velocity, vars, &collision->normal);
+                vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
+                vec_scale_to_length(&work.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (func_00282948(ctx + 0x18)) {
-        obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+    } else if (FastFloatHelperD(vars + 0x18)) {
+        moby[0xBC] = 1;
+        FastVecAdd((char *)&work.velocity, (char *)&work.velocity, vars);
     }
 finish:
-    if (obj[0xBC]) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+    if (moby[0xBC]) {
+        ClearEntryFlag(*(int *)(vars + 0x1C));
+        SpawnBigExplosionEffect(moby, &work.velocity, &work.normal);
     }
 }
 
 
-void func_L22_0038FFF8(char *obj) {
+/* Moves a projectile one step along its velocity and bounces it off walls and objects it hits. */
+void func_L22_0038FFF8(char *moby) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -206,77 +208,77 @@ void func_L22_0038FFF8(char *obj) {
             float material;
             int enabled;
         } packet;
-    } frame;
-    char *ctx = *(char **)(obj + 0x68);
-    char *position = obj + 0x10;
+    } work;
+    char *vars = *(char **)(moby + 0x68);
+    char *position = moby + 0x10;
     char *hit;
     Collision *collision;
 
-    frame.velocity.q = 0;
-    frame.velocity.f[2] = 0.033333335f;
-    frame.normal.q = 0;
-    frame.normal.f[2] = 1.0f;
-    qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
-    frame.packet.moby = obj;
-    frame.packet.flags = 0x830000;
-    if (*(int *)(ctx + 0x18) < 0x122)
-        frame.packet.flags = 0x830001;
-    frame.packet.enabled = 1;
-    frame.packet.material = ((Material *)D_L22_002645F0 + D_00139574)->material;
-    qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
-    frame.packet.kind = 2;
-    frame.packet.vector.f[3] = 5627.925f;
-    frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
-    frame.packet.vector.f[2] = 1.0f;
-    frame.packet.active = 1;
-    (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, (int)&frame.packet)) {
+    work.velocity.q = 0;
+    work.velocity.f[2] = 0.033333335f;
+    work.normal.q = 0;
+    work.normal.f[2] = 1.0f;
+    qcopy(&work.old, position);
+    FastVecAdd(position, position, vars);
+    ComputeViewDirection(position, &work.surface, 0);
+    FastVecScale(&work.surface, &work.surface, 0.0003055556f);
+    SpawnSparkPuff(moby);
+    work.packet.moby = moby;
+    work.packet.flags = 0x830000;
+    if (*(int *)(vars + 0x18) < 0x122)
+        work.packet.flags = 0x830001;
+    work.packet.enabled = 1;
+    work.packet.material = ((Material *)D_L22_002645F0 + D_00139574)->material;
+    qcopy(&work.packet.vector, vars);
+    FastVectorNormalizeHelper(&work.packet.vector, &work.packet.vector, 1.0f);
+    work.packet.kind = 2;
+    work.packet.vector.f[3] = 5627.925f;
+    work.packet.class_id = *(unsigned short *)(moby + 0xAA);
+    work.packet.vector.f[2] = 1.0f;
+    work.packet.active = 1;
+    (*(int *)(vars + 0x14))++;
+    if (CollLine(&work.old, position, 0x10, moby, (int)&work.packet)) {
         collision = ((Collision *)&D_L22_001C00C0);
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = ((Collision *)&D_L22_001C00C0);
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L22_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L22_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
-            obj[0xBC] = 1;
+            moby[0xBC] = 1;
             {
                 void *source = &reread->point;
-                void *dest = obj + 0x10;
+                void *dest = moby + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            FastVectorNormalize(&work.velocity, vars, &reread->normal);
+            vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
+            vec_scale_to_length(&work.normal, &reread->normal, 1.0f);
         } else {
             collision = ((Collision *)&D_L22_001C00C0);
             if (collision->count <= 0)
                 goto finish;
-            obj[0xBC] = 1;
+            moby[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            FastVectorNormalize(&work.velocity, vars, &collision->normal);
+            vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
+            vec_scale_to_length(&work.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
-        obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+    } else if (FastFloatHelperD(vars + 0x18)) {
+        moby[0xBC] = 1;
+        FastVecAdd((char *)&work.velocity, (char *)&work.velocity, vars);
     }
 finish:
-    if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+    if (*(unsigned char *)(moby + 0xBC)) {
+        ClearEntryFlag(*(int *)(vars + 0x1C));
+        if (*(int *)(vars + 0x14) < 20)
+            SpawnBigExplosionEffect(moby, &work.velocity, &work.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            SpawnImpactBurst(moby, &work.velocity, &work.normal);
     }
 }
 
@@ -290,35 +292,38 @@ finish:
 
 /* func_L22_003E87B8 is in L22_003E87B8.c. */
 
-void func_L22_003E8830(s32 a0) {
-    s32 x = *(u32 *)(a0 + 0x68);
+/* Shows the message effect for this object and clears one of its flags. */
+void func_L22_003E8830(s32 moby) {
+    s32 varsPtr = *(u32 *)(moby + 0x68);
 
-    func_L22_003E87B8(a0, x, x);
-    *(u8 *)(a0 + 0x30) = 0xFF;
+    ShowTextMessageAtMoby(moby, varsPtr, varsPtr);
+    *(u8 *)(moby + 0x30) = 0xFF;
 }
 
-void func_L22_003FA1D0(s32 arg, s32 unused1, s32 unused2)
+/* Shows a text message with a sound at the object and starts its effect. Does nothing if the object has no target. */
+void func_L22_003FA1D0(s32 mobyAddr, s32 unused1, s32 unused2)
 {
-    char *a0 = (char *)arg;
-    char *s1 = func_002A9640(a0, -1, 0);
-    char buf[0x10];
+    char *moby = (char *)mobyAddr;
+    char *target = FindOwnedEffectSlot(moby, -1, 0);
+    char offset[0x10];
 
-    if (s1 == 0)
+    if (target == 0)
         return;
-    func_002E5DA0(func_002A77E0(3) + 0xC, 0, a0, 0xE0B);
-    func_002AC728((u8 *)a0, a0 + 0x10, -1, 2.0f, 13.0f);
-    func_002E5CF8(0, 0, a0);
-    func_2F3D60(buf, s1 + 0x10, 0.25f);
-    func_002B0A68(a0, 3, (f32 *)buf, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    func_0029F338(a0);
+    PlaySoundFromClassBank(RandomIntBelow(3) + 0xC, 0, moby, 0xE0B);
+    SpawnExplosionWithSparks((u8 *)moby, moby + 0x10, -1, 2.0f, 13.0f);
+    PlayMobySound(0, 0, moby);
+    func_2F3D60(offset, target + 0x10, 0.25f);
+    SpawnDebrisForMaskedParts(moby, 3, (f32 *)offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    MarkMobySpawned(moby);
 }
 
 
-void func_L22_003FA2A8(s32 a0) {
-    s32 x = *(u32 *)(a0 + 0x68);
+/* Shows the message effect with sound for this object and clears one of its flags. */
+void func_L22_003FA2A8(s32 moby) {
+    s32 varsPtr = *(u32 *)(moby + 0x68);
 
-    func_L22_003FA1D0(a0, x, x);
-    *(u8 *)(a0 + 0x30) = 0xFF;
+    ShowMessageWithSoundEffect(moby, varsPtr, varsPtr);
+    *(u8 *)(moby + 0x30) = 0xFF;
 }
 
 
@@ -326,37 +331,39 @@ void func_L22_003FA2A8(s32 a0) {
 
 /* func_L22_0040D638 lives in L22_00358778-state-g8.c. */
 
-void func_L22_0040DA80(s32 a0) {
-    s32 s1 = a0;
-    s32 s0 = *(u32 *)(s1 + 0x68);
+/* Updates the timers and animation of an object each frame, and ages it by one tick. */
+void func_L22_0040DA80(s32 moby) {
+    s32 mobyCopy = moby;
+    s32 vars = *(u32 *)(mobyCopy + 0x68);
 
-    func_2F36F0(s0 + 0x258);
-    func_2F3720(s0 + 0x25C);
-    if (*(u16 *)(s1 + 0x96) <= 0xFFFE)
-        *(u16 *)(s1 + 0x96) = *(u16 *)(s1 + 0x96) + 1;
-    if (*(u8 *)(s0 + 0x211) == 0)
-        func_3167E8(s1, 7, s0 + 0x210);
-    func_2F4788(s0 + 0x220, 2, *(f32 *)(s0 + 0x26C));
-    *(f32 *)(s0 + 0x26C) = func_2F4AD0(*(f32 *)(s0 + 0x26C), 0.41597018f);
+    func_2F36F0(vars + 0x258);
+    func_2F3720(vars + 0x25C);
+    if (*(u16 *)(mobyCopy + 0x96) <= 0xFFFE)
+        *(u16 *)(mobyCopy + 0x96) = *(u16 *)(mobyCopy + 0x96) + 1;
+    if (*(u8 *)(vars + 0x211) == 0)
+        func_3167E8(mobyCopy, 7, vars + 0x210);
+    func_2F4788(vars + 0x220, 2, *(f32 *)(vars + 0x26C));
+    *(f32 *)(vars + 0x26C) = func_2F4AD0(*(f32 *)(vars + 0x26C), 0.41597018f);
 }
 
 
-void func_L22_0040DC40(s32 a0, s32 a1, s32 a2, f32 f12) {
-    u8 buf[0x10];
-    u8 buf2[0x10];
-    f32 v = f12;
+/* Steers an object toward a target position, scaled by speed and the frame time. */
+void func_L22_0040DC40(s32 moby, s32 target, s32 useOffset, f32 speed) {
+    u8 steer[0x10];
+    u8 adjusted[0x10];
+    f32 step = speed;
 
-    func_2F3AB0(buf, (void *)a1, (void *)(a0 + 0x10));
-    v = v * 0.016666668f;
-    func_2F3D60(buf, buf, v);
-    if (a2 != 0) {
-        func_2F3A80(buf2, (void *)(a0 + 0x10), buf);
-        func_3A2988(buf2, 7.2f);
-        func_2F3AB0(buf, buf2, (void *)(a0 + 0x10));
-        func_2F3D60(buf, buf, v);
+    func_2F3AB0(steer, (void *)target, (void *)(moby + 0x10));
+    step = step * 0.016666668f;
+    func_2F3D60(steer, steer, step);
+    if (useOffset != 0) {
+        func_2F3A80(adjusted, (void *)(moby + 0x10), steer);
+        func_3A2988(adjusted, 7.2f);
+        func_2F3AB0(steer, adjusted, (void *)(moby + 0x10));
+        func_2F3D60(steer, steer, step);
     }
-    func_32F330(a0, a1);
-    func_3300E8(a0, buf);
+    func_32F330(moby, target);
+    func_3300E8(moby, steer);
 }
 
 /* The existing implementation is in L22_0040DD20-rc2.c. */
@@ -391,6 +398,7 @@ extern TrailMoby0040DE00 *func_0029EFD0(int);
 extern void func_00282F20(void *, void *, float);
 extern void func_00282DD8(void *, void *, void *);
 
+/* Creates a trail effect object at a position moving along a velocity, and fills in its size, lifetime and three trail points. */
 TrailMoby0040DE00 *func_L22_0040DE00(float *pos, float *vel, float *scale)
 {
     float ref[4];
@@ -398,8 +406,8 @@ TrailMoby0040DE00 *func_L22_0040DE00(float *pos, float *vel, float *scale)
     TrailMoby0040DE00 *moby;
     TrailVars0040DE00 *vars;
 
-    func_002AFFD8(pos, ref, 1);
-    moby = func_0029EFD0(0xF5D);
+    ComputeViewDirection(pos, ref, 1);
+    moby = CreateMoby(0xF5D /* moby class 3933 */);
     if (moby != 0) {
         vars = moby->vars;
         vars->scale = *scale;
@@ -411,11 +419,11 @@ TrailMoby0040DE00 *func_L22_0040DE00(float *pos, float *vel, float *scale)
         qcopy(vars->vel, vel);
         vars->f18 = 0;
         vars->f14 = 0;
-        func_00282F20(scaled, vel, 1.0f);
+        vec_scale_to_length(scaled, vel, 1.0f);
         qcopy(moby->p0, scaled);
-        func_00282DD8(moby->p1, moby->p0, ref);
-        func_00282F20(moby->p1, moby->p1, 1.0f);
-        func_00282DD8(moby->p2, moby->p1, moby->p0);
+        FastVecCross(moby->p1, moby->p0, ref);
+        vec_scale_to_length(moby->p1, moby->p1, 1.0f);
+        FastVecCross(moby->p2, moby->p1, moby->p0);
         moby->p0[3] = moby->p1[3] = moby->p2[3] = 0.0f;
     }
     return moby;
@@ -427,25 +435,26 @@ extern void func_0029FCC0(void *, s32, void *);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_00282F20(void *, void *, f32);
 
-void func_L22_0040DB20(u8 *a0, f32 *a1, f32 f12) {
-    f32 vec1[4] __attribute__((aligned(16)));
-    f32 vec2[4] __attribute__((aligned(16)));
-    f32 scale = f12;
+/* Spawns two trail effects at the object's joints, flying away from an origin point. */
+void func_L22_0040DB20(u8 *moby, f32 *origin, f32 sizeArg) {
+    f32 jointPos[4] __attribute__((aligned(16)));
+    f32 velocity[4] __attribute__((aligned(16)));
+    f32 size = sizeArg;
 
     if (D_L22_001AF314[0] != 0 && *(f32 *)(*(u8 **)(D_L22_001AF314[0] + 0x68) + 0x20) <= 0.0f) {
         return;
     }
-    func_0029FCC0(a0, 2, vec1);
-    if (scale == 0.0f) {
-        scale = D_L22_001B2A98;
+    TransformMobyJointToWorld(moby, 2, jointPos);
+    if (size == 0.0f) {
+        size = D_L22_001B2A98;
     }
-    func_00282CF0(vec2, a1, vec1);
-    func_00282F20(vec2, vec2, 0.6666667f);
-    func_L22_0040DE00(vec1, vec2, &scale);
-    func_0029FCC0(a0, 3, vec1);
-    func_00282CF0(vec2, a1, vec1);
-    func_00282F20(vec2, vec2, 0.6666667f);
-    func_L22_0040DE00(vec1, vec2, &scale);
+    FastVecSub(velocity, origin, jointPos);
+    vec_scale_to_length(velocity, velocity, 0.6666667f);
+    SpawnTrailEffectMoby_L22(jointPos, velocity, &size);
+    TransformMobyJointToWorld(moby, 3, jointPos);
+    FastVecSub(velocity, origin, jointPos);
+    vec_scale_to_length(velocity, velocity, 0.6666667f);
+    SpawnTrailEffectMoby_L22(jointPos, velocity, &size);
 }
 
 typedef struct { u8 pad[0x18]; u8 *target; } G1C00C0;
@@ -457,41 +466,42 @@ extern void func_002A8C00(void *, void *, int, void *, f32);
 extern void func_002A8E20(void *, void *);
 extern void func_L22_0040E2B0(void *, s32, s32);
 
-void func_L22_0040DF28(u8 *a0, u8 *a1) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
-    u8 vec[16] __attribute__((aligned(16)));
-    u8 ev[0x30] __attribute__((aligned(16)));
-    u8 buf[16] __attribute__((aligned(16)));
+/* Checks whether the object hit something since its last position. If so it hurts the target, spawns the impact effect and goes to state 2. */
+void func_L22_0040DF28(u8 *moby, u8 *oldPos) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 hitDir[16] __attribute__((aligned(16)));
+    u8 hitEvent[0x30] __attribute__((aligned(16)));
+    u8 impactPos[16] __attribute__((aligned(16)));
     u8 *target;
 
-    if (func_002761F8(a1, a0 + 0x10, 0, a0, 0) == 0) {
+    if (CollLine(oldPos, moby + 0x10, 0, moby, 0) == 0) {
         return;
     }
     target = D_001C00C0.target;
     if (target == 0) {
         return;
     }
-    if (*(s16 *)(target + 0xAA) == 0xEDD || *(s16 *)(target + 0xAA) == 0xE0B) {
+    if (*(s16 *)(target + 0xAA) == 0xEDD /* moby class 3805 */ || *(s16 *)(target + 0xAA) == 0xE0B /* moby class 3595 */) {
         return;
     }
-    if (target == D_0018C0B0 && !(*(f32 *)(s0 + 0x1C) < 50.0f)) {
+    if (target == gHeroMoby_0018C0B0 && !(*(f32 *)(vars + 0x1C) < 50.0f)) {
         return;
     }
-    if (*(f32 *)(s0 + 0x1C) >= 50.0f) {
-        *(f32 *)(s0 + 0x1C) = 50.1f;
+    if (*(f32 *)(vars + 0x1C) >= 50.0f) {
+        *(f32 *)(vars + 0x1C) = 50.1f;
     }
-    func_00282F20(vec, s0, 1.0f);
-    func_002A8C00(ev, a0, 0x8B0003, vec, *(f32 *)(s0 + 0x1C));
-    ev[0x18] = 5;
-    ev[0x19] = 3;
-    *(u16 *)(ev + 0x1A) = *(u16 *)(a0 + 0xAA);
-    func_002A8E20(D_001C00C0.target, ev);
-    func_L22_0040E2B0(a0 + 0x10, 10, 1);
+    vec_scale_to_length(hitDir, vars, 1.0f);
+    make_hit_descriptor(hitEvent, moby, 0x8B0003, hitDir, *(f32 *)(vars + 0x1C));
+    hitEvent[0x18] = 5;
+    hitEvent[0x19] = 3;
+    *(u16 *)(hitEvent + 0x1A) = *(u16 *)(moby + 0xAA);
+    QueueMobyImpact(D_001C00C0.target, hitEvent);
+    StartRandomScaleEffect(moby + 0x10, 10, 1);
     if (D_001C00C0.target == 0) {
-        qcopy(buf, a0 + 0x10);
-        func_L22_0040E2B0(buf, 15, 0);
+        qcopy(impactPos, moby + 0x10);
+        StartRandomScaleEffect(impactPos, 15, 0);
     }
-    a0[0x20] = 2;
+    moby[0x20] = 2;
 }
 
 /* func_L22_0040E098 uses the profile in L22_0040E098-g8.c. */

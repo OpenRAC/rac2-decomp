@@ -99,7 +99,7 @@ extern void func_002AF1D0(void *, void *, s32, s32);
    the first call. */
 static __inline__ void TurnJoint(void *moby, void *joint, s32 index, f32 rate)
 {
-    func_002AEC48(moby, joint, index, rate, 0.3f);
+    UpdateEasedNode(moby, joint, index, rate, 0.3f);
 }
 
 /* An item vendor: offers the current item table entry, compares its cost with D_001A79F8, takes
@@ -115,36 +115,36 @@ void func_L01_003D2E50(PurchaseMoby *moby)
     s32 active;
     u64 flag;
 
-    func_L01_003209F8(moby, 0, 0xB1A, 2.5f);
+    SpawnEffectOnMatchingThings(moby, 0, 0xB1A, 2.5f);
     switch (moby->state) {
     case 0:
         if (D_001A7B26[0])
             goto remove_self;
         flag = D_0013978C;
         if (flag >> 7) {
-            if (D_001A79F8[0] < ITEM_COST)
-                func_002A7750(moby, 3, -1);
+            if (gPlayerBolts[0] < ITEM_COST)
+                SetMobyState(moby, 3, -1);
             else
-                func_002A7750(moby, 4, -1);
+                SetMobyState(moby, 4, -1);
         } else {
-            func_002A7750(moby, 1, -1);
+            SetMobyState(moby, 1, -1);
         }
-        func_L01_003128C0(moby);
-        child = func_0029EFD0(0xD7E);
+        ResetMobyVarsDefaults(moby);
+        child = CreateMoby(0xD7E /* moby class 3454 */);
         STATE_CHILD = child;
         if (child) {
             child[0x30] = moby->field30;
             *(u16 *)(STATE_CHILD + 0x32) = moby->field32;
             STATE_CHILD[0x31] = 1;
             func_002A0F48(STATE_CHILD);
-            func_002AB650(STATE_CHILD);
+            CopyHeroField38ToMoby(STATE_CHILD);
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x120)) && func_00288AA0(D_L01_001BF6C0, 0x27)) {
-            func_L01_003246D0(moby);
-            func_00288BE8(D_L01_001BF6C0);
-            func_002A7750(moby, 2, -1);
+        if (IsPointInCuboid(gHeroPosition, *(s32 *)(state + 0x120)) && PushRequestQueue(D_L01_001BF6C0, 0x27)) {
+            ApplyIndexForKey(moby);
+            LaunchQueuedRequest(D_L01_001BF6C0);
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
@@ -157,40 +157,40 @@ void func_L01_003D2E50(PurchaseMoby *moby)
                 STATE_CHILD[0x31] = 0;
             }
         }
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_L01_001B22A0.busy = 0;
             record = D_L01_001B264C[0] + (*(s32 *)(state + 0x120) << 7);
-            func_L00_002B9D60(record + 0x30, record + 0x70, 0, 1);
+            ResetHeroPositionAndDirection(record + 0x30, record + 0x70, 0, 1);
             moby->enabled = 1;
             moby->flags &= 0xFFFE;
             *(u16 *)(STATE_CHILD + 0x34) &= 0xFFFE;
             STATE_CHILD[0x31] = 1;
-            if (D_001A79F8[0] < ITEM_COST)
-                func_002A7750(moby, 3, -1);
+            if (gPlayerBolts[0] < ITEM_COST)
+                SetMobyState(moby, 3, -1);
             else
-                func_002A7750(moby, 4, -1);
+                SetMobyState(moby, 4, -1);
         }
         break;
     case 3:
-        if (ITEM_COST < D_001A79F8[0]) {
-            func_002A7750(moby, 4, -1);
-        } else if (func_L01_003245E0(moby, 10, 2.5f)) {
+        if (ITEM_COST < gPlayerBolts[0]) {
+            SetMobyState(moby, 4, -1);
+        } else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
             func_L00_0030C710(180);
-            func_L01_00324550(0x27AE, ITEM_COST, -1);
-            func_L01_003246D0(moby);
+            PrintLocalizedFormatted(0x27AE, ITEM_COST, -1);
+            ApplyIndexForKey(moby);
         }
         break;
     case 4:
-        if (D_001A79F8[0] < ITEM_COST) {
+        if (gPlayerBolts[0] < ITEM_COST) {
             func_L00_0030C710(180);
-            func_002A7750(moby, 3, -1);
-        } else if (func_L01_003245E0(moby, 10, 2.5f)) {
+            SetMobyState(moby, 3, -1);
+        } else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
             func_L00_0030C710(180);
-            func_L01_00324550(0x27AC, ITEM_COST, -1);
-            func_L01_003246D0(moby);
-            if ((D_00138324 & 0x10) && func_00288AA0(D_L01_001BF6C0, 40)) {
-                func_00288BE8(D_L01_001BF6C0);
-                func_002A7750(moby, 5, -1);
+            PrintLocalizedFormatted(0x27AC, ITEM_COST, -1);
+            ApplyIndexForKey(moby);
+            if ((D_00138324 & 0x10) && PushRequestQueue(D_L01_001BF6C0, 40)) {
+                LaunchQueuedRequest(D_L01_001BF6C0);
+                SetMobyState(moby, 5, -1);
             }
         }
         break;
@@ -204,61 +204,61 @@ void func_L01_003D2E50(PurchaseMoby *moby)
                 STATE_CHILD[0x31] = 0;
             }
         }
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_L01_001B22A0.busy = 0;
             moby->enabled = 1;
             moby->flags &= 0xFFFE;
             *(u16 *)(STATE_CHILD + 0x34) &= 0xFFFE;
             STATE_CHILD[0x31] = 1;
-            func_002A8598(moby->group, 1);
+            SetByteOnGroupMobys(moby->group, 1);
             if (!D_001A7B26[0]) {
-                D_001A79F8[0] = D_001A79F8[0] - ITEM_COST;
+                gPlayerBolts[0] = gPlayerBolts[0] - ITEM_COST;
                 func_L00_0030C710(180);
-                func_00288308(46);
-                func_002AD860(46);
-                func_002B0A18(0x1226, -1);
-                func_00288E18(0x9BC, 19);
+                UnlockHelpEntry(46);
+                HandleRequestSlotState(46);
+                SetEntryValueByIndex(0x1226, -1);
+                RequestSubtitleVoiceLine(0x9BC, 19);
                 if (*(s32 *)(state + 0x12C) != -1)
-                    func_L00_00429020(*(s32 *)(state + 0x12C));
-                func_0029B3E0(0, -1);
+                    LockCameraEntry(*(s32 *)(state + 0x12C));
+                MemcardSave(0, -1);
                 if (STATE_CHILD) {
-                    func_0029F338(STATE_CHILD);
+                    MarkMobySpawned(STATE_CHILD);
                     STATE_CHILD = 0;
                 }
 remove_self:
-                func_0029F338(moby);
+                MarkMobySpawned(moby);
                 return;
             }
         }
         break;
     }
     if (moby->state) {
-        if (!moby->animation && func_00282978(state + 0x11E)) {
-            *(u16 *)(state + 0x11E) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (!moby->animation && FastDecTimer(state + 0x11E)) {
+            *(u16 *)(state + 0x11E) = FloatToInt(RandomFloatRange(1200.0f, 2400.0f));
         } else if ((moby->animFlags & 2) && moby->animation) {
-            func_002A7470(moby, 0, 0, 10);
+            StartAnimationBlended(moby, 0, 0, 10);
         }
     }
     turnRate = 0.02f;
     active = 0;
     if (!moby->animation) {
         active = 1;
-        if (func_00282E80(moby->position, D_00189EA0) < 8.0f &&
-            func_00283C80(moby->yaw, func_00283248(((HeroView *)(D_00189EA0 - 0x80))->position[0] - moby->position[0],
-                                                   ((HeroView *)(D_00189EA0 - 0x80))->position[1] - moby->position[1])) < 1.5707965f) {
-            if (0.01f < func_00282DF0(D_00189EA0 + 0x90))
+        if (vec_distance_xy(moby->position, gHeroPosition) < 8.0f &&
+            FastDiffRots(moby->yaw, FastMatrixHelperA(((HeroView *)(gHeroPosition - 0x80))->position[0] - moby->position[0],
+                                                   ((HeroView *)(gHeroPosition - 0x80))->position[1] - moby->position[1])) < 1.5707965f) {
+            if (0.01f < FastVecLength(gHeroPosition + 0x90))
                 *(s32 *)(state + 0x114) = 120;
             else
-                func_00282948(state + 0x114);
+                FastFloatHelperD(state + 0x114);
         } else if (*(s32 *)(state + 0x114)) {
             *(s32 *)(state + 0x114) = 0;
             qcopy(state + 0x100, D_00189F00);
         }
-        if (func_00282948(state + 0x118)) {
-            *(s32 *)(state + 0x118) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            angle = func_00283B98(moby->yaw, func_002A7878(-90.0f, 90.0f) * 0.017453294f);
-            func_002AF000(state + 0x100, 6.0f, angle, func_002A7878(0.0f, 30.0f) * 0.017453294f);
-            func_00282CC0(state + 0x100, state + 0x100, moby->position);
+        if (FastFloatHelperD(state + 0x118)) {
+            *(s32 *)(state + 0x118) = FloatToInt(RandomFloatRange(180.0f, 300.0f));
+            angle = FastAddRotations(moby->yaw, RandomFloatRange(-90.0f, 90.0f) * 0.017453294f);
+            BuildSphericalOffset(state + 0x100, 6.0f, angle, RandomFloatRange(0.0f, 30.0f) * 0.017453294f);
+            FastVecAdd(state + 0x100, state + 0x100, moby->position);
         }
         if (*(s32 *)(state + 0x114)) {
             qcopy(target, D_00189F00);
@@ -270,9 +270,9 @@ remove_self:
     if (active) {
         qcopy(origin, moby->position);
         ((f32 *)origin)[2] += 2.0f;
-        func_00282CF0(delta, target, origin);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), moby->yaw);
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, origin);
+        yaw = fast_subtract_rotations(FastMatrixHelperA(delta[0], delta[1]), moby->yaw);
+        pitch = -FastMatrixHelperA(vec_length_xy(delta), delta[2]);
         if (1.5707965f < yaw)
             yaw = 1.5707965f;
         else if (yaw < -1.5707965f)
@@ -290,5 +290,5 @@ remove_self:
     TurnJoint(moby, state, 0, turnRate);
     TurnJoint(moby, state + 0x80, 1, turnRate);
     if (STATE_CHILD)
-        func_002AF1D0(moby, STATE_CHILD, 2, 0);
+        CopyJointTransformToObject(moby, STATE_CHILD, 2, 0);
 }

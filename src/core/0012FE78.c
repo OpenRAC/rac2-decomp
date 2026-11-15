@@ -13,11 +13,12 @@ extern int func_0012FD60(void *, int, int);
 
    Returns its callees' values: retail keeps the frame and calls both, and
    2.9-ee tail-calls each arm (bare `j`, SIZE 40/68) when it is void. */
-int func_0012FE78(void *arg0, int arg1, int arg2) {
-    Obj40 *inner = ((Wrapper *)arg0)->obj;
-    if (inner->unk174 != 3) {
-        return func_0012FEC0(arg0, arg1, arg2);
+/* Picks the frame or field decoder depending on the video mode and runs it. */
+int func_0012FE78(void *mpeg, int frameIndex, int frameLimit) {
+    Obj40 *decoder = ((Wrapper *)mpeg)->obj;
+    if (decoder->unk174 != 3) {
+        return DecodeOrSkipMpegField(mpeg, frameIndex, frameLimit);
     } else {
-        return func_0012FD60(arg0, arg1, arg2);
+        return DecodeOrSkipMpegFrame(mpeg, frameIndex, frameLimit);
     }
 }

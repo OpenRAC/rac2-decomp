@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 typedef struct {
@@ -20,40 +21,41 @@ extern void func_0029F338(void *);
 extern char *D_L00_001B05DC __attribute__((sda));
 extern char D_0018C0B0[];
 
+/* Creates the Mini-Nuke blast object at a position, turns it to face along the given direction, and replaces any earlier blast. */
 char *func_L00_003E51C0(TI128 *position, TI128 *direction)
 {
     Local51C0 local;
-    char *p = func_0029EFD0(0xC06);
-    char *data = *(char **)(p + 0x68);
+    char *blast = CreateMoby(0xC06 /* moby class 3078 */);
+    char *data = *(char **)(blast + 0x68);
     char *basis;
     char *axis;
     char *point;
     float half;
     short header;
 
-    if (p != 0) {
+    if (blast != 0) {
         header = 0xFF;
-        *(short *)(p + 0x32) = header;
-        *(char *)(p + 0x30) = header;
-        *(unsigned short *)(p + 0x34) |= 0x100;
-        *(char *)(p + 0x20) = 0;
-        point = p + 0x10;
+        *(short *)(blast + 0x32) = header;
+        *(char *)(blast + 0x30) = header;
+        *(unsigned short *)(blast + 0x34) |= 0x100;
+        *(char *)(blast + 0x20) = 0;
+        point = blast + 0x10;
         *(TI128 *)point = *position;
         *(TI128 *)data = *direction;
-        basis = p + 0xC0;
-        axis = p + 0xE0;
-        func_002833F0(basis, *(char **)D_0018C0B0 + 0xF0);
-        func_002AFFD8(point, &local.v2, 1);
-        func_00282F20(&local.v2, &local.v2, 1.0f);
-        func_00282DD8(&local.v1, axis, &local.v2);
-        half = func_00282DB0(axis, &local.v2) * 0.5f;
-        func_00282D30(&local.v0, &local.v1, func_00283198(half));
-        *(float *)((char *)&local.v0 + 12) = func_00283180(half);
-        func_00283958(&local.v0, &local.v3);
-        func_00283738(basis, &local.v3, basis);
+        basis = blast + 0xC0;
+        axis = blast + 0xE0;
+        euler_rotation_basis(basis, *(char **)gHeroMoby_0018C0B0 + 0xF0);
+        ComputeViewDirection(point, &local.v2, 1);
+        vec_scale_to_length(&local.v2, &local.v2, 1.0f);
+        FastVecCross(&local.v1, axis, &local.v2);
+        half = FastVecDot(axis, &local.v2) * 0.5f;
+        FastVecScale(&local.v0, &local.v1, FastSinOrCosB(half));
+        *(float *)((char *)&local.v0 + 12) = FastSinOrCosA(half);
+        quaternion_to_rotation_basis(&local.v0, &local.v3);
+        multiply_matrix3x3(basis, &local.v3, basis);
         if (D_L00_001B05DC != 0)
-            func_0029F338(D_L00_001B05DC);
-        D_L00_001B05DC = p;
+            MarkMobySpawned(D_L00_001B05DC);
+        D_L00_001B05DC = blast;
     }
-    return p;
+    return blast;
 }

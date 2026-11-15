@@ -19,37 +19,37 @@ typedef union {
    takes the next candidate from func_L09_003FE3B0, records its 0xB2 id in the table and,
    when its sphere passes the test, runs its draws: func_L09_003FD460 for flag 8 of its
    sub-object's 0x42C word, func_L09_003FD128 for flag 2. */
-void func_L09_003FE4D0(unsigned char *a0)
+void func_L09_003FE4D0(unsigned char *moby)
 {
-    unsigned char *s5 = a0;
-    unsigned char *s4 = *(unsigned char **)(s5 + 0x68);
-    int fill = -1;
+    unsigned char *mobyBytes = moby;
+    unsigned char *vars = *(unsigned char **)(mobyBytes + 0x68);
+    int clearValue = -1;
     int i;
-    Vec4_L09 buf;
+    Vec4_L09 sphere;
 
     for (i = 19; i >= 0; i--) {
-        D_L09_00257110[i] = fill;
+        D_L09_00257110[i] = clearValue;
     }
     i = 0;
-    if (*(short *)(s4 + 0x424) > 0) {
-        int *tbl = D_L09_00257110;
-        int none = -1;
-        int *p = tbl;
+    if (*(short *)(vars + 0x424) > 0) {
+        int *table = D_L09_00257110;
+        int noneId = -1;
+        int *tableSlot = table;
         do {
-            char *s0 = (char *)func_L09_003FE3B0(s5[0x21], tbl);
-            unsigned char *s1;
-            *p = *(short *)(s0 + 0xB2);
-            p++;
-            qcopy(&buf, s0 + 0x10);
-            buf.f[3] = 4.0f;
-            if (func_00283DB8(&buf, func_00283CE0(*(short *)(s0 + 0x32))) != none) {
-                s1 = *(unsigned char **)(s0 + 0x68);
-                if (*(int *)(s1 + 0x42C) & 8)
-                    func_L09_003FD460(s0);
-                if (*(int *)(s1 + 0x42C) & 2)
-                    func_L09_003FD128(s0);
+            char *child = (char *)FindFarthestTrackEntry(mobyBytes[0x21], table);
+            unsigned char *childVars;
+            *tableSlot = *(short *)(child + 0xB2);
+            tableSlot++;
+            qcopy(&sphere, child + 0x10);
+            sphere.f[3] = 4.0f;
+            if (FastMathHelperA(&sphere, IntToFloat(*(short *)(child + 0x32))) != noneId) {
+                childVars = *(unsigned char **)(child + 0x68);
+                if (*(int *)(childVars + 0x42C) & 8)
+                    DrawSpinningLayeredQuads(child);
+                if (*(int *)(childVars + 0x42C) & 2)
+                    DrawLightRing(child);
             }
             i++;
-        } while (i < *(short *)(s4 + 0x424));
+        } while (i < *(short *)(vars + 0x424));
     }
 }

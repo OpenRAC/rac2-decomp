@@ -8,60 +8,60 @@ extern int D_001B1B78 MACRO_ADDR;
 extern int D_001EE5A0[];
 
 /* Advances the group cursor to the next moby accepted by the state filter. */
-int func_002A86E8(int *out, unsigned char *m, int includeInactive, int onlyInactive) {
-    short *p;
-    int neg;
+int func_002A86E8(int *outMoby, unsigned char *moby, int includeInactive, int onlyInactive) {
+    short *cursor;
+    int isInactive;
 
-    *out = 0;
-    if (m != D_001B1D40) {
-        if (D_001B1B78 < m[0x21]) {
+    *outMoby = 0;
+    if (moby != D_001B1D40) {
+        if (D_001B1B78 < moby[0x21]) {
             return -1;
         }
         D_001B1D40 = 0;
-        D_001B1D38 = (short *)D_001EE5A0[m[0x21]];
+        D_001B1D38 = (short *)D_001EE5A0[moby[0x21]];
         if (D_001B1D38 == 0) {
             return -1;
         }
         D_001B1D38--;
         {
-            short k;
+            short link;
 
             do {
                 D_001B1D38++;
-                p = D_001B1D38;
-                D_001B1D3C = *(unsigned short *)p & 0x7FFF;
+                cursor = D_001B1D38;
+                D_001B1D3C = *(unsigned short *)cursor & 0x7FFF;
                 D_001B1D40 = (unsigned char *)(D_001B1B5C + (D_001B1D3C << 8));
-                k = *p;
-            } while (k >= 0 && m != D_001B1D40);
-            if (k < 0) {
+                link = *cursor;
+            } while (link >= 0 && moby != D_001B1D40);
+            if (link < 0) {
                 return -1;
             }
         }
     } else {
-        short n = *D_001B1D38;
+        short link = *D_001B1D38;
 
-        p = D_001B1D38;
-        if (n < 0) {
+        cursor = D_001B1D38;
+        if (link < 0) {
             return -1;
         }
     }
     for (;;) {
-        short n;
+        short link;
 
-        D_001B1D38 = p + 1;
+        D_001B1D38 = cursor + 1;
         D_001B1D3C = *(unsigned short *)D_001B1D38 & 0x7FFF;
         D_001B1D40 = (unsigned char *)(D_001B1B5C + (D_001B1D3C << 8));
-        *out = (int)D_001B1D40;
-        neg = (signed char)D_001B1D40[0x20] < 0;
-        if ((includeInactive == 0 && onlyInactive == 0 && !neg) || (includeInactive != 0 && (onlyInactive == 0 || neg))) {
+        *outMoby = (int)D_001B1D40;
+        isInactive = (signed char)D_001B1D40[0x20] < 0;
+        if ((includeInactive == 0 && onlyInactive == 0 && !isInactive) || (includeInactive != 0 && (onlyInactive == 0 || isInactive))) {
             return 0;
         }
-        n = *D_001B1D38;
-        p = D_001B1D38;
-        if (n < 0) {
+        link = *D_001B1D38;
+        cursor = D_001B1D38;
+        if (link < 0) {
             break;
         }
     }
-    *out = 0;
+    *outMoby = 0;
     return -1;
 }

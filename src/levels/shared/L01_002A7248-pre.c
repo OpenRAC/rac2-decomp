@@ -1,3 +1,4 @@
+#include "names.h"
 /* The weapon animation id without the hero's 0x1492 alternative. Own unit:
    -frac2-gcse-unsplit-edges lets PRE hoist the hero's high half above the first test,
    while each block forms its own low half. */
@@ -16,11 +17,11 @@ typedef struct {
 
 int func_L01_002A7248(char *a0)
 {
-    if (a0 != 0 && ((Hero *)D_00189E20)->b[0x22BA] != 0 && ((Hero *)D_00189E20)->h[0x24EC / 2] == 0) {
-        int idx = func_L00_002ADEA0(0);
-        return ((WeaponEntry *)(D_L01_002637A0 + D_00139568[idx] * 224))->v;
+    if (a0 != 0 && ((Hero *)gHeroState)->b[0x22BA] != 0 && ((Hero *)gHeroState)->h[0x24EC / 2] == 0) {
+        int idx = hero_slot_item_id(0);
+        return ((WeaponEntry *)(D_L01_002637A0 + gItemSlotToRecord[idx] * 224))->v;
     }
-    if (((Hero *)D_00189E20)->i[0x24CC / 4] != 1)
+    if (((Hero *)gHeroState)->i[0x24CC / 4] != 1)
         return 0;
     return 0x51;
 }
@@ -47,40 +48,40 @@ extern int func_00288E18(int, int);
 void func_L01_002EABA8(int key, int selection, int mode, int area, int exclude)
 {
     int limit = mode == 0 ? 1 : 65535;
-    SubtitleHistory *entry = &D_0018C958[selection];
+    SubtitleHistory *entry = &gSubtitleHistory[selection];
 
     if (entry->count < limit) {
-        if (exclude != -1 && func_002ACBC8(D_00189EA0, exclude)) {
+        if (exclude != -1 && IsPointInCuboid(gHeroPosition, exclude)) {
             entry->count = 65535;
             return;
         }
-        if (func_002ACBC8(D_00189EA0, area)) {
+        if (IsPointInCuboid(gHeroPosition, area)) {
             switch (mode) {
             case 0:
-                func_00288E18(key, selection);
+                RequestSubtitleVoiceLine(key, selection);
                 break;
             case 1:
-                if (D_001A7390[0] - D_0018C958[selection].time > 1080 || D_0018C958[selection].time == 0)
-                    func_00288E18(key, selection);
-                else if (D_0018C958[selection].time < D_001A7390[0])
-                    D_0018C958[selection].time = D_001A7390[0];
+                if (D_001A7390[0] - gSubtitleHistory[selection].time > 1080 || gSubtitleHistory[selection].time == 0)
+                    RequestSubtitleVoiceLine(key, selection);
+                else if (gSubtitleHistory[selection].time < D_001A7390[0])
+                    gSubtitleHistory[selection].time = D_001A7390[0];
                 break;
             case 2:
-                if (D_0018C958[selection].count != 0) {
-                    if (D_001A7390[0] - D_0018C958[selection].time > 1080 || D_0018C958[selection].time == 0)
-                        func_00288E18(key, selection);
-                    else if (D_0018C958[selection].time < D_001A7390[0])
-                        D_0018C958[selection].time = D_001A7390[0];
+                if (gSubtitleHistory[selection].count != 0) {
+                    if (D_001A7390[0] - gSubtitleHistory[selection].time > 1080 || gSubtitleHistory[selection].time == 0)
+                        RequestSubtitleVoiceLine(key, selection);
+                    else if (gSubtitleHistory[selection].time < D_001A7390[0])
+                        gSubtitleHistory[selection].time = D_001A7390[0];
                     break;
                 }
-                D_0018C958[selection].count++;
-                if (D_0018C958[selection].time < D_001A7390[0])
-                    D_0018C958[selection].time = D_001A7390[0];
-                D_0018C958[selection].levels = (D_0018C958[selection].levels | (1 << D_001A79F0[0])) | 0x80000000;
+                gSubtitleHistory[selection].count++;
+                if (gSubtitleHistory[selection].time < D_001A7390[0])
+                    gSubtitleHistory[selection].time = D_001A7390[0];
+                gSubtitleHistory[selection].levels = (gSubtitleHistory[selection].levels | (1 << gCurrentMapIndex[0])) | 0x80000000;
                 break;
             case 3:
-                if (D_0018C958[selection].levels >= 0)
-                    func_00288E18(key, selection);
+                if (gSubtitleHistory[selection].levels >= 0)
+                    RequestSubtitleVoiceLine(key, selection);
                 break;
             }
         }

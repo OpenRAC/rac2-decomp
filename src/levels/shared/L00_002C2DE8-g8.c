@@ -32,45 +32,47 @@ extern int func_002761F8(void *, void *, int, void *, int);
 extern float func_00282E48(void *, void *);
 extern int func_00277258(void *, int, void *, float);
 
+/* Every few frames, checks the ground and ledges around the hero and records what it finds,
+ * such as a nearby target and whether there is room to step forward. */
 void func_L00_002C2DE8(void)
 {
     float first[4], second[4], probe[4];
-    if (D_00189E20.gate != 0) return;
+    if (gHeroState.gate != 0) return;
     ref_L00_002C2DE8_00();
-    if (D_L00_001B19C8 % 3 == 0) {
-        D_00189E20.height = 4.0f;
-        D_00189E20.first_flag = 0;
-        D_00189E20.second_flag = 0;
-        if (func_L00_002AB108(&D_00189E20.height, 0.7f, 4.0f)) {
-            D_00189E20.angle = func_00283248(D_L00_001BF200.direction[2], func_00282E20(D_L00_001BF200.direction));
-            if (D_L00_001BF200.object) {
-                D_00189E20.second_flag = 1;
-                if (func_002ABB78(D_L00_001BF200.object)) D_00189E20.first_flag = 1;
+    if (gFrameCounter_L00 % 3 == 0) {
+        gHeroState.height = 4.0f;
+        gHeroState.first_flag = 0;
+        gHeroState.second_flag = 0;
+        if (TestHeroReachBlend(&gHeroState.height, 0.7f, 4.0f)) {
+            gHeroState.angle = FastMatrixHelperA(gCollisionResult.direction[2], vec_length_xy(gCollisionResult.direction));
+            if (gCollisionResult.object) {
+                gHeroState.second_flag = 1;
+                if (IsMobyInSpecialClassRange(gCollisionResult.object)) gHeroState.first_flag = 1;
             }
         }
     }
-    if (D_L00_001B19C8 % 5 == 0) {
+    if (gFrameCounter_L00 % 5 == 0) {
         int hit;
         float distance, offset;
-        D_00189E20.valid = 0;
-        D_00189E20.distance = 0.0f;
-        if (D_00189E20.enabled == 0) return;
-        func_L00_002D36E0(first, 1.1f, 0.0f, 1, 1.0f);
-        func_L00_002D36E0(second, 1.1f, 0.0f, 1, -20.0f);
+        gHeroState.valid = 0;
+        gHeroState.distance = 0.0f;
+        if (gHeroState.enabled == 0) return;
+        BuildHeroRelativePoint(first, 1.1f, 0.0f, 1, 1.0f);
+        BuildHeroRelativePoint(second, 1.1f, 0.0f, 1, -20.0f);
         if (second[2] < 0.5f) second[2] = 0.5f;
         distance = 20.0f;
-        hit = func_002761F8(first, second, 2, D_00189E20.object, 0);
-        if (hit) distance = func_00282E48(first, D_L00_001BF200.hit_position);
+        hit = CollLine(first, second, 2, gHeroState.object, 0);
+        if (hit) distance = fast_vec_dist(first, gCollisionResult.hit_position);
         if (!hit || 3.0f < distance) {
             offset = -0.4f;
             do {
-                func_L00_002D36E0(probe, offset + 1.1f, 0.0f, 1, 0.0f);
-                if (!func_00277258(probe, 2, 0, D_00189E20.scale)) {
-                    D_00189E20.valid = 1;
-                    if (!hit) D_00189E20.distance = 20.0f;
-                    else D_00189E20.distance = distance;
-                    D_00189E20.clearance = D_00189E20.scale + offset;
-                    if (D_00189E20.clearance < 0.0f) D_00189E20.clearance = 0.0f;
+                BuildHeroRelativePoint(probe, offset + 1.1f, 0.0f, 1, 0.0f);
+                if (!TestPointAgainstCollision(probe, 2, 0, gHeroState.scale)) {
+                    gHeroState.valid = 1;
+                    if (!hit) gHeroState.distance = 20.0f;
+                    else gHeroState.distance = distance;
+                    gHeroState.clearance = gHeroState.scale + offset;
+                    if (gHeroState.clearance < 0.0f) gHeroState.clearance = 0.0f;
                     return;
                 }
                 offset += 0.1f;

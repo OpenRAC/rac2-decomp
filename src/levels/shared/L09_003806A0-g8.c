@@ -29,6 +29,7 @@ extern void func_L09_0037FCE8(void *);
 extern void func_L00_002E6DB8(void (*)(void *), void *);
 extern void func_L00_002E6CF0(void (*)(void *), void *);
 
+/* Per-frame update of the water sheet object: scrolls the water textures with the hero movement, bobs the water height with a wave, and queues the water draw. */
 void func_L09_003806A0(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -57,8 +58,8 @@ void func_L09_003806A0(u8 *object)
     for (i = 0; i < 4; i++) {
         if (I32(state, 0x40 + i * 4) == -1)
             continue;
-        if (func_002ACBC8(D_00189EA0, I32(state, 0x40 + i * 4))) {
-            { u8 *h = D_00189E20; S16(h, 0x1FE) = 0; }
+        if (IsPointInCuboid(gHeroPosition, I32(state, 0x40 + i * 4))) {
+            { u8 *h = gHeroState; S16(h, 0x1FE) = 0; }
             found = 1;
             break;
         }
@@ -70,13 +71,13 @@ void func_L09_003806A0(u8 *object)
     for (i = 0; i < 4; i++) {
         if (scan[i] == -1)
             continue;
-        if (func_002ACBC8(D_00189EA0, scan[i])) {
+        if (IsPointInCuboid(gHeroPosition, scan[i])) {
             D_L09_001B3124 = F32(D_L09_001B294C + scan[i] * 128, 0x38) + 0.15f;
             break;
         }
     }
-    { u8 *h = D_00189E20; S16(h, 0x1FE) = 2; }
-    func_00282CF0(delta, D_L09_001B9A00, &D_L09_001B3100);
+    { u8 *h = gHeroState; S16(h, 0x1FE) = 2; }
+    FastVecSub(delta, D_L09_001B9A00, &D_L09_001B3100);
     qcopy(&D_L09_001B3100, D_L09_001B9A00);
     if (!(F32(state, 0x20) < F32(D_L09_001B9A00, 8)))
         return;
@@ -85,12 +86,12 @@ void func_L09_003806A0(u8 *object)
         float numerator = D_L09_001AEC38[i] + D_L09_001AEC38[i];
         float denominator = F32(state, 0x18) * 5.0f;
         float scale = numerator / denominator;
-        func_00282D30(scaled, delta, scale);
+        FastVecScale(scaled, delta, scale);
         /* Preserve the ordered comparisons, including the exact-1 and NaN paths. */
         if (1.0f < scaled[0] || scaled[0] < 1.0f)
-            scaled[0] -= func_00283CE0(func_00283CF0(scaled[0]));
+            scaled[0] -= IntToFloat(FloatToInt(scaled[0]));
         if (1.0f < scaled[1] || scaled[1] < 1.0f)
-            scaled[1] -= func_00283CE0(func_00283CF0(scaled[1]));
+            scaled[1] -= IntToFloat(FloatToInt(scaled[1]));
         D_L09_001B3110[i].u += scaled[0];
         D_L09_001B3110[i].v += scaled[1];
         if (1.0f < D_L09_001B3110[i].u)
@@ -103,7 +104,7 @@ void func_L09_003806A0(u8 *object)
             D_L09_001B3110[i].v += 1.0f;
     }
     D_L09_001B3120 = D_L09_001B3124 +
-        func_00283198(func_00283CE0(D_L09_001B2388 % 360) *
+        FastSinOrCosB(IntToFloat(D_L09_001B2388 % 360) *
                      0.017444444820284843f - 3.140000104904175f) * F32(state, 0x34);
     for (i = 0; i < 2; i++) {
         D_L09_001B3110[i].u += D_L09_001AEC48[i * 2] * D_001A7928;
@@ -118,7 +119,7 @@ void func_L09_003806A0(u8 *object)
             D_L09_001B3110[i].v += 1.0f;
     }
     if (I32(state, 0x38))
-        func_L00_002E6DB8(func_L09_0037FCE8, object);
+        AddDrawCallbackToList2(DrawWaterSheet_L09, object);
     else
-        func_L00_002E6CF0(func_L09_0037FCE8, object);
+        AddDrawCallbackToList1(DrawWaterSheet_L09, object);
 }

@@ -84,6 +84,7 @@ extern float func_00282DB0(void *, void *);
 
 /* func_L18_002CFF48 is defined in L18_002CFD68-qcopy.c. */
 
+/* Runs once per frame for the hero: reads the controller, saves the hero position and heading history, and updates the hero movement. */
 void func_L18_002D0C00(void)
 {
     u8 *base;
@@ -92,35 +93,35 @@ void func_L18_002D0C00(void)
     s32 index;
     s32 active = D_L18_001AFBB0;
     if (active) {
-        func_L00_002B2BD0();
+        ResetHeroSpeedsAndVectors();
         return;
     }
-    snapshot = D_00189E20 + 0x2030;
+    snapshot = gHeroState + 0x2030;
     qcopy(snapshot, snapshot - 0x1FB0);
-    if (D_00138180.held & 3) {
+    if (gPadState.held & 3) {
         u8 *hero = snapshot - 0x2030;
         if (*(s16 *)(hero + 0x1454) < 1) *(s16 *)(hero + 0x1454) = 1;
-    } else func_00282978(snapshot - 0xBDC);
-    base = D_00189E20;
+    } else FastDecTimer(snapshot - 0xBDC);
+    base = gHeroState;
     if (*(s32 *)(base + 0x2294) == 16) *(s16 *)(base + 0x1454) = 0;
-    base[0x22C3] = func_L00_002D3400();
-    *(float *)(base + 0x1FB0) = D_00138180.horizontal;
-    *(float *)(base + 0x1FB4) = D_00138180.vertical;
+    base[0x22C3] = GetHeroMovementMode();
+    *(float *)(base + 0x1FB0) = gPadState.horizontal;
+    *(float *)(base + 0x1FB4) = gPadState.vertical;
     *(s32 *)(base + 0x270) = 0;
-    *(float *)(base + 0x24BC) = func_L00_002B3900();
-    if (func_00282E20(base + 0x1FB0) < 0.25f) {
+    *(float *)(base + 0x24BC) = GetHeroStickMagnitude();
+    if (vec_length_xy(base + 0x1FB0) < 0.25f) {
         /* horizontal and vertical start as the left and down bits. */
-        s32 right = (D_00138180.pressed >> 13) & 1;
-        s32 horizontal = (D_00138180.pressed >> 15) & 1;
-        s32 up = (D_00138180.pressed >> 14) & 1;
-        s32 vertical = (D_00138180.pressed >> 12) & 1;
+        s32 right = (gPadState.pressed >> 13) & 1;
+        s32 horizontal = (gPadState.pressed >> 15) & 1;
+        s32 up = (gPadState.pressed >> 14) & 1;
+        s32 vertical = (gPadState.pressed >> 12) & 1;
         horizontal = right - horizontal;
         vertical = up - vertical;
         *(float *)(base + 0x1FB0) = (float)horizontal;
         *(float *)(base + 0x1FB4) = (float)vertical;
     }
-    *(float *)(base + 0x24B8) = func_L00_002B3900();
-    func_L18_002D7650();
+    *(float *)(base + 0x24B8) = GetHeroStickMagnitude();
+    UpdateHeroStateMachine_L18();
     ((HeroHistory *)base)->headingHistory[((HeroHistory *)base)->headingIndex] = *(float *)(base + 0x98);
     *(s32 *)(base + 0x23BC) = (*(s32 *)(base + 0x23BC) + 1) % 32;
     if (++*(s32 *)(base + 0x23C0) > 32) *(s32 *)(base + 0x23C0) = 32;
@@ -129,12 +130,12 @@ void func_L18_002D0C00(void)
     qcopy_nc(positions + index * 16, (base + 0x80));
     *(s32 *)(base + 0x23C4) = (index + 1) % 32;
     if (++*(s32 *)(base + 0x23C8) > 32) *(s32 *)(base + 0x23C8) = 32;
-    func_00283410(base, base + 0x90);
-    func_00283388(base + 0x40);
-    func_00283698(base + 0x40, base);
-    func_L18_002D0850();
-    func_L00_002C2DE8();
-    func_L18_002DEFF8();
+    euler_to_matrix(base, base + 0x90);
+    set_identity_matrix(base + 0x40);
+    matrix_from_basis_rows(base + 0x40, base);
+    UpdateHeroSpeedTargets_L18();
+    ProbeHeroGroundAndLedge();
+    UpdateHeroTimersAndReach_L18();
 }
 
 void func_L18_002D1998(s32 force)
@@ -142,10 +143,10 @@ void func_L18_002D1998(s32 force)
     float start[4], end[4], lowerStart[4], lowerEnd[4];
     float height, reach, angle, dot;
     s32 material;
-    if (func_L00_002D3A58(D_00189E20 + 0xF0) < 0.0016666668f) return;
+    if (GetViewSpaceVectorLength(gHeroState + 0xF0) < 0.0016666668f) return;
     /* Each block forms its own hero pointer; retail keeps only the %hi part across calls. */
     {
-        u8 *hero = D_00189E20;
+        u8 *hero = gHeroState;
         height = 0.37f;
         reach = 0.5f;
         if ((u32)(*(s32 *)(hero + 0x229C) - 17) < 2) {
@@ -153,37 +154,37 @@ void func_L18_002D1998(s32 force)
             reach = 0.7f;
         } else if (hero[0x22B4] == 4) height = 0.35f;
     }
-    func_L00_002D36E0(start, 0.0f, 0.0f, height, 1);
-    func_L00_002D36E0(lowerStart, 0.0f, 0.0f, height * 0.3f, 1);
-    if (force || func_00282E20(D_00189E20 + 0xF0) < 0.01f) {
-        func_00282F20(end, D_00189E20, reach);
-        func_00282F20(lowerEnd, D_00189E20, reach * 1.4f);
+    BuildHeroRelativePoint(start, 0.0f, 0.0f, height, 1);
+    BuildHeroRelativePoint(lowerStart, 0.0f, 0.0f, height * 0.3f, 1);
+    if (force || vec_length_xy(gHeroState + 0xF0) < 0.01f) {
+        vec_scale_to_length(end, gHeroState, reach);
+        vec_scale_to_length(lowerEnd, gHeroState, reach * 1.4f);
     } else {
-        func_L00_002D3B58(end, D_00189E20 + 0xF0, 0.0f);
-        func_00282F20(end, end, reach);
-        func_00282D30(lowerEnd, end, 1.4f);
+        SetViewSpaceHeight(end, gHeroState + 0xF0, 0.0f);
+        vec_scale_to_length(end, end, reach);
+        FastVecScale(lowerEnd, end, 1.4f);
     }
-    func_00282CC0(end, end, start);
+    FastVecAdd(end, end, start);
     material = -1;
-    func_00282CC0(lowerEnd, lowerEnd, lowerStart);
+    FastVecAdd(lowerEnd, lowerEnd, lowerStart);
     {
-        u8 *hero = D_00189E20;
-        if (func_002761F8(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) material = func_00278E78();
+        u8 *hero = gHeroState;
+        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) material = GetCollHitMaterial();
     }
     angle = 0.0f;
     {
-        u8 *hero = D_00189E20;
-        if (func_002761F8(start, end, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) angle = func_L00_002D3EA8(D_L18_001BFC00.normal);
+        u8 *hero = gHeroState;
+        if (CollLine(start, end, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) angle = GetViewSpaceAngle(D_L18_001BFC00.normal);
     }
     if (angle >= 0.8726647f || material == 8 || material == 12) {
-        u8 *hero = D_00189E20;
+        u8 *hero = gHeroState;
         *(s32 *)(hero + 0x270) = D_L18_001BFC00.object;
-        func_L00_002D3B58(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 0.0f);
-        func_00282F20(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 1.0f);
-        dot = func_00282DB0(D_L18_001BFC00.normal, hero + 0xF0);
+        SetViewSpaceHeight(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 0.0f);
+        vec_scale_to_length(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 1.0f);
+        dot = FastVecDot(D_L18_001BFC00.normal, hero + 0xF0);
         if (dot < 0.0f) {
-            func_00282D30(D_L18_001BFC00.normal, D_L18_001BFC00.normal, -dot);
-            func_00282CC0(hero + 0xF0, hero + 0xF0, D_L18_001BFC00.normal);
+            FastVecScale(D_L18_001BFC00.normal, D_L18_001BFC00.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L18_001BFC00.normal);
         }
     }
 }
@@ -191,6 +192,7 @@ void func_L18_002D1998(s32 force)
 
 extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 
+/* Starts a sound or effect that depends on the current level mode, with a short or long version. */
 void func_L18_002E4090(BatchA_A18_s32 a0) {
     BatchA_A18_s32 e = a0 ? 2 : 1;
     switch (D_0018C0D4) {
@@ -210,14 +212,16 @@ void func_L18_002E4090(BatchA_A18_s32 a0) {
 extern void func_0027F1D8(void *a0, void *a1, const char *a2);
 extern char D_L18_00296510[];
 
+/* Draws a fixed text string for the caller. */
 void func_L18_00303A58(void *a0, void *a1) {
-    func_0027F1D8(a0, a1, D_L18_00296510);
+    MeasureTextWidthScaled(a0, a1, D_L18_00296510);
 }
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */
 
 /* func_L18_00307C60 is defined in L18_002C4000-quad.c. */
 
+/* Sets one byte in an entry of the object's table; fails if the entry does not exist. */
 BatchA_A18_s32 func_L18_0032B768(BatchA_A18_u8 *s, BatchA_A18_s32 a1, BatchA_A18_s32 a2) {
     BatchA_A18_u8 *p = *(BatchA_A18_u8 **)(s + 0x98);
     BatchA_A18_u8 *q;
@@ -236,13 +240,14 @@ extern BatchA_A18_s32 func_002A8AF0(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA
 extern BatchA_A18_s32 D_001FE480[];
 
 /* hands the slot's payload to its handler; the slot table entry holds count then payload */
+/* Looks up a table entry and hands its data to a handler, or returns the default value if there is none. */
 BatchA_A18_s32 func_L18_0033B628(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2) {
     BatchA_A18_u8 *p;
     if (a1 != -1) {
         p = (BatchA_A18_u8 *)D_001FE480[a1];
         if (p != 0) {
             if (*(BatchA_A18_s32 *)p != 0) {
-                return func_002A8AF0(a0, (BatchA_A18_s32)(p + 0x10), *(BatchA_A18_s32 *)p);
+                return point_in_path_xy(a0, (BatchA_A18_s32)(p + 0x10), *(BatchA_A18_s32 *)p);
             }
         }
     }
@@ -254,6 +259,7 @@ BatchA_A18_s32 func_L18_0033B628(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A1
 extern float func_L18_0035D5F8(void *a0, void *a1, void *a2, char *a3, float f12);
 extern BatchA_A18_s32 D_001FE480[];
 
+/* Looks up a path by number and finds the best point on it; returns -1 if there is no path. */
 float func_L18_0035D5A8(void *a0, void *a1, void *a2, BatchA_A18_s32 a3, float f12) {
     if (a3 == -1) {
         return -1.0f;
@@ -262,7 +268,7 @@ float func_L18_0035D5A8(void *a0, void *a1, void *a2, BatchA_A18_s32 a3, float f
     if (a3 == 0) {
         return -1.0f;
     }
-    return func_L18_0035D5F8(a0, a1, a2, (char *)a3, f12);
+    return FindBestPointOnPath(a0, a1, a2, (char *)a3, f12);
 }
 
 extern f32 func_L18_0035D238(void *, void *, void *, void *, void *, f32);
@@ -280,13 +286,13 @@ f32 func_L18_0035D5F8(void *out, void *origin, void *direction, char *path, floa
     s32 i = 0;
     PathPoints *points = (PathPoints *)path;
     for (; i < points->count - 1; i++) {
-        score = func_L18_0035D238(candidate, origin, direction, points->point[i], points->point[i + 1], scale);
+        score = FindSegmentSpherePoint(candidate, origin, direction, points->point[i], points->point[i + 1], scale);
         if (score < best) {
             best = score;
             qcopy(out, candidate);
-        } else if (func_00282C48(score - best) < 0.1f) {
-            distance = func_00282E48((char *)candidate, origin);
-            if (distance < func_00282E48(out, origin)) {
+        } else if (FloatAbs(score - best) < 0.1f) {
+            distance = fast_vec_dist((char *)candidate, origin);
+            if (distance < fast_vec_dist(out, origin)) {
                 best = score;
                 qcopy(out, candidate);
             }
@@ -312,61 +318,64 @@ extern char D_L18_001B97C0[];
 /* Advances the object's step counter, refreshes the emitter and asks the particle
    system for the new position; the distance test only runs when the flag is set. */
 void func_L18_003F7198(void *a0) {
-    BatchA_A18_u8 *s0 = (BatchA_A18_u8 *)a0;
-    void *s1;
-    unsigned short v1;
+    BatchA_A18_u8 *moby = (BatchA_A18_u8 *)a0;
+    void *vars;
+    unsigned short stepCount;
 
-    v1 = *(unsigned short *)((char *)s0 + 0x96);
-    if (v1 <= 0xFFFE) {
-        s1 = *(void **)((char *)s0 + 0x68);
-        *(unsigned short *)((char *)s0 + 0x96) = v1 + 1;
+    stepCount = *(unsigned short *)((char *)moby + 0x96);
+    if (stepCount <= 0xFFFE) {
+        vars = *(void **)((char *)moby + 0x68);
+        *(unsigned short *)((char *)moby + 0x96) = stepCount + 1;
     } else {
-        s1 = *(void **)((char *)s0 + 0x68);
+        vars = *(void **)((char *)moby + 0x68);
     }
-    *(unsigned short *)((char *)s1 + 0x290) = 0;
-    if (s0[0x31] != 0) {
-        if (func_00282E48((char *)s0 + 0x10, D_L18_001B97C0) < 24.0f) {
-            func_002A93B0(s0);
-            s0[0x6F] = 0x16;
+    *(unsigned short *)((char *)vars + 0x290) = 0;
+    if (moby[0x31] != 0) {
+        if (fast_vec_dist((char *)moby + 0x10, gCameraPosition_L18) < 24.0f) {
+            UpdateMobyGroundCheck(moby);
+            moby[0x6F] = 0x16;
         }
     }
-    if (*(float *)((char *)s0 + 0x10) < 5.0f || *(float *)((char *)s0 + 0x10) > 1018.0f ||
-        *(float *)((char *)s0 + 0x14) < 5.0f || *(float *)((char *)s0 + 0x14) > 1018.0f ||
-        *(float *)((char *)s0 + 0x18) < 5.0f || *(float *)((char *)s0 + 0x18) > 1018.0f) {
-        func_L18_003F74B8(s0, 0);
+    if (*(float *)((char *)moby + 0x10) < 5.0f || *(float *)((char *)moby + 0x10) > 1018.0f ||
+        *(float *)((char *)moby + 0x14) < 5.0f || *(float *)((char *)moby + 0x14) > 1018.0f ||
+        *(float *)((char *)moby + 0x18) < 5.0f || *(float *)((char *)moby + 0x18) > 1018.0f) {
+        EndCurrentAction(moby, 0);
     }
-    func_002B0990((char *)s0, (char *)s1 + 0x2B0, 2, 1, 1.8f);
+    SetValueAndStartSmoothChange((char *)moby, (char *)vars + 0x2B0, 2, 1, 1.8f);
 }
 
 extern float func_00283248(float a, float b);
 
+/* Switches the Protopet-area object to its turning mode and aims it at a target. */
 void func_L18_003F72D8(BatchA_A18_u8 *a0, BatchA_A18_u8 *a1) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     *(unsigned short *)((char *)p + 0x290) = 1;
     *(float *)((char *)p + 0x264) =
-        func_00283248(*(float *)(a1 + 0x0) - *(float *)(a0 + 0x10),
+        FastMatrixHelperA(*(float *)(a1 + 0x0) - *(float *)(a0 + 0x10),
                       *(float *)(a1 + 0x4) - *(float *)(a0 + 0x14));
 }
 
-int func_L18_003F7320(void *arg0) {
-    int var_a2;
-    void *temp_a1;
+/* Tells if the object has run out of time or steps. */
+int func_L18_003F7320(void *moby) {
+    int result;
+    void *vars;
 
-    var_a2 = 0;
-    temp_a1 = *(void **)((unsigned char *)arg0 + 0x68);
-    if (((unsigned short) (*(unsigned short *)((unsigned char *)arg0 + 0x96)) >= 0xF1U) || ((*(short *)((unsigned char *)temp_a1 + 0x294)) >= (*(short *)((unsigned char *)temp_a1 + 0x2A4)))) {
-        var_a2 = 1;
+    result = 0;
+    vars = *(void **)((unsigned char *)moby + 0x68);
+    if (((unsigned short) (*(unsigned short *)((unsigned char *)moby + 0x96)) >= 0xF1U) || ((*(short *)((unsigned char *)vars + 0x294)) >= (*(short *)((unsigned char *)vars + 0x2A4)))) {
+        result = 1;
     }
-    return var_a2;
+    return result;
 }
 
 extern float func_00308AD0(BatchA_A18_u8 *a0, BatchA_A18_u8 *a1);
 extern BatchA_A18_s32 func_L18_003F8E40(BatchA_A18_u8 *s);
 
+/* Tells if another object is close enough and in a state to be picked up. */
 BatchA_A18_s32 func_L18_003F7358(BatchA_A18_u8 *a0, BatchA_A18_u8 *a1) {
     BatchA_A18_s32 r = 0;
     if (func_00308AD0(a0 + 0x10, a1 + 0x10) < 5.0f) {
-        r = func_L18_003F8E40(a1) != 0;
+        r = IsInEitherActiveState(a1) != 0;
     }
     return r;
 }
@@ -379,21 +388,22 @@ extern float func_00283C80(float, float);
 /* The 1.5707964 spelling is load-bearing: this assembler under-rounds by an ulp
    (1.5707964f, 1.57079637f and even 1.5707963705062866f all encode 0x3FC90FDB,
    retail holds 0x3FC90FDC).  Measured by sweeping spellings, COMPILER-NOTES. */
+/* Tells if the target is close and in front of the object. */
 int func_L18_003F73B8(char *a0, float *a1)
 {
-    char *s1 = a0;
-    float *s0 = a1;
-    int r = 0;
+    char *moby = a0;
+    float *target = a1;
+    int result = 0;
 
-    if (*(unsigned char *)(s1 + 0x31) != 0) {
-        if (func_00282E80(s1 + 0x10, a1) < 3.2f) {
-            if (func_00283C80(*(float *)(s1 + 0xF8),
-                             func_00283248(s0[0] - *(float *)(s1 + 0x10),
-                                           s0[1] - *(float *)(s1 + 0x14))) < 1.5707965f)
-                r = 1;
+    if (*(unsigned char *)(moby + 0x31) != 0) {
+        if (vec_distance_xy(moby + 0x10, a1) < 3.2f) {
+            if (FastDiffRots(*(float *)(moby + 0xF8),
+                             FastMatrixHelperA(target[0] - *(float *)(moby + 0x10),
+                                           target[1] - *(float *)(moby + 0x14))) < 1.5707965f)
+                result = 1;
         }
     }
-    return r;
+    return result;
 }
 
 
@@ -407,9 +417,9 @@ BatchA_A18_s32 func_L18_003F7470(BatchA_A18_u8 *a0) {
     BatchA_A18_u8 buf[16];
     BatchA_A18_s32 p;
 
-    if (func_002A77E0(0x1E) == 0) {
+    if (RandomIntBelow(0x1E) == 0) {
         p = *(BatchA_A18_s32 *)(a0 + 0x68);
-        return func_L18_003F75E8(*(BatchA_A18_s32 *)((char *)p + 0x25C), buf) != 0;
+        return CountGroupProtopets(*(BatchA_A18_s32 *)((char *)p + 0x25C), buf) != 0;
     }
     return 0;
 }
@@ -419,40 +429,42 @@ extern void func_0029F338(void *);
 extern void func_L01_003E9CF8(void *, int, void *);
 extern void func_L18_003F7590(BatchA_A18_u8 *a0);
 
+/* Ends the object's current action: clears its state and either hands off to the next step or removes it. */
 void func_L18_003F74B8(void *a0, void *a1)
 {
-    char *s0 = a0;
-    int s2 = (int)a1;
-    char *s1 = *(char **)(s0 + 0x68);
-    short t;
+    char *moby = a0;
+    int immediate = (int)a1;
+    char *vars = *(char **)(moby + 0x68);
+    short remaining;
 
-    *(int *)(s1 + 0x20) = 0;
-    func_002A7750(s0, 0x13, 0);
-    *(unsigned short *)(s0 + 0x34) &= 0xEFFF;
-    *(unsigned short *)(s1 + 0x292) -= 1;
-    t = *(unsigned short *)(s1 + 0x292);
-    if (t != -1 || *(short *)(s1 + 0x296) == 0xE) {
-        if (s2 != 0) {
-            func_L18_003F7590(s0);
+    *(int *)(vars + 0x20) = 0;
+    SetMobyState(moby, 0x13, 0);
+    *(unsigned short *)(moby + 0x34) &= 0xEFFF;
+    *(unsigned short *)(vars + 0x292) -= 1;
+    remaining = *(unsigned short *)(vars + 0x292);
+    if (remaining != -1 || *(short *)(vars + 0x296) == 0xE) {
+        if (immediate != 0) {
+            ResetToIdle(moby);
         } else {
-            func_L01_003E9CF8(s0, 0, func_L18_003F7590);
+            QueueMobyForGlowEffect(moby, 0, ResetToIdle);
         }
     } else {
-        if (s2 != 0) {
-            func_0029F338(s0);
+        if (immediate != 0) {
+            MarkMobySpawned(moby);
         } else {
-            func_L01_003E9CF8(s0, 0, 0);
+            QueueMobyForGlowEffect(moby, 0, 0);
         }
     }
 }
 
+/* Resets the object's flags and puts it back in its idle state. */
 void func_L18_003F7590(BatchA_A18_u8 *a0) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     *(unsigned short *)((char *)p + 0x88) = 0;
     *(BatchA_A18_s32 *)(a0 + 0x98) = 0;
     *(unsigned short *)(a0 + 0x34) =
         (unsigned short)((*(unsigned short *)(a0 + 0x34) & 0xEFFF) | 0x43);
-    func_002A7750(a0, 1, 0);
+    SetMobyState(a0, 1, 0);
     *(BatchA_A18_s32 *)(a0 + 0x98) = 0;
     *(unsigned short *)(a0 + 0x34) =
         (unsigned short)(*(unsigned short *)(a0 + 0x34) & 0xEFFF);
@@ -469,28 +481,28 @@ extern int D_L18_001B2838[] __attribute__((sda));
    through a1 and returns the last of them (0 when there is none). Retail compares the state with
    0xFE and 0xFD before testing it for 1. */
 BatchA_A18_s32 func_L18_003F75E8(BatchA_A18_s32 a0, BatchA_A18_u8 *a1) {
-    unsigned short *q;
-    unsigned char *e;
-    unsigned char *r;
-    BatchA_A18_s32 *cnt = (BatchA_A18_s32 *)a1;
+    unsigned short *entry;
+    unsigned char *entity;
+    unsigned char *last;
+    BatchA_A18_s32 *count = (BatchA_A18_s32 *)a1;
 
-    *cnt = 0;
+    *count = 0;
     if (a0 == -1)
         return 0;
-    r = 0;
-    for (q = D_L18_001FB320[a0];
-         (a0 & 0xFF) != 0xFF && a0 <= D_L18_001B2838[0] && q != 0 &&
-         ((short)q[-1] >= 0 || q == D_L18_001FB320[a0]);
-         q++) {
-        e = (unsigned char *)(D_L18_001B281C[0] + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    last = 0;
+    for (entry = D_L18_001FB320[a0];
+         (a0 & 0xFF) != 0xFF && a0 <= D_L18_001B2838[0] && entry != 0 &&
+         ((short)entry[-1] >= 0 || entry == D_L18_001FB320[a0]);
+         entry++) {
+        entity = (unsigned char *)(gMobyTable_L18[0] + ((*entry & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        if (*(short *)(e + 0xAA) == 0xB69 && e[0x20] != 0xFE && e[0x20] != 0xFD && e[0x20] == 1) {
-            (*cnt)++;
-            r = e;
+        if (*(short *)(entity + 0xAA) == 0xB69 /* Protopet */ && entity[0x20] != 0xFE && entity[0x20] != 0xFD && entity[0x20] == 1) {
+            (*count)++;
+            last = entity;
         }
     }
-    return (BatchA_A18_s32)r;
+    return (BatchA_A18_s32)last;
 }
 
 /* func_L18_003F76F0 lives in L18_003F76F0-copy.c. */
@@ -500,66 +512,68 @@ extern void func_00282CC0(void *a0, void *a1, void *a2);
 
 /* the object's state flags and aim angle are set, then the target is handed
    over to the object's controller */
-void func_L18_003F7818(BatchA_A18_u8 *s2, BatchA_A18_u8 *s3, BatchA_A18_s32 s7) {
+void func_L18_003F7818(BatchA_A18_u8 *moby, BatchA_A18_u8 *target, BatchA_A18_s32 flip) {
     float local[4];
-    BatchA_A18_u8 *s4;
-    BatchA_A18_s32 *p;
+    BatchA_A18_u8 *vars;
+    BatchA_A18_s32 *info;
     BatchA_A18_s32 v1;
     BatchA_A18_u8 state;
 
-    s4 = *(BatchA_A18_u8 **)(s2 + 0x68);
-    state = s2[0x20];
+    vars = *(BatchA_A18_u8 **)(moby + 0x68);
+    state = moby[0x20];
     if (state == 1) {
-        p = *(BatchA_A18_s32 **)(s2 + 0x24);
-        *(unsigned short *)(s2 + 0x34) =
-            (unsigned short)((*(unsigned short *)(s2 + 0x34) & 0xFFBE) | 0x1000);
-        v1 = p[4];
-        *(unsigned short *)(s2 + 0x34) =
-            (unsigned short)(*(unsigned short *)(s2 + 0x34) & 0xFFFD);
-        *(BatchA_A18_s32 *)(s2 + 0x98) = v1;
-        s4[0x2E] = state;
-        s2[0x7F] = 0;
-        *(float *)(s4 + 0x20) = (float)*(short *)(s4 + 0x24);
-        func_00282F20(local, s3 + 0xC0, -0.5f);
-        func_00282CC0(s2 + 0x10, s3 + 0x10, local);
-        if (s7 != 0) {
-            func_00282F20(local, s3 + 0xD0, 0.5f);
+        info = *(BatchA_A18_s32 **)(moby + 0x24);
+        *(unsigned short *)(moby + 0x34) =
+            (unsigned short)((*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000);
+        v1 = info[4];
+        *(unsigned short *)(moby + 0x34) =
+            (unsigned short)(*(unsigned short *)(moby + 0x34) & 0xFFFD);
+        *(BatchA_A18_s32 *)(moby + 0x98) = v1;
+        vars[0x2E] = state;
+        moby[0x7F] = 0;
+        *(float *)(vars + 0x20) = (float)*(short *)(vars + 0x24);
+        vec_scale_to_length(local, target + 0xC0, -0.5f);
+        FastVecAdd(moby + 0x10, target + 0x10, local);
+        if (flip != 0) {
+            vec_scale_to_length(local, target + 0xD0, 0.5f);
         } else {
-            func_00282F20(local, s3 + 0xD0, -0.5f);
+            vec_scale_to_length(local, target + 0xD0, -0.5f);
         }
-        func_00282CC0(s2 + 0x10, s3 + 0x10, local);
-        *(float *)(s2 + 0xF8) =
-            func_00283248(*(float *)(s3 + 0x10) - *(float *)(s2 + 0x10),
-                          *(float *)(s3 + 0x14) - *(float *)(s2 + 0x14));
+        FastVecAdd(moby + 0x10, target + 0x10, local);
+        *(float *)(moby + 0xF8) =
+            FastMatrixHelperA(*(float *)(target + 0x10) - *(float *)(moby + 0x10),
+                          *(float *)(target + 0x14) - *(float *)(moby + 0x14));
     }
-    *(BatchA_A18_s32 *)(s4 + 0x258) = (BatchA_A18_s32)s3;
-    func_002A7750(s2, 0xB, 2);
-    func_L18_003F8E30((BatchA_A18_u8 *)*(BatchA_A18_s32 *)(s4 + 0x258));
+    *(BatchA_A18_s32 *)(vars + 0x258) = (BatchA_A18_s32)target;
+    SetMobyState(moby, 0xB, 2);
+    SetReadyFlag((BatchA_A18_u8 *)*(BatchA_A18_s32 *)(vars + 0x258));
 }
 
 /* func_L18_003F7988 lives in L18_003F7988-copy.c. */
 
+/* Picks the right animation for the object depending on whether it has a target. */
 void func_L18_003F7A08(BatchA_A18_u8 *a0) {
-    BatchA_A18_u8 *s0 = a0;
-    BatchA_A18_s32 p;
-    if (s0[0x95] != 1) {
+    BatchA_A18_u8 *moby = a0;
+    BatchA_A18_s32 vars;
+    if (moby[0x95] != 1) {
         return;
     }
-    p = *(BatchA_A18_s32 *)(s0 + 0x68);
-    if (*(BatchA_A18_s32 *)(p + 0x258) != 0) {
-        func_00335668(s0, 0xB, 2);
-    } else if (*(BatchA_A18_s32 *)(p + 0x278) != -1) {
-        func_00335668(s0, 0xD, 2);
+    vars = *(BatchA_A18_s32 *)(moby + 0x68);
+    if (*(BatchA_A18_s32 *)(vars + 0x258) != 0) {
+        func_00335668(moby, 0xB, 2);
+    } else if (*(BatchA_A18_s32 *)(vars + 0x278) != -1) {
+        func_00335668(moby, 0xD, 2);
     } else {
-        func_00335668(s0, 0xC, 2);
+        func_00335668(moby, 0xC, 2);
     }
-    func_00335668(s0, 7, -1);
+    func_00335668(moby, 7, -1);
 }
 
 extern void func_L18_003F7A08(BatchA_A18_u8 *a0);
+/* Runs the animation choice only when the object is in the right mode. */
 void func_L18_003F7A88(BatchA_A18_u8 *a0) {
     if (a0[0x95] == 1) {
-        func_L18_003F7A08(a0);
+        ChooseAnimationByTarget(a0);
     }
 }
 
@@ -576,42 +590,44 @@ extern void func_002833F0(char *a, char *b);
 void func_L18_003F8D28(void *a0, void *a1, void *a2) {
     char scratch[16];
     char mat[16];
-    unsigned short v1;
-    void *p;
-    void *s4;
-    void *v;
-    float f;
+    unsigned short flags;
+    void *info;
+    void *vars;
+    void *value;
+    float angle;
 
-    v1 = *(unsigned short *)((char *)a0 + 0x34);
-    p = *(void **)((char *)a0 + 0x24);
-    v1 = (unsigned short)((v1 & 0xFFBE) | 0x1000);
-    *(unsigned short *)((char *)a0 + 0x34) = v1;
-    v = *(void **)((char *)p + 0x10);
-    *(void **)((char *)a0 + 0x98) = v;
-    func_002A7750((BatchA_A18_u8 *)a0, 5, 2);
-    s4 = *(void **)((char *)a0 + 0x68);
-    *(void **)((char *)s4 + 0x74C) = a2;
+    flags = *(unsigned short *)((char *)a0 + 0x34);
+    info = *(void **)((char *)a0 + 0x24);
+    flags = (unsigned short)((flags & 0xFFBE) | 0x1000);
+    *(unsigned short *)((char *)a0 + 0x34) = flags;
+    value = *(void **)((char *)info + 0x10);
+    *(void **)((char *)a0 + 0x98) = value;
+    SetMobyState((BatchA_A18_u8 *)a0, 5, 2);
+    vars = *(void **)((char *)a0 + 0x68);
+    *(void **)((char *)vars + 0x74C) = a2;
     if (a1 != 0) {
-        func_L18_003FB5E8(a1, mat);
-        func_00282F20(scratch, (char *)a1 + 0xD0, -0.3f);
-        func_00282CC0((char *)a0 + 0x10, mat, scratch);
-        *(float *)((char *)a0 + 0x18) = func_002A89A8((char *)a0 + 0x10, 0, 0.5f);
-        f = func_00283248(*(float *)mat - *(float *)((char *)a0 + 0x10),
+        CopySavedPointBelow(a1, mat);
+        vec_scale_to_length(scratch, (char *)a1 + 0xD0, -0.3f);
+        FastVecAdd((char *)a0 + 0x10, mat, scratch);
+        *(float *)((char *)a0 + 0x18) = ProbeGroundHeightBelow((char *)a0 + 0x10, 0, 0.5f);
+        angle = FastMatrixHelperA(*(float *)mat - *(float *)((char *)a0 + 0x10),
                            *(float *)(mat + 4) - *(float *)((char *)a0 + 0x14));
-        *(float *)((char *)a0 + 0xF8) = f;
-        func_002833F0((char *)a0 + 0xC0, (char *)a0 + 0xF0);
-        *(void **)((char *)s4 + 0x750) = a1;
+        *(float *)((char *)a0 + 0xF8) = angle;
+        euler_rotation_basis((char *)a0 + 0xC0, (char *)a0 + 0xF0);
+        *(void **)((char *)vars + 0x750) = a1;
         *(BatchA_A18_u8 *)((char *)a0 + 0x7F) = 0;
     }
 }
 
 /* A18-void-store-16 freshly exact-verified under family reservation */
+/* Sets a flag on the object so it counts as ready. */
 void func_L18_003F8E30(BatchA_A18_u8 *s) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(s + 0x68);
     *(BatchA_A18_BatchAs16 *)((char *)p + 0x768) = 1;
 }
 
 /* A18-cond-select twin of 003F8E80: two independent state gates */
+/* Tells if the object is in one of two particular states. */
 BatchA_A18_s32 func_L18_003F8E40(BatchA_A18_u8 *s) {
     BatchA_A18_s32 r = 0;
     if ((s[0x20] == 5 && s[0xBC] == 1) || (s[0x20] == 3 && s[0x94] == 5)) {
@@ -621,6 +637,7 @@ BatchA_A18_s32 func_L18_003F8E40(BatchA_A18_u8 *s) {
 }
 
 /* A09-cond-select-36 freshly exact-verified under family reservation */
+/* Tells if the object is in a particular state and sub-state. */
 BatchA_A09_s32 func_L18_003F8E80(BatchA_A09_u8 *s) {
     BatchA_A09_s32 r = 0;
     if (s[0x20] == 6) { r = (s[0xBC] == 2); }
@@ -632,6 +649,7 @@ BatchA_A09_s32 func_L18_003F8E80(BatchA_A09_u8 *s) {
 extern void func_00335388(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2,
                           BatchA_A18_s32 a3);
 
+/* Puts the object into its starting animation and clears its links. */
 void func_L18_003F8FA8(BatchA_A18_u8 *a0) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     func_00335388(a0, 0, 0, 3);
@@ -660,31 +678,32 @@ static __inline__ int L18_GroupId(unsigned char *p, int i) {
 /* Walks the id list of each of the object's eight groups and, for every entity in it, calls the
    handler of its kind (0xD5C, 0x11CC, 0xD9B, 0x11CF or 0xB69), clears the entity's word at +0x98
    and sets bits 0 and 1 of its flags at +0x34; then stores -1 at +0x88 of the object. */
+/* Wakes every member of the object's eight groups and resets them. */
 void func_L18_003F9FB0(unsigned char *a0) {
-    unsigned char *p = *(unsigned char **)(a0 + 0x68);
-    unsigned short *q;
-    unsigned char *e;
+    unsigned char *vars = *(unsigned char **)(a0 + 0x68);
+    unsigned short *entry;
+    unsigned char *entity;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (q = D_L18_001FB320[L18_GroupId(p, i)];
-             (L18_GroupId(p, i) & 0xFF) != 0xFF && L18_GroupId(p, i) <= D_L18_001B2838[0] &&
-             q != 0 && ((short)q[-1] >= 0 || q == D_L18_001FB320[L18_GroupId(p, i)]);
-             q++) {
-            e = (unsigned char *)(D_L18_001B281C[0] + ((*q & 0x7FFF) << 8));
-            if (e == 0)
+        for (entry = D_L18_001FB320[L18_GroupId(vars, i)];
+             (L18_GroupId(vars, i) & 0xFF) != 0xFF && L18_GroupId(vars, i) <= D_L18_001B2838[0] &&
+             entry != 0 && ((short)entry[-1] >= 0 || entry == D_L18_001FB320[L18_GroupId(vars, i)]);
+             entry++) {
+            entity = (unsigned char *)(gMobyTable_L18[0] + ((*entry & 0x7FFF) << 8));
+            if (entity == 0)
                 break;
-            if (*(short *)(e + 0xAA) == 0xD5C || *(short *)(e + 0xAA) == 0x11CC ||
-                *(short *)(e + 0xAA) == 0xD9B || *(short *)(e + 0xAA) == 0x11CF) {
-                func_L18_003FC9B8(e);
-            } else if (*(short *)(e + 0xAA) == 0xB69) {
-                func_L18_003F7988(e);
+            if (*(short *)(entity + 0xAA) == 0xD5C /* Train with Rail */ || *(short *)(entity + 0xAA) == 0x11CC /* moby class 4556 */ ||
+                *(short *)(entity + 0xAA) == 0xD9B /* Train */ || *(short *)(entity + 0xAA) == 0x11CF /* moby class 4559 */) {
+                ResetObjectToSavedTransform(entity);
+            } else if (*(short *)(entity + 0xAA) == 0xB69 /* Protopet */) {
+                ResetProtopetToSpawn(entity);
             }
-            *(int *)(e + 0x98) = 0;
-            *(unsigned short *)(e + 0x34) |= 3;
+            *(int *)(entity + 0x98) = 0;
+            *(unsigned short *)(entity + 0x34) |= 3;
         }
     }
-    *(int *)(p + 0x88) = -1;
+    *(int *)(vars + 0x88) = -1;
 }
 
 /* Slot i of the state block's eight group ids (the words at +0x60). */
@@ -705,13 +724,13 @@ void func_L18_003F9FB0(unsigned char *a0) {
    kind 0xB69, also clears the byte at +0x31 and sets bit 0 again. */
 #define L18_DISABLE_GROUP(i) \
     L18_FOR_EACH_ID(entry, i) { \
-        member = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100; \
+        member = gMobyTable_L18[0] + (*entry & 0x7fff) * 0x100; \
         if (member == 0) \
             break; \
         flags = *(unsigned short *)(member + 0x34) & 0xffbc; \
         *(unsigned short *)(member + 0x34) = flags | 0x1000; \
         *(int *)(member + 0x98) = *(int *)(*(char **)(member + 0x24) + 0x10); \
-        if (*(short *)(owner + 0xaa) != 0xb69) { \
+        if (*(short *)(owner + 0xaa) != 0xb69 /* Protopet */) { \
             member[0x31] = 0; \
             *(unsigned short *)(member + 0x34) = flags | 0x1001; \
         } \
@@ -766,26 +785,28 @@ extern const int D_L18_001B2838_1[] __attribute__((sda));
 /* Walks the id list of each of the object's eight groups like func_L18_003F9FB0 and, for every
    entity in it, clears its word at +0x98 and sets bits 0, 1 and 6 of its flags at +0x34 while
    clearing bit 12. */
+/* Resets every member of the object's eight groups and turns on their flags. */
 void func_L18_003FA7C0(unsigned char *a0) {
-    unsigned char *p = *(unsigned char **)(a0 + 0x68);
-    unsigned short *q;
-    unsigned char *e;
+    unsigned char *vars = *(unsigned char **)(a0 + 0x68);
+    unsigned short *entry;
+    unsigned char *entity;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (q = D_L18_001FB320[L18_GroupId(p, i)];
-             (L18_GroupId(p, i) & 0xFF) != 0xFF && L18_GroupId(p, i) <= D_L18_001B2838_1[0] &&
-             q != 0 && ((short)q[-1] >= 0 || q == D_L18_001FB320[L18_GroupId(p, i)]);
-             q++) {
-            e = (unsigned char *)(D_L18_001B281C_1[0] + ((*q & 0x7FFF) << 8));
-            if (e == 0)
+        for (entry = D_L18_001FB320[L18_GroupId(vars, i)];
+             (L18_GroupId(vars, i) & 0xFF) != 0xFF && L18_GroupId(vars, i) <= D_L18_001B2838_1[0] &&
+             entry != 0 && ((short)entry[-1] >= 0 || entry == D_L18_001FB320[L18_GroupId(vars, i)]);
+             entry++) {
+            entity = (unsigned char *)(D_L18_001B281C_1[0] + ((*entry & 0x7FFF) << 8));
+            if (entity == 0)
                 break;
-            *(int *)(e + 0x98) = 0;
-            *(unsigned short *)(e + 0x34) = (*(unsigned short *)(e + 0x34) & 0xEFFF) | 0x43;
+            *(int *)(entity + 0x98) = 0;
+            *(unsigned short *)(entity + 0x34) = (*(unsigned short *)(entity + 0x34) & 0xEFFF) | 0x43;
         }
     }
 }
 
+/* Uses up one count from the object's counter if there is any left. */
 BatchA_A18_s32 func_L18_003FA8E0(BatchA_A18_u8 *s) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(s + 0x68);
     if (*(short *)((char *)p + 0xA8) > 0) {
@@ -796,6 +817,7 @@ BatchA_A18_s32 func_L18_003FA8E0(BatchA_A18_u8 *s) {
     return 0;
 }
 
+/* Adds one to the object's counter. */
 void func_L18_003FA908(BatchA_A18_u8 *s) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(s + 0x68);
     *(unsigned short *)((char *)p + 0xA8) =
@@ -819,7 +841,7 @@ int func_L18_003FA920(char *owner, int slot) {
     char *entity;
     int i;
 
-    func_00115484(secondary, 0, 8);
+    memset(secondary, 0, 8);
     {
         unsigned short *entry;
         for (entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)];
@@ -827,7 +849,7 @@ int func_L18_003FA920(char *owner, int slot) {
              L18_SelectionGroupId(state, slot, 0) <= D_L18_001B2838[0] && entry != 0 &&
              ((short)entry[-1] >= 0 ||
               entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)]); entry++) {
-            entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+            entity = gMobyTable_L18[0] + (*entry & 0x7fff) * 0x100;
             if (entity == 0) break;
             if (entity != 0 && *(unsigned char *)(entity + 0x20) != 0xfe &&
                 *(unsigned char *)(entity + 0x20) != 0xfd &&
@@ -846,7 +868,7 @@ int func_L18_003FA920(char *owner, int slot) {
                  L18_SelectionGroupId(state, slot, 0x20) <= D_L18_001B2838[0] && entry != 0 &&
                  ((short)entry[-1] >= 0 ||
                   entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x20)]); entry++) {
-                entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+                entity = gMobyTable_L18[0] + (*entry & 0x7fff) * 0x100;
                 if (entity == 0) break;
                 if (entity != secondary[0] && entity != 0 &&
                     *(unsigned char *)(entity + 0x20) != 0xfe &&
@@ -866,11 +888,11 @@ int func_L18_003FA920(char *owner, int slot) {
              L18_SelectionGroupId(state, slot, 0x10) <= D_L18_001B2838[0] && entry != 0 &&
              ((short)entry[-1] >= 0 ||
               entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
-            entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+            entity = gMobyTable_L18[0] + (*entry & 0x7fff) * 0x100;
             if (entity == 0) break;
             if (*(unsigned char *)(entity + 0x31) != 0 &&
-                func_L02_002F21C0(D_00189EA0, entity + 0x10) > 16.0f &&
-                func_L02_004127F8((unsigned char *)entity) == 0) {
+                DistanceSquaredXY(gHeroPosition, entity + 0x10) > 16.0f &&
+                IsMobyInStateTwo((unsigned char *)entity) == 0) {
                 selected = entity;
                 break;
             }
@@ -884,9 +906,9 @@ int func_L18_003FA920(char *owner, int slot) {
                  L18_SelectionGroupId(state, slot, 0x10) <= D_L18_001B2838[0] && entry != 0 &&
                  ((short)entry[-1] >= 0 ||
                   entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
-                entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+                entity = gMobyTable_L18[0] + (*entry & 0x7fff) * 0x100;
                 if (entity == 0) break;
-                if (func_L02_004127F8((unsigned char *)entity) == 0) {
+                if (IsMobyInStateTwo((unsigned char *)entity) == 0) {
                     selected = entity;
                     break;
                 }
@@ -894,9 +916,9 @@ int func_L18_003FA920(char *owner, int slot) {
         }
         if (selected == 0) goto fail;
     }
-    func_L18_003F8D28(source, entity, (void *)L18_SelectionGroupId(state, slot, 0x10));
-    func_L18_003F7818((unsigned char *)secondary[0], (unsigned char *)source, 0);
-    func_L18_003FB500((unsigned char *)selected, 1);
+    SetupTargetTransforms(source, entity, (void *)L18_SelectionGroupId(state, slot, 0x10));
+    AttachToTarget((unsigned char *)secondary[0], (unsigned char *)source, 0);
+    EnterHitState((unsigned char *)selected, 1);
     return 1;
 fail:
     return 0;
@@ -908,6 +930,7 @@ fail:
 
 /* func_L18_003FB5E8 is matched in its own unit, src/levels/shared/L18_003FB5E8-qcopy.c (-frac2-qcopy). */
 
+/* Starts one of two animations on the object and clears its links. */
 void func_L18_003FC958(BatchA_A18_u8 *a0, BatchA_A18_s32 a1) {
     if (a1 != 0) {
         func_00335668(a0, 3, -1);
@@ -936,6 +959,7 @@ void func_L18_003FE010(BatchA_A18_u8 *s) {
     *(BatchA_A18_s32 *)((char *)p + 0x74) = -1;
 }
 
+/* Clears the object's saved link value to zero. */
 void func_L18_003FE020(BatchA_A18_u8 *s) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(s + 0x68);
     *(BatchA_A18_s32 *)((char *)p + 0x74) = 0;
@@ -946,6 +970,7 @@ extern void func_0033A0B0(BatchA_A18_u8 *a0, BatchA_A18_u8 *a1);
 extern void func_0032D118(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2,
                           BatchA_A18_s32 a3);
 
+/* Sets the object to its default look with mid-grey color. */
 void func_L18_00426D98(BatchA_A18_u8 *a0) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     *(unsigned short *)((char *)p + 0x50) = 0;
@@ -962,6 +987,7 @@ void func_L18_00426D98(BatchA_A18_u8 *a0) {
 
 extern void func_002EC9C8(BatchA_A18_u8 *a0, BatchA_A18_s32 a1);
 
+/* Starts an animation on the object, or passes the request on when it is in another mode. */
 void func_L18_00426F28(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2, float f12) {
     if (a0[0xBC] == 0) {
         if (a0[0x43] != a1) {
@@ -980,11 +1006,11 @@ void func_L18_00426F78(BatchA_A18_u8 *a0) {
     BatchA_A18_u8 *p = *(BatchA_A18_u8 **)(a0 + 0x68);
     if (a0[0x21] != 0xFF) {
         if (*(BatchA_A18_u8 *)(p + 0x39F) != 0) {
-            func_002B60B0(a0, 0.00027777778450399637f * *(float *)(p + 0x3C4),
+            SetControllerSpeedLimits(a0, 0.00027777778450399637f * *(float *)(p + 0x3C4),
                           0.01666666753590107f * *(float *)(p + 0x3C0),
                           4.848137450608192e-06f * *(float *)(p + 0x3D4),
                           0.0002908882452175021f * *(float *)(p + 0x3D0));
-            func_00282948(*(void **)(p + 0x388));
+            FastFloatHelperD(*(void **)(p + 0x388));
         }
     }
     *(BatchA_A18_u8 *)(p + 0x39F) = 0;
@@ -992,14 +1018,16 @@ void func_L18_00426F78(BatchA_A18_u8 *a0) {
 
 extern void func_00282948(void *a0);
 
+/* Releases the shared resource used by the object, if it holds one. */
 void func_L18_00427010(BatchA_A18_u8 *a0) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     if (a0[0x21] != 0xFF && *(BatchA_A18_u8 *)(p + 0x3B0) != 0) {
-        func_00282948(*(void **)(p + 0x3AC));
+        FastFloatHelperD(*(void **)(p + 0x3AC));
     }
     *(BatchA_A18_u8 *)(p + 0x3B0) = 0;
 }
 
+/* Takes a hold on the shared resource used by the object, if it does not have one yet. */
 void func_L18_00427058(BatchA_A18_u8 *a0) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     BatchA_A18_s32 q;
@@ -1027,8 +1055,8 @@ BatchA_A18_s32 func_L18_00427130(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A1
         *(BatchA_A18_BatchAs16 *)(p + 0x1C8) = (BatchA_A18_BatchAs16)a1;
         return -1;
     }
-    r = func_L09_0033E690(a0 + 0x10, a1, 0.0f);
-    if (func_L09_00329178(a0, a1, a2, r) != 0) {
+    r = MeasureMobyAgainstPathEntry(a0 + 0x10, a1, 0.0f);
+    if (ApplyPathTableEntryToMoby(a0, a1, a2, r) != 0) {
         return *(short *)(p + 0x1C8);
     }
     *(unsigned short *)(p + 0x1C8) = 0;
@@ -1037,6 +1065,7 @@ BatchA_A18_s32 func_L18_00427130(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A1
 
 extern BatchA_A18_s32 func_L09_0033E658(void *a0);
 
+/* Switches the object's animation helper on or off. */
 BatchA_A18_s32 func_L18_004271C0(BatchA_A18_u8 *a0) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(a0 + 0x68);
     if (*(short *)((char *)p + 0x1CA) != 0) {
@@ -1044,7 +1073,7 @@ BatchA_A18_s32 func_L18_004271C0(BatchA_A18_u8 *a0) {
         return 0;
     }
     *(BatchA_A18_BatchAs16 *)((char *)p + 0x1CA) =
-        (BatchA_A18_BatchAs16)func_L09_0033E658(*(void **)((char *)p + 0x38C));
+        (BatchA_A18_BatchAs16)GetPathTableEntryId(*(void **)((char *)p + 0x38C));
     return 1;
 }
 

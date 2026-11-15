@@ -15,6 +15,7 @@ extern void func_002D9CF8(int, int, int);
 extern void func_0028FAB8(int, int, int, int, int, int);
 
 
+/* Draws a list of menu rows with the highlighted row in a different color. */
 int func_002D89D8(char *object)
 {
     MenuTextRectangle rectangle, initial;
@@ -34,17 +35,17 @@ int func_002D89D8(char *object)
         height = (*(int *)(object + 0x30) & 0x40000) ? 14 : 10;
         font = D_00263EF0; texture = 2;
     }
-    func_002FC560(66, 68);
+    VU1_addGSregister(66, 68);
     lineHeight = height + 2;
-    func_002FC560(71, 0x2004B);
-    func_0027C540(0);
+    VU1_addGSregister(71, 0x2004B);
+    SetupGifPaging(0);
     row = *(short **)(object + 0x34);
     count = 0;
     while (row[0]) { row += 6; count++; }
     if (*(int *)(object + 0x30) & 16) spacing = height + 3;
     else spacing = *(int *)(object + 0x24) / (count + 1);
     top = spacing - height / 2 + *(int *)(object + 0x1C);
-    func_00115484(&initial, 0, 24);
+    memset(&initial, 0, 24);
     initial.fields[0] = *(int *)(object + 0x1C) + 4;
     initial.fields[2] = *(int *)(object + 0x18);
     initial.fields[1] = (long)(*(int *)(object + 0x1C) - 4) + *(int *)(object + 0x24);
@@ -52,7 +53,7 @@ int func_002D89D8(char *object)
     initial.fields[5] = top - *(int *)(object + 0x44);
     initial.fields[8] = lineHeight;
     rectangle = initial;
-    textureWord = func_0027C878(texture);
+    textureWord = GetEffectTextureDescriptor(texture);
     for (index = 0; (*(short **)(object + 0x34))[index * 6]; index++) {
         selected = active && *(int *)(object + 0x40) == index;
         enabled = (*(short **)(object + 0x34))[index * 6 + 1] != 0;
@@ -61,24 +62,24 @@ int func_002D89D8(char *object)
         else colour = enabled ? (int)0x80F0F0F0u : (int)0x80303030u;
         if (!(*(int *)(object + 0x30) & 0x10000) && selected && rectangle.fields[5] < rectangle.fields[0])
             *(int *)(object + 0x44) -= 4;
-        text = func_00288FB8((*(short **)(object + 0x34))[index * 6]);
+        text = GetLocalizedString((*(short **)(object + 0x34))[index * 6]);
         rectangle.fields[4] = (*(int *)(object + 0x30) & 0xA00) ? 32 : 4;
         if (*(int *)(object + 0x30) & 0x400) {
             rectangle.fields[9] = 1;
             rectangle.fields[4] = *(int *)(object + 0x20) >> 1;
         }
-        if (selected) func_0027F120();
-        func_0027FC70(rectangle.fields, colour, text, -1, textureWord, font);
-        if (selected) func_0027F110();
+        if (selected) DisableScreenFlag();
+        FontPrintWindow(rectangle.fields, colour, text, -1, textureWord, font);
+        if (selected) EnableScreenFlag();
         if (*(int *)(object + 0x30) & 0x200)
-            func_002D9CF8(15, rectangle.fields[5] + 9, D_001A7A60[index] != 0);
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7A60[index] != 0);
         if (*(int *)(object + 0x30) & 0x800)
-            func_002D9CF8(15, rectangle.fields[5] + 9, D_001A7BB4 == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7BB4 == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
         rectangle.fields[5] += rectangle.fields[7];
         if ((*(short **)(object + 0x34))[index * 6 + 4]) {
-            text = func_00288FB8((*(short **)(object + 0x34))[index * 6 + 4]);
+            text = GetLocalizedString((*(short **)(object + 0x34))[index * 6 + 4]);
             rectangle.fields[4] = 20;
-            func_0027FC70(rectangle.fields, colour, text, -1, textureWord, font);
+            FontPrintWindow(rectangle.fields, colour, text, -1, textureWord, font);
             rectangle.fields[5] += spacing;
         }
         rectangle.fields[5] += 8;
@@ -91,7 +92,7 @@ int func_002D89D8(char *object)
             }
         }
     }
-    func_0027C660();
+    DoGifPaging();
     if (*(int *)(object + 0x30) & 0x8000) {
         *(int *)(object + 0x30) ^= 0x8000;
         return 1;

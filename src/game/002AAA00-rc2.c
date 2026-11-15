@@ -31,77 +31,79 @@ extern void func_002AA2E8(f32 *, f32, f32);
 extern f32 func_002AA738(s32, f32, f32);
 extern void func_002AA800(f32 *, s32, f32, f32);
 
-f32 func_002AAA00(f32 *p, f32 *q, s32 mode, f32 fa, f32 fb, f32 fc, f32 fd)
+/* Moves a value toward a target using a speed that builds up and then brakes in time to
+   stop on the target. Mode 2 lets it pick the shorter way around. */
+f32 func_002AAA00(f32 *value, f32 *velocity, s32 mode, f32 target, f32 accel, f32 brake, f32 maxSpeed)
 {
-    s32 a0;
-    f32 r1;
-    f32 t23;
-    f32 s4;
-    f32 s2;
-    f32 r;
+    s32 direction;
+    f32 delta;
+    f32 stopDistance;
+    f32 absDelta;
+    f32 absDeltaTmp;
+    f32 desiredSpeed;
 
-    a0 = mode;
+    direction = mode;
     if (mode != 2) {
         goto abc;
     }
-    if (fa > 0.0f && *p < 0.0f) {
+    if (target > 0.0f && *value < 0.0f) {
         goto aa0;
     }
-    a0 = 0;
-    if (fa < 0.0f && *p > 0.0f) {
+    direction = 0;
+    if (target < 0.0f && *value > 0.0f) {
         goto aa0;
     }
     goto abc;
 aa0:
-    a0 = 1;
-    if (fa < 0.0f) {
-        a0 = -1;
+    direction = 1;
+    if (target < 0.0f) {
+        direction = -1;
     }
 abc:
-    r1 = func_002AA738(a0, fa, *p);
-    if (*q == 0.0f && r1 == 0.0f) {
+    delta = GetShortestAngleDelta(direction, target, *value);
+    if (*velocity == 0.0f && delta == 0.0f) {
         return 0.0f;
     }
     {
-        f32 qv = *q;
-        f32 qn;
+        f32 oldVelocity = *velocity;
+        f32 newVelocity;
 
-        if (0.0f <= qv * r1) {
-            t23 = ((qv * qv) / fc) * 0.5f;
-            if (func_00282C48(r1) < t23) {
-                s2 = func_00282C48(r1);
-                if (t23 < s2 + func_00282C48(*q)) {
-                    func_002AA2E8(q, 0.0f, fc);
+        if (0.0f <= oldVelocity * delta) {
+            stopDistance = ((oldVelocity * oldVelocity) / brake) * 0.5f;
+            if (FloatAbs(delta) < stopDistance) {
+                absDeltaTmp = FloatAbs(delta);
+                if (stopDistance < absDeltaTmp + FloatAbs(*velocity)) {
+                    ApproachValue(velocity, 0.0f, brake);
                 } else {
-                    func_002AA2E8(q, 0.0f, fc * 1.1f);
+                    ApproachValue(velocity, 0.0f, brake * 1.1f);
                 }
             } else {
-                r = func_00282C10((fc + fc) * r1);
-                if (fd < r) {
-                    r = fd;
+                desiredSpeed = square_root((brake + brake) * delta);
+                if (maxSpeed < desiredSpeed) {
+                    desiredSpeed = maxSpeed;
                 }
-                if (r1 < 0.0f) {
-                    func_002AA800(q, 0, -r, fb);
+                if (delta < 0.0f) {
+                    StepAngleTowardTarget(velocity, 0, -desiredSpeed, accel);
                 } else {
-                    func_002AA800(q, 0, r, fb);
+                    StepAngleTowardTarget(velocity, 0, desiredSpeed, accel);
                 }
             }
-            s4 = func_00282C48(r1);
-            if (func_00282C48(*q) < s4) {
-                qn = *q;
+            absDelta = FloatAbs(delta);
+            if (FloatAbs(*velocity) < absDelta) {
+                newVelocity = *velocity;
             } else {
-                *p = fa;
-                return r1;
+                *value = target;
+                return delta;
             }
         } else {
-            if (0.0f <= qv) {
-                qn = qv - fc;
+            if (0.0f <= oldVelocity) {
+                newVelocity = oldVelocity - brake;
             } else {
-                qn = qv + fc;
+                newVelocity = oldVelocity + brake;
             }
-            *q = qn;
+            *velocity = newVelocity;
         }
-        *p = func_00283B98(qn, *p);
-        return *q;
+        *value = FastAddRotations(newVelocity, *value);
+        return *velocity;
     }
 }

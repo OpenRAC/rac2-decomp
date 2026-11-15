@@ -57,13 +57,14 @@ extern void func_L05_00379F48(int);
 extern void func_002AD7B8(int);
 extern void func_L15_00430590(void *, int);
 
-void func_L15_004307E0(u8 *self)
+/* Runs the Gorn cutscene stage: starts the scene, aims the camera at the target, then hands control back. */
+void func_L15_004307E0(u8 *moby)
 {
     Vector step;
     Vector ahead;
     Vec up;
     Vector basis[3];
-    u8 *vars = *(u8 **)(self + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
 
     if (D_L15_001B1534 == 0) {
         u8 **list;
@@ -71,74 +72,74 @@ void func_L15_004307E0(u8 *self)
 
         D_L15_00221E3C = 0;
         D_L15_001B1534 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
+        music_Unpause();
+        InitAllRegisteredEntries();
+        SetPlayerStateField13(0);
         *(int *)(vars + 0x6C) = 30;
-        list = func_L05_00379EB8();
-        count = func_L00_004272A0();
+        list = GetLevelObjectList();
+        count = GetLevelSavedValue();
         for (i = 0; i < count; i++) {
-            if (*(short *)(list[i] + 0xAA) == 0x1211)
-                func_L05_0037B280(list[i], 1);
+            if (*(short *)(list[i] + 0xAA) == 0x1211 /* moby class 4625 */)
+                SpawnEntryListObjectsWithFlag(list[i], 1);
         }
     }
-    if (func_L10_0037D200(func_L05_00379ED0(0x1211)) != 0)
+    if (CountAliveGroupMobys(FindLevelObjectByClassId(0x1211 /* moby class 4625 */)) != 0)
         return;
     if (D_L15_001B2148 < 6)
         return;
     if (D_L15_001B15BC == 0) {
-        u8 *obj;
-        u8 *pos;
-        float dist;
+        u8 *targetMoby;
+        u8 *targetPos;
+        float distance;
 
-        if (func_00282948(vars + 0x6C) == 0)
+        if (FastFloatHelperD(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 60;
-        func_L05_0037B108();
-        obj = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
-        pos = obj + 0x10;
-        qcopy(camera_pos, pos);
-        func_00282F20(step, obj + 0xC0, 196.0f);
-        dist = 25.0f;
-        func_00282CC0(ahead, pos, step);
-        if (func_002761F8(pos, ahead, 0, obj, 0) != 0) {
+        RemoveEffectFamilyMobys();
+        targetMoby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
+        targetPos = targetMoby + 0x10;
+        qcopy(camera_pos, targetPos);
+        vec_scale_to_length(step, targetMoby + 0xC0, 196.0f);
+        distance = 25.0f;
+        FastVecAdd(ahead, targetPos, step);
+        if (CollLine(targetPos, ahead, 0, targetMoby, 0) != 0) {
             Hit *hit = &D_L15_001BFC00;
 
-            if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211)
-                dist = func_00282E48(hit->pos, pos);
+            if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211 /* moby class 4625 */)
+                distance = fast_vec_dist(hit->pos, targetPos);
         }
-        if (dist < 16.0f)
-            dist = -32.0f;
+        if (distance < 16.0f)
+            distance = -32.0f;
         else
-            dist = dist * 0.5f;
-        func_00282F20(step, obj + 0xC0, dist);
-        func_00282CC0(camera_pos, camera_pos, step);
+            distance = distance * 0.5f;
+        vec_scale_to_length(step, targetMoby + 0xC0, distance);
+        FastVecAdd(camera_pos, camera_pos, step);
         D_L15_001B1550[2] -= 16.0f;
         up.q = 0;
         up.f[2] = 1.0f;
-        qcopy(basis[0], obj + 0xC0);
+        qcopy(basis[0], targetMoby + 0xC0);
         qcopy(basis[2], up.f);
-        func_00282DD8(basis[1], basis[0], basis[2]);
+        FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
-        func_002AB6D8(basis, D_L15_001B1540);
-        func_L05_00442828(camera_pos, D_L15_001B1540, 300);
-        self[0x20] = 3;
+        GetEulerAnglesFromMatrix(basis, D_L15_001B1540);
+        StartShipTransition(camera_pos, D_L15_001B1540, 300);
+        moby[0x20] = 3;
         D_L15_001B15BC = 1;
     } else if (D_L15_001B15D0 != 0) {
-        if (func_00282948(vars + 0x6C) == 0)
+        if (FastFloatHelperD(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 10;
         D_L15_001B1520++;
-        func_L15_00432008();
-        func_0029B3E0(0, -1);
+        ClampAndCopyVolumeSettings();
+        MemcardSave(0, -1);
         D_L15_001B1520--;
-        func_L00_003294F0(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
+        SetObjectFlagBit(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
         D_L15_001B15AC = 0;
         D_L15_001B15D0 = 0;
-        func_L05_00379F48(1);
-        func_002AD7B8(0x10);
-    } else if (func_00282948(vars + 0x6C) != 0) {
-        func_L05_0037B210();
-        func_L15_00430590(self, 0);
+        SetPlayerStateField18(1);
+        MarkFlagAndAppendToList(0x10);
+    } else if (FastFloatHelperD(vars + 0x6C) != 0) {
+        InitAllRegisteredEntries();
+        FinishGornChallengeStage(moby, 0);
     }
 }

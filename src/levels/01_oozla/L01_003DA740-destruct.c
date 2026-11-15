@@ -56,6 +56,7 @@ typedef struct {
    arrives while not blocked; then spawns its debris and sparks, plays its sound 0,
    and once func_002B3868 reports done hides itself, counts in D_L01_001B3468
    for 120 frames and deletes itself. */
+/* Breakable object. When something hits it, it breaks into pieces, hides, and removes itself after a short wait. */
 void func_L01_0040F958(DestructionMoby *object)
 {
     float velocity[4] __attribute__((aligned(16)));
@@ -66,42 +67,42 @@ void func_L01_0040F958(DestructionMoby *object)
     switch (object->state) {
     case 0:
         D_L01_001AEC38++;
-        func_002A7750(object, 1, -1);
+        SetMobyState(object, 1, -1);
         break;
     case 1:
-        if (func_002A9640(object, 0x4010000, 0) && !state->blocked) {
+        if (FindOwnedEffectSlot(object, 0x4010000, 0) && !state->blocked) {
             D_L01_001AEC38--;
-            func_002A7750(object, 2, -1);
+            SetMobyState(object, 2, -1);
         }
         object->hit_slot = 255;
         break;
     case 2:
-        func_00282D30(velocity, object->rot_row1, -0.06666667014360428f);
+        FastVecScale(velocity, object->rot_row1, -0.06666667014360428f);
         if (object->visible && D_L01_001B2090_gp[0] < 0.9f && D_L01_001B208C_gp[0] < 0.9f &&
             D_L01_001B3468 < D_L01_001B15E0[0]) {
-            func_002B0A68(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
+            SpawnDebrisForMaskedParts(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             tilt.q = 0;
             tilt.f[1] = -0.015000000596046448f;
-            func_L00_00324F18(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
-            func_00283098(tilt.f, tilt.f, object->rot_row0);
-            func_L01_002E1680(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.0066666672937572f, 1.0f, 1.0299999713897705f);
+            LocalOffsetToWorld(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
+            matrix_mul_vec3(tilt.f, tilt.f, object->rot_row0);
+            SpawnSparkBurst_L01(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.0066666672937572f, 1.0f, 1.0299999713897705f);
         } else
-            func_002B0A68(object, 2, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
-        func_L00_00326110(object, 1, 0.0f);
-        func_002E5CF8(0, 0, object);
-        func_002A7750(object, 3, -1);
+            SpawnDebrisForMaskedParts(object, 2, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
+        SpawnScaledBolts(object, 1, 0.0f);
+        PlayMobySound(0, 0, object);
+        SetMobyState(object, 3, -1);
         break;
     case 3:
-        if (func_002B3868(object)) {
+        if (SetFirstPendingFlag(object)) {
             object->visible = 0;
             object->collision_disable = 0;
             object->flags |= 1;
             state->timer = 120;
             D_L01_001B3468++;
         }
-        if (func_00282948(&state->timer)) {
+        if (FastFloatHelperD(&state->timer)) {
             D_L01_001B3468--;
-            func_0029F338(object);
+            MarkMobySpawned(object);
         }
         break;
     }

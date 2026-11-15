@@ -1,5 +1,6 @@
 /* func_L00_00368F58 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -g). */
 #include "include_asm.h"
+#include "names.h"
 
 extern float D_001BD370;
 
@@ -9,6 +10,7 @@ extern float D_001B24E0[];
 
 extern void func_002EF080(int);
 
+/* Works out three scale values from the frame time, using a limit between 1 and 4, then updates the display. */
 void func_L00_00368F58(int force)
 {
     float value = 0.62f / D_001BD370;
@@ -32,5 +34,5 @@ void func_L00_00368F58(int force)
     D_001B24E0[1] = base * fourValue;
     D_001B24E0[2] = twice * value;
     D_001B24E0[0] = base * sixValue;
-    func_002EF080(force);
+    SetTfragDists(force);
 }

@@ -24,25 +24,25 @@ void func_L20_0039E5F0(char *obj)
             *(u16 *)(state + 0x24) = 0x1E;
             *(f32 *)(state + 0x20) = 30.0f;
         }
-        func_L20_00330A68(obj, 0xCBC);
+        ChangeMobyClassFromTables(obj, 0xCBC);
         *(u16 *)(obj + 0x32) = 0xFF;
         *(u16 *)(obj + 0x34) &= 0xFFFB;
         *(f32 *)(obj + 0x2C) = *(f32 *)(*(char **)(obj + 0x24) + 0x24) * D_L20_001AED00;
         *(int *)(state + 0x190) = 1;
         *(int *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
     }
     zero = 0.0f;
-    func_002B3BA8(obj, *(int *)(state + 0x80), 0, zero, zero, 0);
+    SelectAimTarget_002B3BA8(obj, *(int *)(state + 0x80), 0, zero, zero, 0);
     if (*(int *)(state + 0x60) == 0)
         *(int *)(state + 0x60) = g_pHeroMoby[0];
-    step = func_002A96A0(obj, func_002A9640(obj, 0x10000, 0));
+    step = UpdateAimTargetStrength(obj, FindOwnedEffectSlot(obj, 0x10000, 0));
     left = *(f32 *)(state + 0x20) - step;
     *(f32 *)(state + 0x20) = left;
     if (left <= zero)
-        func_002A7750(obj, 5, -1);
+        SetMobyState(obj, 5, -1);
     if (5.0f <= step)
-        func_002A7750(obj, 4, -1);
+        SetMobyState(obj, 4, -1);
     *(u8 *)(obj + 0xA8) = 0xFF;
 }

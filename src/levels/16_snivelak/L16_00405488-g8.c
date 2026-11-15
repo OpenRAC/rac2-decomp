@@ -16,6 +16,7 @@ extern u8 D_L16_001A8F20[] __attribute__((sda));
 
 /* Spawns the 0xEBD object at the position with the velocity, aims it along the velocity,
    hands it to its owner and starts two particle bursts on it. */
+/* Spawns a flying shot at the position, aims it along its velocity and starts two particle bursts. */
 u8 *func_L16_00405488(float speed, u8 *owner, float *velocity, TI128 *position)
 {
     u8 *obj;
@@ -25,7 +26,7 @@ u8 *func_L16_00405488(float speed, u8 *owner, float *velocity, TI128 *position)
     u8 *axis;
     float scale;
     float angle;
-    obj = func_0029EFD0(0xEBD);
+    obj = CreateMoby(0xEBD);
     if (obj) {
         obj[0x30] = 255;
         *(u16 *)(obj + 0x32) = 255;
@@ -42,19 +43,19 @@ u8 *func_L16_00405488(float speed, u8 *owner, float *velocity, TI128 *position)
         *(u16 *)(obj + 0x34) |= 0x208;
         rotation = obj + 0xC0;
         axis = obj + 0xD0;
-        *(float *)(obj + 0xF8) = func_00283B98(func_00283248(velocity[0], velocity[1]), 1.5707965f);
-        *(float *)(obj + 0xF0) = -func_00283248(func_00282E20(velocity), velocity[2]);
-        angle = func_002A7940();
-        func_002ACEC0(obj + 0xE0, obj + 0xE0, axis, angle);
-        func_002ACEC0(rotation, rotation, axis, angle);
-        func_002833F0(rotation, obj + 0xF0);
+        *(float *)(obj + 0xF8) = FastAddRotations(FastMatrixHelperA(velocity[0], velocity[1]), 1.5707965f);
+        *(float *)(obj + 0xF0) = -FastMatrixHelperA(vec_length_xy(velocity), velocity[2]);
+        angle = RandomAngle();
+        ApplyAxisRotationToQuaternion(obj + 0xE0, obj + 0xE0, axis, angle);
+        ApplyAxisRotationToQuaternion(rotation, rotation, axis, angle);
+        euler_rotation_basis(rotation, obj + 0xF0);
         obj[0x23] = 128;
         *(float *)(obj + 0x2C) = D_L16_001B1500;
         *(u16 *)(obj + 0x34) |= 0x100;
         *(s32 *)(state + 0x24) = 0;
-        scale = func_002A7878(8.0f, 10.0f);
-        func_002C2210(pos, 15, D_L16_001B1460, 0, 10, D_L16_001A8F20, scale * 0.3f, scale, 0.0f, 0);
-        func_002C2210(pos, 15, D_L16_001B1464, 1, -10, D_L16_001A8F20, scale * 0.04f, scale * 0.4f, 0.0f, 0);
+        scale = RandomFloatRange(8.0f, 10.0f);
+        SpawnGroundEffectParticle(pos, 15, D_L16_001B1460, 0, 10, D_L16_001A8F20, scale * 0.3f, scale, 0.0f, 0);
+        SpawnGroundEffectParticle(pos, 15, D_L16_001B1464, 1, -10, D_L16_001A8F20, scale * 0.04f, scale * 0.4f, 0.0f, 0);
     }
     return obj;
 }

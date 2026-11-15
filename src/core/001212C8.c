@@ -27,6 +27,7 @@ extern double __floatundidf(unsigned long long) __asm__("func_001213B8");
 #define WORD_SIZE (sizeof (SItype) * 8)
 #define HIGH_WORD_COEFF (((UDItype) 1) << WORD_SIZE)
 
+/* Converts a double to a 64-bit unsigned whole number. Negative values give 0. */
 UDItype func_001212C8(DFtype a) {
     DFtype b;
     UDItype v;

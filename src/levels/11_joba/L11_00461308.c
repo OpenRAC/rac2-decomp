@@ -44,86 +44,87 @@ extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
-void func_L11_00461308(char *p)
+/* Updates a floating enemy (moby class 3718) that carries a companion moby: it spawns the companion, bobs up and down, fires three shots at a time, and drops sparks. */
+void func_L11_00461308(char *moby)
 {
-    float v[4], pos[4], dir[4], tmp[4];
-    char *s = P(p,0x68);
+    float vec[4], pos[4], dir[4], tmp[4];
+    char *vars = P(moby,0x68);
     int active=0, i, ready;
-    float t, sn, cs;
-    switch ((unsigned char)p[0x20]) {
+    float spread, sine, cosine;
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        P(s,0x10)=func_0029EFD0(0xCF6);
-        F(s,0x14)=0; F(s,0x18)=0;
-        if(P(s,0x10)) {
-            func_002B37E8(P(s,0x10),0);
-            H(P(s,0x10),0x34)|=6;
-            func_002A7470(P(s,0x10),0x10,0,0);
+        P(vars,0x10)=CreateMoby(0xCF6 /* moby class 3318 */);
+        F(vars,0x14)=0; F(vars,0x18)=0;
+        if(P(vars,0x10)) {
+            InitChildObjectFromParent(P(vars,0x10),0);
+            H(P(vars,0x10),0x34)|=6;
+            StartAnimationBlended(P(vars,0x10),0x10,0,0);
         }
-        func_002A7750(p,1,-1);
+        SetMobyState(moby,1,-1);
         break;
     case 1:
-        if ((D_L11_002B6D40[D_L11_001B089C[0]].flags&0x10) && !I(s,8)) {
-            H(p,0x34)|=0x41;
-            H(P(s,0x10),0x34)|=0x41;
-            I(p,0x98)=0;
+        if ((D_L11_002B6D40[D_L11_001B089C[0]].flags&0x10) && !I(vars,8)) {
+            H(moby,0x34)|=0x41;
+            H(P(vars,0x10),0x34)|=0x41;
+            I(moby,0x98)=0;
             return;
         }
         active=1;
-        H(p,0x34)&=0xFFBE;
-        H(P(s,0x10),0x34)&=0xFFBE;
-        I(p,0x98)=I(P(p,0x24),0x10);
+        H(moby,0x34)&=0xFFBE;
+        H(P(vars,0x10),0x34)&=0xFFBE;
+        I(moby,0x98)=I(P(moby,0x24),0x10);
         ready=1;
-        if(I(s,0xC)!=-1) { char *m=D_L11_001B359C[0]+(I(s,0xC)<<8); ready=0; if((unsigned char)m[0x20]!=3) ready=active; }
-        if (ready && func_002ACBC8(D_00189EA0,I(s,0)))
-            func_002A7750(p,2,-1);
+        if(I(vars,0xC)!=-1) { char *linked=gMobyTable_L11[0]+(I(vars,0xC)<<8); ready=0; if((unsigned char)linked[0x20]!=3) ready=active; }
+        if (ready && IsPointInCuboid(gHeroPosition,I(vars,0)))
+            SetMobyState(moby,2,-1);
         break;
     case 2:
         active=1;
-        t=func_002A7878(0.0f,0.333f);
+        spread=RandomFloatRange(0.0f,0.333f);
         for(i=0;i<3;i++) {
-            func_0029FCC0(p,i==0?3:i==1?2:4,v);
+            TransformMobyJointToWorld(moby,i==0?3:i==1?2:4,vec);
             *(TI128 *)tmp = 0;
-            tmp[0]=func_002A7878(-1.0f,1.0f);
+            tmp[0]=RandomFloatRange(-1.0f,1.0f);
             tmp[3]=1.0f;
-            tmp[1]=t+t-1.0f;
-            t+=0.333f;
+            tmp[1]=spread+spread-1.0f;
+            spread+=0.333f;
             *(TI128 *)dir=*(TI128 *)tmp;
-            func_002830C0(dir,dir,D_L11_001B368C[0]+(I(s,4)<<7));
+            transform_vector(dir,dir,D_L11_001B368C[0]+(I(vars,4)<<7));
             {
                 float high = D_L11_001B2388_block[1];
                 float low = D_L11_001B2388;
-                func_L11_003DD068(p,v,dir,func_002A7878(low,high)*0.00027777778f);
+                SpawnHoverbikeRaceBomb(moby,vec,dir,RandomFloatRange(low,high)*0.00027777778f);
             }
         }
-        func_002A7750(p,3,-1);
+        SetMobyState(moby,3,-1);
         break;
     case 3:
         active=1;
-        if(!func_002ACBC8(D_00189EA0,I(s,0))) func_002A7750(p,1,-1);
+        if(!IsPointInCuboid(gHeroPosition,I(vars,0))) SetMobyState(moby,1,-1);
         break;
     }
     if(active) {
-        F(s,0x14)=func_00283B98(F(s,0x14),0.034906592f);
-        sn=func_00283180(F(s,0x14));
-        cs=func_00283198(F(s,0x14));
-        F(p,0x18)-=F(s,0x18);
-        F(s,0x18)=cs*0.1f;
-        F(p,0x18)+=F(s,0x18);
-        F(p,0xF4)+=cs*0.0015f;
-        F(p,0xF0)+=sn*0.0015f;
-        *(TI128 *)(P(s,0x10)+0xF0)=*(TI128 *)(p+0xF0);
-        func_00282D30(v,p+0xE0,1.46f);
-        func_00282CC0(P(s,0x10)+0x10,p+0x10,v);
-        func_002A05A8(P(s,0x10));
-        func_002A0F48(P(s,0x10));
-        func_00282D30(v,p+0xE0,0.59f);
-        func_00282CC0(pos,p+0x10,v);
-        v[0]=v[1]=0.0f;
-        v[2]=-(func_002A7878(2.25f,3.5f)*(1.0f/60.0f));
-        func_L00_0033C0D0(p,pos,v,D_L11_001B2378,1);
-        v[2]=-(func_002A7878(3.0f,5.0f)*(1.0f/60.0f));
-        func_L00_0033C0D0(p,pos,v,D_L11_001B2368,1);
-        v[2]=-(func_002A7878(4.0f,8.0f)*(1.0f/60.0f));
-        func_L00_0033C0D0(p,pos,v,D_L11_001B2358,1);
+        F(vars,0x14)=FastAddRotations(F(vars,0x14),0.034906592f);
+        sine=FastSinOrCosA(F(vars,0x14));
+        cosine=FastSinOrCosB(F(vars,0x14));
+        F(moby,0x18)-=F(vars,0x18);
+        F(vars,0x18)=cosine*0.1f;
+        F(moby,0x18)+=F(vars,0x18);
+        F(moby,0xF4)+=cosine*0.0015f;
+        F(moby,0xF0)+=sine*0.0015f;
+        *(TI128 *)(P(vars,0x10)+0xF0)=*(TI128 *)(moby+0xF0);
+        FastVecScale(vec,moby+0xE0,1.46f);
+        FastVecAdd(P(vars,0x10)+0x10,moby+0x10,vec);
+        func_002A05A8(P(vars,0x10));
+        func_002A0F48(P(vars,0x10));
+        FastVecScale(vec,moby+0xE0,0.59f);
+        FastVecAdd(pos,moby+0x10,vec);
+        vec[0]=vec[1]=0.0f;
+        vec[2]=-(RandomFloatRange(2.25f,3.5f)*(1.0f/60.0f));
+        SpawnObjectRelativeParticle(moby,pos,vec,D_L11_001B2378,1);
+        vec[2]=-(RandomFloatRange(3.0f,5.0f)*(1.0f/60.0f));
+        SpawnObjectRelativeParticle(moby,pos,vec,D_L11_001B2368,1);
+        vec[2]=-(RandomFloatRange(4.0f,8.0f)*(1.0f/60.0f));
+        SpawnObjectRelativeParticle(moby,pos,vec,D_L11_001B2358,1);
     }
 }

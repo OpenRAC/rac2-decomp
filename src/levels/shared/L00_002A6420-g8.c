@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -62,9 +63,9 @@ void func_L00_002A65D8(void)
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
 
-    func_L00_002A9600();
-    func_L00_002A7958();
-    func_L00_002A7748();
+    UpdateHeroMobyFromHero();
+    FadeScreenEffect();
+    ApplyHeroAxisScales();
 
     if (*(u8 *)(base + 0x22B4) == 1) {
         int record;
@@ -82,8 +83,8 @@ void func_L00_002A65D8(void)
         *(int *)(base + 0x24E4) = 0;
     }
 
-    hero = D_00189EA0;
+    hero = gHeroPosition;
     func_3080D0(hero);
-    func_L00_002A9760();
+    UpdateHeroMobyProbedHeightBounds();
     func_319684(*(void **)(hero + 0x2210));
 }

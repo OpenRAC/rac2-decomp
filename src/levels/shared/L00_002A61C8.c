@@ -32,6 +32,7 @@ extern void func_00282CC0(void *, void *, void *);
 typedef struct Obj_L00_0033BA68 Obj_L00_0033BA68;
 extern Obj_L00_0033BA68 *func_L00_0033BA68(char *, int, float);
 
+/* Plays a footstep sound for one foot and, on some ground, spawns a dust puff at that foot. */
 void func_L00_002A61C8(int kind, int side, int play_sound, int duration) {
     float point[4];
     float offset[4];
@@ -40,35 +41,35 @@ void func_L00_002A61C8(int kind, int side, int play_sound, int duration) {
     int ticks;
     if (play_sound) {
         special = 0;
-        if (D_00189E20.f1270) {
-            int mode = D_00189E20.f1298;
+        if (gHeroState.f1270) {
+            int mode = gHeroState.f1298;
             if ((unsigned int)(mode - 19) < 2 || mode == 54)
                 special = 1;
         }
-        ticks = func_00283CF0((float)((duration << 10) / 30));
-        func_L00_0035F6D8(kind, side, special, 0, (int)D_00189E20.f2290, ticks);
+        ticks = FloatToInt((float)((duration << 10) / 30));
+        StartEffectFromWeights(kind, side, special, 0, (int)gHeroState.f2290, ticks);
     }
-    if (D_001A79F0 == 7) {
-        if (D_00189E20.b149D == 0) goto effect;
+    if (gCurrentMapIndex == 7) {
+        if (gHeroState.b149D == 0) goto effect;
     }
-    if (D_001A79F0 != 19) return;
-    if (D_00189E20.b149D != 2) return;
+    if (gCurrentMapIndex != 19) return;
+    if (gHeroState.b149D != 2) return;
 effect:
-    func_0029FCC0(D_00189E20.f2290, side + 22, (char *)point);
-    point[0] += func_00283180(D_00189E20.f98) * 0.05f;
-    point[1] += func_00283198(D_00189E20.f98) * 0.05f;
-    point[2] = func_002A89A8(point, 0, 0.5f) + 0.057f;
-    heading = D_00189E20.f98;
-    if (D_00189E20.f2294 == 0 || D_00189E20.f229C == 4) {
+    TransformMobyJointToWorld(gHeroState.f2290, side + 22, (char *)point);
+    point[0] += FastSinOrCosA(gHeroState.f98) * 0.05f;
+    point[1] += FastSinOrCosB(gHeroState.f98) * 0.05f;
+    point[2] = ProbeGroundHeightBelow(point, 0, 0.5f) + 0.057f;
+    heading = gHeroState.f98;
+    if (gHeroState.f2294 == 0 || gHeroState.f229C == 4) {
         if (side == 0) {
-            heading = func_00283B98(heading, 0.436332345f);
-            func_00282F20(offset, D_00189E20.v10, 0.037f);
-            func_00282CC0(point, point, offset);
+            heading = FastAddRotations(heading, 0.436332345f);
+            vec_scale_to_length(offset, gHeroState.v10, 0.037f);
+            FastVecAdd(point, point, offset);
         } else {
-            heading = func_00283B98(heading, -0.436332345f);
-            func_00282F20(offset, D_00189E20.v10, -0.037f);
-            func_00282CC0(point, point, offset);
+            heading = FastAddRotations(heading, -0.436332345f);
+            vec_scale_to_length(offset, gHeroState.v10, -0.037f);
+            FastVecAdd(point, point, offset);
         }
     }
-    func_L00_0033BA68((char *)point, !side, heading);
+    SpawnGlowEffect((char *)point, !side, heading);
 }

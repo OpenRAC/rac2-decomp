@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_00284EA8(void);
 
@@ -12,15 +13,15 @@ extern float func_00282C48_8(float t);
 
 extern void func_00283B98_10(float a, float c);
 
-/* calls the measured no-argument callee */
+/* Calls the engine routine at 0x00284EA8 with no arguments. */
 void func_L00_002E5918(void) {
- func_00284EA8();
+ AppendDrawListHeader();
 }
 
 
-/* calls the measured callee with zero */
+/* Calls an engine routine with zero. */
 void func_L00_002E6448(void) {
- func_002CBC58(0);
+ DrawPauseMenuPanels(0);
 }
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
@@ -42,6 +43,7 @@ extern DrawCallback_r002E6CF0 r1_D_0018DC40_002E6CF0[];
 extern void *r1_D_0018DD40_002E6CF0[];
 
 /* rac1-decomp src/game/draw.c: func_001F49B0 */
+/* Adds a draw callback and its argument to the first list, if there is room. */
 void func_L00_002E6CF0(DrawCallback_r002E6CF0 fn, void *arg) {
     int count = r1_D_0015F564_002E6CF0;
     if (count < 0x40) {
@@ -51,7 +53,7 @@ void func_L00_002E6CF0(DrawCallback_r002E6CF0 fn, void *arg) {
     }
 }
 
-/* Runs the queued callbacks. */
+/* Runs every callback in the first list with its argument. */
 typedef void (*Callback_r002E6D40)(void *);
 extern volatile int D_L00_001B1948 __attribute__((sda));
 extern Callback_r002E6D40 D_L00_001BE0C0[];
@@ -81,6 +83,7 @@ extern DrawCallback_r002E6DB8 r1_D_0018DC40_002E6DB8[];
 extern void *r1_D_0018DD40_002E6DB8[];
 
 /* rac1-decomp src/game/draw.c: func_001F49B0 */
+/* Adds a draw callback and its argument to the second list, if there is room. */
 void func_L00_002E6DB8(DrawCallback_r002E6DB8 fn, void *arg) {
     int count = r1_D_0015F564_002E6DB8;
     if (count < 0x40) {
@@ -90,7 +93,7 @@ void func_L00_002E6DB8(DrawCallback_r002E6DB8 fn, void *arg) {
     }
 }
 
-/* Runs the next queued callback set. */
+/* Runs every callback in the second list with its argument. */
 typedef void (*Callback_r002E6E08)(void *);
 extern volatile int D_L00_001B1950 __attribute__((sda));
 extern Callback_r002E6E08 D_L00_001BE4C0[];
@@ -101,7 +104,7 @@ void func_L00_002E6E08(void) {
         D_L00_001BE4C0[i](D_L00_001BE5C0[i]);
 }
 
-/* Runs the next queued callback set. */
+/* Runs every callback in the fourth list with its argument. */
 typedef void (*Callback_r002E6E80)(void *);
 extern volatile int D_L00_001B1954 __attribute__((sda));
 extern Callback_r002E6E80 D_L00_001BE6C0[];
@@ -131,6 +134,7 @@ extern DrawCallback_r002E6EF8 r1_D_0018DC40_002E6EF8[];
 extern void *r1_D_0018DD40_002E6EF8[];
 
 /* rac1-decomp src/game/draw.c: func_001F49B0 */
+/* Adds a draw callback and its argument to the third list, if there is room. */
 void func_L00_002E6EF8(DrawCallback_r002E6EF8 fn, void *arg) {
     int count = r1_D_0015F564_002E6EF8;
     if (count < 0x40) {
@@ -140,7 +144,7 @@ void func_L00_002E6EF8(DrawCallback_r002E6EF8 fn, void *arg) {
     }
 }
 
-/* Runs the next queued callback set. */
+/* Runs every callback in the third list with its argument. */
 typedef void (*Callback_r002E6F48)(void *);
 extern volatile int D_L00_001B194C __attribute__((sda));
 extern Callback_r002E6F48 D_L00_001BE2C0[];
@@ -158,27 +162,31 @@ void func_L00_002E6F48(void) {
 extern int func_0027F128(char *text, int length, char *charset);
 extern char D_L00_0028C590[];
 
+/* Measures the width of text using the first character set. */
 int func_L00_002E9100(char *text, int length) {
- return func_0027F128(text, length, D_L00_0028C590);
+ return measure_text_width(text, length, D_L00_0028C590);
 }
 
 extern char D_L00_0028C930[];
 
+/* Measures the width of text using the second character set. */
 int func_L00_002E9120(char *text, int length) {
- return func_0027F128(text, length, D_L00_0028C930);
+ return measure_text_width(text, length, D_L00_0028C930);
 }
 
 extern char D_L00_0028CCD0[];
 
+/* Measures the width of text using the third character set. */
 int func_L00_002E9140(char *text, int length) {
- return func_0027F128(text, length, D_L00_0028CCD0);
+ return measure_text_width(text, length, D_L00_0028CCD0);
 }
 
 extern void func_0027F1D8(void *a0, void *a1, void *a2);
 extern char D_L00_0028C590[];
 
-void func_L00_002E9210(void *a0, void *a1) {
- func_0027F1D8(a0, a1, D_L00_0028C590);
+/* Runs a text helper on two buffers with the first character set. */
+void func_L00_002E9210(void *first, void *second) {
+ MeasureTextWidthScaled(first, second, D_L00_0028C590);
 }
 
 
@@ -186,9 +194,10 @@ extern unsigned long func_0027C878(int);
 
 extern void func_0027F2A8(int, int, unsigned long, char *, int, unsigned long, char *);
 
+/* Draws coloured text at a screen position using the third character set. */
 void func_L00_002E95C0(int x, int y, unsigned long colour, char *text, int length) {
- unsigned long texture = func_0027C878(3);
- func_0027F2A8(x, y, colour, text, length, texture, D_L00_0028CCD0);
+ unsigned long texture = GetEffectTextureDescriptor(3);
+ DrawTextLine(x, y, colour, text, length, texture, D_L00_0028CCD0);
 }
 
 
@@ -197,10 +206,11 @@ extern void func_0027A9F0(void);
 
 extern void func_0027AB40(void);
 
+/* Refreshes the engine state and the view. */
 void func_L00_002EA600(void) {
- func_00284EA8();
- func_0027A9F0();
- func_0027AB40();
+ AppendDrawListHeader();
+ InitViewContext();
+ UpdateViewContext();
 }
 
 
@@ -220,6 +230,7 @@ extern void func_00282C88(void *);
 extern int func_00283D38(int, int, float);
 extern void *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
 
+/* Spawns a burst of sparks around an object, with colours picked by the palette number. */
 void func_L00_002EC248(char *object, void *positionOffset, void *velocityOffset,
                      int count, int palette, float positionSpread, float velocitySpread,
                      float width, float gravity, float duration)
@@ -232,41 +243,41 @@ void func_L00_002EC248(char *object, void *positionOffset, void *velocityOffset,
     gravity *= 0.00027777778f;
     palette &= 0xFF;
     for (i = 0; i < count; i++) {
-        func_002A7A00(&position, 0.0f, positionSpread);
-        func_00282CC0(&position, &position, positionOffset);
-        func_L00_00324F18(object, &position, position.x, position.y, position.z);
-        func_002A7A00(&velocity, 0.0f, velocitySpread);
-        func_00282CC0(&velocity, &velocity, velocityOffset);
-        func_00283098(&velocity, &velocity, object + 0xC0);
-        scale = duration * func_002A7878(0.5f, 1.5f);
+        RandomDirectionVector(&position, 0.0f, positionSpread);
+        FastVecAdd(&position, &position, positionOffset);
+        LocalOffsetToWorld(object, &position, position.x, position.y, position.z);
+        RandomDirectionVector(&velocity, 0.0f, velocitySpread);
+        FastVecAdd(&velocity, &velocity, velocityOffset);
+        matrix_mul_vec3(&velocity, &velocity, object + 0xC0);
+        scale = duration * RandomFloatRange(0.5f, 1.5f);
         small = scale * 10.0f;
-        first = func_00283CF0(small);
-        middle = func_00283CF0(scale * 40.0f);
-        last = func_00283CF0(small);
-        velocity.w = width * func_002A7878(0.1f, 0.4f);
-        func_00282C88(&endpoint);
+        first = FloatToInt(small);
+        middle = FloatToInt(scale * 40.0f);
+        last = FloatToInt(small);
+        velocity.w = width * RandomFloatRange(0.1f, 0.4f);
+        ClearVector128(&endpoint);
         endpoint.z = -gravity * (float)(first + middle + last);
-        func_00282CC0(&endpoint, &endpoint, &velocity);
+        FastVecAdd(&endpoint, &endpoint, &velocity);
         switch (palette) {
         case 1:
-            start = func_00283D38(0x80102040, 0x801010A0, func_002A7878(0.0f, 1.0f));
-            end = func_00283D38(0x00102040, 0x001010A0, func_002A7878(0.0f, 1.0f));
+            start = FastTweenColor(0x80102040, 0x801010A0, RandomFloatRange(0.0f, 1.0f));
+            end = FastTweenColor(0x00102040, 0x001010A0, RandomFloatRange(0.0f, 1.0f));
             break;
         case 3:
-            start = func_00283D38(0x80201608, 0x80402510, func_002A7878(0.0f, 1.0f));
-            end = func_00283D38(0x00201608, 0x00402510, func_002A7878(0.0f, 1.0f));
+            start = FastTweenColor(0x80201608, 0x80402510, RandomFloatRange(0.0f, 1.0f));
+            end = FastTweenColor(0x00201608, 0x00402510, RandomFloatRange(0.0f, 1.0f));
             break;
         case 2:
-            start = func_00283D38(0x80104010, 0x8020A020, func_002A7878(0.0f, 1.0f));
-            end = func_00283D38(0x00104010, 0x0020A020, func_002A7878(0.0f, 1.0f));
+            start = FastTweenColor(0x80104010, 0x8020A020, RandomFloatRange(0.0f, 1.0f));
+            end = FastTweenColor(0x00104010, 0x0020A020, RandomFloatRange(0.0f, 1.0f));
             break;
         case 0:
         default:
-            start = func_00283D38(0x80004080, 0x80408080, func_002A7878(0.0f, 1.0f));
-            end = func_00283D38(0x00004080, 0x00408080, func_002A7878(0.0f, 1.0f));
+            start = FastTweenColor(0x80004080, 0x80408080, RandomFloatRange(0.0f, 1.0f));
+            end = FastTweenColor(0x00004080, 0x00408080, RandomFloatRange(0.0f, 1.0f));
             break;
         }
-        func_002BAA28(&position, &velocity, &endpoint, start, end,
+        SpawnTrailParticle_002BAA28(&position, &velocity, &endpoint, start, end,
                      first, middle, last, texture);
     }
 }
@@ -277,6 +288,7 @@ void func_L00_002EC248(char *object, void *positionOffset, void *velocityOffset,
 /* func_L00_002ECFE8 is in L00_002ECFE8.c. */
 
 
+/* Does nothing. */
 void func_L00_002ED420(void)
 {
 }
@@ -301,22 +313,22 @@ extern void ref_L00_002ED808_01(void *, int, int);
 /* Steps the sixteen slots: eases the angle down by five degrees a tick and drops a slot
    when its countdown reaches zero. 0.087266475f is 0x3DB2B8C4 as retail materialises it. */
 void func_L00_002ED808(void) {
-    Entry_r002ED808 *e = D_L00_001BECC0;
+    Entry_r002ED808 *entry = D_L00_001BECC0;
     int i = 15;
 
     do {
-        if ((short)e->f10 > 0) {
-            e->f18 = ref_L00_002ED808_00(e->f18, 0.087266475f);
-            if ((short)e->f10 >= 13)
-                e->f12 += 5;
+        if ((short)entry->f10 > 0) {
+            entry->f18 = ref_L00_002ED808_00(entry->f18, 0.087266475f);
+            if ((short)entry->f10 >= 13)
+                entry->f12 += 5;
             else
-                e->f12 -= 5;
-            e->f10--;
-            if ((short)e->f10 <= 0)
-                ref_L00_002ED808_01(e, 0, 0x20);
+                entry->f12 -= 5;
+            entry->f10--;
+            if ((short)entry->f10 <= 0)
+                ref_L00_002ED808_01(entry, 0, 0x20);
         }
         i--;
-        e++;
+        entry++;
     } while (i >= 0);
 }
 
@@ -361,17 +373,17 @@ ASM_FUNC("asm/levels", func_L00_002EE4D8);
 ASM_FUNC("asm/levels", func_L00_002EE660);
 
 /* Takes three floats, computes a value from the second and first, negates the third when that value is not positive, clamps the third against that value and its negation (recomputing it in each branch), then calls a helper with the first and the clamped third. */
-void func_L00_002EF548(float a, float b, float c)
+void func_L00_002EF548(float angle, float other, float amount)
 {
-    float t = func_00283BE0_6(b, a);
+    float limit = func_00283BE0_6(other, angle);
 
-    if (t <= 0.0f)
-        c = -c;
-    if (func_00282C48_8(t) < c)
-        c = func_00282C48_8(t);
-    else if (c < -func_00282C48_8(t))
-        c = -func_00282C48_8(t);
-    func_00283B98_10(a, c);
+    if (limit <= 0.0f)
+        amount = -amount;
+    if (func_00282C48_8(limit) < amount)
+        amount = func_00282C48_8(limit);
+    else if (amount < -func_00282C48_8(limit))
+        amount = -func_00282C48_8(limit);
+    func_00283B98_10(angle, amount);
 }
 
 

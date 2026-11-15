@@ -12,40 +12,42 @@ extern u8 D_L08_001B14F0[];
 
 typedef int V4 __attribute__((mode(TI)));
 
-s32 func_L08_0040F9D0(void *a0, void *a1, void *a2, f32 p1, f32 p2)
+/* Creates a new object (moby class 3704) at a position with a start velocity and a random spin;
+   returns it, or 0 if its first setup step fails. */
+s32 func_L08_0040F9D0(void *owner, void *startPos, void *startVel, f32 turnSpeed, f32 moveSpeed)
 {
-    u8 *m;
-    u8 *p;
-    u8 *st;
-    f32 v;
-    s32 r;
+    u8 *moby;
+    u8 *position;
+    u8 *vars;
+    f32 spin;
+    s32 result;
 
-    m = (u8 *)func_31D1D8(0xE78);
-    if (m != 0) {
-        st = *(u8 **)(m + 0x68);
-        p = m + 0x10;
-        *(u8 *)(m + 0x30) = 0x40;
-        *(u8 *)(m + 0xBC) = 0;
-        *(u8 *)(m + 0x95) = 0;
-        *(u8 *)(m + 0x20) = 0;
-        *(u32 *)(st + 0x18) = (u32)a0;
-        *(V4 *)p = *(V4 *)a1;
-        *(V4 *)st = *(V4 *)a2;
-        *(f32 *)(st + 0x14) = p1 * 0.0002908882452175021f;
-        *(f32 *)(st + 0x10) = p2 * 0.00027777778450399637f;
-        v = func_3279B8();
-        *(f32 *)(m + 0xF0) = v;
-        v = func_3279B8();
-        *(f32 *)(m + 0xF4) = v;
-        v = func_3279B8();
-        *(f32 *)(m + 0xF8) = v;
-        r = func_3AE870(p, 0);
-        *(u32 *)(st + 0x1C) = r;
-        if (r == 0) {
+    moby = (u8 *)func_31D1D8(0xE78 /* moby class 3704 */);
+    if (moby != 0) {
+        vars = *(u8 **)(moby + 0x68);
+        position = moby + 0x10;
+        *(u8 *)(moby + 0x30) = 0x40;
+        *(u8 *)(moby + 0xBC) = 0;
+        *(u8 *)(moby + 0x95) = 0;
+        *(u8 *)(moby + 0x20) = 0;
+        *(u32 *)(vars + 0x18) = (u32)owner;
+        *(V4 *)position = *(V4 *)startPos;
+        *(V4 *)vars = *(V4 *)startVel;
+        *(f32 *)(vars + 0x14) = turnSpeed * 0.0002908882452175021f;
+        *(f32 *)(vars + 0x10) = moveSpeed * 0.00027777778450399637f;
+        spin = func_3279B8();
+        *(f32 *)(moby + 0xF0) = spin;
+        spin = func_3279B8();
+        *(f32 *)(moby + 0xF4) = spin;
+        spin = func_3279B8();
+        *(f32 *)(moby + 0xF8) = spin;
+        result = func_3AE870(position, 0);
+        *(u32 *)(vars + 0x1C) = result;
+        if (result == 0) {
             func_2B71F0(D_L08_001B14F0);
-            func_31D540(m);
-            m = 0;
+            func_31D540(moby);
+            moby = 0;
         }
     }
-    return (s32)m;
+    return (s32)moby;
 }

@@ -1,5 +1,6 @@
 /* func_L00_0033E220 in its own unit: its 16-byte copies are lq/sq pairs (-frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned int u32;
@@ -42,18 +43,19 @@ extern s32 func_002A77E0(s32 range);
 
 extern int *ref_L00_0033E220_00;
 
+/* Creates an effect that can follow an object. It sets the position, size and brightness from the object or from the given point. */
 Obj_L00_0033E220 *func_L00_0033E220(V4_L00_0033E220 *vec, u8 *obj, u32 flags, s32 a3, s32 index, s32 idx2, s32 sc, s32 range, f32 f12, f32 f13)
 {
-    Obj_L00_0033E220 *o = (Obj_L00_0033E220 *)func_002B9030(0x59);
+    Obj_L00_0033E220 *o = (Obj_L00_0033E220 *)AllocParticle(0x59);
 
     if (o != 0) {
         f32 four = 4.0f;
         o->w4 = flags;
-        o->b9 = func_00283CF0(four) + 0x40;
+        o->b9 = FloatToInt(four) + 0x40;
         o->f_c = f12;
         o->b1 = 0;
         o->b3 = 0x48;
-        o->b8 = func_002A77E0(0xFF);
+        o->b8 = RandomIntBelow(0xFF);
         o->b2 = *((u8 *)ref_L00_0033E220_00 + index);
         o->s_a = idx2;
         o->sub.w0 = (u32)obj;
@@ -69,11 +71,11 @@ Obj_L00_0033E220 *func_L00_0033E220(V4_L00_0033E220 *vec, u8 *obj, u32 flags, s3
         }
         if (obj != 0) {
             o->v10 = *(V4_L00_0033E220 *)(obj + 0x10);
-            func_00282CC0(&o->v10, &o->v10, &o->v30);
+            FastVecAdd(&o->v10, &o->v10, &o->v30);
             if (range > 0) {
-                o->b9 = ((range >> 5) << 4) + func_00283CF0(four);
+                o->b9 = ((range >> 5) << 4) + FloatToInt(four);
             } else {
-                o->b9 = (((s16)*(u16 *)(obj + 0x32) >> 5) << 4) + func_00283CF0(four);
+                o->b9 = (((s16)*(u16 *)(obj + 0x32) >> 5) << 4) + FloatToInt(four);
             }
         } else {
             o->v10 = *vec;

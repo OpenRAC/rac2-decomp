@@ -28,26 +28,27 @@
 
 extern void ref_L12_0041BDF8_00(void *);
 
-void func_L12_0041BDF8(s8 *arg0) {
-    s8 *s0;
-    s8 **p;
-    s32 a2;
-    s8 *t;
+/* Gives the two beam helper objects back their normal collision. */
+void func_L12_0041BDF8(s8 *object) {
+    s8 *vars;
+    s8 **slot;
+    s32 remaining;
+    s8 *child;
 
-    if (arg0 != NULL) {
-        if (*(s16 *)(arg0 + 0xAA) == 0xFAE) {
-            s0 = *(s8 **)(arg0 + 0x68);
-            ref_L12_0041BDF8_00(arg0);
-            p = (s8 **)(s0 + 8);
-            a2 = 1;
+    if (object != NULL) {
+        if (*(s16 *)(object + 0xAA) == 0xFAE /* moby class 4014 */) {
+            vars = *(s8 **)(object + 0x68);
+            ref_L12_0041BDF8_00(object);
+            slot = (s8 **)(vars + 8);
+            remaining = 1;
             do {
-                t = *p;
-                a2 -= 1;
-                if (t != NULL) {
-                    *(s32 *)(t + 0x98) = *(s32 *)(*(s8 **)(t + 0x24) + 0x10);
+                child = *slot;
+                remaining -= 1;
+                if (child != NULL) {
+                    *(s32 *)(child + 0x98) = *(s32 *)(*(s8 **)(child + 0x24) + 0x10);
                 }
-                p += 1;
-            } while (a2 >= 0);
+                slot += 1;
+            } while (remaining >= 0);
         }
     }
 }

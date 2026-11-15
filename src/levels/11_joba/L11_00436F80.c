@@ -44,115 +44,116 @@ typedef struct { char pad[0x330]; int children[10]; char gap[0x28]; unsigned cha
 
 void func_L11_004375B8(char *);
 
+/* Runs the chain creature through its states: following its path, firing at the hero, and bursting apart when it dies. */
 void func_L11_00436F80(char *obj)
 {
-    char *s=*(char **)(obj+0x68);
+    char *vars=*(char **)(obj+0x68);
     float target[4], pos[4], direction[4], velocity[4], random[4];
     int i, count;
     char *p;
-    func_L11_004375B8(obj);
-    qcopy(target,s+0x50);
-    func_00282E80(obj+0x10,(char *)target);
+    UpdateChainCreatureDamage(obj);
+    qcopy(target,vars+0x50);
+    vec_distance_xy(obj+0x10,(char *)target);
     { float x=target[0], y=target[1];
       float ox=*(float *)(obj+0x10), oy=*(float *)(obj+0x14);
       x-=ox;
       y-=oy;
-      func_00283C80(*(float *)(obj+0xF8),func_00283248(x,y)); }
+      FastDiffRots(*(float *)(obj+0xF8),FastMatrixHelperA(x,y)); }
 
     switch (*(unsigned char *)(obj+0x95)) {
     case 0: break;
     case 1:
-        if (!func_373978(obj,*(int *)(s+0x38C))) *(int *)(s+0x38C)=func_002E5CF8(0,4,obj);
+        if (!func_373978(obj,*(int *)(vars+0x38C))) *(int *)(vars+0x38C)=PlayMobySound(0,4,obj);
         break;
     }
     switch (*(unsigned char *)(obj+0x20)) {
     case 2:
-        if (func_002B3868(obj)) {
-            if (*(unsigned char *)(obj+0x43)!=0) func_002A7470(obj,0,0,10);
-            func_L11_00438F18(obj);
-            p=*(char **)(s+0x324);
+        if (SetFirstPendingFlag(obj)) {
+            if (*(unsigned char *)(obj+0x43)!=0) StartAnimationBlended(obj,0,0,10);
+            ChooseNextPath(obj);
+            p=*(char **)(vars+0x324);
             qcopy(obj+0x10,p+0x10);
-            *(float *)(obj+0xF8)=func_00283248(*(float *)(p+0x20)-*(float *)(obj+0x10),*(float *)(p+0x24)-*(float *)(obj+0x14));
-            func_002833F0(obj+0xC0,obj+0xF0);
-            func_L11_00438248(obj);
-        } else if (func_L11_004390D0(obj)==1) func_002A7750(obj,3,-1);
+            *(float *)(obj+0xF8)=FastMatrixHelperA(*(float *)(p+0x20)-*(float *)(obj+0x10),*(float *)(p+0x24)-*(float *)(obj+0x14));
+            euler_rotation_basis(obj+0xC0,obj+0xF0);
+            LayOutVerletChain(obj);
+        } else if (FollowPathStep(obj)==1) SetMobyState(obj,3,-1);
         break;
     case 3:
-        if (func_002B3868(obj)) {
-            if (*(unsigned char *)(obj+0x43)!=0) func_002A7470(obj,0,0,10);
-            func_L11_00438F18(obj);
-        } else if (func_L11_004390D0(obj)==1)
-            func_002A7750(obj,func_L11_00439D60(obj),-1);
+        if (SetFirstPendingFlag(obj)) {
+            if (*(unsigned char *)(obj+0x43)!=0) StartAnimationBlended(obj,0,0,10);
+            ChooseNextPath(obj);
+        } else if (FollowPathStep(obj)==1)
+            SetMobyState(obj,PickIdleOrMoveState(obj),-1);
         break;
     case 4:
-        if (func_002B3868(obj)) {
-            if (*(unsigned char *)(obj+0x43)!=0) func_002A7470(obj,0,0,10);
-            func_L11_00438F18(obj);
+        if (SetFirstPendingFlag(obj)) {
+            if (*(unsigned char *)(obj+0x43)!=0) StartAnimationBlended(obj,0,0,10);
+            ChooseNextPath(obj);
         } else {
-            if (func_L11_004390D0(obj)==1) func_002A7750(obj,func_L11_00439D60(obj),-1);
+            if (FollowPathStep(obj)==1) SetMobyState(obj,PickIdleOrMoveState(obj),-1);
             if (*(unsigned char *)(obj+0x31)) {
-                if (*(short *)(s+0x374)==-1) func_L11_00438CD8(obj);
-                func_L11_00438CE8(obj);
+                if (*(short *)(vars+0x374)==-1) ResetProjectileSequence(obj);
+                FireNextSegmentProjectile(obj);
             }
         }
         break;
     case 5:
-        if (func_002B3868(obj)) {
-            if (*(unsigned char *)(obj+0x43)!=4) func_002A7470(obj,4,0,10);
-            if (*(int *)(s+0x38C)!=-1) {
-                char *entry=D_00188660+*(int *)(s+0x38C)*0x70;
-                if (*(char **)(entry+0x88)==obj && *(unsigned char *)(entry+0x74)) func_3739C0(*(int *)(s+0x38C));
+        if (SetFirstPendingFlag(obj)) {
+            if (*(unsigned char *)(obj+0x43)!=4) StartAnimationBlended(obj,4,0,10);
+            if (*(int *)(vars+0x38C)!=-1) {
+                char *entry=gSoundState+*(int *)(vars+0x38C)*0x70;
+                if (*(char **)(entry+0x88)==obj && *(unsigned char *)(entry+0x74)) func_3739C0(*(int *)(vars+0x38C));
             }
-            *(int *)(s+0x38C)=-1;
+            *(int *)(vars+0x38C)=-1;
         }
         if (*(unsigned char *)(obj+0x60)&2) {
-            if (*(unsigned char *)(obj+0x43)!=0) func_002A7470(obj,0,0,7);
+            if (*(unsigned char *)(obj+0x43)!=0) StartAnimationBlended(obj,0,0,7);
         }
-        if (func_L11_004390D0(obj)==1) func_002A7750(obj,func_L11_00439D60(obj),-1);
+        if (FollowPathStep(obj)==1) SetMobyState(obj,PickIdleOrMoveState(obj),-1);
         break;
     case 7: break;
     case 6:
-        if (func_002B3868(obj)) {
+        if (SetFirstPendingFlag(obj)) {
             *(unsigned short *)(obj+0x96)=0;
-            if (*(unsigned char *)(obj+0x43)!=4) func_002A7470(obj,4,0,10);
+            if (*(unsigned char *)(obj+0x43)!=4) StartAnimationBlended(obj,4,0,10);
         }
         if (*(unsigned short *)(obj+0x96)>10) {
-            func_00282CF0(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
-            func_00282F20((char *)direction,(char *)direction,0.5f);
-            qcopy(pos,s+0x100);
-            func_L11_00439640(obj,(char *)pos);
-            func_002A7A00(random,0.03333333507180214f,0.06666667014360428f);
-            func_00282CC0((char *)velocity,(char *)direction,(char *)random);
+            FastVecSub(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
+            vec_scale_to_length((char *)direction,(char *)direction,0.5f);
+            qcopy(pos,vars+0x100);
+            SpawnBlastBurstEffect(obj,(char *)pos);
+            RandomDirectionVector(random,0.03333333507180214f,0.06666667014360428f);
+            FastVecAdd((char *)velocity,(char *)direction,(char *)random);
                 count=0;
-            func_002B0A68(obj,1,velocity,3,6,3,6,255);
+            SpawnDebrisForMaskedParts(obj,1,velocity,3,6,3,6,255);
             for (i=0;i<10;i++) {
-                if (!((ChildSlots *)s)->flags[i]) {
+                if (!((ChildSlots *)vars)->flags[i]) {
                     if (count>=4) {
-                        qcopy(pos,s+0x100+i*16);
-                        func_002A7A00(random,0.1666666716337204f,0.3333333432674408f);
-                        func_00282CC0((char *)velocity,(char *)direction,(char *)random);
-                        func_002B0A68(CHILD(obj,i),3,velocity,3,6,3,6,255);
-                        func_L11_00439640(obj,(char *)pos);
-                        func_L11_0043AB28(CHILD(obj,i));
+                        qcopy(pos,vars+0x100+i*16);
+                        RandomDirectionVector(random,0.1666666716337204f,0.3333333432674408f);
+                        FastVecAdd((char *)velocity,(char *)direction,(char *)random);
+                        SpawnDebrisForMaskedParts(CHILD(obj,i),3,velocity,3,6,3,6,255);
+                        SpawnBlastBurstEffect(obj,(char *)pos);
+                        KillDroneWithEffects(CHILD(obj,i));
                     } else {
-                        char *records=(char *)D_L11_001B359C;
-                        (*(short *)(s+0x378))--;
+                        char *records=(char *)gMobyTable_L11;
+                        (*(short *)(vars+0x378))--;
                         count++;
-                        func_L11_00439640(obj,records+(((ChildSlots *)*(char **)(obj+0x68))->children[i]<<8)+0x10);
-                        func_L11_004393D8(obj,i,0);
+                        SpawnBlastBurstEffect(obj,records+(((ChildSlots *)*(char **)(obj+0x68))->children[i]<<8)+0x10);
+                        AimRotorRecordAtEntry(obj,i,0);
                     }
                 }
             }
-            qcopy(pos,s+0x1B0);
-            func_002A7A00(random,0.3333333432674408f,0.5f);
-            func_00282CC0((char *)velocity,(char *)direction,(char *)random);
-            func_002B0A68((char *)(D_L11_001B359C+(*(int *)(*(char **)(obj+0x68)+0x358)<<8)),7,velocity,3,6,3,6,255);
-            func_L11_00439640(obj,(char *)pos);
-            func_L02_003FC248(obj,0,-1);
-            func_L11_00439BF0(obj);
+            qcopy(pos,vars+0x1B0);
+            RandomDirectionVector(random,0.3333333432674408f,0.5f);
+            FastVecAdd((char *)velocity,(char *)direction,(char *)random);
+            SpawnDebrisForMaskedParts((char *)(gMobyTable_L11+(*(int *)(*(char **)(obj+0x68)+0x358)<<8)),7,velocity,3,6,3,6,255);
+            SpawnBlastBurstEffect(obj,(char *)pos);
+            SetMobyAnimTypeThree(obj,0,-1);
+            ClearChainSoundAndFlags(obj);
         }
         break;
     }
-    func_L11_00437CF0(obj);
+    UpdateChainBodyFrame(obj);
 }
 

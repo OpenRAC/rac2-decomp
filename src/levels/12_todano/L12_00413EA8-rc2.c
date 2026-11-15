@@ -29,24 +29,25 @@
 extern s8 *ref_L12_00413EA8_00[];
 extern s8 *ref_L12_00413EA8_01;
 
-void func_L12_00413EA8(void *arg0, s32 arg1) {
-    s8 *tb ;
-    s8 *p ;
-    s8 *rec;
-    s32 v;
+/* Marks every guard in the given group as having been alerted. */
+void func_L12_00413EA8(void *arg0, s32 group) {
+    s8 *table ;
+    s8 *entry ;
+    s8 *record;
+    s32 entryValue;
 
-    if (arg1 != 0xFF) {
-        tb = ref_L12_00413EA8_00[arg1];
-        if (tb != NULL) {
-            p = tb;
+    if (group != 0xFF) {
+        table = ref_L12_00413EA8_00[group];
+        if (table != NULL) {
+            entry = table;
             do {
-                rec = ref_L12_00413EA8_01 + ((*(u16 *)p & 0x7FFF) << 8);
-                if (*(s8 *)(rec + 0x20) >= 0 && *(s16 *)(rec + 0xAA) == 0xF31) {
-                    *(u8 *)(*(s8 **)(rec + 0x68) + 0x2EA) = 1;
+                record = ref_L12_00413EA8_01 + ((*(u16 *)entry & 0x7FFF) << 8);
+                if (*(s8 *)(record + 0x20) >= 0 && *(s16 *)(record + 0xAA) == 0xF31 /* moby class 3889 */) {
+                    *(u8 *)(*(s8 **)(record + 0x68) + 0x2EA) = 1;
                 }
-                v = *(s16 *)p;
-                p += 2;
-            } while (v >= 0);
+                entryValue = *(s16 *)entry;
+                entry += 2;
+            } while (entryValue >= 0);
         }
     }
 }

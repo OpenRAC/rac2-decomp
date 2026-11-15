@@ -13,7 +13,7 @@ void func_L00_002F59A8(void)
 {
     if (D_L00_001B1BA6 == 0)
         return;
-    if (func_00288E18(D_L00_001B1B88[D_L00_001B1BA7],
+    if (RequestSubtitleVoiceLine(D_L00_001B1B88[D_L00_001B1BA7],
                     D_L00_001B1B98[D_L00_001B1BA7]) == 0)
         return;
     D_L00_001B1BA7 = (D_L00_001B1BA7 + 1) % 7;

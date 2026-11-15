@@ -8,14 +8,15 @@ extern TI128 D_001BFFAFA0;
 
 extern s32 func_00277258(void *, s32, void *, float);
 
-s64 func_002ED948(s32 a0)
+/* Checks if the owner can be placed at its spot; if so, copies the saved position into it and returns 1, else returns 0. */
+s64 func_002ED948(s32 owner)
 {
-    s64 r = 0;
-    s32 p = a0 + 0x10;
+    s64 result = 0;
+    s32 pos = owner + 0x10;
 
-    if (func_00277258(p, 2, a0, 1.5f) != 0) {
-        *(TI128 *)p = D_001BFFAFA0;
-        r = 1;
+    if (TestPointAgainstCollision(pos, 2, owner, 1.5f) != 0) {
+        *(TI128 *)pos = D_001BFFAFA0;
+        result = 1;
     }
-    return r;
+    return result;
 }

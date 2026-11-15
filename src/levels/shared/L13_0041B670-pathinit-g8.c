@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { char pad[0x10]; float rate, limit; int active; short state; short pad1e; float epsilon; int flags; char pad28[8]; } PathSpring;
 typedef struct { char pad[0x40]; int flags; int pad44; float angle; float scale; } PathMotion;
@@ -12,6 +13,7 @@ extern void func_00282C88(Quad *);
 extern int func_L00_00341FA8(void *, void *, void *, int *, float *, int, float, float, float);
 extern int func_00283CF0(float);
 
+/* Sets up the path camera: spring and speed settings, and for the two-route mode, works out where each marker sits along its route. */
 void func_L13_004388C8(char *camera) {
     float projected[4];
     int segment;
@@ -53,7 +55,7 @@ void func_L13_004388C8(char *camera) {
         spring->active = 0;
         spring->state = 0;
         spring->flags = 0;
-        func_00282C88((Quad *)spring);
+        ClearVector128((Quad *)spring);
     }
     {
         char *private = *(char **)(camera + 0x70);
@@ -62,13 +64,13 @@ void func_L13_004388C8(char *camera) {
         spring->epsilon = 0.01f;
         *(float *)((char *)spring + 0x28) = 0.2f;
         *(short *)((char *)spring + 0x2C) = 0;
-        func_00282C88((Quad *)spring);
+        ClearVector128((Quad *)spring);
     }
     {
         char *private = *(char **)(camera + 0x70);
         PathSpring *spring = (PathSpring *)(private + 0x100);
-        func_00282C88((Quad *)spring);
-        func_00282C88((Quad *)(private + 0x120));
+        ClearVector128((Quad *)spring);
+        ClearVector128((Quad *)(private + 0x120));
         *(float *)((char *)spring + 0x40) = 3.0f;
         *(float *)((char *)spring + 0x30) = 0.003f;
         *(float *)((char *)spring + 0x34) = 0.1f;
@@ -90,14 +92,14 @@ void func_L13_004388C8(char *camera) {
         other = D_L13_001FE580[*(int *)(settings + 0x2C)];
         *(short *)(settings + 0x34) = 1;
         for (i = 0; i < first->count; i++) {
-            func_L00_00341FA8(route, first->point[i], projected, &segment, &fraction, 0, 20.0f, 5.0f, 0.0f);
+            find_nearest_path_point(route, first->point[i], projected, &segment, &fraction, 0, 20.0f, 5.0f, 0.0f);
             first->point[i][0] = *(float *)((char *)first + ((i) << 4) + 28);
             *(float *)((char *)first + ((i) << 4) + 28) = (float)segment;
         }
         previous_index = first->count - 1;
         for (i = 0; i < first->count; i++) {
-            previous = func_00283CF0(*(float *)((char *)first + ((previous_index) << 4) + 28));
-            current = func_00283CF0(*(float *)((char *)first + ((i) << 4) + 28));
+            previous = FloatToInt(*(float *)((char *)first + ((previous_index) << 4) + 28));
+            current = FloatToInt(*(float *)((char *)first + ((i) << 4) + 28));
             steps = current - previous;
             if (steps < 0) steps += route->count;
             fraction = 0.0f;
@@ -107,14 +109,14 @@ void func_L13_004388C8(char *camera) {
             previous_index = i;
         }
         for (i = 0; i < other->count; i++) {
-            func_L00_00341FA8(other_route, other->point[i], projected, &segment, &fraction, 0, 20.0f, 5.0f, 0.0f);
+            find_nearest_path_point(other_route, other->point[i], projected, &segment, &fraction, 0, 20.0f, 5.0f, 0.0f);
             other->point[i][0] = *(float *)((char *)other + ((i) << 4) + 28);
             *(float *)((char *)other + ((i) << 4) + 28) = (float)segment;
         }
         previous_index = other->count - 1;
         for (i = 0; i < other->count; i++) {
-            previous = func_00283CF0(*(float *)((char *)other + ((previous_index) << 4) + 28));
-            current = func_00283CF0(*(float *)((char *)other + ((i) << 4) + 28));
+            previous = FloatToInt(*(float *)((char *)other + ((previous_index) << 4) + 28));
+            current = FloatToInt(*(float *)((char *)other + ((i) << 4) + 28));
             steps = current - previous;
             if (steps < 0) steps += other_route->count;
             fraction = 0.0f;

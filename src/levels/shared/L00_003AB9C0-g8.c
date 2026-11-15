@@ -87,7 +87,7 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
     float tmp[4] __attribute__((aligned(16)));
-    SpawnObject *obj = func_0029EFD0(0x5da);
+    SpawnObject *obj = CreateMoby(0x5da);
     SpawnData *data;
     float *basis;
     float speed;
@@ -109,49 +109,49 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
             D_L00_001AF7A0 = (index + 1) % 8;
         }
 
-        speed = ((Material *)(D_00139583 * 0xE0 + (char *)D_L00_00262570))->speed * (1.0f / 60.0f);
+        speed = ((Material *)(D_00139583 * 0xE0 + (char *)gWeaponTable_L00))->speed * (1.0f / 60.0f);
         qcopy(obj->position, pos);
 
         if (target) {
-            func_00282D30(w, target->up, scale);
-            func_00282CC0(v, target->position, w);
+            FastVecScale(w, target->up, scale);
+            FastVecAdd(v, target->position, w);
         } else {
             /* A plain quadword store, not qzero: reload loads its zero into a register,
              * which moves on the reload registers below, and $zero replaces it after reload. */
             *(Quad *)v = 0;
         }
 
-        if (D_00189E20.mode == 1) {
-            func_00282F20(obj->forward, owner->right, -1.0f);
-            func_00282D30(obj->right, owner->forward, -1.0f);
+        if (gHeroState.mode == 1) {
+            vec_scale_to_length(obj->forward, owner->right, -1.0f);
+            FastVecScale(obj->right, owner->forward, -1.0f);
             qcopy(obj->up, owner->up);
             basis = obj->forward;
         } else if (target) {
             float *direction = obj->forward;
-            func_00282CF0(direction, v, obj->position);
-            func_00282F20(direction, direction, 1.0f);
-            func_00282DD8(obj->right, direction, D_00189E20.target->up);
-            func_00282F20(obj->right, obj->right, 1.0f);
-            func_00282DD8(obj->up, obj->right, direction);
+            FastVecSub(direction, v, obj->position);
+            vec_scale_to_length(direction, direction, 1.0f);
+            FastVecCross(obj->right, direction, gHeroState.target->up);
+            vec_scale_to_length(obj->right, obj->right, 1.0f);
+            FastVecCross(obj->up, obj->right, direction);
             basis = direction;
         } else {
-            qcopy(obj->forward, D_00189E20.forward);
+            qcopy(obj->forward, gHeroState.forward);
             basis = obj->forward;
-            if (D_00189E20.aiming)
-                func_L00_0037FA90(basis, pos, 1.0f, 75.0f, 0.52359885f);
-            func_00282DD8(obj->right, basis, D_00189E20.up);
-            func_00282F20(obj->right, obj->right, 1.0f);
-            func_00282DD8(obj->up, obj->right, basis);
+            if (gHeroState.aiming)
+                ComputeAimDirection(basis, pos, 1.0f, 75.0f, 0.52359885f);
+            FastVecCross(obj->right, basis, gHeroState.up);
+            vec_scale_to_length(obj->right, obj->right, 1.0f);
+            FastVecCross(obj->up, obj->right, basis);
         }
 
         obj->forward[3] = obj->right[3] = obj->up[3] = 0.0f;
         data->owner = owner;
-        data->spread = func_002A7878(lo, hi);
+        data->spread = RandomFloatRange(lo, hi);
         if (target)
             data->spread = 0;
-        data->turn = func_002A78D8(6.0f, 10.0f);
+        data->turn = RandomSignedFloatRange(6.0f, 10.0f);
         data->speed = speed;
-        data->phase = func_002A7940();
+        data->phase = RandomAngle();
         data->enabled = on;
         data->target = target;
         data->active = on;
@@ -160,14 +160,14 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
 
         if (D_L00_001A8FF0[0]) {
             float projection;
-            func_002AFFD8(obj->position, w, 1);
-            projection = func_00282DB0(w, data->basis);
-            func_00282D30(tmp, w, projection);
-            func_00282CF0(data->basis, data->basis, tmp);
+            ComputeViewDirection(obj->position, w, 1);
+            projection = FastVecDot(w, data->basis);
+            FastVecScale(tmp, w, projection);
+            FastVecSub(data->basis, data->basis, tmp);
         }
 
         if (target) {
-            TargetState *state = func_002AB1F0(target);
+            TargetState *state = GetMobyPrivateValue0(target);
             if (state) {
                 state->flags |= 0x80;
                 if (state->kind)
@@ -175,11 +175,11 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
             }
         }
 
-        data->life = func_00283CF0(75.0f / speed);
+        data->life = FloatToInt(75.0f / speed);
 
         if (target) {
-            func_00282D30(w, target->up, scale);
-            func_00282CC0(w, target->position, w);
+            FastVecScale(w, target->up, scale);
+            FastVecAdd(w, target->position, w);
             data->position[0] = w[0];
             data->position[1] = w[1];
             data->position[2] = w[2];
@@ -189,16 +189,16 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
         *(Quad *)w = *(Quad *)(owner->position);
         w[2] = ((float *)pos)[2];
 
-        if (func_002761F8(w, pos, 0, D_00189E20.target, 0)) {
+        if (CollLine(w, pos, 0, gHeroState.target, 0)) {
             obj->blocked = on;
             qcopy(obj->position, D_L00_001BF220);
         }
 
-        func_L00_003ACC88(obj, D_L00_0023B710 + (data->material << 6));
+        TransformOffsetToWorld(obj, D_L00_0023B710 + (data->material << 6));
         func_002A0F48(obj);
-        func_002ACA50(obj, D_L00_001B1FB0, 31);
+        AddMobyToIndexList(obj, D_L00_001B1FB0, 31);
         obj->radius *= 2.5f;
-        data->sound = func_002FED90(obj, 0, 1.0f, 1.0f, 1.0f);
+        data->sound = AllocEffectSlot_002FED90(obj, 0, 1.0f, 1.0f, 1.0f);
     }
     return obj;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef float f32;
 
@@ -6,35 +7,36 @@ extern float func_00282C48(float a0);
 
 /* Damped follow step: blends the velocity at a1 toward the spring term, then
    advances the position at a0 and passes the remaining offset to func_00282C48. */
-float func_L01_003CE7D8(f32 *a0, f32 *a1, f32 f12, f32 f13, f32 f14, f32 f15)
+/* Moves a value toward a target with a springy pull that slows over time. */
+float func_L01_003CE7D8(f32 *value, f32 *velocity, f32 target, f32 strength, f32 damping, f32 range)
 {
-    f32 f0, f1, f2;
+    f32 work, speed, current;
 
-    f0 = 1.0f;
-    f15 = f15 * f15;
-    f1 = *a1;
-    f14 = 1.0f - f14;
-    f14 = f14 - 1.0f;
-    f14 = f14 + 1.0f;
-    f1 = f1 * f14;
-    *a1 = f1;
-    f2 = *a0;
-    f0 = f2 - f12;
-    f0 = f0 * f0;
-    if (!(f0 > f15)) {
+    work = 1.0f;
+    range = range * range;
+    speed = *velocity;
+    damping = 1.0f - damping;
+    damping = damping - 1.0f;
+    damping = damping + 1.0f;
+    speed = speed * damping;
+    *velocity = speed;
+    current = *value;
+    work = current - target;
+    work = work * work;
+    if (!(work > range)) {
     } else {
-        f0 = f15;
+        work = range;
     }
-    f0 = f0 * f13;
-    f0 = f0 / f15;
-    if (f12 < f2)
-        *a1 = f1 - f0;
+    work = work * strength;
+    work = work / range;
+    if (target < current)
+        *velocity = speed - work;
     else
-        *a1 = f1 + f0;
-    f1 = *a1;
-    f0 = *a0;
-    f0 = f0 + f1;
-    f12 = f12 - f0;
-    *a0 = f0;
-    return func_00282C48(f12);
+        *velocity = speed + work;
+    speed = *velocity;
+    work = *value;
+    work = work + speed;
+    target = target - work;
+    *value = work;
+    return FloatAbs(target);
 }

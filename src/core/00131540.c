@@ -30,6 +30,7 @@ extern char r1_D_00153D00[], r1_D_00153D10[], r1_D_00153D28[];
 extern char *func_00131540(void);
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D2A0 */
+/* Reads the console ROM version record once and returns it. */
 char *func_00131540(void) {
     int fd;
     if (r1_D_001331D8[0] == 0) {

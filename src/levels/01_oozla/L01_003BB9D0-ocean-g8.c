@@ -38,15 +38,16 @@ extern void func_L01_003BAFB8(void *);
  * camera and the time, keeps their offsets in -1..1, sets the tide height and registers the
  * draw callback func_L01_003BAFB8. The `1.0f < x || x < 1.0f` tests are as written in RAC1.
  */
-void func_L01_003BB9D0(u8 *object)
+/* Updates the Oozla water sheet. It scrolls the wave layers, sets the water height and queues the water to be drawn. */
+void func_L01_003BB9D0(u8 *moby)
 {
-    u8 *state=*(u8 **)(object+0x68);
+    u8 *state=*(u8 **)(moby+0x68);
     float delta[4] __attribute__((aligned(16))),scaled[4] __attribute__((aligned(16)));
     int i,blocked,id;
     int *regions;
     float rate,divisor;
-    if(object[0x20]==0) {
-        object[0x20]=1; object[0x30]=255;
+    if(moby[0x20]==0) {
+        moby[0x20]=1; moby[0x30]=255;
         I32(state,0)=0x80103030; I32(state,4)=0x800c1006;
         I32(state,0xc)=0x50106060; I32(state,0x10)=0x106060;
         F32(state,0x28)=224.0f;
@@ -59,12 +60,12 @@ void func_L01_003BB9D0(u8 *object)
     for(i=0;i<2;i++) {
         id=((OceanContacts *)state)->contacts[i];
         if(id!=-1) {
-            if(RES->f2294==28 && func_002ACBC8(D_L01_001B94C0,id)) {
+            if(RES->f2294==28 && IsPointInCuboid(D_L01_001B94C0,id)) {
                 RES->f1FE=0;
                 blocked=1; break;
             }
-            if(func_002ACBC8(D_00189EA0,((OceanContacts *)state)->contacts[i])) {
-                S16(D_00189EA0,0x17e)=0;
+            if(IsPointInCuboid(gHeroPosition,((OceanContacts *)state)->contacts[i])) {
+                S16(gHeroPosition,0x17e)=0;
                 blocked=1; break;
             }
         }
@@ -74,26 +75,26 @@ void func_L01_003BB9D0(u8 *object)
     regions=(int *)(state+0x40);
     for(i=0;i<8;i++) {
         if(regions[i]==-1) continue;
-        if(RES->f2294==28 && func_002ACBC8(D_L01_001B94C0,regions[i])) {
+        if(RES->f2294==28 && IsPointInCuboid(D_L01_001B94C0,regions[i])) {
             D_L01_001AFE1C=F32(D_L01_001B264C+regions[i]*128,0x38)+0.15f;
             break;
         }
-        if(func_002ACBC8(D_00189EA0,regions[i])) {
+        if(IsPointInCuboid(gHeroPosition,regions[i])) {
             D_L01_001AFE1C=F32(D_L01_001B264C+regions[i]*128,0x38)+0.15f;
             break;
         }
     }
     RES->f1FE=2;
-    func_00282CF0(delta,D_L01_001B94C0,&D_L01_001B2FC0);
+    FastVecSub(delta,D_L01_001B94C0,&D_L01_001B2FC0);
     qcopy(&D_L01_001B2FC0, D_L01_001B94C0);
     if(!(F32(state,0x20)<F32(D_L01_001B94C0,8))) return;
     for(i=0;i<2;i++) {
         rate=D_L01_001AFDF0.speed[i]+D_L01_001AFDF0.speed[i];
         divisor=F32(state,0x18)*5.0f;
         rate=rate/divisor;
-        func_00282D30(scaled,delta,rate);
-        if(1.0f<scaled[0] || scaled[0]<1.0f) scaled[0]-=func_00283CE0(func_00283CF0(scaled[0]));
-        if(1.0f<scaled[1] || scaled[1]<1.0f) scaled[1]-=func_00283CE0(func_00283CF0(scaled[1]));
+        FastVecScale(scaled,delta,rate);
+        if(1.0f<scaled[0] || scaled[0]<1.0f) scaled[0]-=IntToFloat(FloatToInt(scaled[0]));
+        if(1.0f<scaled[1] || scaled[1]<1.0f) scaled[1]-=IntToFloat(FloatToInt(scaled[1]));
         D_L01_001B2FD0[i].u+=scaled[0];
         D_L01_001B2FD0[i].v+=scaled[1];
         if(1.0f<D_L01_001B2FD0[i].u) D_L01_001B2FD0[i].u-=1.0f;
@@ -101,7 +102,7 @@ void func_L01_003BB9D0(u8 *object)
         if(1.0f<D_L01_001B2FD0[i].v) D_L01_001B2FD0[i].v-=1.0f;
         if(D_L01_001B2FD0[i].v<-1.0f) D_L01_001B2FD0[i].v+=1.0f;
     }
-    D_L01_001AFE18=D_L01_001AFE1C+func_00283198(func_00283CE0(D_L01_001B2088%360)*0.017444445f-3.14f)*0.1f;
+    D_L01_001AFE18=D_L01_001AFE1C+FastSinOrCosB(IntToFloat(D_L01_001B2088%360)*0.017444445f-3.14f)*0.1f;
     D_L01_001AA174=&D_L01_001AFE18;
     for(i=0;i<2;i++) {
         float sum=D_L01_001B2FD0[i].u+D_L01_001AFE00_gp[i].u*D_001A7928;
@@ -113,5 +114,5 @@ void func_L01_003BB9D0(u8 *object)
         if(1.0f<sum) D_L01_001B2FD0[i].v=sum-1.0f;
         if(D_L01_001B2FD0[i].v<-1.0f) D_L01_001B2FD0[i].v=D_L01_001B2FD0[i].v+1.0f;
     }
-    func_L00_002E6DB8(func_L01_003BAFB8,object);
+    AddDrawCallbackToList2(DrawWaterSheet,moby);
 }

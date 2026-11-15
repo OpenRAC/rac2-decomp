@@ -14,6 +14,7 @@ extern InitEntry12 D_L13_0021D9F0[];
 extern int * volatile D_L13_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L13_001C9EA0;
 
+/* Fills in the level menu list from the unlocked levels and selects the current one. */
 int func_L13_0035E890(char *obj) {
     int i, entry;
     int *list;

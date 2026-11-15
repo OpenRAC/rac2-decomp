@@ -27,15 +27,16 @@ extern f32 ref_L07_003F68F0_00 __attribute__((sda));
 extern f32 ref_L07_003F68F0_01(f32);
 extern f32 ref_L07_003F68F0_02(f32, f32);
 
-void func_L07_003F68F0(s8 *arg0, f32 fparg0) {
-    s8 *s0;
-    f32 t;
-    f32 x;
+/* Swings the object's yaw back and forth: adds the step to a swing angle and sets the yaw around its rest yaw. */
+void func_L07_003F68F0(s8 *moby, f32 turnStep) {
+    s8 *vars;
+    f32 swingAngle;
+    f32 yaw;
 
-    s0 = *(s8 **)(arg0 + 0x68);
-    t = ref_L07_003F68F0_02(*(f32 *)(s0 + 0x54), fparg0);
-    *(f32 *)(s0 + 0x54) = t;
-    x = ref_L07_003F68F0_00 * (ref_L07_003F68F0_01(t) * 0.017453294f);
-    *(f32 *)(arg0 + 0xF8) = x;
-    *(f32 *)(arg0 + 0xF8) = ref_L07_003F68F0_02(x, *(f32 *)(s0 + 0x60));
+    vars = *(s8 **)(moby + 0x68);
+    swingAngle = ref_L07_003F68F0_02(*(f32 *)(vars + 0x54), turnStep);
+    *(f32 *)(vars + 0x54) = swingAngle;
+    yaw = ref_L07_003F68F0_00 * (ref_L07_003F68F0_01(swingAngle) * 0.017453294f);
+    *(f32 *)(moby + 0xF8) = yaw;
+    *(f32 *)(moby + 0xF8) = ref_L07_003F68F0_02(yaw, *(f32 *)(vars + 0x60));
 }

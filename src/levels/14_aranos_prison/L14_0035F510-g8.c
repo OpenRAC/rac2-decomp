@@ -14,7 +14,8 @@ extern InitEntry12 D_L14_0021D630[];
 extern int * volatile D_L14_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L14_001C9AE0;
 
-int func_L14_0035F510(char *obj) {
+/* Fills the menu entry list from the table of unlocked ids, then finds which entry is currently selected and stores its index. */
+int func_L14_0035F510(char *menu) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
@@ -25,11 +26,11 @@ int func_L14_0035F510(char *obj) {
     }
     list = D_L14_001AA770;
     D_L14_0021D630[i].id = 0;
-    *(int *)(obj + 0x40) = 0;
-    *(unsigned int *)(obj + 0x30) |= 0x8000;
+    *(int *)(menu + 0x40) = 0;
+    *(unsigned int *)(menu + 0x30) |= 0x8000;
     for (i = 0, entry = list[0]; entry; entry = D_L14_001AA770[++i]) {
         if (D_L14_001C9AE0.selected == entry) {
-            *(int *)(obj + 0x40) = i;
+            *(int *)(menu + 0x40) = i;
             break;
         }
     }

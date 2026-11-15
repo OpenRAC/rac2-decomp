@@ -24,21 +24,21 @@ void func_00271E88(void)
     f32 bottom[4] __attribute__((aligned(16)));
     int i;
 
-    if (D_001B5200.moby->state == 6 || D_001A8BB0 != 0) {
-        D_001B5200.grounded = 0;
+    if (gActiveCamera.moby->state == 6 || gCurrentGameMode != 0) {
+        gActiveCamera.grounded = 0;
         return;
     }
-    qcopy(top, D_001B5200.pos);
-    qcopy(bottom, D_001B5200.pos);
+    qcopy(top, gActiveCamera.pos);
+    qcopy(bottom, gActiveCamera.pos);
     top[2] += 0.75f;
     bottom[2] -= 0.75f;
-    for (i = 0; i < 6 && func_002761F8(top, bottom, 0x12, 0, 0); i++) {
-        if (func_00278E78() == 0) {
-            f32 h = func_002A90F8(D_001BAFA0, 0) + 0.04f;
-            if (D_001B5200.pos[2] < h) {
-                D_001B5200.grounded = 1;
+    for (i = 0; i < 6 && CollLine(top, bottom, 0x12, 0, 0); i++) {
+        if (GetCollHitMaterial() == 0) {
+            f32 floorHeight = GetGroundHeightAtPosition(D_001BAFA0, 0) + 0.04f;
+            if (gActiveCamera.pos[2] < floorHeight) {
+                gActiveCamera.grounded = 1;
             } else {
-                D_001B5200.grounded = 0;
+                gActiveCamera.grounded = 0;
             }
             return;
         }

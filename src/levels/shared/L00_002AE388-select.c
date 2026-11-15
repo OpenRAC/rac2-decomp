@@ -25,13 +25,13 @@ char *func_L00_002AE888(void *axis, int type, int occlusion, float range,
     float score, bestScore = 100000000.0f;
 
     if (D_00189E20_26[0x22c3])
-        func_00283698(matrix, D_L00_001B8FF0);
+        matrix_from_basis_rows(matrix, D_L00_001B8FF0);
 
     for (index = 0; (object = D_L00_001FACE0[index]) != 0; index++) {
         if (type != -1 && *(short *)(*(char **)(object + 0x24) + 0x46) != type)
             continue;
         if (type == 5) {
-            float *data = func_002AB1F0(object);
+            float *data = GetMobyPrivateValue0(object);
             if (!data || data[0] == 0.0f)
                 continue;
         }
@@ -39,17 +39,17 @@ char *func_L00_002AE888(void *axis, int type, int occlusion, float range,
             continue;
 
         if (D_00189E20_26[0x22c3])
-            score = func_L00_002AE5F0(object, axis, range, hlimit, vlimit, &blocked, matrix);
+            score = ScoreTargetByAimAxis(object, axis, range, hlimit, vlimit, &blocked, matrix);
         else
-            score = func_L00_002AE388(object, heading, range, hlimit, vlimit, &blocked);
+            score = ScoreTargetByHeading(object, heading, range, hlimit, vlimit, &blocked);
         if (blocked || !(score < bestScore))
             continue;
 
         if (occlusion) {
             qcopy_nc(start, D_00189E20_26 + 0xe0);
-            func_00282F20(end, object + 0xe0, 1.0f);
-            func_00282CC0(end, end, object + 0x10);
-            if (func_002761F8(start, end, 2, 0, 0))
+            vec_scale_to_length(end, object + 0xe0, 1.0f);
+            FastVecAdd(end, end, object + 0x10);
+            if (CollLine(start, end, 2, 0, 0))
                 continue;
         }
         bestScore = score;

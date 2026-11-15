@@ -76,27 +76,28 @@ extern void func_002A7470(void *, int, int, int);
 extern void func_002A7750(void *, int, int);
 extern void func_L08_00422EE0(Ent *);
 
+/* Sets up a new Mutant Sandfly: its health, sizes, timers and start position, and its first state. */
 void func_L08_004233E0(u8 *object)
 {
     InitState1348 *state = *(InitState1348 **)(object + 0x68);
     float position[4], radius;
-    state->f48 = func_00283CF0(15.0f);
-    state->f4A = func_00283CF0(3.2f);
+    state->f48 = FloatToInt(15.0f);
+    state->f4A = FloatToInt(3.2f);
     state->f29 = 1;
     if (!D_L08_001B2508[0]) **(int **)((char *)state+0x1CC)=0;
     qcopy((char *)state+0x150,object+0x10);
-    func_L08_00422900((Ent *)object);
+    ComputeVehicleHeightLimits((Ent *)object);
     *(float *)(object+0x18)=state->f1B0;
     qcopy((char *)state+0x150,object+0x10);
     state->f188=object[0x30];
     *(V4 *)position=*(V4 *)(object+0x10);
-    radius=func_L08_0032EF80(position,state->f190,state->f198,state->f194,-1);
-    if(radius>0) object[0x30]=func_00283CF0(radius+2.0f);
+    radius=ComputePointDepthInVolumes(position,state->f190,state->f198,state->f194,-1);
+    if(radius>0) object[0x30]=FloatToInt(radius+2.0f);
     state->f188=state->f189=object[0x30];
     *(V4 *)position=*(V4 *)(object+0x10);
-    radius=func_L08_0032EF80(position,state->f19C,state->f1A4,state->f1A0,-1);
-    if(radius>0) state->f188=func_00283CF0(radius+2.0f);
-    if(state->f1A8!=-1) func_L01_003377C8(D_L08_001FE7C0[state->f1A8]);
+    radius=ComputePointDepthInVolumes(position,state->f19C,state->f1A4,state->f1A0,-1);
+    if(radius>0) state->f188=FloatToInt(radius+2.0f);
+    if(state->f1A8!=-1) ComputePathSegmentLengths_L01(D_L08_001FE7C0[state->f1A8]);
     *(void **)((char *)state+0x10)=(char *)state+0x50;
     state->f60=9; state->f98=-1;
     state->f88=0; state->f6A=0;
@@ -115,24 +116,24 @@ void func_L08_004233E0(u8 *object)
         *(float *)(object+0x18)=state->f1B0-1.7f;
         qcopy((char *)state+0x150,object+0x10); qzero_nc((char *)state+0x170);
         *(unsigned short *)(object+0x34)&=0xEFFF;
-        if((unsigned char)object[0x43]!=1) func_002A7470(object,1,0,3);
+        if((unsigned char)object[0x43]!=1) StartAnimationBlended(object,1,0,3);
         object[0x31]=0; *(unsigned short *)(object+0x34)|=1;
-        func_002A7750(object,1,-1); break;
+        SetMobyState(object,1,-1); break;
     case 1:
         *(float *)(object+0x18)=state->f1B0+2.7f;
         qcopy((char *)state+0x150,object+0x10); qzero_nc((char *)state+0x170);
-        func_L08_00422EE0((Ent *)object);
+        PickRandomSandflyTarget((Ent *)object);
         *(unsigned short *)(object+0x34)|=0x1000;
-        if((unsigned char)object[0x43]!=1) func_002A7470(object,1,0,3);
-        func_002A7750(object,6,0); break;
+        if((unsigned char)object[0x43]!=1) StartAnimationBlended(object,1,0,3);
+        SetMobyState(object,6,0); break;
     case 2:
         qcopy((char *)state+0x170,(char *)state+0xD0);
         func_2F9DF0(object+0x10,object+0x10,(char *)state+0x170);
         qcopy((char *)state+0x150,object+0x10);
-        if((unsigned char)object[0x43]!=5) func_002A7470(object,5,0,3);
+        if((unsigned char)object[0x43]!=5) StartAnimationBlended(object,5,0,3);
         object[0x31]=1;
         *(unsigned short *)(object+0x34)=(*(unsigned short *)(object+0x34)|0x1000)&0xFFFE;
-        func_002A7750(object,4,-1); break;
+        SetMobyState(object,4,-1); break;
     }
     state->f15C=func_3278F0(0,1);
 }

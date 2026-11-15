@@ -1,8 +1,8 @@
 #include "common.h"
 typedef struct {
     unsigned char pad0[0x30];
-    float f30;
-    float f34;
+    float pointX;
+    float pointY;
     unsigned char pad1[0x48];
 } Rec_42550;
 
@@ -28,58 +28,59 @@ extern int func_L01_00322288(char *, float);
 
 extern int func_002E5CF8(int, int, char *);
 
-int func_L20_00442550(char *arg0) {
-    char *s0 = arg0;
-    char *s2 = *(char **)(arg0 + 0x68);
-    char *s1;
-    char *s3;
-    float f0;
-    int v0;
-    Rec_42550 *p;
+/* Makes the enemy fall and bounce on the ground while it turns toward the hero or its target. Returns 1 when the bouncing has stopped. */
+int func_L20_00442550(char *moby) {
+    char *self = moby;
+    char *vars = *(char **)(moby + 0x68);
+    char *hero;
+    char *heroPos;
+    float value;
+    int pathIndex;
+    Rec_42550 *pathPoint;
 
-    func_002AA2E8((float *)(s0 + 0x48), 1.0f, 0.033333335f);
+    ApproachValue((float *)(self + 0x48), 1.0f, 0.033333335f);
 
-    if (*(u8 *)(s0 + 0x94) == 2) {
-        func_002AA800(s2 + 0x1804, 1, 0.0f, D_L20_001B2124 * 0.00014544412f);
+    if (*(u8 *)(self + 0x94) == 2) {
+        StepAngleTowardTarget(vars + 0x1804, 1, 0.0f, D_L20_001B2124 * 0.00014544412f);
     }
-    f0 = *(float *)(s2 + 0xF8);
-    s1 = D_00189E20;
-    *(float *)(s0 + 0x18) += f0;
+    value = *(float *)(vars + 0xF8);
+    hero = gHeroState;
+    *(float *)(self + 0x18) += value;
 
-    *(float *)(s2 + 0xF8) -= *(float *)(s2 + 0x7C);
+    *(float *)(vars + 0xF8) -= *(float *)(vars + 0x7C);
 
-    if (*(int *)(s1 + 0x2294) == 0x8C) {
-        float f0;
-        s3 = s1 + 0x80;
-        f0 = func_00282E80(s3, s0 + 0x10);
-        if (f0 <= 4.0f) {
-            f0 = *(float *)(s1 + 0x88);
-            f0 += 5.0f;
-            *(float *)(s1 + 0x88) = f0;
-            f0 = func_002A89A8(s3, 0, 0.5f);
-            *(float *)(s1 + 0x88) = f0;
-            *(unsigned short *)(s1 + 0x1E0) = 5;
-            *(unsigned short *)(s1 + 0x1F0) = 5;
+    if (*(int *)(hero + 0x2294) == 0x8C) {
+        float value;
+        heroPos = hero + 0x80;
+        value = vec_distance_xy(heroPos, self + 0x10);
+        if (value <= 4.0f) {
+            value = *(float *)(hero + 0x88);
+            value += 5.0f;
+            *(float *)(hero + 0x88) = value;
+            value = ProbeGroundHeightBelow(heroPos, 0, 0.5f);
+            *(float *)(hero + 0x88) = value;
+            *(unsigned short *)(hero + 0x1E0) = 5;
+            *(unsigned short *)(hero + 0x1F0) = 5;
         }
-        v0 = *(int *)(s2 + 0x230);
-        p = (Rec_42550 *)((v0 << 7) + (unsigned int)D_L20_001B308C);
-        f0 = func_00283248(p->f30 - *(float *)(s0 + 0x10), p->f34 - *(float *)(s0 + 0x14));
-        func_L01_00322288(s0, f0);
+        pathIndex = *(int *)(vars + 0x230);
+        pathPoint = (Rec_42550 *)((pathIndex << 7) + (unsigned int)D_L20_001B308C);
+        value = FastMatrixHelperA(pathPoint->pointX - *(float *)(self + 0x10), pathPoint->pointY - *(float *)(self + 0x14));
+        StartMobyEffectFromEntry(self, value);
 
     } else {
-        func_L01_00322288(s0, func_00283248(
-            *(float *)(s1 + 0x80) - *(float *)(s0 + 0x10),
-            *(float *)(s1 + 0x84) - *(float *)(s0 + 0x14)));
+        StartMobyEffectFromEntry(self, FastMatrixHelperA(
+            *(float *)(hero + 0x80) - *(float *)(self + 0x10),
+            *(float *)(hero + 0x84) - *(float *)(self + 0x14)));
     }
 
-    if (*(float *)(s0 + 0x18) <= *(float *)(s2 + 0xE0)) {
+    if (*(float *)(self + 0x18) <= *(float *)(vars + 0xE0)) {
         float velocity;
-        *(float *)(s0 + 0x18) = *(float *)(s2 + 0xE0);
-        func_002E5CF8(0, 0, s0);
-        velocity = *(float *)(s2 + 0xF8) * -D_L20_001B2134;
-        *(float *)(s2 + 0xF8) = velocity;
+        *(float *)(self + 0x18) = *(float *)(vars + 0xE0);
+        PlayMobySound(0, 0, self);
+        velocity = *(float *)(vars + 0xF8) * -D_L20_001B2134;
+        *(float *)(vars + 0xF8) = velocity;
         if (velocity < 0.016666668f) {
-            *(int *)(s2 + 0xF8) = 0;
+            *(int *)(vars + 0xF8) = 0;
             return 1;
         }
     }

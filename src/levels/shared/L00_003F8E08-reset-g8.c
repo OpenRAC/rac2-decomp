@@ -32,9 +32,9 @@ void func_L00_003F8E08(void)
     EffectTuning *table;
 
     for (i = 0; i < 30; i++)
-        D_L00_002533B0[i].object = 0;
+        gHealthDrainSlots_L00[i].object = 0;
     D_L00_001B0A20 = 0;
-    func_L00_003F8DC8(0);
+    CreateHealthDrainSlotsMoby(0);
     D_L00_001B2BD4 = 3;
     D_L00_001B2BD8 = 30;
     D_L00_001B2BDC = 0.96f;

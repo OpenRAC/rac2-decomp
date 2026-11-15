@@ -27,8 +27,9 @@
 extern s32 func_00282978();
 extern s32 func_002B9180();
 
-void func_002C38A0(s32 arg0) {
-    if (func_00282978(arg0 + 0xA) != 0) {
-        func_002B9180(arg0);
+/* Removes a particle when its timer runs out. */
+void func_002C38A0(s32 particle) {
+    if (FastDecTimer(particle + 0xA) != 0) {
+        KillParticle(particle);
     }
 }

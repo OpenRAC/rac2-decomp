@@ -46,6 +46,7 @@ extern int func_002ACBC8(void *, int), func_L12_003DE4B0(void), func_L00_003DE26
 extern void func_002A8C00(void *, void *, int, void *, float), func_002A8E20(void *, void *);
 extern void func_L00_003DF6B0(int, int), func_L00_004028C0(int, int), func_L00_002E6CF0(void *, void *);
 
+/* Runs a beam that sweeps through its volume. It hurts the hero and the buddy when they stand in it, and plays a humming sound while the way is clear. */
 void func_L12_0041B2A8(u8 *self)
 {
     float start[4], end[4], delta[4], local[4];
@@ -53,7 +54,7 @@ void func_L12_0041B2A8(u8 *self)
     u8 event[48];
     BeamState *state = *(BeamState **)(self + 0x68);
 
-    func_L12_0041BDA8(self);
+    ClearHelperObjectStates(self);
     switch (self[0x20]) {
     case 0: {
         u16 id = *(u16 *)(self + 0xB2);
@@ -62,30 +63,30 @@ void func_L12_0041B2A8(u8 *self)
         if (D_L12_0021EDF0.flags[(s16)id])
             goto Destroy;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)];
+            int packed = D_0019B4A8[((s16)id >> 1) + (gCurrentMapIndex << 10)];
 
             if (id & 1) {
                 if ((packed >> 4) & 7)
                     goto Destroy;
             } else if (packed & 7) {
 Destroy:
-                func_0029F338(self);
+                MarkMobySpawned(self);
                 return;
             }
         }
         state->sound = -1;
         self[0x20] = 1;
-        state->phase = func_002A7878(0.0f, 1.0f);
+        state->phase = RandomFloatRange(0.0f, 1.0f);
         state->f30 = -10.0f;
         {
-            float length = func_00282DF0(D_L12_001B2F8C[state->index].axis1);
+            float length = FastVecLength(D_L12_001B2F8C[state->index].axis1);
 
             state->width = length + length;
-            length = func_00282DF0(D_L12_001B2F8C[state->index].axis2);
+            length = FastVecLength(D_L12_001B2F8C[state->index].axis2);
             state->length = length + length;
         }
-        func_00282CF0(state->start, D_L12_001B2F8C[state->index].position, D_L12_001B2F8C[state->index].axis1);
-        func_00282CC0(state->end, D_L12_001B2F8C[state->index].position, D_L12_001B2F8C[state->index].axis1);
+        FastVecSub(state->start, D_L12_001B2F8C[state->index].position, D_L12_001B2F8C[state->index].axis1);
+        FastVecAdd(state->end, D_L12_001B2F8C[state->index].position, D_L12_001B2F8C[state->index].axis1);
         {
             BeamVolume *volumes = D_L12_001B2F8C;
             BeamVolume *volume = (BeamVolume *)((u32)(state->index << 7) + (u32)volumes);
@@ -94,29 +95,29 @@ Destroy:
             state->end[2] += 1.5f - volume->axis2[2];
             qcopy(end, volume->position);
             end[2] += 1.5f;
-            func_00282F20(start, volumes[state->index].axis1, 0.1f);
+            vec_scale_to_length(start, volumes[state->index].axis1, 0.1f);
         }
-        while (func_002761F8(state->start, end, 2, 0, 0))
-            func_00282CC0(state->start, state->start, start);
-        while (func_002761F8(state->end, end, 2, 0, 0))
-            func_00282CF0(state->end, state->end, start);
+        while (CollLine(state->start, end, 2, 0, 0))
+            FastVecAdd(state->start, state->start, start);
+        while (CollLine(state->end, end, 2, 0, 0))
+            FastVecSub(state->end, state->end, start);
         for (i = 0; i < 2; i++) {
             u8 *obj;
 
             if (D_L12_001B2F8C[state->index].axis2[2] < 2.0f && i > 0)
                 continue;
-            obj = func_0029EFD0(0xFDF);
+            obj = CreateMoby(0xFDF);
             if (obj) {
-                func_002B37E8(obj, self);
+                InitChildObjectFromParent(obj, self);
                 qcopy(obj + 0xF0, D_L12_001B2F8C[state->index].rotation);
-                func_002833F0(obj + 0xC0, obj + 0xF0);
+                euler_rotation_basis(obj + 0xC0, obj + 0xF0);
                 obj[0x31] = 0;
                 *(u16 *)(obj + 0x34) |= 0x105;
                 *(u128 *)local = 0;
                 local[1] = -1.0f;
                 local[2] = -1.0f;
-                func_00283098(delta, local, &D_L12_001B2F8C[state->index]);
-                func_00282CC0(obj + 0x10, delta, D_L12_001B2F8C[state->index].position);
+                matrix_mul_vec3(delta, local, &D_L12_001B2F8C[state->index]);
+                FastVecAdd(obj + 0x10, delta, D_L12_001B2F8C[state->index].position);
                 *(float *)(obj + 0x18) += i * 3.0f;
                 func_002A0F48(obj);
                 {
@@ -141,9 +142,9 @@ Destroy:
         float height = state->width * 0.5f;
 
         state->heights[0] = state->heights[1] = state->heights[2] = height;
-        func_002833F0(matrix, D_L12_001B2F8C[state->index].rotation);
+        euler_rotation_basis(matrix, D_L12_001B2F8C[state->index].rotation);
     }
-    func_00283698(inverse, matrix);
+    matrix_from_basis_rows(inverse, matrix);
     qcopy(start, state->start);
     qcopy(end, state->end);
     {
@@ -151,21 +152,21 @@ Destroy:
         int j = 0;
 
         do {
-            if (!func_002761F8(start, end, 2, 0, 0))
+            if (!CollLine(start, end, 2, 0, 0))
                 break;
-            func_00282CF0(delta, D_L12_001C0260, D_L12_001B2F8C[state->index].position);
-            func_00283098(delta, delta, inverse);
+            FastVecSub(delta, D_L12_001C0260, D_L12_001B2F8C[state->index].position);
+            matrix_mul_vec3(delta, delta, inverse);
             if (state->heights[j] - delta[1] > 1.5f) {
                 u16 id = *(u16 *)(self + 0xB2);
 
                 if (id & 1) {
-                    u8 *counter = (u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
+                    u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
                     u8 packed = *counter;
 
                     if (((packed >> 4) & 7) != 7)
                         *counter = packed + 16;
                 } else {
-                    u8 *counter = (u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
+                    u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
                     u8 packed = *counter;
 
                     if ((packed & 7) != 7)
@@ -179,28 +180,28 @@ Destroy:
             j++;
         } while (j < 3);
         if (clear) {
-            u8 *sound = D_00188660 + state->sound * 0x70;
+            u8 *sound = gSoundState + state->sound * 0x70;
 
             if (*(u8 **)(sound + 0x88) != self || !sound[0x74])
-                state->sound = func_002E5CF8(1, 4, self);
+                state->sound = PlayMobySound(1, 4, self);
         } else {
             int id = state->sound;
 
             if (id != -1) {
-                u8 *sound = D_00188660 + id * 0x70;
+                u8 *sound = gSoundState + id * 0x70;
 
                 if (*(u8 **)(sound + 0x88) == self && sound[0x74])
-                    func_002E59F8(id);
+                    StopSoundVoice(id);
             }
             state->sound = -1;
         }
     }
     {
-        u8 *query = D_00189EA0;
+        u8 *query = gHeroPosition;
         float height, t;
         float *pos;
 
-        if (func_002ACBC8(query, state->index)) {
+        if (IsPointInCuboid(query, state->index)) {
             t = *(float *)(query + 8);
             if (state->start[2] + 4.0f <= t)
                 height = state->heights[2];
@@ -208,27 +209,27 @@ Destroy:
                 height = state->heights[1];
             else
                 height = state->heights[0];
-            func_00282CF0(delta, D_00189EA0, D_L12_001B2F8C[state->index].position);
-            func_00283098(delta, delta, inverse);
+            FastVecSub(delta, gHeroPosition, D_L12_001B2F8C[state->index].position);
+            matrix_mul_vec3(delta, delta, inverse);
             if (delta[1] < height && delta[0] <= D_L12_001B1D10_gp[0]) {
-                func_L12_0041BDF8(self);
+                RestoreBeamChildCollision(self);
                 if (delta[0] >= 0.0f) {
-                    func_00283098(local, D_L12_001B1D00_gp, matrix);
+                    matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
                 } else {
                     D_L12_001B1D00_gp[0] = -0.5f;
                     D_L12_001B1D00[2] = -1.0f;
-                    func_00283098(local, D_L12_001B1D00_gp, matrix);
+                    matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
                     D_L12_001B1D00_gp[0] = 3.0f;
                     D_L12_001B1D00[2] = -3.0f;
                 }
-                func_002A8C00(event, self, 0x10001, pos, 2.0f);
-                func_002A8E20(D_0018C0B0, event);
+                make_hit_descriptor(event, self, 0x10001, pos, 2.0f);
+                QueueMobyImpact(gHeroMoby_0018C0B0, event);
             } else if (delta[1] < height) {
-                func_L12_0041BDF8(self);
+                RestoreBeamChildCollision(self);
             }
-        } else if (func_002ACBC8(query + 0x60, state->index)) {
+        } else if (IsPointInCuboid(query + 0x60, state->index)) {
             t = *(float *)(query + 0x68);
             if (state->start[2] + 4.0f <= t)
                 height = state->heights[2];
@@ -236,44 +237,44 @@ Destroy:
                 height = state->heights[1];
             else
                 height = state->heights[0];
-            func_00282CF0(delta, D_00189EA0 + 0x60, D_L12_001B2F8C[state->index].position);
-            func_00283098(delta, delta, inverse);
+            FastVecSub(delta, gHeroPosition + 0x60, D_L12_001B2F8C[state->index].position);
+            matrix_mul_vec3(delta, delta, inverse);
             if (delta[1] < height) {
-                func_L12_0041BDF8(self);
+                RestoreBeamChildCollision(self);
                 if (delta[0] >= 0.0f) {
-                    func_00283098(local, D_L12_001B1D00_gp, matrix);
+                    matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
                 } else {
                     D_L12_001B1D00_gp[0] = -0.5f;
                     D_L12_001B1D00[2] = -1.0f;
-                    func_00283098(local, D_L12_001B1D00_gp, matrix);
+                    matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
                     D_L12_001B1D00_gp[0] = 3.0f;
                     D_L12_001B1D00[2] = -3.0f;
                 }
-                func_002A8C00(event, self, 0x10001, pos, 2.0f);
-                func_002A8E20(D_0018C0B0, event);
+                make_hit_descriptor(event, self, 0x10001, pos, 2.0f);
+                QueueMobyImpact(gHeroMoby_0018C0B0, event);
             }
         }
     }
-    if (func_L12_003DE4B0() && !func_L00_003DE260()) {
+    if (IsTrackedObjectOpen() && !IsTrackedObjectActive()) {
         u8 *candidate = D_L12_001B090C;
 
         qcopy(delta, candidate + 0x10);
-        if (func_00282C48(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
+        if (FloatAbs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
             delta[2] = D_L12_001B2F8C[state->index].position[2];
-        if (func_002ACBC8(delta, state->index))
-            func_L00_003DF6B0(1, -1);
+        if (IsPointInCuboid(delta, state->index))
+            SetTrackedObjectState(1, -1);
     }
-    if (func_L12_00404778()) {
+    if (IsSecondTrackedObjectOpen()) {
         u8 *candidate = D_L12_001B1360;
 
         qcopy(delta, candidate + 0x10);
-        if (func_00282C48(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
+        if (FloatAbs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
             delta[2] = D_L12_001B2F8C[state->index].position[2];
-        if (func_002ACBC8(delta, state->index))
-            func_L00_004028C0(1, -1);
+        if (IsPointInCuboid(delta, state->index))
+            StartGlobalObject(1, -1);
     }
-    func_L00_002E6CF0(D_L12_0041BF88, self);
-    func_L12_0041BED8(self);
+    AddDrawCallbackToList1(D_L12_0041BF88, self);
+    PushHelperObjects(self);
 }

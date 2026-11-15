@@ -37,6 +37,7 @@ Lg7 = 1.479819860511658591e-01;  /* 3FC2F112 DF3E5244 */
 
 static const f64 zero   =  0.0;
 
+/* Works out the natural logarithm of a number. */
 f64 func_00117CA0(f64 x) {
 	f64 hfsq,f,s,z,R,w,t1,t2,dk;
 	s32 k,hx,i,j;

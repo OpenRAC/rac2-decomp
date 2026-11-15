@@ -6,6 +6,7 @@
  * the switches.
  */
 #include "include_asm.h"
+#include "names.h"
 extern void func_00335E68(void *,int);
 extern int func_00335E20(void *);
 extern void func_00335E38(void *,float,float,float,float);
@@ -31,67 +32,68 @@ extern float ref_003478F0_06,ref_003478F0_07;
 extern MenuIntegerPair ref_003478F0_08[],ref_003478F0_09[];
 typedef struct {float x,y;} MenuFloatPair;
 extern MenuFloatPair ref_003478F0_10[],ref_003478F0_11[];
-void func_003478F0(char *o)
+/* Draws every slot of the item grid menu: the backdrop, the weapon icon, the ammo bar and the highlight on the selected item. */
+void func_003478F0(char *menu)
 {
- if(*(int *)(o+0x4f8)) {
+ if(*(int *)(menu+0x4f8)) {
   int row,col;
-  MenuGridEntry *t=ref_00347468_10;
+  MenuGridEntry *gridEntries=ref_00347468_10;
 
-  func_00336320(o);func_00336320(o+0x4c);func_00336320(o+0x130);
+  DrawScreenElementAtStoredPosition(menu);DrawScreenElementAtStoredPosition(menu+0x4c);DrawScreenElementAtStoredPosition(menu+0x130);
   for(row=0;row<6;row++) {
-   short *ids=&t->id;
-   short *id=(short *)((row<<2)*10+(int)ids);
-   for(col=0;col<4;col++,id+=5) {
+   short *idField=&gridEntries->id;
+   short *idPtr=(short *)((row<<2)*10+(int)idField);
+   for(col=0;col<4;col++,idPtr+=5) {
 
-    { int *color=((int *)func_00335E20(o+0x3b4));
+    { int *color=((int *)GetFieldC(menu+0x3b4));
       float yb=(float)ref_003478F0_01;
       float xs=ref_003478F0_06;
       float xb=(float)ref_003478F0_00;
       float ys=ref_003478F0_07;
       *color=0x60241700;
-      func_00335E38(o+0x3b4,(xs*(float)col+xb)+(*(float **)(o+0x498))[0],(ys*(float)row+yb)+(*(float **)(o+0x498))[1],0.0f,0.0f);
+      SetFirstFloat4(menu+0x3b4,(xs*(float)col+xb)+(*(float **)(menu+0x498))[0],(ys*(float)row+yb)+(*(float **)(menu+0x498))[1],0.0f,0.0f);
     }
-    *((int *)func_00335E20(o+0x98))=0x30f0c070;
-    *((int *)func_00335E20((o+0x3b4)))=0x60241700;
-    func_00335E68((o+0x1c8),0);func_00335E68((o+0x378),0);
-    if(D_001A7AF8[*id]) {
+    *((int *)GetFieldC(menu+0x98))=0x30f0c070;
+    *((int *)GetFieldC((menu+0x3b4)))=0x60241700;
+    SetFlagValue((menu+0x1c8),0);SetFlagValue((menu+0x378),0);
+    if(gItemOwnedFlags[*idPtr]) {
      MenuWeaponRecord *weapons=ref_003478F0_04;
-     unsigned char *slots=D_00139568;
-     func_00336920((o+0x378),weapons[slots[*id]].icon,0);
+     unsigned char *slots=gItemSlotToRecord;
+     SetWidgetValuePair((menu+0x378),weapons[slots[*idPtr]].icon,0);
 
-     func_00335E38((o+0x378),(53.5f*(float)col+(float)ref_003478F0_02)+(*(float **)(o+0x498))[0],(47.0f*(float)row+(float)ref_003478F0_03)+(*(float **)(o+0x498))[1],0.0f,0.0f);
-     if(weapons[slots[*id]].icon==0xea7e) {
-      *((int *)func_00335E20((o+0x378)))=0x80808080;
+     SetFirstFloat4((menu+0x378),(53.5f*(float)col+(float)ref_003478F0_02)+(*(float **)(menu+0x498))[0],(47.0f*(float)row+(float)ref_003478F0_03)+(*(float **)(menu+0x498))[1],0.0f,0.0f);
+     if(weapons[slots[*idPtr]].icon==0xea7e) {
+      *((int *)GetFieldC((menu+0x378)))=0x80808080;
      } else {
       MenuIntegerPair base=ref_003478F0_08[0],stride=ref_003478F0_09[0];
-      int a,b,color;
-      func_00336B90((o+0x1c8),weapons[slots[*id]].max);
-      func_00336B98((o+0x1c8),D_00139868[*id]>>5);
+      int barColorA,barColorB,color;
+      SetMeterMaximum((menu+0x1c8),weapons[slots[*idPtr]].max);
+      SetMeterValue((menu+0x1c8),D_00139868[*idPtr]>>5);
 
-      func_00335E38((o+0x1c8),(float)(stride.x*col+base.x)+(*(float **)(o+0x498))[0],(float)(stride.y*row+base.y)+(*(float **)(o+0x498))[1],0.0f,0.0f);
-      func_00335E68((o+0x1c8),1);
-      a=0;b=0;color=0;
-      func_00336F20(*id,&a,&b,&color);func_00336498((o+0x1c8),a,b);
-      *((int *)func_00335E20((o+0x378)))=color;
-      if(weapons[slots[*id]].max<=0) {func_00336B90((o+0x1c8),100);func_00336B98((o+0x1c8),100);}
+      SetFirstFloat4((menu+0x1c8),(float)(stride.x*col+base.x)+(*(float **)(menu+0x498))[0],(float)(stride.y*row+base.y)+(*(float **)(menu+0x498))[1],0.0f,0.0f);
+      SetFlagValue((menu+0x1c8),1);
+      barColorA=0;barColorB=0;color=0;
+      ChooseItemColors(*idPtr,&barColorA,&barColorB,&color);SetFirstPair((menu+0x1c8),barColorA,barColorB);
+      *((int *)GetFieldC((menu+0x378)))=color;
+      if(weapons[slots[*idPtr]].max<=0) {SetMeterMaximum((menu+0x1c8),100);SetMeterValue((menu+0x1c8),100);}
      }
-     if(D_00139688[*id]==0) {
-      unsigned char *currentSlots=D_00139568;
+     if(gItemAmmoCounts[*idPtr]==0) {
+      unsigned char *currentSlots=gItemSlotToRecord;
       MenuWeaponRecord *currentWeapons=ref_003478F0_04;
-      if(currentWeapons[currentSlots[*id]].ammo!=0) *((int *)func_00335E20(o+0x3b4))=0x60202080;
+      if(currentWeapons[currentSlots[*idPtr]].ammo!=0) *((int *)GetFieldC(menu+0x3b4))=0x60202080;
      }
-     func_00335E68((o+0x378),1);
-     if(func_0026F7A0(ref_003478F0_05[0])==*id) *((int *)func_00335E20(o+0x98))=0x80ffde8d;
+     SetFlagValue((menu+0x378),1);
+     if(EmptyStubF7A0(ref_003478F0_05[0])==*idPtr) *((int *)GetFieldC(menu+0x98))=0x80ffde8d;
     }
     {
      MenuFloatPair stride=ref_003478F0_10[0],base=ref_003478F0_11[0];
 
-     func_00335E38(o+0x98,(stride.x*(float)col+base.x)+(*(float **)(o+0x498))[0],(stride.y*(float)row+base.y)+(*(float **)(o+0x498))[0],0.0f,0.0f);
+     SetFirstFloat4(menu+0x98,(stride.x*(float)col+base.x)+(*(float **)(menu+0x498))[0],(stride.y*(float)row+base.y)+(*(float **)(menu+0x498))[0],0.0f,0.0f);
     }
-    func_00336320((o+0x3b4));func_00336828((o+0x378));func_00336548((o+0x1c8));func_00336320(o+0x98);
+    DrawScreenElementAtStoredPosition((menu+0x3b4));DrawColoredQuadWidget((menu+0x378));DrawProgressBar((menu+0x1c8));DrawScreenElementAtStoredPosition(menu+0x98);
    }
   }
-  func_00336320(o+0xe4);func_00336320(o+0x17c);func_00336A78(o+0x210);func_00336A78(o+0x258);func_00336A78(o+0x2a0);
-  func_003472B8(o);func_00347468(o);
+  DrawScreenElementAtStoredPosition(menu+0xe4);DrawScreenElementAtStoredPosition(menu+0x17c);DrawAlignedTextLabel(menu+0x210);DrawAlignedTextLabel(menu+0x258);DrawAlignedTextLabel(menu+0x2a0);
+  UpdateMenuGridLabels(menu);UpdateItemDetailPanel(menu);
  }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef short s16;
@@ -49,54 +50,55 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
     return result;
 }
 
-void func_L11_004456A0(char *a0) {
-    char buf1[0x20];
-    char buf2[0x70];
+/* Draws the Joba menu header and the count box with its message. */
+void func_L11_004456A0(char *moby) {
+    char boxBuf[0x20];
+    char lineBuf[0x70];
     char *state;
     char *text;
-    char *msg;
-    float x, s, half;
-    int r0, r1, r2, r3, one;
+    char *unitText;
+    float titleX, scale, half;
+    int titleY, boxX, boxY, boxH, one;
 
-    func_L11_00443940(a0, 0);
+    DrawJobaMenuHelpPrompts(moby, 0);
     half = 0.5f;
-    state = *(char **)(a0 + 0x68);
-    text = (char *)func_00288FB8(0x2F45);
+    state = *(char **)(moby + 0x68);
+    text = (char *)GetLocalizedString(0x2F45);
     one = 1;
-    s = D_L11_001B3E04;
-    x = (float)D_L11_001B1810;
-    r0 = scaled_coord(D_L11_001B1814, s, half, one);
-    func_0027F640(x, (float)r0, D_L11_001B180C, text, D_L11_001B1808, -1,
-                  func_0027C878(1), D_L11_002A3AD0);
-    s = D_L11_001B3E04;
-    r1 = scaled_coord(D_L11_001B1830, s, half, one);
-    r2 = scaled_coord(D_L11_001B1834, s, half, one);
-    r3 = scaled_coord(D_L11_001B1820, s, half, one);
-    func_002802E0(buf1, r1, r2, D_L11_001B1838, D_L11_001B183C, D_L11_001B181C, r3,
+    scale = D_L11_001B3E04;
+    titleX = (float)D_L11_001B1810;
+    titleY = scaled_coord(D_L11_001B1814, scale, half, one);
+    FontPrintScaled(titleX, (float)titleY, D_L11_001B180C, text, D_L11_001B1808, -1,
+                  GetEffectTextureDescriptor(1), D_L11_002A3AD0);
+    scale = D_L11_001B3E04;
+    boxX = scaled_coord(D_L11_001B1830, scale, half, one);
+    boxY = scaled_coord(D_L11_001B1834, scale, half, one);
+    boxH = scaled_coord(D_L11_001B1820, scale, half, one);
+    FontSetWindow(boxBuf, boxX, boxY, D_L11_001B1838, D_L11_001B183C, D_L11_001B181C, boxH,
                   D_L11_001B1840, 3);
-    if (*(s16 *)(state + 0x1E8) == 0 && D_001395B8[func_L11_0043E108(0)] < 2) {
-        text = (char *)func_00288FB8(0x2F96);
-        func_00280270(buf1, D_L11_001B1818, text, func_001157AC(text));
-    } else if (*(s16 *)(state + 0x1E8) == 1 && D_001395B8[func_L11_0043E108(1)] < 2) {
-        text = (char *)func_00288FB8(0x2F97);
-        func_00280270(buf1, D_L11_001B1818, text, func_001157AC(text));
+    if (*(s16 *)(state + 0x1E8) == 0 && D_001395B8[GetChallengeFlagIndex(0)] < 2) {
+        text = (char *)GetLocalizedString(0x2F96);
+        DrawTextWindowLargeFont(boxBuf, D_L11_001B1818, text, strlen_001157AC(text));
+    } else if (*(s16 *)(state + 0x1E8) == 1 && D_001395B8[GetChallengeFlagIndex(1)] < 2) {
+        text = (char *)GetLocalizedString(0x2F97);
+        DrawTextWindowLargeFont(boxBuf, D_L11_001B1818, text, strlen_001157AC(text));
     } else {
-        text = (char *)func_00288FB8(0x2F62);
-        msg = (char *)func_00288FB8(0x2F5E);
-        func_00115DA8(buf2, D_L11_001B15A0, text, *(int *)(state + 0x1E0), msg);
-        func_00280270(buf1, D_L11_001B1818, buf2, func_001157AC(buf2));
+        text = (char *)GetLocalizedString(0x2F62);
+        unitText = (char *)GetLocalizedString(0x2F5E);
+        Sprintf(lineBuf, D_L11_001B15A0, text, *(int *)(state + 0x1E0), unitText);
+        DrawTextWindowLargeFont(boxBuf, D_L11_001B1818, lineBuf, strlen_001157AC(lineBuf));
     }
-    text = (char *)func_00288FB8(0x2F47);
+    text = (char *)GetLocalizedString(0x2F47);
     {
         float half = 0.5f;
         int one = 1;
 
-        s = D_L11_001B3E04;
-        r1 = scaled_coord(D_L11_001B1830, s, half, one);
-        r2 = scaled_coord(D_L11_001B1834, s, half, one);
-        r3 = scaled_coord(D_L11_001B182C, s, half, one);
-        func_002802E0(buf1, r1, r2, D_L11_001B1838, D_L11_001B183C, D_L11_001B1828, r3,
+        scale = D_L11_001B3E04;
+        boxX = scaled_coord(D_L11_001B1830, scale, half, one);
+        boxY = scaled_coord(D_L11_001B1834, scale, half, one);
+        boxH = scaled_coord(D_L11_001B182C, scale, half, one);
+        FontSetWindow(boxBuf, boxX, boxY, D_L11_001B1838, D_L11_001B183C, D_L11_001B1828, boxH,
                       D_L11_001B1840, 3);
     }
-    func_00280190(buf1, D_L11_001B1824, text, func_001157AC(text));
+    DrawTextWindowSmallFont(boxBuf, D_L11_001B1824, text, strlen_001157AC(text));
 }

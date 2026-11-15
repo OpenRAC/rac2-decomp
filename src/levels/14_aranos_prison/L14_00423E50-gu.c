@@ -13,19 +13,19 @@ extern unsigned short *D_L14_001FB060[];
    last id flagged by bit 15) is active (state byte +0x20 not negative) and its class (+0xAA)
    is not 0xF91, else 0.  Only group 0xFF with no list returns 0 before the walk: retail
    walks the list of any other group without testing it for null. */
-int func_L14_00423E50(unsigned char *a0)
+int func_L14_00423E50(unsigned char *self)
 {
     unsigned short *p;
     unsigned char *base;
     unsigned char *e;
 
-    if (a0[0x21] == 0xFF && D_L14_001FB060[a0[0x21]] == 0)
+    if (self[0x21] == 0xFF && gGroupEntityLists[self[0x21]] == 0)
         return 0;
-    p = D_L14_001FB060[a0[0x21]];
-    base = D_L14_001B259C;
+    p = gGroupEntityLists[self[0x21]];
+    base = gMobyPool_L14;
     for (;;) {
         e = base + ((*p & 0x7FFF) << 8);
-        if ((signed char)e[0x20] >= 0 && *(short *)(e + 0xAA) != 0xF91)
+        if ((signed char)e[0x20] >= 0 && *(short *)(e + 0xAA) != 0xF91 /* Space Tourist */)
             return 1;
         if ((short)*p < 0)
             break;

@@ -70,27 +70,29 @@ typedef struct {
 
 extern int D_L03_002325D0[];
 
-void func_002FC8D0(u8 *a0, s32 a1, s32 a2) {
+/* Copies a block of image data from the console memory to the graphics chip in 16 KB pieces. */
+void func_002FC8D0(u8 *dest, s32 vramAddr, s32 size) {
     u8 image[112];
-    s32 remain = (a2 + 0x3fff) & ~0x3fff;
-    s32 src = 0, dst = 0;
-    for (; remain > 0; remain -= 0x4000) {
-        func_00126470(image, (s32)(short)((a1+src)>>8), 1, 1, 0, 0, 64, 64);
-        src += 0x4000;
-        func_0011AEA0(0);
-        func_00126730(image,a0+dst);
-        dst += 0x3000;
-        func_001244B8(0,0);
+    s32 remaining = (size + 0x3fff) & ~0x3fff;
+    s32 srcOffset = 0, dstOffset = 0;
+    for (; remaining > 0; remaining -= 0x4000) {
+        func_00126470(image, (s32)(short)((vramAddr+srcOffset)>>8), 1, 1, 0, 0, 64, 64);
+        srcOffset += 0x4000;
+        FlushCache(0);
+        func_00126730(image,dest+dstOffset);
+        dstOffset += 0x3000;
+        WaitGsPathsIdle(0,0);
     }
 }
 /* shared native body of family d50cdefed4015bae (default profile) */
-void func_002FC990(int a0, int a1, int a2)
+/* Uploads image data to the graphics chip in 16 KB pieces by writing DMA packets. */
+void func_002FC990(int data, int vramAddr, int size)
 {
-    int s0 = (a2 + 16383) & -16384;
-    int s6 = 0;
-    int s5 = 0;
+    int remaining = (size + 16383) & -16384;
+    int vramOffset = 0;
+    int dataOffset = 0;
 
-    while (s0 > 0) {
+    while (remaining > 0) {
         *(int *)((char *)D_L02_001B3D08_3 + 0) = 0x10000006;
         *(int *)((char *)D_L02_001B3D08_3 + 4) = 0;
         *(int *)((char *)D_L02_001B3D08_3 + 8) = 0;
@@ -98,14 +100,14 @@ void func_002FC990(int a0, int a1, int a2)
         {
             int *next = (int *)((char *)D_L02_001B3D08_3 + 16);
             D_L02_001B3D08_5 = next;
-            D_00126288(next, (short)((a1 + s6) >> 8), 1, 1, 0, 0, 64, 64);
+            D_00126288(next, (short)((vramAddr + vramOffset) >> 8), 1, 1, 0, 0, 64, 64);
         }
-        s6 += 16384;
-        s0 -= 16384;
+        vramOffset += 16384;
+        remaining -= 16384;
         {
             int *p = D_L02_001B3D08_3;
-            int off = a0 + s5;
-            s5 += 12288;
+            int off = data + dataOffset;
+            dataOffset += 12288;
             D_L02_001B3D08_5 = (int *)((char *)p + 96);
             *(int *)((char *)p + 96) = 0x30000300;
             *(int *)((char *)D_L02_001B3D08_3 + 4) = off;
@@ -118,12 +120,13 @@ void func_002FC990(int a0, int a1, int a2)
 
 extern int func_00282A18(int);
 
+/* Uploads a texture to the graphics chip in blocks and returns the texture setup value for it. */
 long long func_002FCB00(int data, int destination, int width, int height)
 {
     int block = width << 7;
     int offset = 0;
-    int logwidth = func_00282A18(width);
-    int logheight = func_00282A18(height);
+    int logwidth = log2dim(width);
+    int logheight = log2dim(height);
     int width_mask = width & (width - 1);
     int height_mask = height & (height - 1);
     int remaining = width * (height << 2);
@@ -194,6 +197,7 @@ extern int func_0011A930(int, void (*)(void), int);
 
 extern void func_0011B6C0(int);
 
+/* Installs the two DMA interrupt handlers, once. */
 void func_002FCD18(void)
 {
     if (D_001B22C0 != 0) {
@@ -205,20 +209,21 @@ void func_002FCD18(void)
     if ((D_STAT & 0x20000) == 0) {
         *(unsigned int *)0x1000E010 = 0x20000;
     }
-    D_001B22C0 = func_0011A930(1, func_002FCE18, 0);
-    D_001B22C4 = func_0011A930(15, func_002FCF18, 0);
-    func_0011B6C0(1);
+    D_001B22C0 = AddDmacHandler(1, HandleVif1DmaInterrupt, 0);
+    D_001B22C4 = AddDmacHandler(15, HandleDmaErrorHang, 0);
+    ProcessKernelQueueEntryD(1);
 }
 
 /* shared native body of family 349daa693c44d158 */
+/* Removes the two DMA interrupt handlers and clears their ids. */
 void func_002FCDA8(void)
 {
     if ((D_STAT & 0x20000) != 0) {
         D_STAT = 0x20000;
     }
-    func_0011A950(1, D_L03_001B31A0);
-    func_0011A950(15, D_L03_001B31A4);
-    func_0011B658(1);
+    RemoveDmacHandler(1, D_L03_001B31A0);
+    RemoveDmacHandler(15, D_L03_001B31A4);
+    ProcessKernelQueueEntryC(1);
     D_L03_001B31A0 = 0;
     D_L03_001B31A4 = 0;
 }
@@ -251,9 +256,10 @@ typedef struct {
 extern Qword_r002FCF90 *r1_D_00161000_q __asm__("r1_D_00161000") MACRO_ADDR;
 
 /* rac1-decomp src/game/vuchain.c: func_00235290 */
-void func_002FCF90(int arg0) {
+/* Appends a packet header word (tag) to the vector unit packet list. */
+void func_002FCF90(int tag) {
     Qword_r002FCF90 *p = r1_D_00161000_q++;
-    p->w[0] = arg0 + 0x90000000;
+    p->w[0] = tag + 0x90000000;
     p->w[1] = 0;
     p->w[2] = 0;
     p->w[3] = 0;
@@ -276,14 +282,16 @@ extern void func_002FE8D8(void *, float *);
 extern void func_00282D30(float *, float *, float);
 extern void func_00282CF0(float *, float *, float *);
 
+/* Adds a scaled copy of the direction vector for an object onto another vector. */
 void func_002FE880(void *object, float *destination, float scale)
 {
     float vector[4];
-    func_002FE8D8(object, vector);
-    func_00282D30(vector, vector, scale);
-    func_00282CF0(destination, destination, vector);
+    GetObjectFacingDirection(object, vector);
+    FastVecScale(vector, vector, scale);
+    FastVecSub(destination, destination, vector);
 }
 
+/* Works out the up or facing direction for an object, depending on the player's state. */
 void func_002FE8D8(void *object, float *destination)
 {
     char *state = ref_L00_002FE8D8_00;
@@ -294,16 +302,16 @@ void func_002FE8D8(void *object, float *destination)
         }
     }
     if (ref_L00_002FE8D8_01) {
-        func_00282CF0(destination, ref_L00_002FE8D8_02, object);
+        FastVecSub(destination, ref_L00_002FE8D8_02, object);
         destination[2] = 0;
-        func_00282F20(destination, destination, 1.0f);
+        vec_scale_to_length(destination, destination, 1.0f);
     } else if (ref_L00_002FE8D8_03) {
         float sign = 1.0f;
         if (*(float *)(state + 0xBC) > 0.0f) sign = -1.0f;
-        func_00282CF0(destination, (float *)(state + 0xB0), object);
-        func_00282F20(destination, destination, sign);
+        FastVecSub(destination, (float *)(state + 0xB0), object);
+        vec_scale_to_length(destination, destination, sign);
     } else {
-        func_00282C98(destination);
+        VectorCopyHelperA(destination);
     }
 }
 
@@ -370,10 +378,10 @@ int func_002FE9D0(SweptSphere *sphere)
     int result = 0, hit, i;
     char *moby;
 
-    func_002FE8D8(sphere->moby + 0x10, facing);
+    GetObjectFacingDirection(sphere->moby + 0x10, facing);
     if (sphere->useOffset) {
-        func_00282F20(point, (float *)(sphere->moby + 0xE0), sphere->offset);
-        func_00282CC0(point, sphere->position, point);
+        vec_scale_to_length(point, (float *)(sphere->moby + 0xE0), sphere->offset);
+        FastVecAdd(point, sphere->position, point);
         position = sphere->position;
         query = point;
     } else {
@@ -381,16 +389,16 @@ int func_002FE9D0(SweptSphere *sphere)
         query = point;
         position = sphere->position;
     }
-    hit = func_00277258(sphere->radius, query, sphere->collisionFlags, sphere->moby);
+    hit = TestPointAgainstCollision(sphere->radius, query, sphere->collisionFlags, sphere->moby);
     if (hit) {
         hit = 1;
     } else {
         hit = 0;
-        if (func_002761F8(sphere, position, sphere->collisionFlags, sphere->moby, 0)) hit = 2;
+        if (CollLine(sphere, position, sphere->collisionFlags, sphere->moby, 0)) hit = 2;
     }
     sphere->moby = 0;
     if (hit) {
-        sphere->surface = func_00278E78();
+        sphere->surface = GetCollHitMaterial();
         moby = ref_L00_002FE9D0_00.moby;
         if (moby) {
             for (i = 0; i < sphere->ignoredCount; i++) {
@@ -400,19 +408,19 @@ int func_002FE9D0(SweptSphere *sphere)
         }
         if (hit == 1) qcopy(position, ref_L00_002FE9D0_00.center);
         else qcopy(position, ref_L00_002FE9D0_00.point);
-        func_00282D30(sphere->normal, ref_L00_002FE9D0_00.normal, 0.0009765625f);
-        func_00282F20(sphere->normal, sphere->normal, 1.0f);
-        if (func_00282DB0(facing, sphere->normal) < sphere->minFacing ||
+        FastVecScale(sphere->normal, ref_L00_002FE9D0_00.normal, 0.0009765625f);
+        vec_scale_to_length(sphere->normal, sphere->normal, 1.0f);
+        if (FastVecDot(facing, sphere->normal) < sphere->minFacing ||
             (sphere->moby && *(short *)(*(char **)(sphere->moby + 0x24) + 0x46) == 5 &&
              sphere->slideOnCreatures)) {
             velocity = sphere->velocity;
-            func_00283028(velocity, velocity, sphere->normal);
+            FastVectorNormalize(velocity, velocity, sphere->normal);
             result++;
-            dot = func_00282DB0(velocity, sphere->normal);
-            func_00282D30(along, sphere->normal, dot);
-            func_00282CF0(across, velocity, along);
-            func_00282D30(velocity, along, sphere->bounce);
-            func_00282CC0(velocity, across, velocity);
+            dot = FastVecDot(velocity, sphere->normal);
+            FastVecScale(along, sphere->normal, dot);
+            FastVecSub(across, velocity, along);
+            FastVecScale(velocity, along, sphere->bounce);
+            FastVecAdd(velocity, across, velocity);
         } else {
             qcopy(position, ref_L00_002FE9D0_00.point);
             result = 2;
@@ -423,6 +431,7 @@ int func_002FE9D0(SweptSphere *sphere)
 
 extern char D_0021F9C0[];
 
+/* Returns slot number index of the 64-slot table, or nothing if out of range. */
 void *func_002FEC50(int index) {
     void *result = 0;
     if ((unsigned int)index < 64u)
@@ -432,6 +441,7 @@ void *func_002FEC50(int index) {
 
 extern void func_0029F978(unsigned char *, unsigned int, unsigned char *);
 
+/* Finds a free slot in the 64-slot table, sets it up for an object and returns its number. */
 int func_002FEC78(unsigned char *object, unsigned int flags)
 {
     char *p = D_0021F9C0;
@@ -462,7 +472,7 @@ int func_002FEC78(unsigned char *object, unsigned int flags)
             *(int *)(p + 0x28) = 0;
             *(int *)(p + 0x2C) = 0;
             p[1] = 0;
-            func_0029F978(object, flags, (unsigned char *)p);
+            AttachManipulator(object, flags, (unsigned char *)p);
             break;
         }
     } while (i < 64);
@@ -470,13 +480,15 @@ int func_002FEC78(unsigned char *object, unsigned int flags)
 }
 
 extern void func_0029F9F0(char *, char *);
-void func_002FED28(unsigned int index) { if (index < 64u) { char *p = D_0021F9C0 + index * 0x50; func_0029F9F0(*(char **)(p + 0x40), p); *(char **)(p + 0x40) = 0; } }
+/* Releases a slot of the 64-slot table. */
+void func_002FED28(unsigned int index) { if (index < 64u) { char *p = D_0021F9C0 + index * 0x50; DetachManipulator(*(char **)(p + 0x40), p); *(char **)(p + 0x40) = 0; } }
 
 
 /* func_002FED90 is matched in its own unit, src/game/002FED90-qcopy.c (-frac2-qcopy). */
 
 extern char D_002212E0[];
 
+/* Clears the flag word of one entry in a table of small records. */
 void func_002FEE50(int index) {
     int *p;
     if (index < 0) return;
@@ -487,6 +499,7 @@ void func_002FEE50(int index) {
 /* func_002FEE70 is defined in 002FEE70.c. */
 
 
+/* Does nothing. */
 void func_002FF288(void)
 {
 }
@@ -496,13 +509,14 @@ extern void func_00282A60(unsigned int *, unsigned int, int);
 extern void func_002A0F48(void *);
 extern char *ref_L00_002FF290_00 __attribute__((sda));
 extern char *ref_L00_002FF290_01 __attribute__((sda));
+/* Sets up an object of the given kind and gives it a cleared 128-byte block of private data. */
 void func_002FF290(char *object, int kind)
 {
     char *data;
-    func_0029F0C8(object, kind);
+    InitMobyInstance(object, kind);
     data = ref_L00_002FF290_01 + (((int)object - (int)ref_L00_002FF290_00) >> 8) * 128;
     *(char **)(object + 0x68) = data;
-    func_00282A60((unsigned int *)data, 0, 128);
+    ClearMemory((unsigned int *)data, 0, 128);
     if ((*(unsigned short *)(object + 0x34) & 4) == 0)
         func_002A0F48(object);
 }
@@ -512,10 +526,11 @@ void func_002FF290(char *object, int kind)
 extern char *D_001B2348 __attribute__((sda));
 extern void func_002FF290(char *, int);
 
+/* Sets up the preview object so it is small, hidden at first and ready to show. */
 void func_002FF3F8(void)
 {
     char *object;
-    func_002FF290(D_001B2348, 0x3EF);
+    InitObjectWithPrivateData(D_001B2348, 0x3EF);
     object = D_001B2348;
     *(unsigned char *)(object + 0x30) = 255;
     *(unsigned short *)(object + 0x34) |= 0x43;
@@ -580,42 +595,42 @@ void func_002FF968(PreviewObjectPrefix *object)
     float offset[4] __attribute__((aligned(16)));
     float basis[12] __attribute__((aligned(16)));
     float temporary[4] __attribute__((aligned(16)));
-    int special = object->classId == 0xC5A || object->classId == 0xA65;
+    int special = object->classId == 0xC5A /* Miniturret Glove */ || object->classId == 0xA65 /* Megaturret Glove */;
     int compact = 0;
-    if (object->classId == 0x879 || object->classId == 0xAF6 ||
-        object->classId == 0x907 || object->classId == 0xE7A || special)
+    if (object->classId == 0x879 /* Chopper */ || object->classId == 0xAF6 /* Multi-Star */ ||
+        object->classId == 0x907 /* Spiderbot Glove */ || object->classId == 0xE7A /* Tankbot Glove */ || special)
         compact = 1;
     if (special) {
-        func_00282D30(offset, D_001B5200.forward, 2.5f);
+        FastVecScale(offset, gActiveCamera.forward, 2.5f);
     } else if (compact) {
-        func_00282D30(offset, D_001B5200.forward, 2.0f);
+        FastVecScale(offset, gActiveCamera.forward, 2.0f);
     } else {
-        func_00282D30(offset, D_001B5200.forward, 3.0f);
+        FastVecScale(offset, gActiveCamera.forward, 3.0f);
     }
-    func_00282CC0(object->position, D_001B5200.position, offset);
-    if (D_001B2310.spin)
-        object->rotation[0] = func_00283B98(object->rotation[0], 0.03490659f);
+    FastVecAdd(object->position, gActiveCamera.position, offset);
+    if (gObjectPreviewState.spin)
+        object->rotation[0] = FastAddRotations(object->rotation[0], 0.03490659f);
     else
-        object->rotation[2] = func_00283B98(object->rotation[2], 0.03490659f);
-    func_002833F0(basis, object->rotation);
-    if (D_001B2310.spin) {
+        object->rotation[2] = FastAddRotations(object->rotation[2], 0.03490659f);
+    euler_rotation_basis(basis, object->rotation);
+    if (gObjectPreviewState.spin) {
         if (compact) {
-            func_00282D30(temporary, basis + 4, D_001AD818);
-            func_00282CC0(object->position, object->position, temporary);
-            func_00282D30(temporary, basis, D_001AD814);
-            func_00282CC0(object->position, object->position, temporary);
+            FastVecScale(temporary, basis + 4, D_001AD818);
+            FastVecAdd(object->position, object->position, temporary);
+            FastVecScale(temporary, basis, D_001AD814);
+            FastVecAdd(object->position, object->position, temporary);
         } else {
-            func_00282D30(temporary, basis + 4, D_001AD80C);
-            func_00282CC0(object->position, object->position, temporary);
-            func_00282D30(temporary, basis, D_001AD808);
-            func_00282CC0(object->position, object->position, temporary);
+            FastVecScale(temporary, basis + 4, D_001AD80C);
+            FastVecAdd(object->position, object->position, temporary);
+            FastVecScale(temporary, basis, D_001AD808);
+            FastVecAdd(object->position, object->position, temporary);
         }
     } else {
-        func_00282D30(temporary, basis + 8, D_001AD810);
-        func_00282CC0(object->position, object->position, temporary);
+        FastVecScale(temporary, basis + 8, D_001AD810);
+        FastVecAdd(object->position, object->position, temporary);
     }
     func_002A0F48(object);
-    func_00300048(object);
+    SpawnPreviewLightBurst(object);
 }
 
 /* func_002FFCF8 is in 002FC8D0-fade.c. */
@@ -657,38 +672,38 @@ void func_002FFD78(void)
     float farPoint[4] __attribute__((aligned(16)));
     float nearPoint[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    int phase = D_001B2310.phase;
+    int phase = gObjectPreviewState.phase;
     int secondPhase;
     float size, interpolation;
     Particle_C65A0 *particle;
-    func_00282D30(offset, D_001B5200.forward, 9.0f);
-    func_00282CC0(farPoint, D_001B5200.position, offset);
-    func_00282D30(offset, D_001B5200.forward, 0.1f);
-    func_00282CC0(nearPoint, D_001B5200.position, offset);
-    interpolation = func_00283CE0(D_001B2310.frames) * D_001B2310.rate;
-    func_00282D08(position, nearPoint, farPoint, interpolation);
+    FastVecScale(offset, gActiveCamera.forward, 9.0f);
+    FastVecAdd(farPoint, gActiveCamera.position, offset);
+    FastVecScale(offset, gActiveCamera.forward, 0.1f);
+    FastVecAdd(nearPoint, gActiveCamera.position, offset);
+    interpolation = IntToFloat(gObjectPreviewState.frames) * gObjectPreviewState.rate;
+    lerp_vector(position, nearPoint, farPoint, interpolation);
     size = D_001AD81C * 210000.0f;
-    particle = func_002C65A0(position, D_001A8BD0, 4, 0xFF2020, phase, 127, 127,
+    particle = SpawnGravityFadeParticle(position, D_001A8BD0, 4, 0xFF2020, phase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
-        particle->variation = func_00283CF0(0.4f) + 64;
+        particle->variation = FloatToInt(0.4f) + 64;
     }
     secondPhase = (phase + 128) % 255;
-    particle = func_002C65A0(position, D_001A8BD0, 4, 0xFF2020, secondPhase, 127, 127,
+    particle = SpawnGravityFadeParticle(position, D_001A8BD0, 4, 0xFF2020, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
-        particle->variation = func_00283CF0(0.4f) + 64;
+        particle->variation = FloatToInt(0.4f) + 64;
     }
     size *= 0.5f;
-    particle = func_002C65A0(position, D_001A8BD0, 4, 0xFFFFFF, secondPhase, 127, 127,
+    particle = SpawnGravityFadeParticle(position, D_001A8BD0, 4, 0xFFFFFF, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
-        particle->variation = func_00283CF0(0.4f) + 64;
+        particle->variation = FloatToInt(0.4f) + 64;
     }
-    D_001B2310.phase++;
+    gObjectPreviewState.phase++;
 }
 
 extern short D_001B2346;
@@ -701,12 +716,13 @@ extern void func_002FC560(int, long long);
 
 extern void func_0027DE50(int, int, int, int, int);
 
+/* Draws a dark overlay on the screen whose strength comes from the preview fade value. */
 void func_002FFFE0(void)
 {
-    short v;
-    func_002FC560(0x42, ((long long)ref_L00_002FFFE0_00 << 32) | 0x44);
-    v = ref_L00_002FFFE0_00;
-    func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (v << 24) | 0xFFFFFF);
+    short alpha;
+    VU1_addGSregister(0x42, ((long long)ref_L00_002FFFE0_00 << 32) | 0x44);
+    alpha = ref_L00_002FFFE0_00;
+    DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (alpha << 24) | 0xFFFFFF);
 }
 
 
@@ -714,22 +730,24 @@ void func_002FFFE0(void)
 
 
 
-s32 func_00300280(s32 *a0,s32 a1) {
- s32 out=-1,i=0,flag=1; s32 *p=a0;
+/* Puts a value in the first free place of a 64-entry list and returns the place, or -1 if full. */
+s32 func_00300280(s32 *list,s32 value) {
+ s32 placeIndex=-1,i=0,flagValue=1; s32 *p=list;
  for(;i<64;i++,p++) {
   if(*p==0) {
-   *p=a1;
-   a0[0x89]=flag;
-   a0[0x88]++;
-   out=i;
+   *p=value;
+   list[0x89]=flagValue;
+   list[0x88]++;
+   placeIndex=i;
    p[0x40]=0;
    break;
   }
  }
- return out;
+ return placeIndex;
 }
 
 /* Clear corresponding indexed words and decrement a record count */
+/* Removes one entry from the 64-entry list and resets it when it becomes empty. */
 void func_00300300(Rac2Native_74a5d71aacb394c6_ExtraIndexState48 *state, int index) {
     state->first[index] = 0;
     state->second[index] = 0;
@@ -757,8 +775,9 @@ extern float func_00282EB0(char *origin, char *point);
    lower; the helper's point is the row word plus 0x10. */
 extern char D_00190000[];
 
-void func_00300330(void *a0) {
-    State00300330 *state = (State00300330 *)a0;
+/* Sorts the listed objects by distance from the player and keeps the nearest ones. */
+void func_00300330(void *tablePtr) {
+    State00300330 *state = (State00300330 *)tablePtr;
     float distances[64];
     int i;
     int k;
@@ -774,7 +793,7 @@ void func_00300330(void *a0) {
     for (i = 0; i < 64; i++) {
         if (state->row0[i] != 0) {
             state->row1[i] = 0;
-            distances[i] = func_00282EB0((char *)D_00190000 - 0x6160, (char *)(state->row0[i] + 0x10));
+            distances[i] = FastVectorHelperC((char *)D_00190000 - 0x6160, (char *)(state->row0[i] + 0x10));
             calls++;
         }
         if (calls == state->count) {
@@ -824,6 +843,7 @@ typedef struct {
 
 extern State003004B0 D_00220DC0;
 
+/* Returns the saved value for the current entry if enabled, otherwise the value given. */
 float func_003004B0(float value) {
     float result = value;
     if (D_00220DC0.enabled != 0)
@@ -832,6 +852,7 @@ float func_003004B0(float value) {
 }
 
 /* shared native body of family 8a42bc68419c7402 */
+/* Tells whether a value is in the list of ids (1 if found, else 0). */
 int func_003004E0(int value)
 {
     int i;
@@ -849,10 +870,11 @@ int func_003004E0(int value)
 }
 
 /* func_00300540 : dispatch: weapon category selected by the identifier */
-s32 func_00300540(s32 a0) {
-    s32 v = 0;
-    if (a0 == 0 || a0 == 14 || a0 == 13) v = 2;
-    else if (a0 == 1 || a0 == 3 || a0 == 11 || a0 == 12) v = 1;
-    return v;
+/* Sorts a weapon id into a group: 2, 1, or 0 for all others. */
+s32 func_00300540(s32 weaponId) {
+    s32 group = 0;
+    if (weaponId == 0 || weaponId == 14 || weaponId == 13) group = 2;
+    else if (weaponId == 1 || weaponId == 3 || weaponId == 11 || weaponId == 12) group = 1;
+    return group;
 }
 

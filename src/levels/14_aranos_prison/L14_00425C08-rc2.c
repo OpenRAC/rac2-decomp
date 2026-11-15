@@ -26,33 +26,34 @@
 extern s8 *ref_L14_00425C08_00(s32);
 extern void ref_L14_00425C08_01(s8 *, s8 *, s32, s32);
 
-s8 *func_L14_00425C08(s8 *arg0) {
-    s8 *temp_s0;
-    s8 *temp_v1;
-    s8 *temp_v0;
-    u8 temp_a0;
+/* Returns the helper moby linked to this one, creating a new one (class 4418) if it is missing or dead. */
+s8 *func_L14_00425C08(s8 *self) {
+    s8 *vars;
+    s8 *existing;
+    s8 *created;
+    u8 state;
 
-    temp_s0 = (*(s8 **)((s8 *)(arg0) + (0x68)));
-    temp_v1 = (*(s8 **)((s8 *)(temp_s0) + (0x120)));
-    if (temp_v1 == 0) {
+    vars = (*(s8 **)((s8 *)(self) + (0x68)));
+    existing = (*(s8 **)((s8 *)(vars) + (0x120)));
+    if (existing == 0) {
         goto create;
     }
-    temp_a0 = (*(u8 *)((s8 *)(temp_v1) + (0x20)));
-    if (temp_a0 == 0xFE) {
+    state = (*(u8 *)((s8 *)(existing) + (0x20)));
+    if (state == 0xFE) {
         goto create;
     }
-    if (temp_a0 != 0xFD) {
-        return temp_v1;
+    if (state != 0xFD) {
+        return existing;
     }
 create:
-    temp_v0 = ref_L14_00425C08_00(0x1142);
-    (*(s8 **)((s8 *)(temp_s0) + (0x120))) = temp_v0;
-    if (temp_v0 != 0) {
-        (*(u16 *)((s8 *)(temp_v0) + (0x32))) = (*(u16 *)((s8 *)(arg0) + (0x32)));
-        (*(u8 *)((s8 *)((*(s8 **)((s8 *)(temp_s0) + (0x120)))) + (0x30))) = (*(u8 *)((s8 *)(arg0) + (0x30)));
-        (*(s64 *)((s8 *)((*(s8 **)((s8 *)(temp_s0) + (0x120)))) + (0x38))) = (*(s64 *)((s8 *)(arg0) + (0x38)));
-        (*(s8 *)((s8 *)((*(s8 **)((s8 *)(temp_s0) + (0x120)))) + (0x31))) = 1;
-        ref_L14_00425C08_01(arg0, (*(s8 **)((s8 *)(temp_s0) + (0x120))), 2, 0);
+    created = ref_L14_00425C08_00(0x1142 /* moby class 4418 */);
+    (*(s8 **)((s8 *)(vars) + (0x120))) = created;
+    if (created != 0) {
+        (*(u16 *)((s8 *)(created) + (0x32))) = (*(u16 *)((s8 *)(self) + (0x32)));
+        (*(u8 *)((s8 *)((*(s8 **)((s8 *)(vars) + (0x120)))) + (0x30))) = (*(u8 *)((s8 *)(self) + (0x30)));
+        (*(s64 *)((s8 *)((*(s8 **)((s8 *)(vars) + (0x120)))) + (0x38))) = (*(s64 *)((s8 *)(self) + (0x38)));
+        (*(s8 *)((s8 *)((*(s8 **)((s8 *)(vars) + (0x120)))) + (0x31))) = 1;
+        ref_L14_00425C08_01(self, (*(s8 **)((s8 *)(vars) + (0x120))), 2, 0);
     }
-    return (*(s8 **)((s8 *)(temp_s0) + (0x120)));
+    return (*(s8 **)((s8 *)(vars) + (0x120)));
 }

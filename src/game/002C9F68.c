@@ -32,22 +32,22 @@ void func_002C9F68(void) {
     s32 dst;
     s32 src;
 
-    func_002FC3C0(1);
-    func_001261F0(0);
+    WaitForDmaStatusBits(1);
+    GetGsCurrentField(0);
     D_001B1598++;
-    size = D_001A7344 * 1536;
-    src = D_001F2840.src;
+    size = gScreenHeight * 1536;
+    src = gPauseMenuState.src;
     dst = D_001A72D4;
-    if (D_001F2840.mode >= 2) {
+    if (gPauseMenuState.mode >= 2) {
         dst = 0x3FB000 - size;
     }
     for (; size >= 0; size -= 16384) {
         func_00126470(buf, dst >> 8, 1, 0, 0, 0, 64, 64);
         dst += 16384;
-        func_0011AEA0(0);
+        FlushCache(0);
         func_00126730(buf, src);
         src += 16384;
-        func_001244B8(0, 0);
+        WaitGsPathsIdle(0, 0);
     }
-    D_001F2840.mode = 0;
+    gPauseMenuState.mode = 0;
 }

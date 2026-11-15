@@ -28,6 +28,7 @@ extern char ref_0027C878_07[];
 /* Incremental descriptor construction follows RAC1 draw.c (GPL-3.0).
  * Resolve a cached texture descriptor, allocating VRAM and queuing its upload
  * when necessary. Negative identifiers select the render-target descriptors. */
+/* Finds the texture settings for a picture, and loads the picture into video memory first if needed. */
 TextureBits func_0027C878(int id)
 {
     if (id < 0) {

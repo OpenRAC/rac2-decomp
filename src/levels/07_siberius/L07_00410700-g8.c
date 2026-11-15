@@ -27,45 +27,45 @@ extern void func_L07_004106B8(u8 *a);
 
 /* Starts the second phase of the object: its two position vectors, the shared timer record, the
    effect call and the camera-facing vector, then raises bit 2 of every record of the group. */
-void func_L07_00410700(u8 *a0, s32 group)
+void func_L07_00410700(u8 *moby, s32 group)
 {
-    f32 w[4];
-    f32 t[4];
-    u8 *state;
-    u16 *p;
-    u8 *e;
-    f32 r;
-    f32 *origin;
+    f32 lookAngles[4];
+    f32 eyePos[4];
+    u8 *vars;
+    u16 *entry;
+    u8 *record;
+    f32 flatDist;
+    f32 *cameraOrigin;
 
-    func_002A7750(a0, 5, -1);
-    qcopy(a0 + 0x10, &D_L07_001B17E0);
-    qcopy(a0 + 0xF0, &D_L07_001B17F0);
-    *(u16 *)(a0 + 0x34) &= 0xFFFD;
-    func_002A0F48(a0);
-    state = *(u8 **)(a0 + 0x68);
-    D_001A63A8[9] = (*(s32 *)(state + 0xD4) & 0x3FFF) + 3000;
-    D_001A63A8[10] = 0;
-    func_002AAC80(state + 0x11C, 400.0f - D_L07_001B17E0, 5.0f,
+    SetMobyState(moby, 5, -1);
+    qcopy(moby + 0x10, &D_L07_001B17E0);
+    qcopy(moby + 0xF0, &D_L07_001B17F0);
+    *(u16 *)(moby + 0x34) &= 0xFFFD;
+    func_002A0F48(moby);
+    vars = *(u8 **)(moby + 0x68);
+    gMusicState[9] = (*(s32 *)(vars + 0xD4) & 0x3FFF) + 3000;
+    gMusicState[10] = 0;
+    ApproachTargetWithBraking(vars + 0x11C, 400.0f - D_L07_001B17E0, 5.0f,
                   D_L07_001B1748 * 0.00027777778f, D_L07_001B1744 * 0.016666668f);
-    *(s32 *)(state + 0x16B0) = 0;
-    *(s32 *)(state + 0xD0) = group;
-    *(f32 *)(state + 0x16B8) = 1.0f;
-    *(s32 *)(state + 0x16BC) = 0;
-    func_L00_002B9D60(&D_L07_001B1800, &D_L07_001B17F0, 0x6F, 1);
-    *(TI128 *)t = *(TI128 *)D_00189EA0;
-    t[2] = t[2] + 1.0f;
-    qzero_nc(w);
-    origin = &D_L07_001B1810;
-    w[2] = func_00283248(D_00189E20[0x20] - D_L07_001B1810, D_00189E20[0x21] - D_L07_001B1814);
-    r = func_00282E80(t, origin);
-    w[1] = func_00283248(r, D_L07_001B1818 - t[2]);
-    func_00335438(origin, w, 1, 0, 0);
-    func_L07_004106B8(a0);
-    for (p = D_L07_001A9014[group];
-         p != 0 && ((s16)p[-1] >= 0 || p == D_L07_001A9014[group]) &&
-         (e = D_L07_001B2954 + ((*p & 0x7FFF) << 5)) != 0;
-         p++) {
-        e[0x1E] |= 4;
+    *(s32 *)(vars + 0x16B0) = 0;
+    *(s32 *)(vars + 0xD0) = group;
+    *(f32 *)(vars + 0x16B8) = 1.0f;
+    *(s32 *)(vars + 0x16BC) = 0;
+    ResetHeroPositionAndDirection(&D_L07_001B1800, &D_L07_001B17F0, 0x6F, 1);
+    *(TI128 *)eyePos = *(TI128 *)gHeroPosition;
+    eyePos[2] = eyePos[2] + 1.0f;
+    qzero_nc(lookAngles);
+    cameraOrigin = &D_L07_001B1810;
+    lookAngles[2] = FastMatrixHelperA(gHeroState[0x20] - D_L07_001B1810, gHeroState[0x21] - D_L07_001B1814);
+    flatDist = vec_distance_xy(eyePos, cameraOrigin);
+    lookAngles[1] = FastMatrixHelperA(flatDist, D_L07_001B1818 - eyePos[2]);
+    SetCamera5Pose(cameraOrigin, lookAngles, 1, 0, 0);
+    UpdateMobyMatrix(moby);
+    for (entry = D_L07_001A9014[group];
+         entry != 0 && ((s16)entry[-1] >= 0 || entry == D_L07_001A9014[group]) &&
+         (record = D_L07_001B2954 + ((*entry & 0x7FFF) << 5)) != 0;
+         entry++) {
+        record[0x1E] |= 4;
     }
     D_L07_001B1E90 = 0;
 }

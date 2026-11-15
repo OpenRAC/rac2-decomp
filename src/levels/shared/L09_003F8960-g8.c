@@ -26,33 +26,33 @@ extern float func_00282E80(void *, void *);
 
 /* The follow camera's target: a riding object's mount point when there is one,
    else the hero's near or far focus (or the watched object's position), raised a bit. */
-void func_L09_003F8960(char *obj)
+void func_L09_003F8960(char *moby)
 {
-    char *fr = *(char **)(obj + 0x68);
-    char *other;
+    char *vars = *(char **)(moby + 0x68);
+    char *target;
     float pos[4] __attribute__((aligned(16)));
     float ofs[4] __attribute__((aligned(16)));
 
-    if (*(u8 *)(fr + 0x30F) != 0 && (other = *(char **)(fr + 0x2F8)) != 0
-        && *(s16 *)(other + 0xAA) == 0xD0E
-        && *(u8 *)(other + 0x20) != 0xFE && *(u8 *)(other + 0x20) != 0xFD) {
-        qcopy(pos, obj + 0x10);
-        pos[2] += func_002A7878(0.0f, 1.0f);
-        func_00282F20(ofs, *(char **)(fr + 0x2F8) + 0xC0, 4.0f);
-        func_00282CC0(fr + 0x1F0, pos, ofs);
+    if (*(u8 *)(vars + 0x30F) != 0 && (target = *(char **)(vars + 0x2F8)) != 0
+        && *(s16 *)(target + 0xAA) == 0xD0E /* Megacorp Trooper Torso */
+        && *(u8 *)(target + 0x20) != 0xFE && *(u8 *)(target + 0x20) != 0xFD) {
+        qcopy(pos, moby + 0x10);
+        pos[2] += RandomFloatRange(0.0f, 1.0f);
+        vec_scale_to_length(ofs, *(char **)(vars + 0x2F8) + 0xC0, 4.0f);
+        FastVecAdd(vars + 0x1F0, pos, ofs);
         return;
     }
-    if (*(char **)(fr + 0x200) == D_00189E20.p2290) {
-        if (func_00282E80(obj + 0x10, &D_00189E20.q080) > ref_L09_003F8960_00)
-            qcopy(fr + 0x1F0, &D_00189E20.q0D0);
+    if (*(char **)(vars + 0x200) == gHeroState.p2290) {
+        if (vec_distance_xy(moby + 0x10, &gHeroState.q080) > ref_L09_003F8960_00)
+            qcopy(vars + 0x1F0, &gHeroState.q0D0);
         else
-            qcopy(fr + 0x1F0, &D_00189E20.q0E0);
-        if (D_00189E20.i229C == 0xC)
-            *(float *)(fr + 0x1F8) += 0.2f;
+            qcopy(vars + 0x1F0, &gHeroState.q0E0);
+        if (gHeroState.i229C == 0xC)
+            *(float *)(vars + 0x1F8) += 0.2f;
         else
-            *(float *)(fr + 0x1F8) += 0.4f;
+            *(float *)(vars + 0x1F8) += 0.4f;
     } else {
-        qcopy(fr + 0x1F0, *(char **)(fr + 0x200) + 0x10);
-        *(float *)(fr + 0x1F8) += 0.8f;
+        qcopy(vars + 0x1F0, *(char **)(vars + 0x200) + 0x10);
+        *(float *)(vars + 0x1F8) += 0.8f;
     }
 }

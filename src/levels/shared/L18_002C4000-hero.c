@@ -12,6 +12,7 @@ extern s32 D_L18_001AFBB0 MACRO_ADDR;
 extern void func_L00_002D2168(s32, s32, float);
 extern void func_L18_00428428(u8 *, s32);
 #define H ((Hero *)D_00189E20)
+/* Handles the player grabbing and letting go of a held object, and triggers its pickup effect. */
 void func_L18_002C4000(void)
 {
     u8 *object;
@@ -21,14 +22,14 @@ void func_L18_002C4000(void)
             H->b[0x22B8] = 1;
             H->b[0x22BA] = 1;
             if (object[0x43] != 11) {
-                func_L00_002D2168(11, 1, 5.0f);
+                set_hero_animation(11, 1, 5.0f);
                 H->f[0xC20 / 4] = 3.0f;
             }
         } else if (H->i[0xC28 / 4] & 2) {
             H->b[0x22B8] = 0;
             H->b[0x22BA] = 0;
-            if (H->i[0x2294 / 4] == 0x8E) func_L00_002D2168(14, 0, 8.0f);
-            else func_L00_002D2168(13, 0, 9.0f);
+            if (H->i[0x2294 / 4] == 0x8E) set_hero_animation(14, 0, 8.0f);
+            else set_hero_animation(13, 0, 9.0f);
         }
     }
     object = H->ptr[0x2290 / 4];
@@ -36,11 +37,11 @@ void func_L18_002C4000(void)
         H->f[0xC20 / 4] = 3.0f;
         if (*(s16 *)(object + 0xAA) == 0xEE1) {
             if (H->i[0x1D8 / 4] > 3) {
-                if (H->i[0x1D8 / 4] % 6 == 0) func_L18_00428428(object, 0);
-                if ((H->i[0x1D8 / 4] + 3) % 6 == 0) func_L18_00428428(H->ptr[0x2290 / 4], 1);
+                if (H->i[0x1D8 / 4] % 6 == 0) FireShooterShot(object, 0);
+                if ((H->i[0x1D8 / 4] + 3) % 6 == 0) FireShooterShot(H->ptr[0x2290 / 4], 1);
             }
         } else if (*(s16 *)(object + 0xAA) == 0xED4 && H->i[0x1D8 / 4] % 6 != 0) {
-            func_L18_00428428(object, 0);
+            FireShooterShot(object, 0);
         }
     }
 }

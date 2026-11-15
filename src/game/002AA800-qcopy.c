@@ -21,6 +21,7 @@ extern char *func_002AD0B0(char *a);
 extern int func_002AD5F8(char *unused, char *obj, char *arg2, char *arg3, char *arg4, char *arg5);
 extern char *D_0018C0B0;
 
+/* Works out where a hit object should be pushed and spins it, using its collision shape. */
 int func_002AD470(char *a0, char *a1, char *a2, char *a3, char *a4, char *a5)
 {
     char buf0[64];
@@ -28,43 +29,44 @@ int func_002AD470(char *a0, char *a1, char *a2, char *a3, char *a4, char *a5)
     char vec[16];
     char *p;
 
-    p = func_002AD0B0(a1);
+    p = GetMobyPrivateValue2(a1);
     if (p == 0)
         return 0;
     if (*(int *)(p + 60) & 0x40)
-        func_00283410(buf0, a1 + 240);
+        euler_to_matrix(buf0, a1 + 240);
     else
-        func_00283658(buf0, a1 + 192);
-    func_00283098(a4, a2, buf0);
-    func_00282CC0(a4, a4, a1 + 16);
-    func_00283410(buf2, a3);
-    func_00283788(buf2, buf0, buf2);
-    func_002AB6D8(buf2, a5);
+        copy_matrix_rotation(buf0, a1 + 192);
+    matrix_mul_vec3(a4, a2, buf0);
+    FastVecAdd(a4, a4, a1 + 16);
+    euler_to_matrix(buf2, a3);
+    multiply_matrix(buf2, buf0, buf2);
+    GetEulerAnglesFromMatrix(buf2, a5);
     if (*(int *)(p + 60) & 4) {
-        func_00282CC0(a4, a4, p + 16);
-        func_002AD5F8(a0, a1, a4, a5, a2, a3);
+        FastVecAdd(a4, a4, p + 16);
+        GetAttachmentRotationAngles(a0, a1, a4, a5, a2, a3);
         return 1;
     }
-    if (a0 == D_0018C0B0)
+    if (a0 == gHeroMoby_0018C0B0)
         return 1;
     if ((unsigned char)a0[0x22] < (unsigned char)a1[0x22]) {
         qcopy(vec, p + 16);
-        func_002AC9F8(vec, 1.0f);
-        func_00282CC0(a4, a4, vec);
+        ClampVectorLength(vec, 1.0f);
+        FastVecAdd(a4, a4, vec);
     }
     return 1;
 }
 
+/* Combines two transforms and stores the result on the object, then copies in new positions. */
 void func_002AD6F0(void *obj, void *a1, void *a2, void *a3)
 {
     Matrix64_002AD6F0 m0, m1, m2, m3;
     V4_002AD6F0 *p;
 
-    func_00283410((char *)&m0, (char *)a2);
-    func_00283698((char *)&m1, (char *)&m0);
-    func_00283410((char *)&m2, (char *)a3);
-    func_00283788((char *)&m3, (char *)&m1, (char *)&m2);
-    func_002AB6D8((char *)&m3, (char *)obj);
+    euler_to_matrix((char *)&m0, (char *)a2);
+    matrix_from_basis_rows((char *)&m1, (char *)&m0);
+    euler_to_matrix((char *)&m2, (char *)a3);
+    multiply_matrix((char *)&m3, (char *)&m1, (char *)&m2);
+    GetEulerAnglesFromMatrix((char *)&m3, (char *)obj);
     if (*(int *)((char *)obj + 0x3C) & 2) {
         p = (V4_002AD6F0 *)((char *)obj + 0x20);
         *p = *(V4_002AD6F0 *)a2;
@@ -83,6 +85,7 @@ extern float func_00283180(float x);
 extern void func_00282D30(float *dst, float *src, float scale);
 extern void func_002ACDE8(float *dst, float *a, float *b);
 
+/* Builds a rotation that turns one direction toward another by a given fraction. */
 void func_002ACF68(float *dst, float *a, float *b, int normalized, float scale)
 {
     float axis[4];
@@ -90,20 +93,20 @@ void func_002ACF68(float *dst, float *a, float *b, int normalized, float scale)
     float len;
     float angle;
 
-    func_00282DD8(axis, b, a);
-    func_00282F20(axis, axis, 1.0f);
-    dot = func_00282DB0(a, b);
+    FastVecCross(axis, b, a);
+    vec_scale_to_length(axis, axis, 1.0f);
+    dot = FastVecDot(a, b);
     if (normalized == 0) {
-        len = func_00282DF0(a) * func_00282DF0(b);
+        len = FastVecLength(a) * FastVecLength(b);
         if (len == 0.0f) {
             qcopy(dst, a);
             return;
         }
         dot /= len;
     }
-    angle = (1.5707964f - func_002831B0(dot)) * (scale * 0.5f);
-    func_00282D30(axis, axis, func_00283198(angle));
-    axis[3] = func_00283180(angle);
-    func_002ACDE8(dst, a, axis);
+    angle = (1.5707964f - FastAngleHelper(dot)) * (scale * 0.5f);
+    FastVecScale(axis, axis, FastSinOrCosB(angle));
+    axis[3] = FastSinOrCosA(angle);
+    RotateVectorByQuaternion(dst, a, axis);
 }
 

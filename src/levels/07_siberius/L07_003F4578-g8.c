@@ -58,42 +58,43 @@ extern char func_L07_003F4CC0[];
 
 /* Advances the object's own state: three step kinds by the 0x20 flag, then the shared
    spin and the two sampled vectors. */
-void func_L07_003F4970(u8 *a0)
+/* Updates the beam: fades it in, then fades it out and removes it. While alive it spins, draws itself and hurts what it touches. */
+void func_L07_003F4970(u8 *moby)
 {
-    u8 *s1 = a0;
-    u8 *s2 = *(u8 **)(a0 + 0x68);
-    u8 v1 = *(u8 *)(a0 + 0x20);
-    f32 v[4];
-    f32 w[4];
+    u8 *beamMoby = moby;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 state = *(u8 *)(moby + 0x20);
+    f32 startPoint[4];
+    f32 endPoint[4];
 
-    switch (v1) {
+    switch (state) {
     case 0:
         {
-            u32 n = *(u16 *)(s1 + 0x96) + 1;
+            u32 frameCount = *(u16 *)(beamMoby + 0x96) + 1;
 
-            *(u16 *)(s1 + 0x96) = n;
-            if ((u16)n == 1) {
+            *(u16 *)(beamMoby + 0x96) = frameCount;
+            if ((u16)frameCount == 1) {
                 break;
             }
-            func_002AA2E8((f32 *)(s2 + 0x24), 1.0f, D_L07_001B0E98 * (1.0f / 60.0f));
-            if (1.0f <= *(f32 *)(s2 + 0x24)) {
-                func_002A7750(s1, 1, -1);
+            ApproachValue((f32 *)(vars + 0x24), 1.0f, D_L07_001B0E98 * (1.0f / 60.0f));
+            if (1.0f <= *(f32 *)(vars + 0x24)) {
+                SetMobyState(beamMoby, 1, -1);
             }
         }
         break;
     case 1:
-        func_002AA2E8((f32 *)(s2 + 0x24), 0.0f, D_L07_001B0E9C * (1.0f / 60.0f));
-        if (*(f32 *)(s2 + 0x24) <= 0.0f) {
-            func_0029F338(s1);
+        ApproachValue((f32 *)(vars + 0x24), 0.0f, D_L07_001B0E9C * (1.0f / 60.0f));
+        if (*(f32 *)(vars + 0x24) <= 0.0f) {
+            MarkMobySpawned(beamMoby);
             return;
         }
         break;
     }
-    *(f32 *)(s2 + 0x28) = func_00283B98(*(f32 *)(s2 + 0x28), D_L07_001B0EA0 * 0.00029088825f);
-    func_L00_002E6CF0(func_L07_003F4CC0, s1);
-    if (0.333f < *(f32 *)(s2 + 0x24)) {
-        func_L07_003F4C18(s1, v, w);
-        func_L01_003120A8(*(u32 *)(s1 + 0xB8), v, w, 1, *(f32 *)(s2 + 0x2C), 1.0f, 0, 1, 0);
+    *(f32 *)(vars + 0x28) = FastAddRotations(*(f32 *)(vars + 0x28), D_L07_001B0EA0 * 0.00029088825f);
+    AddDrawCallbackToList1(DrawSegmentedBeam, beamMoby);
+    if (0.333f < *(f32 *)(vars + 0x24)) {
+        GetBeamEndPoints(beamMoby, startPoint, endPoint);
+        CastObjectCollisionLine(*(u32 *)(beamMoby + 0xB8), startPoint, endPoint, 1, *(f32 *)(vars + 0x2C), 1.0f, 0, 1, 0);
     }
 }
 
@@ -134,40 +135,40 @@ extern void func_L00_002B9D60(void *obj, void *pos, s32 a2, s32 a3);
 extern void func_L00_0036AE00(s32 id, s32 a1);
 
 /* Switches the object to its second phase. */
-void func_L07_00410930(SibObj *a0)
+void func_L07_00410930(SibObj *moby)
 {
-    f32 arg[4];
-    f32 v[4];
+    f32 offsetCopy[4];
+    f32 offset[4];
     SibGroups *state;
-    u16 *p;
-    u16 *q;
-    u8 *e;
+    u16 *idList;
+    u16 *idListB;
+    u8 *entry;
 
-    *(TI128 *)v = 0;
-    v[2] = D_L07_001B173C;
-    *(TI128 *)arg = *(TI128 *)v;
-    state = (SibGroups *)a0->state;
-    func_L00_002B9D60(&D_L07_001B1730, arg, 0, 1);
-    a0->flags34 |= 2;
-    a0->f98 = 0;
-    for (p = D_L07_001A9014[state->groupD0];
-         p != 0 && ((s16)p[-1] >= 0 || p == D_L07_001A9014[state->groupD0]) &&
-         (e = D_L07_001B2954 + ((*p & 0x7FFF) << 5)) != 0;
-         p++) {
-        e[0x1E] &= 0xFB;
+    *(TI128 *)offset = 0;
+    offset[2] = D_L07_001B173C;
+    *(TI128 *)offsetCopy = *(TI128 *)offset;
+    state = (SibGroups *)moby->state;
+    ResetHeroPositionAndDirection(&D_L07_001B1730, offsetCopy, 0, 1);
+    moby->flags34 |= 2;
+    moby->f98 = 0;
+    for (idList = D_L07_001A9014[state->groupD0];
+         idList != 0 && ((s16)idList[-1] >= 0 || idList == D_L07_001A9014[state->groupD0]) &&
+         (entry = D_L07_001B2954 + ((*idList & 0x7FFF) << 5)) != 0;
+         idList++) {
+        entry[0x1E] &= 0xFB;
     }
-    for (p = D_L07_001A9014[state->groupCC];
-         p != 0 && ((s16)p[-1] >= 0 || p == D_L07_001A9014[state->groupCC]) &&
-         (e = D_L07_001B2954 + ((*p & 0x7FFF) << 5)) != 0;
-         p++) {
-        e[0x1E] |= 4;
+    for (idList = D_L07_001A9014[state->groupCC];
+         idList != 0 && ((s16)idList[-1] >= 0 || idList == D_L07_001A9014[state->groupCC]) &&
+         (entry = D_L07_001B2954 + ((*idList & 0x7FFF) << 5)) != 0;
+         idList++) {
+        entry[0x1E] |= 4;
     }
-    for (q = D_L07_001A9014[state->groupCC];
-         q != 0 && ((s16)q[-1] >= 0 || q == D_L07_001A9014[state->groupCC]) &&
-         (e = D_L07_001B295C + ((*q & 0x7FFF) << 6)) != 0;
-         q++) {
-        *(f32 *)(e + 0x38) -= 100.0f;
-        func_L00_0036AE00(*q & 0x7FFF, 1);
+    for (idListB = D_L07_001A9014[state->groupCC];
+         idListB != 0 && ((s16)idListB[-1] >= 0 || idListB == D_L07_001A9014[state->groupCC]) &&
+         (entry = D_L07_001B295C + ((*idListB & 0x7FFF) << 6)) != 0;
+         idListB++) {
+        *(f32 *)(entry + 0x38) -= 100.0f;
+        SetupScaleRecord(*idListB & 0x7FFF, 1);
     }
     D_L07_001B1E90 = 2;
 }
@@ -180,23 +181,24 @@ extern u8 *func_L00_002D70A0(s32);
 
 typedef struct { f32 x, y; u8 pad08[0x2C]; u32 color; } Effect;
 typedef struct { u8 pad[0x450]; Effect *effect; } EffectState;
-void func_L07_003F8780(u8 *a0)
+/* Sets up the screen effect of the boss. For one variant it also creates the effect record once and fills it in. */
+void func_L07_003F8780(u8 *moby)
 {
-    EffectState *s1 = *(EffectState **)(a0 + 0x68);
+    EffectState *vars = *(EffectState **)(moby + 0x68);
 
-    func_L00_00424A08(0, D_L07_001B10B8, 0.003f);
-    func_L00_00424A50(D_L07_001B10BC, 0.003f);
-    if (*(u8 *)(a0 + 0x95) != 0) {
-        if (s1->effect == 0)
-            s1->effect = (Effect *)func_L00_002D70A0(5);
+    follow_camera_set_distance(0, D_L07_001B10B8, 0.003f);
+    follow_camera_set_height(D_L07_001B10BC, 0.003f);
+    if (*(u8 *)(moby + 0x95) != 0) {
+        if (vars->effect == 0)
+            vars->effect = (Effect *)AllocCameraOverrideSlot(5);
         {
             f32 x = D_L07_001B10B8;
             f32 y = D_L07_001B10BC;
-            u32 z;
-            s1->effect->x = x;
-            z = D_L07_001B10C0;
-            s1->effect->y = y;
-            s1->effect->color = z;
+            u32 color;
+            vars->effect->x = x;
+            color = D_L07_001B10C0;
+            vars->effect->y = y;
+            vars->effect->color = color;
         }
     }
 }
@@ -228,45 +230,45 @@ extern u8 D_L07_001B31A9;
 
 /* Steers the object's two angles: the yaw toward the argument, the pitch from the shared
    record, and the two scaled fields of the state record. */
-void func_L07_0040F468(u8 *a0)
+void func_L07_0040F468(u8 *moby)
 {
-    u8 *s0;
-    u8 *s1;
-    u8 *s2;
-    u8 *v1;
-    u8 *v0;
-    f32 *p;
-    f32 t;
-    f32 r;
-    f32 q;
-    f32 f20;
-    f32 f21;
-    f32 f22;
+    u8 *owner;
+    u8 *vars;
+    u8 *record;
+    u8 *worldInfo;
+    u8 *targetObj;
+    f32 *dirXY;
+    f32 aimAngle;
+    f32 targetYaw;
+    f32 dirAngle;
+    f32 maxTurnSpeed;
+    f32 turnAccel;
+    f32 pi;
 
-    v1 = D_L07_001B9250;
-    if (*(s16 *)(v1 + 0x86) != 0) {
+    worldInfo = D_L07_001B9250;
+    if (*(s16 *)(worldInfo + 0x86) != 0) {
         return;
     }
-    v0 = D_L07_001ADAAC;
-    if (v0 == 0) {
+    targetObj = D_L07_001ADAAC;
+    if (targetObj == 0) {
         return;
     }
-    f22 = 3.14159274f;
-    s0 = *(u8 **)(v1 + 0x70);
-    s1 = *(u8 **)(a0 + 0x68);
-    p = (f32 *)(s0 + 0x160);
-    r = func_2E5318(*(f32 *)(v0 + 0xF8), f22);
-    s2 = s0 + 0x1C0;
-    q = func_2E49C8(p[0], p[1]);
-    t = func_2E5360(r, q);
-    f21 = D_L07_001B17D4 * 0.0000048481375f;
-    f20 = D_L07_001B17D8 * 0.000290888245f;
+    pi = 3.14159274f;
+    owner = *(u8 **)(worldInfo + 0x70);
+    vars = *(u8 **)(moby + 0x68);
+    dirXY = (f32 *)(owner + 0x160);
+    targetYaw = func_2E5318(*(f32 *)(targetObj + 0xF8), pi);
+    record = owner + 0x1C0;
+    dirAngle = func_2E49C8(dirXY[0], dirXY[1]);
+    aimAngle = func_2E5360(targetYaw, dirAngle);
+    turnAccel = D_L07_001B17D4 * 0.0000048481375f;
+    maxTurnSpeed = D_L07_001B17D8 * 0.000290888245f;
     if (D_L07_001B31A9 == 0) {
-        t = func_2E5318(t, f22);
+        aimAngle = func_2E5318(aimAngle, pi);
     }
-    func_3144F0(&t, s1 + 0x1A8, 0.0f, f21, f21, f20, 0);
-    *(f32 *)(s2 + 0x1C) = 1.0f;
-    *(f32 *)(s2 + 0x14) = -*(f32 *)(s1 + 0x1A8);
+    func_3144F0(&aimAngle, vars + 0x1A8, 0.0f, turnAccel, turnAccel, maxTurnSpeed, 0);
+    *(f32 *)(record + 0x1C) = 1.0f;
+    *(f32 *)(record + 0x14) = -*(f32 *)(vars + 0x1A8);
 }
 
 extern u8 D_00189E20[];
@@ -277,35 +279,36 @@ extern f32 func_00282E48(u8 *a, u8 *b);
 
 typedef struct { u8 pad[0xA8]; s32 ids[4]; } Rec;
 
-void func_L07_0040F760(u8 *a0)
+/* Updates the four attached parts of the object: places each one, and lets the player grab a Swingshot Node part or shows and hides it. */
+void func_L07_0040F760(u8 *moby)
 {
-    u8 *s7 = *(u8 **)(a0 + 0x68);
-    u32 frame = ((s32)a0 >> 8) & 7;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u32 frameSlot = ((s32)moby >> 8) & 7;
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        s32 id = ((Rec *)s7)->ids[i];
-        u8 *o;
+        s32 id = ((Rec *)vars)->ids[i];
+        u8 *part;
         if (id == -1)
             continue;
-        o = D_L07_001B22DC + (id << 8);
-        func_002AD470(o, a0, s7 + 0x120 + i * 0x10, s7 + 0x160 + i * 0x10, o + 0x10, o + 0xF0);
-        func_002A0F48(o);
-        if (*(s16 *)(o + 0xAA) == 0x2F6) {
-            u8 *p = D_00189E20;
-            if (*(s32 *)(p + 0x229C) == 13 && *(u8 **)(p + 0xAA4) == o && *(u8 **)(p + 0x3A0) != a0) {
-                if (func_00282E48(p + 0x80, o + 0x10) < 8.0f)
-                    *(u8 **)(p + 0x3A0) = a0;
+        part = gMobyArray_L07 + (id << 8);
+        ApplyCollisionPushToObject(part, moby, vars + 0x120 + i * 0x10, vars + 0x160 + i * 0x10, part + 0x10, part + 0xF0);
+        func_002A0F48(part);
+        if (*(s16 *)(part + 0xAA) == 0x2F6 /* Swingshot Node */) {
+            u8 *hero = gHeroState;
+            if (*(s32 *)(hero + 0x229C) == 13 && *(u8 **)(hero + 0xAA4) == part && *(u8 **)(hero + 0x3A0) != moby) {
+                if (fast_vec_dist(hero + 0x80, part + 0x10) < 8.0f)
+                    *(u8 **)(hero + 0x3A0) = moby;
                 continue;
             }
         }
-        if ((D_L07_001B1E08 & 7) == frame && *(s16 *)(o + 0xAA) == 0x2F6) {
-            u8 *q = D_00189E20;
-            if (*(s32 *)(q + 0x229C) != 13) {
-                if (D_L07_001ADAAC == a0)
-                    *(u16 *)(o + 0x34) &= 0xEFFF;
+        if ((D_L07_001B1E08 & 7) == frameSlot && *(s16 *)(part + 0xAA) == 0x2F6 /* Swingshot Node */) {
+            u8 *heroB = gHeroState;
+            if (*(s32 *)(heroB + 0x229C) != 13) {
+                if (D_L07_001ADAAC == moby)
+                    *(u16 *)(part + 0x34) &= 0xEFFF;
                 else
-                    *(u16 *)(o + 0x34) |= 0x1000;
+                    *(u16 *)(part + 0x34) |= 0x1000;
             }
         }
     }
@@ -325,52 +328,53 @@ extern void func_L07_003F6CF0(u8 *a);
 extern void func_L07_003F6DC0(u8 *self, float *target);
 extern void func_L07_003F6F00(u8 *a0);
 
-void func_L07_003F6960(u8 *a0)
+/* Updates the homing bomb: it flies toward the player and, when it touches something, explodes with a sound and damage, then waits to be reset. */
+void func_L07_003F6960(u8 *moby)
 {
-    u8 *state;
-    u8 *p;
+    u8 *vars;
+    u8 *hitCursor;
     char *pos;
-    char *tune;
+    char *tuningBase;
     f32 dir[4];
-    s32 n, k;
+    s32 hitCount, remaining;
 
-    state = *(u8 **)(a0 + 0x68);
-    if (a0[0x20] != 1)
-        func_L07_003F6CF0(a0);
-    switch (a0[0x20]) {
+    vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] != 1)
+        TickHomingBombFuse(moby);
+    switch (moby[0x20]) {
     case 2:
-        *(f32 *)(a0 + 0x2C) = *(f32 *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L07_001B0FD0;
-        func_L07_003F6DC0(a0, (float *)D_00189EA0);
-        func_L07_003F6F00(a0);
-        n = func_00277F48(a0 + 0x10, 0.333f, 0, (char *)a0, 0);
-        if (n > 0) {
-            p = (u8 *)D_L07_001C36C0;
-            for (k = n; k != 0; k--, p += 4) {
-                u8 *other = *(u8 **)p;
-                if (other == a0)
+        *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * D_L07_001B0FD0;
+        MoveHomingBombTowardTarget(moby, (float *)gHeroPosition);
+        SpawnFallingParticlePuff(moby);
+        hitCount = ProcessCollisionHit(moby + 0x10, 0.333f, 0, (char *)moby, 0);
+        if (hitCount > 0) {
+            hitCursor = (u8 *)D_L07_001C36C0;
+            for (remaining = hitCount; remaining != 0; remaining--, hitCursor += 4) {
+                u8 *other = *(u8 **)hitCursor;
+                if (other == moby)
                     continue;
-                if (other != *(u8 **)(a0 + 0xB8))
-                    func_002A7750(a0, 3, -1);
+                if (other != *(u8 **)(moby + 0xB8))
+                    SetMobyState(moby, 3, -1);
             }
         }
         break;
     case 3:
-        func_002E5DA0(6, 0, (char *)a0, 0xE5F);
-        pos = (char *)a0 + 0x10;
-        func_002A8C28((char *)a0, pos, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
-        func_002A8C28((char *)a0, pos, 1, 4.0f, (f32)state[0x34], 1.0f, 0, 1, 0);
-        func_00282CF0(dir, D_L07_001B9200, pos);
-        func_00282F20(dir, dir, 1.0f);
-        func_0032DA58((char *)a0, pos, (char *)dir, 0.0f);
-        tune = D_L07_001B9200 - 0x140;
-        *(f32 *)(tune + 0x180) = 0.1f;
-        *(s32 *)(tune + 0x188) = 0x5A;
-        *(f32 *)(tune + 0x160) = 0.2f;
-        *(s32 *)(tune + 0x168) = 0x3C;
-        *(s32 *)(tune + 0x16C) = 0;
-        *(s32 *)(a0 + 0x98) = 0;
-        *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(a0, 1, -1);
+        PlaySoundFromClassBank(6, 0, (char *)moby, 0xE5F);
+        pos = (char *)moby + 0x10;
+        SweepCollisionFromObject((char *)moby, pos, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
+        SweepCollisionFromObject((char *)moby, pos, 1, 4.0f, (f32)vars[0x34], 1.0f, 0, 1, 0);
+        FastVecSub(dir, D_L07_001B9200, pos);
+        vec_scale_to_length(dir, dir, 1.0f);
+        SpawnBlastEffectMoby((char *)moby, pos, (char *)dir, 0.0f);
+        tuningBase = D_L07_001B9200 - 0x140;
+        *(f32 *)(tuningBase + 0x180) = 0.1f;
+        *(s32 *)(tuningBase + 0x188) = 0x5A;
+        *(f32 *)(tuningBase + 0x160) = 0.2f;
+        *(s32 *)(tuningBase + 0x168) = 0x3C;
+        *(s32 *)(tuningBase + 0x16C) = 0;
+        *(s32 *)(moby + 0x98) = 0;
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+        SetMobyState(moby, 1, -1);
         break;
     }
 }

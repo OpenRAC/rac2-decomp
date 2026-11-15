@@ -10,9 +10,10 @@ extern s16 D_001A7A1A;
 extern s32 D_001A7A1C;
 
 /* Two values of the resident word 0x001A79F0 select a shared byte or word. */
+/* Returns a setting value that depends on the current mode, or 0 for other modes. */
 s32 func_L08_003DB4A0(void)
 {
-    s32 v = D_001A79F0;
+    s32 v = gCurrentMapIndex;
 
     if (v == 8)
         return D_001A7A1A;

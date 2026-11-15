@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct { short field[12]; } TextLayout;
 extern char D_L00_0022F7C0[];
 extern float D_L00_001B25E0 __attribute__((sda));
@@ -8,17 +9,18 @@ extern unsigned char *func_00288FB8(int);
 /* Retail consumes a 24-byte layout and the complete 64-bit color word. */
 extern void func_00280200(TextLayout *, unsigned long long, unsigned char *, int);
 
+/* Draws a text box telling the player whether the selected item is at its limit. */
 void func_L00_00378E90(void) {
     TextLayout copy;
     TextLayout layout;
     char *model;
     int index;
     float scale;
-    func_002FC620(192, 488, 59, 195);
-    model = D_L00_0022F7C0;
+    SetGsScissorClamped(192, 488, 59, 195);
+    model = gPurchaseMenuModel;
     if (*(int *)(model + 0x84) == 0) return;
     index = *(int *)(model + 0x80);
-    func_00115484(&layout, 0, 24);
+    memset(&layout, 0, 24);
     scale = D_L00_001B25E0;
     layout.field[2] = 32;
     layout.field[3] = 386;
@@ -34,10 +36,10 @@ void func_L00_00378E90(void) {
     if (D_001A79FC >= *(int *)(model + 0x144 + index * 28)) {
         copy.field[9] = 1;
         copy.field[5] = (short)((float)(copy.field[0] + 40) * scale + 0.5f);
-        func_00280200(&copy, 0x80F0F0F0ULL, func_00288FB8(0x1129), -1);
+        DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, GetLocalizedString(0x1129), -1);
     } else {
         copy.field[9] = 1;
         copy.field[5] = (short)((float)(copy.field[0] + 60) * scale + 0.5f);
-        func_00280200(&copy, 0x80F0F0F0ULL, func_00288FB8(0x1128), -1);
+        DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, GetLocalizedString(0x1128), -1);
     }
 }

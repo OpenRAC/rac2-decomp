@@ -40,6 +40,7 @@ extern void func_002AF000(float *, float, float, float);
 extern u8 *func_002BDCE8(void *, float, float, int, void *, int, int, float, float);
 extern float func_00283CE0(int);
 
+/* Sets off an explosion with fire, sparks, smoke and a shockwave. */
 void func_L00_00415DE8(u8 *object, void *unused)
 {
     Vec4 position;
@@ -48,127 +49,127 @@ void func_L00_00415DE8(u8 *object, void *unused)
     u8 *state = *(u8 **)(object + 0x68);
     float inner, outer, angle, speed;
     u8 *effect;
-    int na, nb, nc, ne, ng, nh, nk, sign;
+    int coreIdx, glowIdx, brightIdx, largeIdx, smallIdx, debrisIdx, smokeIdx, sign;
 
     inner = D_L00_001B13EC * F(state, 0x14) * 210000.0f;
     outer = D_L00_001B13F0 * F(state, 0x14) * 210000.0f;
-    effect = func_002C65A0(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 100, 0, inner, outer, 0.0f, 0);
+    effect = SpawnGravityFadeParticle(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 100, 0, inner, outer, 0.0f, 0);
     if (effect)
         effect[2] = D_L00_001FE940.fireColors[0];
-    effect = func_002C65A0(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x63F7, 0, 100, 0, inner, outer, 0.0f, 0);
+    effect = SpawnGravityFadeParticle(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x63F7, 0, 100, 0, inner, outer, 0.0f, 0);
     if (effect)
         effect[2] = D_L00_001FE940.fireColors[0];
-    for (na = 1; na >= 0; na--) {
-        effect = func_002C65A0(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
+    for (coreIdx = 1; coreIdx >= 0; coreIdx--) {
+        effect = SpawnGravityFadeParticle(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
         if (effect)
             effect[2] = D_L00_001FE940.fireColors[5];
     }
-    for (nb = 1; nb >= 0; nb--) {
-        effect = func_002C65A0(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
+    for (glowIdx = 1; glowIdx >= 0; glowIdx--) {
+        effect = SpawnGravityFadeParticle(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
         if (effect)
             effect[2] = D_L00_001FE940.fireColors[6];
     }
-    for (nc = 0; nc < I(state, 0x20); nc++) {
+    for (brightIdx = 0; brightIdx < I(state, 0x20); brightIdx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
-        heading = func_00283248(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
-        phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-        lifetime = func_002A7820(30, 50);
-        position[0] = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        position[1] = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        position[2] = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        size = func_002A7878(0.6f, 1.0f) * F(state, 0x14);
-        speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-        angle = func_00283B98(heading, func_002A78D8(0.0f, 1.3962636f));
-        velocity[0] = func_00283180(angle) * 0.016666668f * speed;
-        velocity[1] = func_00283198(angle) * 0.016666668f * speed;
+        heading = FastMatrixHelperA(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+        phase = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+        lifetime = RandomIntRange(30, 50);
+        position[0] = F(object, 0x10) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        position[1] = F(object, 0x14) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        position[2] = F(object, 0x18) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        size = RandomFloatRange(0.6f, 1.0f) * F(state, 0x14);
+        speed = RandomFloatRange(9.0f, 12.0f) * F(state, 0x14);
+        angle = FastAddRotations(heading, RandomSignedFloatRange(0.0f, 1.3962636f));
+        velocity[0] = FastSinOrCosA(angle) * 0.016666668f * speed;
+        velocity[1] = FastSinOrCosB(angle) * 0.016666668f * speed;
         velocity[2] = 0.0f;
-        speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
+        speed = RandomFloatRange(0.0f, 12.0f) * F(state, 0x14);
         velocity[2] = speed * 0.016666668f;
-        func_002C7970(position, velocity, lifetime, 0x407FFF, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 1);
+        SpawnFadingDriftParticle(position, velocity, lifetime, 0x407FFF, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 1);
         {
-            u8 *effect = func_002C7970(position, velocity, lifetime, 0x20FF, -(phase * 2), 48, 48, size * 1260000.0f, F(state, 0x14) * 4200.0f, 0.00405555591f, 0);
+            u8 *effect = SpawnFadingDriftParticle(position, velocity, lifetime, 0x20FF, -(phase * 2), 48, 48, size * 1260000.0f, F(state, 0x14) * 4200.0f, 0.00405555591f, 0);
             if (effect)
                 effect[2] = D_L00_001FE940.sparkColors[0];
         }
     }
-    for (ne = 0; ne < I(state, 0x24); ne++) {
+    for (largeIdx = 0; largeIdx < I(state, 0x24); largeIdx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
-        heading = func_00283248(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
-        phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-        lifetime = func_002A7820(30, 50);
-        position[0] = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        position[1] = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        position[2] = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        size = func_002A7878(0.75f, 1.5f) * F(state, 0x14);
-        speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-        angle = func_00283B98(heading, func_002A78D8(0.0f, 1.3962636f));
-        velocity[0] = func_00283180(angle) * 0.016666668f * speed;
-        velocity[1] = func_00283198(angle) * 0.016666668f * speed;
+        heading = FastMatrixHelperA(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+        phase = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+        lifetime = RandomIntRange(30, 50);
+        position[0] = F(object, 0x10) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        position[1] = F(object, 0x14) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        position[2] = F(object, 0x18) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        size = RandomFloatRange(0.75f, 1.5f) * F(state, 0x14);
+        speed = RandomFloatRange(9.0f, 12.0f) * F(state, 0x14);
+        angle = FastAddRotations(heading, RandomSignedFloatRange(0.0f, 1.3962636f));
+        velocity[0] = FastSinOrCosA(angle) * 0.016666668f * speed;
+        velocity[1] = FastSinOrCosB(angle) * 0.016666668f * speed;
         velocity[2] = 0.0f;
-        speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
+        speed = RandomFloatRange(0.0f, 12.0f) * F(state, 0x14);
         velocity[2] = speed * 0.016666668f;
-        func_002C7970(position, velocity, lifetime, 0x8FFF, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 5);
+        SpawnFadingDriftParticle(position, velocity, lifetime, 0x8FFF, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 5);
     }
-    for (ng = 0; ng < I(state, 0x28); ng++) {
+    for (smallIdx = 0; smallIdx < I(state, 0x28); smallIdx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
-        heading = func_00283248(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
-        phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-        lifetime = func_002A7820(30, 50);
-        position[0] = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        position[1] = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        position[2] = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-        size = func_002A7878(0.6f, 1.0f) * F(state, 0x14);
-        speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-        angle = func_00283B98(heading, func_002A78D8(0.0f, 1.3962636f));
-        velocity[0] = func_00283180(angle) * 0.016666668f * speed;
-        velocity[1] = func_00283198(angle) * 0.016666668f * speed;
+        heading = FastMatrixHelperA(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+        phase = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+        lifetime = RandomIntRange(30, 50);
+        position[0] = F(object, 0x10) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        position[1] = F(object, 0x14) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        position[2] = F(object, 0x18) + RandomSignedFloatRange(0.0f, 0.1f) * F(state, 0x14);
+        size = RandomFloatRange(0.6f, 1.0f) * F(state, 0x14);
+        speed = RandomFloatRange(9.0f, 12.0f) * F(state, 0x14);
+        angle = FastAddRotations(heading, RandomSignedFloatRange(0.0f, 1.3962636f));
+        velocity[0] = FastSinOrCosA(angle) * 0.016666668f * speed;
+        velocity[1] = FastSinOrCosB(angle) * 0.016666668f * speed;
         velocity[2] = 0.0f;
-        speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
+        speed = RandomFloatRange(0.0f, 12.0f) * F(state, 0x14);
         velocity[2] = speed * 0.016666668f;
-        func_002C7970(position, velocity, lifetime, 0x3064FF, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 3);
+        SpawnFadingDriftParticle(position, velocity, lifetime, 0x3064FF, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 3);
     }
-    for (nh = 0; nh < I(state, 0x30); nh++) {
+    for (debrisIdx = 0; debrisIdx < I(state, 0x30); debrisIdx++) {
         float roll, turn;
-        speed = func_002A7878(15.0f, 20.0f) * F(state, 0x14) * 0.016666668f;
-        func_00282D30(position, object + 0xC0, speed);
-        roll = func_002A78D8(0.261799425f, 1.3962636f);
-        turn = func_002A78D8(0.261799425f, 1.3962636f);
-        func_002AB668(rotation, object + 0xD0, roll);
-        func_002ACDE8(velocity, position, rotation);
-        func_002AB668(rotation, object + 0xC0, turn);
-        func_002ACDE8(velocity, velocity, rotation);
-        func_002C6DD8(object + 0x10, velocity, func_002A7820(20, 35), 0.00405555591f);
+        speed = RandomFloatRange(15.0f, 20.0f) * F(state, 0x14) * 0.016666668f;
+        FastVecScale(position, object + 0xC0, speed);
+        roll = RandomSignedFloatRange(0.261799425f, 1.3962636f);
+        turn = RandomSignedFloatRange(0.261799425f, 1.3962636f);
+        BuildAxisAngleQuaternion(rotation, object + 0xD0, roll);
+        RotateVectorByQuaternion(velocity, position, rotation);
+        BuildAxisAngleQuaternion(rotation, object + 0xC0, turn);
+        RotateVectorByQuaternion(velocity, velocity, rotation);
+        SpawnTrailParticle_002C6DD8(object + 0x10, velocity, RandomIntRange(20, 35), 0.00405555591f);
     }
     if (I(state, 0x34)) {
         *(Quad *)velocity = 0;
         velocity[2] = F(state, 0x14) * 0.13333334f;
         *(Quad *)position = *(Quad *)velocity;
-        func_00308408(object, object + 0x10, position, 16, 255, 0, 0, 40, F(state, 0x14) * 3.5f);
+        SpawnShockwaveRing(object, object + 0x10, position, 16, 255, 0, 0, 40, F(state, 0x14) * 3.5f);
     }
-    func_002ABBB8(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
+    SpawnExplosionEffects(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
     sign = 1;
-    angle = func_00283248(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
-    for (nk = 0; nk < I(state, 0x2C); nk++) {
+    angle = FastMatrixHelperA(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+    for (smokeIdx = 0; smokeIdx < I(state, 0x2C); smokeIdx++) {
         float radius, roll, turn;
-        position[0] = F(object, 0x10) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
+        position[0] = F(object, 0x10) + RandomSignedFloatRange(0.0f, 1.0f) * F(state, 0x14);
         sign = -sign;
-        position[1] = F(object, 0x14) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
-        position[2] = F(object, 0x18) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
-        radius = func_002A7878(0.016666668f, 0.033333335f) * F(state, 0x14);
-        roll = func_002A78D8(0.0f, 1.3962636f);
-        turn = func_00283B98(angle, func_002A78D8(0.0f, 1.5707965f));
-        func_002AF000(velocity, radius, turn, roll);
+        position[1] = F(object, 0x14) + RandomSignedFloatRange(0.0f, 1.0f) * F(state, 0x14);
+        position[2] = F(object, 0x18) + RandomSignedFloatRange(0.0f, 1.0f) * F(state, 0x14);
+        radius = RandomFloatRange(0.016666668f, 0.033333335f) * F(state, 0x14);
+        roll = RandomSignedFloatRange(0.0f, 1.3962636f);
+        turn = FastAddRotations(angle, RandomSignedFloatRange(0.0f, 1.5707965f));
+        BuildSphericalOffset(velocity, radius, turn, roll);
         {
-            u8 *effect = func_002BDCE8(position, 0.0f, 1.0f, sign, velocity, 0x7F60A0FF, 0, 1.01f, F(state, 0x14) * 315000.0f);
+            u8 *effect = SpawnSpinningSparkParticle(position, 0.0f, 1.0f, sign, velocity, 0x7F60A0FF, 0, 1.01f, F(state, 0x14) * 315000.0f);
             if (effect) {
                 u8 *extra = effect + 0x20;
-                *(u16 *)(effect + 0xA) = func_002A7820(40, 70);
-                effect[9] = func_00283CF0(4.0f) + 64;
+                *(u16 *)(effect + 0xA) = RandomIntRange(40, 70);
+                effect[9] = FloatToInt(4.0f) + 64;
                 I(extra, 0x4) = 3;
-                F(extra, 0x1C) = func_00283CE0(func_002A7820(1, 10));
+                F(extra, 0x1C) = IntToFloat(RandomIntRange(1, 10));
                 extra[0xA] = 64;
                 extra[0xB] = effect[0xA];
             }

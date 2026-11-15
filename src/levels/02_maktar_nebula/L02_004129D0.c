@@ -49,7 +49,8 @@ extern void func_002C3150(void *, void *, int, int, int, int, float);
    two-layer ribbon (func_L00_002EBE88) with the two colours faded by +0xC, and while
    D_L02_001A8F00 is zero a spark of the second kind is thrown from a random point on a random
    segment, falling at a speed drawn between the last two range words. */
-void func_L02_004129D0(u8 *a0) {
+/* Draws a wavy glowing beam from the object to a target object and throws off sparks along it. */
+void func_L02_004129D0(u8 *moby) {
     SparkRange range = D_L02_001B1C10;
     SparkSizes sizes = D_L02_001B1C20;
     SparkColours colours = D_L02_001B1C28;
@@ -77,38 +78,38 @@ void func_L02_004129D0(u8 *a0) {
     amp = 1.0f;
     *(TI128 *)&front = 0;
     front.z = 1.5f;
-    state = *(u8 **)(a0 + 0x68);
-    func_00283098(&front, &front, a0 + 0xC0);
-    func_00282CC0(&front, &front, a0 + 0x10);
-    func_00282CF0(&delta, D_L02_001B368C + (*(s32 *)state << 7) + 0x30, &front);
-    func_00282D30(&delta, &delta, amp / func_00283CE0(12));
+    state = *(u8 **)(moby + 0x68);
+    matrix_mul_vec3(&front, &front, moby + 0xC0);
+    FastVecAdd(&front, &front, moby + 0x10);
+    FastVecSub(&delta, D_L02_001B368C + (*(s32 *)state << 7) + 0x30, &front);
+    FastVecScale(&delta, &delta, amp / IntToFloat(12));
     qcopy(&pts[0], &front);
     for (i = 0; i < 12; i++) {
         Vec4 *p = &pts[i + 1];
 
-        func_00282CC0(p, &pts[i], &delta);
+        FastVecAdd(p, &pts[i], &delta);
         p->w = widths.f[0];
     }
     phase = *(float *)(state + 0x14);
-    step = 1.0f / func_00283CE0(13) * 3.1415927f;
+    step = 1.0f / IntToFloat(13) * 3.1415927f;
     for (j = 1; j < 13; j++) {
         Vec4 *q = &pts[j];
 
-        t = func_00283198(phase);
-        q->z += amp * t * func_00283198((float)j * step);
-        phase = func_00283B98(phase, step + step);
+        t = FastSinOrCosB(phase);
+        q->z += amp * t * FastSinOrCosB((float)j * step);
+        phase = FastAddRotations(phase, step + step);
     }
-    col0 = func_00283D38(beam.rgba[0] & 0xFFFFFF, beam.rgba[0], *(float *)(state + 0xC));
-    col1 = func_00283D38(beam.rgba[1] & 0xFFFFFF, beam.rgba[1], *(float *)(state + 0xC));
-    func_L00_002EBE88(pts, layers.b[0], layers.b[1], 13, col0, col1, widths.f[0], widths.f[1],
+    col0 = FastTweenColor(beam.rgba[0] & 0xFFFFFF, beam.rgba[0], *(float *)(state + 0xC));
+    col1 = FastTweenColor(beam.rgba[1] & 0xFFFFFF, beam.rgba[1], *(float *)(state + 0xC));
+    DrawTwoLayerPolylineRibbon(pts, layers.b[0], layers.b[1], 13, col0, col1, widths.f[0], widths.f[1],
                       *(float *)(state + 0x10));
     if (D_L02_001A8F00 == 0) {
         qzero_nc(&vel);
-        seg = func_002A77E0(12);
-        t = func_002A7878(0.0f, 1.0f);
-        func_00282D08(&spot, &pts[seg], &pts[seg + 1], t);
-        vel.z = -(func_002A7878(range.f[2], range.f[3]) * 0.016666668f);
-        kind = (u8)func_002A7820(kinds.b[2], kinds.b[3]);
-        func_002C3150(&spot, &vel, colours.i[1], kind, (u8)func_002A77E0(255), 0, sizes.f[1]);
+        seg = RandomIntBelow(12);
+        t = RandomFloatRange(0.0f, 1.0f);
+        lerp_vector(&spot, &pts[seg], &pts[seg + 1], t);
+        vel.z = -(RandomFloatRange(range.f[2], range.f[3]) * 0.016666668f);
+        kind = (u8)RandomIntRange(kinds.b[2], kinds.b[3]);
+        SpawnHeroRelativeParticle(&spot, &vel, colours.i[1], kind, (u8)RandomIntBelow(255), 0, sizes.f[1]);
     }
 }

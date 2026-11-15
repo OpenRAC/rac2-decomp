@@ -20,6 +20,7 @@ extern Rac2Native_571a3580c10e935f_u8 ref_L00_002F0930_01[];
 
 extern int ref_L00_002F0DA8_00;
 
+/* Adds a small command to the graphics packet list. */
 void func_L00_002F08D0(void)
 {
     *(Rac2Native_73f23b7222fbc541_u32 *)(ref_L00_002F08D0_00 + 0) = 0x30000026u;
@@ -29,6 +30,7 @@ void func_L00_002F08D0(void)
     ref_L00_002F08D0_00 += 16;
 }
 
+/* Adds a small command to the graphics packet list. */
 void func_L00_002F0930(void)
 {
     *(Rac2Native_571a3580c10e935f_u32 *)(ref_L00_002F0930_00 + 0) = 0x30000029u;
@@ -38,6 +40,7 @@ void func_L00_002F0930(void)
     ref_L00_002F0930_00 += 16;
 }
 
+/* Returns a stored global value. */
 int func_L00_002F0DA8(void)
 {
     return ref_L00_002F0DA8_00;

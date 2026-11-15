@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned long long u64;
 typedef int s32;
@@ -19,7 +20,7 @@ void func_L08_0037E6D8(void)
     s32 first = D_L08_001BD800.items[0];
     s32 i;
 
-    func_L00_00311DC0(first);
+    ApplyNearestEnvironmentPreset(first);
     for (i = 1; i < D_L08_001BD800.count; i++)
         *(u64 *)(D_L08_001BD800.items[i] + 0x38) = *(u64 *)(first + 0x38);
 }

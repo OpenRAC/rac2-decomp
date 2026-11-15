@@ -1,3 +1,4 @@
+#include "names.h"
 extern float func_00283CE0(int);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
@@ -8,26 +9,27 @@ typedef struct {
     float x, y, z, w;
 } V4;
 
-int func_L00_0031C3D0(char *a0, char *a1, char *a2, char *a3, void *a4, void *a5, int a6)
+/* Moves two points along two paths in small steps and checks each pair of positions for a hit. Returns 1 as soon as one is found. */
+int func_L00_0031C3D0(char *startA, char *startB, char *endA, char *endB, void *hitInfoA, void *hitInfoB, int stepCount)
 {
-    V4 local0, local1, local2, local3;
-    float fraction;
-    float step;
-    int count = 0;
+    V4 deltaA, deltaB, pointA, pointB;
+    float ratio;
+    float ratioStep;
+    int i = 0;
 
-    step = 1.0f / func_00283CE0(a6);
-    func_00282CF0(&local0, a0, a2);
-    func_00282CF0(&local1, a1, a3);
-    fraction = step;
-    while (count < a6) {
-        func_00282D30(&local2, &local0, fraction);
-        func_00282D30(&local3, &local1, fraction);
-        func_00282CC0(&local2, &local2, a2);
-        func_00282CC0(&local3, &local3, a3);
-        if (func_002761F8(&local2, &local3, 0, a4, a5) != 0)
+    ratioStep = 1.0f / IntToFloat(stepCount);
+    FastVecSub(&deltaA, startA, endA);
+    FastVecSub(&deltaB, startB, endB);
+    ratio = ratioStep;
+    while (i < stepCount) {
+        FastVecScale(&pointA, &deltaA, ratio);
+        FastVecScale(&pointB, &deltaB, ratio);
+        FastVecAdd(&pointA, &pointA, endA);
+        FastVecAdd(&pointB, &pointB, endB);
+        if (CollLine(&pointA, &pointB, 0, hitInfoA, hitInfoB) != 0)
             return 1;
-        count++;
-        fraction += step;
+        i++;
+        ratio += ratioStep;
     }
     return 0;
 }

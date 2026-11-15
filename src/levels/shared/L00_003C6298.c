@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Sound fields measured at 0x38/0x3A in the 0xE0-byte resource entries. */
 typedef struct {
@@ -125,6 +126,7 @@ extern void ref_L00_003CC030_00(char *);
 /* Defined in L00_003C8828-input.c. */
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
+/* Draws the owner's effect while it is active. */
 void func_L00_003C8A58(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
@@ -155,45 +157,45 @@ void func_L00_003CA470(void)
 /* func_L00_003CB980 is defined in L00_003C6298-pool-g8.c. */
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003CBC80(char *p)
+void func_L00_003CBC80(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* func_L00_003CBD08 is defined in L00_003CBD08-curve.c. */
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003CBE28(char *p, float scale)
+void func_L00_003CBE28(char *vectors, float scale)
 {
-    func_00282D30_2(p, p, scale);
-    func_00282D30_2(p + 16, p + 16, scale);
-    func_00282D30_2(p + 32, p + 32, scale);
-    func_00282D30_2(p + 48, p + 48, scale);
+    func_00282D30_2(vectors, vectors, scale);
+    func_00282D30_2(vectors + 16, vectors + 16, scale);
+    func_00282D30_2(vectors + 32, vectors + 32, scale);
+    func_00282D30_2(vectors + 48, vectors + 48, scale);
 }
 
 /* Sets the render state of a position: resets a work record, takes the two aim angles from the
@@ -210,7 +212,7 @@ void func_L00_003CC030(char *position, int color, float scale, char *resource, f
     float distance;
 
     ref_L00_003CC030_00((char *)work);
-    *(long long *)(work + 0x78) = func_0027C878(mode);
+    *(long long *)(work + 0x78) = GetEffectTextureDescriptor(mode);
 
     mode_bits = ((unsigned long long)flag << 2) | 0x0000008000000040ULL;
     *(long long *)(work + 0x88) = mode_bits;
@@ -224,60 +226,62 @@ void func_L00_003CC030(char *position, int color, float scale, char *resource, f
     *(long long *)(work + 0x70) = 0;
 
     *(int *)(work + 0xDC) = 0;
-    first_angle = func_00283248(D_L00_001B8C80.x_140 - *(float *)(position + 0),
+    first_angle = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(position + 0),
                                 D_L00_001B8C80.y_144 - *(float *)(position + 4));
     *(float *)(work + 0xD8) = first_angle;
 
-    distance = func_00282E80(position, &D_L00_001B8C80.x_140);
-    second_angle = func_00283248(distance, D_L00_001B8C80.z_148 - *(float *)(position + 8));
+    distance = vec_distance_xy(position, &D_L00_001B8C80.x_140);
+    second_angle = FastMatrixHelperA(distance, D_L00_001B8C80.z_148 - *(float *)(position + 8));
     *(float *)(work + 0xD0) = alpha;
     *(float *)(work + 0xD4) = -second_angle;
 
-    func_00283410(work + 0x90, work + 0xD0);
+    euler_to_matrix(work + 0x90, work + 0xD0);
     *(float *)(work + 0xC0) = *(float *)(position + 0);
     *(float *)(work + 0xC4) = *(float *)(position + 4);
     *(float *)(work + 0xC8) = *(float *)(position + 8);
     *(float *)(work + 0xCC) = 1.0f;
-    func_L00_003CBE28((char *)work, scale);
-    func_00280B90(work, work + 0x90, 0);
+    ScaleFourVectors_L00((char *)work, scale);
+    draw_world_quad(work, work + 0x90, 0);
 }
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
 void func_L00_003CC6D8(Vec16_Fc936841d *object, int index)
 {
-    char local[16];
+    char edge[16];
 
-    func_00282CF0_9(local, (char *)&object[index - 2], (char *)&object[index - 3]);
-    func_00282CC0_15((char *)&object[index - 1], (char *)&object[index - 2], local);
+    func_00282CF0_9(edge, (char *)&object[index - 2], (char *)&object[index - 3]);
+    func_00282CC0_15((char *)&object[index - 1], (char *)&object[index - 2], edge);
 }
 
+/* Does nothing. */
 void func_L00_003CD158(void)
 {
 }
 
+/* Per-frame update of a trigger object. It opens with a sound and animation when the player comes close, and plays a second animation once it is activated. */
 void func_L00_003CEC50(char *object)
 {
-    char *s0 = object;
+    char *self = object;
 
-    if (*(unsigned char *)(s0 + 0x20) == 0) {
-        if (func_00282E80(s0 + 0x10, D_00189EA0) < 6.0f) {
-            *(unsigned char *)(s0 + 0x20) = 1;
-            *(unsigned int *)(s0 + 0x78) = 0x24C102;
-            if (*(unsigned char *)(s0 + 0x43) != 1) {
-                func_002A7470(s0, 1, 0, 0);
+    if (*(unsigned char *)(self + 0x20) == 0) {
+        if (vec_distance_xy(self + 0x10, gHeroPosition) < 6.0f) {
+            *(unsigned char *)(self + 0x20) = 1;
+            *(unsigned int *)(self + 0x78) = 0x24C102;
+            if (*(unsigned char *)(self + 0x43) != 1) {
+                StartAnimationBlended(self, 1, 0, 0);
             }
-            func_002E5CF8(0, 0, s0);
-            *(unsigned int *)(s0 + 0x98) = 0;
+            PlayMobySound(0, 0, self);
+            *(unsigned int *)(self + 0x98) = 0;
         }
     }
-    if (*(unsigned char *)(s0 + 0x20) == 1) {
-        if (*(unsigned char *)(s0 + 0x60) & 2) {
-            *(unsigned char *)(s0 + 0x20) = 2;
-            *(unsigned int *)(s0 + 0x78) = 0x224C1;
-            if (*(unsigned char *)(s0 + 0x43) != 2) {
-                func_002A7470(s0, 2, 0, 0);
+    if (*(unsigned char *)(self + 0x20) == 1) {
+        if (*(unsigned char *)(self + 0x60) & 2) {
+            *(unsigned char *)(self + 0x20) = 2;
+            *(unsigned int *)(self + 0x78) = 0x224C1;
+            if (*(unsigned char *)(self + 0x43) != 2) {
+                StartAnimationBlended(self, 2, 0, 0);
             }
-            func_002E5CF8(1, 0, s0);
+            PlayMobySound(1, 0, self);
         }
     }
 }
@@ -300,29 +304,29 @@ int func_L00_003D1B50(L00PickupObject *object)
     if (object->phase == 2)
         return 0;
 
-    old_count = D_00139688[func_L00_002D3FB0(state->item)];
-    overflow = func_L00_002D3FB8(state->item, state->limit);
-    if (old_count < D_00139688[func_L00_002D3FB0(state->item)]) {
-        delta = D_00139688[func_L00_002D3FB0(state->item)] - old_count;
+    old_count = gItemAmmoCounts[ReturnArgument_L00_2(state->item)];
+    overflow = AddWeaponAmmo(state->item, state->limit);
+    if (old_count < gItemAmmoCounts[ReturnArgument_L00_2(state->item)]) {
+        delta = gItemAmmoCounts[ReturnArgument_L00_2(state->item)] - old_count;
         if (delta == 1) {
-            sound = ((L00PickupSoundEntry *)(D_00139568[func_L00_002D3FB0(state->item)] * 224 +
-                                             (unsigned int)D_L00_00262570))->single_sound;
+            sound = ((L00PickupSoundEntry *)(gItemSlotToRecord[ReturnArgument_L00_2(state->item)] * 224 +
+                                             (unsigned int)gWeaponTable_L00))->single_sound;
         } else {
-            sound = ((L00PickupSoundEntry *)(D_00139568[func_L00_002D3FB0(state->item)] * 224 +
-                                             (unsigned int)D_L00_00262570))->multiple_sound;
+            sound = ((L00PickupSoundEntry *)(gItemSlotToRecord[ReturnArgument_L00_2(state->item)] * 224 +
+                                             (unsigned int)gWeaponTable_L00))->multiple_sound;
         }
-        func_L00_00326200(sound, delta, -1);
+        ResetEffects(sound, delta, -1);
         if (overflow < state->limit) {
             int elapsed;
 
             object->phase = 2;
             object->scale *= 1.2f;
-            func_00282C88(state);
-            elapsed = D_L00_001B19C8[0] - ref_L00_003D1B50_00[0];
+            ClearVector128(state);
+            elapsed = gFrameCounter_L00[0] - ref_L00_003D1B50_00[0];
             state->fade_rate = 0.13333334f;
-            if (func_00282C30(elapsed) >= 11) {
-                func_002E5CF8(0, 0, object);
-                ref_L00_003D1B50_00[0] = D_L00_001B19C8[0];
+            if (subtract_integer_with_clamp(elapsed) >= 11) {
+                PlayMobySound(0, 0, object);
+                ref_L00_003D1B50_00[0] = gFrameCounter_L00[0];
             }
         }
         result = 1;

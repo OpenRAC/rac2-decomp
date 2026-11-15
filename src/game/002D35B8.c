@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 /* Copies two fields of the current class record (picked by func_00343560 through the
  * D_00139568 index table) into the object and its target. */
 typedef struct {
@@ -23,17 +24,17 @@ int func_002D35B8(char *object)
     int i;
 
     if (D_001A8CFC != 0) {
-        func_00341550(D_001A8CFC + 0x3BE08, 1);
-        i = func_00343560((unsigned char *)D_001A8CFC + 0x3C108);
+        SetTabbedMenuEnabled(D_001A8CFC + 0x3BE08, 1);
+        i = GetMenuSelectedId((unsigned char *)D_001A8CFC + 0x3C108);
         {
-            ClassRecord *r = &D_00239BA0[D_00139568[i]];
+            ClassRecord *r = &gWeaponTable_00239BA0[gItemSlotToRecord[i]];
             int v = r->f42;
             char *a = D_001A8CFC + 0x3C108;
             *(int *)(object + 0x34) = v;
-            target = func_003435A8(a);
+            target = GetMenuExtraValue(a);
         }
-        i = func_00343560((unsigned char *)D_001A8CFC + 0x3C108);
-        *(int *)(target + 0x58) = D_00239BA0[D_00139568[i]].f06;
+        i = GetMenuSelectedId((unsigned char *)D_001A8CFC + 0x3C108);
+        *(int *)(target + 0x58) = gWeaponTable_00239BA0[gItemSlotToRecord[i]].f06;
     }
     return 0;
 }

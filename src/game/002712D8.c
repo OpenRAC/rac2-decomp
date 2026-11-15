@@ -17,7 +17,8 @@ extern void func_002AB668(void*,void*,float), func_002ACDE8(void*,void*,void*);
 extern int func_00282948(void*);
 extern void func_00283958(void*,void*), func_002AB600(void*,void*), func_00282CC0(void*,void*,void*);
 /* Adapted from RAC1 advance_alternate_camera_transition, GPL-3.0. */
-int func_002712D8(Camera *cam, CamBlendOrbit *o) {
+/* Moves the camera around an orbit toward its goal each frame; returns 1 when the move is finished. */
+int func_002712D8(Camera *cam, CamBlendOrbit *orbit) {
     Vec ang;
     Vec fwd;
     Vec side;
@@ -26,63 +27,63 @@ int func_002712D8(Camera *cam, CamBlendOrbit *o) {
     Vec pos;
     Vec diff;
     Vec proj;
-    Vec m[3];
+    Vec axes[3];
     Vec r0;
     Vec r1;
     Vec r2;
-    Vec q;
+    Vec tempRot;
     float step;
     float dyaw;
     float dpitch;
     float yaw;
     float turn;
     float sign;
-    float s2;
+    float pitchSign;
     float d;
-    char *g;
+    char *hero;
 
-    if (o->frames_left <= 0) {
+    if (orbit->frames_left <= 0) {
         return 1;
     }
-    step = 1.0f / func_002A7C00(1.0f, (float)o->frames, (float)o->frames_left * o->inv_frames);
+    step = 1.0f / CosineBlend(1.0f, (float)orbit->frames, (float)orbit->frames_left * orbit->inv_frames);
     if (D_001B5490[2] == 2) {
-        qcopy(&target, D_00189EA0);
-        qcopy(&fwd, &o->fwd);
-        qcopy(&up, &o->up);
-        func_00282DD8(&side, &fwd, &up);
-        func_00270B58(ang.v, &cam->pos, &target, &fwd, &side, &up);
+        qcopy(&target, gHeroPosition);
+        qcopy(&fwd, &orbit->fwd);
+        qcopy(&up, &orbit->up);
+        FastVecCross(&side, &fwd, &up);
+        ComputeAimAngles(ang.v, &cam->pos, &target, &fwd, &side, &up);
     } else {
         qcopy(&target, &cam->pos);
-        g = D_00189E20;
-        func_00282F20(&fwd, *(char **)(g + 0x2290) + 0xC0, 1.0f);
-        func_00282F20(&up, *(char **)(g + 0x2290) + 0xE0, 1.0f);
+        hero = gHeroState;
+        vec_scale_to_length(&fwd, *(char **)(hero + 0x2290) + 0xC0, 1.0f);
+        vec_scale_to_length(&up, *(char **)(hero + 0x2290) + 0xE0, 1.0f);
         ang.v[2] = 0.0f;
         ang.v[1] = 0.0f;
         ang.v[0] = 3.1415927f;
     }
-    dyaw = func_00283BE0(ang.v[0], o->yaw);
-    o->yaw = func_00283B98(o->yaw, dyaw * step);
-    dpitch = func_00283BE0(ang.v[1], o->pitch);
-    o->pitch = func_00283B98(o->pitch, dpitch * step);
-    o->dist = o->dist + (ang.v[2] - o->dist) * step;
-    func_00282F20(&pos, &fwd, o->dist);
-    func_002ACEC0(&pos, &pos, &up, o->yaw);
-    func_00282DD8(&side, &pos, &up);
-    func_00282F20(&side, &side, 1.0f);
-    func_002ACEC0(&pos, &pos, &side, o->pitch);
-    func_00282CC0(&o->pos, &target, &pos);
-    qcopy(D_001B5340, &o->pos);
-    func_00283958(&o->rot, m);
-    d = func_00282DB0(&m[2], cam);
-    func_00282D30(&proj, &m[2], d);
-    func_00282CF0(&diff, cam, &proj);
-    yaw = 1.57079637f - func_002831B0(func_00282DB0(&m[0], &diff) / func_00282DF0(&diff));
+    dyaw = fast_subtract_rotations(ang.v[0], orbit->yaw);
+    orbit->yaw = FastAddRotations(orbit->yaw, dyaw * step);
+    dpitch = fast_subtract_rotations(ang.v[1], orbit->pitch);
+    orbit->pitch = FastAddRotations(orbit->pitch, dpitch * step);
+    orbit->dist = orbit->dist + (ang.v[2] - orbit->dist) * step;
+    vec_scale_to_length(&pos, &fwd, orbit->dist);
+    ApplyAxisRotationToQuaternion(&pos, &pos, &up, orbit->yaw);
+    FastVecCross(&side, &pos, &up);
+    vec_scale_to_length(&side, &side, 1.0f);
+    ApplyAxisRotationToQuaternion(&pos, &pos, &side, orbit->pitch);
+    FastVecAdd(&orbit->pos, &target, &pos);
+    qcopy(gCameraState_001B5340, &orbit->pos);
+    quaternion_to_rotation_basis(&orbit->rot, axes);
+    d = FastVecDot(&axes[2], cam);
+    FastVecScale(&proj, &axes[2], d);
+    FastVecSub(&diff, cam, &proj);
+    yaw = 1.57079637f - FastAngleHelper(FastVecDot(&axes[0], &diff) / FastVecLength(&diff));
     sign = -1.0f;
-    if (func_00282DB0(&diff, &m[1]) >= 0.0f) {
+    if (FastVecDot(&diff, &axes[1]) >= 0.0f) {
         sign = 1.0f;
     }
     yaw = yaw * sign;
-    if (func_00282C48(dyaw) > 1.5707965f
+    if (FloatAbs(dyaw) > 1.5707965f
         && ((dyaw >= 0.0f && sign < 0.0f) || (dyaw < 0.0f && sign >= 0.0f))) {
         if (yaw < 0.0f) {
             yaw += 6.283186f;
@@ -91,34 +92,34 @@ int func_002712D8(Camera *cam, CamBlendOrbit *o) {
         }
     }
     turn = yaw * step;
-    if (func_00282C48(turn) < 1e-5f) {
-        qcopy(&r0, &m[0]);
-        qcopy(&r1, &m[1]);
+    if (FloatAbs(turn) < 1e-5f) {
+        qcopy(&r0, &axes[0]);
+        qcopy(&r1, &axes[1]);
     } else {
-        func_002AB668(&r2, &m[2], turn);
-        func_002ACDE8(&r0, &m[0], &r2);
-        func_002ACDE8(&r1, &m[1], &r2);
+        BuildAxisAngleQuaternion(&r2, &axes[2], turn);
+        RotateVectorByQuaternion(&r0, &axes[0], &r2);
+        RotateVectorByQuaternion(&r1, &axes[1], &r2);
     }
-    if (func_00282C48(yaw) < 1e-5f) {
-        qcopy(&r2, &m[0]);
+    if (FloatAbs(yaw) < 1e-5f) {
+        qcopy(&r2, &axes[0]);
     } else {
-        func_002AB668(&q, &m[2], yaw);
-        func_002ACDE8(&r2, &m[0], &q);
+        BuildAxisAngleQuaternion(&tempRot, &axes[2], yaw);
+        RotateVectorByQuaternion(&r2, &axes[0], &tempRot);
     }
-    yaw = 1.57079637f - func_002831B0(func_00282DB0(&r2, cam));
-    d = func_00282DB0(&r2, &cam->basis[2]);
-    s2 = -1.0f;
+    yaw = 1.57079637f - FastAngleHelper(FastVecDot(&r2, cam));
+    d = FastVecDot(&r2, &cam->basis[2]);
+    pitchSign = -1.0f;
     if (d >= 0.0f) {
-        s2 = 1.0f;
+        pitchSign = 1.0f;
     }
-    yaw *= s2;
-    func_002ACEC0(&r0, &r0, &r1, yaw * step);
-    func_00282F20(&D_001B5570[0], &r0, 1.0f);
-    func_00282DD8(&D_001B5570[1], &D_001B5570[0], D_0018A0E0);
-    func_00282F20(&D_001B5570[1], &D_001B5570[1], -1.0f);
-    func_00282DD8(&D_001B5570[2], &D_001B5570[1], &D_001B5570[0]);
-    func_002AB600(&o->saved_rot, D_001B5570);
-    func_002AB600(&o->rot, D_001B5570);
-    func_00282948(&o->frames_left);
+    yaw *= pitchSign;
+    ApplyAxisRotationToQuaternion(&r0, &r0, &r1, yaw * step);
+    vec_scale_to_length(&D_001B5570[0], &r0, 1.0f);
+    FastVecCross(&D_001B5570[1], &D_001B5570[0], D_0018A0E0);
+    vec_scale_to_length(&D_001B5570[1], &D_001B5570[1], -1.0f);
+    FastVecCross(&D_001B5570[2], &D_001B5570[1], &D_001B5570[0]);
+    TransformMatrixViaCopy(&orbit->saved_rot, D_001B5570);
+    TransformMatrixViaCopy(&orbit->rot, D_001B5570);
+    FastFloatHelperD(&orbit->frames_left);
     return 0;
 }

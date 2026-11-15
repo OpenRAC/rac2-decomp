@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 extern unsigned int D_00138320[];
@@ -32,43 +33,44 @@ typedef struct {
 extern HeroActionState D_00189E20;
 
 /* Hand-adapted from func_L00_002CA898. */
+/* Chooses the hero's next move from the timer, speed and level, such as a jump, a roll or a swing, and starts its animation. */
 void func_L01_002C2CF0(void)
 {
-    D_00189E20.reset_24a0 = 0;
-    func_L00_002B39F0(0, 1.0f);
+    gHeroState.reset_24a0 = 0;
+    ResolveStickInputToDirection(0, 1.0f);
     if (D_00138320[0] & 8) {
         ref_L01_002C2CF0_00(4, 0);
-        func_L00_002D2168(0xD, 2, -2.0f);
-        func_L00_002D2470(3, 0x12);
+        set_hero_animation(0xD, 2, -2.0f);
+        SelectHeroAnimationFrame(3, 0x12);
         return;
     }
-    if (0.3f < D_00189E20.timer && D_00189E20.flag_1e0 == 0) {
-        if (D_00189E20.flag_1492 != 0 || D_00189E20.flag_22b9 != 0) {
+    if (0.3f < gHeroState.timer && gHeroState.flag_1e0 == 0) {
+        if (gHeroState.flag_1492 != 0 || gHeroState.flag_22b9 != 0) {
             ref_L01_002C2CF0_00(2, 1);
         } else {
             int amount;
             if (!ref_L01_002C2CF0_00(2, 0)) return;
             amount = 8;
-            if (D_00189E20.level_49c > 5) amount = 14;
-            D_00189E20.frame = 1;
-            func_L00_002D2168(4, D_L00_001A7DDC, (float)amount);
-            D_00189E20.flag_40e = 1;
+            if (gHeroState.level_49c > 5) amount = 14;
+            gHeroState.frame = 1;
+            set_hero_animation(4, D_L00_001A7DDC, (float)amount);
+            gHeroState.flag_40e = 1;
         }
         return;
     }
-    if ((0.050000004470348358f < D_00189E20.speed_178 && D_00189E20.level_49c > 3) ||
-        D_00189E20.mode == 0x10) {
+    if ((0.050000004470348358f < gHeroState.speed_178 && gHeroState.level_49c > 3) ||
+        gHeroState.mode == 0x10) {
         if (ref_L01_002C2CF0_00(3, 0)) {
-            func_L00_002D2168(5, 0, -1.0f);
-            func_002AC9F8(D_00189E20.velocity, 0.083333335816860199f);
+            set_hero_animation(5, 0, -1.0f);
+            ClampVectorLength(gHeroState.velocity, 0.083333335816860199f);
         }
         return;
     }
-    if (D_00189E20.level_49c < 13 && (D_00189E20.flags_c28 & 2) == 0) return;
+    if (gHeroState.level_49c < 13 && (gHeroState.flags_c28 & 2) == 0) return;
     if (!ref_L01_002C2CF0_00(0, 0)) return;
     if (ref_L01_002C2CF0_01(0) == 0x51) {
-        func_L00_002D2168(ref_L01_002C2CF0_01(0), 0, 15.0f);
-    } else if (D_00189E20.flags_c28 & 2) {
-        func_L00_002D2168(ref_L01_002C2CF0_01(0), 0, -2.0f);
+        set_hero_animation(ref_L01_002C2CF0_01(0), 0, 15.0f);
+    } else if (gHeroState.flags_c28 & 2) {
+        set_hero_animation(ref_L01_002C2CF0_01(0), 0, -2.0f);
     }
 }

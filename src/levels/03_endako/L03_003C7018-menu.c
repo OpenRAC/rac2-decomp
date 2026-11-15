@@ -67,6 +67,7 @@ static __inline__ int screen_coord(int mode, float value, float offset, int one)
     return (int)scaled;
 }
 
+/* Draws the two-line menu panel: a title line, four option labels and, when needed, the extra panel. */
 int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
@@ -78,13 +79,13 @@ int func_L03_003C7018(void)
             float row, x, c, d;
 
             do {
-                title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6);
+                title = (char *)FindTableEntryById(D_L03_001A904C + 0x8710, 0xc6);
                 row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
-            func_00300A00(title, 0x60442d00, x, row, c, d, 0.0f);
+            DrawScaledObjectTwoAxes(title, 0x60442d00, x, row, c, d, 0.0f);
         }
         {
             char *title;
@@ -92,14 +93,14 @@ int func_L03_003C7018(void)
 
             do {
             do {
-                title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
+                title = (char *)FindTableEntryById(D_L03_001A904C + 0x8710, 0xc7);
                 row = (float)label_y2(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
             do {
-                func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+                DrawScaledObjectTwoAxes(title, 0x55f0c070, x, row, c, d, 0.0f);
                 i = 0;
             } while (0);
             } while (0);
@@ -113,21 +114,21 @@ int func_L03_003C7018(void)
             do {
                 int shift = 5;
                 int x;
-                unsigned char *label = func_00288FB8(keys[i]);
+                unsigned char *label = GetLocalizedString(keys[i]);
                 if (i == one) {
-                    func_00115DA8((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
+                    Sprintf((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
-                    func_00115DA8((char *)buf, D_L03_001B0198, label);
+                    Sprintf((char *)buf, D_L03_001B0198, label);
                 }
-                x = func_00283CF0(D_L03_001B0160[i].x);
-                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
+                x = FloatToInt(D_L03_001B0160[i].x);
+                DrawTextCenteredMediumFont(x, FloatToInt((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
                 i++;
             } while (i < 4);
         }
         if (D_001A7A7C[0]) {
-            func_L00_00443DF8((char *)D_L03_001A904C + 0x36f28);
-            func_L00_00443E18((char *)D_L03_001A904C + 0x36f28);
+            GetSubObjectValue1D6C((char *)D_L03_001A904C + 0x36f28);
+            GetSubObjectValue1D6CB((char *)D_L03_001A904C + 0x36f28);
         }
     }
     return 1;

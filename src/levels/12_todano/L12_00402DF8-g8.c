@@ -48,38 +48,38 @@ typedef struct {
    it plays its sound, bumps the counter and is removed. */
 void func_L12_00402DF8(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
-    u16 index;
-    s32 bits;
-    TodanoObjectFlags *record;
+    u16 flagIndex;
+    s32 counterBits;
+    TodanoObjectFlags *flagTable;
 
     if (object[0x20]) return;
     ((TodanoRotation *)object)->rx = D_L12_001B12B8 * 0.0174532942f;
     ((TodanoRotation *)object)->ry = D_L12_001B12BC * 0.0174532942f;
     ((TodanoRotation *)object)->rz = D_L12_001B12C0 * 0.0174532942f;
-    func_002AEE70(object, D_L12_001B3C1C, D_L12_001B3C20, D_L12_001B12B0, D_L12_001B12B4 * 0.00029088825f, 0.0f);
-    index = *(u16 *)(object + 0xB2);
-    record = &D_L12_0021EDF0;
-    if (record->flags[(s16)index]) goto kill;
-    bits = (u8)D_0019B4A8[((s16)index >> 1) + (D_001A79F0 << 10)];
-    if (index & 1) {
-        if ((bits >> 4) & 7) goto kill;
-    } else if (bits & 7) {
+    UpdateWrappedAngleOffset(object, D_L12_001B3C1C, D_L12_001B3C20, D_L12_001B12B0, D_L12_001B12B4 * 0.00029088825f, 0.0f);
+    flagIndex = *(u16 *)(object + 0xB2);
+    flagTable = &D_L12_0021EDF0;
+    if (flagTable->flags[(s16)flagIndex]) goto kill;
+    counterBits = (u8)D_0019B4A8[((s16)flagIndex >> 1) + (gCurrentMapIndex << 10)];
+    if (flagIndex & 1) {
+        if ((counterBits >> 4) & 7) goto kill;
+    } else if (counterBits & 7) {
         goto kill;
     }
     goto update;
 
 kill:
-    func_0029F338(object);
+    MarkMobySpawned(object);
     return;
 
 update:
-    func_L12_00402B48(object);
-    if (func_00282E80(object + 0x10, D_00189EA0) < 1.5f) {
-        func_002B0A18(0x1246, 0x1F4);
-        func_00288308(0x10);
-        func_L00_003294F0(D_L12_001B2E9C + (*(s32 *)state << 8), 1);
-        func_002AD860(0x10);
+    DrawSparkleTrailToHero(object);
+    if (vec_distance_xy(object + 0x10, gHeroPosition) < 1.5f) {
+        SetEntryValueByIndex(0x1246, 0x1F4);
+        UnlockHelpEntry(0x10);
+        SetObjectFlagBit(D_L12_001B2E9C + (*(s32 *)state << 8), 1);
+        HandleRequestSlotState(0x10);
         INCREMENT_OBJECT_COUNTER(object);
-        func_0029F338(object);
+        MarkMobySpawned(object);
     }
 }

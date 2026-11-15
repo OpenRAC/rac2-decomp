@@ -19,6 +19,7 @@ extern void func_00280B90(void *, void *, int);
 extern void func_00283098(void *, void *, void *);
 extern Vector4 D_L00_001B8DC0;
 
+/* Draws a camera-facing quad at each of the given points. */
 /* Draw oriented quads at the supplied points. The EE ABI keeps the three
  * float arguments and six integer/pointer arguments in independent banks. */
 void func_L00_002ECFE8(float width, float height, float u, char *object,
@@ -28,13 +29,13 @@ void func_L00_002ECFE8(float width, float height, float u, char *object,
     Vector4 basis[4];
     Beam beam;
     int i;
-    func_00282D30(&basis[0], object + 0xC0, -1.0f);
-    func_00282CF0(&basis[1], &D_L00_001B8DC0, object + 0x10);
-    func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], width);
-    func_00282F20(&basis[0], &basis[0], height);
+    FastVecScale(&basis[0], object + 0xC0, -1.0f);
+    FastVecSub(&basis[1], &gCameraPosition_L00, object + 0x10);
+    FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], width);
+    vec_scale_to_length(&basis[0], &basis[0], height);
     basis[0].f[3] = 0; basis[1].f[3] = 0; basis[2].f[3] = 0;
-    func_00281DE8(&beam, texture, 1, 0x80);
+    InitQuadPacketState(&beam, texture, 1, 0x80);
     beam.uv[0] = u; beam.uv[1] = 0; beam.uv[2] = u; beam.uv[3] = 1;
     beam.uv[4] = u + 1; beam.uv[5] = 0; beam.uv[6] = u + 1; beam.uv[7] = 1;
     {
@@ -54,9 +55,9 @@ void func_L00_002ECFE8(float width, float height, float u, char *object,
         }
     }
     for (i = 0; i < count; i++) {
-        func_00283098(&basis[3], &points[i], object + 0xC0);
-        func_00282CC0(&basis[3], &basis[3], object + 0x10);
+        matrix_mul_vec3(&basis[3], &points[i], object + 0xC0);
+        FastVecAdd(&basis[3], &basis[3], object + 0x10);
         basis[3].f[3] = 1;
-        func_00280B90(&beam, basis, 0);
+        draw_world_quad(&beam, basis, 0);
     }
 }

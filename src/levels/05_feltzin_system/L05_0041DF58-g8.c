@@ -111,120 +111,121 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* Draws the Feltzin combat HUD: wave and objective text, the timer, the health and ammo bars, the weapon icons and the corner sprites. */
 s32 func_L05_0041DF58(void) {
     char text[128];
     char *label;
     u32 colors[2], colors2[2];
     Block b0, b1, b2;
-    s32 a, b, c, idx, newidx, color, textX;
+    s32 minutes, seconds, hundredths, idx, newidx, color, textX;
     HudBlinkVars *data = *(HudBlinkVars **)(D_L05_001B13B0 + 0x68);
     f32 x, y, ratio, tmp, base, end, fill, tweenColor;
     void *sprite0, *sprite2;
 
     switch (D_L05_001B1360) {
     case 0:
-        func_L05_00421B98(0, 1, 1, 1);
-        label = func_00288FB8(0x31d1);
-        func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
+        DrawFeltzinMissionHudSprites(0, 1, 1, 1);
+        label = GetLocalizedString(0x31d1);
+        Sprintf(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
         textX = D_L05_001B1438 - 60;
-        func_0027F5B8(textX, label_y((void *)textX, D_L05_001B143C - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
-        label = func_00288FB8(0x31d2);
-        func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.wave + 1);
+        DrawTextMediumFont(textX, label_y((void *)textX, D_L05_001B143C - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        label = GetLocalizedString(0x31d2);
+        Sprintf(text, D_L05_001B1448, label, D_L05_00221D10.wave + 1);
         textX = D_L05_001B1440 - 60;
-        func_0027F5B8(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        DrawTextMediumFont(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
         break;
     case 1: {
         f32 half = 0.5f;
         s32 textX2;
 
-        func_L05_00421B98(1, 1, 0, 1);
-        label = func_00288FB8(0x31d4);
-        func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
+        DrawFeltzinMissionHudSprites(1, 1, 0, 1);
+        label = GetLocalizedString(0x31d4);
+        Sprintf(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
         textX = D_L05_001B1440 - 60;
-        func_0027F5B8(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
-        func_002ED578(data->time, &a, &b, &c);
-        label = func_00288FB8(0x2f83);
-        func_00115DA8(text, D_L05_001B1450, label, a, b, c);
+        DrawTextMediumFont(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
+        SplitTimeIntoParts(data->time, &minutes, &seconds, &hundredths);
+        label = GetLocalizedString(0x2f83);
+        Sprintf(text, D_L05_001B1450, label, minutes, seconds, hundredths);
         textX2 = D_L05_001B1428 - 80;
         /* active is the switch value, 1 in this case (allowed by owner ruling, 2026-11-09). */
-        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, D_L05_001B1360), 0x80808080, text, 128);
+        DrawTextMediumFont(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, D_L05_001B1360), 0x80808080, text, 128);
         break;
     }
     case 2: {
         s32 textX2;
 
-        func_L05_00421B98(0, 1, 0, 1);
-        label = func_00288FB8(0x31d1);
-        func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
+        DrawFeltzinMissionHudSprites(0, 1, 0, 1);
+        label = GetLocalizedString(0x31d1);
+        Sprintf(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
         textX2 = D_L05_001B1440 - 60;
-        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        DrawTextMediumFont(textX2, label_y((void *)textX2, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
         f32 half = 0.5f;
         s32 textX2;
 
-        func_L05_00421B98(1, 1, 0, 1);
-        label = func_00288FB8(0x31d7);
-        func_00115DA8(text, D_L05_001B1448, label, D_L05_001B13D0);
+        DrawFeltzinMissionHudSprites(1, 1, 0, 1);
+        label = GetLocalizedString(0x31d7);
+        Sprintf(text, D_L05_001B1448, label, D_L05_001B13D0);
         textX = D_L05_001B1440 - 60;
-        func_0027F5B8(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
-        func_002ED578(D_L05_001B3550, &a, &b, &c);
-        label = func_00288FB8(0x2f83);
-        func_00115DA8(text, D_L05_001B1450, label, a, b, c);
+        DrawTextMediumFont(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
+        SplitTimeIntoParts(D_L05_001B3550, &minutes, &seconds, &hundredths);
+        label = GetLocalizedString(0x2f83);
+        Sprintf(text, D_L05_001B1450, label, minutes, seconds, hundredths);
         textX2 = D_L05_001B1428 - 80;
-        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
+        DrawTextMediumFont(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
         break;
     }
     }
 
     if (D_L05_001A904C) {
-        D_L05_001B1390 = func_00336D50(D_L05_001A904C + 0x8710, 128);
-        D_L05_001B1394 = func_00336D50(D_L05_001A904C + 0x8710, 129);
-        D_L05_001B1398 = func_00336D50(D_L05_001A904C + 0x8710, 130);
-        D_L05_001B139C = func_00336D50(D_L05_001A904C + 0x8710, 131);
-        D_L05_001B13A0 = func_00336D50(D_L05_001A904C + 0x8710, 132);
-        D_L05_001B13A4 = func_00336D50(D_L05_001A904C + 0x8710, 133);
-        x = func_00283CE0(D_001A7340) * 0.5f;
+        D_L05_001B1390 = FindTableEntryById(D_L05_001A904C + 0x8710, 128);
+        D_L05_001B1394 = FindTableEntryById(D_L05_001A904C + 0x8710, 129);
+        D_L05_001B1398 = FindTableEntryById(D_L05_001A904C + 0x8710, 130);
+        D_L05_001B139C = FindTableEntryById(D_L05_001A904C + 0x8710, 131);
+        D_L05_001B13A0 = FindTableEntryById(D_L05_001A904C + 0x8710, 132);
+        D_L05_001B13A4 = FindTableEntryById(D_L05_001A904C + 0x8710, 133);
+        x = IntToFloat(gScreenWidth) * 0.5f;
         y = screen_coord(D_L05_001B2D80, 200.0f, 4.0f);
-        func_00300968(D_L05_001B1390, x, y, 0x60442d00, 1.0f, 0.0f);
-        func_00300968(D_L05_001B1394, x, y, 0x55f0c070, 1.0f, 0.0f);
+        DrawScaledObjectUniform(D_L05_001B1390, x, y, 0x60442d00, 1.0f, 0.0f);
+        DrawScaledObjectUniform(D_L05_001B1394, x, y, 0x55f0c070, 1.0f, 0.0f);
 
-        idx = func_002ED8A0(6);
-        ratio = func_00283CE0(D_L05_002A1800[idx].value) / func_00283CE0(D_L05_002A1800[idx].maxLevel);
+        idx = FindLastUsedChainEntry(6);
+        ratio = IntToFloat(D_L05_002A1800[idx].value) / IntToFloat(D_L05_002A1800[idx].maxLevel);
         switch (idx) {
         case 6:
             if (ratio > 0.0f) {
-                tweenColor = func_00283D38(0x800000ff, 0x8000ff00, ratio);
-                func_00300968(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
+                DrawScaledObjectUniform(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 12:
             if (ratio > 0.5f) {
                 ratio -= 0.5f;
-                tweenColor = func_00283D38(0x800000ff, 0x8000ff00, ratio + ratio);
-                func_00300968(D_L05_001B13A0, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                func_00300968(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
+                DrawScaledObjectUniform(D_L05_001B13A0, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                DrawScaledObjectUniform(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
-                tweenColor = func_00283D38(0x800000ff, 0x8000ff00, ratio + ratio);
-                func_00300968(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
+                DrawScaledObjectUniform(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 14:
             if (ratio > 0.6666667f) {
                 ratio -= 0.6666667f;
-                tweenColor = func_00283D38(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                func_00300968(D_L05_001B13A4, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                func_00300968(D_L05_001B13A0, x, y, 0x8000ff00, 1.0f, 0.0f);
-                func_00300968(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                DrawScaledObjectUniform(D_L05_001B13A4, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                DrawScaledObjectUniform(D_L05_001B13A0, x, y, 0x8000ff00, 1.0f, 0.0f);
+                DrawScaledObjectUniform(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.33333334f) {
                 ratio -= 0.33333334f;
-                tweenColor = func_00283D38(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                func_00300968(D_L05_001B13A0, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                func_00300968(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                DrawScaledObjectUniform(D_L05_001B13A0, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                DrawScaledObjectUniform(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
-                tweenColor = func_00283D38(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                func_00300968(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                DrawScaledObjectUniform(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         }
@@ -232,59 +233,59 @@ s32 func_L05_0041DF58(void) {
         fill = D_L05_00221D10.health * 0.01f;
         if (fill > 0.3f) {
             data->blinkOn = 1;
-        } else if (func_00282948(&data->blinkTimer)) {
+        } else if (FastFloatHelperD(&data->blinkTimer)) {
             data->blinkTimer = 5;
             data->blinkOn ^= 1;
         }
-        colors[1] = func_00283D38(0x800000ff, 0x8000ff00, fill);
+        colors[1] = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         colors[0] = 0x800000ff;
         tmp = fill * 200.0f + 156.0f;
         if (data->blinkOn)
-            func_0027EAE8(156, 14, (s32)tmp, 27, 1, colors);
+            DrawScreenRectangle(156, 14, (s32)tmp, 27, 1, colors);
 
-        idx = func_002ED8A0(7);
-        ratio = func_00283CE0(D_L05_002A1800[idx].value);
-        fill = ratio / func_00283CE0(D_L05_002A1800[idx].maxAmmo);
-        color = func_00283D38(0x800000ff, 0x8000ff00, fill);
-        base = func_00283CE0(450);
-        end = func_00283CE0(386);
-        end -= func_00283CE0(450);
+        idx = FindLastUsedChainEntry(7);
+        ratio = IntToFloat(D_L05_002A1800[idx].value);
+        fill = ratio / IntToFloat(D_L05_002A1800[idx].maxAmmo);
+        color = FastTweenColor(0x800000ff, 0x8000ff00, fill);
+        base = IntToFloat(450);
+        end = IntToFloat(386);
+        end -= IntToFloat(450);
         colors2[0] = 0x800000ff;
         colors2[1] = color;
         end = end * fill;
         tmp = base + end;
         if (fill > 0.0f)
-            func_0027EAE8(450, 8, (s32)tmp, 19, 1, colors2);
+            DrawScreenRectangle(450, 8, (s32)tmp, 19, 1, colors2);
 
         b0 = D_L05_001B1468;
         b1 = D_L05_001B1478;
         b2 = D_L05_001B1488;
-        func_0028EA58(func_0028E588(0xea97, 1), 21, 7, 30, 30, &b1);
-        func_0028EA58(func_0028E588(0xea97, 0), 21, 7, 30, 30, &b0);
-        func_0028EA58(func_0028E588(0xea97, D_L05_002A1800[func_002ED8A0(D_L05_001B13DC)].icon), 21, 7, 30, 30, &b2);
-        func_0028EA58(func_0028E588(0xea97, 1), 462, 9, 30, 30, &b1);
-        func_0028EA58(func_0028E588(0xea97, D_L05_002A1800[func_002ED8A0(7)].icon), 462, 9, 30, 30, &b2);
-        func_00115DA8(text, D_L05_001B1498, D_L05_002A1800[func_002ED8A0(D_L05_001B13DC)].value,
-                      D_L05_002A1800[func_002ED8A0(D_L05_001B13DC)].maxAmmo);
-        func_0027F538(67, 5, 0x80808080, text, 128);
+        DrawHudSpriteGradient(GetIconFrame(0xea97, 1), 21, 7, 30, 30, &b1);
+        DrawHudSpriteGradient(GetIconFrame(0xea97, 0), 21, 7, 30, 30, &b0);
+        DrawHudSpriteGradient(GetIconFrame(0xea97, D_L05_002A1800[FindLastUsedChainEntry(D_L05_001B13DC)].icon), 21, 7, 30, 30, &b2);
+        DrawHudSpriteGradient(GetIconFrame(0xea97, 1), 462, 9, 30, 30, &b1);
+        DrawHudSpriteGradient(GetIconFrame(0xea97, D_L05_002A1800[FindLastUsedChainEntry(7)].icon), 462, 9, 30, 30, &b2);
+        Sprintf(text, D_L05_001B1498, D_L05_002A1800[FindLastUsedChainEntry(D_L05_001B13DC)].value,
+                      D_L05_002A1800[FindLastUsedChainEntry(D_L05_001B13DC)].maxAmmo);
+        DrawTextSmallFont(67, 5, 0x80808080, text, 128);
 
-        func_L05_003263F8(2);
-        newidx = func_L05_00324DB8();
+        SetCounterPlusOne(2);
+        newidx = LookUpStepTable();
         if (newidx >= 0) {
-            D_L05_002A1800[func_002ED8A0(D_L05_001B13DC)].active = 0;
+            D_L05_002A1800[FindLastUsedChainEntry(D_L05_001B13DC)].active = 0;
             D_L05_001B13DC = newidx;
-            D_L05_002A1800[func_002ED8A0(newidx)].active = 1;
+            D_L05_002A1800[FindLastUsedChainEntry(newidx)].active = 1;
         }
-        func_00300968(D_L05_001B1398, x, y, 0x80f0f0f0, 1.0f, 0.0f);
+        DrawScaledObjectUniform(D_L05_001B1398, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
-    func_L00_0030CF60();
-    sprite0 = func_00336D50(D_L05_001A904C + 0x8710, 186);
-    data = func_00336D50(D_L05_001A904C + 0x8710, 187);
-    sprite2 = func_00336D50(D_L05_001A904C + 0x8710, 188);
-    func_00300968(sprite0, D_L05_001AC4E0 + 4.0f, label_y(sprite0, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
-    func_00300968(data, D_L05_001AC4E0 + 4.0f, label_y(data, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
-    func_00300968(sprite2, D_L05_001AC4E0 + 4.0f, label_y(sprite2, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
-    func_L05_0037A5F8();
+    CallLoadedModuleHandler_L00443E18();
+    sprite0 = FindTableEntryById(D_L05_001A904C + 0x8710, 186);
+    data = FindTableEntryById(D_L05_001A904C + 0x8710, 187);
+    sprite2 = FindTableEntryById(D_L05_001A904C + 0x8710, 188);
+    DrawScaledObjectUniform(sprite0, D_L05_001AC4E0 + 4.0f, label_y(sprite0, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
+    DrawScaledObjectUniform(data, D_L05_001AC4E0 + 4.0f, label_y(data, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
+    DrawScaledObjectUniform(sprite2, D_L05_001AC4E0 + 4.0f, label_y(sprite2, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
+    DrawObjectHudMarkers();
     return 1;
 }

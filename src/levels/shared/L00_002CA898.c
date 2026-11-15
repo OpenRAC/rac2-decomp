@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     unsigned char pad0[0x160]; float velocity[4];
     float field_170, elapsed_174, speed_178;
@@ -33,47 +34,48 @@ extern int ref_L00_002CA898_01(int);
 extern void func_002AC9F8(void *, float);
 extern int D_L00_001A7DDC __attribute__((sda));
 
+/* Picks what the hero does next after a landing or a stop, such as starting to run or idling. */
 void func_L00_002CA898(void)
 {
-    D_00189E20.reset_24a0 = 0;
-    if (D_00189E20.flag_1492 != 0 && 0.008333333767950535f < D_00189E20.elapsed_174) {
+    gHeroState.reset_24a0 = 0;
+    if (gHeroState.flag_1492 != 0 && 0.008333333767950535f < gHeroState.elapsed_174) {
         ref_L00_002CA898_00(0x2E, 1);
         return;
     }
-    func_L00_002B39F0(0, 1.0f);
+    ResolveStickInputToDirection(0, 1.0f);
     if (D_00138320[0] & 8) {
         ref_L00_002CA898_00(4, 0);
-        func_L00_002D2168(0xD, 2, -2.0f);
-        func_L00_002D2470(3, 0x12);
+        set_hero_animation(0xD, 2, -2.0f);
+        SelectHeroAnimationFrame(3, 0x12);
         return;
     }
-    if (0.3f < D_00189E20.timer && D_00189E20.flag_1e0 == 0) {
-        if (D_00189E20.flag_1492 != 0 || D_00189E20.flag_22b9 != 0) {
+    if (0.3f < gHeroState.timer && gHeroState.flag_1e0 == 0) {
+        if (gHeroState.flag_1492 != 0 || gHeroState.flag_22b9 != 0) {
             ref_L00_002CA898_00(2, 1);
         } else {
             int amount;
             if (!ref_L00_002CA898_00(2, 0)) return;
             amount = 8;
-            if (D_00189E20.level_49c > 5) amount = 14;
-            D_00189E20.frame = 1;
-            func_L00_002D2168(4, D_L00_001A7DDC, (float)amount);
-            D_00189E20.flag_40e = 1;
+            if (gHeroState.level_49c > 5) amount = 14;
+            gHeroState.frame = 1;
+            set_hero_animation(4, D_L00_001A7DDC, (float)amount);
+            gHeroState.flag_40e = 1;
         }
         return;
     }
-    if ((0.050000004470348358f < D_00189E20.speed_178 && D_00189E20.level_49c > 3) ||
-        D_00189E20.mode == 0x10) {
+    if ((0.050000004470348358f < gHeroState.speed_178 && gHeroState.level_49c > 3) ||
+        gHeroState.mode == 0x10) {
         if (ref_L00_002CA898_00(3, 0)) {
-            func_L00_002D2168(5, 0, -1.0f);
-            func_002AC9F8(D_00189E20.velocity, 0.083333335816860199f);
+            set_hero_animation(5, 0, -1.0f);
+            ClampVectorLength(gHeroState.velocity, 0.083333335816860199f);
         }
         return;
     }
-    if (D_00189E20.level_49c < 13 && (D_00189E20.flags_c28 & 2) == 0) return;
+    if (gHeroState.level_49c < 13 && (gHeroState.flags_c28 & 2) == 0) return;
     if (!ref_L00_002CA898_00(0, 0)) return;
     if (ref_L00_002CA898_01(0) == 0x51) {
-        func_L00_002D2168(ref_L00_002CA898_01(0), 0, 15.0f);
-    } else if (D_00189E20.flags_c28 & 2) {
-        func_L00_002D2168(ref_L00_002CA898_01(0), 0, -2.0f);
+        set_hero_animation(ref_L00_002CA898_01(0), 0, 15.0f);
+    } else if (gHeroState.flags_c28 & 2) {
+        set_hero_animation(ref_L00_002CA898_01(0), 0, -2.0f);
     }
 }

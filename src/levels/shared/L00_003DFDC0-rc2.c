@@ -28,40 +28,41 @@ s32 ref_L00_003DFDC0_00(s32, s32);
 f32 ref_L00_003DFDC0_01(void);
 void ref_L00_003DFDC0_02(void *, s32, f32, s32, f32, s32, s32, f32);
 
-void func_L00_003DFDC0(void *arg0) {
-    f32 temp_f20;
-    f32 temp_f20_2;
-    f32 temp_f20_3;
-    f32 temp_f20_4;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s0_3;
-    s32 temp_s0_4;
-    u8 temp_v1;
-    void *temp_s1;
-    void *temp_s1_2;
-    void *temp_s3;
+/* Throws out two bursts of particles from the object, sized by its scale and a stored value. */
+void func_L00_003DFDC0(void *moby) {
+    f32 sizeA;
+    f32 sizeB;
+    f32 sizeC;
+    f32 sizeD;
+    s32 randomA;
+    s32 randomB;
+    s32 randomC;
+    s32 randomD;
+    u8 state;
+    void *position;
+    void *position2;
+    void *vars;
 
-    temp_v1 = (*(u8 *)((char *)(arg0) + (0x20)));
-    temp_s3 = (*(void **)((char *)(arg0) + (0x68)));
-    switch (temp_v1) {                               
+    state = (*(u8 *)((char *)(moby) + (0x20)));
+    vars = (*(void **)((char *)(moby) + (0x68)));
+    switch (state) {                               
     case 0:
-        temp_s1 = arg0 + 0x10;
-        temp_f20 = (*(f32 *)((char *)(arg0) + (0x2C))) * ((*(f32 *)((char *)(temp_s3) + (0x20))) * 45.0f);
-        temp_s0 = ref_L00_003DFDC0_00(0x5F, 0x6F);
-        ref_L00_003DFDC0_02(temp_s1, 0x103080, temp_f20, temp_s0, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
-        temp_f20_2 = (*(f32 *)((char *)(arg0) + (0x2C))) * ((*(f32 *)((char *)(temp_s3) + (0x20))) * 22.5f);
-        temp_s0_2 = ref_L00_003DFDC0_00(0x6F, 0x7F);
-        ref_L00_003DFDC0_02(temp_s1, 4144959, temp_f20_2, temp_s0_2, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        position = moby + 0x10;
+        sizeA = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 45.0f);
+        randomA = ref_L00_003DFDC0_00(0x5F, 0x6F);
+        ref_L00_003DFDC0_02(position, 0x103080, sizeA, randomA, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        sizeB = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 22.5f);
+        randomB = ref_L00_003DFDC0_00(0x6F, 0x7F);
+        ref_L00_003DFDC0_02(position, 4144959, sizeB, randomB, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
         return;
     case 1:
-        temp_s1_2 = arg0 + 0x10;
-        temp_f20_3 = (*(f32 *)((char *)(arg0) + (0x2C))) * ((*(f32 *)((char *)(temp_s3) + (0x20))) * 45.0f);
-        temp_s0_3 = ref_L00_003DFDC0_00(0x5F, 0x6F);
-        ref_L00_003DFDC0_02(temp_s1_2, 0x103080, temp_f20_3, temp_s0_3, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
-        temp_f20_4 = (*(f32 *)((char *)(arg0) + (0x2C))) * ((*(f32 *)((char *)(temp_s3) + (0x20))) * 22.5f);
-        temp_s0_4 = ref_L00_003DFDC0_00(0x6F, 0x7F);
-        ref_L00_003DFDC0_02(temp_s1_2, 4144959, temp_f20_4, temp_s0_4, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        position2 = moby + 0x10;
+        sizeC = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 45.0f);
+        randomC = ref_L00_003DFDC0_00(0x5F, 0x6F);
+        ref_L00_003DFDC0_02(position2, 0x103080, sizeC, randomC, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        sizeD = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 22.5f);
+        randomD = ref_L00_003DFDC0_00(0x6F, 0x7F);
+        ref_L00_003DFDC0_02(position2, 4144959, sizeD, randomD, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
         return;
     }
 }

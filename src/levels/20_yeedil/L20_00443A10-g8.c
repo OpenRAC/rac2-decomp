@@ -11,6 +11,7 @@ extern float func_00283180(float);
 extern float func_00283198(float);
 extern void func_00282CC0(void *, void *, void *);
 
+/* Works out a spot beside a path point, to the side of the direction toward the hero, for the enemy to walk to. */
 void func_L20_00443A10(char *object, float *output)
 {
     char *state = *(char **)(object + 0x68);
@@ -18,19 +19,19 @@ void func_L20_00443A10(char *object, float *output)
     unsigned int index;
     float y;
     HeadingReference *reference;
-    towardHero = func_00283248(D_00189E20.position[0] - *(float *)(object + 0x10),
-        D_00189E20.position[1] - *(float *)(object + 0x14));
+    towardHero = FastMatrixHelperA(gHeroState.position[0] - *(float *)(object + 0x10),
+        gHeroState.position[1] - *(float *)(object + 0x14));
     index = *(unsigned int *)(state + 0x230);
-    heading = func_00283248(D_L20_001B308C[index].point[0] - *(float *)(object + 0x10),
+    heading = FastMatrixHelperA(D_L20_001B308C[index].point[0] - *(float *)(object + 0x10),
         D_L20_001B308C[index].point[1] - *(float *)(object + 0x14));
-    if (0.0f < func_00283BE0(towardHero, heading))
-        heading = func_00283BE0(heading, 1.5707964f);
+    if (0.0f < fast_subtract_rotations(towardHero, heading))
+        heading = fast_subtract_rotations(heading, 1.5707964f);
     else
-        heading = func_00283B98(heading, 1.5707964f);
-    output[0] = func_00283180(heading) * D_L20_001B2098;
-    y = func_00283198(heading) * D_L20_001B2098;
+        heading = FastAddRotations(heading, 1.5707964f);
+    output[0] = FastSinOrCosA(heading) * D_L20_001B2098;
+    y = FastSinOrCosB(heading) * D_L20_001B2098;
     reference = D_L20_001B308C;
     *(int *)&output[2] = 0;
     output[1] = y;
-    func_00282CC0(output, output, reference[*(unsigned int *)(state + 0x230)].point);
+    FastVecAdd(output, output, reference[*(unsigned int *)(state + 0x230)].point);
 }

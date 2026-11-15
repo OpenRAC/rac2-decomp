@@ -11,43 +11,44 @@ extern int D_L20_001B2FB8;
 
 extern char *D_L20_001B2F9C;
 
-s32 func_L20_0039E0A0(s32 arg0) {
-    char *s1 = D_L20_001FBB20[arg0];
-    s32 s4 = arg0 & 0xFF;
+/* Counts how many objects of a group are still alive (not in state 6). */
+s32 func_L20_0039E0A0(s32 group) {
+    char *idList = D_L20_001FBB20[group];
+    s32 groupByte = group & 0xFF;
     s32 count = 0;
 
-    if (s4 == 0xFF) {
+    if (groupByte == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < arg0) {
+    if (D_L20_001B2FB8 < group) {
         goto end;
     }
-    if (s1 == 0) {
+    if (idList == 0) {
         goto end;
     }
     for (;;) {
-        char *s0 = D_L20_001B2F9C + ((*(u16 *)s1 & 0x7FFF) << 8);
+        char *member = D_L20_001B2F9C + ((*(u16 *)idList & 0x7FFF) << 8);
 
-        if (s0 == 0) {
+        if (member == 0) {
             goto end;
         }
-        if (*(u8 *)(s0 + 0x20) != 6) {
+        if (*(u8 *)(member + 0x20) != 6) {
             count++;
         }
-        s1 += 2;
-        if ((arg0 & 0xFF) == 0xFF) {
+        idList += 2;
+        if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < arg0) {
+        if (D_L20_001B2FB8 < group) {
             goto end;
         }
-        if (s1 == 0) {
+        if (idList == 0) {
             goto end;
         }
-        if (*(s16 *)(s1 - 2) >= 0) {
+        if (*(s16 *)(idList - 2) >= 0) {
             continue;
         }
-        if (s1 == D_L20_001FBB20[arg0]) {
+        if (idList == D_L20_001FBB20[group]) {
             continue;
         }
         break;

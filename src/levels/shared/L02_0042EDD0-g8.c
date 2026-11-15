@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_0042EDD0 is a unit of its own: it reads D_L02_001B2434 through $gp (hence -G8) and
    needs two opt-in profiles (docs/build/compiler-notes.md). -frac2-no-annulled-wide-stores keeps
@@ -33,48 +34,49 @@ extern float D_L02_001B2434 __attribute__((sda));
 extern void func_002833F0(void *, void *);
 extern void func_00283738(void *, void *, void *);
 
-void func_L02_0042EDD0(u8 *a0) {
-    int *s = *(int **)(a0 + 0x68);
+/* Sets up a linked group of parts once, then turns them a little every frame and advances a shared 0 to 1 timer. */
+void func_L02_0042EDD0(u8 *object) {
+    int *vars = *(int **)(object + 0x68);
 
-    switch (a0[0x20]) {
+    switch (object[0x20]) {
     case 0: {
         unsigned short *p;
         Rec32 *e;
         u8 none = 0xFF;
 
-        if (s[0] == -1)
+        if (vars[0] == -1)
             break;
-        a0[0x30] = none;
-        for (p = D_L02_001A9014[s[0]];
-             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L02_001A9014[s[0]]) &&
+        object[0x30] = none;
+        for (p = D_L02_001A9014[vars[0]];
+             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L02_001A9014[vars[0]]) &&
              (e = D_L02_001B3C14 + (*p & 0x7FFF)) != 0;
              p++)
             e->w = e->w + e->w;
-        a0[0x20] = 1;
+        object[0x20] = 1;
         break;
     }
     case 1: {
         unsigned short *p;
         u8 *e;
-        float v[4];
-        float m[12];
-        float x;
-        u8 *g;
+        float angles[4];
+        float rotationMatrix[12];
+        float timer;
+        u8 *sharedState;
 
-        for (p = D_L02_001A9014[s[0]];
-             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L02_001A9014[s[0]]) &&
+        for (p = D_L02_001A9014[vars[0]];
+             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L02_001A9014[vars[0]]) &&
              (e = D_L02_001B3C1C + ((*p & 0x7FFF) << 6)) != 0;
              p++) {
-            *(TI128 *)v = 0;
-            v[2] = 0.00785398297f;
-            func_002833F0(m, v);
-            func_00283738(e, e, m);
+            *(TI128 *)angles = 0;
+            angles[2] = 0.00785398297f;
+            euler_rotation_basis(rotationMatrix, angles);
+            multiply_matrix3x3(e, e, rotationMatrix);
         }
-        g = D_L02_001AD410;
-        x = *(float *)(g + 0x74) + D_L02_001B2434 * 0.016666668f;
-        *(float *)(g + 0x74) = x;
-        if (x > 1.0f)
-            *(float *)(g + 0x74) = x - 1.0f;
+        sharedState = D_L02_001AD410;
+        timer = *(float *)(sharedState + 0x74) + D_L02_001B2434 * 0.016666668f;
+        *(float *)(sharedState + 0x74) = timer;
+        if (timer > 1.0f)
+            *(float *)(sharedState + 0x74) = timer - 1.0f;
         break;
     }
     }

@@ -35,55 +35,56 @@ extern void func_0011AEA0(int);
 extern int func_00132028(void);
 extern void func_001330D0(void);
 
-void func_00132DF0(int cmd, int size, unsigned char *data, int cb, long cb_data)
+/* Queues a sound command with its data and an optional reply callback. Waits if the queue is full. */
+void func_00132DF0(int command, int size, unsigned char *data, int callback, long callbackData)
 {
-    int need;
-    int tries;
-    int held;
+    int paddedSize;
+    int waitCount;
+    int heldFlag;
     int i;
-    int slot;
-    unsigned char *p;
+    int bufIdx;
+    unsigned char *dest;
 
-    held = 0;
-    if (D_001A74C4 == 0 && D_001A7480 == 0 && size == 0 && cb == 0) {
-        func_001322B8(D_001A7080, 1);
-        while (func_0011D810(D_001A7040) != 0) {
+    heldFlag = 0;
+    if (D_001A74C4 == 0 && D_001A7480 == 0 && size == 0 && callback == 0) {
+        PrepareSoundReplyBuffer(D_001A7080, 1);
+        while (IsRpcHandleValid(D_001A7040) != 0) {
             if (D_001A74F8 == 0)
-                func_00115D48(D_001A7578);
-            func_00132028();
-            func_0011AEA0(0);
+                Printf(D_001A7578);
+            snd_Pump();
+            FlushCache(0);
         }
-        func_0011D620(D_001A7040, cmd, 1, 0, 0, D_001A7080, 0xC, 0, 0);
+        CallRpcServer(D_001A7040, command, 1, 0, 0, D_001A7080, 0xC, 0, 0);
         return;
     }
-    need = size + 4;
-    tries = 0;
-    if (need % 4 != 0)
-        need += 4 - need % 4;
-    while (*D_001A74A0[D_001A74C0] == 0x100 || D_001A74A8[D_001A74C0] < need) {
+    paddedSize = size + 4;
+    waitCount = 0;
+    if (paddedSize % 4 != 0)
+        paddedSize += 4 - paddedSize % 4;
+    while (*D_001A74A0[D_001A74C0] == 0x100 || D_001A74A8[D_001A74C0] < paddedSize) {
         if (D_001A74C4 != 0) {
             D_001A74C4 = 0;
-            held = 1;
+            heldFlag = 1;
         }
-        func_00132028();
-        if (tries == 1 && D_001A74F8 == 0)
-            func_00115D48(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
-        tries++;
+        snd_Pump();
+        if (waitCount == 1 && D_001A74F8 == 0)
+            Printf(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
+        waitCount++;
     }
-    if (tries != 0 && D_001A74F8 == 0)
-        func_00115D48(D_001A78D0, tries);
-    if (held != 0)
+    if (waitCount != 0 && D_001A74F8 == 0)
+        Printf(D_001A78D0, waitCount);
+    if (heldFlag != 0)
         D_001A74C4 = 1;
-    p = (unsigned char *)D_001A74A0[D_001A74C0] - (D_001A74A8[D_001A74C0] - 0x1000);
-    *(short *)p = cmd;
-    p += 2;
-    *(short *)p = size;
-    p += 2;
+    dest = (unsigned char *)D_001A74A0[D_001A74C0] - (D_001A74A8[D_001A74C0] - 0x1000);
+    *(short *)dest = command;
+    dest += 2;
+    *(short *)dest = size;
+    dest += 2;
     for (i = 0; i < size; i++)
-        p[i] = data[i];
-    D_001A74A8[D_001A74C0] -= need;
-    slot = D_001A74C0;
-    D_001A74B0[slot][*D_001A74A0[slot]].fn = cb;
-    D_001A74B0[slot][*D_001A74A0[slot]].data = cb_data;
-    func_001330D0();
+        dest[i] = data[i];
+    D_001A74A8[D_001A74C0] -= paddedSize;
+    bufIdx = D_001A74C0;
+    D_001A74B0[bufIdx][*D_001A74A0[bufIdx]].fn = callback;
+    D_001A74B0[bufIdx][*D_001A74A0[bufIdx]].data = callbackData;
+    CommitQueuedSoundCommand();
 }

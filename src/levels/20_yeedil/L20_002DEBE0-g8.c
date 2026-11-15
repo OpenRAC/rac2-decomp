@@ -93,92 +93,95 @@ extern void func_0032DA58(void *,void *,void *,float);
 extern void func_L03_00326458(void *);
 extern void *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 
-void func_L20_0039BB18(void *arg0)
+/* Updates the glowing particle effect (moby class 4802). It fades the effect in while its owner is close, spawns drifting sparks
+ * every frame, and removes itself once it has faded out. */
+void func_L20_0039BB18(void *moby)
 {
     L20_0039BB18_V4 pos;
     L20_0039BB18_V4 vel;
-    u32 s0;
-    float g;
+    u32 vars;
+    float drift;
     float angle;
-    float rnd01;
-    float rnd;
-    float zero_arg;
-    u32 old;
-    unsigned long long c64;
-    int m;
-    int r;
-    float r2;
-    float rr;
-    float rr2;
+    float radiusRand;
+    float fadeRand;
+    float zeroTarget;
+    u32 frameCount;
+    unsigned long long prevCount;
+    int lifetime;
+    int colorSeed;
+    float speedRand;
+    float sizeRand;
+    float sizeRand2;
 
-    s0 = *(u32 *)((u32)arg0 + 0x68);
-    if (func_00282948((int *)(s0 + 4)) != 0)
+    vars = *(u32 *)((u32)moby + 0x68);
+    if (FastFloatHelperD((int *)(vars + 4)) != 0)
         goto pathA;
-    old = *(u16 *)((u32)arg0 + 0x96);
-    c64 = old++;
-    *(u16 *)((u32)arg0 + 0x96) = old;
-    if (c64 < 11)
+    frameCount = *(u16 *)((u32)moby + 0x96);
+    prevCount = frameCount++;
+    *(u16 *)((u32)moby + 0x96) = frameCount;
+    if (prevCount < 11)
         goto check;
-    if (*(u16 *)(*(u32 *)((u32)arg0 + 0xB8) + 0x34) & 1)
+    if (*(u16 *)(*(u32 *)((u32)moby + 0xB8) + 0x34) & 1)
         goto pathA;
 check:
-    if (func_00282E80((void *)((u32)arg0 + 0x10),
-                      (void *)(*(u32 *)((u32)arg0 + 0xB8) + 0x10)) > 0.1f) {
+    if (vec_distance_xy((void *)((u32)moby + 0x10),
+                      (void *)(*(u32 *)((u32)moby + 0xB8) + 0x10)) > 0.1f) {
 pathA:
-        zero_arg = 0.0f;
-        func_002AA2E8((float *)s0, zero_arg, 0.016666667f);
-        if (*(float *)s0 == 0.0f) {
-            func_0029F338(arg0);
+        zeroTarget = 0.0f;
+        ApproachValue((float *)vars, zeroTarget, 0.016666667f);
+        if (*(float *)vars == 0.0f) {
+            MarkMobySpawned(moby);
             goto end;
         }
     } else {
-        func_002AA2E8((float *)s0, 1.0f, 0.016666667f);
+        ApproachValue((float *)vars, 1.0f, 0.016666667f);
     }
 
-    g = D_L20_001AEC68;
+    drift = D_L20_001AEC68;
     {
-        float v = *(float *)(s0 + 0xC) + g * 0.016666667f;
-        *(float *)(s0 + 0xC) = v;
+        float v = *(float *)(vars + 0xC) + drift * 0.016666667f;
+        *(float *)(vars + 0xC) = v;
         if (v > 1.0f) {
-            *(float *)(s0 + 0xC) = v - 1.0f;
+            *(float *)(vars + 0xC) = v - 1.0f;
         } else if (v < -1.0f) {
-            *(float *)(s0 + 0xC) = v + 1.0f;
+            *(float *)(vars + 0xC) = v + 1.0f;
         } else {
             goto skip;
         }
     }
 skip:
-    rnd = func_002A7878(0.1f, 0.3f);
-    m = func_002A7820(30, 60);
+    fadeRand = RandomFloatRange(0.1f, 0.3f);
+    lifetime = RandomIntRange(30, 60);
     vel.q = 0;
-    r2 = func_002A7878(0.5f, 2.0f);
-    vel.f[2] = -r2 * 0.016666667f;
+    speedRand = RandomFloatRange(0.5f, 2.0f);
+    vel.f[2] = -speedRand * 0.016666667f;
     pos.q = vel.q;
-    rnd01 = func_002A7878(0.0f, 1.0f);
-    angle = func_002A7940();
-    vel.f[0] = func_00283180(angle) * rnd01;
-    vel.f[1] = func_00283198(angle) * rnd01;
+    radiusRand = RandomFloatRange(0.0f, 1.0f);
+    angle = RandomAngle();
+    vel.f[0] = FastSinOrCosA(angle) * radiusRand;
+    vel.f[1] = FastSinOrCosB(angle) * radiusRand;
     vel.f[2] = 0.0f;
-    rr = func_002A7878(1.0f, 10.0f);
-    vel.f[2] = rr;
-    rr2 = func_002A7878(1.0f, 10.0f);
-    if (!(vel.f[2] > rr2)) {
+    sizeRand = RandomFloatRange(1.0f, 10.0f);
+    vel.f[2] = sizeRand;
+    sizeRand2 = RandomFloatRange(1.0f, 10.0f);
+    if (!(vel.f[2] > sizeRand2)) {
         ;
     } else {
-        vel.f[2] = rr2;
+        vel.f[2] = sizeRand2;
     }
-    func_00282CC0(&vel, &vel, arg0 + 0x10);
+    FastVecAdd(&vel, &vel, moby + 0x10);
     {
-        u8 particle_count = m;
-        r = func_002A77E0(255);
-        func_002C3150(&vel, &pos, 0x60107080, particle_count, r & 0xFF, 0, rnd);
+        u8 particle_count = lifetime;
+        colorSeed = RandomIntBelow(255);
+        SpawnHeroRelativeParticle(&vel, &pos, 0x60107080, particle_count, colorSeed & 0xFF, 0, fadeRand);
     }
-    func_L00_002E6CF0(func_L20_0039BEC8, arg0);
+    AddDrawCallbackToList1(DrawGlowEffectTrail, moby);
 end:
     return;
 }
 
 
+/* Runs the Yeedil level script each frame. It tweaks some objects in the level and moves the camera for the cutscene steps. */
 void func_L20_00310E38(void *incoming)
 {
     int lower, upper;
@@ -188,27 +191,27 @@ void func_L20_00310E38(void *incoming)
     Vector matrix[4], work, offset;
     float value;
 
-    func_L00_002FC980(incoming);
+    StartStartupAnimations(incoming);
     {
         int i;
         for (i = 0; i < D_L20_001BDCC0.count; ++i) {
             u8 *object;
             object = D_L20_001BDCC0.refs.objects[i];
-            if (object && *(s16 *)(object+0xAA) == 0xE29)
+            if (object && *(s16 *)(object+0xAA) == 0xE29 /* moby class 3625 */)
                 *(u16 *)(object+0x34) |= 0x800;
-            if (*(s16 *)(object+0xAA) == 0xD54)
-                func_002E64A0(object);
-            if (object && *(s16 *)(object+0xAA) == 0xFA0 && *(void **)(object+0x68))
-                func_L00_00326048((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
+            if (*(s16 *)(object+0xAA) == 0xD54 /* moby class 3412 */)
+                UpdateEquipmentPieces(object);
+            if (object && *(s16 *)(object+0xAA) == 0xFA0 /* TV Screens */ && *(void **)(object+0x68))
+                StoreAngleUpdateResult((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
                                   0x80AAAAD2,0x80396464,0.06108653545f);
 
         }
     }
-    if (D_001A79F0 != 20) return;
+    if (gCurrentMapIndex != 20) return;
     {
         if ((u32)(D_L20_001BDCC0.mode-4) < 2) {
             {
-                YeedilHeroPrefix *hero = &D_00189E20;
+                YeedilHeroPrefix *hero = &gHeroState;
                 int owner = D_L20_001BDCC0.refs.named.owner;
                 hero->owner = owner;
                 if (D_L20_001BDCC0.mode == 4) {
@@ -227,32 +230,32 @@ void func_L20_00310E38(void *incoming)
                 {
                     YeedilCameraPrefix *camera = &D_L20_001C6AE0;
                     if (D_L20_001BDCC0.state == lower) {
-                        func_00282A60(camera,0,0x50);
+                        ClearMemory(camera,0,0x50);
                         D_L20_001AF3B0[0] = 1;
                         camera->scale = 0.8f;
                     }
                     if (lower < D_L20_001BDCC0.state && D_L20_001BDCC0.state < upper) {
-                        func_0029FC20(target,0,matrix);
-                        func_00283678(D_0018A550,matrix);
+                        TransformMobyJointPoint(target,0,matrix);
+                        copy_matrix3x4(D_0018A550,matrix);
                         value = camera->scale;
                         value += (12.0f-value)*0.07f;
                         camera->scale = value;
-                        func_0029FCC0(target,0,camera);
-                        func_00282F20(&camera->point,D_0018A550,camera->scale);
-                        func_00282CC0(&camera->point,camera,&camera->point);
-                        func_0030CAD0(target);
-                        func_0030CCD0(target);
-                        func_L00_002E6EF8(func_0030D430,target);
+                        TransformMobyJointToWorld(target,0,camera);
+                        vec_scale_to_length(&camera->point,D_0018A550,camera->scale);
+                        FastVecAdd(&camera->point,camera,&camera->point);
+                        InitializeBoltPointChain(target);
+                        UpdateBeamChainPoints(target);
+                        AddDrawCallbackToList3(DrawBeamRibbonsLevelVariant,target);
                         if (D_L20_001BDCC0.mode == 5 && D_L20_001BDCC0.state == upper-1) {
                             offset.q = 0;
                             offset.f[0] = 18.0f; offset.f[1] = -2.5f; offset.f[2] = 1.0f;
-                            func_00283098(&offset,&offset,D_L20_001BA1F0);
-                            func_00282CC0(&offset,&offset,D_L20_001BA1F0-0x230);
-                            func_00282CF0(&work,D_L20_001BA1F0-0x230,&offset);
-                            func_00282F20(&work,&work,1.0f);
-                            func_0032DA58(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
+                            matrix_mul_vec3(&offset,&offset,D_L20_001BA1F0);
+                            FastVecAdd(&offset,&offset,D_L20_001BA1F0-0x230);
+                            FastVecSub(&work,D_L20_001BA1F0-0x230,&offset);
+                            vec_scale_to_length(&work,&work,1.0f);
+                            SpawnBlastEffectMoby(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
                         }
-                    } else D_00189E20.owner = 0;
+                    } else gHeroState.owner = 0;
                 }
             }
         }
@@ -265,17 +268,17 @@ void func_L20_00310E38(void *incoming)
                 u16 word;
                 object = D_L20_001BDCC0.refs.objects[i];
                 word = *(u16 *)(object+0xAA);
-                if ((u32)(word-0xD0E) < 2) {
+                if ((u32)(word-0xD0E /* Megacorp Trooper Torso, Legs */) < 2) {
                     *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
                 }
-                if (*(s16 *)(object+0xAA) == 0xCE0 && (D_L20_001BDCC0.mode != 3 || D_L20_001BDCC0.state < D_L20_001A9430))
-                    func_L03_00326458(object);
+                if (*(s16 *)(object+0xAA) == 0xCE0 /* moby class 3296 */ && (D_L20_001BDCC0.mode != 3 || D_L20_001BDCC0.state < D_L20_001A9430))
+                    EmitScaledObjectParticles(object);
             }
         }
         if (D_L20_001BDCC0.mode == 3 && D_L20_001BDCC0.state == D_L20_001A9430) {
             qcopy(matrix,(u8 *)D_L20_001BDCC0.refs.named.target+0x10);
-            func_00282CC0(matrix,matrix,&D_L20_001A9420);
-            func_0032C700(matrix,0,0x19,0x14,0x14,0x14,0x2D,1,1.0f,20.0f,1,1,0,0);
+            FastVecAdd(matrix,matrix,&D_L20_001A9420);
+            SpawnExplosion(matrix,0,0x19,0x14,0x14,0x14,0x2D,1,1.0f,20.0f,1,1,0,0);
             {
                 YeedilEffectPrefix *effect = &D_L20_001B9E80;
                 effect->scale1 = 0.09f;
@@ -369,6 +372,7 @@ extern void func_00281EB8(void *,int,u32,int,float,float,float);
 
 
 
+/* Draws the glowing trail for the particle effect: two crossed ribbons and some sparkles, faded by the effect's strength. */
 void func_L20_0039BEC8(void *arg)
 {
     char *object = arg;
@@ -378,9 +382,9 @@ void func_L20_0039BEC8(void *arg)
     float *vars = *(float **)(object + 0x68);
 
     u32 color;
-    func_00283658(matrix, object + 0xc0);
+    copy_matrix_rotation(matrix, object + 0xc0);
     qcopy(matrix + 12, object + 0x10);
-    packet.descriptor[1] = func_0027C878(D_L20_001AEC6C);
+    packet.descriptor[1] = GetEffectTextureDescriptor(D_L20_001AEC6C);
     packet.descriptor[0] = 0;
     packet.descriptor[2] = 0xff9000000260ULL;
     packet.descriptor[3] = 0x8000000048ULL;
@@ -392,8 +396,8 @@ void func_L20_0039BEC8(void *arg)
             packet.uv[i].y = D_L20_001AEC84[i * 2];
             color = D_L20_001AEC70[(i & 1) ? 0 : 1];
             packet.color[i] = color;
-            packet.color[i] = func_00283D38(color & 0xffffff, color, vars[0]);
-            func_00282C90(&packet.position[i]);
+            packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
+            StoreVectorHelper(&packet.position[i]);
             packet.position[i].f[0] = D_L20_001AEC7C;
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
@@ -401,17 +405,17 @@ void func_L20_0039BEC8(void *arg)
     }
     *(Quad *)(rotated + 12) = 0;
     rotated[14] = 0.19634954631328583f;
-    func_002833F0(rotated, rotated + 12);
-    func_L01_002E1510(&packet, 1, rotated, 32, matrix);
-    func_00282CF0(&direction, D_L20_001B9FC0, object + 0x10);
-    func_002AFDD8(object, (char *)&direction, (char *)&direction, 0);
+    euler_rotation_basis(rotated, rotated + 12);
+    TransformAndDrawEntries(&packet, 1, rotated, 32, matrix);
+    FastVecSub(&direction, D_L20_001B9FC0, object + 0x10);
+    TransformVectorByObjectOrGiven(object, (char *)&direction, (char *)&direction, 0);
     normal.q = 0;
     normal.f[0] = direction.f[1];
     normal.f[1] = -direction.f[0];
     normal.f[3] = 1.0f;
     tangent.q = normal.q;
     direction.f[2] = 0.0f;
-    packet.descriptor[1] = func_0027C878(D_L20_001AECA0);
+    packet.descriptor[1] = GetEffectTextureDescriptor(D_L20_001AECA0);
     {
         int i;
         for (i = 0; i < 4; i++) {
@@ -421,33 +425,33 @@ void func_L20_0039BEC8(void *arg)
             packet.uv[i].y = D_L20_001AECBC[i * 2];
             color = D_L20_001AECA8[(i & 1) ? 0 : 1];
             packet.color[i] = color;
-            packet.color[i] = func_00283D38(color & 0xffffff, color, vars[0]);
+            packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
             width = i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C;
-            func_00282F20(&packet.position[i], &tangent, width);
+            vec_scale_to_length(&packet.position[i], &tangent, width);
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
         }
     }
-    func_00280B90(&packet, matrix, 0);
+    draw_world_quad(&packet, matrix, 0);
     {
         int i;
         for (i = 0; i < 4; i++) {
             float width = -(i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C);
-            func_00282F20(&packet.position[i], &tangent, width);
+            vec_scale_to_length(&packet.position[i], &tangent, width);
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
         }
     }
-    func_00280B90(&packet, matrix, 0);
+    draw_world_quad(&packet, matrix, 0);
     qcopy(&normal, object + 0x10);
     normal.f[2] += 0.333f;
-    color = func_00283D38(D_L20_001AECD8_gp, D_L20_001AECD8[1], func_002A7878(0.0f,1.0f));
-    color = func_00283D38(color & 0xffffff, color, vars[0]);
-    func_00281EB8(&normal, 11, color, 1, D_L20_001AECE8, 0.0f, func_002A7940());
-    color = func_00283D38(D_L20_001AECD8[2], D_L20_001AECD8[3], func_002A7878(0.0f,1.0f));
-    color = func_00283D38(color & 0xffffff, color, vars[0]);
-    func_00281EB8(&normal, 11, color, 1, D_L20_001AECEC, 0.0f, func_002A7940());
-    func_00281EB8(object + 0x10, 49, color, 1, D_L20_001AECEC, 0.0f, func_002A7940());
+    color = FastTweenColor(D_L20_001AECD8_gp, D_L20_001AECD8[1], RandomFloatRange(0.0f,1.0f));
+    color = FastTweenColor(color & 0xffffff, color, vars[0]);
+    DrawBillboardQuad_00281EB8(&normal, 11, color, 1, D_L20_001AECE8, 0.0f, RandomAngle());
+    color = FastTweenColor(D_L20_001AECD8[2], D_L20_001AECD8[3], RandomFloatRange(0.0f,1.0f));
+    color = FastTweenColor(color & 0xffffff, color, vars[0]);
+    DrawBillboardQuad_00281EB8(&normal, 11, color, 1, D_L20_001AECEC, 0.0f, RandomAngle());
+    DrawBillboardQuad_00281EB8(object + 0x10, 49, color, 1, D_L20_001AECEC, 0.0f, RandomAngle());
 }
 
 /* func_L20_002DEBE0 is in the sibling file L20_002DEBE0-decider.c. */

@@ -16,37 +16,38 @@ extern void func_00282D30(void *dst, void *src, float scale);
 extern void *func_002BD8B0(void *a0, void *a1, int a2, int a3, int a4, int a5, float f);
 extern int D_001B1688 __attribute__((sda));
 
-void func_002BD9B0(char *p)
+/* Moves a spark particle and fades its size and colour over its life. It also drops smaller sparks behind it and disappears when its time is up. */
+void func_002BD9B0(char *particle)
 {
-    char *s = p + 0x20;
-    float inv;
-    float len;
-    float keep[4] __attribute__((aligned(16)));
-    float v[4] __attribute__((aligned(16)));
-    float w[4] __attribute__((aligned(16)));
+    char *motion = particle + 0x20;
+    float invLife;
+    float speed;
+    float savedPos[4] __attribute__((aligned(16)));
+    float sparkVel[4] __attribute__((aligned(16)));
+    float randomVec[4] __attribute__((aligned(16)));
 
-    if (func_00282978((short *)(p + 0xA))) {
-        func_002B9180(p);
+    if (FastDecTimer((short *)(particle + 0xA))) {
+        KillParticle(particle);
         return;
     }
-    inv = 1.0f / func_00283CE0(*(short *)(s + 0x18));
-    *(float *)(p + 0xC) = func_00283CE0(*(short *)(p + 0xA)) * *(float *)(s + 0x1C) * inv;
-    *(int *)(p + 4) = func_002A9568(*(int *)(s + 0x14), *(int *)(s + 0x10), func_00283CE0(*(short *)(p + 0xA)) * inv);
-    func_00282CC0((p + 0x10), (p + 0x10), s);
-    *(float *)(s + 8) -= 0.001f;
-    qcopy(keep, p + 0x10);
-    if (*(short *)(s + 0x1A) != 0 && (D_001B1688 & 1)) {
-        *(TI *)w = 0;
-        w[0] = func_002A7878(-1.0f, 1.0f);
-        w[1] = func_002A7878(-1.0f, 1.0f);
-        w[2] = func_002A7878(-1.0f, 1.0f);
-        *(TI *)v = *(TI *)w;
-        len = func_00282DF0(s);
-        func_00282F20(v, v, len * func_002A7878(0.21f, 0.25f));
-        func_00282CC0(v, v, s);
-        func_00282D30(v, v, func_002A7878(0.75f, 0.95f));
-        func_002BD8B0((p + 0x10), v, *(int *)(p + 4), *(int *)(s + 0x14), func_002A7820(15, 20), 0, *(float *)(p + 0xC));
+    invLife = 1.0f / IntToFloat(*(short *)(motion + 0x18));
+    *(float *)(particle + 0xC) = IntToFloat(*(short *)(particle + 0xA)) * *(float *)(motion + 0x1C) * invLife;
+    *(int *)(particle + 4) = ForwardTwoValuesAndAmount(*(int *)(motion + 0x14), *(int *)(motion + 0x10), IntToFloat(*(short *)(particle + 0xA)) * invLife);
+    FastVecAdd((particle + 0x10), (particle + 0x10), motion);
+    *(float *)(motion + 8) -= 0.001f;
+    qcopy(savedPos, particle + 0x10);
+    if (*(short *)(motion + 0x1A) != 0 && (gGameTime & 1)) {
+        *(TI *)randomVec = 0;
+        randomVec[0] = RandomFloatRange(-1.0f, 1.0f);
+        randomVec[1] = RandomFloatRange(-1.0f, 1.0f);
+        randomVec[2] = RandomFloatRange(-1.0f, 1.0f);
+        *(TI *)sparkVel = *(TI *)randomVec;
+        speed = FastVecLength(motion);
+        vec_scale_to_length(sparkVel, sparkVel, speed * RandomFloatRange(0.21f, 0.25f));
+        FastVecAdd(sparkVel, sparkVel, motion);
+        FastVecScale(sparkVel, sparkVel, RandomFloatRange(0.75f, 0.95f));
+        SpawnTrailingSparkParticle((particle + 0x10), sparkVel, *(int *)(particle + 4), *(int *)(motion + 0x14), RandomIntRange(15, 20), 0, *(float *)(particle + 0xC));
     } else {
-        func_00282D30(s, s, 0.96f);
+        FastVecScale(motion, motion, 0.96f);
     }
 }

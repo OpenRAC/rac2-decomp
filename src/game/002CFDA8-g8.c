@@ -25,49 +25,50 @@ extern int D_001ABA00 __attribute__((sda));
 extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern short D_0026CF18[][3];
 
+/* Draws the skill points list with the player's count out of 30 and five rows around the cursor. */
 int func_002CFDA8(void) {
     char buf[64];
-    int r, i, y, k, color;
-    char *text;
+    int r, i, y, entryIndex, color;
+    char *formatText;
     float z;
-    func_0027C540(0);
+    SetupGifPaging(0);
     z = 0.0f;
-    r = func_00336D50(D_001A8CFC + 0x8710, 0xD7);
-    func_00300A00(r, 0x60442D00, (float)(D_001A7340 / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    r = func_00336D50(D_001A8CFC + 0x8710, 0xD8);
-    func_00300A00(r, 0x60241700, (float)(D_001A7340 / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    r = func_00336D50(D_001A8CFC + 0x8710, 0xD9);
-    func_00300A00(r, 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    r = func_00336D50(D_001A8CFC + 0x8710, 0xDA);
-    func_00300A00(r, 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    func_0027F120();
-    func_0027FAA8(0xB9, 0x1B, 0x80F0F0F0ULL, func_00288FB8(0x2E10), -1);
-    text = func_00288FB8(0x2F2F);
-    func_00115DA8(buf, text, func_002B0E90(), 30);
-    func_0027FAA8(0x92, 0x177, 0x80F0F0F0ULL, buf, -1);
-    func_0027F110();
-    func_0027FAA8(0x1AD, 0x177, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
-    func_0028FC48(0x15E, 0xDA, 0x1E6, 0xDC, 0x55F0C070ULL, 0);
+    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD7);
+    DrawScaledObjectTwoAxes(r, 0x60442D00, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD8);
+    DrawScaledObjectTwoAxes(r, 0x60241700, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD9);
+    DrawScaledObjectTwoAxes(r, 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xDA);
+    DrawScaledObjectTwoAxes(r, 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    DisableScreenFlag();
+    DrawTextCenteredSmallFont(0xB9, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2E10), -1);
+    formatText = GetLocalizedString(0x2F2F);
+    Sprintf(buf, formatText, CountNonZeroFlags(), 30);
+    DrawTextCenteredSmallFont(0x92, 0x177, 0x80F0F0F0ULL, buf, -1);
+    EnableScreenFlag();
+    DrawTextCenteredSmallFont(0x1AD, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
+    AppendScreenRectPacket(0x15E, 0xDA, 0x1E6, 0xDC, 0x55F0C070ULL, 0);
     if (D_0026CF18[D_001AB9FC][2] != -1)
-        func_0027FAA8(0x1A0, 0xE0, 0x80F0F0F0ULL, func_00288FB8(D_0026CF18[D_001AB9FC][2]), -1);
-    func_002CEBD0();
+        DrawTextCenteredSmallFont(0x1A0, 0xE0, 0x80F0F0F0ULL, GetLocalizedString(D_0026CF18[D_001AB9FC][2]), -1);
+    DrawMenuScrollArrowsAndFrame();
     for (y = 0x112, i = 0; i < 5; i++, y += 20) {
-        char *label;
-        k = i + D_001AB9FC - 2;
-        if (k < 0) k += 30;
-        if (k >= 30) k -= 30;
+        char *rowText;
+        entryIndex = i + D_001AB9FC - 2;
+        if (entryIndex < 0) entryIndex += 30;
+        if (entryIndex >= 30) entryIndex -= 30;
         color = 0x80F0F0F0;
-        label = func_00288FB8(D_0026CF18[k][0]);
-        if (D_001A7A60[k]) color = 0x7029A1FF;
+        rowText = GetLocalizedString(D_0026CF18[entryIndex][0]);
+        if (D_001A7A60[entryIndex]) color = 0x7029A1FF;
         color &= 0xFFFFFF;
         if (i == 0 || i == 4) color |= 0x10000000;
         else if (i == 1 || i == 3) color |= 0x50000000;
         else {
             color |= 0x70000000;
-            func_002CF0A0(func_0027F198(label, func_001157AC(label)), color);
+            DrawMenuTextHighlightFrame(MeasureTextWidthMediumFont(rowText, strlen_001157AC(rowText)), color);
         }
-        func_0027FB40(D_001A7340 / 2, y, color, label, -1);
+        DrawTextCenteredMediumFont(gScreenWidth / 2, y, color, rowText, -1);
     }
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }

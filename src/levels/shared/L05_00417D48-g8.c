@@ -86,104 +86,105 @@ typedef struct {
 
 /* State 0 spawns the equipment parts chosen by the D_001A7AF0 selector bits; state 1 updates timers and the
  * position copy. */
-void func_L05_00417D48(Obj_L05_00417D48 *o)
+/* Updates the equipment holder object (moby class 4031). On its first frame it creates the player's equipment parts; after that it keeps its sound, timers and light going. */
+void func_L05_00417D48(Obj_L05_00417D48 *object)
 {
-    State_L05_00417D48 *st = o->pVar;
-    int mode = o->state;
-    int id;
-    unsigned int flags;
+    State_L05_00417D48 *vars = object->pVar;
+    int phase = object->state;
+    int partClass;
+    unsigned int selector;
 
-    switch (mode) {
+    switch (phase) {
     case 0:
-        st->f30 = -1;
-        st->f270 = -1;
-        st->f260 = 1;
-        st->f264 = 0x3840;
-        st->f0 = 0;
-        st->f4 = 0;
-        st->f8 = 0;
-        st->fA = 0;
-        st->f20C = 0;
-        st->f210 = 0;
-        st->f14 = 0;
-        st->f18 = 0;
-        st->f1C = 0;
-        st->f34 = 0;
-        st->f38 = 0;
-        st->f3C = 0;
-        st->f268 = 0;
-        st->f26C = 0;
-        st->f27C = 0;
-        o->state = 1;
-        o->modeBits |= 0x100;
-        func_L05_00418200(o);
-        func_00282C88(D_L05_001B34F0);
-        D_0018B650[0] = o;
-        flags = D_001A7AF0 & 3;
-        D_L05_001B3500 = 0;
-        o->modeBits |= 0x41;
-        st->f40 = func_L05_0041C708(o, 0.05f, 0, D_L05_001A8F70[flags]);
-        if (st->f40) *(int *)(st->f40 + 0x98) = 0;
-        flags = (D_001A7AF0 >> 2) & 3;
-        id = D_L05_001A8F78[flags];
-        st->f44 = func_L05_0041C708(o, 0.05f, 0, id);
-        st->f48 = func_L05_0041C708(o, 0.05f, 1, id);
-        if (st->f44) *(int *)(st->f44 + 0x98) = 0;
-        if (st->f48) *(int *)(st->f48 + 0x98) = 0;
-        flags = (D_001A7AF0 >> 4) & 3;
-        st->f4C = func_L05_0041C708(o, 0.05f, 0, D_L05_001A8F80[flags]);
-        if (st->f4C) *(int *)(st->f4C + 0x98) = 0;
-        st->f50 = func_L05_00432080(o, 0.05f);
-        flags = (D_001A7AF0 >> 6) & 1;
-        id = D_L05_001A8F88[flags];
-        st->fAC = func_L05_0041C708(o, 0.05f, 0, id);
-        st->f1F0 = func_L05_0041C708(o, 0.05f, 1, id);
-        if (st->fAC) *(int *)(st->fAC + 0x98) = 0;
-        if (st->f1F0) *(int *)(st->f1F0 + 0x98) = 0;
-        flags = (D_001A7AF0 >> 9) & 1;
-        id = D_L05_001A8F98[flags];
-        st->f1F4 = func_L05_0041C708(o, 0.05f, 0, id);
-        st->f1F8 = func_L05_0041C708(o, 0.05f, 1, id);
-        if (st->f1F4) *(int *)(st->f1F4 + 0x98) = 0;
-        if (st->f1F8) *(int *)(st->f1F8 + 0x98) = 0;
-        if (func_002ED8A0(3)) {
-            flags = (D_001A7AF0 >> 7) & 3;
-            id = D_L05_001A8F90[flags];
-            if (id) {
-                st->f1FC = func_L05_0041C708(o, 0.05f, 0, id);
-                st->f200 = func_L05_0041C708(o, 0.05f, 1, id);
-                if (st->f1FC) *(int *)(st->f1FC + 0x98) = 0;
-                if (st->f200) *(int *)(st->f200 + 0x98) = 0;
+        vars->f30 = -1;
+        vars->f270 = -1;
+        vars->f260 = 1;
+        vars->f264 = 0x3840;
+        vars->f0 = 0;
+        vars->f4 = 0;
+        vars->f8 = 0;
+        vars->fA = 0;
+        vars->f20C = 0;
+        vars->f210 = 0;
+        vars->f14 = 0;
+        vars->f18 = 0;
+        vars->f1C = 0;
+        vars->f34 = 0;
+        vars->f38 = 0;
+        vars->f3C = 0;
+        vars->f268 = 0;
+        vars->f26C = 0;
+        vars->f27C = 0;
+        object->state = 1;
+        object->modeBits |= 0x100;
+        func_L05_00418200(object);
+        ClearVector128(gLightSpotSum);
+        D_0018B650[0] = object;
+        selector = gEquipmentBits & 3;
+        gLightSpotCount = 0;
+        object->modeBits |= 0x41;
+        vars->f40 = SpawnEquipmentPartMoby(object, 0.05f, 0, D_L05_001A8F70[selector]);
+        if (vars->f40) *(int *)(vars->f40 + 0x98) = 0;
+        selector = (gEquipmentBits >> 2) & 3;
+        partClass = D_L05_001A8F78[selector];
+        vars->f44 = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
+        vars->f48 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        if (vars->f44) *(int *)(vars->f44 + 0x98) = 0;
+        if (vars->f48) *(int *)(vars->f48 + 0x98) = 0;
+        selector = (gEquipmentBits >> 4) & 3;
+        vars->f4C = SpawnEquipmentPartMoby(object, 0.05f, 0, D_L05_001A8F80[selector]);
+        if (vars->f4C) *(int *)(vars->f4C + 0x98) = 0;
+        vars->f50 = CreateTransformClone(object, 0.05f);
+        selector = (gEquipmentBits >> 6) & 1;
+        partClass = D_L05_001A8F88[selector];
+        vars->fAC = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
+        vars->f1F0 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        if (vars->fAC) *(int *)(vars->fAC + 0x98) = 0;
+        if (vars->f1F0) *(int *)(vars->f1F0 + 0x98) = 0;
+        selector = (gEquipmentBits >> 9) & 1;
+        partClass = D_L05_001A8F98[selector];
+        vars->f1F4 = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
+        vars->f1F8 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        if (vars->f1F4) *(int *)(vars->f1F4 + 0x98) = 0;
+        if (vars->f1F8) *(int *)(vars->f1F8 + 0x98) = 0;
+        if (FindLastUsedChainEntry(3)) {
+            selector = (gEquipmentBits >> 7) & 3;
+            partClass = D_L05_001A8F90[selector];
+            if (partClass) {
+                vars->f1FC = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
+                vars->f200 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+                if (vars->f1FC) *(int *)(vars->f1FC + 0x98) = 0;
+                if (vars->f200) *(int *)(vars->f200 + 0x98) = 0;
             }
         }
-        flags = (D_001A7AF0 >> 10) & 3;
-        id = D_L05_001A8FA0[flags];
-        st->f204 = func_L05_0041C708(o, 0.05f, 0, id);
-        st->f208 = func_L05_0041C708(o, 0.05f, 1, id);
-        if (st->f204) *(int *)(st->f204 + 0x98) = 0;
-        if (st->f208) *(int *)(st->f208 + 0x98) = 0;
-        if (func_002ED8A0(4) != -1) {
-            st->f274 = func_L05_0041C708(o, 0.05f, 0, 0x10E2);
-            if (st->f274) *(int *)(st->f274 + 0x98) = 0;
+        selector = (gEquipmentBits >> 10) & 3;
+        partClass = D_L05_001A8FA0[selector];
+        vars->f204 = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
+        vars->f208 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        if (vars->f204) *(int *)(vars->f204 + 0x98) = 0;
+        if (vars->f208) *(int *)(vars->f208 + 0x98) = 0;
+        if (FindLastUsedChainEntry(4) != -1) {
+            vars->f274 = SpawnEquipmentPartMoby(object, 0.05f, 0, 0x10E2 /* moby class 4322 */);
+            if (vars->f274) *(int *)(vars->f274 + 0x98) = 0;
         }
-        if (func_002ED8A0(5) != -1) {
-            st->f278 = func_L05_0041C708(o, 0.05f, 0, 0x10E4);
-            if (st->f278) *(int *)(st->f278 + 0x98) = 0;
+        if (FindLastUsedChainEntry(5) != -1) {
+            vars->f278 = SpawnEquipmentPartMoby(object, 0.05f, 0, 0x10E4 /* moby class 4324 */);
+            if (vars->f278) *(int *)(vars->f278 + 0x98) = 0;
         }
-        st->f58 = 70;
-        st->f54 = 60;
-        st->f5C = 0;
-        st->fA0 = 0;
+        vars->f58 = 70;
+        vars->f54 = 60;
+        vars->f5C = 0;
+        vars->fA0 = 0;
         break;
     case 1:
-        if (func_L05_0037AC00() < func_L05_0037AC40()) st->f260 = mode;
-        if (st->f260) {
-            if (func_00282948((char *)&st->f264)) st->f268 = mode;
+        if (GetShieldSlotValue() < GetShieldSlotLimit()) vars->f260 = phase;
+        if (vars->f260) {
+            if (FastFloatHelperD((char *)&vars->f264)) vars->f268 = phase;
         }
-        if (!func_002E59B0(o, st->f30)) st->f30 = func_002E5CF8(0, 4, o);
-        func_L05_00418288(o);
-        qcopy(D_L05_001B3510, o->pos);
-        func_L00_004450C0(o);
+        if (!IsVoicePlayingForOwner(object, vars->f30)) vars->f30 = PlayMobySound(0, 4, object);
+        UpdateWobblingLight(object);
+        qcopy(D_L05_001B3510, object->pos);
+        ForwardResidentAddress(object);
         break;
     }
 }

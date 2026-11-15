@@ -51,6 +51,7 @@ extern int ref_L00_00309900_03;
 
 extern int ref_L00_00309900_01;
 
+/* Save menu screen step: when the memory card is idle, picks screen 12, 3, 19 or 16 depending on the error word, the selection and the saved size. */
 void func_00298630(void)
 {
     short phase;
@@ -76,6 +77,7 @@ void func_00298630(void)
         ref_L00_00309828_01 = 16;
 }
 
+/* Save menu screen step: goes to screen 3 when something is selected, or to screen 13 when a flag is set. */
 void func_002986D0(void)
 {
     if (ref_L00_003098C8_01.selector_10 != 0) {
@@ -86,6 +88,7 @@ void func_002986D0(void)
         ref_L00_003098C8_02 = 13;
 }
 
+/* Save menu screen step: goes to screen 3, or reacts to two flags by moving to screen 24, 12 or 14. */
 void func_00298708(void)
 {
     if (ref_L00_00309900_02.selector_10 != 0) {

@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
 /* The clear proves an 80-byte state span; this view covers that span. */
 typedef struct TrailCamera {
@@ -48,6 +49,7 @@ extern void func_L00_002E6EF8(void (*)(void *), void *);
 extern void func_L00_002E6CF0(void (*)(void *), void *);
 extern char *func_L01_002F1FD0(float, float, float);
 
+/* Per-frame level script for the Oozla intro scene. It tweaks a few objects and runs the trailing camera that follows the player. */
 void func_L01_002F2570(void)
 {
     int i;
@@ -55,26 +57,26 @@ void func_L01_002F2570(void)
     char *trail;
     Quadword angle;
 
-    func_L00_002FC980();
+    StartStartupAnimations();
     for (i = 0; i < D_L01_001BD1C0.count; ++i) {
         actor = D_L01_001BD1C0.entries[i];
-        if (actor && *(short *)(actor + 0xAA) == 0xE29) {
+        if (actor && *(short *)(actor + 0xAA) == 0xE29 /* moby class 3625 */) {
             *(unsigned short *)(actor + 0x34) |= 0x800;
         }
-        if (*(short *)(actor + 0xAA) == 0xD54)
-            func_002E64A0(actor);
-        if (actor && *(short *)(actor + 0xAA) == 0xFA0 && *(char **)(actor + 0x68))
-            func_L00_00326048(actor, (float *)(*(char **)(actor + 0x68) + 0xC),
+        if (*(short *)(actor + 0xAA) == 0xD54 /* moby class 3412 */)
+            UpdateEquipmentPieces(actor);
+        if (actor && *(short *)(actor + 0xAA) == 0xFA0 /* TV Screens */ && *(char **)(actor + 0x68))
+            StoreAngleUpdateResult(actor, (float *)(*(char **)(actor + 0x68) + 0xC),
                              0x80AAAAD2, 0x80396464, 0.061086535453796387f);
     }
 
-    if (D_001A79F0 == 1) {
+    if (gCurrentMapIndex == 1) {
         if (D_L01_001BD1C0.mode == 1) {
             TrailCamera *camera = &D_L01_001C5F90;
-            D_00189E20.camera = D_L01_001BD1C0.entries[2];
+            gHeroState.camera = D_L01_001BD1C0.entries[2];
             trail = D_L01_001BD1C0.entries[3];
             if (D_L01_001BD1C0.frame == D_L01_001A9460) {
-                func_00282A60(camera, 0, sizeof(TrailCamera));
+                ClearMemory(camera, 0, sizeof(TrailCamera));
                 D_L01_001AF240 = 1;
                 camera->distance = 0.8f;
             }
@@ -82,23 +84,23 @@ void func_L01_002F2570(void)
                 D_L01_001BD1C0.frame < D_L01_001A9464) {
                 angle = 0;
                 ((float *)&angle)[2] = -0.13f;
-                func_002833F0(D_00189E20.transform, &angle);
+                euler_rotation_basis(gHeroState.transform, &angle);
                 camera->distance += (12.0f - camera->distance) * 0.07f;
-                func_0029FCC0(trail, 0, (char *)camera);
-                func_00282F20(camera->position, D_00189E20.transform,
+                TransformMobyJointToWorld(trail, 0, (char *)camera);
+                vec_scale_to_length(camera->position, gHeroState.transform,
                              camera->distance);
-                func_00282CC0(camera->position, camera->target,
+                FastVecAdd(camera->position, camera->target,
                              camera->position);
-                func_0030CAD0(trail);
-                func_0030CCD0(trail);
-                func_L00_002E6EF8(func_0030D430, trail);
+                InitializeBoltPointChain(trail);
+                UpdateBeamChainPoints(trail);
+                AddDrawCallbackToList3(DrawBeamRibbonsLevelVariant, trail);
             } else {
-                D_00189E20.camera = 0;
+                gHeroState.camera = 0;
             }
         }
         if (D_L01_001BD1C0.mode == 3) {
-            trail = func_L01_002F1FD0(0.0f, 0.0f, 0.0f);
-            func_L00_002E6CF0(func_L01_002F21F0, trail);
+            trail = FindNearestTvScreen(0.0f, 0.0f, 0.0f);
+            AddDrawCallbackToList1(BuildShipTrailMeshFromSource, trail);
         }
     }
 }

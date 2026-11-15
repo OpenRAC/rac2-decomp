@@ -27,19 +27,20 @@ typedef struct Mount {
 extern f32 func_L08_00422850(void *, f32, f32, f32, f32);
 
 /* The mount's floor under the entry, raised to its minimum, and the ceiling over the hero. */
-void func_L08_00422900(Ent *a0)
+/* Works out how low and how high the ridden vehicle may go, from the ground below it and the hero's height. */
+void func_L08_00422900(Ent *entry)
 {
-    Mount *s0 = a0->f68;
+    Mount *mount = entry->f68;
     f32 pos[4] __attribute__((aligned(16)));
-    f32 top, hero;
-    qcopy(pos, a0->pos);
-    if (a0->f20 == 0) {
-        s0->f1B0 = func_L08_00422850(pos, s0->f158 + 20.0f, s0->f158 - 10.0f, s0->f1D4, s0->f1D0);
+    f32 floorTop, hero;
+    qcopy(pos, entry->pos);
+    if (entry->f20 == 0) {
+        mount->f1B0 = FindGroundHeight(pos, mount->f158 + 20.0f, mount->f158 - 10.0f, mount->f1D4, mount->f1D0);
     } else {
-        s0->f1B0 = func_L08_00422850(pos, a0->pos[2] + 2.0f, a0->pos[2] - 10.0f, s0->f1D4, s0->f1D0);
+        mount->f1B0 = FindGroundHeight(pos, entry->pos[2] + 2.0f, entry->pos[2] - 10.0f, mount->f1D4, mount->f1D0);
     }
-    if (s0->f1B0 < s0->f1D4) s0->f1B0 = s0->f1D4;
-    top = s0->f1B0 + 1.7f;
-    hero = ((Hero *)D_00189E20)->f[0x88 / 4] + 0.1f;
-    s0->f1B4 = top > hero ? top : hero;
+    if (mount->f1B0 < mount->f1D4) mount->f1B0 = mount->f1D4;
+    floorTop = mount->f1B0 + 1.7f;
+    hero = ((Hero *)gHeroState)->f[0x88 / 4] + 0.1f;
+    mount->f1B4 = floorTop > hero ? floorTop : hero;
 }

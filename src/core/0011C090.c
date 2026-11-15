@@ -1,3 +1,4 @@
+#include "names.h"
 /* Decimal-exponent formatter reconstructed from retail and the current
  * public rac1-decomp counterpart src/core/00119D88.c:func_00119F38
  * (origin/main 69c3e42d). The software-double helper identities and the
@@ -12,6 +13,7 @@ extern int func_0011C000(unsigned long);
 extern void (*D_00134698)(int);
 extern void func_0011C7E8(const char *, ...);
 
+/* Prints a decimal number in the form 0.123e+4. */
 void func_0011C090(double value)
 {
     int exponent = 0;
@@ -31,8 +33,8 @@ void func_0011C090(double value)
             exponent++;
         }
     }
-    digits = func_0011C000(func_001212C8(value * 1000000.0));
-    func_0011C7E8("0.%d", digits);
-    if (exponent >= 0) func_0011C7E8("e+%d", exponent);
-    else func_0011C7E8("e%d", exponent);
+    digits = DoubleBitsToDigits(DoubleToUnsignedLongLong(value * 1000000.0));
+    PrintFormatted("0.%d", digits);
+    if (exponent >= 0) PrintFormatted("e+%d", exponent);
+    else PrintFormatted("e%d", exponent);
 }

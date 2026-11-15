@@ -11,7 +11,7 @@ typedef struct {
     s32 f18;
     s32 f1C;
     u8 pad20[0x10];
-    f32 vec[4];
+    f32 anchorPos[4];
 } Vars40B838;
 
 typedef struct {
@@ -43,57 +43,58 @@ extern f32 func_002EF240(int);
 extern f32 func_002A7940(void);
 extern void func_002A0F48(void *);
 
-Moby40B838 *func_L00_0040B838(f32 *pos, int arg1, f32 *parent, int arg3)
+/* Creates a Clank Zapper at a position, attached to a parent object, with random spin. */
+Moby40B838 *func_L00_0040B838(f32 *pos, int param, f32 *parent, int extra)
 {
-    f32 tmp[4] __attribute__((aligned(16)));
-    f32 vec[4] __attribute__((aligned(16)));
-    Moby40B838 *m;
+    f32 parentPos[4] __attribute__((aligned(16)));
+    f32 offset[4] __attribute__((aligned(16)));
+    Moby40B838 *moby;
     Vars40B838 *vars;
     Link40B838 *link;
     int i;
 
-    m = func_0029EFD0(0xED8);
-    if (m != 0) {
-        vars = m->vars;
-        m->alpha = 0xFF;
-        m->f34 = 0x100;
-        m->f32 = 0xFF;
-        m->f31 = 1;
-        m->fB8 = arg1;
-        m->state = 0;
-        qcopy(vars->vec, parent + 4);
-        vars->vec[2] += func_002AB1F0(parent)->f10;
+    moby = CreateMoby(0xED8 /* Clank Zapper */);
+    if (moby != 0) {
+        vars = moby->vars;
+        moby->alpha = 0xFF;
+        moby->f34 = 0x100;
+        moby->f32 = 0xFF;
+        moby->f31 = 1;
+        moby->fB8 = param;
+        moby->state = 0;
+        qcopy(vars->anchorPos, parent + 4);
+        vars->anchorPos[2] += GetMobyPrivateValue0(parent)->f10;
         if (parent != 0) {
-            qcopy(tmp, parent + 4);
-            link = func_002AB1F0(parent);
+            qcopy(parentPos, parent + 4);
+            link = GetMobyPrivateValue0(parent);
             if (link != 0) {
-                func_002AFFD8(parent + 4, vec, 1);
-                func_00282D30(vec, vec, link->f10);
-                func_00282CC0(tmp, tmp, vec);
+                ComputeViewDirection(parent + 4, offset, 1);
+                FastVecScale(offset, offset, link->f10);
+                FastVecAdd(parentPos, parentPos, offset);
             }
         }
-        qcopy(m->pos, pos);
+        qcopy(moby->pos, pos);
         vars->f10 = D_L00_001B0FE4;
         vars->f14 = 1.0f / func_002EF240(D_L00_001B0FE4);
-        vars->f1C = arg3;
+        vars->f1C = extra;
         *(f32 **)((char *)vars + 0xC) = parent;
         if (parent != 0) {
-            link = func_002AB1F0(parent);
+            link = GetMobyPrivateValue0(parent);
             if (link != 0)
                 link->flags |= 0x80;
         }
-        m->rot[0] = func_002A7940();
-        m->rot[1] = func_002A7940();
-        m->rot[2] = func_002A7940();
-        vars->dir[0] = func_002A7940();
-        vars->dir[1] = func_002A7940();
-        vars->dir[2] = func_002A7940();
+        moby->rot[0] = RandomAngle();
+        moby->rot[1] = RandomAngle();
+        moby->rot[2] = RandomAngle();
+        vars->dir[0] = RandomAngle();
+        vars->dir[1] = RandomAngle();
+        vars->dir[2] = RandomAngle();
         for (i = 0; i < 3; i++) {
             D_L00_001B2D40[i] = -1;
             D_L00_001B2D50[i] = 0x18;
         }
-        m->state = 0;
-        func_002A0F48(m);
+        moby->state = 0;
+        func_002A0F48(moby);
     }
-    return m;
+    return moby;
 }

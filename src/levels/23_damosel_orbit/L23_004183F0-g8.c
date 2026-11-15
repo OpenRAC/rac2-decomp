@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L23_004183F0 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -40,53 +41,54 @@ extern void func_L23_003C1AB0(char *);
 
 extern void func_L23_00418160(char *);
 
-void func_L23_004183F0(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    float v0[4];
-    float v1[4];
-    float m[16];
+/* Updates the gun: follows its joint, ends the shot when the timer runs out, and picks the nearest visible target to fire at. */
+void func_L23_004183F0(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    float backOffset[4];
+    float jointPos[4];
+    float jointMatrix[16];
     float dist;
     char *best;
     float bestDist;
-    char **p;
+    char **objPtr;
     int i;
     int j;
-    int a;
-    int b;
-    int ok;
+    int effectA;
+    int effectB;
+    int visible;
 
     if (*(int *)(state + 0x59C) != 0) {
-        func_0029FCC0(arg0, *(int *)(state + 0x594) + 0x1E, (char *)v1);
-        D_L23_001B3800 = *(TI128 *)v1;
-        func_00282D30(D_L23_001B3810, arg0 + 0xE0, D_L23_001B15B4);
-        func_00282CC0(D_L23_001B3810, D_L23_001B3810, *(char **)(state + 0x59C) + 0x10);
-        func_0029FC20(arg0, *(int *)(state + 0x594) + 0x1E, (char *)m);
-        func_00282D30((char *)v0, (char *)(m + 8), -16.0f);
-        func_00282CC0((char *)v1, (char *)v1, (char *)v0);
-        func_00282948(state + 0x598);
+        TransformMobyJointToWorld(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointPos);
+        D_L23_001B3800 = *(TI128 *)jointPos;
+        FastVecScale(D_L23_001B3810, moby + 0xE0, D_L23_001B15B4);
+        FastVecAdd(D_L23_001B3810, D_L23_001B3810, *(char **)(state + 0x59C) + 0x10);
+        TransformMobyJointPoint(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointMatrix);
+        FastVecScale((char *)backOffset, (char *)(jointMatrix + 8), -16.0f);
+        FastVecAdd((char *)jointPos, (char *)jointPos, (char *)backOffset);
+        FastFloatHelperD(state + 0x598);
         if (*(int *)(state + 0x598) == 0) {
             *(int *)(state + 0x59C) = 0;
             *(int *)(state + 0x594) = (*(int *)(state + 0x594) + 1) % 4;
-            a = D_L23_001B37F0;
-            if (a != 0) {
-                func_0029F338(a);
+            effectA = D_L23_001B37F0;
+            if (effectA != 0) {
+                MarkMobySpawned(effectA);
                 D_L23_001B37F0 = 0;
             }
-            b = D_L23_001B37F4;
-            if (b != 0) {
-                func_0029F338(b);
+            effectB = D_L23_001B37F4;
+            if (effectB != 0) {
+                MarkMobySpawned(effectB);
                 D_L23_001B37F4 = 0;
             }
         }
     }
     D_L23_001B36AC = 0;
-    p = D_L23_00259560;
+    objPtr = D_L23_00259560;
     i = 24;
     do {
         i--;
-        if (!(*(unsigned short *)(*p + 0x34) & 1))
+        if (!(*(unsigned short *)(*objPtr + 0x34) & 1))
             D_L23_001B36AC = D_L23_001B36AC + 1;
-        p++;
+        objPtr++;
     } while (i >= 0);
     best = 0;
     bestDist = 3000.0f;
@@ -94,8 +96,8 @@ void func_L23_004183F0(char *arg0) {
         for (j = 0; j < 25; j++) {
             char *obj = D_L23_00259560[j];
 
-            ok = !(*(unsigned short *)(obj + 0x34) & 1);
-            if (ok && func_L23_003C19E0(obj, &dist) != 0) {
+            visible = !(*(unsigned short *)(obj + 0x34) & 1);
+            if (visible && GetTargetablePointInFront(obj, &dist) != 0) {
                 if (best == 0) {
                     best = obj;
                     bestDist = dist;
@@ -107,7 +109,7 @@ void func_L23_004183F0(char *arg0) {
         }
     }
     if (best != 0)
-        func_L23_003C1AB0(best);
+        SelectObjectAndPlayAnim(best);
     if (*(int *)(state + 0x590) != 0 && *(int *)(state + 0x598) <= 0)
-        func_L23_00418160(arg0);
+        FireGunAtTarget(moby);
 }

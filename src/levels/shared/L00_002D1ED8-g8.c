@@ -79,10 +79,10 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
             seq = 0x31;
     }
 
-    id = func_0029FA88(obj);
+    id = AllocObjectSlot(obj);
     if (id >= 0) {
         func_002A2450(obj, id | 0x300);
-        func_0011AEA0(0);
+        FlushCache(0);
         qcopy(D_L00_001D98C0 + id * 16, obj);
         if (obj->seq != 0xFF)
             obj->prevSeq = obj->seq;
@@ -92,11 +92,11 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
     }
     obj->nextFrame = frame;
     obj->nextSeq = seq;
-    func_0029F390(obj);
+    update_moby_animation_state(obj);
 
     if (obj->seq != 0xFF)
-        obj->current = func_L00_002A4DB0((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
-    obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+        obj->current = CopyAnimationEntryData((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
+    obj->next = CopyAnimationEntryData((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
 
     HA->speed = 1.0f;
     if (speed > 0.0f) {
@@ -105,12 +105,12 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
         HA->curve = -1;
     } else {
         HA->rate = 1.0f;
-        HA->curve = func_00283CF0(-speed) - 1;
+        HA->curve = FloatToInt(-speed) - 1;
         HA->step = 0;
         obj->time = 0.0f;
     }
 
-    func_L00_002D24B8();
+    ClearHeroQueuedAnimation();
 
     obj->sound = obj->model->seqs[seq]->sound;
     HA->changing = 1;
@@ -118,10 +118,10 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
         speed = D_L00_001A7DF8[HA->curve];
 
     if (HA->flag22b4 == 0)
-        func_L00_002D1C40(seq, frame, speed);
+        SyncLinkedObjectAnimations(seq, frame, speed);
     if (HA->flag22b4 == 0 && HA->flag22ba == 0 && seq != HA->mode)
         HA->flag22b8 = 0;
-    func_L00_002D1F60();
+    ClearHeroAnimFlags();
     if (HA->slot != 0)
-        func_L00_002D1FD8(seq, frame, speed);
+        StartLinkedObjectAnimation(seq, frame, speed);
 }

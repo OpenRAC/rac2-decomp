@@ -29,30 +29,31 @@ typedef struct {
     float phase[9], speed[9];
 } BeamParticle;
 
+/* Starts a new beam particle at a point, using the first unused one in the pool. */
 void func_L00_003A8670(TI128 *position, int index)
 {
-    char *base = func_L00_0032A088(1483, index);
+    char *base = GetSlotBody(1483 /* Pulse Rifle */, index);
     BeamParticle *entry;
     int i, j;
-    Context *context = (Context *)D_00189E20;
+    Context *context = (Context *)gHeroState;
     for (i = 0, entry = (BeamParticle *)base; i < 80; ++i, ++entry) {
         if (entry->active == 0) {
             float high;
             entry->active = 1;
             qcopy(&entry->position, position);
-            entry->angle = func_002A7940();
-            entry->spin = func_002A78D8(D_L00_001AF718, D_L00_001AF71C) * 0.017453294f;
-            entry->scale = func_002A7878(D_L00_001AF728, D_L00_001AF724);
-            entry->duration = func_002A7820(D_L00_001AF734, D_L00_001AF738);
-            entry->reciprocal = 1.0f / func_00283CE0(entry->duration);
+            entry->angle = RandomAngle();
+            entry->spin = RandomSignedFloatRange(D_L00_001AF718, D_L00_001AF71C) * 0.017453294f;
+            entry->scale = RandomFloatRange(D_L00_001AF728, D_L00_001AF724);
+            entry->duration = RandomIntRange(D_L00_001AF734, D_L00_001AF738);
+            entry->reciprocal = 1.0f / IntToFloat(entry->duration);
             if (context->level == 29)
                 high = D_L00_001AF744;
             else
                 high = D_L00_001AF740;
-            entry->drift = func_002A7878(D_L00_001AF73C, high) * 0.016666668f;
+            entry->drift = RandomFloatRange(D_L00_001AF73C, high) * 0.016666668f;
             for (j = 0; j < 9; j++) {
                 ((BeamParticle *)base)[i].phase[j] = 0.0f;
-                ((BeamParticle *)base)[i].speed[j] = func_002A7878(D_L00_001AF72C, D_L00_001AF730);
+                ((BeamParticle *)base)[i].speed[j] = RandomFloatRange(D_L00_001AF72C, D_L00_001AF730);
             }
             return;
         }

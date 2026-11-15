@@ -91,6 +91,7 @@ extern void func_L00_002AF568(void),func_L00_002AF7D0(void),func_L00_002E6CF0(vo
 extern void func_L00_003B84F0(void);
 extern int func_002E5CF8(int,int,void *);
 
+/* Handles the targeting and lock-on beam of the player's grabbing tool. It picks targets, tracks them, aims the tool and handles the charge sound and button. */
 void func_L00_003B9310(unsigned char *object,AimState *state)
 {
     AimVector target, origin, direction, temp;
@@ -104,72 +105,72 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
         state->charge.bits=0; state->charge2=0; state->target=0;
         state->delay=0; state->height.bits=0; state->special=0;
         D_L00_001AFCE0=0; state->handle=-1;
-        func_00282A60(&D_L00_0023DB20,0,128);
+        ClearMemory(&D_L00_0023DB20,0,128);
         state->mode=1;
-        func_L00_003B9170();
+        CollectSpecialMobysIntoTable();
     }
-    func_L00_003B9290();
+    SaveAndClearObjectValues();
     range=D_L00_001B28E4; cone=D_L00_001B28E0;
     D_L00_001B28E4=35.0f;
-    if (D_00189E20.f2294==29 && (U(D_00189E20.f2290,0x34)&1)) {
-        qcopy(&state->origin,&D_L00_001B8DC0); qcopy(&origin,&D_L00_001B8DC0);
+    if (gHeroState.f2294==29 && (U(gHeroState.f2290,0x34)&1)) {
+        qcopy(&state->origin,&gCameraPosition_L00); qcopy(&origin,&gCameraPosition_L00);
         D_L00_001B28E0=0.10471976548433304f; angle=0.0872664749622345f;
         if (!state->special) state->target=0;
         state->special=1;
     } else {
-        func_00282D30(&origin,D_00189E20.f2290+0xe0,0.75f);
-        func_00282CC0(&origin,(char *)&D_00189E20+0x80,&origin);
-        if (D_00189E20.f22b4!=4) func_0029FCC0(object,1,&state->origin);
-        else func_0029FCC0(D_00189E20.f2290,5,&state->origin);
+        FastVecScale(&origin,gHeroState.f2290+0xe0,0.75f);
+        FastVecAdd(&origin,(char *)&gHeroState+0x80,&origin);
+        if (gHeroState.f22b4!=4) TransformMobyJointToWorld(object,1,&state->origin);
+        else TransformMobyJointToWorld(gHeroState.f2290,5,&state->origin);
         angle=0.2617994248867035f; D_L00_001B28E0=angle; state->special=0;
     }
-    func_00282978(&state->delay); old=state->target;
+    FastDecTimer(&state->delay); old=state->target;
     if (old) {
         unsigned char *descriptor;
         entry=old;
-        descriptor=func_002AB1F0(entry);
+        descriptor=GetMobyPrivateValue0(entry);
         if (descriptor) {
-            func_00282D30(&direction,entry+0xe0,F(descriptor,0x10));
-            func_00282CC0(&target,entry+0x10,&direction);
+            FastVecScale(&direction,entry+0xe0,F(descriptor,0x10));
+            FastVecAdd(&target,entry+0x10,&direction);
         } else qcopy(&target,entry+0x10);
         if (!old || B(old,0x20)==254 || B(old,0x20)==253 ||
-            (descriptor && F(descriptor,0)<=0.0f) || !B(old,0x31) || D_00189E20.f24ec) {
+            (descriptor && F(descriptor,0)<=0.0f) || !B(old,0x31) || gHeroState.f24ec) {
             state->target=0; state->targetId=-1; state->height.bits=0;
-        } else D_00189E20.fbf8=old;
+        } else gHeroState.fbf8=old;
     }
-    if (state->mode==1 && !D_00189E20.f24ec && !state->delay && !D_L00_001AFCE0 && !D_00189E20.f1e0) {
+    if (state->mode==1 && !gHeroState.f24ec && !state->delay && !D_L00_001AFCE0 && !gHeroState.f1e0) {
         qcopy(&direction,&D_L00_001B8FF0);
-        if (D_00189E20.f2294==29) direction.v[2]=0;
-        func_00282D30(&state->direction,&direction,1.0f);
-        candidate=func_L00_003B8E58(&origin,&direction,angle,cone,range,0.7853982448577881f,0.6108653f,state->target);
+        if (gHeroState.f2294==29) direction.v[2]=0;
+        FastVecScale(&state->direction,&direction,1.0f);
+        candidate=SelectCurrentOrPreferredTarget(&origin,&direction,angle,cone,range,0.7853982448577881f,0.6108653f,state->target);
         if (!candidate) {
-            func_00282F20(&temp,&direction,D_L00_001B28E4);
-            func_00282CC0(&temp,&temp,&origin);
-            if (func_002761F8(&origin,&temp,0,D_00189E20.f2290,0)) {
-                unsigned char *hit=D_L00_001BF200.hit;
-                if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==0xee1) {
+            vec_scale_to_length(&temp,&direction,D_L00_001B28E4);
+            FastVecAdd(&temp,&temp,&origin);
+            if (CollLine(&origin,&temp,0,gHeroState.f2290,0)) {
+                unsigned char *hit=gCollisionResult.hit;
+                if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==0xee1 /* Receiver Bot */) {
                     entry=P(hit,0x68);
-                    if ((B(entry,0x3b1)&0x80) && (F(entry,0x3e4)==0.0f || func_00282E80(&origin,object+0x10)<F(entry,0x3e4)))
-                        candidate=D_L00_001BF200.hit;
+                    if ((B(entry,0x3b1)&0x80) && (F(entry,0x3e4)==0.0f || vec_distance_xy(&origin,object+0x10)<F(entry,0x3e4)))
+                        candidate=gCollisionResult.hit;
                 }
             }
         }
         if (candidate) {
             if (candidate==state->candidate) {
-                if (func_00282948(&state->timer)) {
+                if (FastFloatHelperD(&state->timer)) {
                     unsigned char *newDescriptor;
                     if (state->handle!=-1) {
                         int handle=state->handle;
-                        unsigned char *sound=D_00188660+handle*0x70;
-                        if (P(sound,0x88)==object && B(sound,0x74)) func_002E59F8(handle);
+                        unsigned char *sound=gSoundState+handle*0x70;
+                        if (P(sound,0x88)==object && B(sound,0x74)) StopSoundVoice(handle);
                     }
                     state->target=candidate; state->handle=-1;
                     state->targetId=U(candidate,0xaa); state->height.bits=0; state->delay=D_L00_001AFCE4;
-                    newDescriptor=func_002AB1F0(candidate);
+                    newDescriptor=GetMobyPrivateValue0(candidate);
                     if (newDescriptor) {
                         state->height.value=F(newDescriptor,0x10);
-                        func_00282D30(&temp,state->target+0xe0,F(newDescriptor,0x10));
-                        func_00282CC0(&target,state->target+0x10,&temp);
+                        FastVecScale(&temp,state->target+0xe0,F(newDescriptor,0x10));
+                        FastVecAdd(&target,state->target+0x10,&temp);
                     } else qcopy(&target,state->target+0x10);
                 }
             } else state->timer=D_L00_001AFCE8;
@@ -178,55 +179,55 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
         }
         state->candidate=candidate;
     }
-    if (D_00189E20.f2294==29) func_00273318(object,1.0f,0x600fff0f,0,38,0.0f,-1,90.0f,4);
+    if (gHeroState.f2294==29) AddMobyMarker(object,1.0f,0x600fff0f,0,38,0.0f,-1,90.0f,4);
     if (state->target) {
-        float opacity=func_00282C48(0.9f-func_00282E48(&D_L00_001B8DC0,&target)*0.006666667f*0.65f);
-        func_00273318(object,opacity,0xff0fff0f,&target,38,0.0f,-1,90.0f,4);
-        func_00282CF0(&state->direction,&target,&state->origin);
-        func_00282F20(&state->direction,&state->direction,1.0f);
+        float opacity=FloatAbs(0.9f-fast_vec_dist(&gCameraPosition_L00,&target)*0.006666667f*0.65f);
+        AddMobyMarker(object,opacity,0xff0fff0f,&target,38,0.0f,-1,90.0f,4);
+        FastVecSub(&state->direction,&target,&state->origin);
+        vec_scale_to_length(&state->direction,&state->direction,1.0f);
     }
     {
-        func_00283698(matrix,object+0xc0);
-        func_002830C0(&direction,&state->direction,matrix);
-        if (D_00189E20.f22b4!=4) {
-            D_L00_0023DB20.yaw=func_00283B98(1.5707964f,func_00283248(direction.v[0],direction.v[1]));
-            D_L00_0023DB20.pitch=-func_00283248(func_00282E20(&direction),direction.v[2]);
+        matrix_from_basis_rows(matrix,object+0xc0);
+        transform_vector(&direction,&state->direction,matrix);
+        if (gHeroState.f22b4!=4) {
+            D_L00_0023DB20.yaw=FastAddRotations(1.5707964f,FastMatrixHelperA(direction.v[0],direction.v[1]));
+            D_L00_0023DB20.pitch=-FastMatrixHelperA(vec_length_xy(&direction),direction.v[2]);
         } else {
-            D_L00_0025BE10.yaw=func_00283248(direction.v[0],direction.v[1]);
-            D_L00_0025BE10.pitch=func_00283248(func_00282E20(&direction),direction.v[2]);
+            D_L00_0025BE10.yaw=FastMatrixHelperA(direction.v[0],direction.v[1]);
+            D_L00_0025BE10.pitch=FastMatrixHelperA(vec_length_xy(&direction),direction.v[2]);
         }
     }
-    if (state->mode==1 && D_00189E20.f2294!=28 && D_00189E20.f2294!=49) {
-        if (D_00189E20.f2294==1) func_L00_002C42E0(29,1);
-        if (D_00189E20.f22b4!=4) func_002AEC48(object,&D_L00_0023DB20,D_00189E20.f22b4==4?5:0,ref_L00_003B9310_02,ref_L00_003B9310_03);
-        if (D_00189E20.f340 && !D_00189E20.f34e && !D_L00_001AFCE0 && !D_00189E20.f22bc && (D_00138180.held&D_00189E20.f1230) && (D_00189E20.f1240>=16 || D_00189E20.f22b4==4)) {
+    if (state->mode==1 && gHeroState.f2294!=28 && gHeroState.f2294!=49) {
+        if (gHeroState.f2294==1) SetHeroAction_L00(29,1);
+        if (gHeroState.f22b4!=4) UpdateEasedNode(object,&D_L00_0023DB20,gHeroState.f22b4==4?5:0,ref_L00_003B9310_02,ref_L00_003B9310_03);
+        if (gHeroState.f340 && !gHeroState.f34e && !D_L00_001AFCE0 && !gHeroState.f22bc && (gPadState.held&gHeroState.f1230) && (gHeroState.f1240>=16 || gHeroState.f22b4==4)) {
             if (!state->held) {
-                if (D_00189E20.f22b4!=4) {
+                if (gHeroState.f22b4!=4) {
                     unsigned char *sound;
-                    func_L00_002AF568(); sound=D_00188660+state->handle*0x70;
-                    if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=func_002E5CF8(0,4,object);
+                    start_equipped_item_animation(); sound=gSoundState+state->handle*0x70;
+                    if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=PlayMobySound(0,4,object);
                 }
                 state->held=1;
             }
-            if (D_00189E20.f340 && !D_00189E20.f34e && (D_00138180.pressed&D_00189E20.f1230)) {
+            if (gHeroState.f340 && !gHeroState.f34e && (gPadState.pressed&gHeroState.f1230)) {
                 unsigned char *sound;
                 state->charge.bits=0; state->charge2=0;
-                sound=D_00188660+state->handle*0x70;
-                if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=func_002E5CF8(0,4,object);
+                sound=gSoundState+state->handle*0x70;
+                if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=PlayMobySound(0,4,object);
             }
         }
-        if (state->charge.value>0.0f || (D_00138180.held&D_00189E20.f1230) || !D_00189E20.f340 || D_00189E20.f34e)
-            func_L00_002E6CF0(func_L00_003B84F0,object);
-        if (!(D_00138180.held&D_00189E20.f1230) && (D_00189E20.f1d8>=10 || !D_00189E20.f22b8 || !D_00189E20.f340 || D_00189E20.f34e)) {
+        if (state->charge.value>0.0f || (gPadState.held&gHeroState.f1230) || !gHeroState.f340 || gHeroState.f34e)
+            AddDrawCallbackToList1(DrawTargetTetherBeam,object);
+        if (!(gPadState.held&gHeroState.f1230) && (gHeroState.f1d8>=10 || !gHeroState.f22b8 || !gHeroState.f340 || gHeroState.f34e)) {
             if (state->handle!=-1) {
                 int handle=state->handle;
-                unsigned char *sound=D_00188660+handle*0x70;
-                if (P(sound,0x88)==object && B(sound,0x74)) func_002E59F8(handle);
+                unsigned char *sound=gSoundState+handle*0x70;
+                if (P(sound,0x88)==object && B(sound,0x74)) StopSoundVoice(handle);
             }
             state->handle=-1;
-            if (D_00189E20.f22b4!=4) func_L00_002AF7D0();
+            if (gHeroState.f22b4!=4) cancel_hero_item_animation();
             state->held=0;
         }
     }
-    func_L00_003B92D0();
+    RestoreSavedObjectValues();
 }

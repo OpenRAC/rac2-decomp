@@ -17,6 +17,7 @@ extern void func_002B7170();
 extern void func_002E5FE0();
 extern void func_L00_0035F8D0();
 #include "include_asm.h"
+#include "names.h"
 extern int D_L00_001C9340[];
 extern int D_L00_001B2600[];
 extern int D_L00_001B2614 __attribute__((section(".sdata")));
@@ -39,23 +40,23 @@ void func_L00_00303530(int index, int argument)
     int i;
     if (root[0] == index)
         return;
-    func_L00_0035F8D0(0, 0, 0, 0, 0);
-    func_002E5FE0();
-    func_002B7170();
-    func_002FC3C0(1);
+    ConfigureScreenEffect(0, 0, 0, 0, 0);
+    ClearAllSoundVoices();
+    WaitForMusicIdle();
+    WaitForDmaStatusBits(1);
     root[0] = index;
     block = (int *)D_L00_001B2600[0];
     D_L00_001B2608 = D_L00_001B2600[D_L00_001B2614];
-    func_L00_002FD400();
-    func_002B7C80((char *)block, D_0014B540.entries[index].sector + D_0014B540.base, D_0014B540.entries[index].size);
+    FlushTableEntryOffsets();
+    ReadDiscWithPause((char *)block, gCopySetupData.entries[index].sector + gCopySetupData.base, gCopySetupData.entries[index].size);
     first = (int *)((char *)block + block[0]);
     second = (int *)((char *)block + block[1]);
-    func_0011AEA0(0);
-    func_0029D4D0(first, root[2]);
-    func_0029D4D0(second, root[1]);
-    func_0011AEA0(0);
-    func_L00_00300090(root[2], root[4]);
-    func_L00_00300378(root[1]);
+    FlushCache(0);
+    fast_decompress(first, root[2]);
+    fast_decompress(second, root[1]);
+    FlushCache(0);
+    initialize_tfrag_render_data(root[2], root[4]);
+    RelocateLevelHeaderBlocks(root[1]);
     {
         int count = D_L00_001B24D4;
         if (count > 0) {
@@ -78,11 +79,11 @@ void func_L00_00303530(int index, int argument)
         *p = 0xffff;
         func_002F0468((void *)0x70003000);
     }
-    func_002F0FA0();
-    func_L00_003032F0();
-    func_L00_0032D208(index);
-    func_L00_00303418(index);
-    func_002B6E78(argument, 1, 1024);
-    if (func_002B49C8(2))
-        func_002B72E8(0);
+    ResetRecordList();
+    ResetTutorialRecordValues();
+    ReloadSoundBank(index);
+    UpdateObjectVisibilityForSelection(index);
+    StartMusicStreamNoLoop(argument, 1, 1024);
+    if (IsCurrentRequestSlot(2))
+        music_Pause(0);
 }

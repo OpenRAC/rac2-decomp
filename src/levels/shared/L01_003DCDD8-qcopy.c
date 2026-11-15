@@ -18,11 +18,11 @@ s32 func_L01_003DCDD8(u8 *object, void *arg)
     s32 r;
 
     if (state[0x3E4])
-        func_L01_003DC8B8(object, matrix, extra);
+        MarkNearbyObjectsOfKind(object, matrix, extra);
     qcopy(position, object + 0x10);
-    r = func_L01_00321178(object, arg);
-    func_L01_003DC9E0(object, position);
+    r = TurnMobyTowardTarget(object, arg);
+    FollowAttachedObject(object, position);
     if (state[0x3E4])
-        func_L01_003DC9A8(matrix, extra);
+        ClearMarkedObjects(matrix, extra);
     return r;
 }

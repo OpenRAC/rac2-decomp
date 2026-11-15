@@ -25,22 +25,22 @@ void func_L03_0041F178(u8 *self) {
     u8 *st = *(u8 **)(self + 0x68);
     int enabled;
 
-    if (D_L03_001B2548 & 1) {
+    if (gFrameCounter_L03 & 1) {
         *(s16 *)(st + 0x334) = (*(s16 *)(st + 0x334) + 1) % 4;
         if (*(s16 *)(st + 0x336) < 3)
             ++*(s16 *)(st + 0x336);
         D_L03_001B1C20.f[0] = *(float *)(st + 0x33C);
-        func_00283098(&from, &D_L03_001B1C10, self + 0xC0);
-        func_00282CC0(&from, &from, self + 0x10);
+        matrix_mul_vec3(&from, &D_L03_001B1C10, self + 0xC0);
+        FastVecAdd(&from, &from, self + 0x10);
         enabled = 0;
-        func_00283098(&to, &D_L03_001B1C20, self + 0xC0);
-        func_00282CC0(&to, &to, self + 0x10);
-        func_002A8C00(hit, self, self[0x95] == 2 ? 0x10001 : 1,
+        matrix_mul_vec3(&to, &D_L03_001B1C20, self + 0xC0);
+        FastVecAdd(&to, &to, self + 0x10);
+        make_hit_descriptor(hit, self, self[0x95] == 2 ? 0x10001 : 1,
                      D_L03_001A8F20, (float)st[0x34]);
-        if (func_002761F8(&from, &to, 0, self, hit)) {
+        if (CollLine(&from, &to, 0, self, hit)) {
             u8 *direction = D_L03_001BFE00;
             u8 *ctx = direction - 0x40;
-            if (func_00283248(func_00282E20(direction), *(float *)(ctx + 0x48)) > 1.396263599395752f)
+            if (FastMatrixHelperA(vec_length_xy(direction), *(float *)(ctx + 0x48)) > 1.396263599395752f)
                 enabled = 1;
             qcopy(&to, direction - 0x20);
             if (*(u8 **)(ctx + 0x18)) {
@@ -51,14 +51,14 @@ void func_L03_0041F178(u8 *self) {
                 if (type >= 0x209)
                     goto no_damage;
                 {
-                    func_002A8C00(hit, self, 0x10000, D_L03_001A8F20, (float)st[0x34]);
-                    func_002A8E20(*(u8 **)(ctx + 0x18), hit);
+                    make_hit_descriptor(hit, self, 0x10000, D_L03_001A8F20, (float)st[0x34]);
+                    QueueMobyImpact(*(u8 **)(ctx + 0x18), hit);
                 }
             }
         }
 no_damage:
         if (*(s16 *)(st + 0x336) >= 3)
-            func_L03_0041F410(self, &to,
+            EmitLaserBeamParticles(self, &to,
                              (Vector *)((((*(s16 *)(st + 0x334) + 3) % 4) * 32) +
                                         (u32)st + 0x2B0), enabled);
         if (*(int *)(st + 0x298))

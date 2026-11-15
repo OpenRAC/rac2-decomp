@@ -23,21 +23,21 @@ void func_L22_003FD958(float *position, float *direction, int count) {
     float life, yaw, tilt, speed;
     int sign, remaining;
     for (remaining = 0; remaining < count; remaining++) {
-        life = func_002A7878(ref_L22_003FD958_00, ref_L22_003FD958_01);
-        sign = func_002A77E0(2);
+        life = RandomFloatRange(ref_L22_003FD958_00, ref_L22_003FD958_01);
+        sign = RandomIntBelow(2);
         if (sign == 0) sign--;
-        yaw = func_002A7940();
-        tilt = func_002A7878(0.6981318f, 1.5358899f);
-        speed = func_002A7878(ref_L22_003FD958_02 * 0.016666668f, ref_L22_003FD958_03 * 0.016666668f);
-        func_002AF000(velocity, speed, yaw, tilt);
+        yaw = RandomAngle();
+        tilt = RandomFloatRange(0.6981318f, 1.5358899f);
+        speed = RandomFloatRange(ref_L22_003FD958_02 * 0.016666668f, ref_L22_003FD958_03 * 0.016666668f);
+        BuildSphericalOffset(velocity, speed, yaw, tilt);
         *(BurstVector *)scaled = *(BurstVector *)direction;
-        func_00282D30(scaled, direction, func_002A7878(0.75f, 0.95f));
-        func_00282CD8(difference, velocity, scaled);
+        FastVecScale(scaled, direction, RandomFloatRange(0.75f, 0.95f));
+        add_vectors(difference, velocity, scaled);
         qcopy(point, position);
-        point[0] += func_002A78D8(0.0f, 0.0375f);
-        point[1] += func_002A78D8(0.0f, 0.0375f);
-        point[2] += func_002A78D8(0.0f, 0.0375f);
-        func_002C2210(point, ref_L22_003FD958_07, ref_L22_003FD958_04, 0, sign, velocity, 0, life * 0.1f, life, ref_L22_003FD958_06);
-        func_002C2210(point, ref_L22_003FD958_07, ref_L22_003FD958_05, 1, -sign, velocity, 0, life * 0.05f, life * 0.5f, ref_L22_003FD958_06);
+        point[0] += RandomSignedFloatRange(0.0f, 0.0375f);
+        point[1] += RandomSignedFloatRange(0.0f, 0.0375f);
+        point[2] += RandomSignedFloatRange(0.0f, 0.0375f);
+        SpawnGroundEffectParticle(point, ref_L22_003FD958_07, ref_L22_003FD958_04, 0, sign, velocity, 0, life * 0.1f, life, ref_L22_003FD958_06);
+        SpawnGroundEffectParticle(point, ref_L22_003FD958_07, ref_L22_003FD958_05, 1, -sign, velocity, 0, life * 0.05f, life * 0.5f, ref_L22_003FD958_06);
     }
 }

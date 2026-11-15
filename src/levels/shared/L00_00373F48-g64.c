@@ -27,8 +27,9 @@ extern void func_L00_002F5890(int);
 extern void func_002F73A8(void);
 extern void func_002FB1A0(void);
 
+/* Handles buying an upgrade in the shop: waits for the player to confirm, charges the bolts and marks the upgrade as owned. */
 void func_L00_00373F48(int *answer) {
-    PurchaseModel *model = &D_L00_0022F7C0;
+    PurchaseModel *model = &gPurchaseMenuModel;
     int cost = model->cost.rows[model->head.index].value;
     int state = model->head.state;
     int category;
@@ -37,50 +38,50 @@ void func_L00_00373F48(int *answer) {
     if (state == 1) {
         if (*(int *)((char *)model + 0x740) != 0) {
             ref_L00_00373F48_00();
-            D_L00_0022F7C0.head.state = 2;
-        } else D_L00_0022F7C0.head.state = 0;
+            gPurchaseMenuModel.head.state = 2;
+        } else gPurchaseMenuModel.head.state = 0;
     } else if (state == 2) {
-        if (*(unsigned int *)(D_00138180 + 0x1C4) & 0x10) {
+        if (*(unsigned int *)(gPadState + 0x1C4) & 0x10) {
             *answer = 0;
-            D_L00_0022F7C0.head.state = 4;
-        } else if (*(unsigned int *)(D_00138180 + 0x1C4) & 0x40)
-            D_L00_0022F7C0.head.state = 3;
+            gPurchaseMenuModel.head.state = 4;
+        } else if (*(unsigned int *)(gPadState + 0x1C4) & 0x40)
+            gPurchaseMenuModel.head.state = 3;
     } else if (state == 3) {
         *answer = 0;
-        if (func_002B0D70() < cost) {
-            func_002E5CF8(2, 17, *(char **)((char *)model + 0x28));
-            D_L00_0022F7C0.head.state = 4;
+        if (CountItemsAboveBaseline() < cost) {
+            PlayMobySound(2, 17, *(char **)((char *)model + 0x28));
+            gPurchaseMenuModel.head.state = 4;
         } else {
-            int g = D_L00_0022F7C0.group.rows[model->head.index].value;
-            int c = D_L00_0022F7C0.category.rows[model->head.index].value;
+            int g = gPurchaseMenuModel.group.rows[model->head.index].value;
+            int c = gPurchaseMenuModel.category.rows[model->head.index].value;
             if ((unsigned long)D_001A7A80[g] & ((1U << (c * 2)) & 255UL)) *answer = 0;
             else *answer = 1;
-            D_L00_0022F7C0.head.state = 4;
+            gPurchaseMenuModel.head.state = 4;
         }
     } else if (state == 4) {
         if (*answer != 0) {
-        if (func_002B0D70() >= cost) {
-            func_002F88D8((void *)func_00288FB8(0x2DCB));
-            func_002E5CF8(7, 17, *(char **)((char *)model + 0x28));
-            func_L00_00326950(cost);
-            func_L00_002F5890(D_L00_001AD4F0[model->head.index]);
-            category = D_L00_0022F7C0.category.rows[D_L00_0022F7C0.head.index].value;
-            group = D_L00_0022F7C0.group.rows[D_L00_0022F7C0.head.index].value;
+        if (CountItemsAboveBaseline() >= cost) {
+            SetShopMessageText((void *)GetLocalizedString(0x2DCB));
+            PlayMobySound(7, 17, *(char **)((char *)model + 0x28));
+            TrySpendCounter(cost);
+            SpawnOnSecondMode(D_L00_001AD4F0[model->head.index]);
+            category = gPurchaseMenuModel.category.rows[gPurchaseMenuModel.head.index].value;
+            group = gPurchaseMenuModel.group.rows[gPurchaseMenuModel.head.index].value;
             switch (category) {
-            case 0: enabled = ((Metadata *)(D_L00_00262570 + D_00139568[group] * 0xE0))->flag[0]; break;
-            case 1: enabled = ((Metadata *)(D_L00_00262570 + D_00139568[group] * 0xE0))->flag[1]; break;
-            case 2: enabled = ((Metadata *)(D_L00_00262570 + D_00139568[group] * 0xE0))->flag[2]; break;
+            case 0: enabled = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group] * 0xE0))->flag[0]; break;
+            case 1: enabled = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group] * 0xE0))->flag[1]; break;
+            case 2: enabled = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group] * 0xE0))->flag[2]; break;
             default: enabled = 0; break;
             }
             if (enabled) { int t = (1 << (category * 2)) | D_001A7A80[group]; D_001A7A80[group] = t; }
             {
-            int category2 = D_L00_0022F7C0.category.rows[D_L00_0022F7C0.head.index].value;
-            int group2 = D_L00_0022F7C0.group.rows[D_L00_0022F7C0.head.index].value;
+            int category2 = gPurchaseMenuModel.category.rows[gPurchaseMenuModel.head.index].value;
+            int group2 = gPurchaseMenuModel.group.rows[gPurchaseMenuModel.head.index].value;
             int enabled2;
             switch (category2) {
-            case 0: enabled2 = ((Metadata *)(D_L00_00262570 + D_00139568[group2] * 0xE0))->flag[0]; break;
-            case 1: enabled2 = ((Metadata *)(D_L00_00262570 + D_00139568[group2] * 0xE0))->flag[1]; break;
-            case 2: enabled2 = ((Metadata *)(D_L00_00262570 + D_00139568[group2] * 0xE0))->flag[2]; break;
+            case 0: enabled2 = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group2] * 0xE0))->flag[0]; break;
+            case 1: enabled2 = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group2] * 0xE0))->flag[1]; break;
+            case 2: enabled2 = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group2] * 0xE0))->flag[2]; break;
             default: enabled2 = 0; break;
             }
             if (enabled2) {
@@ -91,13 +92,13 @@ void func_L00_00373F48(int *answer) {
                 }
             }
             }
-            func_002F73A8();
+            BuildShopChannelList();
         } else {
-            func_002F88D8((void *)func_00288FB8(0x2DCC));
-            func_002E5CF8(0, 17, *(char **)((char *)model + 0x28));
+            SetShopMessageText((void *)GetLocalizedString(0x2DCC));
+            PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
         }
-        } else func_002E5CF8(0, 17, *(char **)((char *)model + 0x28));
-        D_L00_0022F7C0.head.state = 0;
-        func_002FB1A0();
+        } else PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
+        gPurchaseMenuModel.head.state = 0;
+        PrepareVendorSelectionPreview();
     }
 }

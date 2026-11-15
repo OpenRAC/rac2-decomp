@@ -28,14 +28,14 @@ extern s32 D_001A8D18;
 extern s32 D_001A8D28 __attribute__((sda));
 extern s32 D_001B1840;
 
-s32 func_00288FB8(s32 arg0) {
-    s32 t;
+s32 func_00288FB8(s32 stringId) {
+    s32 index;
 
-    t = func_00288F48(arg0);
-    if (t >= 0) {
-        return *(s32 *)(D_001B1840 + t * 0x10);
+    index = Help_FindIndex(stringId);
+    if (index >= 0) {
+        return *(s32 *)(gSubtitleEntries + index * 0x10);
     }
-    if (arg0 == 0x9C40) {
+    if (stringId == 0x9C40) {
         return D_001A8D18;
     }
     return (s32)&D_001A8D28;

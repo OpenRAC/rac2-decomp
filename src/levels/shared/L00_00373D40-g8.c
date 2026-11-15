@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Purchase confirmation state and input fields measured from retail accesses. */
 typedef struct {
@@ -24,42 +25,43 @@ extern void func_002F88D8(void *);
 extern void func_002F9198(void);
 extern void func_002FB1A0(void);
 
+/* Asks the player to confirm buying the selected item, then takes the bolts and gives the item. */
 void func_L00_00373D40(int *answer, int *unused) {
-    PurchaseModel *model = &D_L00_0022F7C0;
+    PurchaseModel *model = &gPurchaseMenuModel;
     int index = model->index;
     int price = model->cells[index].price;
-    int state = D_L00_0022F7C0.state;
+    int state = gPurchaseMenuModel.state;
     if (state == 1) {
         *answer = 0;
-        if (D_001A79F8 < price) func_002E5CF8(2, 17, D_L00_0022F7C0.object);
-        D_L00_0022F7C0.state = 2;
+        if (gPlayerBolts < price) PlayMobySound(2, 17, gPurchaseMenuModel.object);
+        gPurchaseMenuModel.state = 2;
     } else if (state == 2) {
-        if ((D_00138180.pressed & 0x10) && !(D_L00_001B25A4 & 0x10)) {
+        if ((gPadState.pressed & 0x10) && !(D_L00_001B25A4 & 0x10)) {
             *answer = 0;
-            D_L00_0022F7C0.state = 3;
-        } else if ((D_00138180.pressed & 0x40) && !(D_L00_001B25A4 & 0x40)) {
+            gPurchaseMenuModel.state = 3;
+        } else if ((gPadState.pressed & 0x40) && !(D_L00_001B25A4 & 0x40)) {
             *answer = 1;
-            D_L00_0022F7C0.state = 3;
+            gPurchaseMenuModel.state = 3;
         }
     } else if (state == 3) {
         if (*answer) {
-            if (D_001A79F8 >= price && D_L00_001AD500 != 4) {
+            if (gPlayerBolts >= price && D_L00_001AD500 != 4) {
                 D_L00_001AD4F8 = 1;
                 D_L00_001AD4FC = model->cells[index].value;
-                func_002E5CF8(7, 17, D_L00_0022F7C0.object);
-                D_001A79F8 -= price;
-                func_002F88D8((void *)func_00288FB8(0x2DCB));
-                func_002E5CF8(7, 17, D_L00_0022F7C0.object);
-                func_002F9198();
+                PlayMobySound(7, 17, gPurchaseMenuModel.object);
+                gPlayerBolts -= price;
+                SetShopMessageText((void *)GetLocalizedString(0x2DCB));
+                PlayMobySound(7, 17, gPurchaseMenuModel.object);
+                CloseShopSubMenu();
             } else if (D_L00_001AD500 == 4) {
-                func_002F88D8((void *)func_00288FB8(0x2DCC));
-                func_002E5CF8(0, 17, D_L00_0022F7C0.object);
+                SetShopMessageText((void *)GetLocalizedString(0x2DCC));
+                PlayMobySound(0, 17, gPurchaseMenuModel.object);
             } else {
-                func_002F88D8((void *)func_00288FB8(0x2DCC));
-                func_002E5CF8(0, 17, D_L00_0022F7C0.object);
+                SetShopMessageText((void *)GetLocalizedString(0x2DCC));
+                PlayMobySound(0, 17, gPurchaseMenuModel.object);
             }
-        } else func_002E5CF8(0, 17, D_L00_0022F7C0.object);
-        D_L00_0022F7C0.state = 0;
-        func_002FB1A0();
+        } else PlayMobySound(0, 17, gPurchaseMenuModel.object);
+        gPurchaseMenuModel.state = 0;
+        PrepareVendorSelectionPreview();
     }
 }

@@ -66,11 +66,11 @@ void func_L09_00404C50(char *obj)
     int count;
 
     qcopy((char *)rec + 0x300, obj + 0x10);
-    size = func_002A7878(1.0f, 1.333f);
+    size = RandomFloatRange(1.0f, 1.333f);
     rec->f_344 = size;
     *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * size;
-    rec->f_48 = func_00283CF0(15.0f);
-    rec->f_4A = func_00283CF0(4.0f);
+    rec->f_48 = FloatToInt(15.0f);
+    rec->f_4A = FloatToInt(4.0f);
     count = 3;
     rec->f_98 = count;
     rec->f_8C = 0.4f;
@@ -86,7 +86,7 @@ void func_L09_00404C50(char *obj)
     rec->f_100 = rec->f_344 * 0.3f;
     rec->f_10C = rec->f_108 = 0.1f;
     rec->f_138 |= 0x80;
-    spin = func_002A78D8(18.0f, 22.0f);
+    spin = RandomSignedFloatRange(18.0f, 22.0f);
     rec->f_1E8 = 7;
     rec->f_1E9 = 6;
     rec->f_1DC = spin * 0.017453294f;
@@ -95,10 +95,10 @@ void func_L09_00404C50(char *obj)
     rec->f_13C = rec->f_234;
     rec->f_1D4 = 1.75f;
     rec->f_1D0 = D_L09_001B13F4 * 0.016666668f;
-    rec->f_348 = func_002A7940();
-    func_002A7750(obj, 1, 0);
+    rec->f_348 = RandomAngle();
+    SetMobyState(obj, 1, 0);
     if (*(u8 *)(obj + 0x43) != 0)
-        func_002A7470(obj, 0, 0, 0);
+        StartAnimationBlended(obj, 0, 0, 0);
     *(s32 *)(obj + 0x9C) = 0xC;
     *(unsigned short *)(obj + 0x34) |= 0x1000;
 }

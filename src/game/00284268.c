@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00284268: sets up the anti-aliased frame-buffer state D_001A6480 and writes its seven
  * strip and sprite packet loops (adapted from RAC1 framebuf.c, SetupFS_AA_buffer). A unit of its
  * own for -fno-rerun-loop-opt and -frac2-no-extra-increment-givs (config/cflags.txt): every loop
@@ -95,30 +96,31 @@ static inline void store(unsigned long *d, unsigned long v) {
     *d = v;
 }
 
+/* Sets up the anti-aliased screen mode. It fills in the screen description and builds the packets that blit the picture to the screen in 16 vertical strips. */
 void func_00284268(int display_width, int display_height, int storage_width, int storage_height,
                    int display_offset_x, int display_offset_y) {
     unsigned long *q;
     unsigned long *out;
 
-    D_001A742C = &D_001A6480;
-    D_001A6480.display_width = display_width;
-    D_001A6480.display_height = display_height;
-    D_001A6480.reserved170 = 0;
-    D_001A6480.storage_width = storage_width;
-    D_001A6480.storage_height = storage_height;
-    D_001A6480.display_offset_x = display_offset_x;
-    D_001A6480.display_offset_y = display_offset_y;
-    D_001A6480.storage_psm = 1;
-    D_001A6480.psm = 0;
-    D_001A6480.target_psm = 0;
-    D_001A6480.zpsm = 0x31;
-    D_001A6480.fbp1 = D_001A72D8 >> 13;
-    D_001A6480.fbp0 = D_001A72DC >> 13;
-    D_001A6480.zbp = D_001A72E0 >> 13;
-    func_00125A20(&D_001A6480, 1, storage_width, storage_height, display_offset_x,
+    D_001A742C = &gScreenAdjustOffsets;
+    gScreenAdjustOffsets.display_width = display_width;
+    gScreenAdjustOffsets.display_height = display_height;
+    gScreenAdjustOffsets.reserved170 = 0;
+    gScreenAdjustOffsets.storage_width = storage_width;
+    gScreenAdjustOffsets.storage_height = storage_height;
+    gScreenAdjustOffsets.display_offset_x = display_offset_x;
+    gScreenAdjustOffsets.display_offset_y = display_offset_y;
+    gScreenAdjustOffsets.storage_psm = 1;
+    gScreenAdjustOffsets.psm = 0;
+    gScreenAdjustOffsets.target_psm = 0;
+    gScreenAdjustOffsets.zpsm = 0x31;
+    gScreenAdjustOffsets.fbp1 = D_001A72D8 >> 13;
+    gScreenAdjustOffsets.fbp0 = D_001A72DC >> 13;
+    gScreenAdjustOffsets.zbp = D_001A72E0 >> 13;
+    SetupGsDispEnv(&gScreenAdjustOffsets, 1, storage_width, storage_height, display_offset_x,
                   display_offset_y);
-    D_001A742C->dispfb.FBP = D_001A6480.fbp1;
-    if (D_001A7BB8) D_001A742C->display = 0x1BF4FF00834140UL;
+    D_001A742C->dispfb.FBP = gScreenAdjustOffsets.fbp1;
+    if (gWidescreenFlag) D_001A742C->display = 0x1BF4FF00834140UL;
     {
         int dx, dy, magh, magv, dw, dh;
         D_001A7438[0] = dx = D_001A742C->display & 0xFFF;
@@ -135,19 +137,19 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         D_001A744C[0] = dh;
         D_001A7464[0] = dh;
     }
-    func_00125F20(&D_001A742C->frame0, D_001A6480.psm, D_001A6480.display_width,
-                  D_001A6480.display_height, 3, D_001A6480.zpsm);
-    D_001A742C->frame0.FBP = D_001A6480.fbp0;
+    sceGsSetDefDrawEnv(&D_001A742C->frame0, gScreenAdjustOffsets.psm, gScreenAdjustOffsets.display_width,
+                  gScreenAdjustOffsets.display_height, 3, gScreenAdjustOffsets.zpsm);
+    D_001A742C->frame0.FBP = gScreenAdjustOffsets.fbp0;
     *(long *)&D_001A742C->draw0[1] =
-        (long)D_001A6480.zbp | ((unsigned long)(D_001A6480.zpsm & 0xF) << 24);
+        (long)gScreenAdjustOffsets.zbp | ((unsigned long)(gScreenAdjustOffsets.zpsm & 0xF) << 24);
     *(u128_FAB40 *)&D_001A742C->giftag0 = 0;
     D_001A742C->giftag0.NLOOP = 8;
     D_001A742C->giftag0.EOP = 1;
     D_001A742C->giftag0.NREG = 1;
     D_001A742C->giftag0.REGS0 = 0xE;
-    func_00125F20(&D_001A742C->frame1, D_001A6480.storage_psm, D_001A6480.storage_width,
-                  D_001A6480.storage_height, 0, 0);
-    D_001A742C->frame1.FBP = D_001A6480.fbp1;
+    sceGsSetDefDrawEnv(&D_001A742C->frame1, gScreenAdjustOffsets.storage_psm, gScreenAdjustOffsets.storage_width,
+                  gScreenAdjustOffsets.storage_height, 0, 0);
+    D_001A742C->frame1.FBP = gScreenAdjustOffsets.fbp1;
     *(long *)&D_001A742C->draw1[1] = 1UL << 32;
     *(u128_FAB40 *)&D_001A742C->giftag1 = 0;
     D_001A742C->giftag1.NLOOP = 8;
@@ -171,7 +173,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
     *out++ = 6;
     *out++ = 0x4400000000008010UL;
     *out = 0x5353;
-    if (D_001A7BB8) {
+    if (gWidescreenFlag) {
         int n;
         int i;
         for (i = 0, n = 12; i < 16; i++) {
@@ -216,7 +218,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
     *out++ = (0x7FF8 - D_001A742C->storage_width * 8) |
              ((long)(D_001A742C->storage_height * 8 + 0x7FF8) << 16);
 
-    func_00284088(0, 0);
+    BuildAspectBlitStrips(0, 0);
 
     q = (unsigned long *)D_001A6600;
     out = q;
@@ -267,7 +269,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         }
     }
 
-    func_00282AB0(D_001A6E90, D_001A6D40, 0x150);
+    CopyMemoryAligned(D_001A6E90, D_001A6D40, 0x150);
 
     q = (unsigned long *)D_00138850;
     {
@@ -285,7 +287,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         unsigned long *p = q + 8;
         int i;
         for (i = 0; i < 16; i++) {
-            if (D_001A7BB8) {
+            if (gWidescreenFlag) {
                 *p++ = (i * 0x280 + 0x6BF8) |
                        ((long)(0x7FF8 - D_001A742C->storage_height * 8) << 16);
                 *p++ = ((i + 1) * 0x280 + 0x6BF8) |
@@ -335,5 +337,5 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         r[2] = ((long)fbp >> 13) | 0xFFFFFF00080000UL;
         r[10] = ((fbp >> 8) | 0x24020000) | 0x640000000UL;
     }
-    func_0011AEA0(0);
+    FlushCache(0);
 }

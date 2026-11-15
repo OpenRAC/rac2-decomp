@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 extern unsigned char D_00189E20[];
@@ -18,38 +19,38 @@ void func_L00_002AABE0(int dust, int debris, int model) {
     float angle, radius, size;
     int kind, life;
     if (model) {
-        unsigned char *origin = D_00189E20 + 0x80;
+        unsigned char *origin = gHeroState + 0x80;
         velocity.q = *(Quadword *)origin;
         velocity.f[2] = *(float *)(origin + 0x2B0);
-        func_00312D58(&velocity, 2.25f);
+        SpawnScaledEffectMoby(&velocity, 2.25f);
     }
     if (dust > 0) {
-        unsigned char *player = D_00189E20;
+        unsigned char *player = gHeroState;
         do {
             --dust;
-            velocity.f[0] = *(float *)(player + 0x80) + func_002A7878(-0.3f, 0.3f);
-            velocity.f[1] = *(float *)(player + 0x84) + func_002A7878(-0.3f, 0.3f);
+            velocity.f[0] = *(float *)(player + 0x80) + RandomFloatRange(-0.3f, 0.3f);
+            velocity.f[1] = *(float *)(player + 0x84) + RandomFloatRange(-0.3f, 0.3f);
             velocity.f[2] = *(float *)(player + 0x330);
-            size = func_002A7878(0.3f, 0.6f);
-            func_002C19D8(&velocity, (float *)(player + 0x330), -1, size, 5250.0f);
+            size = RandomFloatRange(0.3f, 0.6f);
+            SpawnDriftingParticle_002C19D8(&velocity, (float *)(player + 0x330), -1, size, 5250.0f);
         } while (dust);
     }
     if (debris > 0) {
         int remaining = debris;
-        unsigned char *player = D_00189E20;
+        unsigned char *player = gHeroState;
         do {
             --remaining;
-            angle = func_002A7940();
-            radius = func_002A7878(0.0f, 0.05000000447034836f);
-            velocity.f[0] = func_00283180(angle) * radius;
-            velocity.f[1] = func_00283198(angle) * radius;
-            velocity.f[2] = func_002A7878(0.05000000447034836f, 0.13333334028720856f);
+            angle = RandomAngle();
+            radius = RandomFloatRange(0.0f, 0.05000000447034836f);
+            velocity.f[0] = FastSinOrCosA(angle) * radius;
+            velocity.f[1] = FastSinOrCosB(angle) * radius;
+            velocity.f[2] = RandomFloatRange(0.05000000447034836f, 0.13333334028720856f);
             position.f[0] = *(float *)(player + 0x80) + velocity.f[0] * 8.0f;
             position.f[1] = *(float *)(player + 0x84) + velocity.f[0] * 8.0f;
-            position.f[2] = *(float *)(player + 0x330) - func_002A7878(0.0f, 0.2f);
-            kind = func_002A77E0(2);
-            life = func_002A7820(90, 120);
-            func_002BFB38(&position, &velocity, kind, life);
+            position.f[2] = *(float *)(player + 0x330) - RandomFloatRange(0.0f, 0.2f);
+            kind = RandomIntBelow(2);
+            life = RandomIntRange(90, 120);
+            SpawnSparkParticle_002BFB38(&position, &velocity, kind, life);
         } while (remaining);
     }
 }

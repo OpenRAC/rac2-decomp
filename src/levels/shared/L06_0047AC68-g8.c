@@ -19,14 +19,15 @@ extern L06State D_00189E20 __attribute__((nosda));
 
 extern int D_001A79F0;
 
-s32 func_L06_0047AC68(s32 a0)
+/* Checks whether a camera volume moby may trigger, from its type and the game state, then runs the shared handler. */
+s32 func_L06_0047AC68(s32 moby)
 {
     s32 *row;
     s32 *entry;
     char *state;
     u16 tag;
 
-    row = (s32 *)((*(s16 *)(a0 + 0x84) << 5) + (s32)ref_L06_0047AC68_00[0]);
+    row = (s32 *)((*(s16 *)(moby + 0x84) << 5) + (s32)ref_L06_0047AC68_00[0]);
     entry = row + 7;
     state = (char *)*entry;
 
@@ -41,10 +42,10 @@ s32 func_L06_0047AC68(s32 a0)
     case 10:
         if (*(s16 *)(state + 0x2E) != 0)
             goto clear;
-        if (D_00189E20.field34C != 0) {
-            if (D_001A79F0 != 14)
+        if (gHeroState.field34C != 0) {
+            if (gCurrentMapIndex != 14)
                 return 0;
-            if (D_00189E20.field24A0 != 13)
+            if (gHeroState.field24A0 != 13)
                 return 0;
         }
     }
@@ -56,6 +57,6 @@ clear:
     *(u16 *)(state + 0x2E) = 0;
     return 0;
 call:
-    ref_L06_0047AC68_01(a0);
+    ref_L06_0047AC68_01(moby);
     return 0;
 }

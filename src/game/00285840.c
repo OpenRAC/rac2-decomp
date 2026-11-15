@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Owner-reviewed Qwen backlog: observed operations, not recovered original object boundaries. */
 
@@ -12,11 +13,13 @@ extern unsigned int D_001BAD08;
 /* func_002858B0: owner ABI/declaration review retained. */
 extern int D_001BAD14;
 
+/* Returns the saved menu state value. */
 unsigned int func_00285840(void)
 {
     return D_001BACC0;
 }
 
+/* Returns the second saved menu value. */
 unsigned int func_00285850(void)
 {
     return D_001BAD08;
@@ -28,20 +31,22 @@ extern void func_002B7320(void);
 extern void func_00132028(void);
 extern void func_002B8518(void);
 
+/* Ends the menu: undoes the pause sounds when needed and clears the saved menu state. */
 void func_00285860(void)
 {
-    if (func_002B49C8(3) == 0) {
-        func_00132B28(0x5D);
-        func_002B7320();
-        func_00132028();
+    if (IsCurrentRequestSlot(3) == 0) {
+        SendSoundCommand23(0x5D);
+        music_Unpause();
+        snd_Pump();
     }
-    func_002B8518();
+    ClearPadPortState();
     D_001BACC0 = 0;
 }
 
-void func_002858B0(int param_1)
+/* Stores a number into a global menu setting. */
+void func_002858B0(int value)
 {
-  D_001BAD14 = param_1;
+  D_001BAD14 = value;
 }
 
 /* func_002859C8 is defined in 002859C8-panel-g8.c. */

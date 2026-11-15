@@ -60,6 +60,7 @@ static inline int in_reg_window (int reg, frame_state *udata) { return 0; }
    frame called by UDATA or 0.  */
 
 /* get_reg_addr */
+/* Finds where a saved register lives for a stack frame. */
 word_type * func_00120A30 (unsigned reg, frame_state *udata, frame_state *sub_udata)
 {
   while (udata->saved[reg] == REG_SAVED_REG)

@@ -26,14 +26,15 @@
 extern s32 func_0028AB20(s32);
 extern s8 *D_001B188C;
 
-void func_0028B650(s8 *a0, s32 a1) {
-    s32 v;
-    u16 t;
+/* Fills a HUD element from the table entry that matches the given id. */
+void func_0028B650(s8 *dest, s32 key) {
+    s32 index;
+    u16 firstWord;
 
-    v = func_0028AB20(a1);
-    t = *(u16 *)(D_001B188C + v * 8);
-    (*(s16 *)((s8 *)(a0) + (0x40))) = v;
-    (*(s32 *)((s8 *)(a0) + (0))) = t;
-    (*(u8 *)((s8 *)(a0) + (0x42))) = *(u8 *)(D_001B188C + v * 8 + 6);
-    (*(s32 *)((s8 *)(a0) + (0x44))) = *(u16 *)(D_001B188C + v * 8 + 4);
+    index = FindHudEntryIndex(key);
+    firstWord = *(u16 *)(D_001B188C + index * 8);
+    (*(s16 *)((s8 *)(dest) + (0x40))) = index;
+    (*(s32 *)((s8 *)(dest) + (0))) = firstWord;
+    (*(u8 *)((s8 *)(dest) + (0x42))) = *(u8 *)(D_001B188C + index * 8 + 6);
+    (*(s32 *)((s8 *)(dest) + (0x44))) = *(u16 *)(D_001B188C + index * 8 + 4);
 }

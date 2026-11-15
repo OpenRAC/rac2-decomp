@@ -13,36 +13,36 @@ extern void func_0029FCC0(char *, s32, void *);
 extern void func_002BAE50(void *, void *, s32, s32, s32, s32, s32, s32);
 
 /* Sprays the flame sprites of the object's grabbed target: while the target is the live flame moby it draws two bursts at each of its two hand points. */
-void func_L09_003F7840(char *obj)
+void func_L09_003F7840(char *moby)
 {
-    V4_F3F7840 a, b, org, tmp;
-    char *rec = *(char **)(obj + 0x68);
-    char *tgt = *(char **)(rec + 0x2F8);
-    s32 big, small, st;
+    V4_F3F7840 handA, handB, offset, temp;
+    char *vars = *(char **)(moby + 0x68);
+    char *target = *(char **)(vars + 0x2F8);
+    s32 bigSize, smallSize, targetState;
 
-    if (tgt != 0 && *(short *)(tgt + 0xAA) == 0xD0E) {
-        st = *(u8 *)(tgt + 0x20);
-        if (st != 0xFE) {
-            if (st != 0xFD) {
-                tmp.q = 0;
-                tmp.f[2] = -(func_002A7878(tgt, 1.7f, 3.0f) * 0.016666668f);
-                org.q = tmp.q;
-                func_00282CC0(&org, &org, rec + 0x1A0);
-                func_0029FCC0(*(char **)(rec + 0x2F8), 5, &a);
-                func_0029FCC0(*(char **)(rec + 0x2F8), 6, &b);
+    if (target != 0 && *(short *)(target + 0xAA) == 0xD0E /* Megacorp Trooper Torso */) {
+        targetState = *(u8 *)(target + 0x20);
+        if (targetState != 0xFE) {
+            if (targetState != 0xFD) {
+                temp.q = 0;
+                temp.f[2] = -(RandomFloatRange(target, 1.7f, 3.0f) * 0.016666668f);
+                offset.q = temp.q;
+                FastVecAdd(&offset, &offset, vars + 0x1A0);
+                TransformMobyJointToWorld(*(char **)(vars + 0x2F8), 5, &handA);
+                TransformMobyJointToWorld(*(char **)(vars + 0x2F8), 6, &handB);
                 if (D_L09_001B2388[0] & 1) {
-                    func_002BAE50(&a, &org, 0xCF0000FF, 0xCF, func_002A7820(0x12, 0x16), 0x28, -10, 1);
-                    func_002BAE50(&b, &org, 0xCF0000FF, 0xCF, func_002A7820(0x12, 0x16), 0x28, -10, 1);
+                    SpawnScalingParticle(&handA, &offset, 0xCF0000FF, 0xCF, RandomIntRange(0x12, 0x16), 0x28, -10, 1);
+                    SpawnScalingParticle(&handB, &offset, 0xCF0000FF, 0xCF, RandomIntRange(0x12, 0x16), 0x28, -10, 1);
                 } else {
-                    func_002BAE50(&a, &org, 0x6000FFFF, 0x80, func_002A7820(0x14, 0x18), 0x50, -10, 1);
-                    func_002BAE50(&b, &org, 0x6000FFFF, 0x80, func_002A7820(0x14, 0x18), 0x50, -10, 1);
+                    SpawnScalingParticle(&handA, &offset, 0x6000FFFF, 0x80, RandomIntRange(0x14, 0x18), 0x50, -10, 1);
+                    SpawnScalingParticle(&handB, &offset, 0x6000FFFF, 0x80, RandomIntRange(0x14, 0x18), 0x50, -10, 1);
                 }
-                big = func_002A7820(10, 0x19);
-                small = func_002A7820(10, 15);
-                func_002BAE50(&a, &org, 0xEFFF7F4F, 0xFF0000, small, big, -big, 1);
-                big = func_002A7820(10, 0x19);
-                small = func_002A7820(10, 15);
-                func_002BAE50(&b, &org, 0xEFFF7F4F, 0xFF0000, small, big, -big, 1);
+                bigSize = RandomIntRange(10, 0x19);
+                smallSize = RandomIntRange(10, 15);
+                SpawnScalingParticle(&handA, &offset, 0xEFFF7F4F, 0xFF0000, smallSize, bigSize, -bigSize, 1);
+                bigSize = RandomIntRange(10, 0x19);
+                smallSize = RandomIntRange(10, 15);
+                SpawnScalingParticle(&handB, &offset, 0xEFFF7F4F, 0xFF0000, smallSize, bigSize, -bigSize, 1);
             }
         }
     }

@@ -6,6 +6,7 @@ extern int ref_L05_003D0728_00(void *dst, void *src);
 extern int ref_L05_003D0728_01(void *obj, void *src, int id);
 extern void ref_L05_003D0728_02(void *obj);
 
+/* On its first frame, spawns a wave of small enemies of three kinds around the spawner. */
 void func_L05_003D0728(unsigned char *obj)
 {
     long long buf[2];

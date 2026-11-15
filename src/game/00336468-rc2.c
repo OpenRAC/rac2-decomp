@@ -27,7 +27,8 @@
 extern s32 func_003360F8();
 extern s8 D_001AD9F8[];
 
-void func_00336468(void *arg0) {
-    (*(s8 **)((char *)(arg0) + (0x30))) = D_001AD9F8;
-    func_003360F8();
+/* Sets the object type pointer and runs the shared base cleanup. */
+void func_00336468(void *obj) {
+    (*(s8 **)((char *)(obj) + (0x30))) = D_001AD9F8;
+    DestroyArrayObject();
 }

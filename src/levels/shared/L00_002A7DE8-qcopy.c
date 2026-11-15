@@ -1,5 +1,6 @@
 /* func_L00_002A7DE8 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
+#include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 extern char D_00189E20[];
 extern void func_L00_002A7A10(void);
@@ -12,15 +13,16 @@ typedef struct {
     short index;
 } Ring_L00_002A7DE8;
 
-void func_L00_002A7DE8(Quad *src, int value, float first, float second)
+/* Adds a glow point to the hero effect queue, storing its position, color and two size values. The queue has room for eight. */
+void func_L00_002A7DE8(Quad *position, int color, float size, float fade)
 {
-    Ring_L00_002A7DE8 *r = (Ring_L00_002A7DE8 *)D_00189E20;
-    int index = r->index;
+    Ring_L00_002A7DE8 *hero = (Ring_L00_002A7DE8 *)gHeroState;
+    int index = hero->index;
 
-    r->ring[index] = *src;
-    r->value[index] = value;
-    r->first[r->index] = first;
-    r->second[r->index] = second;
-    func_L00_002A7A10();
-    r->index++;
+    hero->ring[index] = *position;
+    hero->value[index] = color;
+    hero->first[hero->index] = size;
+    hero->second[hero->index] = fade;
+    QueueHeroGlowDrawRoutine();
+    hero->index++;
 }

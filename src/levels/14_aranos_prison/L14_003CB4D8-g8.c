@@ -10,22 +10,23 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_002AD6F0(void *, void *, void *, void *);
 
+/* Applies the swing angle to the object: turns its rotation, moves it around its pivot point and carries along anything riding on it. */
 void func_L14_003CB4D8(char *object) {
     Vector rotation, delta, world, initial;
     char *matrix;
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     char *angles = object + 0xF0;
     qcopy(&rotation, angles);
-    *(float *)(object + 0xF4) = *(float *)(state + 0x80);
+    *(float *)(object + 0xF4) = *(float *)(vars + 0x80);
     matrix = object + 0xC0;
-    func_002833F0(matrix, angles);
+    euler_rotation_basis(matrix, angles);
     object += 0x10;
     initial.q = 0;
     initial.f[2] = D_L14_001AFF0C;
     world.q = initial.q;
-    func_00283098(&world, &world, matrix);
-    func_00282CC0(&world, &world, object);
-    func_00282CF0(&delta, state + 0x70, &world);
-    func_00282CC0(object, object, &delta);
-    func_002AD6F0(state + 0x20, &delta, &rotation, angles);
+    matrix_mul_vec3(&world, &world, matrix);
+    FastVecAdd(&world, &world, object);
+    FastVecSub(&delta, vars + 0x70, &world);
+    FastVecAdd(object, object, &delta);
+    CombineTransformsAndStore(vars + 0x20, &delta, &rotation, angles);
 }

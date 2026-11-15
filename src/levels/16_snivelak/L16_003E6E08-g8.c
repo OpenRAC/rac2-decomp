@@ -21,6 +21,7 @@ extern void func_L00_002E6EF8(void (*)(void *), void *);
 extern void func_L16_003E70E0(void *);
 
 /* Updates the moving object, handles impact/timeout, and emits its death particles. */
+/* Moves a flying shot and removes it with a burst when it hits something or times out. */
 void func_L16_003E6E08(char *object)
 {
     float position[4];
@@ -30,33 +31,33 @@ void func_L16_003E6E08(char *object)
     char *state = *(char **)(object + 104);
     float size;
     if (++*(int *)(state + 36) > 240) {
-        func_002A8C28(0.6f, *(float *)(state + 20), 0.0f, object, object + 16, 0x10001, 0, 1, 0);
-        func_002A7750(object, 1, -1);
+        SweepCollisionFromObject(0.6f, *(float *)(state + 20), 0.0f, object, object + 16, 0x10001, 0, 1, 0);
+        SetMobyState(object, 1, -1);
     }
     switch (*(unsigned char *)(object + 32)) {
     case 0:
-        func_00282CC0(position, object + 16, state);
-        func_002A8C00(collision, object, 1, state, *(float *)(state + 20));
+        FastVecAdd(position, object + 16, state);
+        make_hit_descriptor(collision, object, 1, state, *(float *)(state + 20));
         *(unsigned short *)(collision + 26) = *(unsigned short *)(object + 170);
-        if ((func_002761F8(object + 16, position, 0, object, collision) ||
-             func_00277258(object + 16, 0, object, 0.3f)) &&
+        if ((CollLine(object + 16, position, 0, object, collision) ||
+             TestPointAgainstCollision(object + 16, 0, object, 0.3f)) &&
              (D_L16_001BFF58[0] == 0 || D_L16_001BFF58[0] != *(char **)(state + 16))) {
-            func_002A8C28(0.6f, *(float *)(state + 20), 0.0f, object, object + 16, 0x10001, 0, 1, 0);
-            func_002A7750(object, 1, -1);
+            SweepCollisionFromObject(0.6f, *(float *)(state + 20), 0.0f, object, object + 16, 0x10001, 0, 1, 0);
+            SetMobyState(object, 1, -1);
             return;
         }
         *(Quadword *)(object + 16) = *(Quadword *)position;
-        func_00282D30(velocity, state, -0.5f);
-        func_00282C88(direction);
+        FastVecScale(velocity, state, -0.5f);
+        ClearVector128(direction);
         break;
     case 1:
-        size = func_002A7878(8.0f, 10.0f);
-        func_002C2210(object + 16, 15, D_L16_001B0CA8, 0, 10, D_L16_001A8F20, size * 0.3f, size, 0.0f, 0);
-        func_002C2210(object + 16, 15, D_L16_001B0CAC, 1, -10, D_L16_001A8F20, size * 0.04f, size * 0.4f, 0.0f, 0);
-        func_0029F338(object);
+        size = RandomFloatRange(8.0f, 10.0f);
+        SpawnGroundEffectParticle(object + 16, 15, D_L16_001B0CA8, 0, 10, D_L16_001A8F20, size * 0.3f, size, 0.0f, 0);
+        SpawnGroundEffectParticle(object + 16, 15, D_L16_001B0CAC, 1, -10, D_L16_001A8F20, size * 0.04f, size * 0.4f, 0.0f, 0);
+        MarkMobySpawned(object);
         return;
     }
-    func_002ACEC0(object + 224, object + 224, object + 208, D_L16_001B0C78 * 0.017453294f);
-    func_002ACEC0(object + 192, object + 192, object + 208, D_L16_001B0C78 * 0.017453294f);
-    func_L00_002E6EF8(func_L16_003E70E0, object);
+    ApplyAxisRotationToQuaternion(object + 224, object + 224, object + 208, D_L16_001B0C78 * 0.017453294f);
+    ApplyAxisRotationToQuaternion(object + 192, object + 192, object + 208, D_L16_001B0C78 * 0.017453294f);
+    AddDrawCallbackToList3(DrawTwoLayeredSprites, object);
 }

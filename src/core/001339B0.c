@@ -9,6 +9,7 @@ extern long D_001A7200 NOT_SDA;
 extern long D_001A7208 NOT_SDA;
 extern long D_001A7210 MACRO_ADDR;
 
+/* Runs every vertical sync and updates the timer counters. */
 int func_001339B0(void) {
     D_001A7208++;
     D_001A7210 = D_001A7200 + (unsigned int)((int)T1_COUNT);

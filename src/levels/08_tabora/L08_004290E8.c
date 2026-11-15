@@ -8,40 +8,40 @@ extern void func_L08_00429EE8(void *);
 
 /* The spawner's three slots: the first byte of the record says whether the slot is
    empty (0), in use (1) or a finished one (4); a slot whose record is gone is freed. */
-void func_L08_004290E8(char *a0) {
+void func_L08_004290E8(char *spawner) {
     s32 i;
     s32 k;
     s32 count;
-    s32 v;
+    s32 slotState;
 
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(spawner + 0x20)) {
     case 0:
         for (k = 0; k < 3; k++) {
-            D_L08_001B39A0[k] = 0;
-            D_L08_001B3A30[k] = 0;
+            gBeamSlotState[k] = 0;
+            gBeamSlotKey[k] = 0;
         }
-        *(u8 *)(a0 + 0x20) = 1;
-        *(u8 *)(a0 + 0x30) = 0xFF;
+        *(u8 *)(spawner + 0x20) = 1;
+        *(u8 *)(spawner + 0x30) = 0xFF;
         break;
     case 1:
         count = 0;
         for (i = 0; i < 3; i++) {
-            v = D_L08_001B39A0[i];
-            if (v == 1) {
-                if (*(signed char *)(D_L08_001B3A30[i] + 0x20) < 0) {
-                    D_L08_001B39A0[i] = 0;
-                    D_L08_001B3A30[i] = 0;
+            slotState = gBeamSlotState[i];
+            if (slotState == 1) {
+                if (*(signed char *)(gBeamSlotKey[i] + 0x20) < 0) {
+                    gBeamSlotState[i] = 0;
+                    gBeamSlotKey[i] = 0;
                 }
-            } else if (v == 4) {
-                func_L08_00429408(i);
-            } else if (v != 0) {
-                func_L08_00429560(D_L08_001B3A30[i], i);
+            } else if (slotState == 4) {
+                ReleaseBeamSlot(i);
+            } else if (slotState != 0) {
+                update_slot_panes_and_effects(gBeamSlotKey[i], i);
                 count++;
-                D_L08_001B39A0[i] = 4;
+                gBeamSlotState[i] = 4;
             }
         }
         if (count != 0) {
-            func_L08_002F2D10(func_L08_00429EE8, a0);
+            QueueDrawCallback(DrawBeamSlots, spawner);
         }
         break;
     }

@@ -21,86 +21,87 @@ extern u8 D_0019B4A8[];
 /* Its address is rebuilt (unsplit la) before each spawn call, as in L01_00388FD0-tether-g8.c. */
 extern float D_L01_001A8F60[] MACRO_ADDR;
 
-void func_L01_003BC540(char *obj)
+/* Updates the breakable Oozla object. When it is hit it bursts into spinning debris pieces, plays a sound, removes itself and records that it was destroyed. */
+void func_L01_003BC540(char *moby)
 {
     float delta[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
     float dimensions[4] __attribute__((aligned(16)));
-    char *state=*(char **)(obj+0x68), *hit,*piece;
-    float step,scale,t,size;
-    int i,j,byte,idx;
+    char *vars=*(char **)(moby+0x68), *hitMoby,*debrisPiece;
+    float step,scale,travelled,sizeRatio;
+    int i,j,saveByte,saveIndex;
     float distance;
-    if(*(unsigned char *)(obj+0x20)==0) {
-        *(float *)(obj+0x2C)*=func_002A7878(0.8f,1.1f);
-        if(*(unsigned char *)(obj+0xB0)!=255) {
-            if(D_L01_0021E4B0.collected[*(short *)(obj+0xB2)]) goto remove_initial;
-            byte=D_0019B4A8[(*(short *)(obj+0xB2)>>1)+(D_001A79F0<<10)];
-            if(*(short *)(obj+0xB2)&1) {
-                if((byte>>4)&7) goto remove_initial;
+    if(*(unsigned char *)(moby+0x20)==0) {
+        *(float *)(moby+0x2C)*=RandomFloatRange(0.8f,1.1f);
+        if(*(unsigned char *)(moby+0xB0)!=255) {
+            if(D_L01_0021E4B0.collected[*(short *)(moby+0xB2)]) goto remove_initial;
+            saveByte=D_0019B4A8[(*(short *)(moby+0xB2)>>1)+(gCurrentMapIndex<<10)];
+            if(*(short *)(moby+0xB2)&1) {
+                if((saveByte>>4)&7) goto remove_initial;
                 goto initial_path;
             }
-            if(!(byte&7)) goto initial_path;
+            if(!(saveByte&7)) goto initial_path;
 remove_initial:
-            func_L00_00326620(obj,0xA29,0);
-            func_0029F338(obj);
+            SpawnChildMoby_L00(moby,0xA29,0);
+            MarkMobySpawned(moby);
             return;
         }
 initial_path:
-        distance=*(float *)(state+0x50);
+        distance=*(float *)(vars+0x50);
         if(distance>0.0f) {
-            step=distance/ *(float *)(state+0x54);
-            func_00282F20(delta,obj+0xC0,step);
-            func_00282CC0(position,obj+0x10,delta);
-            for(t=step;t<*(float *)(state+0x50);t+=step) {
-                func_L01_003BC490(obj,position);
-                func_00282CC0(position,position,delta);
+            step=distance/ *(float *)(vars+0x54);
+            vec_scale_to_length(delta,moby+0xC0,step);
+            FastVecAdd(position,moby+0x10,delta);
+            for(travelled=step;travelled<*(float *)(vars+0x50);travelled+=step) {
+                SpawnBreakableCopy(moby,position);
+                FastVecAdd(position,position,delta);
             }
         }
-        *(unsigned char *)(obj+0x20)=1;
+        *(unsigned char *)(moby+0x20)=1;
     }
     else {
-    hit=func_002A9640(obj,0x4010000,0);
-    if(hit && *(float *)(hit+0x2C)>0.0f) {
-        size=*(float *)(obj+0x2C)/ *(float *)(*(char **)(obj+0x24)+0x24);
-        scale=size;
-        qcopy(position,obj+0xF0);
+    hitMoby=FindOwnedEffectSlot(moby,0x4010000,0);
+    if(hitMoby && *(float *)(hitMoby+0x2C)>0.0f) {
+        sizeRatio=*(float *)(moby+0x2C)/ *(float *)(*(char **)(moby+0x24)+0x24);
+        scale=sizeRatio;
+        qcopy(position,moby+0xF0);
         *(BC540Quad *)rotation=0;
         rotation[1]=-1.3790000f; rotation[2]=0.778f; rotation[3]=0.3f;
-        func_002E5CF8(0,0,obj);
+        PlayMobySound(0,0,moby);
         for(i=0;i<4;i++) {
-            func_0029FCC0(obj,i,delta);
-            position[2]=func_002A7940();
+            TransformMobyJointToWorld(moby,i,delta);
+            position[2]=RandomAngle();
             for(j=2;j>=0;j--) {
-                piece=func_L01_003BCA38(obj,0xA28,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
-                *(float *)(piece+0x2C)*=scale;
-                position[2]=func_00283B98(position[2],2.0943954f);
+                debrisPiece=SpawnDebrisPiece_L01(moby,0xA28 /* moby class 2600 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
+                *(float *)(debrisPiece+0x2C)*=scale;
+                position[2]=FastAddRotations(position[2],2.0943954f);
             }
             scale*=0.85f;
         }
         *(BC540Quad *)dimensions=0;
         dimensions[0]=0.175f;dimensions[1]=0.136f;dimensions[2]=-0.691f;dimensions[3]=0.05f;
-        func_0029FCC0(obj,4,delta);
-        qcopy(position,obj+0xF0);
+        TransformMobyJointToWorld(moby,4,delta);
+        qcopy(position,moby+0xF0);
         for(j=2;j>=0;j--) {
-            piece=func_L01_003BCA38(obj,0xA27,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
-            *(float *)(piece+0x2C)*=size;
-            position[2]=func_00283B98(position[2],2.0943954f);
+            debrisPiece=SpawnDebrisPiece_L01(moby,0xA27 /* moby class 2599 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
+            *(float *)(debrisPiece+0x2C)*=sizeRatio;
+            position[2]=FastAddRotations(position[2],2.0943954f);
         }
-        func_L00_00326620(obj,0xA29,0);
-        func_002A6C58(obj,0,3);
-        if(*(short *)(obj+0xB2)&1) {
-            idx=(*(short *)(obj+0xB2)>>1)+(D_001A79F0<<10);
-            if(((D_0019B4A8[idx]>>4)&7)!=7) D_0019B4A8[idx]+=16;
+        SpawnChildMoby_L00(moby,0xA29,0);
+        SetDeathBits(moby,0,3);
+        if(*(short *)(moby+0xB2)&1) {
+            saveIndex=(*(short *)(moby+0xB2)>>1)+(gCurrentMapIndex<<10);
+            if(((D_0019B4A8[saveIndex]>>4)&7)!=7) D_0019B4A8[saveIndex]+=16;
         } else {
-            idx=(*(short *)(obj+0xB2)>>1)+(D_001A79F0<<10);
-            if((D_0019B4A8[idx]&7)!=7) D_0019B4A8[idx]++;
+            saveIndex=(*(short *)(moby+0xB2)>>1)+(gCurrentMapIndex<<10);
+            if((D_0019B4A8[saveIndex]&7)!=7) D_0019B4A8[saveIndex]++;
         }
-        func_0029F338(obj);
+        MarkMobySpawned(moby);
     }
     }
-    if(*(unsigned char *)(obj+0xBC)) {
-        if(*(unsigned char *)(obj+0x43)!=1) func_002A7470(obj,1,0,10);
-        *(unsigned char *)(obj+0xBC)=0;
-    } else if((*(unsigned char *)(obj+0x60)&2) && *(unsigned char *)(obj+0x43)!=0) func_002A7470(obj,0,0,60);
+    if(*(unsigned char *)(moby+0xBC)) {
+        if(*(unsigned char *)(moby+0x43)!=1) StartAnimationBlended(moby,1,0,10);
+        *(unsigned char *)(moby+0xBC)=0;
+    } else if((*(unsigned char *)(moby+0x60)&2) && *(unsigned char *)(moby+0x43)!=0) StartAnimationBlended(moby,0,0,60);
 }

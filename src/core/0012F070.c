@@ -70,11 +70,12 @@ extern void r1_func_0012CC70(void);
 extern void r1_func_0012CC80(void);
 
 /* rac1-decomp src/core/0012AC80.c: func_0012B250 */
-int func_0012F070(void *arg0) {
-    r1_func_0012AB60(arg0, 0x38);
-    r1_func_0012AB60(arg0, 0x28);
-    while (r1_func_0012AAA8(arg0, 1) == 1) {
-        r1_func_0012AB60(arg0, 0x18);
+/* Skips the system header of a movie stream. Returns 1. */
+int func_0012F070(void *stream) {
+    r1_func_0012AB60(stream, 0x38);
+    r1_func_0012AB60(stream, 0x28);
+    while (r1_func_0012AAA8(stream, 1) == 1) {
+        r1_func_0012AB60(stream, 0x18);
     }
     return 1;
 }
@@ -82,9 +83,10 @@ int func_0012F070(void *arg0) {
 /* rac1-decomp src/core/0012AC80.c: func_0012B2C0 */
 /* Parse one MPEG-2 PES packet header from the bit stream into hdr (libmpeg _PES_packet).
    Adapted from Lombyte (GPL-3.0) for PAL: src/sdk/library/_PES_packet.c, _PES_packet. */
-int func_0012F0E0(int arg0, struct PES_BS *bs, struct PES_HDR *hdr) {
+/* Reads one packet header of a movie stream and records its type, length and timestamps. */
+int func_0012F0E0(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr) {
     struct PES_TBL tbl;
-    int ctx;
+    int mpegCtx;
     int flag1;
     int len;         /* PES_header_data_length */
     int base;        /* (int)bs->stamp, captured before the header fields */
@@ -93,7 +95,7 @@ int func_0012F0E0(int arg0, struct PES_BS *bs, struct PES_HDR *hdr) {
     int v8;          /* 4-bit length, indexes tbl */
     int v5;          /* PES_extension_flag */
 
-    ctx = arg0;
+    mpegCtx = mpeg;
     hdr->unk28 = (int)bs->stamp;
     tbl = *(struct PES_TBL *)r1_D_00153AC8;
     r1_func_0012AB60(bs, 0x18);
@@ -164,7 +166,7 @@ int func_0012F0E0(int arg0, struct PES_BS *bs, struct PES_HDR *hdr) {
                 r1_func_0012AB60(bs, 0x20);
             }
             if (a2 == v5) {
-                r1_func_0012C468_a(ctx, r1_D_00153AD8);
+                r1_func_0012C468_a(mpegCtx, r1_D_00153AD8);
                 return 0;
             }
             if (a3 == v5) {
@@ -238,8 +240,9 @@ int func_0012F0E0(int arg0, struct PES_BS *bs, struct PES_HDR *hdr) {
  * masked off, and two more (0x1000B020/0x1000B420) are zeroed before the
  * tail call into r1_func_0012D068.
  */
+/* Starts up the movie player by resetting its DMA channels. */
 void func_0012F690(void) {
-    int r = r1_func_0011D960();
+    int intrState = r1_func_0011D960();
 
     D_ENABLEW =
         D_ENABLER | 0x10000;
@@ -248,7 +251,7 @@ void func_0012F690(void) {
     D_ENABLEW =
         D_ENABLER & ~0x10000;
 
-    if (r != 0) {
+    if (intrState != 0) {
         r1_func_0011D9A8();
     }
 
@@ -276,100 +279,101 @@ void func_0012F690(void) {
  * fills that call's delay slot, and the last four stores are in the
  * order that schedules as retail's.
  */
-int func_0012F738(void *arg0, void *workarea, int size) {
-    char *w = (char *)arg0;
-    unsigned int wa = (unsigned int)workarea;
-    char *aligned;
-    char *area2;
-    unsigned int avail;
+/* Sets up a movie player in a work area. Returns 0 if the area is too small. */
+int func_0012F738(void *mpeg, void *workarea, int size) {
+    char *mpegPtr = (char *)mpeg;
+    unsigned int workAddr = (unsigned int)workarea;
+    char *decoder;
+    char *heap;
+    unsigned int availBytes;
     int neg1;
 
     r1_func_001153FC_p(workarea, 0, size);
 
-    aligned = (char *)(((wa + 3) >> 2) << 2);
-    avail = (unsigned int)size - ((unsigned int)aligned - wa);
+    decoder = (char *)(((workAddr + 3) >> 2) << 2);
+    availBytes = (unsigned int)size - ((unsigned int)decoder - workAddr);
 
-    if (avail < 0x10C0) {
-        func_00130288(aligned, r1_D_00153B10);
+    if (availBytes < 0x10C0) {
+        ReportMpegError(decoder, r1_D_00153B10);
         return 0;
     }
 
-    area2 = aligned + 0x108;
-    *(int *)(w + 0x40) = (int)aligned;
-    avail -= 0x10C0;
-    func_0012FB48(area2, (int)(aligned + 0x10C0), (int)avail);
+    heap = decoder + 0x108;
+    *(int *)(mpegPtr + 0x40) = (int)decoder;
+    availBytes -= 0x10C0;
+    InitMpegCounters(heap, (int)(decoder + 0x10C0), (int)availBytes);
     neg1 = -1;
 
-    *(int *)(w + 0x0) = 0;
-    *(int *)(w + 0x4) = 0;
-    *(int *)(w + 0x8) = 0;
-    *(long *)(w + 0x10) = -1;
-    *(long *)(w + 0x18) = -1;
-    *(long *)(w + 0x20) = 0;
-    *(long *)(w + 0x28) = -1;
-    *(long *)(w + 0x30) = -1;
-    *(long *)(w + 0x38) = 0;
+    *(int *)(mpegPtr + 0x0) = 0;
+    *(int *)(mpegPtr + 0x4) = 0;
+    *(int *)(mpegPtr + 0x8) = 0;
+    *(long *)(mpegPtr + 0x10) = -1;
+    *(long *)(mpegPtr + 0x18) = -1;
+    *(long *)(mpegPtr + 0x20) = 0;
+    *(long *)(mpegPtr + 0x28) = -1;
+    *(long *)(mpegPtr + 0x30) = -1;
+    *(long *)(mpegPtr + 0x38) = 0;
 
-    *(int *)(aligned + 0xB4) = 0;
-    *(int *)(aligned + 0xB8) = 0;
-    *(int *)(aligned + 0xBC) = 0;
-    *(int *)(aligned + 0xC0) = 0;
-    *(int *)(aligned + 0xC4) = 0;
-    *(int *)(aligned + 0xC8) = 0;
-    *(int *)(aligned + 0xCC) = 0;
-    *(int *)(aligned + 0xD0) = 0;
-    *(int *)(aligned + 0xD4) = 0;
-    *(int *)(aligned + 0xD8) = 0;
-    *(int *)(aligned + 0xDC) = 0;
-    *(int *)(aligned + 0xE0) = 0;
-    *(int *)(aligned + 0xE4) = 0;
-    *(int *)(aligned + 0xE8) = 0;
-    *(int *)(aligned + 0xF8) = 0;
-    *(int *)(aligned + 0xC) = 0;
-    *(int *)(aligned + 0x14) = 0;
-    *(int *)(aligned + 0x2C) = 0;
-    *(int *)(aligned + 0x34) = 0;
-    *(int *)(aligned + 0x3C) = 0;
-    *(long *)(aligned + 0xF0) = -1;
-    *(int *)(aligned + 0x1C) = (int)r1_func_0012CC70;
-    *(int *)(aligned + 0x24) = (int)r1_func_0012CC80;
+    *(int *)(decoder + 0xB4) = 0;
+    *(int *)(decoder + 0xB8) = 0;
+    *(int *)(decoder + 0xBC) = 0;
+    *(int *)(decoder + 0xC0) = 0;
+    *(int *)(decoder + 0xC4) = 0;
+    *(int *)(decoder + 0xC8) = 0;
+    *(int *)(decoder + 0xCC) = 0;
+    *(int *)(decoder + 0xD0) = 0;
+    *(int *)(decoder + 0xD4) = 0;
+    *(int *)(decoder + 0xD8) = 0;
+    *(int *)(decoder + 0xDC) = 0;
+    *(int *)(decoder + 0xE0) = 0;
+    *(int *)(decoder + 0xE4) = 0;
+    *(int *)(decoder + 0xE8) = 0;
+    *(int *)(decoder + 0xF8) = 0;
+    *(int *)(decoder + 0xC) = 0;
+    *(int *)(decoder + 0x14) = 0;
+    *(int *)(decoder + 0x2C) = 0;
+    *(int *)(decoder + 0x34) = 0;
+    *(int *)(decoder + 0x3C) = 0;
+    *(long *)(decoder + 0xF0) = -1;
+    *(int *)(decoder + 0x1C) = (int)r1_func_0012CC70;
+    *(int *)(decoder + 0x24) = (int)r1_func_0012CC80;
 
-    *(int *)(aligned + 0x44) = (int)func_0012FB80(aligned, area2, 0x600, 8);
+    *(int *)(decoder + 0x44) = (int)AllocMpegAligned(decoder, heap, 0x600, 8);
 
-    *(int *)(aligned + 0x48) = 0;
-    *(int *)(aligned + 0xFC) = 0;
-    *(int *)(aligned + 0x100) = 0;
-    *(int *)(aligned + 0x104) = 0;
-    *(int *)(aligned + 0x70) = 0;
-    *(long *)(aligned + 0x78) = 0;
-    *(int *)(aligned + 0x80) = neg1;
-    *(long *)(aligned + 0x88) = 0;
-    *(int *)(aligned + 0x90) = 0;
-    *(int *)(aligned + 0xAC) = 0;
-    *(int *)(aligned + 0x94) = neg1;
-    *(int *)(aligned + 0x98) = neg1;
-    *(int *)(aligned + 0x9C) = neg1;
-    *(int *)(aligned + 0x858) = (int)w;
-    *(int *)(aligned + 0xB0) = 1;
+    *(int *)(decoder + 0x48) = 0;
+    *(int *)(decoder + 0xFC) = 0;
+    *(int *)(decoder + 0x100) = 0;
+    *(int *)(decoder + 0x104) = 0;
+    *(int *)(decoder + 0x70) = 0;
+    *(long *)(decoder + 0x78) = 0;
+    *(int *)(decoder + 0x80) = neg1;
+    *(long *)(decoder + 0x88) = 0;
+    *(int *)(decoder + 0x90) = 0;
+    *(int *)(decoder + 0xAC) = 0;
+    *(int *)(decoder + 0x94) = neg1;
+    *(int *)(decoder + 0x98) = neg1;
+    *(int *)(decoder + 0x9C) = neg1;
+    *(int *)(decoder + 0x858) = (int)mpegPtr;
+    *(int *)(decoder + 0xB0) = 1;
 
-    func_00130118(aligned);
-    func_0012F9C8(w);
-    func_0012FA18(w);
+    SetMpegScratchpadBuffers(decoder);
+    ResetMpegDecoder(mpegPtr);
+    ClearMpegBufferFlags(mpegPtr);
 
-    *(int *)(aligned + 0x1B8) = (int)(aligned + 0x1E8);
-    *(int *)(aligned + 0x1BC) = (int)(aligned + 0x250);
-    *(int *)(aligned + 0x1C4) = (int)(aligned + 0x2B8);
-    *(int *)(aligned + 0x1C8) = (int)(aligned + 0x320);
-    *(int *)(aligned + 0x1CC) = (int)(aligned + 0x388);
-    *(int *)(aligned + 0x1D4) = (int)(aligned + 0x3F0);
-    *(int *)(aligned + 0x1D8) = (int)(aligned + 0x458);
-    *(int *)(aligned + 0x1DC) = (int)(aligned + 0x4C0);
-    *(int *)(aligned + 0x1E4) = (int)(aligned + 0x528);
+    *(int *)(decoder + 0x1B8) = (int)(decoder + 0x1E8);
+    *(int *)(decoder + 0x1BC) = (int)(decoder + 0x250);
+    *(int *)(decoder + 0x1C4) = (int)(decoder + 0x2B8);
+    *(int *)(decoder + 0x1C8) = (int)(decoder + 0x320);
+    *(int *)(decoder + 0x1CC) = (int)(decoder + 0x388);
+    *(int *)(decoder + 0x1D4) = (int)(decoder + 0x3F0);
+    *(int *)(decoder + 0x1D8) = (int)(decoder + 0x458);
+    *(int *)(decoder + 0x1DC) = (int)(decoder + 0x4C0);
+    *(int *)(decoder + 0x1E4) = (int)(decoder + 0x528);
 
-    func_0012FB60(area2);
+    CopyMpegCounter(heap);
 
-    *(int *)(aligned + 0x850) = neg1;
-    *(int *)(aligned + 0x84C) = 0;
-    *(int *)(aligned + 0x81C) = 0x70003600;
-    *(int *)(aligned + 0x854) = 0;
+    *(int *)(decoder + 0x850) = neg1;
+    *(int *)(decoder + 0x84C) = 0;
+    *(int *)(decoder + 0x81C) = 0x70003600;
+    *(int *)(decoder + 0x854) = 0;
 }

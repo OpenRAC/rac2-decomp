@@ -18,52 +18,53 @@ extern int func_002B3868(char *);
 extern int func_0029F338(char *);
 
 typedef struct { char pad0[0x31]; u8 active; u16 pad32; u16 flags; char pad36[0x62]; int target; } RetiringObject;
-void func_L01_0040F360(char *a0)
+/* Update for a breakable object: counts itself, waits to be hit, bursts with a sound and retires after a timer. */
+void func_L01_0040F360(char *mobyArg)
 {
-    char *s0 = a0;
-    char *s1 = *(char **)(a0 + 0x68);
-    float buf[4];
-    int current;
+    char *moby = mobyArg;
+    char *vars = *(char **)(mobyArg + 0x68);
+    float offset[4];
+    int activeCount;
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
         D_L01_001AEC38 = D_L01_001AEC38 + 1;
-        func_002A7750(s0, 1, -1);
+        SetMobyState(moby, 1, -1);
         return;
     case 1:
-        if (func_002A9640(s0, 0x4010000, 0) != 0 && *(int *)s1 == 0) {
+        if (FindOwnedEffectSlot(moby, 0x4010000, 0) != 0 && *(int *)vars == 0) {
             D_L01_001AEC38 = counter_abs - 1;
-            func_002A7750(s0, 2, -1);
+            SetMobyState(moby, 2, -1);
         }
-        *(u8 *)(s0 + 0xA8) = 0xFF;
+        *(u8 *)(moby + 0xA8) = 0xFF;
         return;
     case 2:
-        func_00282D30((char *)buf, s0 + 0xD0, -0.06666667f);
-        if (*(u8 *)(s0 + 0x31) != 0 && D_L01_001B2090 < 0.9f &&
-            D_L01_001B208C < 0.9f && (current = D_L01_001B3468, current < D_L01_001B15E0)) {
-            func_002B0A68(s0, 0x1F, buf, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
+        FastVecScale((char *)offset, moby + 0xD0, -0.06666667f);
+        if (*(u8 *)(moby + 0x31) != 0 && D_L01_001B2090 < 0.9f &&
+            D_L01_001B208C < 0.9f && (activeCount = D_L01_001B3468, activeCount < D_L01_001B15E0)) {
+            SpawnDebrisForMaskedParts(moby, 0x1F, offset, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
         } else {
-            func_002B0A68(s0, 5, buf, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
+            SpawnDebrisForMaskedParts(moby, 5, offset, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
         }
-        func_L00_00326110(s0, 0.0f, 1);
-        func_002E5CF8(0, 0, s0);
-        func_002A7750(s0, 3, -1);
+        SpawnScaledBolts(moby, 0.0f, 1);
+        PlayMobySound(0, 0, moby);
+        SetMobyState(moby, 3, -1);
         return;
     case 3:
-        if (func_002B3868(s0) != 0) {
-            RetiringObject *retiring = (RetiringObject *)s0;
+        if (SetFirstPendingFlag(moby) != 0) {
+            RetiringObject *retiring = (RetiringObject *)moby;
             unsigned int flags = retiring->flags;
             int count;
             retiring->active = 0;
             retiring->target = 0;
             count = active_abs;
             retiring->flags = flags | 1;
-            *(int *)(s1 + 4) = 0x78;
+            *(int *)(vars + 4) = 0x78;
             active_abs = count + 1;
         }
-        if (func_00282948(s1 + 4) != 0) {
+        if (FastFloatHelperD(vars + 4) != 0) {
             D_L01_001B3468 = D_L01_001B3468 - 1;
-            func_0029F338(s0);
+            MarkMobySpawned(moby);
         }
         return;
     }

@@ -30,77 +30,78 @@ extern Global_6C78C D_0018C750_6C78;
 
 typedef struct { char pad[0x20]; short count, active, timer; } TransitionState;
 typedef int CameraQuad __attribute__((mode(TI)));
-int func_L00_00426C78(char *a, char *b)
+/* Checks every frame whether the hero is hitting a trigger the right way. Counts the hits, and after 7 in a row it fires the trigger. It also nudges the camera while a hit is in progress. */
+int func_L00_00426C78(char *triggerObj, char *otherObj)
 {
-    float temp[4] __attribute__((aligned(16)));
-    char v1[16] __attribute__((aligned(16)));
-    char v2[16] __attribute__((aligned(16)));
-    TransitionState *p = *(TransitionState **)(D_L00_001B1844[0].table + *(short *)(a + 0x84)*32 + 28);
+    float scratch[4] __attribute__((aligned(16)));
+    char dirA[16] __attribute__((aligned(16)));
+    char dirB[16] __attribute__((aligned(16)));
+    TransitionState *transition = *(TransitionState **)(D_L00_001B1844[0].table + *(short *)(triggerObj + 0x84)*32 + 28);
     char *owner;
-    char *hit;
-    int type;
+    char *blocker;
+    int heroIdentity;
     int otherType, ownerType;
-    float len, dot;
+    float lengthProduct, dotValue;
     if (ref_L00_00426C78_00) { ref_L00_00426C78_00 = 0; return 0; }
-    type = D_00189E20_6C78.identity;
-    { int identity = *(short *)(a + 0x86);
+    heroIdentity = D_00189E20_6C78.identity;
+    { int identity = *(short *)(triggerObj + 0x86);
     ref_L00_00426C78_00 = 0;
-    if (type == identity || type == 0x51) {
-        owner = D_L00_001B8E10;
-        otherType = *(short *)(b + 0x86);
+    if (heroIdentity == identity || heroIdentity == 0x51) {
+        owner = gFollowCameraObject;
+        otherType = *(short *)(otherObj + 0x86);
         if (!(otherType == 0 || otherType == 10 || otherType == 14 || otherType == 2)) goto clear;
         ownerType = *(short *)(owner + 0x86);
         if (!(ownerType == 0 || ownerType == 10 || ownerType == 14 || ownerType == 2)) goto clear;
-        *(CameraQuad *)temp = *(CameraQuad *)D_00189EA0;
-        hit = func_L00_002DB350((char *)temp, 0.25f);
-        if (hit && (*(int *)(hit + 0x18) & 1)) return 0;
-        p->timer = 0;
-        p->active = 1;
-        p->count++;
-        if (p->count >= 7) {
-            if (*(short *)(owner + 0x86) == 0) *(char *)(a + 0x7C) = 5;
+        *(CameraQuad *)scratch = *(CameraQuad *)gHeroPosition;
+        blocker = FindIntersectingGridPrimitive((char *)scratch, 0.25f);
+        if (blocker && (*(int *)(blocker + 0x18) & 1)) return 0;
+        transition->timer = 0;
+        transition->active = 1;
+        transition->count++;
+        if (transition->count >= 7) {
+            if (*(short *)(owner + 0x86) == 0) *(char *)(triggerObj + 0x7C) = 5;
             return 1;
         }
-        temp[0] = func_00283180(D_00189E20_6C78.angle);
-        temp[1] = func_00283198(D_00189E20_6C78.angle);
-        temp[2] = 0;
-        func_L00_00424F00((char *)temp, 0.06981317698955536f, temp[2]);
+        scratch[0] = FastSinOrCosA(D_00189E20_6C78.angle);
+        scratch[1] = FastSinOrCosB(D_00189E20_6C78.angle);
+        scratch[2] = 0;
+        SetCameraStrengthAndSteer((char *)scratch, 0.06981317698955536f, scratch[2]);
         goto timer;
 clear:
-        p->count = 0;
-        p->active = 0;
+        transition->count = 0;
+        transition->active = 0;
         goto timer;
     }
     }
-    p->count = 0;
-    if (p->active == 0) goto timer;
-    p->active = 0;
+    transition->count = 0;
+    if (transition->active == 0) goto timer;
+    transition->active = 0;
     if (*(short *)(D_L00_001B8C80_6C78.owner + 0x86) != 0) goto timer;
     if (D_0018C750_6C78.count < 65535) ++D_0018C750_6C78.count;
     if (D_001A7390[0] > D_0018C750_6C78.time) D_0018C750_6C78.time = D_001A7390[0];
-    D_0018C750_6C78.flags = (D_0018C750_6C78.flags | (1U << D_001A79F0[0])) | 0x80000000U;
-    dot = func_00282DB0(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
-    func_00282D30((char *)temp, D_L00_001B8C80_6C78.axis, dot);
-    func_00282CF0(v1, D_L00_001B8C80_6C78.owner, (char *)temp);
-    dot = func_00282DB0(D_L00_001B8C80_6C78.axis, D_00189E20_6C78.owner + 0xC0);
-    func_00282D30((char *)temp, D_L00_001B8C80_6C78.axis, dot);
-    func_00282CF0(v2, D_00189E20_6C78.owner + 0xC0, (char *)temp);
-    len = func_00282DF0(v2);
-    if (len != 0.0f) {
-        len *= func_00282DF0(v1);
+    D_0018C750_6C78.flags = (D_0018C750_6C78.flags | (1U << gCurrentMapIndex[0])) | 0x80000000U;
+    dotValue = FastVecDot(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
+    FastVecScale((char *)scratch, D_L00_001B8C80_6C78.axis, dotValue);
+    FastVecSub(dirA, D_L00_001B8C80_6C78.owner, (char *)scratch);
+    dotValue = FastVecDot(D_L00_001B8C80_6C78.axis, D_00189E20_6C78.owner + 0xC0);
+    FastVecScale((char *)scratch, D_L00_001B8C80_6C78.axis, dotValue);
+    FastVecSub(dirB, D_00189E20_6C78.owner + 0xC0, (char *)scratch);
+    lengthProduct = FastVecLength(dirB);
+    if (lengthProduct != 0.0f) {
+        lengthProduct *= FastVecLength(dirA);
     }
-    if (len != 0.0f) {
-        do { dot = func_002831B0(func_00282DB0(v2, v1) / len); } while (0);
-        if (1.3962636f <= 1.5707964f - dot) { func_L00_002D9D98(); return 0; }
+    if (lengthProduct != 0.0f) {
+        do { dotValue = FastAngleHelper(FastVecDot(dirB, dirA) / lengthProduct); } while (0);
+        if (1.3962636f <= 1.5707964f - dotValue) { ResetDefaultCamera(); return 0; }
     }
-    p->timer = 30;
+    transition->timer = 30;
 timer:
-    if (p->timer) {
-        func_00282978((char *)&p->timer);
-        temp[0] = func_00283180(D_00189E20_6C78.angle);
-        temp[1] = func_00283198(D_00189E20_6C78.angle);
-        temp[2] = 0;
-        func_L00_00424F00((char *)temp, 0.13962635397911072f, temp[2]);
+    if (transition->timer) {
+        FastDecTimer((char *)&transition->timer);
+        scratch[0] = FastSinOrCosA(D_00189E20_6C78.angle);
+        scratch[1] = FastSinOrCosB(D_00189E20_6C78.angle);
+        scratch[2] = 0;
+        SetCameraStrengthAndSteer((char *)scratch, 0.13962635397911072f, scratch[2]);
     }
     return 0;
 }

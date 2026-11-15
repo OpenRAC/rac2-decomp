@@ -66,23 +66,23 @@ extern void func_L09_003F7788(void *, void *);
 
 
 /* Returns 1 as soon as one of the two bound sub-objects carries a live state word. */
-s32 func_L12_0041BE60(u8 *a0)
+s32 func_L12_0041BE60(u8 *moby)
 {
-    u8 *a1 = a0;
-    u8 *s0;
-    u8 **p;
+    u8 *mobyCopy = moby;
+    u8 *vars;
+    u8 **slot;
     s32 i;
 
-    if (a1 == 0)
+    if (mobyCopy == 0)
         return 0;
-    if (*(s16 *)(a1 + 0xAA) != 0xFAE)
+    if (*(s16 *)(mobyCopy + 0xAA) != 0xFAE /* moby class 4014 */)
         return 0;
-    s0 = *(u8 **)(a1 + 0x68);
-    func_L12_0041BED8(a1);
-    p = (u8 **)(s0 + 8);
-    for (i = 0; i < 2; i++, p++) {
-        if (*p != 0) {
-            if (*(s32 *)(*p + 0x98) != 0)
+    vars = *(u8 **)(mobyCopy + 0x68);
+    PushHelperObjects(mobyCopy);
+    slot = (u8 **)(vars + 8);
+    for (i = 0; i < 2; i++, slot++) {
+        if (*slot != 0) {
+            if (*(s32 *)(*slot + 0x98) != 0)
                 return 1;
         }
     }
@@ -91,15 +91,17 @@ s32 func_L12_0041BE60(u8 *a0)
 
 /* --- func_L12_0041A698 (52 B) ------------------------------------------------------ */
 
+/* Tells whether the object has reached the last point of its path. */
 s32 func_L12_0041A698(u8 *self)
 {
-    Tab698 *n = *(Tab698 **)(self + 0x68);
+    Tab698 *vars = *(Tab698 **)(self + 0x68);
 
-    return (n->f220 ^ (u32)(*D_L12_001FEAC0[n->f110] - 1)) < 1;
+    return (vars->f220 ^ (u32)(*D_L12_001FEAC0[vars->f110] - 1)) < 1;
 }
 
 /* --- func_L12_00416390 (88 B) ------------------------------------------------------ */
 
+/* Turns the object a little more each frame so it spins slowly. */
 f32 func_L12_00416390(Obj390 *self)
 {
     if (self->f20 == 0) {
@@ -112,19 +114,20 @@ f32 func_L12_00416390(Obj390 *self)
 
 /* --- func_L12_0041BDA8 (68 B) ------------------------------------------------------ */
 
-void func_L12_0041BDA8(u8 *a0)
+/* Clears the state word of the object's two helper objects. */
+void func_L12_0041BDA8(u8 *moby)
 {
     s32 i;
-    u8 **p;
+    u8 **slot;
 
-    if (a0 == 0)
+    if (moby == 0)
         return;
-    if (*(s16 *)(a0 + 0xAA) != 0xFAE)
+    if (*(s16 *)(moby + 0xAA) != 0xFAE /* moby class 4014 */)
         return;
-    p = (u8 **)(*(u8 **)(a0 + 0x68) + 8);
-    for (i = 1; i >= 0; i--, p++) {
-        if (*p != 0)
-            *(u32 *)(*p + 0x98) = 0;
+    slot = (u8 **)(*(u8 **)(moby + 0x68) + 8);
+    for (i = 1; i >= 0; i--, slot++) {
+        if (*slot != 0)
+            *(u32 *)(*slot + 0x98) = 0;
     }
 }
 
@@ -138,15 +141,15 @@ void func_L12_0041BDA8(u8 *a0)
 /* the two bound sub-objects of the moby this driver walks */
 
 /* Walks the moby's two sub-objects, re-arms each one's parent link and releases it. */
-void func_L12_004149B8(Ent49B8 *a0)
+void func_L12_004149B8(Ent49B8 *guard)
 {
-    Moby49B8 *moby = a0->f68;
+    Moby49B8 *moby = guard->f68;
     Sub114B *head = moby->f2F8;
     s32 i;
 
     if (head == 0)
         return;
-    if (head->fAA != 0x114B)
+    if (head->fAA != 0x114B /* moby class 4427 */)
         return;
     if (head->f20 == 0xFE)
         return;
@@ -155,14 +158,14 @@ void func_L12_004149B8(Ent49B8 *a0)
     for (i = 0; i < 2; i++) {
         if (moby->f2F0[i] != 0) {
             func_326F10(moby->f2F8, moby->f2F0[i], i, (i ^ 1) ? 0 : 6);
-            if (a0->f31 != 0) {
+            if (guard->f31 != 0) {
                 moby->f2F0[i]->f34 = moby->f2F0[i]->f34 & 0xFFFE;
                 moby->f2F0[i]->f31 = 1;
             } else {
                 moby->f2F0[i]->f34 = moby->f2F0[i]->f34 | 1;
                 moby->f2F0[i]->f31 = 0;
             }
-            func_L09_003F7788(a0, moby->f2F0[i]);
+            CopyMobyColor(guard, moby->f2F0[i]);
         }
     }
 }
@@ -186,22 +189,23 @@ void func_L12_004149B8(Ent49B8 *a0)
 
 /* func_L12_00419D68 is matched in its own unit, L12_00419D68.c. */
 
+/* Puts the object back at its saved spot, switches it to state 2 and starts animation 8. */
 void func_L12_0041A5F8(u8 *self)
 {
     u8 *dst = self + 0x10;
-    u8 *n = *(u8 **)(self + 0x68);
-    void *m;
+    u8 *vars = *(u8 **)(self + 0x68);
+    void *classDef;
 
-    qcopy(dst, n + 0x210);
-    *(f32 *)(self + 0xF8) = *(f32 *)(n + 0x21C);
-    *(u32 *)(n + 0x224) = 0;
+    qcopy(dst, vars + 0x210);
+    *(f32 *)(self + 0xF8) = *(f32 *)(vars + 0x21C);
+    *(u32 *)(vars + 0x224) = 0;
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & 0xFFBE) | 0x1000;
-    m = *(void **)(self + 0x24);
-    *(u32 *)(self + 0x98) = *(u32 *)((u8 *)m + 0x10);
-    func_L02_002EF388(self, dst, self + 0xF0, 0, 0);
-    func_002A7750(self, 2, -1);
+    classDef = *(void **)(self + 0x24);
+    *(u32 *)(self + 0x98) = *(u32 *)((u8 *)classDef + 0x10);
+    FuseObjectWithLinkedObjects(self, dst, self + 0xF0, 0, 0);
+    SetMobyState(self, 2, -1);
     if (*(u8 *)(self + 0x43) != 8)
-        func_002A7470(self, 8, 0, 1);
+        StartAnimationBlended(self, 8, 0, 1);
 }
 
 /* func_L12_0041A790 is matched in L12_0041A790-g8.c. */
@@ -212,22 +216,24 @@ void func_L12_0041A5F8(u8 *self)
 
 /* --- func_L12_0041BED8 (176 B) ----------------------------------------------------- */
 
+/* Pushes each of the object's two helper objects along a little and updates their size every
+   frame. */
 void func_L12_0041BED8(u8 *self)
 {
-    u8 *s1 = *(u8 **)(self + 0x68);
-    u8 **s0 = (u8 **)(s1 + 8);
+    u8 *vars = *(u8 **)(self + 0x68);
+    u8 **slot = (u8 **)(vars + 8);
     s32 i;
 
-    for (i = 1; i >= 0; i--, s0++) {
-        if (*s0 != 0) {
-            f32 v = (*(f32 *)((u8 *)s0 + 0x2C) + *(f32 *)(s1 + 0x40) * 0.5f)
+    for (i = 1; i >= 0; i--, slot++) {
+        if (*slot != 0) {
+            f32 scale = (*(f32 *)((u8 *)slot + 0x2C) + *(f32 *)(vars + 0x40) * 0.5f)
                     * 0.16666667f;
-            f32 t;
+            f32 size;
 
-            func_00282F20((f32 *)(*s0 + 0xD0), *s0 + 0xD0, v);
-            func_002A0F48(*s0);
-            t = *(f32 *)(*(u8 **)(*s0 + 0x24) + 0x3C);
-            *(f32 *)(*s0 + 0xC) = t + t;
+            vec_scale_to_length((f32 *)(*slot + 0xD0), *slot + 0xD0, scale);
+            func_002A0F48(*slot);
+            size = *(f32 *)(*(u8 **)(*slot + 0x24) + 0x3C);
+            *(f32 *)(*slot + 0xC) = size + size;
         }
     }
 }

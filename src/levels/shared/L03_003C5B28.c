@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -94,65 +95,70 @@ typedef struct {
     s32 f98;
 } L03_5EE8Moby;
 
-void func_L03_003C5EE8(L03_5EE8Moby *m) {
+/* Finds a safe spot for the object this one is holding and puts it down there. If the spot is blocked, it keeps holding the object. */
+void func_L03_003C5EE8(L03_5EE8Moby *moby) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 test[4] __attribute__((aligned(16)));
-    L03_5EE8Vars *v = m->f68;
+    L03_5EE8Vars *vars = moby->f68;
 
-    func_L03_00419A60(v->f220, v->f358 + 0x10, 0);
-    func_L03_003CAB80(v->f358, D_00189EA0, pos);
+    SetRouteNodeEnabledFlag(vars->f220, vars->f358 + 0x10, 0);
+    ChooseRouteTargetPoint(vars->f358, gHeroPosition, pos);
     qcopy(test, pos);
-    test[2] += v->f110 + v->f114;
-    if (func_00277258(test, 0, m, v->f110) == 0) {
-        qcopy(v->f340, pos);
-        func_L00_003294F0(v->f358, 0);
-        v->f358 = 0;
-        m->f98 = m->f24->f10;
-        func_002A7750((u8 *)m, 0x11, 4);
-        if (m->f43 != 0) {
-            func_002A7470(m, 0, 0, 0x14);
+    test[2] += vars->f110 + vars->f114;
+    if (TestPointAgainstCollision(test, 0, moby, vars->f110) == 0) {
+        qcopy(vars->f340, pos);
+        SetObjectFlagBit(vars->f358, 0);
+        vars->f358 = 0;
+        moby->f98 = moby->f24->f10;
+        SetMobyState((u8 *)moby, 0x11, 4);
+        if (moby->f43 != 0) {
+            StartAnimationBlended(moby, 0, 0, 0x14);
         }
     } else {
-        func_L03_00419A60(v->f220, v->f358 + 0x10, 1);
+        SetRouteNodeEnabledFlag(vars->f220, vars->f358 + 0x10, 1);
     }
 }
 
 /* func_L03_003C9FB8 lives in L03_003C9FB8.c. */
 
-int func_L03_003CA138(unsigned char *p) { return p[0x20] == 1; }
+/* Tells whether the object is in its first state. */
+int func_L03_003CA138(unsigned char *moby) { return moby[0x20] == 1; }
 
 /* func_L03_003CA148 is matched in its own unit, L03_003CA148.c. */
 
-void func_L03_003CA220(u8 *a0, f32 a1) {
-    *(f32 *)(*(u8 **)(a0 + 0x68) + 0xA0) = a1;
+/* Sets the height offset stored in the object. */
+void func_L03_003CA220(u8 *moby, f32 height) {
+    *(f32 *)(*(u8 **)(moby + 0x68) + 0xA0) = height;
 }
 
 /* func_L03_003CA230 lives in the -g8 sibling: its first call reads a float
    constant through $gp at 0x1300. */
 
-int func_L03_003CA280(unsigned char *p) { return p[0x20] == 1; }
+/* Tells whether the object is in its first state. */
+int func_L03_003CA280(unsigned char *moby) { return moby[0x20] == 1; }
 
 
 
-void func_L03_003CA9F8(u8 *entity) {
-    switch (entity[0x20]) {
+/* Updates a toggling object (moby class 2426). It switches between two states as its animation finishes, and sets a flag value while in the second one. */
+void func_L03_003CA9F8(u8 *moby) {
+    switch (moby[0x20]) {
     case 0:
-        func_002A7750(entity, 1, -1);
-        *(u32 *)(entity + 0x98) = 0;
-        *(unsigned short *)(entity + 0x34) =
-            (*(unsigned short *)(entity + 0x34) | 0x41) & 0xEFFF;
+        SetMobyState(moby, 1, -1);
+        *(u32 *)(moby + 0x98) = 0;
+        *(unsigned short *)(moby + 0x34) =
+            (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
         break;
     case 1:
-        if (func_002B38B8(entity) != 0) {
-            func_002A7750(entity, 2, -1);
-            *(u32 *)(entity + 0x98) =
-                *(u32 *)(*(u8 **)(entity + 0x24) + 0x10);
+        if (IsThirdPendingFlagSet(moby) != 0) {
+            SetMobyState(moby, 2, -1);
+            *(u32 *)(moby + 0x98) =
+                *(u32 *)(*(u8 **)(moby + 0x24) + 0x10);
         }
         break;
     case 2:
-        if (func_002B38B8(entity) == 0) {
-            func_002A7750(entity, 1, -1);
-            *(u32 *)(entity + 0x98) = 0;
+        if (IsThirdPendingFlagSet(moby) == 0) {
+            SetMobyState(moby, 1, -1);
+            *(u32 *)(moby + 0x98) = 0;
         }
         break;
     }
@@ -160,14 +166,16 @@ void func_L03_003CA9F8(u8 *entity) {
 
 extern int func_002ACBC8(u8 *, u32);
 
-u32 func_L03_003CAAC8(u8 *a0, u8 *a1) {
-    return func_002ACBC8(a1, *(u32 *)(*(u8 **)(a0 + 0x68) + 0x60)) != 0;
+/* Checks another object against a test value stored in this object. Returns 1 if it passes. */
+u32 func_L03_003CAAC8(u8 *moby, u8 *other) {
+    return IsPointInCuboid(other, *(u32 *)(*(u8 **)(moby + 0x68) + 0x60)) != 0;
 }
 
 /* func_L03_003CAAF0 lives in the -g8 sibling: its first call reads a float
    constant through $gp at 0x1354. */
 
-s32 func_L03_00419BD8(u32 a0, u8 *first, u8 *second);
+/* Checks two points against the route graph of the indexed record. */
+s32 func_L03_00419BD8(u32 poolIndex, u8 *first, u8 *second);
 extern void func_L03_003CAAF0(u8 *, f32 *, f32 *);
 extern s32 func_L03_00419C58(u32, f32 *);
 extern f32 func_00282E80(void *, f32 *);
@@ -183,12 +191,13 @@ extern f32 func_002A89A8(f32 *, s32, f32);
 
 extern f32 func_00283B98(f32, f32);
 
-void func_L03_003CC1D8(u8 *a0) {
-    if (*(u8 *)(a0 + 0x31) == 0)
+/* Updates the Blue Swingshot Target. Once active, it turns two of its rotation values toward their goals. */
+void func_L03_003CC1D8(u8 *moby) {
+    if (*(u8 *)(moby + 0x31) == 0)
         return;
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4),
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4),
                                         0.10471977293491364f);
-    *(f32 *)(a0 + 0xF8) = func_00283B98(*(f32 *)(a0 + 0xF8),
+    *(f32 *)(moby + 0xF8) = FastAddRotations(*(f32 *)(moby + 0xF8),
                                         0.04654212296009064f);
 }
 
@@ -212,19 +221,20 @@ extern void func_00282CC0(void *, void *, void *);
 
 extern void func_002C2210(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
 
-void func_L03_003D0FC8(u8 *a0, s32 a1, s32 a2) {
-    f32 buf[3];
-    f32 f20, f21;
-    s32 s1, s2;
+/* Spawns two puffs of particles with random size and speed, used by the particle emitter. */
+void func_L03_003D0FC8(u8 *moby, s32 matrix, s32 color) {
+    f32 velocity[3];
+    f32 size, life;
+    s32 spin, tint;
 
-    s2 = a2;
-    f20 = func_002A7878(0.25f, 1.0f);
-    s1 = func_002A77E0(2);
-    f21 = func_002A7878(3.0f, 7.0f) * (1.0f / 3600.0f);
-    func_002A7A00(buf, 0.0f, 0.1f);
-    func_00282CC0(buf, buf, a1);
-    func_002C2210(buf, 0x28, 0x7F800000, 0, s1, s2, 0, f20 * 0.2f, f20, f21);
-    func_002C2210(buf, 0x3C, 0x7F7F7F7F, 1, -s1, s2, 0, f20 * 0.14f, f20 * 0.7f, f21);
+    tint = color;
+    size = RandomFloatRange(0.25f, 1.0f);
+    spin = RandomIntBelow(2);
+    life = RandomFloatRange(3.0f, 7.0f) * (1.0f / 3600.0f);
+    RandomDirectionVector(velocity, 0.0f, 0.1f);
+    FastVecAdd(velocity, velocity, matrix);
+    SpawnGroundEffectParticle(velocity, 0x28, 0x7F800000, 0, spin, tint, 0, size * 0.2f, size, life);
+    SpawnGroundEffectParticle(velocity, 0x3C, 0x7F7F7F7F, 1, -spin, tint, 0, size * 0.14f, size * 0.7f, life);
 }
 
 /* func_L03_003D9578 is defined in L03_003D9578.c. */
@@ -239,81 +249,83 @@ void func_L03_003D0FC8(u8 *a0, s32 a1, s32 a2) {
 
 /* func_L03_003E2C08 is defined in L03_003C5B28-g8.c (it reads the step count through $gp). */
 
-s32 func_L03_003E2D98(u8 *a0, u32 a1, s32 a2, u32 *a3, s32 a4) {
-    u8 *rec = *(u8 **)(a0 + 0x68);
+/* Picks a random value from a row of the table that is not already in use. Returns -1 if all are used. */
+s32 func_L03_003E2D98(u8 *moby, u32 row, s32 usedCount, u32 *extraUsed, s32 extraCount) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     s32 start;
     s32 six;
     s32 i;
-    s32 v;
+    s32 value;
     s32 found;
-    u32 offset;
-    start = func_002A77E0(6);
+    u32 rowOffset;
+    start = RandomIntBelow(6);
     six = 6;
-    offset = a1 * 24;
+    rowOffset = row * 24;
 
     for (i = 0; i < six; i++) {
         s32 index = (i + start) % six;
         s32 j;
 
-        v = *(u32 *)((u8 *)&D_L03_0024A7B0 + (offset + index * 4));
-        if (v == -1)
+        value = *(u32 *)((u8 *)&D_L03_0024A7B0 + (rowOffset + index * 4));
+        if (value == -1)
             continue;
         j = 0;
         found = 0;
-        for (; j < a2 + 2; j++) {
-            if (((L03ChoiceRecord *)rec)->values[j] == v)
+        for (; j < usedCount + 2; j++) {
+            if (((L03ChoiceRecord *)vars)->values[j] == value)
                 found = 1;
         }
         {
             s32 k;
-            for (k = 0; k < a4; k++) {
-                if (a3[k] == v)
+            for (k = 0; k < extraCount; k++) {
+                if (extraUsed[k] == value)
                     found = 1;
             }
         }
         if (found == 0)
-            return v;
+            return value;
     }
     return -1;
 }
 
-void func_L03_003E2EC8(u8 *a0) {
-    L03ChoicePath *r = *(L03ChoicePath **)(a0 + 0x68);
-    u8 *bytes = (u8 *)r;
-    if (r->current == r->last) {
-        *(u8 *)(bytes + r->previous + 0x10) = 0;
-        bytes[r->length] = 0xFF;
-        r->previous = r->last;
-        if (r->length >= 2)
-            r->last = bytes[r->length - 2];
+/* Adds the current choice to the path, or takes back the last one if it was just chosen. Then it rebuilds the list of choices. */
+void func_L03_003E2EC8(u8 *moby) {
+    L03ChoicePath *path = *(L03ChoicePath **)(moby + 0x68);
+    u8 *data = (u8 *)path;
+    if (path->current == path->last) {
+        *(u8 *)(data + path->previous + 0x10) = 0;
+        data[path->length] = 0xFF;
+        path->previous = path->last;
+        if (path->length >= 2)
+            path->last = data[path->length - 2];
         else
-            r->last = 0;
-        *(u8 *)(bytes + r->length + 0x30) = 0xFF;
-        r->length--;
-        if (r->depth != 0)
-            r->depth--;
+            path->last = 0;
+        *(u8 *)(data + path->length + 0x30) = 0xFF;
+        path->length--;
+        if (path->depth != 0)
+            path->depth--;
         else
-            r->cursor--;
+            path->cursor--;
     } else {
-        *(u8 *)(bytes + r->current + 0x10) = 1;
+        *(u8 *)(data + path->current + 0x10) = 1;
         {
-            s16 depth = r->depth;
-            u16 value = *(u16 *)&r->depth;
-            if (depth == 0 && r->current == bytes[r->cursor + 0x21])
-                r->cursor++;
+            s16 depth = path->depth;
+            u16 value = *(u16 *)&path->depth;
+            if (depth == 0 && path->current == data[path->cursor + 0x21])
+                path->cursor++;
             else
-                r->depth = value + 1;
+                path->depth = value + 1;
         }
-        r->last = r->previous;
-        r->previous = r->current;
-        r->length++;
-        bytes[r->length] = (u8)r->current;
+        path->last = path->previous;
+        path->previous = path->current;
+        path->length++;
+        data[path->length] = (u8)path->current;
     }
-    func_L03_003E3308(a0);
-    r->field48 = 0;
-    r->field4C = 0;
-    r->field56 = 0;
-    func_L03_003E3018(a0);
+    BuildChoiceList(moby);
+    path->field48 = 0;
+    path->field4C = 0;
+    path->field56 = 0;
+    ComputePathPuzzleTurn(moby);
 }
 
 /* func_L03_003E3018 is defined in L03_003E3018.c. */
@@ -377,17 +389,18 @@ extern void func_002B37E8(u8 *, u8 *);
 
 extern void func_002833F0(u8 *, u8 *);
 
-void func_L03_003E5070(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
-    u8 *p = func_0029EFD0(0xB28);
+/* Creates an Infiltrator Ball, links it to this object and remembers it in this object's data. */
+void func_L03_003E5070(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *child = CreateMoby(0xB28 /* Infiltrator Ball */);
 
-    if (p == 0)
+    if (child == 0)
         return;
-    func_002B37E8(p, a0);
-    func_002833F0(p + 0xC0, p + 0xF0);
-    *(unsigned short *)(p + 0x34) =
-        (*(unsigned short *)(p + 0x34) | 0x100);
-    *(u32 *)(q + 0x58) = (u32)p;
+    InitChildObjectFromParent(child, moby);
+    euler_rotation_basis(child + 0xC0, child + 0xF0);
+    *(unsigned short *)(child + 0x34) =
+        (*(unsigned short *)(child + 0x34) | 0x100);
+    *(u32 *)(vars + 0x58) = (u32)child;
 }
 
 /* func_L03_003E50E0 lives in the -g8 sibling: its first call reads a float
@@ -409,25 +422,26 @@ extern f32 D_001B2464 __attribute__((sda));
 
 /* Hands the entity's gadget class id to the active-gadget global, clears the entity's
  * gadget state and releases the resident class it was holding. */
-void func_L03_003E5170(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
+void func_L03_003E5170(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     f32 zero = 0.0f;
     f32 scale = 1.12434113f;    /* bits 0x3F8FEA69 (0x3F8FEA69 != 1.12434f) */
 
-    func_003355A8(3);
+    SetCameraModeState(3);
     D_001B9C14 = scale;
-    func_0026FF08(1, 0, scale, 0.005f, 0.2f, zero);
-    *(f32 *)(q + 0x6C) = zero;
-    g_activeGadgetItem = *(s32 *)(q + 0x64);
+    SetCameraValueTarget(1, 0, scale, 0.005f, 0.2f, zero);
+    *(f32 *)(vars + 0x6C) = zero;
+    g_activeGadgetItem = *(s32 *)(vars + 0x64);
     D_001B2464 = zero;
-    if (*(u8 **)(q + 0x58) != 0) {
-        func_0029F338(*(u8 **)(q + 0x58));
-        *(u32 *)(q + 0x58) = 0;
+    if (*(u8 **)(vars + 0x58) != 0) {
+        MarkMobySpawned(*(u8 **)(vars + 0x58));
+        *(u32 *)(vars + 0x58) = 0;
     }
 }
 
-void func_L03_003E5218(u8 *a0) {
-    *(u32 *)(*(u8 **)(a0 + 0x68) + 0x60) = 1;
+/* Turns on a flag in the object's data. */
+void func_L03_003E5218(u8 *moby) {
+    *(u32 *)(*(u8 **)(moby + 0x68) + 0x60) = 1;
 }
 
 
@@ -438,33 +452,36 @@ void func_L03_003E5218(u8 *a0) {
 
 extern f32 func_00282C48(f32);
 
-int func_L03_00409D28(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
+/* Tells whether the object's height is almost exactly a stored height. */
+int func_L03_00409D28(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    return func_00282C48(*(f32 *)(a0 + 0x18) - *(f32 *)(q + 0x8)) < 0.01f;
+    return FloatAbs(*(f32 *)(moby + 0x18) - *(f32 *)(vars + 0x8)) < 0.01f;
 }
 
 /* func_L03_00419578 lives in L03_00419578-g8.c. */
 
-u32 func_L03_004197A8(u8 *a0) {
-    u8 *p = *(u8 **)(a0 + 0x68);
+/* Returns the stored count while the object is in state 2, otherwise 0. */
+u32 func_L03_004197A8(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (*(u8 *)(a0 + 0x20) == 2)
-        return *(u32 *)(p + 0x10);
+    if (*(u8 *)(moby + 0x20) == 2)
+        return *(u32 *)(vars + 0x10);
     return 0;
 }
 
 /* func_L03_004197C8 lives in the -g8 sibling: its first call reads a float
    constant through $gp at 0x2AA0. */
 
-void func_L03_00419818(u8 *a0, u32 a1) {
-    u8 *p = *(u8 **)(a0 + 0x68);
-    s32 n = *(s32 *)(p + 0x10);
-    *(u32 *)(p + 0x1C) = a1;
-    n--;
-    *(s32 *)(p + 0x10) = n;
-    if (n == 0)
-        func_002A7750(a0, 3, -1);
+/* Saves a value and counts down a stored number. When the count reaches zero, the object moves to state 3. */
+void func_L03_00419818(u8 *moby, u32 value) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    s32 count = *(s32 *)(vars + 0x10);
+    *(u32 *)(vars + 0x1C) = value;
+    count--;
+    *(s32 *)(vars + 0x10) = count;
+    if (count == 0)
+        SetMobyState(moby, 3, -1);
 }
 
 
@@ -472,16 +489,17 @@ extern void func_0029F338(u8 *);
 
 extern u32 func_L03_00329EF0(u8 *, u8 *, u8 *, s32);
 
-void func_L03_004199F0(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
+/* On the first state, frees the object if it has no data. Otherwise it sets up its route table and moves to state 1. */
+void func_L03_004199F0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (*(u8 *)(a0 + 0x20) == 0) {
-        if (q == 0) {
-            func_0029F338(a0);
+    if (*(u8 *)(moby + 0x20) == 0) {
+        if (vars == 0) {
+            MarkMobySpawned(moby);
         } else {
-            *(u32 *)(q + 0x480) =
-                func_L03_00329EF0(a0, q, q + 0x80, 0x20);
-            func_002A7750(a0, 1, -1);
+            *(u32 *)(vars + 0x480) =
+                BuildRegionLinkGraph(moby, vars, vars + 0x80, 0x20);
+            SetMobyState(moby, 1, -1);
         }
     }
 }
@@ -494,9 +512,9 @@ void func_L03_00419A60(u32 a0, u8 *a1, s32 a2) {
     s32 index;
 
     if (*(u8 *)(rec + 0x20) == 0)
-        func_L03_004199F0(rec);
+        InitRoutePoolRecord(rec);
     index = -1;
-    if (func_L02_0032EDD8(a1, &q[0x80], ((s32 *)q)[0x120], &index) == 0)
+    if (FindRouteNodeContainingPoint(a1, &q[0x80], ((s32 *)q)[0x120], &index) == 0)
         return;
     if (a2 != 0)
         *(unsigned short *)(q + (index << 5) + 0x8C) &= 0xFFFE;
@@ -506,37 +524,40 @@ void func_L03_00419A60(u32 a0, u8 *a1, s32 a2) {
 
 extern s32 func_L02_0032E998(u8 *, u8 *, void *, u8 *, s32, s32 *, s32 *, float, float);
 
-s32 func_L03_00419B10(u32 a0, u8 *a1, u8 *a2, u8 *a3, s32 *x4, s32 *x5,
+/* Asks the route graph of the indexed record about two points and a heading. Passes along the margin and tolerance. */
+s32 func_L03_00419B10(u32 poolIndex, u8 *first, u8 *second, u8 *heading, s32 *firstIndex, s32 *secondIndex,
                      float margin, float tolerance) {
-    u8 *q = *(u8 **)((u8 *)D_L03_001B2A1C + (a0 << 8) + 0x68);
+    u8 *vars = *(u8 **)((u8 *)D_L03_001B2A1C + (poolIndex << 8) + 0x68);
 
-    return func_L02_0032E998(a1, a2, a3, q + 0x80, *(s32 *)(q + 0x480), x4, x5,
+    return ComputeRegionRouteHeading(first, second, heading, vars + 0x80, *(s32 *)(vars + 0x480), firstIndex, secondIndex,
                             margin, tolerance);
 }
 
-s32 func_L03_00419B58(u32 a0, s32 a1) {
-    u8 *q = *(u8 **)((u8 *)D_L03_001B2A1C + (a0 << 8) + 0x68);
-    u8 *p;
+/* Returns the value stored for a route node, or -1 if there is no node. */
+s32 func_L03_00419B58(u32 poolIndex, s32 nodeIndex) {
+    u8 *vars = *(u8 **)((u8 *)D_L03_001B2A1C + (poolIndex << 8) + 0x68);
+    u8 *node;
 
-    if (a1 != -1) {
-        p = q + (a1 << 5);
-        return *(s32 *)(p + 0x80);
+    if (nodeIndex != -1) {
+        node = vars + (nodeIndex << 5);
+        return *(s32 *)(node + 0x80);
     }
     return -1;
 }
 
 extern s32 func_L02_0032EDD8(u8 *, u8 *, s32, s32 *);
 
-void func_L03_00419B90(u32 a0, u8 *a1, u8 *a2) {
-    u8 *q = *(u8 **)((u8 *)D_L03_001B2A1C + (a0 << 8) + 0x68);
+/* Finds which node of the route graph holds a point and writes its index. */
+void func_L03_00419B90(u32 poolIndex, u8 *point, u8 *outIndex) {
+    u8 *vars = *(u8 **)((u8 *)D_L03_001B2A1C + (poolIndex << 8) + 0x68);
 
-    func_L02_0032EDD8(a1, q + 0x80, *(s32 *)(q + 0x480), (s32 *)a2);
+    FindRouteNodeContainingPoint(point, vars + 0x80, *(s32 *)(vars + 0x480), (s32 *)outIndex);
 }
 
 s32 func_L03_00419C00(u8 *, u8 *, u8 *);
 
 s32 func_L03_00419BD8(u32 a0, u8 *first, u8 *second) {
-    return func_L03_00419C00((u8 *)D_L03_001B2A1C + (a0 << 8), first, second);
+    return CheckPointsOnObjectRouteGraph((u8 *)D_L03_001B2A1C + (a0 << 8), first, second);
 }
 
 /* The route graph a pool record points to. Reading count through the struct matters:
@@ -556,7 +577,7 @@ s32 func_L03_00419C00(u8 *object, u8 *first, u8 *second) {
     L03RouteState *record = *(L03RouteState **)(object + 0x68);
     firstIndex = -1;
     secondIndex = -1;
-    return func_L02_0032E998(first, second, &angle, record->nodes,
+    return ComputeRegionRouteHeading(first, second, &angle, record->nodes,
                             record->count, &firstIndex, &secondIndex,
                             0.0f, 0.1f);
 }
@@ -566,10 +587,11 @@ s32 func_L03_00419C58(u32 a0, f32 *a1) {
     L03RouteState *state = *(L03RouteState **)((u8 *)D_L03_001B2A1C + (a0 << 8) + 0x68);
     s32 out = -1;
 
-    func_L02_0032EDD8((u8 *)a1, state->nodes, state->count, &out);
+    FindRouteNodeContainingPoint((u8 *)a1, state->nodes, state->count, &out);
     return out;
 }
 
+/* Does nothing. */
 void func_L03_0041B848(void)
 {
 }
@@ -578,33 +600,34 @@ void func_L03_0041B848(void)
 
 extern s32 func_002A77E0(s32);
 
-void func_L03_00425030(u8 *a0) {
-    u8 *rec = *(u8 **)(a0 + 0x68);
-    f32 *p = (f32 *)(rec + 0x10);
+/* Sets up the object's data with random color values and fixed numbers. */
+void func_L03_00425030(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 *color = (f32 *)(vars + 0x10);
     s32 i;
 
     for (i = 3; i >= 0; i--) {
-        *p++ = (f32)func_002A77E0(0xFF);
+        *color++ = (f32)RandomIntBelow(0xFF);
     }
-    *(f32 *)(rec + 0x20) = -1.0f;
-    *(f32 *)(rec + 0x24) = -2.25f;
-    *(f32 *)(rec + 0x28) = 1.25f;
-    *(f32 *)(rec + 0x2C) = 2.5f;
+    *(f32 *)(vars + 0x20) = -1.0f;
+    *(f32 *)(vars + 0x24) = -2.25f;
+    *(f32 *)(vars + 0x28) = 1.25f;
+    *(f32 *)(vars + 0x2C) = 2.5f;
     {
-        s32 j = 3;
-        u32 *q = (u32 *)(rec + 0x3C);
-        u32 v = 0xFF;
+        s32 k = 3;
+        u32 *target = (u32 *)(vars + 0x3C);
+        u32 level = 0xFF;
 
-        for (; j >= 0; j--) {
-            *q = v;
-            q--;
-            v -= 0x40;
+        for (; k >= 0; k--) {
+            *target = level;
+            target--;
+            level -= 0x40;
         }
     }
-    *(f32 *)(rec + 0x40) = 2.0f;
-    *(f32 *)(rec + 0x44) = 2.46f;
-    *(f32 *)(rec + 0x4C) = 2.0f;
-    *(f32 *)(rec + 0x48) = 2.46f;
+    *(f32 *)(vars + 0x40) = 2.0f;
+    *(f32 *)(vars + 0x44) = 2.46f;
+    *(f32 *)(vars + 0x4C) = 2.0f;
+    *(f32 *)(vars + 0x48) = 2.46f;
 }
 
 
@@ -615,39 +638,40 @@ extern int D_001A79F0 __attribute__((sda));
 
 extern void func_L03_0042B868(u8 *, void *, void *);
 
-extern void func_L03_0042B908(u8 *, u32);
+extern /* Splits a packed number into its top byte and its lower 24 bits and stores both in the object's data. */
+void func_L03_0042B908(u8 *, u32);
 
 /* Allocates the object's record, copies the two source fields into it, hands the record to
    the two setup helpers, and writes into the resident block the size the word at 0x001A79F0
    selects. */
-u8 *func_L03_0042B6F8(void *a0, void *a1, u32 a2, u8 *a3, u32 a4, u32 a5) {
-    u8 *s0 = func_0029EFD0(0x13BA);
-    u8 *s1;
+u8 *func_L03_0042B6F8(void *position, void *velocity, u32 packed, u8 *parent, u32 param, u32 keepTimer) {
+    u8 *moby = CreateMoby(0x13BA /* moby class 5050 */);
+    u8 *vars;
 
-    if (s0 != 0) {
-        *(unsigned short *)(s0 + 0x34) |= 0x100;
-        s1 = *(u8 **)(s0 + 0x68);
-        *(u8 *)(s0 + 0x30) = (a3 != 0) ? *(u8 *)(a3 + 0x30) : 0x96;
-        *(unsigned short *)(s0 + 0x32) = (a3 != 0) ? *(unsigned short *)(a3 + 0x32) : 0x96;
-        *(u8 *)(s0 + 0x20) = 0;
-        *(u32 *)(s1 + 0x20) = a4;
-        *(u32 *)(s1 + 0x44) = (u32)a3;
-        func_L03_0042B868(s0, a0, a1);
-        func_L03_0042B908(s0, a2);
-        if (a5 == 0)
-            *(u32 *)(s1 + 0x3C) = 0;
-        if (D_001A79F0 == 0)
-            *(u32 *)(s1 + 0x48) = 0x48;
-        if (D_001A79F0 == 3)
-            *(u32 *)(s1 + 0x48) = 0x3F;
-        if (D_001A79F0 == 6)
-            *(u32 *)(s1 + 0x48) = 0x44;
-        if (D_001A79F0 == 9)
-            *(u32 *)(s1 + 0x48) = 0x48;
-        if (D_001A79F0 == 0x12)
-            *(u32 *)(s1 + 0x48) = 0x43;
+    if (moby != 0) {
+        *(unsigned short *)(moby + 0x34) |= 0x100;
+        vars = *(u8 **)(moby + 0x68);
+        *(u8 *)(moby + 0x30) = (parent != 0) ? *(u8 *)(parent + 0x30) : 0x96;
+        *(unsigned short *)(moby + 0x32) = (parent != 0) ? *(unsigned short *)(parent + 0x32) : 0x96;
+        *(u8 *)(moby + 0x20) = 0;
+        *(u32 *)(vars + 0x20) = param;
+        *(u32 *)(vars + 0x44) = (u32)parent;
+        InitMobyBetweenPoints(moby, position, velocity);
+        SetPackedMobyFields(moby, packed);
+        if (keepTimer == 0)
+            *(u32 *)(vars + 0x3C) = 0;
+        if (gCurrentMapIndex == 0)
+            *(u32 *)(vars + 0x48) = 0x48;
+        if (gCurrentMapIndex == 3)
+            *(u32 *)(vars + 0x48) = 0x3F;
+        if (gCurrentMapIndex == 6)
+            *(u32 *)(vars + 0x48) = 0x44;
+        if (gCurrentMapIndex == 9)
+            *(u32 *)(vars + 0x48) = 0x48;
+        if (gCurrentMapIndex == 0x12)
+            *(u32 *)(vars + 0x48) = 0x43;
     }
-    return s0;
+    return moby;
 }
 
 
@@ -686,6 +710,7 @@ extern void r1_func_L02_002FBB48();
 
 /* rac1-decomp src/overlays/shared/vendor_002A5218.c: func_L02_002FBB10 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002ec308.c, FUN_L02_002fa6d8. */
+/* Resets a global record to zero, sets a large distance value and stores a callback. */
 void func_L03_0043AC40(void) {
     r1_D_L02_00167680_FBB10.a = 0;
     r1_D_L02_00167680_FBB10.b = 0;
@@ -702,10 +727,11 @@ extern void func_L03_002D84F0(void *);
 
 extern void func_L03_0043ACD8(void);
 
+/* If a strength value is set, starts a timed effect scaled by it and registers a callback. */
 void func_L03_0043AC78(void) {
     if (D_L03_001B9BEC != 0.0f) {
-        func_L00_00424A88(1, D_L03_001B9BEC * 0.35f, 0.005f);
-        func_L03_002D84F0(func_L03_0043ACD8);
+        SetCameraAimOffsetTarget(1, D_L03_001B9BEC * 0.35f, 0.005f);
+        register_camera_update_callback(TickCountdownTimer);
     }
 }
 
@@ -715,15 +741,18 @@ extern void func_L03_0043ACD8(void);
 /* rac1-decomp src/game/stub.c: func_001E97C8 */
 /* Takes an argument (callers pass one, e.g. r1_func_001EC210) and ignores
    it -- the unused parameter costs no codegen, still 0/8. */
-int func_L03_0043AF30(void *arg0) {
+/* Does nothing and returns 0. */
+int func_L03_0043AF30(void *unusedArg) {
     return 0;
 }
 
 
+/* Does nothing. */
 void func_L03_00456E58(void)
 {
 }
 
+/* Does nothing. */
 void func_L03_004586F0(void)
 {
 }

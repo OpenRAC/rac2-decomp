@@ -27,33 +27,34 @@ extern s32 func_00288768(s32 a0);
 extern s8 D_001A7B68[];
 extern s8 D_001A7B88[];
 
+/* Walks the item list, clears every entry that is not allowed, and tells whether all were fine. */
 s32 func_002908D0(void) {
-    s32 p;
-    s32 end;
-    s32 ok;
-    u8 c;
-    s32 s0;
+    s32 entry;
+    s32 listEnd;
+    s32 allValid;
+    u8 raw;
+    s32 itemId;
 
-    s32 k = 0x1E;
-    p = (s32)D_001A7B68;
-    end = (s32)D_001A7B88;
-    ok = 1;
+    s32 skipId = 0x1E;
+    entry = (s32)D_001A7B68;
+    listEnd = (s32)D_001A7B88;
+    allValid = 1;
     do {
-        c = *(u8 *)p;
-        if (c == 0xFF) {
-            p++;
+        raw = *(u8 *)entry;
+        if (raw == 0xFF) {
+            entry++;
             continue;
         }
-        s0 = c & 0x3F;
-        if (s0 == k) {
-            p++;
+        itemId = raw & 0x3F;
+        if (itemId == skipId) {
+            entry++;
             continue;
         }
-        if (func_00288768(s0) == 0 || s0 == 0) {
-            *(u8 *)p = 0xFF;
-            ok = 0;
+        if (IsHelpIdInMappingTable(itemId) == 0 || itemId == 0) {
+            *(u8 *)entry = 0xFF;
+            allValid = 0;
         }
-        p++;
-    } while (p < end);
-    return ok;
+        entry++;
+    } while (entry < listEnd);
+    return allValid;
 }

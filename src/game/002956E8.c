@@ -16,16 +16,16 @@ extern s32 func_00295680(s32);
 extern void func_00295788(s32, s32);
 
 s32 func_002956E8(void) {
-    s32 i = func_00295680(1);
+    s32 slot = FindFreeMapSlot(1);
 
-    if (i != 0) {
-        return i;
+    if (slot != 0) {
+        return slot;
     }
-    for (i = 1; i < 5; i++) {
-        if (!(D_001C4FA0.a[i] & 0x1000) && D_001C4FA0.b[i] != 0) {
+    for (slot = 1; slot < 5; slot++) {
+        if (!(gMapOverlayState.a[slot] & 0x1000) && gMapOverlayState.b[slot] != 0) {
             break;
         }
     }
-    func_00295788(0, i);
-    return i;
+    MoveMapCacheSlot(0, slot);
+    return slot;
 }

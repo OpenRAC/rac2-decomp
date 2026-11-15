@@ -60,7 +60,7 @@ void func_L16_00417DB0(char *object)
     if (*(unsigned char *)(object + 0x20) == 1) {
         target = D_L16_001B2B1C + *(int *)state*0x100;
         if (target == 0 || *(unsigned char *)(target + 0x20) == 0xfe || *(unsigned char *)(target + 0x20) == 0xfd) {
-            if (func_002ACBC8(&D_00189EA0, *(int *)(state + 8)) != 0) {
+            if (IsPointInCuboid(&gHeroPosition, *(int *)(state + 8)) != 0) {
                 int snapshot = *(int *)(*(char **)(object + 0x24) + 0x10);
                 object[0x20] = 2;
                 *(int *)(object + 0x98) = snapshot;
@@ -75,46 +75,46 @@ void func_L16_00417DB0(char *object)
         *(float *)(state + 0x10) -= 8.0f;
     if (*(float *)(state + 0x18) >= 8.0f)
         *(float *)(state + 0x18) -= 8.0f;
-    *(float *)(state + 0x14) = func_002A7878(0.003f, 0.005f);
-    *(float *)(state + 0x1c) = func_002A7878(0.001f, 0.0025f);
-    func_L00_002E6EF8(func_L14_003F0E68, object);
-    if (func_002A8508(*(int *)(state + 4), -1) == 0) {
+    *(float *)(state + 0x14) = RandomFloatRange(0.003f, 0.005f);
+    *(float *)(state + 0x1c) = RandomFloatRange(0.001f, 0.0025f);
+    AddDrawCallbackToList3(BindObjectToSmallDataWords, object);
+    if (CountMobysInGroupNotInState(*(int *)(state + 4), -1) == 0) {
         *(int *)(object + 0x98) = 0;
         object[0x20] = 3;
     }
-    qcopy(&local.player, &D_00189EA0);
+    qcopy(&local.player, &gHeroPosition);
     ((float *)&local.player)[2] = ((float *)&local.player)[2] + 0.75f;
-    if (func_00277258(&local.player, 0, D_00189EA0.collision, 0.5f) != 0 && D_L16_001BFF40.owner != 0 && *(short *)(D_L16_001BFF40.owner + 0xaa) == 0x10fb) {
+    if (TestPointAgainstCollision(&local.player, 0, gHeroPosition.collision, 0.5f) != 0 && D_L16_001BFF40.owner != 0 && *(short *)(D_L16_001BFF40.owner + 0xaa) == 0x10fb) {
         qcopy(&local.point, &D_L16_001BFF40.point);
         {
-            char *audioBank = D_00188660;
+            char *audioBank = gSoundState;
             for (i = 2; i >= 0; i--) {
                 int loopHandle = *(int *)(state + 12);
                 struct SoundAnchor *loopSound = (struct SoundAnchor *)(audioBank + 0x70*loopHandle);
                 if (loopSound->owner != object || loopSound->active == 0)
-                    *(int *)(state + 12) = func_002E5CF8(1, 4, object);
-                speed = func_002A7878(1.0f, 2.0f);
-                index = func_002A77E0(2);
+                    *(int *)(state + 12) = PlayMobySound(1, 4, object);
+                speed = RandomFloatRange(1.0f, 2.0f);
+                index = RandomIntBelow(2);
                 if (index == 0)
                     index--;
-                firstAngle = func_002A7940();
-                secondAngle = func_002A7878(0.3490658998f, 1.535889864f);
-                magnitude = func_002A7878(0.05f, 0.1f);
-                func_002AF000((float *)&local.velocity, magnitude, firstAngle, secondAngle);
+                firstAngle = RandomAngle();
+                secondAngle = RandomFloatRange(0.3490658998f, 1.535889864f);
+                magnitude = RandomFloatRange(0.05f, 0.1f);
+                BuildSphericalOffset((float *)&local.velocity, magnitude, firstAngle, secondAngle);
                 qcopy(&local.previous, &local.point);
-                ((float *)&local.point)[0] += func_002A78D8(0.0f, 0.15f);
-                ((float *)&local.point)[1] += func_002A78D8(0.0f, 0.15f);
-                ((float *)&local.point)[2] += func_002A78D8(0.0f, 0.15f);
-                func_002C2210(&local.point, 15, 0xff803040u, speed*0.1f, speed, 0, index, &local.velocity, 0.006f, 0);
+                ((float *)&local.point)[0] += RandomSignedFloatRange(0.0f, 0.15f);
+                ((float *)&local.point)[1] += RandomSignedFloatRange(0.0f, 0.15f);
+                ((float *)&local.point)[2] += RandomSignedFloatRange(0.0f, 0.15f);
+                SpawnGroundEffectParticle(&local.point, 15, 0xff803040u, speed*0.1f, speed, 0, index, &local.velocity, 0.006f, 0);
             }
         }
         return;
     }
     handle = *(int *)(state + 12);
     if (handle != -1) {
-        sound = (struct SoundAnchor *)(D_00188660 + 0x70*handle);
+        sound = (struct SoundAnchor *)(gSoundState + 0x70*handle);
         if (sound->owner == object && sound->active != 0)
-            func_002E59F8(handle);
+            StopSoundVoice(handle);
     }
     *(int *)(state + 12) = -1;
 }

@@ -27,18 +27,20 @@ extern s32 ref_L12_003A6EF8_00;
 extern s8 ref_L12_003A6EF8_01[];
 extern void ref_L12_003A6EF8_02(void *, void *, s32 *);
 
-void func_L12_003A6EF8(void *arg0) {
-    s32 *temp_a2;
-    s8 *t68;
+/* Checks a level-wide setting and, when it differs from the one this object remembers, saves
+   the new one and calls a callback for the object. */
+void func_L12_003A6EF8(void *moby) {
+    s32 *current;
+    s8 *vars;
 
-    if (*(u8 *)((s8 *)arg0 + 0x21) != 0xFF) {
-        s32 dv  = ref_L12_003A6EF8_00;
-        t68 = *(s8 **)((s8 *)arg0 + 0x68);
-        if (dv != 0) {
-            temp_a2 = *(s32 **)(t68 + 8);
-            if (dv != *temp_a2) {
-                *temp_a2 = dv;
-                ref_L12_003A6EF8_02(ref_L12_003A6EF8_01, arg0, temp_a2);
+    if (*(u8 *)((s8 *)moby + 0x21) != 0xFF) {
+        s32 wanted  = ref_L12_003A6EF8_00;
+        vars = *(s8 **)((s8 *)moby + 0x68);
+        if (wanted != 0) {
+            current = *(s32 **)(vars + 8);
+            if (wanted != *current) {
+                *current = wanted;
+                ref_L12_003A6EF8_02(ref_L12_003A6EF8_01, moby, current);
             }
         }
     }

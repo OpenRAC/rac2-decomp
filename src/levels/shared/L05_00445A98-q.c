@@ -17,13 +17,14 @@ extern TI128 D_L05_001B35F0 MACRO_ADDR;
 extern void func_L05_00441D40(char *);
 
 /* Saves the four 16-byte blocks of the state record and hands its bound block on. */
+/* Saves the ship's position and direction when the camera is in ship mode, and copies its position to the linked record. */
 void func_L05_00445A98(void)
 {
     char *state = D_L05_001B9710;
 
     if (*(short *)(state + 0x86) != 0x19)
         return;
-    func_L05_00441D40(state);
+    InitCameraState(state);
     D_L05_001B3600 = *(TI128 *)(state + 0x30);
     D_L05_001B35D0 = *(TI128 *)(state + 0x00);
     D_L05_001B35E0 = *(TI128 *)(state + 0x10);

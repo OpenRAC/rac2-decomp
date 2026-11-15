@@ -131,188 +131,189 @@ extern void func_002FC8D0(int, int, int);
 extern void func_002C9F68(void);
 extern void func_0028B338(int);
 
+/* Sets up the pause or cutscene screen: picks the menu page for the current state, resets the camera and screen buffers, and lays out the memory areas used while paused. */
 void func_002CA070(void)
 {
     int queued = 0;
-    int s, j, k, n, t, u;
-    int *p;
+    int s, j, k, n, gsBase, gsAfterBackground;
+    int *bufferPtr;
     void (*upd)(void);
 
-    D_001BAF80[4] |= 0x80000000;
-    D_001F2840.unk134 = 0;
-    D_001F2840.unkE0 = 0;
-    switch (D_001F2840.state) {
+    gCollisionHit[4] |= 0x80000000;
+    gPauseMenuState.unk134 = 0;
+    gPauseMenuState.unkE0 = 0;
+    switch (gPauseMenuState.state) {
     case 0:
     case 7:
     case 9:
         break;
     case 2:
         queued = 1;
-        D_001F2840.page = D_0025A190;
-        D_001F2840.next = D_0025A190;
+        gPauseMenuState.page = D_0025A190;
+        gPauseMenuState.next = D_0025A190;
         break;
     case 3:
-        D_001F2840.page = 0;
-        D_001F2840.next = 0;
+        gPauseMenuState.page = 0;
+        gPauseMenuState.next = 0;
         break;
     case 4:
-        D_001F2840.page = D_0025E488;
-        D_001F2840.next = D_0025E488;
+        gPauseMenuState.page = D_0025E488;
+        gPauseMenuState.next = D_0025E488;
         queued = 1;
-        func_002C9C60(6.0f);
+        SetPauseScaleInverse(6.0f);
         break;
     case 11:
-        D_001F2840.next = D_001F2840.page = D_00261238;
-        D_001A8C8C[0] = D_001F2840.unk134 = 1;
-        D_001F2840.state = 5;
-        func_002D5E98(D_001AA4B0);
+        gPauseMenuState.next = gPauseMenuState.page = D_00261238;
+        D_001A8C8C[0] = gPauseMenuState.unk134 = 1;
+        gPauseMenuState.state = 5;
+        StartMenuAction(D_001AA4B0);
         break;
     case 5:
-        D_001F2840.page = D_00261238;
-        D_001F2840.next = D_00261238;
-        D_001F2840.unk134 = 1;
+        gPauseMenuState.page = D_00261238;
+        gPauseMenuState.next = D_00261238;
+        gPauseMenuState.unk134 = 1;
         D_001A8C8C[0] = 1;
         break;
     case 6:
-        D_001F2840.page = D_00259458;
-        D_001F2840.next = D_00259458;
+        gPauseMenuState.page = D_00259458;
+        gPauseMenuState.next = D_00259458;
         break;
     case 1:
-        D_001F2840.page = D_00259328;
-        D_001F2840.next = D_00259328;
+        gPauseMenuState.page = D_00259328;
+        gPauseMenuState.next = D_00259328;
         break;
     case 10:
-        D_001F2840.page = D_0025A738;
-        D_001F2840.next = D_0025A738;
+        gPauseMenuState.page = D_0025A738;
+        gPauseMenuState.next = D_0025A738;
         break;
     case 8:
-        D_001F2840.page = D_00259018;
-        D_001F2840.next = D_00259018;
+        gPauseMenuState.page = D_00259018;
+        gPauseMenuState.next = D_00259018;
         D_00210A40.a = 0x18;
         D_00210A40.b = 0x18;
         D_00210A40.c = D_00258D70;
-        D_00210A40.upd = func_002CB648;
-        D_00210A40.init = func_002CB510;
+        D_00210A40.upd = DrawLevelSelectList;
+        D_00210A40.init = RebuildLevelSelectAvailability;
         D_00210A40.init(0);
-        func_002C9AD8(&D_00210A40);
+        StepRingListForward(&D_00210A40);
         break;
     }
 
-    if (D_001F2840.hasQueued != 0) {
-        D_001A7478[0] = D_001F2840.unk140;
-        D_001F2840.page = D_001F2840.queued;
-        D_001F2840.next = D_001F2840.queued;
-        if (D_001F2840.state == 2 || D_001F2840.state == 4) {
-            func_00295C50(D_001F2840.unkF4);
+    if (gPauseMenuState.hasQueued != 0) {
+        D_001A7478[0] = gPauseMenuState.unk140;
+        gPauseMenuState.page = gPauseMenuState.queued;
+        gPauseMenuState.next = gPauseMenuState.queued;
+        if (gPauseMenuState.state == 2 || gPauseMenuState.state == 4) {
+            SetCurrentMapAndRefresh(gPauseMenuState.unkF4);
             queued = 1;
-            func_0029D830();
+            UpdateEntryStates();
         }
-        D_001F2840.queued = 0;
-        D_001F2840.hasQueued = 0;
+        gPauseMenuState.queued = 0;
+        gPauseMenuState.hasQueued = 0;
     }
 
     {
-        u8 *r = D_001C2AD0;
-        func_00282D30(r, D_001AA490, 1.0f);
-        qcopy(r - 0x10, D_001AA4A0);
-        r += 0x20;
-        qzero_nc(r);
+        u8 *camera = D_001C2AD0;
+        FastVecScale(camera, D_001AA490, 1.0f);
+        qcopy(camera - 0x10, D_001AA4A0);
+        camera += 0x20;
+        qzero_nc(camera);
     }
     qzero_nc(D_001C2AD0 + 0x10);
-    qcopy(D_001F2840.v50, D_001B5340);
-    qcopy(D_001F2840.v60, D_001B5340 + 0x10);
+    qcopy(gPauseMenuState.v50, gCameraState_001B5340);
+    qcopy(gPauseMenuState.v60, gCameraState_001B5340 + 0x10);
     {
         float zfar = 524288.0f;
         float fog = 255.0f;
         float scale = 0.62f;
-        D_001F2840.unkF8 = D_001B9040.fB0;
+        gPauseMenuState.unkF8 = D_001B9040.fB0;
         D_001B9040.fB0 = scale;
         D_001B9040.f21C = zfar;
         D_001B9040.f228 = fog;
         D_001B9040.i22C = 0;
         D_001B9040.i218 = 0;
     }
-    func_0027AB40();
-    func_002C9C90();
-    func_00279D18();
-    func_002FC3C0(1);
-    func_001261F0(0);
+    UpdateViewContext();
+    ResetActiveCameraPosition();
+    BuildViewMatrices();
+    WaitForDmaStatusBits(1);
+    GetGsCurrentField(0);
     D_001B1598_sda = D_001B1598[0] + 1;
 
     if (queued) {
-        int a, b, c, d;
-        a = D_001BAEC0.fC + 0x30000;
-        b = D_001BAEC0.f10 + 0x30000;
-        c = a + 0x3C000;
-        d = b + 0xE0000;
-        D_001F2840.unk10C = c + 0x11800;
+        int areaA, areaB, areaC, areaD;
+        areaA = D_001BAEC0.fC + 0x30000;
+        areaB = D_001BAEC0.f10 + 0x30000;
+        areaC = areaA + 0x3C000;
+        areaD = areaB + 0xE0000;
+        gPauseMenuState.unk10C = areaC + 0x11800;
         D_001B22B0[0] = 0x30000;
-        D_001F2840.unk114 = a;
-        D_001F2840.unk20 = b;
-        D_001F2840.unk118 = c;
-        D_001F2840.unk11C = d;
-        D_001F2840.unk110 = d;
-        func_002DE3A0(0);
+        gPauseMenuState.unk114 = areaA;
+        gPauseMenuState.unk20 = areaB;
+        gPauseMenuState.unk118 = areaC;
+        gPauseMenuState.unk11C = areaD;
+        gPauseMenuState.unk110 = areaD;
+        InitStreamChunkTable(0);
     } else {
-        int a, b, c, d, e, f;
-        a = D_001BAEC0.fC + 0x60000;
-        b = D_001BAEC0.f10 + 0x60000;
-        b = b + 0xC000;
-        a = a + 0xC000;
-        c = a + 0x30000;
-        d = b + 0xE0000;
-        e = c + 0xC1000;
-        f = d + 0x60800;
-        D_001F2840.unk10C = e;
+        int areaA, areaB, areaC, areaD, areaE, areaF;
+        areaA = D_001BAEC0.fC + 0x60000;
+        areaB = D_001BAEC0.f10 + 0x60000;
+        areaB = areaB + 0xC000;
+        areaA = areaA + 0xC000;
+        areaC = areaA + 0x30000;
+        areaD = areaB + 0xE0000;
+        areaE = areaC + 0xC1000;
+        areaF = areaD + 0x60800;
+        gPauseMenuState.unk10C = areaE;
         D_001B22B0[0] = 0x60000;
-        D_001F2840.unk114 = a;
-        D_001F2840.unk20 = b;
-        D_001F2840.unk118 = c;
-        D_001F2840.unk11C = d;
-        D_001F2840.unk110 = f;
-        func_002DE3A0(1);
+        gPauseMenuState.unk114 = areaA;
+        gPauseMenuState.unk20 = areaB;
+        gPauseMenuState.unk118 = areaC;
+        gPauseMenuState.unk11C = areaD;
+        gPauseMenuState.unk110 = areaF;
+        InitStreamChunkTable(1);
     }
     D_001A8BC0 = 0x2000;
-    func_002FC1D8();
+    ResetPacketBuffer();
     if (queued) {
-        func_002954C0();
+        ResetMapCacheAndReload();
     }
-    func_0028AFE8(0);
+    UnlinkHudBankGroup(0);
     if (queued) {
-        func_0028ACB0(1);
+        LoadStashedHudBanks(1);
     } else {
-        func_0028ACB0(0);
+        LoadStashedHudBanks(0);
     }
-    if (D_001F2840.unkD0 == 0) {
-        func_002FC8D0(D_001F2840.unk20, D_001A72D8[1], D_001A7340[1] << 11);
+    if (gPauseMenuState.unkD0 == 0) {
+        CopyImageToGsBlocks(gPauseMenuState.unk20, D_001A72D8[1], gScreenWidth[1] << 11);
     } else {
-        func_002C9F68();
+        UploadPauseBackgroundToGs();
     }
-    t = D_001A72D4[0];
-    D_001F2840.unk28 = t;
+    gsBase = D_001A72D4[0];
+    gPauseMenuState.unk28 = gsBase;
     if (queued) {
-        D_001C4FA0.unk24C = t;
-        u = t + 0x40000;
-        D_001C4FA0.unk250 = u;
-        D_001A72D4[0] = u + 0x400;
+        gMapOverlayState.unk24C = gsBase;
+        gsAfterBackground = gsBase + 0x40000;
+        gMapOverlayState.unk250 = gsAfterBackground;
+        D_001A72D4[0] = gsAfterBackground + 0x400;
         for (j = 0; j < 4; j++) {
-            int v = D_001A72D4[0];
-            D_001C4FA0.bufs[j] = v;
-            D_001A72D4[0] = v + 0x4000;
+            int bufferAddr = D_001A72D4[0];
+            gMapOverlayState.bufs[j] = bufferAddr;
+            D_001A72D4[0] = bufferAddr + 0x4000;
         }
     } else {
-        int z;
-        D_001C4FA0.unk24C = 0;
-        D_001C4FA0.unk250 = 0;
-        p = &D_001C4FA0.bufs[3];
-        for (z = 0; z < 4; z++) {
-            *p = 0;
-            p--;
+        int bufferIndex;
+        gMapOverlayState.unk24C = 0;
+        gMapOverlayState.unk250 = 0;
+        bufferPtr = &gMapOverlayState.bufs[3];
+        for (bufferIndex = 0; bufferIndex < 4; bufferIndex++) {
+            *bufferPtr = 0;
+            bufferPtr--;
         }
     }
-    func_0028B338(1);
+    select_moby_context(1);
     for (k = 0; k < 4; k++) {
-        D_001F2840.unk40[k] = D_001A7398[k];
-        D_001F2840.unk30[k] = D_001A7398[k];
+        gPauseMenuState.unk40[k] = D_001A7398[k];
+        gPauseMenuState.unk30[k] = D_001A7398[k];
     }
 }

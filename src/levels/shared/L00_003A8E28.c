@@ -107,7 +107,7 @@ char *func_L00_003A98E8(void *position, void *velocity, char *owner, float speed
     ProjectilePoint step;
     ProjectilePoint forward;
     ProjectilePoint projected;
-    char *moby = func_0029EFD0(0x5D8);
+    char *moby = CreateMoby(0x5D8 /* Hoverbomb Projectile */);
     char *hit;
     ProjectileVars *vars;
     float along;
@@ -118,12 +118,12 @@ char *func_L00_003A98E8(void *position, void *velocity, char *owner, float speed
         *(short *)(moby + 0x32) = 255;
         *(unsigned char *)(moby + 0x31) = 1;
         vars = *(ProjectileVars **)(moby + 0x68);
-        *(float *)(moby + 0xF8) = func_002A7940();
-        *(float *)(moby + 0xF4) = func_002A7940();
-        *(float *)(moby + 0xF0) = func_002A7940();
+        *(float *)(moby + 0xF8) = RandomAngle();
+        *(float *)(moby + 0xF4) = RandomAngle();
+        *(float *)(moby + 0xF0) = RandomAngle();
         *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * 0.5f;
         qcopy(moby + 0x10, position);
-        func_00282F20(vars, velocity, speed);
+        vec_scale_to_length(vars, velocity, speed);
         qcopy(&vars->backup, vars);
 
         vars->owner = owner;
@@ -136,37 +136,37 @@ char *func_L00_003A98E8(void *position, void *velocity, char *owner, float speed
         vars->counter24 = 0;
         vars->counter28 = 0;
         vars->counter2C = 12;
-        vars->spinX = func_002A78D8(0.00087266473565f, 0.00436332356185f);
-        vars->spinY = func_002A78D8(0.00174532947131f, 0.00872664712369f);
-        vars->spinZ = func_002A78D8(0.00698131788522f, 0.0349065884948f);
+        vars->spinX = RandomSignedFloatRange(0.00087266473565f, 0.00436332356185f);
+        vars->spinY = RandomSignedFloatRange(0.00174532947131f, 0.00872664712369f);
+        vars->spinZ = RandomSignedFloatRange(0.00698131788522f, 0.0349065884948f);
         vars->target = -1;
         func_002A0F48(moby);
 
         *(ProjectileQuad *)step = 0;
         step[2] = 0.1333333333f;
-        *(ProjectileQuad *)near = *(ProjectileQuad *)(D_0018C0B0 + 0x10);
+        *(ProjectileQuad *)near = *(ProjectileQuad *)(gHeroMoby_0018C0B0 + 0x10);
         near[2] = *(float *)((char *)position + 8);
-        if (func_002761F8(near, position, 0, D_0018C0B0, 0)) {
+        if (CollLine(near, position, 0, gHeroMoby_0018C0B0, 0)) {
             hit = ref_L00_003A98E8_0.moby;
             if (hit == 0
                 || (*(short *)(hit + 0xAA) != 0xC87 && *(short *)(hit + 0xAA) != 0xECC)) {
                 qcopy(moby + 0x10, &ref_L00_003A98E8_0.point);
-                func_00283028(step, from, &ref_L00_003A98E8_0.normal);
-                func_00282F20(step, step, 0.0333333333f);
-                func_002ABBB8(moby, step, 0, 0, 0, 10, 3, 9, 6, 3, 9, 0, -1, 15, 1, 1, -1, 0,
+                FastVectorNormalize(step, from, &ref_L00_003A98E8_0.normal);
+                vec_scale_to_length(step, step, 0.0333333333f);
+                SpawnExplosionEffects(moby, step, 0, 0, 0, 10, 3, 9, 6, 3, 9, 0, -1, 15, 1, 1, -1, 0,
                               0x810001);
-                func_L00_003A9798(moby, vars, moby + 0x10, 0);
-                func_0029F338(moby);
+                DamageNearbyOnProjectileHit(moby, vars, moby + 0x10, 0);
+                MarkMobySpawned(moby);
                 return 0;
             }
         }
 
-        vars->effect = func_002FED90(moby, 0, 1, 1, 1);
+        vars->effect = AllocEffectSlot_002FED90(moby, 0, 1, 1, 1);
         if (ref_L00_003A98E8_1) {
-            func_002AFFD8(moby + 0x10, forward, 1);
-            along = func_00282DB0(forward, vars);
-            func_00282D30(projected, forward, along);
-            func_00282CF0(vars, vars, projected);
+            ComputeViewDirection(moby + 0x10, forward, 1);
+            along = FastVecDot(forward, vars);
+            FastVecScale(projected, forward, along);
+            FastVecSub(vars, vars, projected);
             qcopy(&vars->backup, vars);
         }
     }
@@ -180,25 +180,25 @@ char *func_L00_003A98E8(void *position, void *velocity, char *owner, float speed
 /* func_L00_003AB388 is defined in L00_003AB388-hit.c. */
 
 /* Applies a state record to a 3D point when the record carries a live tag. */
-void func_L00_003AB618(char *a0, char *a1, char *a2)
+void func_L00_003AB618(char *position, char *direction, char *target)
 {
-    if (a2 != 0) {
-        unsigned char t = *(unsigned char *)(a2 + 0x20);
+    if (target != 0) {
+        unsigned char kind = *(unsigned char *)(target + 0x20);
 
-        if (t != 0xFE)
-            if (t != 0xFD) {
-                char b0[16];
-                char b1[16];
-                char b2[16];
-                float f;
+        if (kind != 0xFE)
+            if (kind != 0xFD) {
+                char forward[16];
+                char offset[16];
+                char aimed[16];
+                float amount;
 
-                func_3251D0(a0, b0, 1);
-                f = *(float *)(func_31E7A8(a2) + 0x10);
-                func_2EE178(b1, b0, f);
-                func_2EE108(b2, a2 + 0x10, b1);
-                f = func_2EE238(a1);
-                func_2EE138(a1, b2, a0);
-                func_2EE3D0(a1, a1, f);
+                func_3251D0(position, forward, 1);
+                amount = *(float *)(func_31E7A8(target) + 0x10);
+                func_2EE178(offset, forward, amount);
+                func_2EE108(aimed, target + 0x10, offset);
+                amount = func_2EE238(direction);
+                func_2EE138(direction, aimed, position);
+                func_2EE3D0(direction, direction, amount);
             }
     }
 }
@@ -207,36 +207,37 @@ extern int func_002A77E0(int);
 extern int func_00283CF0(float);
 extern char *func_002BDCE8(void *, int, void *, float, float, unsigned int, float, float, int);
 extern char D_L00_001A8F20[] __attribute__((section(".sdata")));
+/* Sprays a few sparks from a point when a seeker shot hits. */
 void func_L00_003AB6F0(void *unused, void *position)
 {
     int i, sign;
-    char *p, *q;
+    char *particle, *payload;
     for (i=1; i>=0; i--) {
-        int n=func_002A77E0(16);
-        sign=func_002A77E0(2);
-        p=func_002BDCE8(position, sign ? -n : n, D_L00_001A8F20, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
-        q=p+32;
-        if(p) {
-            *(short *)(p+10)=10;
-            p[9]=func_00283CF0(4.0f)+64;
-            *(int *)(q+4)=2;
-            q[10]=127;
-            q[11]=*(unsigned char *)(p+10);
+        int n=RandomIntBelow(16);
+        sign=RandomIntBelow(2);
+        particle=SpawnSpinningSparkParticle(position, sign ? -n : n, D_L00_001A8F20, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
+        payload=particle+32;
+        if(particle) {
+            *(short *)(particle+10)=10;
+            particle[9]=FloatToInt(4.0f)+64;
+            *(int *)(payload+4)=2;
+            payload[10]=127;
+            payload[11]=*(unsigned char *)(particle+10);
         }
     }
     { int n=16;
     int j;
     for(j=0;j<2;j++) {
-        p=func_002BDCE8(position,n,D_L00_001A8F20,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
+        particle=SpawnSpinningSparkParticle(position,n,D_L00_001A8F20,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
         n=-n;
-        q=p+32;
-        if(p) {
-            p[9]=func_00283CF0(4.0f)+64;
-            *(short *)(p+10)=2;
-            p[8]=func_002A77E0(255);
-            *(int *)(q+4)=2;
-            q[10]=127;
-            q[11]=*(unsigned char *)(p+10);
+        payload=particle+32;
+        if(particle) {
+            particle[9]=FloatToInt(4.0f)+64;
+            *(short *)(particle+10)=2;
+            particle[8]=RandomIntBelow(255);
+            *(int *)(payload+4)=2;
+            payload[10]=127;
+            payload[11]=*(unsigned char *)(particle+10);
         }
     }
     }
@@ -295,14 +296,14 @@ void func_L00_003ADA30(char *moby)
         if (*(unsigned char *)(other + 0x20) == 6 && other != moby && other
             && *(short *)(other + 0xAA) == *(short *)(moby + 0xAA)) {
             *(TI128_ADA30 *)pos = *(TI128_ADA30 *)(moby + 0x10);
-            func_00282CF0(diff, pos, other + 0x10);
-            func_00282CF0(left, pos, ref_L00_003ADA30_1);
-            func_00282CF0(right, other + 0x10, ref_L00_003ADA30_1);
-            func_00282DD8(left, left, diff);
-            func_00282F20(left, left, 0.1f);
-            func_00282DD8(right, right, diff);
-            func_00282F20(right, right, 0.1f);
-            q.b = func_0027C878(14);
+            FastVecSub(diff, pos, other + 0x10);
+            FastVecSub(left, pos, ref_L00_003ADA30_1);
+            FastVecSub(right, other + 0x10, ref_L00_003ADA30_1);
+            FastVecCross(left, left, diff);
+            vec_scale_to_length(left, left, 0.1f);
+            FastVecCross(right, right, diff);
+            vec_scale_to_length(right, right, 0.1f);
+            q.b = GetEffectTextureDescriptor(14);
             q.c = 0xFF9000000260L;
             q.d = 0x8000000048L;
             q.a = 0;
@@ -314,15 +315,15 @@ void func_L00_003ADA30(char *moby)
                 q.uv[i][0] = ref_L00_003ADA30_2[i][0];
                 q.uv[i][1] = ref_L00_003ADA30_2[i][1];
             }
-            func_00282CF0(tmp, pos, left);
+            FastVecSub(tmp, pos, left);
             *(TI128_ADA30 *)q.v[0] = *(TI128_ADA30 *)tmp;
-            func_00282CC0(tmp, pos, left);
+            FastVecAdd(tmp, pos, left);
             *(TI128_ADA30 *)q.v[1] = *(TI128_ADA30 *)tmp;
-            func_00282CF0(tmp, other + 0x10, right);
+            FastVecSub(tmp, other + 0x10, right);
             *(TI128_ADA30 *)q.v[2] = *(TI128_ADA30 *)tmp;
-            func_00282CC0(tmp, other + 0x10, right);
+            FastVecAdd(tmp, other + 0x10, right);
             *(TI128_ADA30 *)q.v[3] = *(TI128_ADA30 *)tmp;
-            func_00280B90(&q, 0, 0);
+            draw_world_quad(&q, 0, 0);
         }
     }
 }
@@ -383,7 +384,7 @@ int func_L00_003AE550(char *motion, char *object, int mode)
     ArcVector previous;
     ArcVector probe;
     int timer;
-    ArcHero *hero = &D_00189E20;
+    ArcHero *hero = &gHeroState;
     int i;
     char *vars;
 
@@ -393,14 +394,14 @@ int func_L00_003AE550(char *motion, char *object, int mode)
         return 0;
     qcopy(previous, object + 0x10);
     if (*(unsigned char *)(object + 0x20) == 1) {
-        position[0] = func_00283180(func_00283B98(-0.36196801f, func_00283248(hero->facingX, hero->facingY))) * 0.859039f;
-        position[1] = func_00283198(func_00283B98(-0.36196801f, func_00283248(hero->facingX, hero->facingY))) * 0.859039f;
+        position[0] = FastSinOrCosA(FastAddRotations(-0.36196801f, FastMatrixHelperA(hero->facingX, hero->facingY))) * 0.859039f;
+        position[1] = FastSinOrCosB(FastAddRotations(-0.36196801f, FastMatrixHelperA(hero->facingX, hero->facingY))) * 0.859039f;
         *(int *)&position[2] = 0;
-        func_00282CC0(position, position, hero->pos);
+        FastVecAdd(position, position, hero->pos);
         position[2] = position[2] + 0.49082f;
         qcopy(velocity, motion);
-        if (hero->ground != 0 && func_002AD0B0(hero->ground) != 0 && mode != 0) {
-            func_00282CC0(velocity, velocity, hero->displacement);
+        if (hero->ground != 0 && GetMobyPrivateValue2(hero->ground) != 0 && mode != 0) {
+            FastVecAdd(velocity, velocity, hero->displacement);
         }
         timer = 120;
     } else {
@@ -417,51 +418,51 @@ int func_L00_003AE550(char *motion, char *object, int mode)
         }
     }
     {
-        ArcHero *player = &D_00189E20;
+        ArcHero *player = &gHeroState;
         char *moby = player->moby;
 
         *(ArcQuad *)probe = *(ArcQuad *)(moby + 0x10);
         probe[2] = position[2];
-        if (func_002761F8(probe, position, 0x10, moby, 0) != 0) {
-            if (func_00278E78() != 0 && D_L00_001BF200.count > 0) {
-                qcopy(motion + 0x10, D_L00_001BF200.point);
+        if (CollLine(probe, position, 0x10, moby, 0) != 0) {
+            if (GetCollHitMaterial() != 0 && gCollisionResult.count > 0) {
+                qcopy(motion + 0x10, gCollisionResult.point);
             }
         }
     }
-    while (func_00282948(&timer) == 0) {
+    while (FastFloatHelperD(&timer) == 0) {
         qcopy(previous, position);
         i = 9;
         do {
-            func_00282CC0(position, position, velocity);
+            FastVecAdd(position, position, velocity);
             velocity[2] = velocity[2] - 0.0027222224f;
         } while (--i >= 0);
-        if (func_002761F8(previous, position, 0x12, object, 0) == 0)
+        if (CollLine(previous, position, 0x12, object, 0) == 0)
             continue;
-        if (func_00278E78() == 0 && 0.0f < velocity[2])
+        if (GetCollHitMaterial() == 0 && 0.0f < velocity[2])
             continue;
-        if (D_L00_001BF200.count > 0) {
-            qcopy(motion + 0x10, D_L00_001BF200.point);
+        if (gCollisionResult.count > 0) {
+            qcopy(motion + 0x10, gCollisionResult.point);
             break;
         }
     }
     if (timer != 0) {
         if (mode == 0) {
-            if (D_L00_001BF200.hit == 0)
+            if (gCollisionResult.hit == 0)
                 return 0;
-            if (func_002AD0B0(D_L00_001BF200.hit) == 0)
+            if (GetMobyPrivateValue2(gCollisionResult.hit) == 0)
                 return 0;
         }
-        if (mode != 2 || D_L00_001BF200.hit == 0 || func_002AD0B0(D_L00_001BF200.hit) == 0) {
-            func_L00_002E6CF0(func_L00_003AD7C8, object);
+        if (mode != 2 || gCollisionResult.hit == 0 || GetMobyPrivateValue2(gCollisionResult.hit) == 0) {
+            AddDrawCallbackToList1(DrawSpinningQuadPair, object);
         }
         {
-            float *camera = D_L00_001B8DC0;
+            float *camera = gCameraPosition_L00;
             char *impact = motion + 0x10;
 
-            *(ArcQuad *)(motion + 0x20) = *(ArcQuad *)D_L00_001BF200.normal;
-            func_00282CF0(previous, impact, camera);
-            func_00282D30(previous, previous, 0.95f);
-            func_00282CC0(impact, previous, camera);
+            *(ArcQuad *)(motion + 0x20) = *(ArcQuad *)gCollisionResult.normal;
+            FastVecSub(previous, impact, camera);
+            FastVecScale(previous, previous, 0.95f);
+            FastVecAdd(impact, previous, camera);
         }
         return 1;
     }

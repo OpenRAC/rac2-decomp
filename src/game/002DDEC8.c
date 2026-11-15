@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int u32;
 
@@ -31,7 +32,7 @@ extern s32 D_001F2840[];
    the result). */
 void func_002DE3A0(s32 param)
 {
-    s32 *state = D_001F2840;
+    s32 *state = gPauseMenuState;
     u32 key1 = state[0x118 / 4];
     u32 key2 = state[0x11C / 4];
     s32 n1, n2, n3, n4;
@@ -108,10 +109,10 @@ int func_002DE618(int key)
         if (D_001B1F50_slots[i].key == key) {
             if ((D_001B1F50_slots[i].flags & 2) != 0) {
                 if ((D_001B1F50_slots[i].flags & 4) != 0) {
-                    state = (unsigned char *)D_001F2840;
+                    state = (unsigned char *)gPauseMenuState;
                     D_001B1F50_slots[i].flags ^= 4;
                     if (state[0xDB] != 0) {
-                        func_002B7AD0();
+                        RequestDiscReadBreak();
                         state[0xDB] = 0;
                     }
                 }
@@ -126,6 +127,7 @@ int func_002DE618(int key)
 extern int D_001B1F50[] __attribute__((sda));
 extern int D_001B1F54[] __attribute__((sda));
 
+/* Finds the stream chunk with this key and returns its size (large or small), or -1 if there is none. */
 int func_002DE6F0(int key)
 {
     int count = 0;
@@ -143,6 +145,7 @@ int func_002DE6F0(int key)
 }
 
 /* authored C for independently verified level-native body */
+/* Marks the stream chunk with this key as holding the latch. Returns 0 if found, 1 if not. */
 s32 func_002DE750(s32 key) {
  s32 count=0;
  u32 *flags=D_L24_001B1B74;
@@ -155,6 +158,7 @@ s32 func_002DE750(s32 key) {
  return 1;
 }
 
+/* Clears the latch mark of the stream chunk with this key. Returns 0 if found, 1 if not. */
 int func_002DE7A0(int key)
 {
     int count = 0;
@@ -174,14 +178,15 @@ int func_002DE7A0(int key)
     return 1;
 }
 
-void func_002DE810(unsigned short *a0,u8 *a1) {
- a0[0]=0;
- a0[1]=*(unsigned short *)(a1+0x24);
- a0[2]=0;
- a0[3]=*(unsigned short *)(a1+0x20);
- a0[4]=*(s32 *)(a1+0x20)>>1;
- a0[5]=*(s32 *)(a1+0x24)>>1;
- a0[8]=0x10;a0[9]=0;
+/* Sets up a menu text box rectangle that covers the whole menu, with the text centred. */
+void func_002DE810(unsigned short *box,u8 *menu) {
+ box[0]=0;
+ box[1]=*(unsigned short *)(menu+0x24);
+ box[2]=0;
+ box[3]=*(unsigned short *)(menu+0x20);
+ box[4]=*(s32 *)(menu+0x20)>>1;
+ box[5]=*(s32 *)(menu+0x24)>>1;
+ box[8]=0x10;box[9]=0;
 }
 
 
@@ -200,16 +205,17 @@ extern int D_001A79F0 __attribute__((sda));
 extern unsigned char D_001393E0[];
 extern void func_00298E08(int, int);
 
-void func_002DE858(int value, int mode)
+/* Starts saving the game into a slot: stores the time, queues the save job and remembers which slot is used. */
+void func_002DE858(int saveName, int slotIndex)
 {
-    unsigned char *state = D_001393E0;
-    func_001256D8((CdClock *)D_001A7360);
-    func_00131A98(D_001A7360);
-    func_002980D0();
-    func_00297670(D_0018D278 + (D_001A79F0 << 11));
-    func_0029ADA0(value);
-    *(int *)(state + 0x174) = value;
-    *(short *)(state + 0x18) = mode;
+    unsigned char *state = gMemcardState;
+    ReadCdClock((CdClock *)D_001A7360);
+    ClockToLocalTime(D_001A7360);
+    CopyMapBandColours();
+    FillMapBuffer(D_0018D278 + (gCurrentMapIndex << 11));
+    BuildSavePacket(saveName);
+    *(int *)(state + 0x174) = saveName;
+    *(short *)(state + 0x18) = slotIndex;
     *(int *)(state + 0x148) = 0;
     if (*(int *)(state + 0x164) < 0) {
         *(int *)(state + 0x168) = 0;
@@ -217,18 +223,19 @@ void func_002DE858(int value, int mode)
     }
 }
 
-void func_002DE900(int value, int mode)
+/* Clears the chosen slot, then starts saving the game into it. */
+void func_002DE900(int saveName, int slotIndex)
 {
     unsigned char *state;
-    func_00298E08(value, mode);
-    func_001256D8((CdClock *)D_001A7360);
-    func_00131A98(D_001A7360);
-    func_0029ADA0(value);
-    state = D_001393E0;
+    LoadGameDataAndResetSaveMenu(saveName, slotIndex);
+    ReadCdClock((CdClock *)D_001A7360);
+    ClockToLocalTime(D_001A7360);
+    BuildSavePacket(saveName);
+    state = gMemcardState;
     *(int *)(state + 0x148) = 0;
-    *(short *)(state + 0x18) = mode;
-    *(int *)(state + mode * 0x1C + 0x30) = 0;
-    *(int *)(state + 0x174) = value;
+    *(short *)(state + 0x18) = slotIndex;
+    *(int *)(state + slotIndex * 0x1C + 0x30) = 0;
+    *(int *)(state + 0x174) = saveName;
     if (*(int *)(state + 0x164) < 0) {
         *(int *)(state + 0x168) = 0;
         *(int *)(state + 0x164) = 0x13;
@@ -237,13 +244,14 @@ void func_002DE900(int value, int mode)
 
 
 
+/* If scoring is switched on, adds an amount to the running total and passes it on. */
 void func_002DF158(s32 object, s32 amount)
 {
     extern s32 D_001F2840[];
     extern void func_002A0300(s32, s32);
-    if (D_001F2840[0x168 / 4] != 0) {
-        D_001F2840[0x16C / 4] += amount;
-        func_002A0300(object, amount);
+    if (gPauseMenuState[0x168 / 4] != 0) {
+        gPauseMenuState[0x16C / 4] += amount;
+        UploadObjectTextures(object, amount);
     }
 }
 

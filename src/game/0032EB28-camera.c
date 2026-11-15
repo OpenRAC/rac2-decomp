@@ -7,21 +7,22 @@ extern void func_00272550(void *, void *, void *);
 extern char D_001B5340[];
 extern float D_00189EA0[];
 
+/* Moves the camera to a new place and turning, then starts a blend or hold that lasts the given time. */
 void func_00335438(TI128 *position, TI128 *rotation, int mode, int duration, int flags) {
     TI128 pos, rot, oldpos, oldrot;
-    char *camera = func_00270280(5);
+    char *camera = FindRecordByHandleId(5);
     char *state, *transition, *statepos, *staterot;
     qcopy(&pos, position);
     qcopy(&rot, rotation);
-    qcopy(&oldpos, D_001B5340);
-    qcopy(&oldrot, D_001B5340 + 0x10);
-    func_00270598(camera);
+    qcopy(&oldpos, gCameraState_001B5340);
+    qcopy(&oldrot, gCameraState_001B5340 + 0x10);
+    SwitchActiveCamera(camera);
     state = *(char **)(camera + 0x70);
     camera[0x7D] = 1;
     transition = state + 0xE0;
     statepos = state + 0x80;
     qcopy(camera + 0x30, &pos);
-    qcopy(D_001B5340, &pos);
+    qcopy(gCameraState_001B5340, &pos);
     qcopy(camera + 0x40, &rot);
     qcopy(statepos, &pos);
     staterot = state + 0x90;
@@ -34,8 +35,8 @@ void func_00335438(TI128 *position, TI128 *rotation, int mode, int duration, int
         *(int *)(transition + 0x48) = 0;
         qcopy(camera + 0x30, &oldpos);
         qcopy(camera + 0x40, &oldrot);
-        qcopy(state + 0x110, D_00189EA0);
-        func_00272550(state + 0xFC, &oldpos, D_00189EA0);
+        qcopy(state + 0x110, gHeroPosition);
+        ComputeDirectionAngles(state + 0xFC, &oldpos, gHeroPosition);
         /* fall through */
     case 2:
         *(int *)(transition + 4) = duration;

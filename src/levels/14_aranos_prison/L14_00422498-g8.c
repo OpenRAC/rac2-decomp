@@ -73,21 +73,21 @@ void func_L14_00422498(char *object)
     int i;
 
     state = *(BoltState **)(object + 0x68);
-    D_L14_001B1638 = func_002A7940();
-    D_L14_001B1640 = func_002A7940();
-    D_L14_001B1654 = func_00283B98(D_L14_001B1654, D_L14_001B1658);
-    func_00282C88(&position);
+    D_L14_001B1638 = RandomAngle();
+    D_L14_001B1640 = RandomAngle();
+    D_L14_001B1654 = FastAddRotations(D_L14_001B1654, D_L14_001B1658);
+    ClearVector128(&position);
     state->count = D_L14_001B1618;
-    func_00282CF0(&direction, &state->end, &state->start);
-    func_00282F20(&direction, &direction, 1.0f);
-    func_00282D30(&step, &direction, scale);
+    FastVecSub(&direction, &state->end, &state->start);
+    vec_scale_to_length(&direction, &direction, 1.0f);
+    FastVecScale(&step, &direction, scale);
     path = D_L14_001FE1C0[state->path];
     qcopy_nc(&D_L14_002594F0[state->row].core[0], &path->points[0]);
     qcopy_nc(&D_L14_002594F0[state->row].wave[0], &path->points[0]);
     for (i = 1; i < D_L14_001B1618; i++) {
-        nz = func_002A78D8(D_L14_001B1670, D_L14_001B1674);
-        nx = func_002A78D8(D_L14_001B1670, D_L14_001B1674);
-        ny = func_002A78D8(D_L14_001B1670, D_L14_001B1674);
+        nz = RandomSignedFloatRange(D_L14_001B1670, D_L14_001B1674);
+        nx = RandomSignedFloatRange(D_L14_001B1670, D_L14_001B1674);
+        ny = RandomSignedFloatRange(D_L14_001B1670, D_L14_001B1674);
         qcopy_nc(&D_L14_002594F0[state->row].core[i], &path->points[i]);
         f = (float)i;
         D_L14_002594F0[state->row].core[i].z += nz;
@@ -95,29 +95,29 @@ void func_L14_00422498(char *object)
         D_L14_002594F0[state->row].core[i].y += ny;
         /* Previous point: the row's points from index -1. */
         prev = &D_L14_002594F0[state->row].core[-1];
-        func_00282CF0(&delta, &D_L14_002594F0[state->row].core[i], &prev[i]);
-        phase = func_002ABB18(D_L14_001B1640 + f * D_L14_001B1648);
-        angle = func_002ABB18(D_L14_001B1654 + f * D_L14_001B165C);
-        amplitude = D_L14_001B164C * func_00283198(angle);
+        FastVecSub(&delta, &D_L14_002594F0[state->row].core[i], &prev[i]);
+        phase = WrapAngleToPi(D_L14_001B1640 + f * D_L14_001B1648);
+        angle = WrapAngleToPi(D_L14_001B1654 + f * D_L14_001B165C);
+        amplitude = D_L14_001B164C * FastSinOrCosB(angle);
         /* Column i of the wave points, then this bolt's row. */
         qcopy_nc(&D_L14_002594F0[0].wave[i] + state->row * 40,
                  &D_L14_002594F0[state->row].core[i]);
-        nz = amplitude * func_00283198(phase) + func_002A78D8(0.0f, 0.1f);
+        nz = amplitude * FastSinOrCosB(phase) + RandomSignedFloatRange(0.0f, 0.1f);
         D_L14_002594F0[state->row].wave[i].z += nz;
-        angle = func_00283B98(func_00283248(delta.x, delta.y), 1.5707964897155762f);
-        horizontalAmplitude = D_L14_001B1650 * func_00283180(phase);
-        perpendicular.x = func_00283180(angle) * horizontalAmplitude;
-        perpendicular.y = func_00283198(angle) * horizontalAmplitude;
+        angle = FastAddRotations(FastMatrixHelperA(delta.x, delta.y), 1.5707964897155762f);
+        horizontalAmplitude = D_L14_001B1650 * FastSinOrCosA(phase);
+        perpendicular.x = FastSinOrCosA(angle) * horizontalAmplitude;
+        perpendicular.y = FastSinOrCosB(angle) * horizontalAmplitude;
         perpendicular.z = 0.0f;
         wave = D_L14_002594F0[state->row].wave;
-        func_00282CC0(&wave[i], &wave[i], &perpendicular);
+        FastVecAdd(&wave[i], &wave[i], &perpendicular);
         if (i > 1 && (i == D_L14_001B1618 - 1 || !(i & 1))) {
-            func_002A8C00(effect, object, 1, 0.0f, D_L14_001A8F20);
+            make_hit_descriptor(effect, object, 1, 0.0f, D_L14_001A8F20);
             *(unsigned short *)(effect + 26) = *(unsigned short *)(object + 0xaa);
-            if (func_002761F8(&path->points[i - 2], &path->points[i], 17, object, effect)) {
-                if (D_L14_001BF940.owner == D_00189E20.moby) {
-                    D_00189E20.f5B0 = 0.0f;
-                    D_00189E20.f5B8 = 0.0f;
+            if (CollLine(&path->points[i - 2], &path->points[i], 17, object, effect)) {
+                if (D_L14_001BF940.owner == gHeroState.moby) {
+                    gHeroState.f5B0 = 0.0f;
+                    gHeroState.f5B8 = 0.0f;
                 }
             }
         }

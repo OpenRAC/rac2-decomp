@@ -7,8 +7,9 @@ extern s32 D_L22_0023B530[3][60];
 extern s32 D_L22_001B1920[4];
 extern s32 *D_L22_001B2AB4 __attribute__((sda));
 
-void func_L22_003A3CA0(char *arg0) {
-    char *st = *(char **)(arg0 + 0x68);
+/* Clears the counts and rows of spawned pickups and sets the starting limits from the ship. */
+void func_L22_003A3CA0(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
     s32 i, j;
     s32 *q;
     s32 a, b;
@@ -23,10 +24,10 @@ void func_L22_003A3CA0(char *arg0) {
             row[j] = 0;
     }
     q = D_L22_001B2AB4;
-    b = *(s16 *)(st + 0x32E);
+    b = *(s16 *)(vars + 0x32E);
     D_L22_001B1920[3] = b;
     q[3] = b;
-    a = *(s16 *)(st + 0x32A);
+    a = *(s16 *)(vars + 0x32A);
     D_L22_001B1920[2] = a;
     q[2] = a;
     D_L22_001B1920[0] = 0;

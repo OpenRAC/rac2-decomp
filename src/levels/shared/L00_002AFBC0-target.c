@@ -32,33 +32,34 @@ extern void func_L00_002D3B58(float *, float *, float);
  * hero position and yaw (or, when the value at 0x24B8 exceeds 0.5, from the alternate position and yaw after
  * clearing the target and marking it active), then aims: the angle and offset to the chosen target, else the
  * saved yaw and vector. Finally passes the aim vector to a helper. */
+/* Picks the best thing in front of the hero to aim at and turns the aim toward it. */
 void func_L00_002B75A0(float a, float b, float c)
 {
-    HeroTargetState *p = &D_00189E20_target;
-    char *result;
+    HeroTargetState *hero = &D_00189E20_target;
+    char *bestTarget;
     float yaw;
     float vector[4];
 
-    if (p->state == 0x20 || p->active != 0)
+    if (hero->state == 0x20 || hero->active != 0)
         return;
-    yaw = p->yaw;
-    qcopy(vector, p->pos);
-    if (0.5f < p->f24B8) {
-        func_L00_002B39F0(0, 1.0f);
-        yaw = p->altYaw;
-        qcopy(vector, p->altPos);
-        p->target = 0;
-        p->active = 1;
+    yaw = hero->yaw;
+    qcopy(vector, hero->pos);
+    if (0.5f < hero->f24B8) {
+        ResolveStickInputToDirection(0, 1.0f);
+        yaw = hero->altYaw;
+        qcopy(vector, hero->altPos);
+        hero->target = 0;
+        hero->active = 1;
     }
-    result = func_L00_002AE888(a, yaw, b, c, vector, -1, 0);
-    if (result != 0 && (p->target == 0 || p->active != 0)) {
-        p->aimAngle = func_00283248(*(float *)(result + 0x10) - p->origin[0],
-                                    *(float *)(result + 0x14) - p->origin[1]);
-        func_00282CF0(p->aim, result + 0x10, p->origin);
-        p->target = result;
+    bestTarget = SelectBestEligibleTarget(a, yaw, b, c, vector, -1, 0);
+    if (bestTarget != 0 && (hero->target == 0 || hero->active != 0)) {
+        hero->aimAngle = FastMatrixHelperA(*(float *)(bestTarget + 0x10) - hero->origin[0],
+                                    *(float *)(bestTarget + 0x14) - hero->origin[1]);
+        FastVecSub(hero->aim, bestTarget + 0x10, hero->origin);
+        hero->target = bestTarget;
     } else {
         D_00189E20_target.aimAngle = yaw;
         qcopy(D_00189E20_target.aim, vector);
     }
-    func_L00_002D3B58(D_00189E20_target.aim, D_00189E20_target.aim, 0.0f);
+    SetViewSpaceHeight(D_00189E20_target.aim, D_00189E20_target.aim, 0.0f);
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -7,9 +8,10 @@ typedef signed short s16;
 
 extern u16 D_L12_001B0B0C __attribute__((sda));
 
-void func_L12_003E2448(u8 *a0) {
-    *(u8 *)(a0 + 0x95) = 9;
-    *(u16 *)(*(u32 *)(a0 + 0x68) + 0x29E) = D_L12_001B0B0C;
+/* Sets the object's byte at +0x95 to 9 and copies a level-wide halfword into its private data. */
+void func_L12_003E2448(u8 *moby) {
+    *(u8 *)(moby + 0x95) = 9;
+    *(u16 *)(*(u32 *)(moby + 0x68) + 0x29E) = D_L12_001B0B0C;
 }
 
 extern float func_00283B98(float, float);
@@ -75,34 +77,34 @@ struct L12Kind348Object {
 /* Turns the object's angle and its mirrored scale into its word at +0x78; when the frame
    counter D_L12_001B29C8 differs from the object's word at +0x350, walks the object's group
    and refreshes every live entity of kind 0x11EB, then registers func_L12_004281D8. */
-void func_L12_00428040(struct L12Kind348Object *a0) {
-    struct L12Kind348 *o = a0->obj;
-    struct L12PairWord v = D_L12_001B21D0;
-    float f;
-    unsigned short *q;
-    struct L12Kind348Entity *e;
-    struct L12Kind348 *s0;
+void func_L12_00428040(struct L12Kind348Object *moby) {
+    struct L12Kind348 *vars = moby->obj;
+    struct L12PairWord colorPair = D_L12_001B21D0;
+    float wave;
+    unsigned short *groupEntry;
+    struct L12Kind348Entity *entity;
+    struct L12Kind348 *entityVars;
 
-    f = func_00283B98(o->f348, 0.2094395458f);
-    o->f348 = f;
-    f = func_00283198(f);
-    o->f34C = f * 0.5f + 0.5f;
-    a0->f78 = func_00283D38(v.a, v.b, o->f34C);
-    if (o->f350 != D_L12_001B29C8_s) {
-        for (q = D_L12_001FB960[a0->group];
-             a0->group != 0xFF && a0->group <= D_L12_001B2EB8 && q != 0 &&
-             ((q != 0 && (short)q[-1] >= 0) || q == D_L12_001FB960[a0->group]);
-             q++) {
-            e = (struct L12Kind348Entity *)(D_L12_001B2E9C[0] + ((*q & 0x7FFF) << 8));
-            if (e == 0)
+    wave = FastAddRotations(vars->f348, 0.2094395458f);
+    vars->f348 = wave;
+    wave = FastSinOrCosB(wave);
+    vars->f34C = wave * 0.5f + 0.5f;
+    moby->f78 = FastTweenColor(colorPair.a, colorPair.b, vars->f34C);
+    if (vars->f350 != D_L12_001B29C8_s) {
+        for (groupEntry = D_L12_001FB960[moby->group];
+             moby->group != 0xFF && moby->group <= D_L12_001B2EB8 && groupEntry != 0 &&
+             ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == D_L12_001FB960[moby->group]);
+             groupEntry++) {
+            entity = (struct L12Kind348Entity *)(D_L12_001B2E9C[0] + ((*groupEntry & 0x7FFF) << 8));
+            if (entity == 0)
                 break;
-            if (e->f31 != 0 && e->type == 0x11EB && e->state != 0xFE && e->state != 0xFD) {
-                s0 = e->obj;
-                func_0029FC20((char *)e, 0, (char *)s0 + 0x240);
-                s0->f350 = D_L12_001B29C8[0];
+            if (entity->f31 != 0 && entity->type == 0x11EB && entity->state != 0xFE && entity->state != 0xFD) {
+                entityVars = entity->obj;
+                TransformMobyJointPoint((char *)entity, 0, (char *)entityVars + 0x240);
+                entityVars->f350 = D_L12_001B29C8[0];
             }
         }
-        func_L00_002E6CF0((void *)func_L12_004281D8, a0);
+        AddDrawCallbackToList1((void *)DrawGroupEntityGlows, moby);
     }
 }
 
@@ -129,31 +131,31 @@ extern struct L12PairWord D_L12_001B21F0;
    set, state byte at +0x20 not 0xFE or 0xFD): the vector at D_L12_001B21E0 is turned by the
    angle at +0x344 of the entity's private block and then by its matrix at +0x240, the colour
    pair at D_L12_001B21F0 is mixed by the fraction at +0x34C, and both go to func_L00_00325AE8. */
-void func_L12_004281D8(u8 *a0) {
+void func_L12_004281D8(u8 *moby) {
     u16 *q;
     u16 *p;
     u8 *e;
-    u8 *s0;
+    u8 *priv;
     float buf[4];
     int r;
 
-    if (a0[0x21] == 0xFF)
+    if (moby[0x21] == 0xFF)
         return;
-    q = D_L12_001FB960[a0[0x21]];
+    q = D_L12_001FB960[moby[0x21]];
     if (q == 0)
         return;
-    for (p = q; a0[0x21] != 0xFF && a0[0x21] <= D_L12_001B2EB8_a[0] && p != 0 &&
-           ((p != 0 && (s16)p[-1] >= 0) || p == D_L12_001FB960[a0[0x21]]);
+    for (p = q; moby[0x21] != 0xFF && moby[0x21] <= D_L12_001B2EB8_a[0] && p != 0 &&
+           ((p != 0 && (s16)p[-1] >= 0) || p == D_L12_001FB960[moby[0x21]]);
          p++) {
         e = D_L12_001B2E9C[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (e[0x31] != 0 && *(s16 *)(e + 0xAA) == 0x11EB && e[0x20] != 0xFE && e[0x20] != 0xFD) {
-            s0 = *(u8 **)(e + 0x68);
-            func_00282D30(buf, D_L12_001B21E0, *(float *)(s0 + 0x344));
-            func_002830C0(buf, buf, s0 + 0x240);
-            r = func_00283D38(D_L12_001B21F0.a, D_L12_001B21F0.b, *(float *)(s0 + 0x34C));
-            func_L00_00325AE8(buf, r, *(float *)(s0 + 0x344) * 0.2f, 0.08f);
+        if (e[0x31] != 0 && *(s16 *)(e + 0xAA) == 0x11EB /* moby class 4587 */ && e[0x20] != 0xFE && e[0x20] != 0xFD) {
+            priv = *(u8 **)(e + 0x68);
+            FastVecScale(buf, D_L12_001B21E0, *(float *)(priv + 0x344));
+            transform_vector(buf, buf, priv + 0x240);
+            r = FastTweenColor(D_L12_001B21F0.a, D_L12_001B21F0.b, *(float *)(priv + 0x34C));
+            DrawBillboardQuad_L00(buf, r, *(float *)(priv + 0x344) * 0.2f, 0.08f);
         }
     }
 }
@@ -168,21 +170,22 @@ extern int D_L12_001B2324 __attribute__((sda));
 extern int D_L12_001B22E4 __attribute__((sda));
 extern int D_L12_001B22E8 __attribute__((sda));
 
+/* Draws two glow effects at the object's position, each with a random brightness and its own scale and colour. */
 void func_L12_00429D60(char *object) {
-    int value;
-    int value2;
+    int flareAlpha;
+    int flareAlpha2;
     float scale;
     float scale2;
     float random;
     scale = D_L12_001B2328;
     scale *= *(float *)(object + 0x2C);
-    value = func_002A7820(95, 111);
-    random = func_002A7940();
-    ref_L12_00429D60_00(object + 0x10, D_L12_001B22E4, scale, value, random, 1.0f, D_L12_001B2320, 2, object);
+    flareAlpha = RandomIntRange(95, 111);
+    random = RandomAngle();
+    ref_L12_00429D60_00(object + 0x10, D_L12_001B22E4, scale, flareAlpha, random, 1.0f, D_L12_001B2320, 2, object);
     scale2 = D_L12_001B2328;
     scale2 *= *(float *)(object + 0x2C);
     scale2 *= D_L12_001B232C;
-    value2 = func_002A7820(111, 127);
-    random = func_002A7940();
-    ref_L12_00429D60_00(object + 0x10, D_L12_001B22E8, scale2, value2, random, 1.0f, D_L12_001B2324, 2, object);
+    flareAlpha2 = RandomIntRange(111, 127);
+    random = RandomAngle();
+    ref_L12_00429D60_00(object + 0x10, D_L12_001B22E8, scale2, flareAlpha2, random, 1.0f, D_L12_001B2324, 2, object);
 }

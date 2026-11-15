@@ -83,12 +83,12 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
     float scale;
     int i;
 
-    if (func_L00_003CBBD0())
+    if (IsSheepinatorModeFour())
         return 0;
 
     for (i = 0; i < 5 && D_L00_002472C0[i].word_00 != 0; i++)
         ;
-    object = func_0029EFD0(0xA9B);
+    object = CreateMoby(0xA9B);
     if (object != 0) {
         object->update_dist = object->draw_dist = 255;
         state = (L00PoolState *)object->pvars;
@@ -97,10 +97,10 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         scale = 1.0f;
 
         *(L00PoolQuad *)saved = *(L00PoolQuad *)object->position;
-        *(L00PoolQuad *)object->position = *(L00PoolQuad *)D_00189EA0;
-        state->effect_slot = func_002FED90(object, scale, scale, scale, 0);
+        *(L00PoolQuad *)object->position = *(L00PoolQuad *)gHeroPosition;
+        state->effect_slot = AllocEffectSlot_002FED90(object, scale, scale, scale, 0);
         *(L00PoolQuad *)object->position = *(L00PoolQuad *)saved;
-        func_00282F20(state, direction, scale);
+        vec_scale_to_length(state, direction, scale);
         state->lifetime = 160;
         state->timer = 20;
         state->slot = i;
@@ -117,9 +117,9 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         p = owner->pvars;
         if (!D_L00_001B013C) {
             D_L00_001B2AD4 = *(L00PoolParticle **)(p + 8);
-            p = func_L00_00329FF0((char *)D_L00_001B2AD4 + 0xC00);
+            p = RoundUpToMultipleOf16_L00((char *)D_L00_001B2AD4 + 0xC00);
             D_L00_001B2AD8 = (L00PoolTrail *)p;
-            func_L00_00329FF0(p + 0x780);
+            RoundUpToMultipleOf16_L00(p + 0x780);
             D_L00_001B013C = 1;
             for (i = 63; i >= 0; i--)
                 D_L00_001B2AD4[i].owner = 0;
@@ -128,7 +128,7 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         }
 
         for (i = 0; i < 20; i++)
-            func_L00_003CB538(object);
+            SpawnPoolParticle(object);
     }
     return object;
 }

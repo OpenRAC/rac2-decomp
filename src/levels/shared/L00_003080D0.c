@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct Map80D0 {
     unsigned char pad00[0xc];
     unsigned char *bitmap;
@@ -13,6 +14,7 @@ extern int func_L00_00308700(int);
 extern int D_001A79F0 __attribute__((sda));
 extern int func_L00_00308538(void);
 extern void func_00297FE8(float, float, float *, float *, int);
+/* Clears the unexplored-map bits around a world position wherever the map colour matches the colour at that spot. */
 void func_L00_003080D0(float *position)
 {
     float px, py;
@@ -25,9 +27,9 @@ void func_L00_003080D0(float *position)
     int bit;
     if (D_L00_001C93A0.active == 0)
         return;
-    if (func_L00_00308538())
+    if (DispatchLevelEventOnce())
         return;
-    func_00297FE8(position[0], position[1], &px, &py, D_001A79F0);
+    ConvertWorldToMapPosition(position[0], position[1], &px, &py, gCurrentMapIndex);
     x = (int)(px * 512.0f) + 1;
     y = (int)(py * 512.0f) + 1;
     if (x < 0 || y < 0 || x >= 512 || y >= 512)
@@ -41,7 +43,7 @@ void func_L00_003080D0(float *position)
     if (minX < 0) minX = 0;
     if (maxX >= 512) maxX = 511;
     regionRow = (y >> 5) * 16;
-    func_L00_00308700((x >> 5) + regionRow);
+    LookupCacheEntry((x >> 5) + regionRow);
     sampleRow = y & 31;
     sampleRow *= 16;
     {
@@ -68,7 +70,7 @@ void func_L00_003080D0(float *position)
                     int dx = col - x + 16;
                     if ((*(D_L00_001C93A0.mask[0] + (dx / 8 + (dy << 2))) >> (dx % 8)) & 1)
                         continue;
-                    func_L00_00308700((col >> 5) + regionRow);
+                    LookupCacheEntry((col >> 5) + regionRow);
                     sample = (col & 31) / 2;
                     sample = *(D_L00_001C93A0.samples + sample + sampleRow);
                     if (col & 1) sample >>= 4;

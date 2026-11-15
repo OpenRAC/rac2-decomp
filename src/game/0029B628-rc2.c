@@ -28,10 +28,11 @@ extern s32 D_001A7290 __attribute__((nosda));
 extern s32 D_001A72C0 __attribute__((nosda));
 extern s32 D_00152C00[];
 
+/* Resets a few global slot ids to -1 and clears a flag. */
 void func_0029B628(void) {
     s32 *p;
 
-    p = D_00152C00;
+    p = gHeroMoby_00152C00;
     D_001A7290 = -1;
     p[6] = -1;
     D_001A72C0 = -1;

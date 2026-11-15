@@ -45,6 +45,7 @@ extern int D_L13_001B1648 __attribute__((sda));
 extern int D_L13_001B164C __attribute__((sda));
 extern float D_L13_001B1660[4][2] SDATA(D_L13_001B1660);
 
+/* Draws the electric beam as a few glowing strips running through its points. */
 void func_L13_0041AD00(char *m) {
     Beam *d = *(Beam **)(m + 0x68);
     Pkt P[3];
@@ -65,12 +66,12 @@ void func_L13_0041AD00(char *m) {
     Beam *src = d;
     int corners = 4;
 
-    func_00283410(M1, (char *)d + 0x650);
-    func_00283698(M2, M1);
+    euler_to_matrix(M1, (char *)d + 0x650);
+    matrix_from_basis_rows(M2, M1);
     qcopy_nc(&M1[12], m + 0x10);
-    func_00282CF0(v230, D_L13_001B98C0, m + 0x10);
-    func_00283098(v230, v230, M2);
-    tex = func_0027C878(D_L13_001B163C);
+    FastVecSub(v230, D_L13_001B98C0, m + 0x10);
+    matrix_mul_vec3(v230, v230, M2);
+    tex = GetEffectTextureDescriptor(D_L13_001B163C);
     flags = (long)D_L13_001B1640;
     flags |= (long)D_L13_001B1644 << 2;
     flags |= (long)D_L13_001B1648 << 4;
@@ -91,7 +92,7 @@ void func_L13_0041AD00(char *m) {
         P[1].color[t] = col;
         P[0].color[t] = col;
     }
-    func_00282C88(v250);
+    ClearVector128(v250);
     {
         int i;
         int segs = 31;
@@ -108,30 +109,30 @@ void func_L13_0041AD00(char *m) {
         for (i = 0; i < segs; i++) {
             qcopy(v240, v250);
             if (i < last) {
-                func_00282CF0(v270, path->pts[i], ahead->pts[i + 2]);
-                func_00282CF0(v260, mid->pts[i + 1], v230);
-                func_00282DD8(v250, v260, v270);
-                func_00282F20(v250, v250, 0.1f);
+                FastVecSub(v270, path->pts[i], ahead->pts[i + 2]);
+                FastVecSub(v260, mid->pts[i + 1], v230);
+                FastVecCross(v250, v260, v270);
+                vec_scale_to_length(v250, v250, 0.1f);
             } else {
-                func_00282C88(v250);
+                ClearVector128(v250);
             }
             for (k = 0; k < 4; k++) {
                 if (k < kh) {
                     qcopy(P[0].corner[k], near->pts[i]);
                     if (k & odd)
-                        func_00282CC0(P[0].corner[k], P[0].corner[k], v240);
+                        FastVecAdd(P[0].corner[k], P[0].corner[k], v240);
                     else
-                        func_00282CF0(P[0].corner[k], P[0].corner[k], v240);
+                        FastVecSub(P[0].corner[k], P[0].corner[k], v240);
                 } else {
                     qcopy(P[0].corner[k], far->pts[i + 1]);
                     if (k & odd2)
-                        func_00282CC0(P[0].corner[k], P[0].corner[k], v250);
+                        FastVecAdd(P[0].corner[k], P[0].corner[k], v250);
                     else
-                        func_00282CF0(P[0].corner[k], P[0].corner[k], v250);
+                        FastVecSub(P[0].corner[k], P[0].corner[k], v250);
                 }
-                P[0].uv[k][0] = D_L13_001B1660[k][0] + func_00283CE0(i - i / 4 * 4) * 0.25f;
+                P[0].uv[k][0] = D_L13_001B1660[k][0] + IntToFloat(i - i / 4 * 4) * 0.25f;
             }
-            func_00280B90(&P[0], M1, mode);
+            draw_world_quad(&P[0], M1, mode);
         }
     }
     {
@@ -149,7 +150,7 @@ void func_L13_0041AD00(char *m) {
         Beam *mid2 = d;
         Beam *ahead2 = d;
         for (j = 0; j < beams; j++) {
-            func_00282C88(v250);
+            ClearVector128(v250);
             c = cnt->cnt[j];
             if (c >= cmax)
                 continue;
@@ -158,12 +159,12 @@ void func_L13_0041AD00(char *m) {
             for (n = 0; n < 3; n++) {
                 qcopy(v240, v250);
                 if (n < rlast) {
-                    func_00282CF0(v270, seg->seg[n][j], ahead2->seg[n + 2][j]);
-                    func_00282CF0(v260, mid2->seg[n + 1][j], v230);
-                    func_00282DD8(v250, v260, v270);
-                    func_00282F20(v250, v250, 0.1f);
+                    FastVecSub(v270, seg->seg[n][j], ahead2->seg[n + 2][j]);
+                    FastVecSub(v260, mid2->seg[n + 1][j], v230);
+                    FastVecCross(v250, v260, v270);
+                    vec_scale_to_length(v250, v250, 0.1f);
                 } else {
-                    func_00282C88(v250);
+                    ClearVector128(v250);
                 }
                 if (n == 0)
                     qcopy(v240, v250);
@@ -171,19 +172,19 @@ void func_L13_0041AD00(char *m) {
                     if (k < kh2) {
                         qcopy(P[0].corner[k], near2->seg[n][j]);
                         if (k & odd3)
-                            func_00282CC0(P[0].corner[k], P[0].corner[k], v240);
+                            FastVecAdd(P[0].corner[k], P[0].corner[k], v240);
                         else
-                            func_00282CF0(P[0].corner[k], P[0].corner[k], v240);
+                            FastVecSub(P[0].corner[k], P[0].corner[k], v240);
                     } else {
                         qcopy(P[0].corner[k], d->seg[n + 1][j]);
                         if (k & odd4)
-                            func_00282CC0(P[0].corner[k], P[0].corner[k], v250);
+                            FastVecAdd(P[0].corner[k], P[0].corner[k], v250);
                         else
-                            func_00282CF0(P[0].corner[k], P[0].corner[k], v250);
+                            FastVecSub(P[0].corner[k], P[0].corner[k], v250);
                     }
-                    P[0].uv[k][0] = D_L13_001B1660[k][0] + func_00283CE0(n - n / 4 * 4) * 0.25f;
+                    P[0].uv[k][0] = D_L13_001B1660[k][0] + IntToFloat(n - n / 4 * 4) * 0.25f;
                 }
-                func_00280B90(&P[0], M1, mode2);
+                draw_world_quad(&P[0], M1, mode2);
             }
         }
     }

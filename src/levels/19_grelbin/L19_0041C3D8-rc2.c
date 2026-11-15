@@ -31,14 +31,15 @@ extern s32 func_00122DA8(s32, s32);
 extern f32 func_00123298(s32);
 extern void ref_L19_0041C3D8_00(void *, s32, s32);
 
-void func_L19_0041C3D8(void *arg0) {
-    void *s2;
-    s32 t;
+/* On its first frame, works out a value from the object's turn and stores it in the object's data, then moves to state 1. */
+void func_L19_0041C3D8(void *moby) {
+    void *vars;
+    s32 value;
 
-    s2 = (*(void **)((char *)(arg0) + (0x68)));
-    if ((*(u8 *)((char *)(arg0) + (0x20))) == 0) {
-        t = func_001234F0((*(f32 *)((char *)(arg0) + (0xC))));
-        (*(f32 *)((char *)(s2) + (0x10))) = func_00123298(func_00122DA8(t, func_00122B00(func_00131430((s64)0x8000 << 47), (s64)0x8120 << 47)));
-        ref_L19_0041C3D8_00(arg0, 1, -1);
+    vars = (*(void **)((char *)(moby) + (0x68)));
+    if ((*(u8 *)((char *)(moby) + (0x20))) == 0) {
+        value = FloatToDouble((*(f32 *)((char *)(moby) + (0xC))));
+        (*(f32 *)((char *)(vars) + (0x10))) = DoubleToFloat(DivideDoubles(value, MultiplyDoubles(func_00131430((s64)0x8000 << 47), (s64)0x8120 << 47)));
+        ref_L19_0041C3D8_00(moby, 1, -1);
     }
 }

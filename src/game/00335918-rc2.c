@@ -28,7 +28,8 @@ extern s32 func_00335870();
 
 extern s8 D_001AD988[];
 
-void func_00335918(s32 *arg0) {
-    arg0[1] = (s32)D_001AD988;
-    func_00335870();
+/* Sets the object type pointer and runs the shared base cleanup. */
+void func_00335918(s32 *obj) {
+    obj[1] = (s32)D_001AD988;
+    ResetObjectTypeAndFree();
 }

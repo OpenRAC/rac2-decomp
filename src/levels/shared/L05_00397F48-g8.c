@@ -35,12 +35,12 @@ void func_L05_00397F48(s32 owner, char *state, char *position)
         t.f1C = D_L05_001AEBE4;
     t.s20 = 1;
     qcopy(&t.v, state);
-    func_00282F20(&t, &t, 1.0f);
+    vec_scale_to_length(&t, &t, 1.0f);
     id = *(u16 *)(owner + 0xAA);
     t.v.d = 5627.9248046875f;
     t.b18 = 3;
     t.b19 = 2;
     t.h1A = id;
-    func_00277F48(position, 1, *(s32 *)(state + 0x20), &t,
+    ProcessCollisionHit(position, 1, *(s32 *)(state + 0x20), &t,
                   *(s32 *)(state + 0x24) ? D_L05_001AEBE0 : D_L05_001AEBDC);
 }

@@ -19,33 +19,34 @@ extern f32 D_L11_001B0168 __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
-u8 *func_L11_003DD068(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
-    u8 *s0 = arg0;
-    u8 *s2 = arg1;
-    u8 *s3 = arg2;
-    f32 f21 = arg3;
-    u8 *s1 = func_0029EFD0(0xA77);
+/* Creates a Hoverbike Race Bomb and sets its starting position and travel direction. */
+u8 *func_L11_003DD068(u8 *owner, u8 *startPos, u8 *targetPos, f32 gravity) {
+    u8 *ownerOrVars = owner;
+    u8 *start = startPos;
+    u8 *target = targetPos;
+    f32 fallRate = gravity;
+    u8 *bomb = CreateMoby(0xA77 /* Hoverbike Race Bomb */);
 
-    if (s1 != 0) {
+    if (bomb != 0) {
         u8 *v1;
         TI128 *dst;
-        f32 f20;
+        f32 travelTime;
 
-        v1 = s0;
-        s0 = *(u8 **)(s1 + 0x68);
-        func_002B37E8(s1, v1);
-        v1 = *(u8 **)(s1 + 0x24);
-        dst = (TI128 *)(s1 + 0x10);
+        v1 = ownerOrVars;
+        ownerOrVars = *(u8 **)(bomb + 0x68);
+        InitChildObjectFromParent(bomb, v1);
+        v1 = *(u8 **)(bomb + 0x24);
+        dst = (TI128 *)(bomb + 0x10);
 
-        *(f32 *)(s1 + 0x2C) = *(f32 *)(v1 + 0x24) * D_L11_001B016C;
-        *(u16 *)(s1 + 0x34) |= 0x5000;
-        *dst = *(TI128 *)s2;
-        func_00282CF0((f32 *)s0, (f32 *)s3, (f32 *)s2);
-        *(s32 *)(s0 + 0x8) = 0;
-        f20 = func_00282DF0((f32 *)s0) / D_L11_001B0168;
-        func_00282F20((f32 *)s0, (f32 *)s0, f20);
-        *(f32 *)(s0 + 0x8) = func_L00_0031CDD0((char *)s2, (char *)s3, 0, f20, -f21);
-        *(f32 *)(s0 + 0xC) = f21;
+        *(f32 *)(bomb + 0x2C) = *(f32 *)(v1 + 0x24) * D_L11_001B016C;
+        *(u16 *)(bomb + 0x34) |= 0x5000;
+        *dst = *(TI128 *)start;
+        FastVecSub((f32 *)ownerOrVars, (f32 *)target, (f32 *)start);
+        *(s32 *)(ownerOrVars + 0x8) = 0;
+        travelTime = FastVecLength((f32 *)ownerOrVars) / D_L11_001B0168;
+        vec_scale_to_length((f32 *)ownerOrVars, (f32 *)ownerOrVars, travelTime);
+        *(f32 *)(ownerOrVars + 0x8) = ComputeShotLaunchSpeed((char *)start, (char *)target, 0, travelTime, -fallRate);
+        *(f32 *)(ownerOrVars + 0xC) = fallRate;
     }
-    return s1;
+    return bomb;
 }

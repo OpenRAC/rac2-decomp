@@ -68,6 +68,7 @@ typedef struct {
     char pad74[9]; unsigned char handoff; short transition;
 } CameraOwner;
 
+/* Resets the follow camera to its starting settings (speeds, limits, counters). It then places the camera behind the hero. */
 void func_L00_004233F8(CameraOwner *owner)
 {
     CameraQuad projected, difference;
@@ -79,7 +80,7 @@ void func_L00_004233F8(CameraOwner *owner)
     PlaneState *plane;
     TrackerState *tracker;
     float distance;
-    unsigned char *initialPosition = D_00189E20 + 0x80;
+    unsigned char *initialPosition = gHeroState + 0x80;
     unsigned char *hero;
     D_L00_001B1580 = 0;
     D_L00_001B1584 = 0;
@@ -170,28 +171,28 @@ void func_L00_004233F8(CameraOwner *owner)
     tracker->f3C = D_L00_001B14DC;
     tracker->f40 = D_L00_001B14D8;
     tracker->i48 = D_L00_001B1854;
-    func_00282C88(tracker->direction);
+    ClearVector128(tracker->direction);
     if (owner->handoff == 2) {
-        func_L00_00423290((unsigned char *)owner);
+        InitFollowCameraFromHero((unsigned char *)owner);
         *(CameraQuad *)(owner->previous) = *(CameraQuad *)owner;
         if (D_L00_001B8E14[0]->mode == 7 && CS(hero, 0x34C) == 0)
             orientation->h0 = 0;
         else {
             orientation->h0 = D_L00_001B1518;
-            orientation->f24 = 1.0f / func_00283CE0((short)D_L00_001B1518);
+            orientation->f24 = 1.0f / IntToFloat((short)D_L00_001B1518);
         }
     } else {
-        func_L00_00420638((char *)owner);
-        func_L00_00423038(1);
+        InitCameraStateVectors((char *)owner);
+        UpdateFollowCameraOrientation(1);
     }
-    func_00282CF0(movement, owner->pos, camera->direction);
+    FastVecSub(movement, owner->pos, camera->direction);
     *(CameraQuad *)(movement->previous) = *(CameraQuad *)movement;
     *(CameraQuad *)root = *(CameraQuad *)(owner->pos);
     *(CameraQuad *)(tracker->previous) = *(CameraQuad *)(owner->pos);
-    distance = func_00282DB0(movement, &D_0018A0E0);
-    func_00282D30(&projected, &D_0018A0E0, distance);
-    func_00282CF0(&difference, movement, &projected);
-    distance = movement->f2C - func_00282DF0(&difference);
+    distance = FastVecDot(movement, &D_0018A0E0);
+    FastVecScale(&projected, &D_0018A0E0, distance);
+    FastVecSub(&difference, movement, &projected);
+    distance = movement->f2C - FastVecLength(&difference);
     tracker->f30 = distance;
     if (distance < -0.1f) tracker->h3A = 1;
     orientation->f8 = movement->f30;

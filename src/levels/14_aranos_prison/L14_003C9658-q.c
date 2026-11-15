@@ -16,9 +16,9 @@ void func_L14_003C9658(char *entity, char *position)
     state = *(char **)(entity + 0x68);
     if (*(u8 *)(entity + 0x20) == 7)
         return;
-    if (func_L03_00419BD8(*(s32 *)(state + 0x220), entity + 0x10, position) == 0)
+    if (CheckPointsOnRouteGraph(*(s32 *)(state + 0x220), entity + 0x10, position) == 0)
         return;
-    func_002A7750(entity, 7, -1);
+    SetMobyState(entity, 7, -1);
     *(s32 *)(state + 0x37C) = 0x3C;
     *(TI128 *)(state + 0x340) = *(TI128 *)position;
 }

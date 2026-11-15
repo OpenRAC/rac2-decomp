@@ -43,7 +43,7 @@ void func_L00_003AB388(char *moby, void *direction, void *position)
     hit.active = 1;
     hit.owner = moby;
     hit.damage = ((WeaponDamageClass *)(
-        D_00139568[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].damage;
+        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].damage;
     qcopy(hit.dir, direction);
     func_2EE3D0(hit.dir, hit.dir, 1.0f);
     target = ref_L00_003AB388_1;
@@ -52,27 +52,27 @@ void func_L00_003AB388(char *moby, void *direction, void *position)
     hit.mode = 2;
     hit.id = *(unsigned short *)(moby + 0xAA);
     if (target) {
-        func_002A8E20(target, &hit);
+        QueueMobyImpact(target, &hit);
         if (((WeaponDamageClass *)(
-        D_00139568[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode)
-            func_00334160(target, 0x43, *(char **)(moby + 0xB8));
+        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode)
+            StartHealthDrainOnTarget(target, 0x43, *(char **)(moby + 0xB8));
         else
-            func_00334160(target, 0x18, *(char **)(moby + 0xB8));
+            StartHealthDrainOnTarget(target, 0x18, *(char **)(moby + 0xB8));
     }
     hit.damage = ((WeaponDamageClass *)(
-        D_00139568[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].area;
-    count = func_00277F48(position, 1, target, &hit, 2.0f);
+        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].area;
+    count = ProcessCollisionHit(position, 1, target, &hit, 2.0f);
     if (((WeaponDamageClass *)(
-        D_00139568[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode) {
+        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode) {
         for (i = 0; i < count; i++)
-            func_00334160(ref_L00_003AB388_2[i], 0x43, *(char **)(moby + 0xB8));
+            StartHealthDrainOnTarget(ref_L00_003AB388_2[i], 0x43, *(char **)(moby + 0xB8));
     } else {
         for (i = 0; i < count; i++)
-            func_00334160(ref_L00_003AB388_2[i], 0x18, *(char **)(moby + 0xB8));
+            StartHealthDrainOnTarget(ref_L00_003AB388_2[i], 0x18, *(char **)(moby + 0xB8));
     }
     func_3251D0(moby + 0x10, forward, 1);
     func_2EE178(forward, forward, -1.0f);
-    func_002E5CF8(2, 0, moby);
-    func_0032C700(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
+    PlayMobySound(2, 0, moby);
+    SpawnExplosion(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
                   1, 0, 1, 0, D_L00_001ADB2C);
 }

@@ -33,6 +33,7 @@ extern void func_00283788(void *, void *, void *);
 extern unsigned long func_0027C878(int);
 extern void func_00280B90(void *, void *, int);
 
+/* Draws two flat spinning pictures at the object, one for each side. */
 void func_L00_003AD7C8(unsigned char *object)
 {
     RotorQuad quad;
@@ -49,28 +50,28 @@ void func_L00_003AD7C8(unsigned char *object)
         int side = i & 1;
         float phase;
         unsigned long texture;
-        float radius = func_00282C10(state->direction.x * state->direction.x +
+        float radius = square_root(state->direction.x * state->direction.x +
                                     state->direction.z * state->direction.z);
-        angles.x = func_00283B98(-func_00283248(radius, state->direction.y), 1.5707963705062866f);
-        angles.y = func_00283248(state->direction.z, state->direction.x);
+        angles.x = FastAddRotations(-FastMatrixHelperA(radius, state->direction.y), 1.5707963705062866f);
+        angles.y = FastMatrixHelperA(state->direction.z, state->direction.x);
         angles.z = 0.0f;
         angles.w = 0.0f;
         D_L00_001AF7C0_gp[0].x = 0.0f;
-        phase = func_00283C28(func_00283CE0(D_L00_001B19C8 % 180) * 0.03490659f);
+        phase = FastFloatHelperG(IntToFloat(gFrameCounter_L00 % 180) * 0.03490659f);
         if (side)
             phase = -phase;
         D_L00_001AF7C0[0].y = phase;
         D_L00_001AF7C0[0].z = 0.0f;
         D_L00_001AF7C0[0].w = 0.0f;
-        func_00283410(&phaseMatrix, &D_L00_001AF7C0_gp[0]);
-        func_00283410(&model, &angles);
-        func_00283788(&model, &model, &phaseMatrix);
+        euler_to_matrix(&phaseMatrix, &D_L00_001AF7C0_gp[0]);
+        euler_to_matrix(&model, &angles);
+        multiply_matrix(&model, &model, &phaseMatrix);
         qcopy(&model.rows[3], &state->position);
         quad.colors[0] = 0x80808080U;
         quad.colors[1] = 0x80808080U;
         quad.colors[2] = 0x80808080U;
         quad.colors[3] = 0x80808080U;
-        texture = func_0027C878(side ? 18 : 17);
+        texture = GetEffectTextureDescriptor(side ? 18 : 17);
         quad.textureState = 0xFF9000000260UL;
         quad.texture = texture;
         quad.flags = 0x8000000048UL;
@@ -87,6 +88,6 @@ void func_L00_003AD7C8(unsigned char *object)
         quad.uv[1][0] = one; quad.uv[1][1] = one;
         quad.uv[2][0] = 0.0f; quad.uv[2][1] = 0.0f;
         quad.uv[3][0] = one; quad.uv[3][1] = 0.0f;
-        func_00280B90(&quad, &model, 1);
+        draw_world_quad(&quad, &model, 1);
     }
 }

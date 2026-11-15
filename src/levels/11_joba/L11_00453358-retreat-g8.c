@@ -38,13 +38,13 @@ void func_L11_00456938(RetreatObject *object)
     Probe copy, probe;
 
     if (target == 0) {
-        func_002A7750(object, 4, 2);
+        SetMobyState(object, 4, 2);
         return;
     }
 
-    distance = func_00282E80(object->position, target + 0x10);
+    distance = vec_distance_xy(object->position, target + 0x10);
     if (distance < D_L11_001B1DA4) {
-        func_002A7750(object, 7, 3);
+        SetMobyState(object, 7, 3);
     } else {
         probe.q = 0;
         probe.f[0] = object->position[0];
@@ -52,12 +52,12 @@ void func_L11_00456938(RetreatObject *object)
         probe.f[2] = object->position[2];
         probe.f[3] = 0.5f;
         copy.q = probe.q;
-        if (func_00283DB8(&copy, 128.0f) <= 0) {
-            func_002A7750(object, 7, 3);
-        } else if (distance > D_L11_001B1DA0 || func_002A77E0(D_L11_001B1DA8) == 0) {
-            func_002A7750(object, 9, 3);
+        if (FastMathHelperA(&copy, 128.0f) <= 0) {
+            SetMobyState(object, 7, 3);
+        } else if (distance > D_L11_001B1DA0 || RandomIntBelow(D_L11_001B1DA8) == 0) {
+            SetMobyState(object, 9, 3);
         } else {
-            func_002A7750(object, 7, 3);
+            SetMobyState(object, 7, 3);
         }
     }
 }

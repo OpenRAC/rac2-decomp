@@ -29,17 +29,18 @@ extern s32 ref_L05_00416EC0_02(s8 *, s8 *, void *);
 extern s32 ref_L05_00416EC0_03(s8 *, s8 *, s8 *);
 extern s32 ref_L05_00416EC0_04(void *, void *, s8 *);
 
-void func_L05_00416EC0(void *arg0, s32 arg1) {
+/* Moves the object by a step based on its speed, turned by its own direction, and adds that step to its position. */
+void func_L05_00416EC0(void *moby, s32 value) {
     s8 frame[0x80];
-    s8 *base = (s8 *)arg0;
-    void *temp_s0;
+    s8 *base = (s8 *)moby;
+    void *vars;
 
-    *(s32 *)(frame + 0x70) = arg1;
-    temp_s0 = *(void **)(base + 0x68);
-    ref_L05_00416EC0_00(arg0, 1, (s32 *)(frame + 0x70), frame);
+    *(s32 *)(frame + 0x70) = value;
+    vars = *(void **)(base + 0x68);
+    ref_L05_00416EC0_00(moby, 1, (s32 *)(frame + 0x70), frame);
     ref_L05_00416EC0_01(frame + 0x40, frame + 0x30,
         *(f32 *)(base + 0x2C) * 0.00097656f);
-    ref_L05_00416EC0_02(frame + 0x50, frame + 0x40, temp_s0);
+    ref_L05_00416EC0_02(frame + 0x50, frame + 0x40, vars);
     ref_L05_00416EC0_02(frame + 0x60, frame + 0x40, base + 0xC0);
     ref_L05_00416EC0_03(frame + 0x60, frame + 0x50, frame + 0x60);
     ref_L05_00416EC0_04(base + 0x10, base + 0x10, frame + 0x60);

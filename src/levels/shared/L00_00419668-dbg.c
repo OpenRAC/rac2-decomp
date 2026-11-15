@@ -20,6 +20,7 @@ extern void func_00282D30(void *, void *, float);
 extern void func_00280B90(char *, int, int);
 
 /* Debug line labels reproduce the measured assembler division padding. */
+/* Draws a stretched square many times along a line, with each copy fainter than the one before. */
 void func_L00_00419668(char *object)
 {
     RenderPacket packet;
@@ -40,48 +41,48 @@ void func_L00_00419668(char *object)
     *(int *)&packet.uv[2][1] = 0;
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
-    func_00281DE8(&packet, *(int *)(state + 0x48), 1, 0x80);
+    InitQuadPacketState(&packet, *(int *)(state + 0x48), 1, 0x80);
     packet.f70 = 0;
-    func_002FC560(0x42, 0x8000000048ULL);
-    func_002FC560(8, 0);
-    func_002FC560(0x14, 0xFF9000000260ULL);
-    func_002FC560(0x47, 0x513F1);
-    func_00282CF0(&a, D_L00_001A8F20, D_L00_001B9000);
-    func_00282CF0(&a, &a, D_L00_001B9000 + 0x10);
-    func_00282CF0(&b, D_L00_001B9000 + 0x10, D_L00_001B9000);
-    func_00282CF0(&c, D_L00_001B9000, D_L00_001B9000 + 0x10);
-    func_00282CC0(&d, D_L00_001B9000, D_L00_001B9000 + 0x10);
-    func_00282CF0(&center, D_L00_001B9000 - 0x240, state);
-    func_00282F20(&center, &center, 0.75f);
-    func_00282CC0(&center, state, &center);
-    func_00282D30(&temp, &a, *(float *)(state + 0xC));
-    func_00282CC0(&packet.vertex[0], &temp, &center);
-    func_00282D30(&temp, &b, *(float *)(state + 0xC));
-    func_00282CC0(&packet.vertex[1], &temp, &center);
-    func_00282D30(&temp, &c, *(float *)(state + 0xC));
-    func_00282CC0(&packet.vertex[2], &temp, &center);
-    func_00282D30(&temp, &d, *(float *)(state + 0xC));
-    func_00282CC0(&packet.vertex[3], &temp, &center);
+    VU1_addGSregister(0x42, 0x8000000048ULL);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x14, 0xFF9000000260ULL);
+    VU1_addGSregister(0x47, 0x513F1);
+    FastVecSub(&a, D_L00_001A8F20, D_L00_001B9000);
+    FastVecSub(&a, &a, D_L00_001B9000 + 0x10);
+    FastVecSub(&b, D_L00_001B9000 + 0x10, D_L00_001B9000);
+    FastVecSub(&c, D_L00_001B9000, D_L00_001B9000 + 0x10);
+    FastVecAdd(&d, D_L00_001B9000, D_L00_001B9000 + 0x10);
+    FastVecSub(&center, D_L00_001B9000 - 0x240, state);
+    vec_scale_to_length(&center, &center, 0.75f);
+    FastVecAdd(&center, state, &center);
+    FastVecScale(&temp, &a, *(float *)(state + 0xC));
+    FastVecAdd(&packet.vertex[0], &temp, &center);
+    FastVecScale(&temp, &b, *(float *)(state + 0xC));
+    FastVecAdd(&packet.vertex[1], &temp, &center);
+    FastVecScale(&temp, &c, *(float *)(state + 0xC));
+    FastVecAdd(&packet.vertex[2], &temp, &center);
+    FastVecScale(&temp, &d, *(float *)(state + 0xC));
+    FastVecAdd(&packet.vertex[3], &temp, &center);
     divisor = count - 1;
     delta = (*(float *)(state + 0x1C) - *(float *)(state + 0xC)) / divisor;
-    func_00282CF0(&step, state + 0x10, state);
-    func_00282D30(&step, &step, 1.0f / divisor);
-    func_00282D30(&temp, &a, delta);
-    func_00282CC0(&a, &temp, &step);
-    func_00282D30(&temp, &b, delta);
-    func_00282CC0(&b, &temp, &step);
-    func_00282D30(&temp, &c, delta);
-    func_00282CC0(&c, &temp, &step);
-    func_00282D30(&temp, &d, delta);
-    func_00282CC0(&d, &temp, &step);
+    FastVecSub(&step, state + 0x10, state);
+    FastVecScale(&step, &step, 1.0f / divisor);
+    FastVecScale(&temp, &a, delta);
+    FastVecAdd(&a, &temp, &step);
+    FastVecScale(&temp, &b, delta);
+    FastVecAdd(&b, &temp, &step);
+    FastVecScale(&temp, &c, delta);
+    FastVecAdd(&c, &temp, &step);
+    FastVecScale(&temp, &d, delta);
+    FastVecAdd(&d, &temp, &step);
     for (; i < count; i++) {
         int alpha;
         unsigned int color;
-        func_00282CC0(&packet.vertex[0], &packet.vertex[0], &a);
-        func_00282CC0(&packet.vertex[1], &packet.vertex[1], &b);
-        func_00282CC0(&packet.vertex[2], &packet.vertex[2], &c);
-        func_00282CC0(&packet.vertex[3], &packet.vertex[3], &d);
-        alpha = func_00283CF0((float)*(int *)(state + 0x2C) * (float)(count - i) / (float)count);
+        FastVecAdd(&packet.vertex[0], &packet.vertex[0], &a);
+        FastVecAdd(&packet.vertex[1], &packet.vertex[1], &b);
+        FastVecAdd(&packet.vertex[2], &packet.vertex[2], &c);
+        FastVecAdd(&packet.vertex[3], &packet.vertex[3], &d);
+        alpha = FloatToInt((float)*(int *)(state + 0x2C) * (float)(count - i) / (float)count);
         if (alpha > 255) alpha = 255;
         else if (alpha < 0) alpha = 0;
         color = *(unsigned int *)(state + 0x40) + (alpha << 24);
@@ -89,6 +90,6 @@ void func_L00_00419668(char *object)
         packet.color[2] = color;
         packet.color[1] = color;
         packet.color[0] = color;
-        if (alpha > 0) func_00280B90((char *)&packet, 0, 0);
+        if (alpha > 0) draw_world_quad((char *)&packet, 0, 0);
     }
 }

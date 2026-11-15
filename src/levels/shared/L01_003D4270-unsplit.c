@@ -55,125 +55,126 @@ extern int func_00283DB8(void *, float);
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define B(p, o) (*(unsigned char *)((char *)(p) + (o)))
 
-void func_L01_003D4270(char *m)
+/* Watches a trigger area: while the player is inside and its conditions hold, it creates an effect and can take over the camera. */
+void func_L01_003D4270(char *moby)
 {
     float pos[4] __attribute__((aligned(16)));
     float rot[4];
     int clear = 1;
-    TriggerData *d = *(TriggerData **)(m + 0x68);
-    int active = func_002ACBC8(D_00189EA0, d->volume);
-    Pool *p;
+    TriggerData *trigger = *(TriggerData **)(moby + 0x68);
+    int active = IsPointInCuboid(gHeroPosition, trigger->volume);
+    Pool *pool;
 
-    if (d->conditions[0] == -1 && d->conditions[1] == -1 &&
-        d->conditions[2] == -1 && d->conditions[3] == -1)
+    if (trigger->conditions[0] == -1 && trigger->conditions[1] == -1 &&
+        trigger->conditions[2] == -1 && trigger->conditions[3] == -1)
         clear = 0;
-    if (d->conditions[0] != -1 && func_002A8508(d->conditions[0], -1))
+    if (trigger->conditions[0] != -1 && CountMobysInGroupNotInState(trigger->conditions[0], -1))
         clear = 0;
-    if (d->conditions[1] != -1 && func_002A8508(d->conditions[1], -1))
+    if (trigger->conditions[1] != -1 && CountMobysInGroupNotInState(trigger->conditions[1], -1))
         clear = 0;
-    if (d->conditions[2] != -1 && func_002A8508(d->conditions[2], -1))
+    if (trigger->conditions[2] != -1 && CountMobysInGroupNotInState(trigger->conditions[2], -1))
         clear = 0;
-    if (d->conditions[3] != -1 && func_002A8508(d->conditions[3], -1))
+    if (trigger->conditions[3] != -1 && CountMobysInGroupNotInState(trigger->conditions[3], -1))
         clear = 0;
 
-    if (B(m, 0x20)) {
-        if (d->pool && (!active || clear)) {
-            func_L00_002D7140(d->pool);
-            d->pool = 0;
-        } else if (!d->pool && active && !clear && d->target == -1) {
+    if (B(moby, 0x20)) {
+        if (trigger->pool && (!active || clear)) {
+            EndCameraOverride(trigger->pool);
+            trigger->pool = 0;
+        } else if (!trigger->pool && active && !clear && trigger->target == -1) {
             Pool *created;
 
-            created = func_L00_002D70A0(d->b33);
-            d->pool = created;
+            created = AllocCameraOverrideSlot(trigger->b33);
+            trigger->pool = created;
             if (!created)
                 return;
-            created->f0 = d->f18;
-            created->fc = d->f1c == -1.0f ? d->f1c : d->f1c * 0.01745329424738884f;
-            created->f4 = d->f20;
-            created->f8 = d->f24;
-            if (!d->b45)
-                created->f14 = d->f28;
+            created->f0 = trigger->f18;
+            created->fc = trigger->f1c == -1.0f ? trigger->f1c : trigger->f1c * 0.01745329424738884f;
+            created->f4 = trigger->f20;
+            created->f8 = trigger->f24;
+            if (!trigger->b45)
+                created->f14 = trigger->f28;
             else
                 created->f14 = -1.0f;
-            created->f10 = d->f2c == -1.0f ? d->f2c : d->f2c * 0.01745329424738884f;
-            created->s1a = d->b30;
-            created->b1e = d->b31;
-            created->b1f = d->b32;
-            created->b18 = d->b46;
-            if (d->f40 != -1)
-                created->f34 = d->f40;
-            if (d->anchor != -1) {
-                if (d->b49)
-                    created->pos = ref_L01_003D4270_00[d->anchor].q0;
+            created->f10 = trigger->f2c == -1.0f ? trigger->f2c : trigger->f2c * 0.01745329424738884f;
+            created->s1a = trigger->b30;
+            created->b1e = trigger->b31;
+            created->b1f = trigger->b32;
+            created->b18 = trigger->b46;
+            if (trigger->f40 != -1)
+                created->f34 = trigger->f40;
+            if (trigger->anchor != -1) {
+                if (trigger->b49)
+                    created->pos = ref_L01_003D4270_00[trigger->anchor].q0;
                 else {
-                    func_00282CF0(pos, &D_L01_001B264C[0][d->anchor].centre, D_00189EA0);
+                    FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, gHeroPosition);
                     created->pos = *(Quad *)(pos);
                 }
             }
-        } else if (active && !d->state && d->target != -1) {
-            char *camera = D_L01_001FE180[d->target];
+        } else if (active && !trigger->state && trigger->target != -1) {
+            char *camera = D_L01_001FE180[trigger->target];
 
-            *(Quad *)(pos) = *(Quad *)(D_00189EA0);
+            *(Quad *)(pos) = *(Quad *)(gHeroPosition);
             pos[2] += 1.25f;
-            rot[2] = func_00283248(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
-            rot[1] = -func_00283248(func_00282E80(camera + 0x10, pos), pos[2] - F(camera, 0x18));
+            rot[2] = FastMatrixHelperA(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
+            rot[1] = -FastMatrixHelperA(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
-            func_00335438(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 120, 0);
-            func_00335370(camera + 0x10);
-            func_003353C8(rot);
-            d->state = 1;
-        } else if (active && d->state) {
+            SetCamera5Pose(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 120, 0);
+            CopyVectorToSelectedObject(camera + 0x10);
+            SetCameraStateRotation(rot);
+            trigger->state = 1;
+        } else if (active && trigger->state) {
             char *camera;
 
-            if (d->state == 1 && (func_L01_0042A568() & 1)) {
-                d->state = 2;
-                func_L01_0042A6F0(1, 0);
+            if (trigger->state == 1 && (GetShipDockingState() & 1)) {
+                trigger->state = 2;
+                SetCamera5Mode(1, 0);
             }
-            camera = D_L01_001FE180[d->target];
-            *(Quad *)(pos) = *(Quad *)(D_00189EA0);
+            camera = D_L01_001FE180[trigger->target];
+            *(Quad *)(pos) = *(Quad *)(gHeroPosition);
             pos[2] += 1.25f;
-            rot[2] = func_00283248(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
-            rot[1] = -func_00283248(func_00282E80(camera + 0x10, pos), pos[2] - F(camera, 0x18));
+            rot[2] = FastMatrixHelperA(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
+            rot[1] = -FastMatrixHelperA(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
-            func_00335370(camera + 0x10);
-            func_003353C8(rot);
-        } else if (!active && d->state) {
-            func_003355A8(1);
-            d->state = 0;
-        } else if (d->pool && d->anchor != -1) {
-            p = d->pool;
-            if (d->b49)
-                p->pos = ref_L01_003D4270_00[d->anchor].q0;
+            CopyVectorToSelectedObject(camera + 0x10);
+            SetCameraStateRotation(rot);
+        } else if (!active && trigger->state) {
+            SetCameraModeState(1);
+            trigger->state = 0;
+        } else if (trigger->pool && trigger->anchor != -1) {
+            pool = trigger->pool;
+            if (trigger->b49)
+                pool->pos = ref_L01_003D4270_00[trigger->anchor].q0;
             else {
-                func_00282CF0(pos, &D_L01_001B264C[0][d->anchor].centre, D_00189EA0);
-                p->pos = *(Quad *)(pos);
+                FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, gHeroPosition);
+                pool->pos = *(Quad *)(pos);
             }
         }
 
-        if (d->pool) {
-            p = d->pool;
-            if (!d->b47 && d->anchor != -1) {
-                qcopy(pos, &ref_L01_003D4270_00[d->anchor].centre);
+        if (trigger->pool) {
+            pool = trigger->pool;
+            if (!trigger->b47 && trigger->anchor != -1) {
+                qcopy(pos, &ref_L01_003D4270_00[trigger->anchor].centre);
                 pos[3] = 1;
-                if (func_00283DB8(pos, 255.0f) != -1) {
-                    d->b47 = 1;
-                    if (d->b45)
-                        d->pool->f14 = d->f28;
-                    if (d->b44) {
-                        d->pool->b1f = 0;
-                        d->pool->b1e = 0;
+                if (FastMathHelperA(pos, 255.0f) != -1) {
+                    trigger->b47 = 1;
+                    if (trigger->b45)
+                        trigger->pool->f14 = trigger->f28;
+                    if (trigger->b44) {
+                        trigger->pool->b1f = 0;
+                        trigger->pool->b1e = 0;
                     }
-                    if (d->b48)
-                        d->pool->b18 = 1;
+                    if (trigger->b48)
+                        trigger->pool->b18 = 1;
                 }
             }
-            p->f10 = d->f2c * 0.01745329424738884f;
+            pool->f10 = trigger->f2c * 0.01745329424738884f;
         }
     } else {
-        d->pool = 0;
-        d->state = 0;
-        d->b47 = 0;
-        B(m, 0x20) = 1;
-        B(m, 0x30) = 255;
+        trigger->pool = 0;
+        trigger->state = 0;
+        trigger->b47 = 0;
+        B(moby, 0x20) = 1;
+        B(moby, 0x30) = 255;
     }
 }

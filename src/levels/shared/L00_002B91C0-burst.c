@@ -22,7 +22,7 @@ extern void func_002BAE50(void *, void *, unsigned, int, int, int, int, int);
 void func_L00_002BA220(void)
 {
     float pos[4], vec[4];
-    char *origin = D_00189EA0;
+    char *origin = gHeroPosition;
     ResidentState_A220 *state = (ResidentState_A220 *)(origin - 0x80);
     int i;
     int life, fade;
@@ -30,19 +30,19 @@ void func_L00_002BA220(void)
 
     i = 9;
     do {
-        life = func_00283CF0(func_002A7878(4200.0f, 7350.0f) * 0.001f);
-        fade = func_00283CF0(func_002A7878(21000.0f, 31500.001953125f) * 0.001f);
-        speed = func_002A7878(0.002500000176951289f, 0.011666666716337204f);
+        life = FloatToInt(RandomFloatRange(4200.0f, 7350.0f) * 0.001f);
+        fade = FloatToInt(RandomFloatRange(21000.0f, 31500.001953125f) * 0.001f);
+        speed = RandomFloatRange(0.002500000176951289f, 0.011666666716337204f);
         qcopy(pos, origin);
-        if (D_001A79F0 != 6)
+        if (gCurrentMapIndex != 6)
             pos[2] = state->f334;
         i--;
-        angle = func_002A7940();
-        elevation = func_002A7878(0.349065899848938f, 1.396263599395752f);
-        radius = func_002A7878(0.05f, state->f264 + 0.2f);
+        angle = RandomAngle();
+        elevation = RandomFloatRange(0.349065899848938f, 1.396263599395752f);
+        radius = RandomFloatRange(0.05f, state->f264 + 0.2f);
         func_002AF000_1((char *)vec, speed, angle, elevation);
-        pos[0] += func_00283180(angle) * radius;
-        pos[1] += func_00283198(angle) * radius;
-        func_002BAE50(pos, vec, 0x7000c0f0, 0x70f0, 40, life, fade, 1);
+        pos[0] += FastSinOrCosA(angle) * radius;
+        pos[1] += FastSinOrCosB(angle) * radius;
+        SpawnScalingParticle(pos, vec, 0x7000c0f0, 0x70f0, 40, life, fade, 1);
     } while (i >= 0);
 }

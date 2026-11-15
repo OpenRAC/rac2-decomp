@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -37,32 +38,32 @@ extern void func_002A7750(u8 *, int, int);
 /* Puts into state 5 every entity of the object's group (state byte other than 1, kind byte
    below 2) that lies in front of it, within 1.0 ahead, 0.7 sideways and 0.5 up or down in the
    object's own frame, storing a1 at +0x374 of its state and clearing its halfword at +0x96. */
-void func_L03_003C5B28(u8 *a0, float a1) {
-    float v[4];
-    unsigned short *p;
-    u8 *e;
-    u8 *s;
+void func_L03_003C5B28(u8 *obj, float value) {
+    float offset[4];
+    unsigned short *idPtr;
+    u8 *entity;
+    u8 *entityVars;
 
-    if (a0[0x21] == 0xFF)
+    if (obj[0x21] == 0xFF)
         return;
-    for (p = D_L03_001FB5A0[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L03_001B2A38 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L03_001FB5A0[a0[0x21]]);
-         p++) {
-        e = D_L03_001B2A1C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (idPtr = D_L03_001FB5A0[obj[0x21]];
+         obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L03_001FB5A0[obj[0x21]]);
+         idPtr++) {
+        entity = D_L03_001B2A1C_1[0] + ((*idPtr & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        if (e[0x20] == 1)
+        if (entity[0x20] == 1)
             continue;
-        if (e[0x95] < 2) {
-            func_00282CF0(v, e + 0x10, a0 + 0x10);
-            func_002AFDD8(a0, v, v, 0);
-            if (v[0] > 0.0f && v[0] < 1.0f && func_00282C48(v[1]) < 0.7f &&
-                func_00282C48(v[2]) < 0.5f) {
-                s = *(u8 **)(e + 0x68);
-                func_002A7750(e, 5, 1);
-                *(float *)(s + 0x374) = a1;
-                *(short *)(e + 0x96) = 0;
+        if (entity[0x95] < 2) {
+            FastVecSub(offset, entity + 0x10, obj + 0x10);
+            TransformVectorByObjectOrGiven(obj, offset, offset, 0);
+            if (offset[0] > 0.0f && offset[0] < 1.0f && FloatAbs(offset[1]) < 0.7f &&
+                FloatAbs(offset[2]) < 0.5f) {
+                entityVars = *(u8 **)(entity + 0x68);
+                SetMobyState(entity, 5, 1);
+                *(float *)(entityVars + 0x374) = value;
+                *(short *)(entity + 0x96) = 0;
             }
         }
     }
@@ -70,23 +71,23 @@ void func_L03_003C5B28(u8 *a0, float a1) {
 
 /* Answers 1 when the resident word at 0x18A15C equals the object's state word at +0x358, or
    when the state of an entity of the object's group holds it at +0x198; 0 otherwise. */
-int func_L03_003C5CE8(u8 *a0) {
-    u8 *s = *(u8 **)(a0 + 0x68);
-    unsigned short *p;
-    u8 *e;
+int func_L03_003C5CE8(u8 *obj) {
+    u8 *vars = *(u8 **)(obj + 0x68);
+    unsigned short *idPtr;
+    u8 *entity;
 
-    if (D_0018A15C == *(int *)(s + 0x358))
+    if (D_0018A15C == *(int *)(vars + 0x358))
         return 1;
-    if (a0[0x21] == 0xFF)
+    if (obj[0x21] == 0xFF)
         return 0;
-    for (p = D_L03_001FB5A0[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L03_001B2A38 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L03_001FB5A0[a0[0x21]]);
-         p++) {
-        e = D_L03_001B2A1C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (idPtr = D_L03_001FB5A0[obj[0x21]];
+         obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L03_001FB5A0[obj[0x21]]);
+         idPtr++) {
+        entity = D_L03_001B2A1C_1[0] + ((*idPtr & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        if (*(int *)(*(u8 **)(e + 0x68) + 0x198) == *(int *)(s + 0x358))
+        if (*(int *)(*(u8 **)(entity + 0x68) + 0x198) == *(int *)(vars + 0x358))
             return 1;
     }
     return 0;
@@ -96,24 +97,24 @@ extern float func_00282E80(u8 *, u8 *);
 
 /* Answers 0 when another entity of the object's group, whose state holds the same word at
    +0x358, is nearer to a1 than the object is; 1 otherwise. */
-int func_L03_003C5DC8(u8 *a0, u8 *a1) {
-    u8 *s = *(u8 **)(a0 + 0x68);
-    float d;
-    unsigned short *p;
-    u8 *e;
+int func_L03_003C5DC8(u8 *obj, u8 *target) {
+    u8 *vars = *(u8 **)(obj + 0x68);
+    float ownDist;
+    unsigned short *idPtr;
+    u8 *entity;
 
-    d = func_00282E80(a0 + 0x10, a1);
-    for (p = D_L03_001FB5A0[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L03_001B2A38 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L03_001FB5A0[a0[0x21]]);
-         p++) {
-        e = D_L03_001B2A1C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    ownDist = vec_distance_xy(obj + 0x10, target);
+    for (idPtr = D_L03_001FB5A0[obj[0x21]];
+         obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L03_001FB5A0[obj[0x21]]);
+         idPtr++) {
+        entity = D_L03_001B2A1C_1[0] + ((*idPtr & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        if (e == a0)
+        if (entity == obj)
             continue;
-        if (*(int *)(*(u8 **)(e + 0x68) + 0x358) == *(int *)(s + 0x358) &&
-            func_00282E80(e + 0x10, a1) < d)
+        if (*(int *)(*(u8 **)(entity + 0x68) + 0x358) == *(int *)(vars + 0x358) &&
+            vec_distance_xy(entity + 0x10, target) < ownDist)
             return 0;
     }
     return 1;
@@ -135,39 +136,41 @@ extern void func_00282CC0(u8 *, u8 *, u8 *);
 
 extern void func_002A0F48(u8 *);
 
-void func_L03_003CAAF0(u8 *a0, u8 *a1, u8 *a2) {
-    Local16 buf0;
-    Local16 buf1;
+/* Computes two points on opposite sides of the object, one along its direction and one against it. */
+void func_L03_003CAAF0(u8 *obj, u8 *outA, u8 *outB) {
+    Local16 dirA;
+    Local16 dirB;
 
-    func_00282F20(buf0.b, a0 + 0xC0, D_L03_001B0344);
-    func_00282D30(buf1.b, buf0.b, -1.0f);
-    func_00282CC0(a1, buf0.b, a0 + 0x10);
-    func_00282CC0(a2, buf1.b, a0 + 0x10);
+    vec_scale_to_length(dirA.b, obj + 0xC0, D_L03_001B0344);
+    FastVecScale(dirB.b, dirA.b, -1.0f);
+    FastVecAdd(outA, dirA.b, obj + 0x10);
+    FastVecAdd(outB, dirB.b, obj + 0x10);
 }
 
-void func_L03_003E50E0(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
-    u8 *p = *(u8 **)(q + 0x58);
+/* Moves the attached child object to a fixed spot, runs its callback if it has one, then refreshes it. */
+void func_L03_003E50E0(u8 *obj) {
+    u8 *vars = *(u8 **)(obj + 0x68);
+    u8 *child = *(u8 **)(vars + 0x58);
 
-    func_00282F20(p + 0x10, D_L03_001B9BB0, D_L03_001B0CA0);
-    func_00282CC0(p + 0x10, p + 0x10, D_L03_001B9BB0 - 0x230);
-    if (*(u32 *)(p + 0x64) != 0)
-        (*(void (**)(u8 *))(*(u8 **)(q + 0x58) + 0x64))(p);
-    func_002A0F48(*(u8 **)(q + 0x58));
+    vec_scale_to_length(child + 0x10, D_L03_001B9BB0, D_L03_001B0CA0);
+    FastVecAdd(child + 0x10, child + 0x10, D_L03_001B9BB0 - 0x230);
+    if (*(u32 *)(child + 0x64) != 0)
+        (*(void (**)(u8 *))(*(u8 **)(vars + 0x58) + 0x64))(child);
+    func_002A0F48(*(u8 **)(vars + 0x58));
 }
 
 /* updates the registered countdown state and clears its original completion flags */
 void func_L03_0043ACD8(void) {
-    NativeCallbackTimer *state = &D_L04_001B98E0;
-    u32 mode = state->field04;
-    state->field08 = 10000.0f;
+    NativeCallbackTimer *timer = &D_L04_001B98E0;
+    u32 mode = timer->field04;
+    timer->field08 = 10000.0f;
     if (mode == 0) {
-        state->field0C -= D_L04_001B1C88;
-        if (state->field0C < 0.0f) state->field0C = 0.0f;
+        timer->field0C -= D_L04_001B1C88;
+        if (timer->field0C < 0.0f) timer->field0C = 0.0f;
     } else {
-        state->field04 = 0;
+        timer->field04 = 0;
     }
-    state->field00 = 0;
+    timer->field00 = 0;
 }
 
 /* The $gp float each of the two mutual twins reads (3.0f and 1.0f). */
@@ -175,15 +178,16 @@ extern f32 D_L03_001B02F0 __attribute__((sda));
 
 extern f32 D_L03_001B1A90 __attribute__((sda));
 
-void func_L03_003CA230(u8 *a0, u8 *a1) {
-    func_00282D30(a1, a0 + 0xC0, D_L03_001B02F0);
-    func_00282CC0(a1, a1, a0 + 0x10);
+/* Places a point at the object's position plus its direction scaled by a fixed amount. */
+void func_L03_003CA230(u8 *obj, u8 *out) {
+    FastVecScale(out, obj + 0xC0, D_L03_001B02F0);
+    FastVecAdd(out, out, obj + 0x10);
 }
 
 /* The same body with func_00282F20 and 1.0f. */
-void func_L03_004197C8(u8 *a0, u8 *a1) {
-    func_00282F20(a1, a0 + 0xC0, D_L03_001B1A90);
-    func_00282CC0(a1, a1, a0 + 0x10);
+void func_L03_004197C8(u8 *obj, u8 *out) {
+    vec_scale_to_length(out, obj + 0xC0, D_L03_001B1A90);
+    FastVecAdd(out, out, obj + 0x10);
 }
 
 extern f32 D_L03_001B1FC4 __attribute__((sda));
@@ -195,20 +199,20 @@ extern void func_0029F338(u8 *);
 /* Ages one entity: scales the rate the owner record holds by the shared $gp factor, drops
    the entity's own 1/240 timer, blends two matrix columns and then the three angles, and
    releases the entity when its 0xBC countdown runs out. */
-void func_L03_0042B930(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
-    u8 *r = *(u8 **)(a0 + 0x24);
+void func_L03_0042B930(u8 *obj) {
+    u8 *vars = *(u8 **)(obj + 0x68);
+    u8 *owner = *(u8 **)(obj + 0x24);
 
-    *(f32 *)(a0 + 0x2C) = *(f32 *)(r + 0x24) * D_L03_001B1FC4;
-    *(f32 *)(q + 0x8) = *(f32 *)(q + 0x8) - 0.0041666669f;
-    func_00282CC0(a0 + 0x10, a0 + 0x10, q);
-    func_00282CC0(a0 + 0xF0, a0 + 0xF0, q + 0x10);
-    *(f32 *)(a0 + 0xF0) = func_00283B98(*(f32 *)(a0 + 0xF0), *(f32 *)(q + 0x10));
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), *(f32 *)(q + 0x14));
-    *(f32 *)(a0 + 0xF8) = func_00283B98(*(f32 *)(a0 + 0xF8), *(f32 *)(q + 0x18));
-    a0[0xBC] = a0[0xBC] - 1;
-    if (a0[0xBC] == 0)
-        func_0029F338(a0);
+    *(f32 *)(obj + 0x2C) = *(f32 *)(owner + 0x24) * D_L03_001B1FC4;
+    *(f32 *)(vars + 0x8) = *(f32 *)(vars + 0x8) - 0.0041666669f;
+    FastVecAdd(obj + 0x10, obj + 0x10, vars);
+    FastVecAdd(obj + 0xF0, obj + 0xF0, vars + 0x10);
+    *(f32 *)(obj + 0xF0) = FastAddRotations(*(f32 *)(obj + 0xF0), *(f32 *)(vars + 0x10));
+    *(f32 *)(obj + 0xF4) = FastAddRotations(*(f32 *)(obj + 0xF4), *(f32 *)(vars + 0x14));
+    *(f32 *)(obj + 0xF8) = FastAddRotations(*(f32 *)(obj + 0xF8), *(f32 *)(vars + 0x18));
+    obj[0xBC] = obj[0xBC] - 1;
+    if (obj[0xBC] == 0)
+        MarkMobySpawned(obj);
 }
 
 /* One sixteen-byte entry per path step: the step's type and the two nodes chosen for it. */
@@ -235,8 +239,9 @@ extern s32 func_L03_003E2D98(u8 *, u32, s32, u32 *, s32);
    func_L03_003E2D98 (a neighbour of a node that is not on the path): type 1 picks one
    neighbour of the step's path node, type 2 also a neighbour of that pick, type 3 a second
    neighbour of the path node other than the first. */
-void func_L03_003E2C08(u8 *p) {
-    PathState *q = *(PathState **)(p + 0x68);
+/* Fills in the path choices for each step: picks one or two neighbouring nodes depending on the step type. */
+void func_L03_003E2C08(u8 *obj) {
+    PathState *state = *(PathState **)(obj + 0x68);
     s32 i;
     u32 node, prev, prev2;
 
@@ -244,20 +249,20 @@ void func_L03_003E2C08(u8 *p) {
         D_L03_0029BCD0[i].first = -1;
         D_L03_0029BCD0[i].second = -1;
         D_L03_0029BCD0[i].flag = -1;
-        node = q->path[i];
+        node = state->path[i];
         switch (D_L03_0029BCD0[i].type) {
         case 1:
-            D_L03_0029BCD0[i].first = func_L03_003E2D98(p, node, i, 0, 0);
+            D_L03_0029BCD0[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
             break;
         case 2:
-            D_L03_0029BCD0[i].first = func_L03_003E2D98(p, node, i, 0, 0);
+            D_L03_0029BCD0[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
             prev = D_L03_0029BCD0[i].first;
-            D_L03_0029BCD0[i].second = func_L03_003E2D98(p, prev, i, &prev, 1);
+            D_L03_0029BCD0[i].second = SelectUnusedTableEntry(obj, prev, i, &prev, 1);
             break;
         case 3:
-            D_L03_0029BCD0[i].first = func_L03_003E2D98(p, node, i, 0, 0);
+            D_L03_0029BCD0[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
             prev2 = D_L03_0029BCD0[i].first;
-            D_L03_0029BCD0[i].second = func_L03_003E2D98(p, node, i, &prev2, 1);
+            D_L03_0029BCD0[i].second = SelectUnusedTableEntry(obj, node, i, &prev2, 1);
             break;
         }
     }

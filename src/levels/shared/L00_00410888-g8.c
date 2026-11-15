@@ -50,32 +50,32 @@ void func_L00_00410888(char *object, int mode)
     basis[0] = 0.3f;
     basis[1] = -1.0f;
     basis[3] = 1.0f;
-    func_00283098(basis, basis, object + 0xc0);
+    matrix_mul_vec3(basis, basis, object + 0xc0);
     angle = 0.0f;
-    func_00282CC0(position, object + 0x10, basis);
-    func_002ACEC0(basis, D_0018A550, D_0018A550 + 0x10, 0.349065899848938f);
+    FastVecAdd(position, object + 0x10, basis);
+    ApplyAxisRotationToQuaternion(basis, D_0018A550, D_0018A550 + 0x10, 0.349065899848938f);
     qcopy(direction, basis);
     for (i = 0; i < mode * 20 + 20; i++) {
-        angle = func_00283B98(angle, func_002A7878(0.0f, 0.6283186f));
-        func_00282D30(offset, direction, func_002A7878(7.0f, 60.0f) * 0.016666668f);
-        life = func_002A7820(10, 30);
-        point[0] = position[0] + func_002A78D8(0.0f, 0.2f);
-        point[1] = position[1] + func_002A78D8(0.0f, 0.2f);
-        point[2] = position[2] + func_002A78D8(0.0f, 0.2f);
-        func_002C6DD8(point, offset, life, 0.0022222223f);
-        if (func_00282C48(angle) > 0.00001f) {
-            func_002AB668(rotation, D_0018A550, angle);
-            func_002ACDE8(direction, basis, rotation);
+        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186f));
+        FastVecScale(offset, direction, RandomFloatRange(7.0f, 60.0f) * 0.016666668f);
+        life = RandomIntRange(10, 30);
+        point[0] = position[0] + RandomSignedFloatRange(0.0f, 0.2f);
+        point[1] = position[1] + RandomSignedFloatRange(0.0f, 0.2f);
+        point[2] = position[2] + RandomSignedFloatRange(0.0f, 0.2f);
+        SpawnTrailParticle_002C6DD8(point, offset, life, 0.0022222223f);
+        if (FloatAbs(angle) > 0.00001f) {
+            BuildAxisAngleQuaternion(rotation, D_0018A550, angle);
+            RotateVectorByQuaternion(direction, basis, rotation);
         }
     }
 
-    func_002ACEC0(basis, D_0018A550, D_0018A550 + 0x10, D_L00_001B1300 * 0.017453294f);
+    ApplyAxisRotationToQuaternion(basis, D_0018A550, D_0018A550 + 0x10, D_L00_001B1300 * 0.017453294f);
     angle = 0.0f;
     qcopy(direction, basis);
     /* Only external calls read this local vector after its clear. */
     qzero_nc(offset);
-    if (D_00189E20.flag)
-        func_00282D30(offset, D_00189E20.velocity, 1.7f);
+    if (gHeroState.flag)
+        FastVecScale(offset, gHeroState.velocity, 1.7f);
     scale = D_L00_001B1324;
     speed = D_L00_001B1328;
     spread = D_L00_001B1304;
@@ -85,23 +85,23 @@ void func_L00_00410888(char *object, int mode)
         spread = 0.8f;
     }
     for (j = 19; j >= 0; j--) {
-        angle = func_00283B98(angle, func_002A7878(0.0f, 0.6283186f));
-        func_00282D30(velocity, direction,
-                      func_002A7878(D_L00_001B1318 * 0.016666668f,
+        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186f));
+        FastVecScale(velocity, direction,
+                      RandomFloatRange(D_L00_001B1318 * 0.016666668f,
                                     D_L00_001B131C * 0.016666668f));
-        func_00282CC0(velocity, velocity, offset);
+        FastVecAdd(velocity, velocity, offset);
         kind = D_L00_001B1310;
-        life2 = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        point[0] = position[0] + func_002A78D8(0.0f, spread);
-        point[1] = position[1] + func_002A78D8(0.0f, spread);
-        point[2] = position[2] + func_002A78D8(0.0f, spread);
-        jitter = func_002A7878(D_L00_001B1320, scale) * 210000.0f;
-        func_00282CF0(point, point, velocity);
-        func_002C16C0(point, velocity, kind, D_L00_001B1308, D_L00_001B130C,
+        life2 = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        point[0] = position[0] + RandomSignedFloatRange(0.0f, spread);
+        point[1] = position[1] + RandomSignedFloatRange(0.0f, spread);
+        point[2] = position[2] + RandomSignedFloatRange(0.0f, spread);
+        jitter = RandomFloatRange(D_L00_001B1320, scale) * 210000.0f;
+        FastVecSub(point, point, velocity);
+        SpawnBurstParticle_002C16C0(point, velocity, kind, D_L00_001B1308, D_L00_001B130C,
                       life2, jitter, speed, D_L00_001B1314, 0.0f, 0.0f);
-        if (func_00282C48(angle) > 0.00001f) {
-            func_002AB668(rotation, D_0018A550, angle);
-            func_002ACDE8(direction, basis, rotation);
+        if (FloatAbs(angle) > 0.00001f) {
+            BuildAxisAngleQuaternion(rotation, D_0018A550, angle);
+            RotateVectorByQuaternion(direction, basis, rotation);
         }
     }
 }

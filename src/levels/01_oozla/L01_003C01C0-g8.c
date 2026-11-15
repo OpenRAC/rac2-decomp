@@ -40,58 +40,59 @@ extern float D_L01_001AFEE4 __attribute__((sda));
 extern float D_L01_001AFEE8 __attribute__((sda));
 extern char D_00189EA0[];
 
-void func_L01_003C01C0(F003C01C0obj *obj)
+/* Handles damage taken by the Swamp Monster II and moves its linked parts with it. */
+void func_L01_003C01C0(F003C01C0obj *moby)
 {
-    F003C01C0s *s = *(F003C01C0s **)((char *)obj + 0x68);
-    int old = obj->f20;
+    F003C01C0s *vars = *(F003C01C0s **)((char *)moby + 0x68);
+    int oldState = moby->f20;
 
-    if (func_002B0ED8(obj, (char *)s + 0x60, 0) || s->f2e == 2) {
-        if (s->f20 <= 0.0f || s->f2e == 2) {
-            s->f20 = 0.0f;
-            if (s->f2e == 2 && !(s->f98 & 1)) {
+    if (ApplyDamageToObject(moby, (char *)vars + 0x60, 0) || vars->f2e == 2) {
+        if (vars->f20 <= 0.0f || vars->f2e == 2) {
+            vars->f20 = 0.0f;
+            if (vars->f2e == 2 && !(vars->f98 & 1)) {
                 int zero __attribute__((mode(TI)));
 
                 /* The cleared local is consumed only by the following call. */
                 qzero_nc(&zero);
-                func_002B1350(obj, (char *)s + 0x60, &zero, 4);
-                s->f2e = 3;
-                obj->f95 = 6;
-                obj->fbc = 99;
-                obj->f20 = 99;
+                ApplyObjectReaction(moby, (char *)vars + 0x60, &zero, 4);
+                vars->f2e = 3;
+                moby->f95 = 6;
+                moby->fbc = 99;
+                moby->f20 = 99;
             }
-            if (s->f2f8 != -1) {
-                D_L01_001B255C[s->f2f8 * 256 + 0xbc] = 1;
-                if (s->f2fc != -1) {
-                    int index = s->f2fc;
+            if (vars->f2f8 != -1) {
+                gMobyTable_L01[vars->f2f8 * 256 + 0xbc] = 1;
+                if (vars->f2fc != -1) {
+                    int index = vars->f2fc;
                     char *base = D_L01_001B264C;
 
                     /* Copying position leaves the separate transform row intact. */
-                    qcopy_nc((char *)obj + 0x10, base + index * 128 + 0x30);
-                    qcopy((char *)obj + 0xf0, base + index * 128 + 0x70);
+                    qcopy_nc((char *)moby + 0x10, base + index * 128 + 0x30);
+                    qcopy((char *)moby + 0xf0, base + index * 128 + 0x70);
                 }
             }
         }
     }
-    if (obj->f20 == 255) {
-        obj->f20 = old;
+    if (moby->f20 == 255) {
+        moby->f20 = oldState;
     }
-    func_002B3BA8(obj, s->f2f0, 0, 0, 0.0f, 0.0f);
-    if (*(char **)((char *)s + 0x2e4)) {
-        func_00282CF0(*(char **)((char *)s + 0x2e4) + 0x20,
-                     (char *)obj + 0x10, D_00189EA0);
-        (*(char **)((char *)s + 0x2e4))[0x1f] = 1;
-        *(float *)(*(char **)((char *)s + 0x2e4) + 0x10) =
+    SelectAimTarget_002B3BA8(moby, vars->f2f0, 0, 0, 0.0f, 0.0f);
+    if (*(char **)((char *)vars + 0x2e4)) {
+        FastVecSub(*(char **)((char *)vars + 0x2e4) + 0x20,
+                     (char *)moby + 0x10, gHeroPosition);
+        (*(char **)((char *)vars + 0x2e4))[0x1f] = 1;
+        *(float *)(*(char **)((char *)vars + 0x2e4) + 0x10) =
             D_L01_001AFEE0 * 0.017453294f;
-        if (s->f2f4 || (obj->f95 == 3 && obj->f20 == 2)) {
-            *(float *)*(char **)((char *)s + 0x2e4) = D_L01_001AFEE8;
-            *(int *)(*(char **)((char *)s + 0x2e4) + 0x34) = 6;
+        if (vars->f2f4 || (moby->f95 == 3 && moby->f20 == 2)) {
+            *(float *)*(char **)((char *)vars + 0x2e4) = D_L01_001AFEE8;
+            *(int *)(*(char **)((char *)vars + 0x2e4) + 0x34) = 6;
         } else {
-            *(float *)*(char **)((char *)s + 0x2e4) = D_L01_001AFEE4;
-            *(int *)(*(char **)((char *)s + 0x2e4) + 0x34) = 3;
+            *(float *)*(char **)((char *)vars + 0x2e4) = D_L01_001AFEE4;
+            *(int *)(*(char **)((char *)vars + 0x2e4) + 0x34) = 3;
         }
     }
-    if (*(float *)(D_00189EA0 + 8) < obj->f18 + 20.0f &&
-        (unsigned)(obj->f95 - 2) < 5) {
-        func_L01_002F14E8(2, 0, s->f20 / func_00283CE0(s->f24));
+    if (*(float *)(gHeroPosition + 8) < moby->f18 + 20.0f &&
+        (unsigned)(moby->f95 - 2) < 5) {
+        StartHudOverlay(2, 0, vars->f20 / IntToFloat(vars->f24));
     }
 }

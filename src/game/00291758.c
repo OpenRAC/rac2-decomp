@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned char count[4]; int groups, runs; } RenderHeader;
 extern int D_001BAEC0[];
@@ -152,10 +153,11 @@ extern struct Table1 Fee2b87d1_D_0014B540;
 
 extern struct Table2 Fee2b87d1_D_00152CD0;
 
+/* Frees the old part data of a light and rebuilds its sections. */
 void func_00291758(int param_1)
 {
-    func_00291788(param_1);
-    func_00291640(param_1);
+    FlushLightPartIndices(param_1);
+    CreatePointLight(param_1);
 }
 
 /* One slot of the moby-part table the loader walks: six 16-bit indices into a
@@ -184,18 +186,18 @@ extern int ref_L00_002FD338_03(short *, short *, int);
    program, so they carry no address in their names. */
 void func_00291788(int index)
 {
-    BatchA_A02_Part *s0 = ref_L00_002FD338_00 + index;
+    BatchA_A02_Part *part = ref_L00_002FD338_00 + index;
 
-    if (s0->index) {
-        ref_L00_002FD338_01(s0->index + s0->idx0, s0->index + s0->idx0 + s0->idx1, index);
-        s0->idx0 = 0;
-        s0->idx1 = 0;
-        ref_L00_002FD338_02(s0->index + s0->idx2, s0->index + s0->idx2 + s0->idx3, index);
-        s0->idx2 = 0;
-        s0->idx3 = 0;
-        ref_L00_002FD338_03(s0->index + s0->idx4, s0->index + s0->idx4 + s0->idx5, index);
-        s0->idx4 = 0;
-        s0->idx5 = 0;
+    if (part->index) {
+        ref_L00_002FD338_01(part->index + part->idx0, part->index + part->idx0 + part->idx1, index);
+        part->idx0 = 0;
+        part->idx1 = 0;
+        ref_L00_002FD338_02(part->index + part->idx2, part->index + part->idx2 + part->idx3, index);
+        part->idx2 = 0;
+        part->idx3 = 0;
+        ref_L00_002FD338_03(part->index + part->idx4, part->index + part->idx4 + part->idx5, index);
+        part->idx4 = 0;
+        part->idx5 = 0;
     }
 }
 
@@ -224,7 +226,7 @@ void func_00291CA8(int *hdr, int base, int *list, int count)
         else
             D_001F2540[i] = *entry - (data_off - (int)D_001F2740);
     }
-    func_00282AB0(D_001F2740, (char *)hdr + data_off, data_size);
+    CopyMemoryAligned(D_001F2740, (char *)hdr + data_off, data_size);
     for (D_001B1DA4 = 0; D_001B1DA4 < count; D_001B1DA4++) {
         int src_page = base + *list++;
         int src_offset = *list++;
@@ -232,7 +234,7 @@ void func_00291CA8(int *hdr, int base, int *list, int count)
         int dst_size = *list++;
 
         D_001F1F40[D_001B1DA4].a = (src_page << 4) + src_offset;
-        D_001F1F40[D_001B1DA4].b = (dst_page << 4) + func_00282A18(dst_size);
+        D_001F1F40[D_001B1DA4].b = (dst_page << 4) + log2dim(dst_size);
     }
 }
 
@@ -291,9 +293,9 @@ void func_00292078(int pack)
     unsigned long long f;
     unsigned long long a;
 
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     buffer = LOAD_BUFFER;
-    func_002B7CE0(1);
+    PumpMusicAndDiscRead(1);
 
     if (PACK_FLAG_6)
         pack = 6;
@@ -305,8 +307,8 @@ void func_00292078(int pack)
         pack = 5;
 
     cursor = buffer + 1;
-    func_002B7C80(buffer, D_0014B540.packs[pack].sector2 + D_0014B540.base,
-                  D_0014B540.packs[pack].size2);
+    ReadDiscWithPause(buffer, gCopySetupData.packs[pack].sector2 + gCopySetupData.base,
+                  gCopySetupData.packs[pack].size2);
 
     image_vram = IMAGE_VRAM;
     LOAD_COUNT = buffer[0];
@@ -317,19 +319,19 @@ void func_00292078(int pack)
         clut_page = clut_vram >> 8;
         clut = record->clut;
         func_00126288(&work, clut_page, 1, 0, 0, 0, 16, 16);
-        func_0011AEA0(0);
-        func_001265B0(&work, clut);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        ExecGsLoadImage(&work, clut);
+        WaitGsPathsIdle(0, 0);
         clut_vram += 0x400;
-        n = func_00282A18(record->width);
+        n = log2dim(record->width);
         tbw = record->width >> 6;
         if (tbw < 1)
             tbw = 1;
         image_page = image_vram >> 8;
         func_00126288(&work, image_page, tbw, 0x1B, 0, 0, record->width, record->height);
-        func_0011AEA0(0);
-        func_001265B0(&work, record->pixels);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        ExecGsLoadImage(&work, record->pixels);
+        WaitGsPathsIdle(0, 0);
         a = ((unsigned long long)n << 26) | 0x1B00000;
         tag = (unsigned long long)image_page | ((unsigned long long)tbw << 14);
         tag |= a;
@@ -341,8 +343,8 @@ void func_00292078(int pack)
         cursor++;
     }
 
-    func_002B7C80(buffer, D_0014B540.packs[pack].sector + D_0014B540.base,
-                  D_0014B540.packs[pack].size);
+    ReadDiscWithPause(buffer, gCopySetupData.packs[pack].sector + gCopySetupData.base,
+                  gCopySetupData.packs[pack].size);
 }
 
 
@@ -352,12 +354,13 @@ extern u8 *D_L03_001DAB80[];
 extern void func_002934B8(u8 *, u8 *);
 extern unsigned char *D_001BAF38;
 
-void func_002923C0(void *param)
+/* Loads the texture pack of a level and its draw packets, then remembers the level number. */
+void func_002923C0(void *level)
 {
-    func_00292078(param);
-    func_00292328(param);
-    func_002934B8((u8 *)D_L03_001DAB80[0], D_001BAF38);
-    *(int *)0x001A7290 = (int)param;
+    LoadTexturePackToVram(level);
+    BuildTextureDrawPackets(level);
+    CopyHeaderAndRelocatePointers((u8 *)D_L03_001DAB80[0], D_001BAF38);
+    *(int *)0x001A7290 = (int)level;
 }
 
 
@@ -388,26 +391,26 @@ void func_002926B8(int index)
     UploadTable *table;
     int width, log;
 
-    state = &D_00152C00;
+    state = &gHeroMoby_00152C00;
     state->index = index;
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     base = (char *)D_001B22A0[1 - D_001B22B4[0]];
-    func_002B7CE0(1);
+    PumpMusicAndDiscRead(1);
     clut = base + 0x20;
     table = &upload_table;
-    func_002B7C80(base, table->entries[index].off + table->base, table->entries[index].size);
+    ReadDiscWithPause(base, table->entries[index].off + table->base, table->entries[index].size);
     func_00126288(&packet, D_001A72F0[0] >> 8, 1, 0, 0, 0, 16, 16);
-    func_0011AEA0(0);
-    func_001265B0(&packet, clut);
-    func_001244B8(0, 0);
-    log = func_00282A18(*(int *)(base + 8));
+    FlushCache(0);
+    ExecGsLoadImage(&packet, clut);
+    WaitGsPathsIdle(0, 0);
+    log = log2dim(*(int *)(base + 8));
     width = *(int *)(base + 8) >> 6;
     if (width < 1)
         width = 1;
     func_00126288(&packet, D_001A7300[0] >> 8, width, 27, 0, 0, *(short *)(base + 8), *(short *)(base + 12));
-    func_0011AEA0(0);
-    func_001265B0(&packet, base + 0x420);
-    func_001244B8(0, 0);
+    FlushCache(0);
+    ExecGsLoadImage(&packet, base + 0x420);
+    WaitGsPathsIdle(0, 0);
     {
         long image, tex, format, clut_base, word;
 
@@ -443,30 +446,30 @@ extern long r1_D_0019E7D8[];
    the second word), -1 a fixed constant and 0. The row is read before
    the sign test, as in retail. The OR operands are named locals so fold
    does not move the 0x20 to the end of the chain. */
-void func_00292EB0(long *out, int arg1, int arg2, int arg3, int arg4, int arg5) {
-    long f0 = r1_D_0019E640[arg5 * 3];
-    long f1 = r1_D_0019E640[arg5 * 3 + 1];
-    long f2 = r1_D_0019E640[arg5 * 3 + 2];
+void func_00292EB0(long *out, int lodK, int minFilter, int clampMode, int flagBits, int rowIndex) {
+    long f0 = r1_D_0019E640[rowIndex * 3];
+    long f1 = r1_D_0019E640[rowIndex * 3 + 1];
+    long f2 = r1_D_0019E640[rowIndex * 3 + 2];
 
-    if (arg5 >= 0) {
-        long t = ((long)arg2 << 6) | 0x20;
+    if (rowIndex >= 0) {
+        long minAndFlag = ((long)minFilter << 6) | 0x20;
 
-        *out = (f1 & 0x1C) | t | ((long)arg1 << 32);
+        *out = (f1 & 0x1C) | minAndFlag | ((long)lodK << 32);
         out += 2;
-        *out = arg3 | ((long)arg4 << 2) | ((long)arg5 << 24);
+        *out = clampMode | ((long)flagBits << 2) | ((long)rowIndex << 24);
         out += 2;
         *out = f0;
         out[2] = f2;
-    } else if (arg5 < -1) {
+    } else if (rowIndex < -1) {
         long *tpl = r1_D_0019E7C0;
 
-        if (arg5 == -3) {
+        if (rowIndex == -3) {
             tpl = r1_D_0019E7D8;
         }
         {
-            long v = (long)arg2 << 6;
-            long u = ((long)arg1 << 32) | 0x20;
-            *out = v | u;
+            long minShifted = (long)minFilter << 6;
+            long kAndFlag = ((long)lodK << 32) | 0x20;
+            *out = minShifted | kAndFlag;
         }
         out += 2;
         *out = 5;
@@ -475,9 +478,9 @@ void func_00292EB0(long *out, int arg1, int arg2, int arg3, int arg4, int arg5) 
         out[2] = tpl[2];
     } else {
         {
-            long v = (long)arg2 << 6;
-            long u = ((long)arg1 << 32) | 0x20;
-            *out = v | u;
+            long minShifted = (long)minFilter << 6;
+            long kAndFlag = ((long)lodK << 32) | 0x20;
+            *out = minShifted | kAndFlag;
         }
         out += 2;
         *out = 5;
@@ -489,13 +492,14 @@ void func_00292EB0(long *out, int arg1, int arg2, int arg3, int arg4, int arg5) 
 
 /* func_00293000 is in 00293000-g8.c. */
 
-void func_00293260(int *a0, int a1){
-  BatchA_A02_Blk *r;
+/* Turns the offsets stored in one asset block into real addresses. */
+void func_00293260(int *table, int index){
+  BatchA_A02_Blk *block;
   int i;
-  a0 += a1;
-  r = *(BatchA_A02_Blk **)((char *)a0 + 0x48);
-  if (r->off) r->off = (int)r + r->off;
-  for (i = 0; i < r->n; i++) r->ent[i] = (int)r + r->ent[i];
+  table += index;
+  block = *(BatchA_A02_Blk **)((char *)table + 0x48);
+  if (block->off) block->off = (int)block + block->off;
+  for (i = 0; i < block->n; i++) block->ent[i] = (int)block + block->ent[i];
 }
 
 
@@ -535,18 +539,19 @@ void func_002933D0(RenderHeader *base, char *textures, unsigned char *map)
             r += 4;
         }
     }
-    func_002932B8(groups, textures, map, count);
+    DrawTextureBatches(groups, textures, map, count);
 }
 
 
 
-void func_002934B8(u8 *a0, u8 *a1) {
-    *(u8 *)(a0 + 4) = *(u8 *)(a1 + 0);
-    *(u8 *)(a0 + 5) = *(u8 *)(a1 + 1);
-    *(u8 *)(a0 + 6) = *(u8 *)(a1 + 2);
-    *(u8 *)(a0 + 7) = *(u8 *)(a1 + 3);
-    *(u8 **)(a0 + 0x0) = a1 + *(s32 *)(a1 + 4);
-    *(u8 **)(a0 + 0x20) = a1 + *(s32 *)(a1 + 8);
+/* Copies four header bytes and turns two stored offsets into real addresses. */
+void func_002934B8(u8 *dest, u8 *src) {
+    *(u8 *)(dest + 4) = *(u8 *)(src + 0);
+    *(u8 *)(dest + 5) = *(u8 *)(src + 1);
+    *(u8 *)(dest + 6) = *(u8 *)(src + 2);
+    *(u8 *)(dest + 7) = *(u8 *)(src + 3);
+    *(u8 **)(dest + 0x0) = src + *(s32 *)(src + 4);
+    *(u8 **)(dest + 0x20) = src + *(s32 *)(src + 8);
 }
 
 
@@ -558,14 +563,14 @@ void func_002934B8(u8 *a0, u8 *a1) {
    address, so alignment is applied after subtracting the read size. */
 int func_002939D0(void)
 {
-    DiscToc *toc = &D_0014B540;
+    DiscToc *toc = &gCopySetupData;
     int sectors = toc->level.size;
     int bytes = ((sectors << 11) + 0x1057) & 0xFFFFF000;
     int addr = ((int)D_01FF7FF0 - bytes) & -16;
 
     D_001A7288 = (int *)addr;
     *(unsigned int *)addr = 0x60;
-    func_002B7C10((int)D_001A7288 + *D_001A7288, toc->level.sector + toc->level_base, toc->level.size);
+    ReadDiscSectorsBlocking((int)D_001A7288 + *D_001A7288, toc->level.sector + toc->level_base, toc->level.size);
     return 1;
 }
 
@@ -579,20 +584,20 @@ int func_002939D0(void)
    load is done. */
 int func_00293A60(void)
 {
-    func_00133230();
-    func_00132028();
-    if (func_00133580(1)) {
+    ClearSoundFlagAndUpdate();
+    snd_Pump();
+    if (snd_CheckLoadInProgress(1)) {
         ++D_001A7430;
         if (D_001A7900 == 1 && D_001A7430 > 720) {
             D_001A7434 = 1;
             D_001A7900 = 0;
             if (D_001A7280.stage < 3)
                 D_001A7280.stage--;
-            func_00133640();
+            RunHandlerOrSendSoundCommand37();
         }
         return 0;
     }
-    if (func_00125588() && !D_001A7434) {
+    if (GetCdLastError() && !D_001A7434) {
         D_001A7434 = 1;
         D_001A7900 = 0;
         if (D_001A7280.stage < 3)
@@ -600,7 +605,7 @@ int func_00293A60(void)
     }
     switch (D_001A7280.stage) {
     case 0: {
-        DiscToc *toc = &D_0014B540;
+        DiscToc *toc = &gCopySetupData;
         unsigned int bytes;
 
         bytes = ((toc->archive1.size << 11) + 4095) & 0xFFFFF000;
@@ -608,33 +613,33 @@ int func_00293A60(void)
         bytes = ((toc->archive0.size << 11) + 4095) & 0xFFFFF000;
         D_001A7280.archive0 = D_001A7280.archive1 - bytes;
         D_00152C2C[0] = 0;
-        func_002B7C10(D_001A7280.archive0, toc->archive0.sector + toc->archive_base, toc->archive0.size);
+        ReadDiscSectorsBlocking(D_001A7280.archive0, toc->archive0.sector + toc->archive_base, toc->archive0.size);
         D_001A7280.stage++;
         break;
     }
     case 1:
-        func_002B7C10(D_001A7280.archive1, D_0014B540.archive1.sector + D_0014B540.archive_base,
-                      D_0014B540.archive1.size);
+        ReadDiscSectorsBlocking(D_001A7280.archive1, gCopySetupData.archive1.sector + gCopySetupData.archive_base,
+                      gCopySetupData.archive1.size);
         D_001A7280.stage++;
         break;
     case 2:
         if (D_001A7280.busy)
             return 0;
-        func_002E4A68();
-        func_002B6788();
+        PrintSoundStatus();
+        LoadFirstSoundBank();
         D_001A7280.stage++;
         break;
     case 3:
-        func_00132028();
+        snd_Pump();
         if (D_00189E00 != -1)
             D_001A7280.stage++;
         break;
     case 4:
-        func_002B6828(0);
+        LoadSoundBankEntry(0);
         D_001A7280.stage++;
         break;
     case 5:
-        func_00132028();
+        snd_Pump();
         if (D_00189E04 != -1) {
             func_00132828();
             return 1;
@@ -645,21 +650,22 @@ int func_00293A60(void)
 }
 
 
+/* Reads the part of the current chunk between this entry and the next one from the disc, when it is not empty. Always returns 1. */
 int func_00293CA8(int index)
 {
-    int j = index + 1;
-    int *d = F46b43b72_D_001B8840;
-    int *b = F46b43b72_D_0014B540;
-    int *t = (int *)((char *)b + 25416);
-    int n = d[12] * 332;
-    int hold = d[28];
-    int j4 = j * 4;
-    int cur = *(int *)((char *)t + (n + index * 4));
-    int next = *(int *)((char *)t + (j4 + n));
+    int nextIndex = index + 1;
+    int *state = F46b43b72_D_001B8840;
+    int *toc = F46b43b72_D_0014B540;
+    int *offsetTable = (int *)((char *)toc + 25416);
+    int size = state[12] * 332;
+    int buffer = state[28];
+    int nextOffset = nextIndex * 4;
+    int startOffset = *(int *)((char *)offsetTable + (size + index * 4));
+    int endOffset = *(int *)((char *)offsetTable + (nextOffset + size));
 
-    n = next - cur;
-    if (n > 0) {
-        F46b43b72_FUN_002B7B18(hold, (char *)(cur + b[6341]));
+    size = endOffset - startOffset;
+    if (size > 0) {
+        F46b43b72_FUN_002B7B18(buffer, (char *)(startOffset + toc[6341]));
         F46b43b72_FUN_002B7CE0(0);
     }
     return 1;
@@ -687,21 +693,22 @@ extern PartsState parts_state __asm__("D_001B8840");
 extern int func_002B7B18(int, int, int);
 extern void func_0027D330(int);
 
+/* Loads a set of parts from the disc into the record buffer and points each part at its data. */
 void func_00293F98(int index, int flag)
 {
-    PartEntry *r;
+    PartEntry *entry;
     int i;
 
-    func_002B7B18((int)parts_state.rec, parts_toc.files[index].sector + parts_toc.base,
+    StartDiscRead((int)parts_state.rec, parts_toc.files[index].sector + parts_toc.base,
                   parts_toc.files[index].size);
     if (flag != 0) {
-        func_002B7CE0(0);
-        func_0027D330(flag);
+        PumpMusicAndDiscRead(0);
+        FadeToBlack(flag);
     }
     parts_state.index = index;
-    func_002B7CE0(1);
-    for (i = 0, r = parts_state.rec; i < 0x46 && r->count != 0; i++, r++) {
-        int offset = r->offset + 0x800;
+    PumpMusicAndDiscRead(1);
+    for (i = 0, entry = parts_state.rec; i < 0x46 && entry->count != 0; i++, entry++) {
+        int offset = entry->offset + 0x800;
         parts_state.parts[i] = (int)parts_state.rec + offset;
     }
 }
@@ -721,19 +728,20 @@ extern void func_00293D30(void);
    update run, then store the sum of the two counters there. */
 void func_00294070(int index)
 {
-    struct SegTable *p = &ref_00294070_00;
+    struct SegTable *table = &ref_00294070_00;
 
-    p->cur = p->entry[index];
-    func_00293D30();
-    p->cur = ref_00294070_01 + ref_00294070_02;
+    table->cur = table->entry[index];
+    RelocateWorldObjectParts();
+    table->cur = ref_00294070_01 + ref_00294070_02;
 }
 
+/* Clears the class cache table and marks all its slots as empty. */
 void func_002940C0(void)
 {
     extern void func_00282A60(unsigned int *, unsigned int, int);
     struct Table2 *table = &Fee2b87d1_D_00152CD0;
     int i;
-    func_00282A60((unsigned int *)table, 0, 0x35840);
+    ClearMemory((unsigned int *)table, 0, 0x35840);
     *(short *)((char *)table + 0x14) = -1;
     for (i = 2; i >= 0; --i)
         table->slots[i] = -1;
@@ -746,29 +754,32 @@ void func_002940C0(void)
 
 extern void func_002942A0(int, int, int, int);
 
-void func_00294398(int value, int index)
+/* Looks the id up in the class table and starts loading it into the given cache slot if it is not already there. */
+void func_00294398(int id, int index)
 {
     int i = 0;
-    if (Fee2b87d1_D_0014B540.slots[0].w == value) goto after;
+    if (Fee2b87d1_D_0014B540.slots[0].w == id) goto after;
     while (++i < 48) {
-        if (Fee2b87d1_D_0014B540.slots[i].w == value) break;
+        if (Fee2b87d1_D_0014B540.slots[i].w == id) break;
     }
 after:
     if (i == 48) return;
     if (Fee2b87d1_D_00152CD0.slots[index] == i) return;
-    func_002942A0(i, index, (int)((char *)&Fee2b87d1_D_00152CD0 + 0x40 + index * 0xC800), 0);
+    StartDiscEntryLoad(i, index, (int)((char *)&Fee2b87d1_D_00152CD0 + 0x40 + index * 0xC800), 0);
 }
 
 
 extern void func_00294398(int a0, int a1);
 
-void func_002945E8(void *a0, void *a1)
+/* Loads a class into a cache slot, waiting for pending disc reads before and after. */
+void func_002945E8(void *id, void *slotIndex)
 {
     F46b43b72_FUN_002B7CE0(1);
-    func_00294398(a0, a1);
+    LoadClassIntoCacheSlot(id, slotIndex);
     F46b43b72_FUN_002B7CE0(1);
 }
 
+/* Checks whether the class with this id is already in one of the three cache slots. Returns 1 if it is unknown or loaded. */
 s32 func_00294630(s32 value) {
     s32 i = 0;
     s32 *q;
@@ -803,19 +814,19 @@ void func_002946C0(int id, int index, int *data)
     ClassData *loaded;
 
     if (data[3]) {
-        char *src = (char *)data + data[2] - (D_0014B540.slots[index].sector << 11);
+        char *src = (char *)data + data[2] - (gCopySetupData.slots[index].sector << 11);
 
-        func_0011AEA0(0);
-        func_0029D4D0(src, &D_00178510);
-        func_0011AEA0(0);
+        FlushCache(0);
+        fast_decompress(src, &D_00178510);
+        FlushCache(0);
         if (D_00178510.type == 1) {
             int tbw, width, offset;
             char *pixels;
 
             func_00126288(&work.image, (D_001A72F4 >> 8) + D_00152CD0.clut_offset, 1, 0, 0, 0, 16, 16);
-            func_0011AEA0(0);
-            func_001265B0(&work.image, D_00178540);
-            func_001244B8(0, 0);
+            FlushCache(0);
+            ExecGsLoadImage(&work.image, D_00178540);
+            WaitGsPathsIdle(0, 0);
             offset = D_00152CD0.image_offset << 2;
             width = D_00178528;
             tbw = width >> 6;
@@ -823,17 +834,17 @@ void func_002946C0(int id, int index, int *data)
             if (tbw < 1)
                 tbw = 1;
             func_00126288(&work.image, (D_001A7304 + offset) >> 8, tbw, 0x1B, 0, 0, width, width);
-            func_0011AEA0(0);
-            func_001265B0(&work.image, pixels);
-            func_001244B8(0, 0);
+            FlushCache(0);
+            ExecGsLoadImage(&work.image, pixels);
+            WaitGsPathsIdle(0, 0);
         }
     }
     {
-        char *src = (char *)data + data[0] - (D_0014B540.slots[index].sector << 11);
+        char *src = (char *)data + data[0] - (gCopySetupData.slots[index].sector << 11);
 
-        func_0011AEA0(0);
-        func_0029D4D0(src, &D_00178510);
-        func_0011AEA0(0);
+        FlushCache(0);
+        fast_decompress(src, &D_00178510);
+        FlushCache(0);
     }
     {
         ClassCache *cache = &D_00152CD0;
@@ -842,7 +853,7 @@ void func_002946C0(int id, int index, int *data)
         saved = D_001B1B40;
         work.map[0] = cache->map;
         D_001B1B40 = cache->slot;
-        func_00293890(decoded, (char *)cache - (cache->map << 4), work.map, id);
+        RegisterClassCacheObject(decoded, (char *)cache - (cache->map << 4), work.map, id);
         D_001D0E00[cache->slot] = 0xFFF00000;
         loaded = D_001CDB80[D_001CE4E0[id]];
         D_001B1B40 = saved;
@@ -854,7 +865,7 @@ void func_002946C0(int id, int index, int *data)
         int first = func_001337F0();
         int second = func_00133820();
 
-        func_0026FEB8(format, first, second);
+        STUB_printf(format, first, second);
     }
 }
 

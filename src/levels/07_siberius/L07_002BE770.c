@@ -10,31 +10,32 @@ extern int D_L07_001B2534 __attribute__((sda));
 
 
 
-/* func_L07_002F2C70 is defined in L07_002BE770-g8.c (it reads small data through $gp). */
+/* func_L07_002F2C70 is defined in L07_002BE770-g8.isBurst (it reads small data through $gp). */
 
-char *func_L07_00336860(void *a, void *b, int c, int d)
+/* Creates one falling snow particle at source position with source random size, color and spin. */
+char *func_L07_00336860(void *source, void *velocity, int isBurst, int useGroup)
 {
- char *p=func_002B9030(0x68); char *q;
- if(p) {
- q=p+0x20;
- *(int *)(q+0x10)=func_002A7820(32,80);
- *(int *)(p+4)=0x808080;
- p[9]=func_00283CF0(2.0f)-16; p[1]=0; p[3]=0x48;
- if(func_002A77E0(2)) p[2]=D_L07_001FEEA4[0]; else p[2]=D_L07_001FEF00[0];
- *(float *)(p+12)=func_002A7878(0.1f,0.24f)*210000.0f;
- p[8]=func_002A77E0(255);
- qcopy(p+16,a); qcopy(q,b);
- *(short *)(p+10)=1<<func_002A7820(6,10);
- if(c) {*(short *)(p+10)=120; *(int *)(q+20)=1;}
- if(d) *(int *)(p+4)+=*(int *)(q+16)<<24;
- { float f=func_002A7820(0,100); int n=D_L07_001B2534; *(float *)(q+12)=f; D_L07_001B2534=n+1; }
+ char *particle=AllocParticle(0x68); char *params;
+ if(particle) {
+ params=particle+0x20;
+ *(int *)(params+0x10)=RandomIntRange(32,80);
+ *(int *)(particle+4)=0x808080;
+ particle[9]=FloatToInt(2.0f)-16; particle[1]=0; particle[3]=0x48;
+ if(RandomIntBelow(2)) particle[2]=D_L07_001FEEA4[0]; else particle[2]=D_L07_001FEF00[0];
+ *(float *)(particle+12)=RandomFloatRange(0.1f,0.24f)*210000.0f;
+ particle[8]=RandomIntBelow(255);
+ qcopy(particle+16,source); qcopy(params,velocity);
+ *(short *)(particle+10)=1<<RandomIntRange(6,10);
+ if(isBurst) {*(short *)(particle+10)=120; *(int *)(params+20)=1;}
+ if(useGroup) *(int *)(particle+4)+=*(int *)(params+16)<<24;
+ { float f=RandomIntRange(0,100); int n=D_L07_001B2534; *(float *)(params+12)=f; D_L07_001B2534=n+1; }
  }
- return p;
+ return particle;
 }
 
-/* func_L07_00378898 is defined in L07_002BE770-rotation-g8.c ($gp speed table). */
+/* func_L07_00378898 is defined in L07_002BE770-rotation-g8.isBurst ($gp speed table). */
 
-/* func_L07_00378AE0 is defined in L07_002BE770-particle-g8.c. */
+/* func_L07_00378AE0 is defined in L07_002BE770-particle-g8.isBurst. */
 
 
-/* func_L07_00379180 is defined in L07_002BE770-g8.c (this unit has no $gp access for it). */
+/* func_L07_00379180 is defined in L07_002BE770-g8.isBurst (this unit has no $gp access for it). */

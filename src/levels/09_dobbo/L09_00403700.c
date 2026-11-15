@@ -4,12 +4,13 @@
 
 extern int func_002A8D70(float x, float y, float z, void *object, int bone, int mode, int first, int second, int third);
 
-void func_L09_00403700(char *a0) {
-    char *s2 = *(char **)(a0 + 0x68);
+/* Makes sparks come off four of the object while it is in state 7. */
+void func_L09_00403700(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
     s32 i;
 
-    if (*(u8 *)(a0 + 0x20) == 7) {
+    if (*(u8 *)(obj + 0x20) == 7) {
         for (i = 0; i < 4; i++)
-            func_002A8D70(0.17f, *(u8 *)(s2 + 0x34), 1.0f, a0, i, 0x4000001, 0, 1, 0);
+            TestHitAtBone(0.17f, *(u8 *)(vars + 0x34), 1.0f, obj, i, 0x4000001, 0, 1, 0);
     }
 }

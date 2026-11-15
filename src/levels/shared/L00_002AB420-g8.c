@@ -1,5 +1,6 @@
 /* Updates the hero idle rotation targets and the two rotation blends. */
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     unsigned char pad0[0x1E8];
     int f1e8;
@@ -60,51 +61,52 @@ extern void func_L00_002AB3E0(void);
 extern void func_L00_002AB0F0(float, float);
 extern void func_L00_002AB0C0(float, float);
 extern int func_L00_002ADEA0(int);
+/* Picks new random head and body turn targets while the hero stands idle, and eases toward them. */
 void func_L00_002AB420(void)
 {
-    float x;
-    int flag, status;
+    float lookAngle;
+    int applyBlend, status;
     int kind;
 
     if (D_001A7A43 && D_00189E20_2.f1314)
         D_L00_0025BE10.fd0c = D_L00_001A7CF8;
     D_L00_0025BE10.fc5c = D_L00_001A7CF4;
     if (D_001A7A41)
-        func_002AA2E8(&D_L00_001A7CF4, 1.57f, 0.05f);
+        ApproachValue(&D_L00_001A7CF4, 1.57f, 0.05f);
     else
-        func_002AA2E8(&D_L00_001A7CF4, 0.875f, 0.05f);
+        ApproachValue(&D_L00_001A7CF4, 0.875f, 0.05f);
 
     if (D_00189E20_2.f1e8 < 20)
         return;
     if (D_00189E20_2.f22b8 || D_00189E20_2.fbf8) {
-        func_L00_002AB3E0();
-        func_L00_002AB0F0(0.03f, 0.2f);
-        func_L00_002AB0C0(0.03f, 0.2f);
-        D_00189E20_2.f11a0 = func_002A7820(90, 120);
-        D_00189E20_2.f208 = func_002A7820(90, 120);
+        ClearHeroSlotRecords();
+        SetCameraLimitsSlot3(0.03f, 0.2f);
+        SetCameraLimitsSlot1(0.03f, 0.2f);
+        D_00189E20_2.f11a0 = RandomIntRange(90, 120);
+        D_00189E20_2.f208 = RandomIntRange(90, 120);
         return;
     }
     if (D_00189E20_2.f290 && D_00189E20_2.f288 > 1.4f &&
         D_00189E20_2.f278 > 1.0f) {
-        func_L00_002AB0F0(0.015f, 0.3f);
-        x = D_00189E20_2.f288 * (1.5f * 0.017453294f) + 0.19198623f;
-        if (x > 0.47123894f)
-            x = 0.47123894f;
+        SetCameraLimitsSlot3(0.015f, 0.3f);
+        lookAngle = D_00189E20_2.f288 * (1.5f * 0.017453294f) + 0.19198623f;
+        if (lookAngle > 0.47123894f)
+            lookAngle = 0.47123894f;
         {
-            float r = (1.0f - D_00189E20_2.f28c) * (35.0f * 0.017453294f);
-            if (r < x)
-                x = r;
+            float ratio = (1.0f - D_00189E20_2.f28c) * (35.0f * 0.017453294f);
+            if (ratio < lookAngle)
+                lookAngle = ratio;
         }
-        D_L00_0025BE10.f274 = x;
-        func_L00_002AB0C0(0.008f, 0.3f);
+        D_L00_0025BE10.f274 = lookAngle;
+        SetCameraLimitsSlot1(0.008f, 0.3f);
         D_L00_0025BE10.f114 = D_L00_0025BE10.f274 * 0.7f;
         return;
     }
 
-    status = func_L00_002ADEA0(0);
-    flag = 1;
+    status = hero_slot_item_id(0);
+    applyBlend = 1;
     if (status == 30 || status == 24)
-        flag = 0;
+        applyBlend = 0;
     if (D_00189E20_2.f2294)
         return;
     kind = D_00189E20_2.f2290[0x43];
@@ -113,22 +115,22 @@ void func_L00_002AB420(void)
     if (D_00189E20_2.f2490)
         return;
     if ((unsigned)(kind - 1) < 2)
-        D_00189E20_2.f11a0 = func_002A7820(40, 70);
-    if (func_00282948(&D_00189E20_2.f11a0)) {
-        D_00189E20_2.f1194 = -func_002A7878((-9.0f * 0.017453294f),
+        D_00189E20_2.f11a0 = RandomIntRange(40, 70);
+    if (FastFloatHelperD(&D_00189E20_2.f11a0)) {
+        D_00189E20_2.f1194 = -RandomFloatRange((-9.0f * 0.017453294f),
                                          (25.0f * 0.017453294f));
         if (D_00189E20_2.f278 < 1.5f)
-            D_00189E20_2.f1198 = func_002A78D8((50.0f * 0.017453294f),
+            D_00189E20_2.f1198 = RandomSignedFloatRange((50.0f * 0.017453294f),
                                              (70.0f * 0.017453294f));
         else
-            D_00189E20_2.f1198 = func_002A78D8((20.0f * 0.017453294f),
+            D_00189E20_2.f1198 = RandomSignedFloatRange((20.0f * 0.017453294f),
                                              (57.0f * 0.017453294f));
         {
-            float r = func_002A7878(0.0f, 1.0f);
-            D_00189E20_2.f11a4 = func_002AA140(0.015f, 0.007f, r);
-            D_00189E20_2.f11a8 = func_002AA140(0.29f, 0.3f, r);
-            D_00189E20_2.f11a0 = func_002A7820(90, 200);
-            D_00189E20_2.f11a0 += func_00283CF0(r * 80.0f);
+            float ratio = RandomFloatRange(0.0f, 1.0f);
+            D_00189E20_2.f11a4 = LerpFloat_002AA140(0.015f, 0.007f, ratio);
+            D_00189E20_2.f11a8 = LerpFloat_002AA140(0.29f, 0.3f, ratio);
+            D_00189E20_2.f11a0 = RandomIntRange(90, 200);
+            D_00189E20_2.f11a0 += FloatToInt(ratio * 80.0f);
         }
     }
     if ((unsigned)(D_00189E20_2.f2290[0x43] - 1) < 2) {
@@ -141,11 +143,11 @@ void func_L00_002AB420(void)
         if (D_00189E20_2.f1194 < 0.0f)
             D_00189E20_2.f1194 = 0.0f;
     }
-    func_L00_002AB0F0(D_00189E20_2.f11a4, D_00189E20_2.f11a8);
+    SetCameraLimitsSlot3(D_00189E20_2.f11a4, D_00189E20_2.f11a8);
     D_L00_0025BE10.f278 = D_00189E20_2.f1198;
     D_L00_0025BE10.f274 = D_00189E20_2.f1194;
-    if (flag) {
-        func_L00_002AB0C0(0.008f, 0.3f);
+    if (applyBlend) {
+        SetCameraLimitsSlot1(0.008f, 0.3f);
         D_L00_0025BE10.f118 = D_L00_0025BE10.f278 * 0.52f;
         D_L00_0025BE10.f114 = D_L00_0025BE10.f274 * 0.55f;
     }

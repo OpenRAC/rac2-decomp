@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* One-shot trigger: on the first update it marks the object initialised; once the level's
    counter reaches 14 while the current level (0x1A79F0) is 16, it sets the resident flag at
@@ -22,6 +23,7 @@ struct TriggerState {
     unsigned char state;
 };
 
+/* Update for the moby class 4810 trigger. Once the level counter is high enough in the right level, it sets a story flag and plays the one-time event. */
 void func_L02_00389F70(struct TriggerState *self) {
     if (self->initialized == 0) {
         self->state = 0xFF;
@@ -29,12 +31,12 @@ void func_L02_00389F70(struct TriggerState *self) {
     }
     if (D_L02_001A9048 < 14)
         return;
-    if (D_001A79F0 != 16)
+    if (gCurrentMapIndex != 16)
         return;
     if (D_001A7A6B != 0)
         return;
     D_001A7A6B = 1;
-    func_002E5E58(1, 0, 0);
-    func_002B0A18(0x1233, -1);
+    PlaySoundFromGlobalBank(1, 0, 0);
+    SetEntryValueByIndex(0x1233, -1);
     D_L02_001A903C = 1;
 }

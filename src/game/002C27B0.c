@@ -11,43 +11,44 @@ extern void func_00282CC0(char *, char *, char *);
 
 typedef int V4 __attribute__((mode(TI)));
 
+/* Updates a particle that follows another object. It disappears when that object is gone or dying. */
 void func_002C27B0(char *self)
 {
-    V4 local;
+    V4 prevPos;
     char *state = self + 0x30;
-    char *sub = *(char **)(self + 0x30);
-    float f0;
-    float f21;
-    float f22;
+    char *target = *(char **)(self + 0x30);
+    float randomFactor;
+    float newSize;
+    float savedExtra;
     int count;
 
-    if (sub == 0)
+    if (target == 0)
         goto kill;
-    if (*(short *)(sub + 0xAA) == *(int *)(state + 8)) {
-        if (*(unsigned char *)(sub + 0x20) == 0xFE)
+    if (*(short *)(target + 0xAA) == *(int *)(state + 8)) {
+        if (*(unsigned char *)(target + 0x20) == 0xFE)
             goto kill;
-        if (*(unsigned char *)(sub + 0x20) != 0xFD)
+        if (*(unsigned char *)(target + 0x20) != 0xFD)
             goto cont;
     }
 kill:
-    func_002B9180(self);
+    KillParticle(self);
     return;
 cont:
-    f0 = func_002A7878(0.5f, 1.0f);
-    f22 = *(float *)(self + 0x2C);
-    f21 = *(float *)(state + 0xC) * f0;
-    qcopy(&local, self + 0x10);
+    randomFactor = RandomFloatRange(0.5f, 1.0f);
+    savedExtra = *(float *)(self + 0x2C);
+    newSize = *(float *)(state + 0xC) * randomFactor;
+    qcopy(&prevPos, self + 0x10);
     count = *(int *)(state + 4);
     if (count > 0) {
-        func_0029FCC0(*(int *)(self + 0x30), count, self + 0x10);
+        TransformMobyJointToWorld(*(int *)(self + 0x30), count, self + 0x10);
     } else {
         qcopy(self + 0x10, (char *)*(int *)(self + 0x30) + 0x10);
     }
-    if (1.5f < func_00282E48(self + 0x10, self + 0x20)) {
-        func_00282CF0(&local, &local, self + 0x10);
-        func_00282F20(&local, &local, 1.5f);
-        func_00282CC0(self + 0x20, self + 0x10, &local);
+    if (1.5f < fast_vec_dist(self + 0x10, self + 0x20)) {
+        FastVecSub(&prevPos, &prevPos, self + 0x10);
+        vec_scale_to_length(&prevPos, &prevPos, 1.5f);
+        FastVecAdd(self + 0x20, self + 0x10, &prevPos);
     }
-    *(float *)(self + 0x1C) = f21;
-    *(float *)(self + 0x2C) = f22;
+    *(float *)(self + 0x1C) = newSize;
+    *(float *)(self + 0x2C) = savedExtra;
 }

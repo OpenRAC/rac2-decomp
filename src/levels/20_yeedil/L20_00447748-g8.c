@@ -43,19 +43,20 @@ typedef struct {
     void (*enqueue)(void (*)(void *), void *);
 } WaterContext;
 
+/* Runs a patch of water (moby class 4685). It builds and draws the water tiles and turns on the objects linked to it. */
 void func_L20_00447748(u8 *object)
 {
     WaterContext context;
     u8 *state;
-    u8 *controller = D_00189E20.controller;
+    u8 *controller = gHeroState.controller;
     int count;
     int remaining;
     int *child;
     int absent;
 
-    if (controller != 0 && *(s16 *)(controller + 0xAA) == 0x45 &&
+    if (controller != 0 && *(s16 *)(controller + 0xAA) == 0x45 /* moby class 69 */ &&
         controller[0x20] != 0xFE && controller[0x20] != 0xFD &&
-        D_00189E20.state == 0x31)
+        gHeroState.state == 0x31)
         return;
     state = *(u8 **)(object + 0x68);
     if (state == 0)
@@ -75,24 +76,24 @@ void func_L20_00447748(u8 *object)
     context.buffer = D_L20_0025DD60;
     context.slots = D_L20_002B22E0;
     context.owner = object;
-    context.draw = func_L20_00447908;
-    context.enqueue = func_L00_002E6EF8;
+    context.draw = StartLevelEffectSix;
+    context.enqueue = AddDrawCallbackToList3;
     switch (object[0x20]) {
     case 0:
-        func_L04_003A1A78((u8 *)&context);
-        func_L04_003A5C08((u32)object, *(float *)(state + 0x28));
+        InitWaterObject((u8 *)&context);
+        AddWaterSplashEntry((u32)object, *(float *)(state + 0x28));
     case 1:
-        func_L04_003A1C98((char *)&context);
+        UpdateWaterController((char *)&context);
         break;
     case 2:
         absent = -1;
-        func_L04_003A1FA0((u8 *)&context);
+        AdvanceWaterControllerState((u8 *)&context);
         child = (int *)(state + 0x30);
         for (remaining = 3; remaining >= 0; --remaining, ++child) {
             if (*child != absent)
-                func_L00_003294F0(D_L20_001B2F9C + (*child << 8), state[0x14]);
+                SetObjectFlagBit(D_L20_001B2F9C + (*child << 8), state[0x14]);
         }
         break;
     }
-    func_L04_003A1FE0((u8 *)&context);
+    UpdateWaterRipplePatches_L04((u8 *)&context);
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -12,11 +13,12 @@ extern void func_001338C8();
 
 extern s32 func_00133930(s32, s32);
 
+/* Sends sound command 0x36 with one value. */
 int func_00133490(int value)
 {
     int payload[4];
     payload[0] = value;
-    return func_00132C48(0x36, 4, payload);
+    return snd_SendCommandSync(0x36, 4, payload);
 }
 
 /* func_001334B8 is matched in src/core/001334B8-g8.c. */
@@ -29,37 +31,42 @@ int func_00133490(int value)
 
 extern int func_00132DF0(int, int, void *, int, int);
 
+/* Sends sound command 81 with two values. */
 int func_00133750(int first, int second) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
-    return func_00132DF0(81, 8, payload, 0, 0);
+    return QueueSoundCommand(81, 8, payload, 0, 0);
 }
 
 extern int func_00132DF0(int, int, void *, int, int);
 
+/* Sends sound command 16 with four values. */
 int func_00133788(int first, int second, int third, int fourth) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
     payload[2] = third;
     payload[3] = fourth;
-    return func_00132DF0(16, 16, payload, 0, 0);
+    return QueueSoundCommand(16, 16, payload, 0, 0);
 }
 
 
 
 
+/* Sends sound command 61, which has no data. */
 int func_00133890(void) {
-    return func_00132C48(61, 0, 0);
+    return snd_SendCommandSync(61, 0, 0);
 }
 
 
+/* Sends sound command 0x3C, which has no data. */
 void func_001338C8(void)
 {
-  func_00132C48(0x3c, 0, 0);
+  snd_SendCommandSync(0x3c, 0, 0);
 }
 
+/* Sends sound command 62 with five values. */
 int func_001338F0(int first, int second, int third, int fourth, int fifth) {
     int payload[8];
     payload[0] = first;
@@ -67,10 +74,11 @@ int func_001338F0(int first, int second, int third, int fourth, int fifth) {
     payload[2] = third;
     payload[3] = fourth;
     payload[4] = fifth;
-    return func_00132C48(62, 20, payload);
+    return snd_SendCommandSync(62, 20, payload);
 }
 
 
+/* Sends sound command 0x5A with two values. */
 int func_00133930(int first, int second)
 {
     struct {
@@ -80,9 +88,10 @@ int func_00133930(int first, int second)
     } payload;
     payload.first = first;
     payload.second = second;
-    return func_00132C48(0x5a, 8, &payload.first);
+    return snd_SendCommandSync(0x5a, 8, &payload.first);
 }
 
+/* Sends sound command 91, which has no data. */
 int func_00133960(void) {
-    return func_00132C48(91, 0, 0);
+    return snd_SendCommandSync(91, 0, 0);
 }

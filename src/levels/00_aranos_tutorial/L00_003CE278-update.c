@@ -75,8 +75,8 @@ typedef struct {
 #define STOP_SOUND() { \
     handle = ctx->sound; \
     if (handle != -1) { \
-        LiftSound *sound = (LiftSound *)(handle * 0x70 + (int)D_00188660); \
-        if (sound->owner == obj && sound->active) func_002E59F8(handle); \
+        LiftSound *sound = (LiftSound *)(handle * 0x70 + (int)gSoundState); \
+        if (sound->owner == obj && sound->active) StopSoundVoice(handle); \
     } \
     ctx->sound = -1; \
 }
@@ -117,9 +117,9 @@ void func_L00_003CE278(LiftObject *obj) {
         }
         ctx->frames = 0;
         ctx->sound = -1;
-        ctx->child = func_0029EFD0(0xC16);
+        ctx->child = CreateMoby(0xC16 /* moby class 3094 */);
         if (!ctx->child) {
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
             return;
         }
         ctx->child->group = obj->group;
@@ -130,39 +130,39 @@ void func_L00_003CE278(LiftObject *obj) {
         qcopy(&child->position, &obj->position);
         child->position.f[2] += 0.15f;
         func_002A0F48(ctx->child);
-        if (obj->animation != 2) func_002A7470(obj, 2, 0, 0);
-        ctx->phase = func_002A7940();
+        if (obj->animation != 2) StartAnimationBlended(obj, 2, 0, 0);
+        ctx->phase = RandomAngle();
         break;
     }
     case 1:
-        ctx->phase = func_00283B98(ctx->phase, 0.10471977f);
-        value = func_00283CF0((func_00283198(ctx->phase) * 4.0f - 3.0f) * 208.0f);
+        ctx->phase = FastAddRotations(ctx->phase, 0.10471977f);
+        value = FloatToInt((FastSinOrCosB(ctx->phase) * 4.0f - 3.0f) * 208.0f);
         if (value > 208) value = 208;
         else if (value < 80) value = 80;
         brightness = (value << 8) | 0x80000000;
         color = (value << 16) | brightness;
         ctx->child->color = color | value;
-        if (func_00282E80(&obj->position, &D_00189E20.position) < 6.0f && obj->animation == 2)
-            func_002A7470(obj, 1, 0, 6);
-        if (func_L00_00324120((int)ctx->child)) {
+        if (vec_distance_xy(&obj->position, &gHeroState.position) < 6.0f && obj->animation == 2)
+            StartAnimationBlended(obj, 1, 0, 6);
+        if (IsCurrentSelectedId((int)ctx->child)) {
             if (!ctx->active) {
-                func_002A7750(obj, 3, -1);
-                if (obj->animation != 2) func_002A7470(obj, 2, 0, 6);
+                SetMobyState(obj, 3, -1);
+                if (obj->animation != 2) StartAnimationBlended(obj, 2, 0, 6);
                 ctx->child->animationData = 0;
                 ctx->child->color = 0x8000DF2A;
-                func_002E5DA0(0, 0, obj, 0x8A1);
+                PlaySoundFromClassBank(0, 0, obj, 0x8A1);
                 START_SOUND();
             } else {
                 SET_ACTIVE(2);
                 START_SOUND();
             }
         }
-        if (func_00282C48(obj->position.f[2] - D_00189E20.position.f[2]) > 14.0f &&
-            !ctx->active && D_00189E20.position.f[2] < obj->position.f[2]) {
+        if (FloatAbs(obj->position.f[2] - gHeroState.position.f[2]) > 14.0f &&
+            !ctx->active && gHeroState.position.f[2] < obj->position.f[2]) {
             START_SOUND();
             SET_ACTIVE(3);
-        } else if (func_00282C48(obj->position.f[2] - D_00189E20.position.f[2]) > 6.0f &&
-                   ctx->active == 1 && obj->position.f[2] < D_00189E20.position.f[2]) {
+        } else if (FloatAbs(obj->position.f[2] - gHeroState.position.f[2]) > 6.0f &&
+                   ctx->active == 1 && obj->position.f[2] < gHeroState.position.f[2]) {
             START_SOUND();
             SET_ACTIVE(2);
         }
@@ -170,25 +170,25 @@ void func_L00_003CE278(LiftObject *obj) {
     case 2:
         qcopy(&frame.delta, &obj->position);
         frame.delta.f[2] = ctx->upperHeight;
-        if (func_00282E48(&obj->position, &frame.delta) > 0.14f) {
-            func_002AA3A8(&obj->position.f[2], &ctx->rate, frame.delta.f[2],
+        if (fast_vec_dist(&obj->position, &frame.delta) > 0.14f) {
+            SpringFloatToGoal(&obj->position.f[2], &ctx->rate, frame.delta.f[2],
                           0.02f, 0.3f, 0.10000001f);
             ++ctx->frames;
         } else {
-            if (func_00282E80(&obj->position, &D_00189E20.position) > 1.2f) {
+            if (vec_distance_xy(&obj->position, &gHeroState.position) > 1.2f) {
                 ctx->active = 0;
                 STOP_SOUND();
-                func_002A7750(obj, 1, -1);
-                if (obj->animation != 1) func_002A7470(obj, 1, 0, 6);
+                SetMobyState(obj, 1, -1);
+                if (obj->animation != 1) StartAnimationBlended(obj, 1, 0, 6);
                 ctx->child->color = 0x808C8C8C;
                 ctx->child->animationData = ctx->child->model->animation;
             } else {
                 if (ctx->frames > 0) {
-                    func_002E5CF8(1, 0, obj);
+                    PlayMobySound(1, 0, obj);
                     ctx->frames = 0;
                 }
                 STOP_SOUND();
-                if (obj->animation != 1) func_002A7470(obj, 1, 0, 6);
+                if (obj->animation != 1) StartAnimationBlended(obj, 1, 0, 6);
             }
         }
         break;
@@ -196,38 +196,38 @@ void func_L00_003CE278(LiftObject *obj) {
         float height = obj->position.f[2];
 
         if (ctx->lowerHeight < height) {
-            if (height - D_00189E20.position.f[2] < 1.8f && D_00189E20.position.f[2] < height) {
-                if (func_002ACBC8(&D_00189E20.position, ctx->blockFlag)) break;
-                func_002AA3A8(&obj->position.f[2], &ctx->rate, ctx->lowerHeight,
+            if (height - gHeroState.position.f[2] < 1.8f && gHeroState.position.f[2] < height) {
+                if (IsPointInCuboid(&gHeroState.position, ctx->blockFlag)) break;
+                SpringFloatToGoal(&obj->position.f[2], &ctx->rate, ctx->lowerHeight,
                               0.02f, 0.3f, 0.10000001f);
                 ++ctx->frames;
             } else {
-                func_002AA3A8(&obj->position.f[2], &ctx->rate, ctx->lowerHeight,
+                SpringFloatToGoal(&obj->position.f[2], &ctx->rate, ctx->lowerHeight,
                               0.0016666667f, 0.0033333334f, 0.10000001f);
                 ++ctx->frames;
             }
             break;
         }
-        if (func_00282E80(&obj->position, &D_00189E20.position) > 1.2f) {
+        if (vec_distance_xy(&obj->position, &gHeroState.position) > 1.2f) {
             ctx->active = 1;
             STOP_SOUND();
-            func_002A7750(obj, 1, -1);
-            if (obj->animation != 1) func_002A7470(obj, 1, 0, 6);
+            SetMobyState(obj, 1, -1);
+            if (obj->animation != 1) StartAnimationBlended(obj, 1, 0, 6);
             ctx->child->color = 0x808C8C8C;
             ctx->child->animationData = ctx->child->model->animation;
         } else {
             if (ctx->frames > 0) {
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
                 ctx->frames = 0;
             }
             STOP_SOUND();
-            if (obj->animation != 1) func_002A7470(obj, 1, 0, 6);
+            if (obj->animation != 1) StartAnimationBlended(obj, 1, 0, 6);
         }
         break;
     }
     }
-    func_00282CF0(&frame.delta, &obj->position, &frame.old);
-    func_002AD6F0((char *)ctx + 0x20, &frame.delta, &frame.rotation, &obj->rotation);
+    FastVecSub(&frame.delta, &obj->position, &frame.old);
+    CombineTransformsAndStore((char *)ctx + 0x20, &frame.delta, &frame.rotation, &obj->rotation);
     child = ctx->child;
     qcopy(&child->position, &obj->position);
     child->position.f[2] += 0.2f;

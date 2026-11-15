@@ -49,6 +49,7 @@ extern float func_00282DB0(Vec4458 *, Vec4458 *);
  * under the first ray, or collision type 8 or 12 under the second, records the hit's word
  * at +0x18 in +0x270 and removes the part of the velocity at +0xF0 that runs into the
  * flattened surface normal. */
+/* Looks ahead of the moving hero for a steep wall and removes the speed that would push into it. */
 void func_L00_002B4458(int force)
 {
     Vec4458 upper;
@@ -61,43 +62,43 @@ void func_L00_002B4458(int force)
     float dot;
     int type;
 
-    if (func_L00_002D3A58(&D_00189E20.velocity) < 0.0016666668f)
+    if (GetViewSpaceVectorLength(&gHeroState.velocity) < 0.0016666668f)
         return;
     height = 0.37f;
     reach = 0.5f;
-    if ((unsigned int)(D_00189E20.x229C - 17) < 2) {
+    if ((unsigned int)(gHeroState.x229C - 17) < 2) {
         height = 0.0f;
         reach = 0.7f;
-    } else if (D_00189E20.mode == 1) {
+    } else if (gHeroState.mode == 1) {
         height = 0.35f;
         reach = 0.27f;
     }
-    func_L00_002D36E0(&upper, 0.0f, 0.0f, height, 1);
-    func_L00_002D36E0(&lower, 0.0f, 0.0f, height * 0.3f, 1);
-    if (force || func_00282E20(&D_00189E20.velocity) < 0.01f) {
-        func_00282F20(&upperEnd, &D_00189E20.dir0, reach);
-        func_00282F20(&lowerEnd, &D_00189E20.dir0, reach * 1.4f);
+    BuildHeroRelativePoint(&upper, 0.0f, 0.0f, height, 1);
+    BuildHeroRelativePoint(&lower, 0.0f, 0.0f, height * 0.3f, 1);
+    if (force || vec_length_xy(&gHeroState.velocity) < 0.01f) {
+        vec_scale_to_length(&upperEnd, &gHeroState.dir0, reach);
+        vec_scale_to_length(&lowerEnd, &gHeroState.dir0, reach * 1.4f);
     } else {
-        func_L00_002D3B58(&upperEnd, &D_00189E20.velocity, 0.0f);
-        func_00282F20(&upperEnd, &upperEnd, reach);
-        func_00282D30(&lowerEnd, &upperEnd, 1.4f);
+        SetViewSpaceHeight(&upperEnd, &gHeroState.velocity, 0.0f);
+        vec_scale_to_length(&upperEnd, &upperEnd, reach);
+        FastVecScale(&lowerEnd, &upperEnd, 1.4f);
     }
     type = -1;
-    func_00282CC0(&upperEnd, &upperEnd, &upper);
-    func_00282CC0(&lowerEnd, &lowerEnd, &lower);
-    if (func_002761F8(&lower, &lowerEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
-        type = func_00278E78();
+    FastVecAdd(&upperEnd, &upperEnd, &upper);
+    FastVecAdd(&lowerEnd, &lowerEnd, &lower);
+    if (CollLine(&lower, &lowerEnd, 2, gHeroState.moby, 0) && gCollisionResult.hits > 0)
+        type = GetCollHitMaterial();
     slope = 0.0f;
-    if (func_002761F8(&upper, &upperEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
-        slope = func_L00_002D3EA8(&D_L00_001BF200.normal);
+    if (CollLine(&upper, &upperEnd, 2, gHeroState.moby, 0) && gCollisionResult.hits > 0)
+        slope = GetViewSpaceAngle(&gCollisionResult.normal);
     if (slope >= 0.87266469f || type == 8 || type == 12) {
-        D_00189E20.x270 = D_L00_001BF200.x18;
-        func_L00_002D3B58(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 0.0f);
-        func_00282F20(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 1.0f);
-        dot = func_00282DB0(&D_L00_001BF200.normal, &D_00189E20.velocity);
+        gHeroState.x270 = gCollisionResult.x18;
+        SetViewSpaceHeight(&gCollisionResult.normal, &gCollisionResult.normal, 0.0f);
+        vec_scale_to_length(&gCollisionResult.normal, &gCollisionResult.normal, 1.0f);
+        dot = FastVecDot(&gCollisionResult.normal, &gHeroState.velocity);
         if (dot < 0.0f) {
-            func_00282D30(&D_L00_001BF200.normal, &D_L00_001BF200.normal, -dot);
-            func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &D_L00_001BF200.normal);
+            FastVecScale(&gCollisionResult.normal, &gCollisionResult.normal, -dot);
+            FastVecAdd(&gHeroState.velocity, &gHeroState.velocity, &gCollisionResult.normal);
         }
     }
 }

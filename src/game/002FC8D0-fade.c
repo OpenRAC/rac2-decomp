@@ -17,10 +17,11 @@ extern int func_00283CF0(float);
 extern void func_002FC560(int, long long);
 extern void func_0027DE50(int, int, int, int, u64);
 
+/* Draws a black overlay on the screen whose strength follows the preview timer, to fade the screen. */
 void func_002FFCF8(void)
 {
     int v;
-    func_002FC560(0x42, 0x44);
-    v = func_00283CF0((1.0f - func_00283CE0(D_001B2310.frames) * D_001B2310.rate) * 255.0f);
-    func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (u64)(v << 24));
+    VU1_addGSregister(0x42, 0x44);
+    v = FloatToInt((1.0f - IntToFloat(gObjectPreviewState.frames) * gObjectPreviewState.rate) * 255.0f);
+    DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (u64)(v << 24));
 }

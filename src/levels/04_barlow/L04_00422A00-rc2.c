@@ -39,20 +39,21 @@ typedef struct {
     s32 tail[2];
 } QueryWork;
 
-f32 func_L04_00422A00(void *arg0) {
+/* Projects the object's position onto the screen and, if it lands inside the view, looks up a value for that spot; returns -1 when it does not. */
+f32 func_L04_00422A00(void *object) {
     QueryWork work;
-    f32 temp_f20;
-    s32 temp_s1;
+    f32 queryResult;
+    s32 positionPtr;
 
-    temp_s1 = *(s32 *)((s8 *)arg0 + 0x68) + 0x30;
-    ref_L04_00422A00_00(&work, (s32 *)temp_s1, ref_L04_00422A00_05);
-    temp_f20 = ref_L04_00422A00_01(&work, ref_L04_00422A00_05 + 0x230);
-    ref_L04_00422A00_02((s32 *)temp_s1, &work.x, &work.y);
+    positionPtr = *(s32 *)((s8 *)object + 0x68) + 0x30;
+    ref_L04_00422A00_00(&work, (s32 *)positionPtr, ref_L04_00422A00_05);
+    queryResult = ref_L04_00422A00_01(&work, ref_L04_00422A00_05 + 0x230);
+    ref_L04_00422A00_02((s32 *)positionPtr, &work.x, &work.y);
     if (work.x < 0 ||
-        work.x >= D_001A7340 - 0x10 ||
+        work.x >= gScreenWidth - 0x10 ||
         work.y < 0 ||
-        work.y >= D_001A7344[0] - 8 ||
-        !(temp_f20 > 0.0f) ||
+        work.y >= gScreenHeight[0] - 8 ||
+        !(queryResult > 0.0f) ||
         ref_L04_00422A00_03(-1, (u16)work.x, (u16)work.y, 0x10, 8, 0, &ref_L04_00422A00_04) == -1) {
         ref_L04_00422A00_04 = -1.0f;
     }

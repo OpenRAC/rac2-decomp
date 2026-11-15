@@ -28,35 +28,37 @@ typedef struct {
     float scale[16];
 } Sparkle;
 extern Sparkle D_L08_001B9E00;
+/* Starts a set of eleven randomly coloured sparkles for the owner (once only), picking each
+   one's colour, lifetime and size. */
 void func_L08_003F77C0(void *owner)
 {
-    int i, intensity, mode, component;
-    unsigned int grey;
-    int green;
-    float value;
+    int i, intensity, colorMode, red;
+    unsigned int baseColor;
+    int greenPart;
+    float phase;
     if (D_L08_001B9E00.active == 1) return;
     D_L08_001B9E00.owner = owner;
     D_L08_001B9E00.active = 1;
     i = 1;
-    grey = 0x706080;
+    baseColor = 0x706080;
     for (; i < 12; ++i) {
-        intensity = func_002A77E0(63) + 1;
-        mode = func_002A77E0(6);
-        switch (mode) {
-        case 0: D_L08_001B9E00.color[i] = intensity + grey - (intensity << 16); break;
-        case 1: D_L08_001B9E00.color[i] = (intensity << 8) + (intensity + grey); break;
-        case 2: D_L08_001B9E00.color[i] = (func_002A77E0(intensity) << 8) + (intensity + grey); break;
+        intensity = RandomIntBelow(63) + 1;
+        colorMode = RandomIntBelow(6);
+        switch (colorMode) {
+        case 0: D_L08_001B9E00.color[i] = intensity + baseColor - (intensity << 16); break;
+        case 1: D_L08_001B9E00.color[i] = (intensity << 8) + (intensity + baseColor); break;
+        case 2: D_L08_001B9E00.color[i] = (RandomIntBelow(intensity) << 8) + (intensity + baseColor); break;
         case 3:
-            component = func_002A77E0(intensity);
-            green = (func_002A77E0(intensity) << 8) + grey;
-            D_L08_001B9E00.color[i] = (component << 16) + green + intensity; break;
-        default: D_L08_001B9E00.color[i] = grey; break;
+            red = RandomIntBelow(intensity);
+            greenPart = (RandomIntBelow(intensity) << 8) + baseColor;
+            D_L08_001B9E00.color[i] = (red << 16) + greenPart + intensity; break;
+        default: D_L08_001B9E00.color[i] = baseColor; break;
         }
-        D_L08_001B9E00.life[i] = func_002A77E0(3) + 1;
-        value = func_002A7878(-0.95f, 2.5f);
-        D_L08_001B9E00.phase[i] = value;
-        value = func_00282C48(func_00283180(func_00283C28(value + 1)));
-        D_L08_001B9E00.scale[i] = value * value * value * 1.7f;
+        D_L08_001B9E00.life[i] = RandomIntBelow(3) + 1;
+        phase = RandomFloatRange(-0.95f, 2.5f);
+        D_L08_001B9E00.phase[i] = phase;
+        phase = FloatAbs(FastSinOrCosA(FastFloatHelperG(phase + 1)));
+        D_L08_001B9E00.scale[i] = phase * phase * phase * 1.7f;
         D_L08_001B9E00.size[i] = 23;
     }
     D_L08_001B9E00.phase[0] = -1;

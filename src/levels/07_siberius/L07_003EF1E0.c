@@ -4,14 +4,15 @@ extern float func_002E5460(int);
 
 extern void func_003109C8(char *, int, int);
 
-void func_L07_003EF1E0(char *arg0, int arg1, int arg2)
+/* Starts a timer on the object: stores how fast it counts down for the given length, then switches the object to state 1. */
+void func_L07_003EF1E0(char *moby, int length, int param)
 {
-    int *p = *(int **)(arg0 + 0x68);
-    float v;
+    int *vars = *(int **)(moby + 0x68);
+    float lengthFloat;
 
-    p[0] = 0;
-    v = func_002E5460(arg1);
-    p[2] = arg2;
-    *(float *)((char *)p + 4) = 1.0f / v;
-    func_003109C8(arg0, 1, -1);
+    vars[0] = 0;
+    lengthFloat = func_002E5460(length);
+    vars[2] = param;
+    *(float *)((char *)vars + 4) = 1.0f / lengthFloat;
+    func_003109C8(moby, 1, -1);
 }

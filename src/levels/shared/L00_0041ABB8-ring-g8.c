@@ -38,13 +38,13 @@ typedef struct {
 void func_L00_0041ABB8(char *self, Quad *first, Quad *second, int value)
 {
     RingState *state = ((RingOwner *)self)->state;
-    RingEntry *slot = (RingEntry *)(state->head * 0x40 + D_L00_001B144C);
+    RingEntry *slot = (RingEntry *)(state->head * 0x40 + gLavaGunRingEntries);
 
     qcopy(&slot->first, first);
     qcopy(&slot->second, second);
     if (slot->handle >= 0)
-        func_002FEE50(slot->handle);
-    slot->handle = func_002FED90(self, slot, 1.0f, 1.0f, 1.0f);
+        ClearEntryFlag(slot->handle);
+    slot->handle = AllocEffectSlot_002FED90(self, slot, 1.0f, 1.0f, 1.0f);
     slot->value = value;
     slot->f34 = 0;
     state->last = state->head;
@@ -104,7 +104,7 @@ void func_L00_0041B840(void *unused, float *origin, Quad *first, Quad *second)
     Quad *point, *quads;
 
     for (index = 0; index < 10; index++) {
-        slot = (EffectSlot *)(index * 0x530 + (int)D_L00_001B1450);
+        slot = (EffectSlot *)(index * 0x530 + (int)gLavaGunBeamSlots);
         if (slot->inUse != 0)
             continue;
         quads = (Quad *)slot;
@@ -115,28 +115,28 @@ void func_L00_0041B840(void *unused, float *origin, Quad *first, Quad *second)
         point = quads;
         for (; part < 2; part++) {
             view = (PartView *)((char *)slot + part * 0x90);
-            func_L00_0041AF60((char *)&slot->packet[part]);
-            func_L00_0041AF60((char *)&slot->matrix[part]);
-            widthScale = func_002A7878(0.3f, 0.5f);
+            InitSpritePacketLarge((char *)&slot->packet[part]);
+            InitSpritePacketLarge((char *)&slot->matrix[part]);
+            widthScale = RandomFloatRange(0.3f, 0.5f);
             view->m[0][1] *= widthScale;
             view->m[1][1] *= widthScale;
             view->m[2][1] *= widthScale;
             view->m[3][1] *= widthScale;
-            heightScale = func_002A7878(0.9f, 1.0f);
+            heightScale = RandomFloatRange(0.9f, 1.0f);
             view->m[1][2] *= heightScale;
             view->m[3][2] *= heightScale;
             view->m[1][1] *= 0.4f;
             view->m[3][1] *= 0.4f;
-            ((float *)(point + 2))[0] = origin[0] + func_002A7878(-0.1f, 0.1f);
-            ((float *)(point + 2))[1] = origin[1] + func_002A7878(-0.1f, 0.1f);
+            ((float *)(point + 2))[0] = origin[0] + RandomFloatRange(-0.1f, 0.1f);
+            ((float *)(point + 2))[1] = origin[1] + RandomFloatRange(-0.1f, 0.1f);
             ((float *)(point + 2))[2] = origin[2];
             ((float *)(point + 2))[3] = 1.0f;
-            *velocity = func_002A7878(-0.02f, -0.01f);
+            *velocity = RandomFloatRange(-0.02f, -0.01f);
             point++;
             velocity++;
-            *scroll = func_002A7878(-7.99f, 0.0f);
+            *scroll = RandomFloatRange(-7.99f, 0.0f);
             scroll++;
-            *phase = func_001163B0() % 2;
+            *phase = Rand() % 2;
             phase++;
         }
         slot->f510 = 0;

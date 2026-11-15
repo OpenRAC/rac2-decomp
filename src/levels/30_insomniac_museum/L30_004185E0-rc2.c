@@ -29,22 +29,23 @@ extern void ref_L30_004185E0_02(s32, s8 *, f32);
 extern void ref_L30_004185E0_03(s32, s32, s8 *);
 extern void ref_L30_004185E0_04(s8 *);
 
-void func_L30_004185E0(s8 *arg0) {
-    s8 *temp_s3;
-    s8 *temp_s2;
-    s8 *temp_v1;
-    s32 temp_s1;
-    s8 *s0;
+/* Updates the helper effect object this object owns and runs the effect's own update callback if it has one. */
+void func_L30_004185E0(s8 *moby) {
+    s8 *vars;
+    s8 *effect;
+    s8 *holder;
+    s32 effectPos;
+    s8 *table;
 
-    s0 = ref_L30_004185E0_01;
-    temp_s3 = *(s8 **)(arg0 + 0x68);
-    temp_s2 = *(s8 **)(temp_s3 + 0x50);
-    temp_s1 = (s32)(temp_s2 + 0x10);
-    ref_L30_004185E0_02(temp_s1, s0, ref_L30_004185E0_00);
-    ref_L30_004185E0_03(temp_s1, temp_s1, s0 - 0x230);
-    if (*(void **)(temp_s2 + 0x64) != 0) {
-        temp_v1 = *(s8 **)(temp_s3 + 0x50);
-        (*(void (**)(s8 *))(temp_v1 + 0x64))(temp_s2);
+    table = ref_L30_004185E0_01;
+    vars = *(s8 **)(moby + 0x68);
+    effect = *(s8 **)(vars + 0x50);
+    effectPos = (s32)(effect + 0x10);
+    ref_L30_004185E0_02(effectPos, table, ref_L30_004185E0_00);
+    ref_L30_004185E0_03(effectPos, effectPos, table - 0x230);
+    if (*(void **)(effect + 0x64) != 0) {
+        holder = *(s8 **)(vars + 0x50);
+        (*(void (**)(s8 *))(holder + 0x64))(effect);
     }
-    ref_L30_004185E0_04(*(s8 **)(temp_s3 + 0x50));
+    ref_L30_004185E0_04(*(s8 **)(vars + 0x50));
 }

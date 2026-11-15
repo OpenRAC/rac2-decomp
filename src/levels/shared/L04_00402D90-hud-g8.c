@@ -31,63 +31,64 @@ extern int func_00336D50(char *,int);
    integer and five float arguments, in the same order within each register bank. */
 extern void func_00300A00(int,float,int,float,float,float,float);
 extern void func_002FC560(int,unsigned long long);
-void func_L04_0040C880(unsigned char *m)
+/* Draws the race banner: five fading coloured markers and the icons at the left and right sides of the screen. */
+void func_L04_0040C880(unsigned char *controller)
 {
     B1202Five x = D_L04_001B09B0;
     B1202Five y = D_L04_001B09C8;
     B1202Five start = D_L04_001B09E0;
     B1202Five end = D_L04_001B09F8;
     int colors[5];
-    unsigned char *p = *(unsigned char **)(m+0x68);
-    int frame,i,j,right,a,b,c,d;
-    int sprite,s1;
-    float angle, sine, sign, fx, fy;
+    unsigned char *vars = *(unsigned char **)(controller+0x68);
+    int frame,i,j,right,fadeInStart,fadeInEnd,fadeOutStart,fadeOutEnd;
+    int sprite,bannerSprite;
+    float angle, sine, sign, leftX, innerX;
     int one, top, off;
-    if (m[0xbc]==3 || m[0xbc]==4 || m[0xbc]==1 || m[0xbc]==2) frame=150-*(int *)(p+0x394);
-    else frame=D_L04_001A8FE8+150;
+    if (controller[0xbc]==3 || controller[0xbc]==4 || controller[0xbc]==1 || controller[0xbc]==2) frame=150-*(int *)(vars+0x394);
+    else frame=gRaceTimeTicks+150;
     if (!D_L04_001A904C) return;
     for(i=0;i<5;i++) {
-        if(i==4) { a=120;b=149;do{c=156;}while(0);d=171; }
-        else { j=i*30; a=j;b=a+30;d=a+45;c=b; }
+        if(i==4) { fadeInStart=120;fadeInEnd=149;do{fadeOutStart=156;}while(0);fadeOutEnd=171; }
+        else { j=i*30; fadeInStart=j;fadeInEnd=fadeInStart+30;fadeOutEnd=fadeInStart+45;fadeOutStart=fadeInEnd; }
         colors[i]=0;
-        if(frame>=a && frame<b) colors[i]=func_00283D38(0,start.v[i],(float)(frame-a)*0.033333335f);
-        else if(frame>=b && frame<c && b!=c) colors[i]=start.v[i];
-        else if(frame>=c && frame<d) colors[i]=func_00283D38(start.v[i],end.v[i],(float)(frame-c)*0.06666667f);
-        else if(frame>=d) colors[i]=end.v[i];
+        if(frame>=fadeInStart && frame<fadeInEnd) colors[i]=FastTweenColor(0,start.v[i],(float)(frame-fadeInStart)*0.033333335f);
+        else if(frame>=fadeInEnd && frame<fadeOutStart && fadeInEnd!=fadeOutStart) colors[i]=start.v[i];
+        else if(frame>=fadeOutStart && frame<fadeOutEnd) colors[i]=FastTweenColor(start.v[i],end.v[i],(float)(frame-fadeOutStart)*0.06666667f);
+        else if(frame>=fadeOutEnd) colors[i]=end.v[i];
     }
     i=0;
     off=0x8710;
     angle=0.56217057f;
-    sine=func_00283198(angle);
-    sine=sine/func_00283180(angle);
+    sine=FastSinOrCosB(angle);
+    sine=sine/FastSinOrCosA(angle);
     D_L04_001BDB80.tan_half=sine;
-    func_0027AB40();
+    UpdateViewContext();
 
     one=1;
     for(;i<2;i++) {
         if(i==0) {j=10;right=31;sign=1.0f;} else {j=498;right=478;sign=-1.0f;}
-        fx=(float)j;
-        s1=func_00336D50((char *)D_L04_001A904C+off,58);
+        leftX=(float)j;
+        bannerSprite=FindTableEntryById((char *)D_L04_001A904C+off,58);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
-        func_00300A00(s1,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
-        sprite=func_00336D50((char *)D_L04_001A904C+off,59);
+        DrawScaledObjectTwoAxes(bannerSprite,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
+        sprite=FindTableEntryById((char *)D_L04_001A904C+off,59);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
-        func_00300A00(sprite,(float)j,0x55f0c070,(float)top,sign,1.0f,0.0f);
-        sprite=func_00336D50((char *)D_L04_001A904C+off,60);
-        func_00300A00(sprite,fx,0x55f0c070,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
-        fy=(float)right;
+        DrawScaledObjectTwoAxes(sprite,(float)j,0x55f0c070,(float)top,sign,1.0f,0.0f);
+        sprite=FindTableEntryById((char *)D_L04_001A904C+off,60);
+        DrawScaledObjectTwoAxes(sprite,leftX,0x55f0c070,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
+        innerX=(float)right;
         for(j=0;j<5;j++) {
-            func_00300A00(func_00336D50((char *)D_L04_001A904C+0x8710,61),fy,colors[j],(float)(D_001A7B90?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
+            DrawScaledObjectTwoAxes(FindTableEntryById((char *)D_L04_001A904C+0x8710,61),innerX,colors[j],(float)(gIsPalVideo?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
         }
-        func_002FC560(71,0x5360b);
+        VU1_addGSregister(71,0x5360b);
     }
-    if(m[0x20]!=3) {
+    if(controller[0x20]!=3) {
         float turn, ratio;
-        turn=*(float *)(p+0x28c);
+        turn=*(float *)(vars+0x28c);
         turn*=0.008726647f;
-        ratio=func_00283198(turn);
-        ratio=ratio/func_00283180(turn);
+        ratio=FastSinOrCosB(turn);
+        ratio=ratio/FastSinOrCosA(turn);
         D_L04_001BDB80.tan_half=ratio;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }

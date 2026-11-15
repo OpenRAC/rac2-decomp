@@ -16,46 +16,47 @@ extern MenuPanel D_0025CAA0[];
 extern int D_0025CB50[];
 extern MenuText D_001ABD6A[] MACRO_ADDR;
 
+/* Handles left and right on the six-page viewer and updates the page text and its scroll timer. */
 int func_002D2018(void)
 {
     int result = 0;
-    int flags = ((CallbackMenuState *)&D_00138180)->flags;
-    int old = D_001ABA60;
+    int flags = ((CallbackMenuState *)&gPadState)->flags;
+    int oldCursor = D_001ABA60;
 
     if (flags & 0x10) {
         int value;
-        int status;
+        int returnCode;
         D_001ABA60 = 0;
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
+            returnCode = -1;
             goto finish;
         }
-        status = 0;
+        returnCode = 0;
 finish:
-        return status;
+        return returnCode;
     }
     if (flags & 0x900) {
         D_001ABA60 = 0;
         result = 1;
     } else if (flags & 0x8000) {
-        if (old > 0)
-            func_002E5E58(3, 0, 0);
+        if (oldCursor > 0)
+            PlaySoundFromGlobalBank(3, 0, 0);
         else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         if (--D_001ABA60 < 0)
             D_001ABA60 = 0;
     } else if (flags & 0x2000) {
-        if (old < 5)
-            func_002E5E58(3, 0, 0);
+        if (oldCursor < 5)
+            PlaySoundFromGlobalBank(3, 0, 0);
         else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         if (++D_001ABA60 > 5)
             D_001ABA60 = 5;
     }
-    if (old != D_001ABA60)
+    if (oldCursor != D_001ABA60)
         D_0025CAA0[0].timer = -300;
     D_0025CB50[0] = D_001ABA60;
     D_0025CAA0[0].text = D_001ABD6A[D_001ABA60].text;

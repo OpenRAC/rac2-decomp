@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -41,10 +42,11 @@ extern void func_00280B90(void *, int, int);
 
 /* func_L06_0035EA68 is defined in L06_0035EA68-fall.c. */
 
-void func_L06_0036F728(s32 a0, s32 a1) {
-    s32 v1 = func_L01_003246F8(a0);
-    if (v1 != -1)
-        D_L06_00139A28[v1].fieldC = a1;
+/* Looks up a table entry from an id and stores a value in it. */
+void func_L06_0036F728(s32 id, s32 value) {
+    s32 entryIndex = FindKeyInPairTable(id);
+    if (entryIndex != -1)
+        D_L06_00139A28[entryIndex].fieldC = value;
 }
 
 /* func_L06_00382608 is defined in L06_00382608.c. */
@@ -52,16 +54,17 @@ void func_L06_0036F728(s32 a0, s32 a1) {
 extern float func_00282E48(char *, char *);
 extern float func_00282C48(float);
 
-s32 func_L06_00382850(char *a0, char *a1, float f12) {
+/* Finds the point in a list whose distance from a given point is closest to a wanted distance. Returns its index. */
+s32 func_L06_00382850(char *point, char *pointList, float wantedDistance) {
     s32 i;
     s32 best = 0;
-    float best_val = 1.0e11f;
-    float base = f12;
+    float bestValue = 1.0e11f;
+    float baseDistance = wantedDistance;
 
-    for (i = 0; i < *(s32 *)a1; i++) {
-        float v = func_00282E48(a1 + 0x10 + i * 0x10, a0);
-        if (func_00282C48(v - base) < best_val) {
-            best_val = v;
+    for (i = 0; i < *(s32 *)pointList; i++) {
+        float distance = fast_vec_dist(pointList + 0x10 + i * 0x10, point);
+        if (FloatAbs(distance - baseDistance) < bestValue) {
+            bestValue = distance;
             best = i;
         }
     }
@@ -71,89 +74,91 @@ s32 func_L06_00382850(char *a0, char *a1, float f12) {
 
 extern void ref_L06_0039A2F0_00(void *, s32, s32);
 
-void func_L06_0039A2F0(s32 a0, s32 a1, s32 a2, s32 a3, s32 *list)
+/* Looks for a matching record in a small list and updates it, or adds a new record at the end of the list. */
+void func_L06_0039A2F0(s32 valueA, s32 valueB, s32 owner, s32 mode, s32 *list)
 {
-    char *shot;
+    char *newEntry;
     s32 count;
-    s32 score;
-    s32 tag = a3;
-    s16 d;
-    s16 fc = *(s16 *)(a2 + 0xB2);
-    s16 fa = *(s16 *)(a2 + 0xAA);
+    s32 index;
+    s32 tag = mode;
+    s16 key;
+    s16 subtype = *(s16 *)(owner + 0xB2);
+    s16 classId = *(s16 *)(owner + 0xAA);
 
-    if (a3 == 1)
-        d = (s16)(a0 - a2);
+    if (mode == 1)
+        key = (s16)(valueA - owner);
     else
-        d = (s16)(a0 - *(u16 *)(a2 + 0x68));
+        key = (s16)(valueA - *(u16 *)(owner + 0x68));
 
-    for (score = 0; score < list[0]; score++) {
-        char *entry = (char *)list + 4 + score * 16;
-        if (*(s32 *)entry != d) continue;
-        if (*(u16 *)(entry + 8) != a1) continue;
-        if (fc != *(s16 *)(entry + 0xC)) continue;
-        if (fa != *(s16 *)(entry + 0xE)) continue;
+    for (index = 0; index < list[0]; index++) {
+        char *entry = (char *)list + 4 + index * 16;
+        if (*(s32 *)entry != key) continue;
+        if (*(u16 *)(entry + 8) != valueB) continue;
+        if (subtype != *(s16 *)(entry + 0xC)) continue;
+        if (classId != *(s16 *)(entry + 0xE)) continue;
         tag = *(s16 *)(entry + 0xA);
         if (tag != 0) {
-            ref_L06_0039A2F0_00(entry + 4, a0, a1);
+            ref_L06_0039A2F0_00(entry + 4, valueA, valueB);
             return;
         }
     }
     count = list[0];
-    shot = (char *)list + 4 + count * 16;
+    newEntry = (char *)list + 4 + count * 16;
     list[0] = count + 1;
-    *(s32 *)shot = d;
-    ref_L06_0039A2F0_00(shot + 4, a0, a1);
-    *(u16 *)(shot + 8) = a1;
-    *(s16 *)(shot + 0xA) = tag;
-    *(s16 *)(shot + 0xC) = fc;
-    *(s16 *)(shot + 0xE) = fa;
+    *(s32 *)newEntry = key;
+    ref_L06_0039A2F0_00(newEntry + 4, valueA, valueB);
+    *(u16 *)(newEntry + 8) = valueB;
+    *(s16 *)(newEntry + 0xA) = tag;
+    *(s16 *)(newEntry + 0xC) = subtype;
+    *(s16 *)(newEntry + 0xE) = classId;
 }
 
+/* Updates a collectable pickup (moby class 750): it waits for the hero to touch it, gives the item, then shrinks and fades away. */
 void func_L06_003E0D88(u8 *moby)
 {
-    char *st = *(char **)(moby + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     float scale, inverse;
     switch ((u8)moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
-        if (!D_001A7BC8[*(int *)st]) func_002A7750(moby, 1, -1);
-        else func_0029F338(moby);
+        if (!D_001A7BC8[*(int *)vars]) SetMobyState(moby, 1, -1);
+        else MarkMobySpawned(moby);
         break;
     case 1:
-        if (func_00282E80(moby + 0x10, D_00189EA0) < 2.0f &&
-            func_00282C48(*(float *)(moby + 0x18) - *(float *)(D_00189EA0 + 8)) < 2.0f) {
-            func_002AD7B8(*(int *)st);
-            func_002A7750(moby, 2, -1);
+        if (vec_distance_xy(moby + 0x10, gHeroPosition) < 2.0f &&
+            FloatAbs(*(float *)(moby + 0x18) - *(float *)(gHeroPosition + 8)) < 2.0f) {
+            MarkFlagAndAppendToList(*(int *)vars);
+            SetMobyState(moby, 2, -1);
             *(u16 *)(moby + 0x34) |= 0x100;
-            *(int *)(st + 8) = 180;
+            *(int *)(vars + 8) = 180;
         }
-        if (*(int *)st == 24 && D_001A7BE0) {
-            func_002AD7B8(24);
-            func_002A7750(moby, 2, -1);
+        if (*(int *)vars == 24 && D_001A7BE0) {
+            MarkFlagAndAppendToList(24);
+            SetMobyState(moby, 2, -1);
             *(u16 *)(moby + 0x34) |= 0x100;
-            *(int *)(st + 8) = 180;
+            *(int *)(vars + 8) = 180;
         }
         break;
     case 2:
         if ((*(u16 *)(moby + 0x34) ^ 1) & 1) {
-            scale = func_00282DF0(moby + 0xC0);
-            func_002AA2E8(&scale, 0, 0.06666667014360428f);
+            scale = FastVecLength(moby + 0xC0);
+            ApproachValue(&scale, 0, 0.06666667014360428f);
             inverse = 2.0f - scale;
-            func_00282F20(moby + 0xC0, moby + 0xC0, scale);
-            func_00282F20(moby + 0xD0, moby + 0xD0, scale);
-            func_00282F20(moby + 0xE0, moby + 0xE0, inverse);
+            vec_scale_to_length(moby + 0xC0, moby + 0xC0, scale);
+            vec_scale_to_length(moby + 0xD0, moby + 0xD0, scale);
+            vec_scale_to_length(moby + 0xE0, moby + 0xE0, inverse);
             if (scale <= 0) {
                 moby[0x31] = 0;
                 *(u16 *)(moby + 0x34) |= 1;
             }
         }
-        func_L00_002E6CF0(func_L06_003E1040, moby);
-        if ((D_L06_001B2348 ^ 1) & 1) (*(int *)(st + 4))++;
-        if (func_00282948((int *)(st + 8))) {
-            func_002AA2E8((float *)(st + 12), 0, 0.05000000447034836f);
-            if (*(float *)(st + 12) <= 0) func_0029F338(moby);
+        AddDrawCallbackToList1(ShowPickupNotice, moby);
+        if ((D_L06_001B2348 ^ 1) & 1) (*(int *)(vars + 4))++;
+        if (FastFloatHelperD((int *)(vars + 8))) {
+            ApproachValue((float *)(vars + 12), 0, 0.05000000447034836f);
+            if (*(float *)(vars + 12) <= 0) MarkMobySpawned(moby);
         } else {
-            func_002AA2E8((float *)(st + 12), 1, 0.05000000447034836f);
+            ApproachValue((float *)(vars + 12), 1, 0.05000000447034836f);
         }
         break;
     }
@@ -161,10 +166,11 @@ void func_L06_003E0D88(u8 *moby)
 
 
 
-s32 func_L06_003E3CC8(u8 *a0) {
-    if (*(s16 *)(a0 + 0xAA) != 0x330)
+/* Returns 1 if this is a Taxi moby that is in one of its flying states (2 to 6). */
+s32 func_L06_003E3CC8(u8 *moby) {
+    if (*(s16 *)(moby + 0xAA) != 0x330 /* Taxi */)
         return 0;
-    return (u32)(a0[0x20] - 2) < 5;
+    return (u32)(moby[0x20] - 2) < 5;
 }
 
 
@@ -180,36 +186,37 @@ extern void func_00283098(void *, void *, void *);
 extern void func_2EEEB8(void *, void *, void *);
 
 /* Same body as func_L17_003C3250, with this function's own callees. */
-void func_L06_003E4FA0(char *a2)
+/* Moves a set of seven local points to follow the moby, and stores them in a shared table entry. */
+void func_L06_003E4FA0(char *moby)
 {
-    char *s5;
-    char *s0;
-    char *s2;
-    char *s4;
-    char *s3;
+    char *vars;
+    char *outPoint;
+    char *sourcePoint;
+    char *position;
+    char *matrix;
     char *base;
-    int v1;
+    int tableEntry;
     int i;
 
-    s5 = *(char **)(a2 + 0x68);
-    v1 = *(int *)(s5 + 0xF8);
-    if (v1 == -1)
+    vars = *(char **)(moby + 0x68);
+    tableEntry = *(int *)(vars + 0xF8);
+    if (tableEntry == -1)
         return;
-    v1 = *(int *)(D_L17_001FE880 + v1 * 4);
-    if (*(int *)v1 != 7)
+    tableEntry = *(int *)(gPathTable_L17 + tableEntry * 4);
+    if (*(int *)tableEntry != 7)
         return;
-    s3 = a2 + 0xC0;
-    s4 = a2 + 0x10;
-    s2 = D_L17_00296F80;
-    s0 = v1 + 0x10;
+    matrix = moby + 0xC0;
+    position = moby + 0x10;
+    sourcePoint = D_L17_00296F80;
+    outPoint = tableEntry + 0x10;
     for (i = 6; i >= 0; i--) {
-        func_00283098(s0, s2, s3);
-        s2 += 0x10;
-        func_2EEEB8(s0, s0, s4);
-        s0 += 0x10;
+        matrix_mul_vec3(outPoint, sourcePoint, matrix);
+        sourcePoint += 0x10;
+        func_2EEEB8(outPoint, outPoint, position);
+        outPoint += 0x10;
     }
-    base = D_00189E20;
-    *(unsigned short *)(base + 0x24FE) = *(unsigned short *)(s5 + 0xF8);
+    base = gHeroState;
+    *(unsigned short *)(base + 0x24FE) = *(unsigned short *)(vars + 0xF8);
 }
 
 
@@ -232,45 +239,47 @@ void func_L06_003E4FA0(char *a2)
 /* func_L06_004638F0 is defined in L06_004638F0.c. */
 
 
+/* Draws a flat textured square twice, the second one slightly in front, as the look of the swaying effect moby. */
 void func_L06_00463FC0(char *moby)
 {
     L06Quad q;
-    u8 *st = *(u8 **)(moby + 0x68);
-    if (st[0x4D]) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    if (vars[0x4D]) {
         q.uv[0] = 0; q.uv[1] = 0; q.uv[2] = 0; q.uv[3] = 1;
         q.uv[4] = 1; q.uv[5] = 0; q.uv[6] = 1; q.uv[7] = 1;
     } else {
         q.uv[0] = 0; q.uv[1] = 0; q.uv[2] = 1; q.uv[3] = 0;
         q.uv[4] = 0; q.uv[5] = 1; q.uv[6] = 1; q.uv[7] = 1;
     }
-    *(u32 *)(st + 0x58) &= 0xFFFFFF;
-    *(u32 *)(st + 0x58) += (u8)moby[0x23] << 24;
-    q.color[0] = q.color[1] = q.color[2] = q.color[3] = *(u32 *)(st + 0x58);
+    *(u32 *)(vars + 0x58) &= 0xFFFFFF;
+    *(u32 *)(vars + 0x58) += (u8)moby[0x23] << 24;
+    q.color[0] = q.color[1] = q.color[2] = q.color[3] = *(u32 *)(vars + 0x58);
     q.tag[0] = 0;
-    func_002FC560(0x42, 0x8000000048UL);
-    func_002FC560(0x14, 0xFF9000000260UL);
-    func_002FC560(0x47, 0x50000);
-    func_00281DE8(&q, st[0x4E], 0, 0x80);
-    func_L01_0031A278(moby, q.point[0], 0, *(float *)(st + 0x50), -*(float *)(st + 0x54));
-    func_L01_0031A278(moby, q.point[1], 0, *(float *)(st + 0x50), *(float *)(st + 0x54));
-    func_L01_0031A278(moby, q.point[2], 0, -*(float *)(st + 0x50), -*(float *)(st + 0x54));
-    func_L01_0031A278(moby, q.point[3], 0, -*(float *)(st + 0x50), *(float *)(st + 0x54));
-    func_00280B90(&q, 0, 0);
-    func_00281DE8(&q, st[0x4F], 0, 0x80);
-    func_002FC560(0x47, 0x50000);
-    func_L01_0031A278(moby, q.point[0], -0.001f, *(float *)(st + 0x50), -*(float *)(st + 0x54));
-    func_L01_0031A278(moby, q.point[1], -0.001f, *(float *)(st + 0x50), *(float *)(st + 0x54));
-    func_L01_0031A278(moby, q.point[2], -0.001f, -*(float *)(st + 0x50), -*(float *)(st + 0x54));
-    func_L01_0031A278(moby, q.point[3], -0.001f, -*(float *)(st + 0x50), *(float *)(st + 0x54));
-    func_00280B90(&q, 0, 0);
+    VU1_addGSregister(0x42, 0x8000000048UL);
+    VU1_addGSregister(0x14, 0xFF9000000260UL);
+    VU1_addGSregister(0x47, 0x50000);
+    InitQuadPacketState(&q, vars[0x4E], 0, 0x80);
+    ComputeMobyLocalPoint(moby, q.point[0], 0, *(float *)(vars + 0x50), -*(float *)(vars + 0x54));
+    ComputeMobyLocalPoint(moby, q.point[1], 0, *(float *)(vars + 0x50), *(float *)(vars + 0x54));
+    ComputeMobyLocalPoint(moby, q.point[2], 0, -*(float *)(vars + 0x50), -*(float *)(vars + 0x54));
+    ComputeMobyLocalPoint(moby, q.point[3], 0, -*(float *)(vars + 0x50), *(float *)(vars + 0x54));
+    draw_world_quad(&q, 0, 0);
+    InitQuadPacketState(&q, vars[0x4F], 0, 0x80);
+    VU1_addGSregister(0x47, 0x50000);
+    ComputeMobyLocalPoint(moby, q.point[0], -0.001f, *(float *)(vars + 0x50), -*(float *)(vars + 0x54));
+    ComputeMobyLocalPoint(moby, q.point[1], -0.001f, *(float *)(vars + 0x50), *(float *)(vars + 0x54));
+    ComputeMobyLocalPoint(moby, q.point[2], -0.001f, -*(float *)(vars + 0x50), -*(float *)(vars + 0x54));
+    ComputeMobyLocalPoint(moby, q.point[3], -0.001f, -*(float *)(vars + 0x50), *(float *)(vars + 0x54));
+    draw_world_quad(&q, 0, 0);
 }
 
 extern s32 D_L06_001B9890;
 
-void func_L06_00475C10(float a0) {
-    s32 v1 = D_L06_001B9890;
-    if (*(s16 *)(v1 + 0x86) == 0)
-        *(float *)(*(s32 *)(v1 + 0x70) + 0x24C) = a0;
+/* Sets a camera distance value, unless the camera is switched off. */
+void func_L06_00475C10(float distance) {
+    s32 cameraState = D_L06_001B9890;
+    if (*(s16 *)(cameraState + 0x86) == 0)
+        *(float *)(*(s32 *)(cameraState + 0x70) + 0x24C) = distance;
 }
 
 
@@ -280,14 +289,17 @@ void func_L06_00475C10(float a0) {
 /* func_L06_0047AC68 is defined in L06_0047AC68-g8.c. */
 
 /* Separate camera activate, update and exit entries, shared by seven levels. */
+/* Empty camera activate entry. */
 void func_L06_0047C1D0(void *camera)
 {
 }
 
+/* Empty camera update entry. */
 void func_L06_0047C1D8(void *camera)
 {
 }
 
+/* Empty camera exit entry. */
 void func_L06_0047C1E0(void *camera)
 {
 }

@@ -74,57 +74,59 @@ extern void func_002ACB48(void *, float);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_L00_0033FFB8(void *, void *, int);
 
+/* Todano cutscene scene update (runs every frame). It marks and refreshes the scene objects,
+   and in mode 5 it sprays effects from the two emitters and runs the current story event. */
 void func_L12_00300410(void)
 {
-    V a, b, c, d;
-    V *velocity;
-    int i, j, k;
+    V posA, posB, velBuf, zeroVec;
+    V *velPtr;
+    int objIndex, emitterIndex, sparkIndex;
     char *obj;
-    State *st;
-    char **entries;
+    State *scene;
+    char **emitterList;
 
-    func_L00_002FC980();
-    for (i = 0; i < D_L12_001BDB00.count; i++) {
-        obj = D_L12_001BDB00.objects[i];
+    StartStartupAnimations();
+    for (objIndex = 0; objIndex < D_L12_001BDB00.count; objIndex++) {
+        obj = D_L12_001BDB00.objects[objIndex];
         if (obj && *(short *)(obj + 0xAA) == 0xE29) {
             *(unsigned short *)(obj + 0x34) |= 0x800;
         }
         if (*(short *)(obj + 0xAA) == 0xD54) {
-            func_002E64A0(obj);
+            UpdateEquipmentPieces(obj);
         }
-        if (obj && *(short *)(obj + 0xAA) == 0xFA0) {
+        if (obj && *(short *)(obj + 0xAA) == 0xFA0 /* TV Screens */) {
             char *p = *(char **)(obj + 0x68);
             if (p) {
-                func_L00_00326048(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
+                StoreAngleUpdateResult(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
             }
         }
     }
-    func_L00_002E6CF0(func_L12_00300138, 0);
+    AddDrawCallbackToList1(RefreshSceneTuningFactors, 0);
 
-    st = &D_L12_001BDB00;
-    if (st->mode != 5) {
+    scene = &D_L12_001BDB00;
+    if (scene->mode != 5) {
         return;
     }
-    entries = st->emitters;
-    velocity = &c;
-    for (j = 1; j >= 0; j--) {
-        char *emitter = *entries;
+    emitterList = scene->emitters;
+    velPtr = &velBuf;
+    for (emitterIndex = 1; emitterIndex >= 0; emitterIndex--) {
+        char *emitter = *emitterList;
 
-        func_0029FCC0(emitter, 3, &a);
-        func_0029FCC0(emitter, 5, &b);
-        func_00282D08(&a, &a, &b, 0.5f);
-        d.q = 0;
-        d.f[2] = -(func_002A7878(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
-        c.q = d.q;
+        TransformMobyJointToWorld(emitter, 3, &posA);
+        TransformMobyJointToWorld(emitter, 5, &posB);
+        lerp_vector(&posA, &posA, &posB, 0.5f);
+        zeroVec.q = 0;
+        zeroVec.f[2] = -(RandomFloatRange(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
+        velBuf.q = zeroVec.q;
         if (D_L12_001B29C8[0] & 1) {
-            func_002BAE50(&a, velocity, D_L12_001A93E8, D_L12_001A93EC[0], func_002A7820(18, 22),
+            SpawnScalingParticle(&posA, velPtr, D_L12_001A93E8, D_L12_001A93EC[0], RandomIntRange(18, 22),
                           D_L12_001A9400, -10, 1);
         } else {
-            func_002BAE50(&a, velocity, D_L12_001A93F0[0], D_L12_001A93F4[0], func_002A7820(20, 24),
+            SpawnScalingParticle(&posA, velPtr, D_L12_001A93F0[0], D_L12_001A93F4[0], RandomIntRange(20, 24),
                           D_L12_001A9404[0], -10, 1);
         }
-        entries++;
-        func_002BAE50(&a, velocity, D_L12_001A93F8[0], D_L12_001A93FC[0], func_002A7820(10, 15),
+        emitterList++;
+        SpawnScalingParticle(&posA, velPtr, D_L12_001A93F8[0], D_L12_001A93FC[0], RandomIntRange(10, 15),
                       D_L12_001A9408[0], -10, 1);
     }
 
@@ -132,8 +134,8 @@ void func_L12_00300410(void)
     case 2:
         for (obj = D_L12_001B2E9C[0]; obj < D_L12_001B2EA4[0]; obj += 0x100) {
             int cls = *(short *)(obj + 0xAA);
-            if (cls == 0x11EB || cls == 0x1F5 || cls == 0x326) {
-                func_0029F338(obj);
+            if (cls == 0x11EB || cls == 0x1F5 /* Nanotech Crate */ || cls == 0x326) {
+                MarkMobySpawned(obj);
             }
         }
         break;
@@ -141,35 +143,35 @@ void func_L12_00300410(void)
         D_L12_001B9CC0.fade = 0.5f;
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
-        func_0029FCC0(D_L12_001BDB00.objects[4], 0, &a);
-        func_0032C700(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        TransformMobyJointToWorld(D_L12_001BDB00.objects[4], 0, &posA);
+        SpawnExplosion(&posA, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         break;
     case 0x6F5:
         D_L12_001B9CC0.fade = 0.5f;
         D_L12_001B9CC0.time = 60;
         D_L12_001B9CC0.flag = 0;
-        func_00282F20(&a, &D_L12_001B9CC0.rot, 4.0f);
-        func_00282CC0(&a, &a, &D_L12_001B9CC0.pos);
-        func_00282F20(&b, &D_L12_001B9CC0.rot, -1.0f);
-        func_0032DA58(D_L12_001BDB00.objects[2], &a, &b, 0.0f);
+        vec_scale_to_length(&posA, &D_L12_001B9CC0.rot, 4.0f);
+        FastVecAdd(&posA, &posA, &D_L12_001B9CC0.pos);
+        vec_scale_to_length(&posB, &D_L12_001B9CC0.rot, -1.0f);
+        SpawnBlastEffectMoby(D_L12_001BDB00.objects[2], &posA, &posB, 0.0f);
         break;
     case 0x8D2:
         D_L12_001B9CC0.fade = 0.5f;
-        a.q = 0;
-        a.f[0] = 4.0f;
-        a.f[1] = -1.0f;
-        a.f[2] = 1.0f;
+        posA.q = 0;
+        posA.f[0] = 4.0f;
+        posA.f[1] = -1.0f;
+        posA.f[2] = 1.0f;
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
-        func_00283098(&a, &a, &D_L12_001B9CC0.rot);
-        func_00282CC0(&a, &a, &D_L12_001B9CC0.pos);
-        func_0032C700(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
-        for (k = 24; k >= 0; k--) {
-            qcopy(&b, &a);
-            func_002ACB48(&b, 0.3f);
-            func_00282CF0(velocity, &b, &a);
-            func_00282F20(velocity, velocity, func_002A7878(0.0f, 1.0f) * 0.016666668f);
-            func_L00_0033FFB8(&b, velocity, 300);
+        matrix_mul_vec3(&posA, &posA, &D_L12_001B9CC0.rot);
+        FastVecAdd(&posA, &posA, &D_L12_001B9CC0.pos);
+        SpawnExplosion(&posA, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        for (sparkIndex = 24; sparkIndex >= 0; sparkIndex--) {
+            qcopy(&posB, &posA);
+            AddRandomOffsetToVector(&posB, 0.3f);
+            FastVecSub(velPtr, &posB, &posA);
+            vec_scale_to_length(velPtr, velPtr, RandomFloatRange(0.0f, 1.0f) * 0.016666668f);
+            SpawnSpinningParticle_L00_2(&posB, velPtr, 300);
         }
         break;
     }

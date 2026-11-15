@@ -56,6 +56,7 @@ ivln10 = 4.34294481903251816668e-01, /* 3FDBCB7B 1526E50E */
 log10_2hi = 3.01029995663611771306e-01, /* 3FD34413 509F6000 */
 log10_2lo = 3.69423907715893078616e-13; /* 3D59FEF3 11F12B36 */
 
+/* Works out the base 10 logarithm of a number. */
 double func_001182B8(double x)
 {
 	double y,z;
@@ -78,6 +79,6 @@ double func_001182B8(double x)
         hx = (hx&0x000fffff)|((0x3ff-i)<<20);
         y  = (double)(k+i);
 	SET_HIGH_WORD(x,hx);
-	z  = y*log10_2lo + ivln10*func_00117CA0(x);
+	z  = y*log10_2lo + ivln10*__ieee754_log(x);
 	return  z+y*log10_2hi;
 }

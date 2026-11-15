@@ -4,15 +4,16 @@ typedef unsigned int u128 __attribute__((mode(TI)));
 
 extern float func_002AA140(float, float, float);
 
-void func_L00_0031D670(f32 *out, const f32 *a, const f32 *b, f32 factor) {
-    u128 left, right;
-    f32 *lf = (f32 *)&left;
-    f32 *rf = (f32 *)&right;
-    left = *(const u128 *)a;
-    right = *(const u128 *)b;
+/* Blends each of the four parts of one vector toward another by the given amount. */
+void func_L00_0031D670(f32 *out, const f32 *from, const f32 *to, f32 amount) {
+    u128 fromVec, toVec;
+    f32 *fromF = (f32 *)&fromVec;
+    f32 *toF = (f32 *)&toVec;
+    fromVec = *(const u128 *)from;
+    toVec = *(const u128 *)to;
 
-    out[0] = func_002AA140(lf[0], rf[0], factor);
-    out[1] = func_002AA140(lf[1], rf[1], factor);
-    out[2] = func_002AA140(lf[2], rf[2], factor);
-    out[3] = func_002AA140(lf[3], rf[3], factor);
+    out[0] = LerpFloat_002AA140(fromF[0], toF[0], amount);
+    out[1] = LerpFloat_002AA140(fromF[1], toF[1], amount);
+    out[2] = LerpFloat_002AA140(fromF[2], toF[2], amount);
+    out[3] = LerpFloat_002AA140(fromF[3], toF[3], amount);
 }

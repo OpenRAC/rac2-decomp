@@ -48,79 +48,80 @@ extern void r1_func_00129600();
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C0A0 */
 /* _decodeOrSkipField (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
-int func_0012FEC0(void *handle, int arg1, int arg2)
+/* Decodes or skips one video field and moves the field counters forward. */
+int func_0012FEC0(void *mpeg, int fieldIndex, int fieldLimit)
 {
-  struct MpegHandle *arg0 = handle;
-  struct MpegFieldDec *p;
-  int decode;
+  struct MpegHandle *wrapper = mpeg;
+  struct MpegFieldDec *decoder;
+  int shouldDecode;
   unsigned int ref;
-  int want;
-  long r;
-  int ret;
-  int gate;
-  decode = 0;
-  p = arg0->unk40;
-  p->unk120 = 0;
-  if ((arg2 == (-1)) || (arg1 < arg2))
+  int wantedMode;
+  long status;
+  int result;
+  int hasReference;
+  shouldDecode = 0;
+  decoder = wrapper->unk40;
+  decoder->unk120 = 0;
+  if ((fieldLimit == (-1)) || (fieldIndex < fieldLimit))
   {
-    decode = 1;
+    shouldDecode = 1;
   }
-  if (p->unk8 == 0)
+  if (decoder->unk8 == 0)
   {
-    arg0->unk8 = 0;
-    p->unk8 = 1;
+    wrapper->unk8 = 0;
+    decoder->unk8 = 1;
   }
-  r = r1_func_00129690(p, 0);
-  if ((r != 0) && (decode != 0))
+  status = r1_func_00129690(decoder, 0);
+  if ((status != 0) && (shouldDecode != 0))
   {
-    r1_func_00129530(p);
+    r1_func_00129530(decoder);
   }
-  p->unk120 = 1;
-  r = r1_func_00128C90(p);
-  if (r == 0)
+  decoder->unk120 = 1;
+  status = r1_func_00128C90(decoder);
+  if (status == 0)
   {
-    func_00130020(arg0);
-    p->unk0 = 1;
+    StopMpegDecoding(wrapper);
+    decoder->unk0 = 1;
     return 0;
   }
-  want = 2;
-  if (p->unkD4 != 1)
+  wantedMode = 2;
+  if (decoder->unkD4 != 1)
   {
-    want = 1;
+    wantedMode = 1;
   }
-  if (p->unk174 != want)
+  if (decoder->unk174 != wantedMode)
   {
     return -1;
   }
-  ref = r1_func_00129690(p, 1);
-  gate = 0;
+  ref = r1_func_00129690(decoder, 1);
+  hasReference = 0;
   if (ref != 0)
   {
-    gate = 1;
+    hasReference = 1;
   }
-  ret = 0;
-  if (gate != 0)
+  result = 0;
+  if (hasReference != 0)
   {
-    if (decode == 0)
+    if (shouldDecode == 0)
     {
       goto out;
     }
-    r = r1_func_00129530(p);
-    if (r != 0)
+    status = r1_func_00129530(decoder);
+    if (status != 0)
     {
-      ret = 1;
+      result = 1;
     }
   }
   out:
-  r1_func_00129600(p, p->unk118, p->unk4);
+  r1_func_00129600(decoder, decoder->unk118, decoder->unk4);
 
-  p->unk120 = 0;
-  arg0->unk8 = p->unk118 - p->unkAC;
-  p->unk118 = p->unk118 + 1;
-  p->unk4 = (unsigned long long) (p->unk4 + 1);
-  if (decode == 0)
+  decoder->unk120 = 0;
+  wrapper->unk8 = decoder->unk118 - decoder->unkAC;
+  decoder->unk118 = decoder->unk118 + 1;
+  decoder->unk4 = (unsigned long long) (decoder->unk4 + 1);
+  if (shouldDecode == 0)
   {
-    func_0012FAE8((int)arg0);
+    SendMpegEventOne((int)wrapper);
   }
-  return ret;
+  return result;
 }

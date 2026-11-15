@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 
 
 typedef int s32;
@@ -66,77 +67,78 @@ extern s32 func_0011F5E0();
 
 extern s32 func_0011F628();
 
-void func_0012D808(struct Rac1Cpr8Input *arg0, struct Rac1Cpr8Output *arg1) {
-    struct Rac1Cpr8InputView *sp0;
-    s32 sp4;
-    s32 sp8;
-    s32 temp_2_106;
-    s32 temp_2_73;
-    s32 temp_4_27;
-    s32 var_16_70;
-    s32 var_17_68;
-    s32 var_18_22;
-    s32 var_20_40;
-    s32 var_21_38;
-    s32 var_30_43;
-    s32 var_3_29;
-    s32 var_5_64;
+/* Copies a decoded video picture to the screen buffer in chunks using two DMA channels. */
+void func_0012D808(struct Rac1Cpr8Input *input, struct Rac1Cpr8Output *output) {
+    struct Rac1Cpr8InputView *view;
+    s32 passCount;
+    s32 srcBase;
+    s32 intrState2;
+    s32 intrState1;
+    s32 chromaSize;
+    s32 row;
+    s32 srcAddr;
+    s32 dstAddr;
+    s32 qwCount;
+    s32 dstStep;
+    s32 srcStep;
+    s32 chromaSizeUsed;
+    s32 pass;
 
-    sp0 = (struct Rac1Cpr8InputView *)arg0;
-    var_18_22 = arg1->unk0 & 0x0FFFFFFF;
-    sp8 = arg0->unkD8 & 0x0FFFFFFF;
-    if (sp0->unk174 == 3) {
+    view = (struct Rac1Cpr8InputView *)input;
+    dstAddr = output->unk0 & 0x0FFFFFFF;
+    srcBase = input->unkD8 & 0x0FFFFFFF;
+    if (view->unk174 == 3) {
         goto block_3;
     }
-    temp_4_27 = sp0->unkE0;
-    var_3_29 = temp_4_27;
-    if (temp_4_27 != 0) {
+    chromaSize = view->unkE0;
+    chromaSizeUsed = chromaSize;
+    if (chromaSize != 0) {
         goto block_8;
     }
     goto block_4;
 block_3:
-    var_3_29 = sp0->unkE0;
+    chromaSizeUsed = view->unkE0;
 block_4:
-    var_21_38 = arg1->unk10 * 0x180;
-    var_20_40 = var_21_38 >> 4;
-    if (var_3_29 == 0) {
+    dstStep = output->unk10 * 0x180;
+    qwCount = dstStep >> 4;
+    if (chromaSizeUsed == 0) {
         goto block_6;
     }
-    var_30_43 = (var_3_29 >> 4) * 0x180;
+    srcStep = (chromaSizeUsed >> 4) * 0x180;
     goto block_7;
 block_6:
-    var_30_43 = var_21_38;
+    srcStep = dstStep;
 block_7:
-    sp4 = 1;
+    passCount = 1;
     goto block_9;
 block_8:
-    var_30_43 = (temp_4_27 >> 4) * 0xC0;
-    var_21_38 = ((s32) arg1->unk10 >> 1) * 0x180;
-    sp4 = 2;
-    var_20_40 = var_21_38 >> 4;
+    srcStep = (chromaSize >> 4) * 0xC0;
+    dstStep = ((s32) output->unk10 >> 1) * 0x180;
+    passCount = 2;
+    qwCount = dstStep >> 4;
 block_9:
-    var_5_64 = 0;
-    while (var_5_64 < sp4) {
-        var_17_68 = sp8;
-        for (var_16_70 = 0; var_16_70 < arg1->unkC; var_16_70++) {
-            temp_2_73 = func_0011F5E0();
+    pass = 0;
+    while (pass < passCount) {
+        srcAddr = srcBase;
+        for (row = 0; row < output->unkC; row++) {
+            intrState1 = DIntr();
             D9_SADR = 0;
-            D9_MADR = var_18_22;
-            D9_QWC = var_20_40;
+            D9_MADR = dstAddr;
+            D9_QWC = qwCount;
             D9_CHCR = 0x101;
-            if (temp_2_73 == 0) {
+            if (intrState1 == 0) {
                 goto block_15;
             }
             func_0011F628();
         block_15:
             while (D9_CHCR & 0x100) {
             }
-            temp_2_106 = func_0011F5E0();
+            intrState2 = DIntr();
             D8_SADR = 0;
-            D8_MADR = var_17_68;
-            D8_QWC = var_20_40;
+            D8_MADR = srcAddr;
+            D8_QWC = qwCount;
             D8_CHCR = 0x100;
-            if (temp_2_106 == 0) {
+            if (intrState2 == 0) {
                 goto block_19;
             }
             func_0011F628();
@@ -145,11 +147,11 @@ block_9:
             }
             while (D8_QWC != 0) {
             }
-            var_17_68 += var_30_43;
-            var_18_22 += var_21_38;
+            srcAddr += srcStep;
+            dstAddr += dstStep;
         }
-        var_5_64++;
-        sp8 += sp0->unkE4 * 0xC0;
+        pass++;
+        srcBase += view->unkE4 * 0xC0;
     }
     return;
 }

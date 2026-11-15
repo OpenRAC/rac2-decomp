@@ -96,6 +96,7 @@ extern void func_002A9288(void *, float);
 #define STATE(p) (*(unsigned char *)((p) + 0x20))
 
 /* Advances launch, grounded movement, falling and teardown states of a timed actor. */
+/* Updates the Turret Spider Bot (moby class 3705): it is launched, moves along the ground, falls, and is removed when its time runs out. */
 void func_L00_003FFBA0(char *obj)
 {
     /* The query and attachment transform use the same workspace in separate phases. */
@@ -110,23 +111,23 @@ void func_L00_003FFBA0(char *obj)
     char *hero;
 
     if (STATE(obj) >= 2)
-    func_L00_003252A8(obj, D_L00_001B2C00, 1);
+    ForwardObjectPositionCall(obj, D_L00_001B2C00, 1);
     else
-    func_002FE8D8(obj + 0x10, D_L00_001B2C00);
-    func_00282D30(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
-    func_00282D30(&scratch.ahead, obj + 0xE0, D_L00_001B0CAC);
-    func_00282CC0(&scratch.ahead, obj + 0x10, &scratch.ahead);
-    func_00282D30(&scratch.behind, obj + 0xE0, -1.0f);
-    func_00282CC0(&scratch.behind, obj + 0x10, &scratch.behind);
-    if (func_002761F8(&scratch.ahead, &scratch.behind, 2, obj, 0)) {
-        if (func_00278E78() == 2) {
-            func_00282D30(D_L00_001B2C00, D_L00_001BF240, 0.0009765625f);
-            func_00282F20(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
+    GetObjectFacingDirection(obj + 0x10, D_L00_001B2C00);
+    FastVecScale(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
+    FastVecScale(&scratch.ahead, obj + 0xE0, D_L00_001B0CAC);
+    FastVecAdd(&scratch.ahead, obj + 0x10, &scratch.ahead);
+    FastVecScale(&scratch.behind, obj + 0xE0, -1.0f);
+    FastVecAdd(&scratch.behind, obj + 0x10, &scratch.behind);
+    if (CollLine(&scratch.ahead, &scratch.behind, 2, obj, 0)) {
+        if (GetCollHitMaterial() == 2) {
+            FastVecScale(D_L00_001B2C00, D_L00_001BF240, 0.0009765625f);
+            vec_scale_to_length(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
             D_L00_001B2C14[0] = 1;
         } else {
             update_collision = 0;
         }
-        if (func_00278E78() == 6)
+        if (GetCollHitMaterial() == 6)
         update_water = 1;
         else
         update_water = 0;
@@ -134,7 +135,7 @@ void func_L00_003FFBA0(char *obj)
         update_collision = 0;
         D_L00_001B2C18[0] = 0;
     }
-    func_002B0CE0(6, 0, 1);
+    ForceClaimNotice(6, 0, 1);
     switch (STATE(obj)) {
     case 0:
         STATE(obj) = 1;
@@ -143,22 +144,22 @@ void func_L00_003FFBA0(char *obj)
         I(obj, 0x98) = 0;
         particles = D_L00_00254650;
         for (i = 97; i >= 0; i--) {
-            (*particles)[0] = func_002A7940();
-            (*particles)[1] = func_002A78D8(720.0f, 2160.0f) * 0.00029088825f;
+            (*particles)[0] = RandomAngle();
+            (*particles)[1] = RandomSignedFloatRange(720.0f, 2160.0f) * 0.00029088825f;
             particles++;
         }
         update_timer = 1800;
         if (D_L00_001A904C[0])
-            func_0029B758(0, func_L00_004003F0);
+            StoreLevelObjectValuePair(0, DrawTurretSpiderBotTimer);
         /* fall through */
     case 1:
-        hero = D_00189E20;
+        hero = gHeroState;
         action = I(hero, 0x2294);
         if (action == 98 || D_L00_001A8F00 == 2 || action == 111 || action == 100 ||
             action == 99 || action == 23 || action == 24 || action == 129 || action == 39) {
             ref_L00_003FFBA0_00();
             STATE(obj) = 7;
-            func_L00_00402DB8();
+            ActivateLinkedObjectData();
             I(vars, 0x60) = 0;
             break;
         }
@@ -166,28 +167,28 @@ void func_L00_003FFBA0(char *obj)
         if (F(obj, 0x2C) > 0.023f)
             F(obj, 0x2C) = 0.023f;
         qcopy(&scratch.previous, obj + 0x10);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars);
-        func_002FEE70(D_L00_001B2C28[0], vars, 0);
-        func_00300190(obj + 0x10, obj + 0x10);
-        func_00300248(vars, vars);
-        func_002FE880(obj + 0x10, vars, 0.0030555557f);
-        if (func_002761F8(&scratch.previous, obj + 0x10, 0, obj, 0)) {
-            UpdateCollision *collision = &D_L00_001BF200;
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
+        SteerEffectDirection(D_L00_001B2C28[0], vars, 0);
+        TransformVectorOrCopy(obj + 0x10, obj + 0x10);
+        TriggerCurrentStateEffect(vars, vars);
+        AddObjectDirectionScaled(obj + 0x10, vars, 0.0030555557f);
+        if (CollLine(&scratch.previous, obj + 0x10, 0, obj, 0)) {
+            UpdateCollision *collision = &gCollisionResult;
             char *other = collision->hit;
-            if (other && (other == P(hero, 0x2290) || *(short *)(other + 0xAA) == 0x907))
+            if (other && (other == P(hero, 0x2290) || *(short *)(other + 0xAA) == 0x907 /* Spiderbot Glove */))
                 break;
             qcopy(obj + 0x10, &collision->point);
-            func_002B0CE0(6, 0, 1);
-            func_L00_002C42E0(28, 1);
-            func_00335798(obj + 0x10, obj + 0xF0, obj);
+            ForceClaimNotice(6, 0, 1);
+            SetHeroAction_L00(28, 1);
+            SetupObjectEffectEntry(obj + 0x10, obj + 0xF0, obj);
             STATE(obj) = 2;
-            func_002A7470(obj, 1, 0, 10);
+            StartAnimationBlended(obj, 1, 0, 10);
             I(obj, 0x48) = 0;
         }
         break;
     case 2:
         STATE(obj) = 3;
-        func_002E5CF8(2, 0, obj);
+        PlayMobySound(2, 0, obj);
         if (D_0018C0B4 != 28 || D_L00_001A8F00 == 2) {
             ref_L00_003FFBA0_00();
             STATE(obj) = 9;
@@ -195,12 +196,12 @@ void func_L00_003FFBA0(char *obj)
         }
         break;
     case 3:
-        func_0032FDD0(obj);
-        func_003309A0(obj);
-        func_0032FEA8(obj);
-        func_L00_00401D50(obj);
-        func_00331718();
-        if (func_00282948(D_L00_001B2C10)) {
+        ReadClampedStickInput(obj);
+        SteerHeadingTowardAim(obj);
+        UpdateVehicleSpeedAndMove(obj);
+        NotifyNearbyTypedObjects(obj);
+        PlaySoundsOnThresholdCrossing();
+        if (FastFloatHelperD(D_L00_001B2C10)) {
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
@@ -216,10 +217,10 @@ void func_L00_003FFBA0(char *obj)
         break;
     case 4:
         qcopy(&scratch.previous, obj + 0x10);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars);
-        func_002FE880(obj + 0x10, vars, 0.0061111115f);
-        func_00300190(obj + 0x10, obj + 0x10);
-        func_00300248(vars, vars);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
+        AddObjectDirectionScaled(obj + 0x10, vars, 0.0061111115f);
+        TransformVectorOrCopy(obj + 0x10, obj + 0x10);
+        TriggerCurrentStateEffect(vars, vars);
         qcopy(&scratch.workspace.query.start, &scratch.previous);
         qcopy(&scratch.workspace.query.end, obj + 0x10);
         qcopy(&scratch.workspace.query.velocity, vars);
@@ -233,31 +234,31 @@ void func_L00_003FFBA0(char *obj)
         scratch.workspace.query.flags = 0;
         scratch.workspace.query.mask = 0;
         scratch.workspace.query.gravity = 0;
-        hit = func_002FE9D0(&scratch.workspace.query);
+        hit = CollideSweptSphere(&scratch.workspace.query);
         qcopy(obj + 0x10, &scratch.workspace.query.end);
         qcopy(vars, &scratch.workspace.query.velocity);
         if (hit == 2) {
-            if (func_00300540(scratch.workspace.query.surface) || scratch.workspace.query.surface == 12) {
+            if (GetWeaponGroup(scratch.workspace.query.surface) || scratch.workspace.query.surface == 12) {
                 STATE(obj) = 9;
                 I(vars, 0x60) = 10;
             } else {
                 STATE(obj) = 2;
-                func_00282C88(vars);
+                ClearVector128(vars);
             }
-        } else if (func_00282DF0(vars) > 0.4f) {
+        } else if (FastVecLength(vars) > 0.4f) {
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
         break;
     case 9:
         STATE(obj) = 5;
-        func_L00_00402DB8();
+        ActivateLinkedObjectData();
         /* fall through */
     case 5:
-        if (func_00282948(vars + 0x60)) {
-            func_002E5CF8(1, 0, obj);
-            func_00282F20(&scratch.rotation, obj + 0xC0, 1.0f);
-            func_0032DA58(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
+        if (FastFloatHelperD(vars + 0x60)) {
+            PlayMobySound(1, 0, obj);
+            vec_scale_to_length(&scratch.rotation, obj + 0xC0, 1.0f);
+            SpawnBlastEffectMoby(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
             STATE(obj) = 6;
             *(unsigned short *)(obj + 0x34) |= 0x41;
             if (D_0018C0B4 != 28 || D_L00_001A8F00 == 2) {
@@ -269,39 +270,39 @@ void func_L00_003FFBA0(char *obj)
         }
         break;
     case 6:
-        func_00330CA0(obj);
+        QueueRadialMobyImpacts(obj);
         F(vars, 0x64) += D_L00_001B0C98 * 0.016666668f;
-        if (func_00282948(vars + 0x60) && !I(vars, 0x68))
+        if (FastFloatHelperD(vars + 0x60) && !I(vars, 0x68))
             STATE(obj) = 8;
         break;
     case 7:
-        if (func_00282948(vars + 0x60))
+        if (FastFloatHelperD(vars + 0x60))
             STATE(obj) = 8;
         break;
     case 8:
         if (D_0018C0B4 == 28)
-            func_L00_002C42E0(0, 1);
-        if (*(short *)(D_L00_001B8E10 + 0x86) == 27)
+            SetHeroAction_L00(0, 1);
+        if (*(short *)(gFollowCameraObject + 0x86) == 27)
             ref_L00_003FFBA0_00();
-        func_002FEE50(update_handle);
-        func_002FED28(I(vars, 0x6C));
-        func_002FED28(I(vars, 0x70));
-        func_002FED28(I(vars, 0x74));
+        ClearEntryFlag(update_handle);
+        FreeSlot(I(vars, 0x6C));
+        FreeSlot(I(vars, 0x70));
+        FreeSlot(I(vars, 0x74));
         D_L00_001B0CA0 = 0;
-        func_0029B758(0, 0);
-        func_0029F338(obj);
+        StoreLevelObjectValuePair(0, 0);
+        MarkMobySpawned(obj);
         return;
     }
     if (STATE(obj) >= 2 && D_L00_001ADB2C[0]) {
-        func_00283658(scratch.workspace.attachment.transform, obj + 0xC0);
-        func_002AB6D8(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
-        func_002AD0E0(obj, D_L00_001ADB2C[0], obj + 0x10,
+        copy_matrix_rotation(scratch.workspace.attachment.transform, obj + 0xC0);
+        GetEulerAnglesFromMatrix(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
+        TransformPointAndRotationByParent(obj, D_L00_001ADB2C[0], obj + 0x10,
                      &scratch.workspace.attachment.angles, obj + 0x10,
                      &scratch.workspace.attachment.adjusted);
-        func_002833F0(obj + 0xC0, &scratch.workspace.attachment.adjusted);
+        euler_rotation_basis(obj + 0xC0, &scratch.workspace.attachment.adjusted);
     }
     if ((unsigned int)(STATE(obj) - 2) < 2)
-        func_0032F598(obj);
-    func_0027D098(func_L00_00401FF0, obj);
-    func_002A9288(obj, D_L00_001B0CB0);
+        UpdateVehicleGunAiming(obj);
+    RegisterFinalDrawCallback(func_L00_00401FF0, obj);
+    QueueGroundShadow(obj, D_L00_001B0CB0);
 }

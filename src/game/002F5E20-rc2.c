@@ -44,22 +44,23 @@ extern void func_00288EA0(void);
 extern void func_002B7170(void);
 extern void func_002E5FE0(void);
 
-void func_002F5E20(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+/* Starts playing a movie: remembers where it is on the disc and fades out to begin it. */
+void func_002F5E20(s32 sector, s32 size, s32 fileEntry, s32 mode, s32 flag)
 {
-    u8 *p;
+    u8 *flags;
 
-    p = D_00188660;
-    p[0x6B] = p[0x6B] | 8;
+    flags = gSoundState;
+    flags[0x6B] = flags[0x6B] | 8;
     func_00133710(2, 0, 0, 0, 0);
-    func_0011AEA0(0);
-    func_002E5FE0();
-    func_002B7170();
-    D_001B2208 = arg0;
+    FlushCache(0);
+    ClearAllSoundVoices();
+    WaitForMusicIdle();
+    D_001B2208 = sector;
     D_001B221C = (s32) D_001A63F0[0];
-    D_001B220C = arg1;
-    D_001B2210 = arg2;
-    D_001B2214 = arg3;
-    D_001B2218 = arg4;
-    func_0027D330(4);
-    func_00288EA0();
+    D_001B220C = size;
+    D_001B2210 = fileEntry;
+    D_001B2214 = mode;
+    D_001B2218 = flag;
+    FadeToBlack(4);
+    ClearSubtitleState();
 }

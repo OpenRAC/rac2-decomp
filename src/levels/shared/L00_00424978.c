@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct Rac2Native_428d1e2cc4aa1f21_Keyed {
     unsigned char unknown_00[28];
@@ -9,27 +10,28 @@ extern char *D_L00_001B8E10;
 
 extern Rac2Native_428d1e2cc4aa1f21_Keyed *D_L00_001B1844;
 
-int func_L00_00424978(char *a0)
+/* Tries to claim the camera request slot. A new request wins if the current owner has a lower priority; returns -1 if the camera is not in the normal mode. */
+int func_L00_00424978(char *request)
 {
-    char *p = D_L00_001B8E10;
-    char *q;
-    char *v;
+    char *camera = gFollowCameraObject;
+    char *state;
+    char *current;
 
-    if (*(short *)(p + 134) != 0) {
+    if (*(short *)(camera + 134) != 0) {
         return -1;
     }
-    q = *(char **)(p + 112);
-    v = *(char **)(q + 576);
-    if (v == 0) {
-        *(char **)(q + 576) = a0;
+    state = *(char **)(camera + 112);
+    current = *(char **)(state + 576);
+    if (current == 0) {
+        *(char **)(state + 576) = request;
         return 1;
     }
-    if (v == a0) {
+    if (current == request) {
         return 1;
     }
-    if (*(unsigned char *)(D_L00_001B1844[*(short *)(v + 132)].owner_1c + 28) <
-        *(unsigned char *)(D_L00_001B1844[*(short *)(a0 + 132)].owner_1c + 28)) {
-        *(char **)(q + 576) = a0;
+    if (*(unsigned char *)(D_L00_001B1844[*(short *)(current + 132)].owner_1c + 28) <
+        *(unsigned char *)(D_L00_001B1844[*(short *)(request + 132)].owner_1c + 28)) {
+        *(char **)(state + 576) = request;
         return 1;
     }
     return 0;

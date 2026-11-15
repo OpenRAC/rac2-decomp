@@ -24,15 +24,15 @@ void func_L30_00382FB8(void)
         current += sourceCenter;
         for (column = 1; column < 23; column++) {
             int at = column * 4;
-            float sum = *(float *)(previous+at+(char *)D_L30_00233A60)
-                     +*(float *)(next+at+(char *)D_L30_00233A60)
-                     +*(float *)(current+at-8+(char *)D_L30_00233A60)
-                     +*(float *)(current+at+(char *)D_L30_00233A60)
-                     +*(float *)(previous+at-4+(char *)D_L30_00233A60)
-                     +*(float *)(previous+at+4+(char *)D_L30_00233A60)
-                     +*(float *)(next+at-4+(char *)D_L30_00233A60)
-                     +*(float *)(next+at+4+(char *)D_L30_00233A60);
-            float *cell = (float *)(out+at+(char *)D_L30_00233A60);
+            float sum = *(float *)(previous+at+(char *)gMuseumWaterHeights)
+                     +*(float *)(next+at+(char *)gMuseumWaterHeights)
+                     +*(float *)(current+at-8+(char *)gMuseumWaterHeights)
+                     +*(float *)(current+at+(char *)gMuseumWaterHeights)
+                     +*(float *)(previous+at-4+(char *)gMuseumWaterHeights)
+                     +*(float *)(previous+at+4+(char *)gMuseumWaterHeights)
+                     +*(float *)(next+at-4+(char *)gMuseumWaterHeights)
+                     +*(float *)(next+at+4+(char *)gMuseumWaterHeights);
+            float *cell = (float *)(out+at+(char *)gMuseumWaterHeights);
             float value = sum * 0.25f - *cell;
             *cell = value - value * 0.0625f;
         }

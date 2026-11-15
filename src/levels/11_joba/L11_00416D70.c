@@ -21,6 +21,7 @@ extern int D_L11_001B0D90 __attribute__((sda));
 extern float D_L11_001B0D94 __attribute__((sda));
 extern int D_L11_001B0D98 __attribute__((sda));
 
+/* Runs a sliding gate with a child part attached to it: it plays open and close animations, moves a little, and keeps the child part in place on it. */
 void func_L11_00416D70(char *self) {
     float offset[4] __attribute__((aligned(16)));
     /* Separate initial and final query events use four measured local vectors. */
@@ -37,20 +38,20 @@ void func_L11_00416D70(char *self) {
         *(int *)(state + 0x10) = 0;
         *(int *)(state + 0x14) = 0;
         *(int *)(state + 0x18) = 0;
-        func_002A7750(self, 2, -1);
-        if (*(unsigned char *)(self + 0x43) != 0) func_002A7470(self, 0, 0, 0);
+        SetMobyState(self, 2, -1);
+        if (*(unsigned char *)(self + 0x43) != 0) StartAnimationBlended(self, 0, 0, 0);
         ((Obj48 *)self)->f48 = 0.0f;
-        func_00282F20(updated, self + 0xD0, D_L11_001B0D94);
-        func_00282CC0(self + 0x10, self + 0x10, updated);
+        vec_scale_to_length(updated, self + 0xD0, D_L11_001B0D94);
+        FastVecAdd(self + 0x10, self + 0x10, updated);
         qcopy(state, self + 0x10);
-        *(char **)(state + 0x1C) = func_0029EFD0(0x1172);
+        *(char **)(state + 0x1C) = CreateMoby(0x1172 /* moby class 4466 */);
         if (*(char **)(state + 0x1C) == 0) return;
         *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 0x41;
         *(unsigned char *)(*(char **)(state + 0x1C) + 0x30) = *(unsigned char *)(self + 0x30);
         *(short *)(*(char **)(state + 0x1C) + 0x32) = 0;
-        func_0029FCC0(self, 0, (char *)position);
-        func_00283098(transformed, D_L11_001B0DA0, self + 0xC0);
-        func_00282CC0(position, transformed, position);
+        TransformMobyJointToWorld(self, 0, (char *)position);
+        matrix_mul_vec3(transformed, D_L11_001B0DA0, self + 0xC0);
+        FastVecAdd(position, transformed, position);
         {
             char *child = *(char **)(state + 0x1C);
             qcopy(child + 0x10, position);
@@ -67,66 +68,66 @@ void func_L11_00416D70(char *self) {
                 out++;
             } while (count < 3);
         }
-        func_002AB028(*(char **)(state + 0x1C) + 0xC0);
+        NormalizeMatrixColumns(*(char **)(state + 0x1C) + 0xC0);
         func_002A10E8(*(char **)(state + 0x1C));
         *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 6;
         break;
     case 1:
-        if (func_002B3868(self)) *(short *)(state + 0x22) = D_L11_001B0D98;
-        if (!func_00282978(state + 0x22)) {
-            func_00282F20(updated, self + 0xD0, D_L11_001B0D94 / (float)D_L11_001B0D98);
-            func_00282CC0(self + 0x10, self + 0x10, updated);
+        if (SetFirstPendingFlag(self)) *(short *)(state + 0x22) = D_L11_001B0D98;
+        if (!FastDecTimer(state + 0x22)) {
+            vec_scale_to_length(updated, self + 0xD0, D_L11_001B0D94 / (float)D_L11_001B0D98);
+            FastVecAdd(self + 0x10, self + 0x10, updated);
         }
         if (*(unsigned char *)(self + 0x60) & 2) {
             qcopy(self + 0x10, state);
             ((Obj48 *)self)->f48 = 0.0f;
-            func_002A7750(self, 2, -1);
+            SetMobyState(self, 2, -1);
         }
         break;
     case 3:
-        if (func_002B3868(self)) *(short *)(state + 0x22) = D_L11_001B0D98;
-        if (!func_00282978(state + 0x22)) {
-            func_00282F20(updated, self + 0xD0, -D_L11_001B0D94 / (float)D_L11_001B0D98);
-            func_00282CC0(self + 0x10, self + 0x10, updated);
+        if (SetFirstPendingFlag(self)) *(short *)(state + 0x22) = D_L11_001B0D98;
+        if (!FastDecTimer(state + 0x22)) {
+            vec_scale_to_length(updated, self + 0xD0, -D_L11_001B0D94 / (float)D_L11_001B0D98);
+            FastVecAdd(self + 0x10, self + 0x10, updated);
         }
         if (*(unsigned char *)(self + 0x60) & 2) {
             ((Obj48 *)self)->f48 = 0.0f;
-            func_002A7750(self, 4, -1);
+            SetMobyState(self, 4, -1);
         }
         break;
     case 4:
-        func_002A7750(self, 5, -1);
+        SetMobyState(self, 5, -1);
         ((Obj48 *)self)->f48 = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 1) func_002A7470(self, 1, 0, 0);
-        func_L11_00417340(self);
+        if (*(unsigned char *)(self + 0x43) != 1) StartAnimationBlended(self, 1, 0, 0);
+        PlaceAndInitChildMobys(self);
         break;
     case 5:
         if (*(unsigned char *)(self + 0x60) & 2) {
             *(short *)(state + 0x20) = D_L11_001B0D90;
             ((Obj48 *)self)->f48 = 0.0f;
-            func_002A7750(self, 6, -1);
+            SetMobyState(self, 6, -1);
         }
         break;
     case 6:
         if (!*(short *)(state + 0x20)) {
         ((Obj48 *)self)->f48 = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 2) func_002A7470(self, 2, 0, 0);
-        func_002A7750(self, 7, -1);
+        if (*(unsigned char *)(self + 0x43) != 2) StartAnimationBlended(self, 2, 0, 0);
+        SetMobyState(self, 7, -1);
         } else {
-            func_00282978(state + 0x20);
+            FastDecTimer(state + 0x20);
         }
         break;
     case 7:
         if (*(unsigned char *)(self + 0x60) & 2) {
-            if (*(unsigned char *)(self + 0x43) != 3) func_002A7470(self, 3, 0, 0);
-            func_002A7750(self, 1, -1);
+            if (*(unsigned char *)(self + 0x43) != 3) StartAnimationBlended(self, 3, 0, 0);
+            SetMobyState(self, 1, -1);
         }
         break;
     }
     if (*(char **)(state + 0x1C) && ((Obj48 *)self)->f48 != 0.0f) {
-        func_0029FCC0(self, 0, (char *)updated);
-        func_00283098(position, D_L11_001B0DA0, self + 0xC0);
-        func_00282CC0(updated, position, updated);
+        TransformMobyJointToWorld(self, 0, (char *)updated);
+        matrix_mul_vec3(position, D_L11_001B0DA0, self + 0xC0);
+        FastVecAdd(updated, position, updated);
         {
             char *child = *(char **)(state + 0x1C);
             qcopy(child + 0x10, updated);
@@ -141,7 +142,7 @@ void func_L11_00416D70(char *self) {
             source++;
             destination++;
         }
-        func_002AB028(childMatrix + 0xC0);
+        NormalizeMatrixColumns(childMatrix + 0xC0);
         }
         func_002A10E8(*(char **)(state + 0x1C));
         *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 6;

@@ -33,6 +33,7 @@ typedef struct {
     float fCC;                    /* 0xCC */
 } Ctl_L02_00332EF0;
 
+/* Checks how far an object is from the ground and from its target and sets the contact flags. It counts frames on and off the ground and snaps the object to the ground when asked. */
 void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *target, void *newpos, int adjust)
 {
     int changed;
@@ -40,8 +41,8 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
     float dist, near;
 
     changed = 0;
-    func_L02_00333300(self, ctl);
-    dist = func_00282E48(self->pos, D_L02_001B3210);
+    ProbeGroundAhead(self, ctl);
+    dist = fast_vec_dist(self->pos, D_L02_001B3210);
     if (dist < ctl->f90 - ctl->f08) {
         changed = 1;
         ctl->flags94 |= 2;
@@ -53,7 +54,7 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
         }
     }
     if (ctl->hC0 != 0) {
-        if (ctl->f10 < func_L02_00329410(self, ctl->v50, 0)) {
+        if (ctl->f10 < ComputeFacingAngleFromVector(self, ctl->v50, 0)) {
             changed = 1;
             ctl->flags94 |= 4;
         }
@@ -61,25 +62,25 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
     position = self->pos;
     if (changed) {
         *(Quad_L02_00332EF0 *)position = *(Quad_L02_00332EF0 *)newpos;
-        func_L02_00333300(self, ctl);
-        dist = func_00282E48(position, D_L02_001B3210);
+        ProbeGroundAhead(self, ctl);
+        dist = fast_vec_dist(position, D_L02_001B3210);
     }
     if (dist <= ctl->f90 + 0.005f) {
-        func_002AFF38(self, ctl->vA0, 0);
+        GetVerticalOffset(self, ctl->vA0, 0);
         if (adjust)
-            func_002AFD88(self, position, 0.0f, 0.0f, ctl->f90 - dist);
+            AddTransformedPointToVector(self, position, 0.0f, 0.0f, ctl->f90 - dist);
         ctl->hC2 = 0;
         ctl->hC0++;
     } else if (ctl->f90 + ctl->f0C <= dist) {
         ctl->hC0 = 0;
         ctl->hC2++;
     }
-    near = func_00282E48(position, target);
+    near = fast_vec_dist(position, target);
     ctl->fCC = near;
     if (near <= ctl->f34)
         ctl->flags94 |= 0x80;
     if (ctl->flags38 & 0x200) {
-        if (func_002B63C0(self, ctl))
-            func_002A90C8(self, 0, 0x10000, position, 255.0f);
+        if (IsObjectWellAboveGround(self, ctl))
+            StartEffectWithDefaultTable(self, 0, 0x10000, position, 255.0f);
     }
 }

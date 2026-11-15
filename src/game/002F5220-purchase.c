@@ -36,138 +36,139 @@ extern void func_002FB1A0(void);
 #define ITEM (D_00239BA0[D_00139568[D_0021F240.rows[D_0021F240.index].item]])
 #define ROW (D_0021F240.rows[D_0021F240.index])
 #define BUTTONS (D_00138180.buttons)
+/* Runs the buy dialog in the vendor screen: works out how many the player can afford, reads the buttons, and completes or cancels the purchase. */
 void func_002F8918(int *cancel, int *confirm)
 {
-    PurchaseItem result;
-    int item, special, used;
-    if (D_0021F240.state == 1) {
+    PurchaseItem upgradeInfo;
+    int item, special, boughtCount;
+    if (gVendorMenuState.state == 1) {
         {
             PurchaseItem *record = &ITEM;
-            if (record->price) D_001B2248 = D_001A79F8 / record->price;
+            if (record->price) D_001B2248 = gPlayerBolts / record->price;
             else D_001B2248 = 0;
         }
         {
-            int *ammo = &D_00139688[ROW.item];
+            int *ammo = &gItemAmmoCounts[ROW.item];
             PurchaseItem *record = &ITEM;
             int room = record->capacity - *ammo;
             if (D_001B2248 > room) D_001B2248 = room;
         }
         *cancel = 0;
         *confirm = 0;
-        if (ROW.kind == 1 && D_00139688[ROW.item] >= ITEM.capacity) {
-            func_002E5CF8(2, 17, D_0021F240.moby);
+        if (ROW.kind == 1 && gItemAmmoCounts[ROW.item] >= ITEM.capacity) {
+            PlayMobySound(2, 17, gVendorMenuState.moby);
         } else if (ROW.kind == 1) {
             PurchaseItem *record = &ITEM;
-            if (D_001A79F8 < record->price) func_002E5CF8(2, 17, D_0021F240.moby);
+            if (gPlayerBolts < record->price) PlayMobySound(2, 17, gVendorMenuState.moby);
             else *confirm = 1;
-        } else if (D_001A79F8 < func_002F6510()) {
-            func_002E5CF8(2, 0, D_0021F240.moby);
+        } else if (gPlayerBolts < GetSelectedShopItemPrice()) {
+            PlayMobySound(2, 0, gVendorMenuState.moby);
         }
-        D_0021F240.state = 2;
-    } else if (D_0021F240.state == 2) {
+        gVendorMenuState.state = 2;
+    } else if (gVendorMenuState.state == 2) {
         if (*confirm == 1) {
             if ((BUTTONS & 0x8000) || (D_001B223C >= 16 && !(D_001B223C & 7)) || D_001B223C >= 48) {
                 if (D_001B2248 >= 2) {
                     --D_001B2248;
                     if (!(D_001B223C & 3) || D_001B223C < 16)
-                        func_002E5CF8(1, 17, D_0021F240.moby);
+                        PlayMobySound(1, 17, gVendorMenuState.moby);
                 }
             }
             if ((BUTTONS & 0x2000) || (D_001B2240 >= 16 && !(D_001B2240 & 7)) || D_001B2240 >= 48) {
                 PurchaseItem *record = &ITEM;
                 if (record->price) {
-                    int max = D_001A79F8 / record->price;
-                    int left = record->capacity - D_00139688[ROW.item];
+                    int max = gPlayerBolts / record->price;
+                    int left = record->capacity - gItemAmmoCounts[ROW.item];
                     if (left < max) max = left;
                     if (D_001B2248 < max) {
                         ++D_001B2248;
                         if (!(D_001B2240 & 3) || D_001B2240 < 16)
-                            func_002E5CF8(1, 17, D_0021F240.moby);
+                            PlayMobySound(1, 17, gVendorMenuState.moby);
                     }
                 }
             }
         }
         if ((BUTTONS & 16) && !(D_001B2244 & 16)) {
             *cancel = 0;
-            D_0021F240.state = 4;
+            gVendorMenuState.state = 4;
         } else if ((BUTTONS & 64) && !(D_001B2244 & 64)) {
             *cancel = 1;
-            D_0021F240.state = 4;
+            gVendorMenuState.state = 4;
         }
-    } else if (D_0021F240.state == 4) {
+    } else if (gVendorMenuState.state == 4) {
         if (*cancel == 1) {
             int cost;
             PurchaseItem *gate;
             if (ROW.kind == 1) {
                 PurchaseItem *record = &ITEM;
                 cost = record->price * D_001B2248;
-            } else cost = func_002F6510();
-            if (D_001A79F8 < cost && D_00139688[ROW.item] >= (gate = &ITEM)->capacity) {
-                func_002E5CF8(0, 17, D_0021F240.moby);
+            } else cost = GetSelectedShopItemPrice();
+            if (gPlayerBolts < cost && gItemAmmoCounts[ROW.item] >= (gate = &ITEM)->capacity) {
+                PlayMobySound(0, 17, gVendorMenuState.moby);
             } else if (ROW.kind == 1) {
-                int *ammo = &D_00139688[ROW.item];
+                int *ammo = &gItemAmmoCounts[ROW.item];
                 PurchaseItem *record = &ITEM;
                 int total;
                 if (*ammo < record->capacity) {
                     total = record->price * D_001B2248;
-                    if (D_001A79F8 >= total) {
+                    if (gPlayerBolts >= total) {
                         if (*ammo > record->capacity) *ammo = record->capacity;
-                        used = D_001B2248;
-                        used -= func_0026F740(ROW.item, used);
+                        boughtCount = D_001B2248;
+                        boughtCount -= EmptyStubF740(ROW.item, boughtCount);
                         {
                             PurchaseItem *record = &ITEM;
-                            total = record->price * used;
-                            D_001A79F8 -= total;
+                            total = record->price * boughtCount;
+                            gPlayerBolts -= total;
                         }
-                        func_002F6608(0);
-                        func_002F88D8(func_00288FB8(0x2DCB));
-                        func_002E5CF8(7, 17, D_0021F240.moby);
+                        BuildVendorWeaponList(0);
+                        SetShopMessageText(GetLocalizedString(0x2DCB));
+                        PlayMobySound(7, 17, gVendorMenuState.moby);
                     } else {
-                        func_002F88D8(func_00288FB8(0x2DCC));
-                        func_002E5CF8(0, 17, D_0021F240.moby);
+                        SetShopMessageText(GetLocalizedString(0x2DCC));
+                        PlayMobySound(0, 17, gVendorMenuState.moby);
                     }
-                } else func_002E5CF8(0, 17, D_0021F240.moby);
+                } else PlayMobySound(0, 17, gVendorMenuState.moby);
             } else {
-                int price = func_002F6510();
-                if (D_001A79F8 >= price) {
+                int price = GetSelectedShopItemPrice();
+                if (gPlayerBolts >= price) {
                     item = ROW.item;
-                    func_00288308(item);
+                    UnlockHelpEntry(item);
                     if (ROW.special) {
                         special = 0;
                         switch (ROW.item) {
                         case 12: case 14: case 17: case 18: case 53: special = 1; break;
                         }
                         if (special) {
-                            PurchaseState *shop = &D_0021F240;
+                            PurchaseState *shop = &gVendorMenuState;
                             PurchaseRow *rows = shop->rows;
-                            if (func_00288870(&result, rows[shop->index].item, 1) && result.price)
-                                D_00139688[rows[shop->index].item] = result.capacity;
+                            if (CopyHelpRecordAtDepth(&upgradeInfo, rows[shop->index].item, 1) && upgradeInfo.price)
+                                gItemAmmoCounts[rows[shop->index].item] = upgradeInfo.capacity;
                         } else {
-                            PurchaseState *shop = &D_0021F240;
+                            PurchaseState *shop = &gVendorMenuState;
                             PurchaseRow *rows = shop->rows;
-                            if (func_00288870(&result, rows[shop->index].item, 2) && result.price)
-                                D_00139688[rows[shop->index].item] = result.capacity;
+                            if (CopyHelpRecordAtDepth(&upgradeInfo, rows[shop->index].item, 2) && upgradeInfo.price)
+                                gItemAmmoCounts[rows[shop->index].item] = upgradeInfo.capacity;
                         }
                     }
-                    if (item != 31 && item != 61) func_002AD860(item);
-                    D_0021F240.last = item;
-                    if (ROW.special) func_002887B0(ROW.item);
-                    func_0028A130(D_0021F240.last);
-                    D_001A79F8 -= price;
-                    func_002F6608(0);
-                    if (D_0021F240.handle != -1) func_0028B6C8(D_0021F240.handle, 0);
-                    D_0021F240.handle = -1;
-                    if (ROW.kind == 1) func_0029B6D0(ROW.item, 0x112A880);
-                    else if (D_0021F240.index > D_0021F240.count - 1) D_0021F240.index = D_0021F240.count - 1;
-                    func_002F88D8(func_00288FB8(0x2DCB));
-                    func_002E5CF8(7, 17, D_0021F240.moby);
+                    if (item != 31 && item != 61) HandleRequestSlotState(item);
+                    gVendorMenuState.last = item;
+                    if (ROW.special) StartHelpEntry(ROW.item);
+                    QueueHintForEvent(gVendorMenuState.last);
+                    gPlayerBolts -= price;
+                    BuildVendorWeaponList(0);
+                    if (gVendorMenuState.handle != -1) set_animation_parameter(gVendorMenuState.handle, 0);
+                    gVendorMenuState.handle = -1;
+                    if (ROW.kind == 1) ForwardPairToLevelObject(ROW.item, 0x112A880);
+                    else if (gVendorMenuState.index > gVendorMenuState.count - 1) gVendorMenuState.index = gVendorMenuState.count - 1;
+                    SetShopMessageText(GetLocalizedString(0x2DCB));
+                    PlayMobySound(7, 17, gVendorMenuState.moby);
                 } else {
-                    func_002F88D8(func_00288FB8(0x2DCC));
-                    func_002E5CF8(0, 17, D_0021F240.moby);
+                    SetShopMessageText(GetLocalizedString(0x2DCC));
+                    PlayMobySound(0, 17, gVendorMenuState.moby);
                 }
             }
-        } else func_002E5CF8(0, 17, D_0021F240.moby);
-        D_0021F240.state = 0;
-        func_002FB1A0();
+        } else PlayMobySound(0, 17, gVendorMenuState.moby);
+        gVendorMenuState.state = 0;
+        PrepareVendorSelectionPreview();
     }
 }

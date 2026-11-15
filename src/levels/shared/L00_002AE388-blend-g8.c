@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct SlotAED68 {
  unsigned char pad0[6];
  unsigned char flags[2];
@@ -61,18 +62,19 @@ extern void func_L00_00310D30(void *,void *);
 extern int func_L00_002A4EF0(int);
 extern int func_L00_002ADFE8(int,float *);
 extern int func_L00_002ADFD0(void *,int);
+/* Fades the two item display slots in and out and blends between old and new item pictures. */
 void func_L00_002AED68(void)
 {
  int i,j,enabled,different,active; struct { short v; } transition; float amount;
  for(i=0;i<2;i++) {
-  StateAED68 *g=&D_00189E20_26;
-  SlotAED68 *t0=D_00189E20_26.slots[i];
-  if(t0 && t0->destroy) {
-   if(func_002AA2E8(&t0->opacity,0.0f,0.1f)==0.0f)
-    func_L00_00310C88(g->f2290,&D_00189E20_26.slots[i]);
+  StateAED68 *state=&D_00189E20_26;
+  SlotAED68 *firstSlot=D_00189E20_26.slots[i];
+  if(firstSlot && firstSlot->destroy) {
+   if(ApproachValue(&firstSlot->opacity,0.0f,0.1f)==0.0f)
+    release_moby_animation_slot(state->f2290,&D_00189E20_26.slots[i]);
   } else {
    enabled=0;
-   if(g->f22bb && (i==0 || g->f22bb==2)) enabled=1;
+   if(state->f22bb && (i==0 || state->f22bb==2)) enabled=1;
    { StateAED68 *k=&D_00189E20_26;
    if(k->f22bf) {
     enabled=0;
@@ -81,82 +83,82 @@ void func_L00_002AED68(void)
    if(enabled) {
     StateAED68 *h=&D_00189E20_26;
     if(!D_00189E20_26.slots[i]) {
-     D_00189E20_26.slots[i]=func_L00_00310BC8(h->f2290,D_L00_001A7D00[i]);
+     D_00189E20_26.slots[i]=allocate_moby_animation_slot(h->f2290,D_L00_001A7D00[i]);
      D_00189E20_26.slots[i]->opacity=0.0f;
      D_00189E20_26.slots[i]->icon=D_L00_001D9F00[D_L00_001DA860[i+1]];
     }
    } else {
     StateAED68 *h=&D_00189E20_26;
     if(!D_00189E20_26.slots[i]) continue;
-    if(func_002AA2E8(&D_00189E20_26.slots[i]->opacity,0.0f,0.15f)==0.0f)
-     func_L00_00310C88(h->f2290,&D_00189E20_26.slots[i]);
+    if(ApproachValue(&D_00189E20_26.slots[i]->opacity,0.0f,0.15f)==0.0f)
+     release_moby_animation_slot(h->f2290,&D_00189E20_26.slots[i]);
    }
   }
   {
   StateAED68 *h=&D_00189E20_26;
-  SlotAED68 *p=D_00189E20_26.slots[i]; if(!p) continue;
+  SlotAED68 *slot=D_00189E20_26.slots[i]; if(!slot) continue;
   different=h->f2290->modes[0]!=h->f2290->modes[1];
   if(h->fe98 && !h->fea4)
-   func_002AA2E8(&p->opacity,0.0f,0.15f);
-  else if(!p->destroy) func_002AA2E8(&p->opacity,1.0f,0.25f);
+   ApproachValue(&slot->opacity,0.0f,0.15f);
+  else if(!slot->destroy) ApproachValue(&slot->opacity,1.0f,0.25f);
   transition.v=0;
   if(different && D_00189E20_26.fc2c &&
-     func_L00_002A4EF0(p->modes[1])!=func_L00_002A4EF0(D_00189E20_26.f2290->modes[1]))
-   transition.v=p->modes[0]!=p->modes[1];
-  p->transition=transition.v;
-  active=func_L00_002ADFE8(g->f2290->modes[1],&amount);
-  if(active || p->active) {
+     ReturnArgument_L00(slot->modes[1])!=ReturnArgument_L00(D_00189E20_26.f2290->modes[1]))
+   transition.v=slot->modes[0]!=slot->modes[1];
+  slot->transition=transition.v;
+  active=GetHeldItemAimAdjustment(state->f2290->modes[1],&amount);
+  if(active || slot->active) {
    if(amount!=0.0f) {
     D_L00_0025BE10.f6d4=0.05f; D_L00_0025BE10.f6d8=0.3f;
     D_L00_0025BE10.f694=amount; D_L00_0025BE10.f5e4=amount;
     D_L00_0025BE10.f624=0.05f; D_L00_0025BE10.f628=0.3f;
    }
-   if(active && (!p->active || p->modes[1])) {
-     if(p->modes[0]==p->modes[1] || p->progress>0.5f) { p->modes[0]=p->modes[1]; p->ids[0]=p->ids[1]; }
-     p->progress=0.0f; p->speed=0.06666667f; p->modes[1]=0; p->ids[1]=0;
-     p->scale=1.0f; p->active=1; p->fading=0;
+   if(active && (!slot->active || slot->modes[1])) {
+     if(slot->modes[0]==slot->modes[1] || slot->progress>0.5f) { slot->modes[0]=slot->modes[1]; slot->ids[0]=slot->ids[1]; }
+     slot->progress=0.0f; slot->speed=0.06666667f; slot->modes[1]=0; slot->ids[1]=0;
+     slot->scale=1.0f; slot->active=1; slot->fading=0;
    }
    if(!active) {
-    if(!p->fading) {
-     p->modes[1]=func_L00_002ADFD0(g->f2290,g->f2290->modes[1]);
-     p->ids[1]=0; p->fading=1; p->progress=0; p->scale=0;
+    if(!slot->fading) {
+     slot->modes[1]=GetValueOrObjectDefault(state->f2290,state->f2290->modes[1]);
+     slot->ids[1]=0; slot->fading=1; slot->progress=0; slot->scale=0;
     } else {
-     p->progress+=0.1f; if(p->progress>1.0f) p->progress=1.0f;
-     if(p->progress==1.0f) p->active=0;
+     slot->progress+=0.1f; if(slot->progress>1.0f) slot->progress=1.0f;
+     if(slot->progress==1.0f) slot->active=0;
     }
-   } else p->scale=1.0f;
+   } else slot->scale=1.0f;
    { int k;
    for(k=0;k<2;k++) {
-    if(p->modes[k]<23) { p->flags[k]=1; p->buffers[k]=&D_L00_001B3400[i*2+k]; }
-    else { p->flags[k]=0; p->buffers[k]=&D_L00_001B5C00[i*2+k]; }
+    if(slot->modes[k]<23) { slot->flags[k]=1; slot->buffers[k]=&D_L00_001B3400[i*2+k]; }
+    else { slot->flags[k]=0; slot->buffers[k]=&D_L00_001B5C00[i*2+k]; }
    }
    }
-   func_L00_00310D30(g->f2290,p);
+   AdvanceAndDecodeAnimationFrames(state->f2290,slot);
   } else {
-   if(!p->transition) for(j=0;j<2;j++) {
+   if(!slot->transition) for(j=0;j<2;j++) {
     if(different && j!=1) continue;
-    p->modes[j]=func_L00_002ADFD0(D_00189E20_26.f2290,D_00189E20_26.f2290->modes[j]);
+    slot->modes[j]=GetValueOrObjectDefault(D_00189E20_26.f2290,D_00189E20_26.f2290->modes[j]);
    }
-   if(p->transition) {
-    p->progress+=0.15f;
-    if(p->progress>=1.0f) { p->modes[0]=p->modes[1]; p->ids[0]=p->ids[1]; p->transition=0; }
+   if(slot->transition) {
+    slot->progress+=0.15f;
+    if(slot->progress>=1.0f) { slot->modes[0]=slot->modes[1]; slot->ids[0]=slot->ids[1]; slot->transition=0; }
    } else {
     if(!different) {
-     p->ids[0]=g->f2290->ids[0];
-     p->ids[1]=g->f2290->ids[1];
-     p->progress=g->f2290->progress;
+     slot->ids[0]=state->f2290->ids[0];
+     slot->ids[1]=state->f2290->ids[1];
+     slot->progress=state->f2290->progress;
     } else {
-     p->ids[1]=g->f2290->ids[1];
-     p->progress=g->f2290->progress;
+     slot->ids[1]=state->f2290->ids[1];
+     slot->progress=state->f2290->progress;
     }
    }
    { int l;
    for(l=0;l<2;l++) {
-    if(p->modes[l]<23) { p->flags[l]=1; p->buffers[l]=&D_L00_001B3400[i*2+l]; }
-    else { p->flags[l]=0; p->buffers[l]=&D_L00_001B5C00[i*2+l]; }
+    if(slot->modes[l]<23) { slot->flags[l]=1; slot->buffers[l]=&D_L00_001B3400[i*2+l]; }
+    else { slot->flags[l]=0; slot->buffers[l]=&D_L00_001B5C00[i*2+l]; }
    }
    }
-   func_L00_00310D30(g->f2290,p);
+   AdvanceAndDecodeAnimationFrames(state->f2290,slot);
   }
   }
  }

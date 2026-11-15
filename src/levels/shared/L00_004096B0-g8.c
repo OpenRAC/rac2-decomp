@@ -39,13 +39,14 @@ typedef struct { SettingRow rows[238]; } SettingsBank;
 extern SettingSlot D_L00_00256620[30];
 extern SettingsBank D_L00_002592C0;
 
+/* Sets up the shot tables at level start: clears 30 slots and fills in default values for two copies of 119 table rows. */
 void func_L00_004115E8(void) {
     int i;
 
     for (i = 29; i >= 0; i--)
         D_L00_00256620[i].active = 0;
     D_L00_001B1340 = 0;
-    func_L00_004115A8(0);
+    AllocateShotRecord(0);
     for (i = 119; i < 238; i++) {
         D_L00_002592C0.rows[i - 119].multiplier = 1.0f;
         D_L00_002592C0.rows[i].multiplier = 1.0f;
@@ -202,7 +203,7 @@ extern char D_L00_001B1FB0[] MACRO_ADDR;
 char *func_L00_00409E48(char *owner, void *position, char *target, void *color, float height)
 {
     Vector aim, offset, tmp1, tmp2, tmp3, tmp4;
-    ProjectileObject *m = (ProjectileObject *)func_0029EFD0(0xed7);
+    ProjectileObject *m = (ProjectileObject *)CreateMoby(0xed7 /* moby class 3799 */);
     ProjectileState *s;
     char *hit;
     float scale;
@@ -219,75 +220,75 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
             D_L00_001B0FD8 = 0;
         s->index = D_L00_001B0FD8;
         D_L00_001B0FD8 = (D_L00_001B0FD8 + 1) % 32;
-        scale = (D_L00_00262570 + D_00139583)->value * (1.0f / 60.0f);
+        scale = (gWeaponTable_L00 + D_00139583)->value * (1.0f / 60.0f);
         qcopy(m->position, position);
         if (target) {
-            func_00282D30(offset, target + 0xe0, height);
-            func_00282CC0(aim, target + 0x10, offset);
+            FastVecScale(offset, target + 0xe0, height);
+            FastVecAdd(aim, target + 0x10, offset);
         } else {
             qzero(aim);
         }
 
-        if (D_00189E20.mode == 29) {
+        if (gHeroState.mode == 29) {
             qcopy(m->forward, D_L00_001B8FF0[0]);
             qcopy(m->right, D_L00_001B8FF0[1]);
             qcopy(m->up, D_L00_001B8FF0[2]);
-            qcopy(m->position, D_L00_001B8DC0);
-            func_00282D30(offset, D_L00_001B8FF0[2], -0.2f);
-            func_00282CC0(m->position, m->position, offset);
-            func_00282D30(tmp1, D_L00_001B8FF0[1], -0.25f);
-            func_00282CC0(m->position, m->position, tmp1);
-            func_00282D30(tmp2, D_L00_001B8FF0[0], 0.0f);
-            func_00282CC0(m->position, m->position, tmp2);
+            qcopy(m->position, gCameraPosition_L00);
+            FastVecScale(offset, D_L00_001B8FF0[2], -0.2f);
+            FastVecAdd(m->position, m->position, offset);
+            FastVecScale(tmp1, D_L00_001B8FF0[1], -0.25f);
+            FastVecAdd(m->position, m->position, tmp1);
+            FastVecScale(tmp2, D_L00_001B8FF0[0], 0.0f);
+            FastVecAdd(m->position, m->position, tmp2);
             if (target) {
-                func_00282CF0(m->forward, aim, m->position);
-                func_00282F20(m->forward, m->forward, 1.0f);
-                func_00282DD8(m->right, m->forward, D_00189E20.object + 0xe0);
-                func_00282F20(m->right, m->right, 1.0f);
-                func_00282DD8(m->up, m->right, m->forward);
+                FastVecSub(m->forward, aim, m->position);
+                vec_scale_to_length(m->forward, m->forward, 1.0f);
+                FastVecCross(m->right, m->forward, gHeroState.object + 0xe0);
+                vec_scale_to_length(m->right, m->right, 1.0f);
+                FastVecCross(m->up, m->right, m->forward);
             } else {
-                func_00282D30(tmp3, D_L00_001B8FF0[0], 30.0f);
-                func_00282CC0(tmp3, D_L00_001B8DC0, tmp3);
-                if (func_002761F8(D_L00_001B8DC0, tmp3, 0, D_00189E20.object, 0))
+                FastVecScale(tmp3, D_L00_001B8FF0[0], 30.0f);
+                FastVecAdd(tmp3, gCameraPosition_L00, tmp3);
+                if (CollLine(gCameraPosition_L00, tmp3, 0, gHeroState.object, 0))
                     qcopy(tmp3, D_L00_001BF220);
-                func_00282CF0(tmp4, tmp3, m->position);
-                func_00282F20(m->forward, tmp4, 1.0f);
-                func_00282DD8(m->right, m->forward, D_00189E20.object + 0xe0);
-                func_00282F20(m->right, m->right, 1.0f);
-                func_00282DD8(m->up, m->right, m->forward);
+                FastVecSub(tmp4, tmp3, m->position);
+                vec_scale_to_length(m->forward, tmp4, 1.0f);
+                FastVecCross(m->right, m->forward, gHeroState.object + 0xe0);
+                vec_scale_to_length(m->right, m->right, 1.0f);
+                FastVecCross(m->up, m->right, m->forward);
             }
-        } else if (D_00189E20.orientation == 1) {
-            func_00282F20(m->forward, owner + 0xd0, -1.0f);
-            func_00282D30(m->right, owner + 0xc0, -1.0f);
+        } else if (gHeroState.orientation == 1) {
+            vec_scale_to_length(m->forward, owner + 0xd0, -1.0f);
+            FastVecScale(m->right, owner + 0xc0, -1.0f);
             qcopy(m->up, owner + 0xe0);
         } else if (target) {
-            func_00282CF0(m->forward, aim, m->position);
-            func_00282F20(m->forward, m->forward, 1.0f);
-            func_00282DD8(m->right, m->forward, D_00189E20.object + 0xe0);
-            func_00282F20(m->right, m->right, 1.0f);
-            func_00282DD8(m->up, m->right, m->forward);
+            FastVecSub(m->forward, aim, m->position);
+            vec_scale_to_length(m->forward, m->forward, 1.0f);
+            FastVecCross(m->right, m->forward, gHeroState.object + 0xe0);
+            vec_scale_to_length(m->right, m->right, 1.0f);
+            FastVecCross(m->up, m->right, m->forward);
         } else {
-            qcopy(m->forward, D_00189E20.forward);
-            func_00282DD8(m->right, m->forward, D_00189E20.up);
-            func_00282F20(m->right, m->right, 1.0f);
-            func_00282DD8(m->up, m->right, m->forward);
+            qcopy(m->forward, gHeroState.forward);
+            FastVecCross(m->right, m->forward, gHeroState.up);
+            vec_scale_to_length(m->right, m->right, 1.0f);
+            FastVecCross(m->up, m->right, m->forward);
         }
         m->forward[3] = m->right[3] = m->up[3] = 0;
 
         s->owner = owner;
-        s->yaw = func_002A7878(4.0f, 10.0f);
+        s->yaw = RandomFloatRange(4.0f, 10.0f);
         if (target)
             s->yaw = 0;
-        s->spin_speed = func_002A78D8(6.0f, 10.0f);
+        s->spin_speed = RandomSignedFloatRange(6.0f, 10.0f);
         s->speed = scale;
-        s->spin = func_002A7940();
+        s->spin = RandomAngle();
         s->target = 0;
         s->age = 1;
         s->homing = 1;
         qcopy(s->forward, m->forward);
         qcopy(s->color, color);
         if (target) {
-            hit = func_002AB1F0(target);
+            hit = GetMobyPrivateValue0(target);
             if (hit) {
                 *(unsigned short *)(hit + 0x1e) |= 0x80;
                 if (*(unsigned char *)(hit + 0xb))
@@ -307,14 +308,14 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
         /* Trace from the owner (at the spawn height) to the spawn point. */
         *(Quadword *)offset = *(Quadword *)(owner + 0x10);
         offset[2] = ((float *)position)[2];
-        if (func_002761F8(offset, position, 0, D_00189E20.object, 0)) {
+        if (CollLine(offset, position, 0, gHeroState.object, 0)) {
             m->hit = 1;
             qcopy(m->position, D_L00_001BF220);
         }
-        func_L00_0040B2C0(m, D_L00_00255BA0 + s->index * 64);
+        GetOffsetPointInMobySpace(m, D_L00_00255BA0 + s->index * 64);
         func_002A0F48(m);
-        func_002ACA50(m, D_L00_001B1FB0, 31);
-        s->handle = func_002FED90(m, 0, 1.0f, 1.0f, 1.0f);
+        AddMobyToIndexList(m, D_L00_001B1FB0, 31);
+        s->handle = AllocEffectSlot_002FED90(m, 0, 1.0f, 1.0f, 1.0f);
         m->radius *= 2.5f;
     }
     return (char *)m;
@@ -330,6 +331,7 @@ extern float D_L00_001B100C __attribute__((sda));
 extern float D_L00_001B1004 __attribute__((sda));
 extern Vector D_L00_002563A0[][10];
 
+/* Updates four jagged lightning strands: when a strand timer ends it makes a new curve, otherwise it jitters the points a little. */
 void func_L00_0040B398(char *object)
 {
     Vector p, delta, out, diffs[10];
@@ -337,53 +339,53 @@ void func_L00_0040B398(char *object)
     int g, i, j, k, l, n;
 
     for (g = 0; g < 4; g++) {
-        if (func_00282978(&D_L00_001B2D40[g])) {
+        if (FastDecTimer(&D_L00_001B2D40[g])) {
             D_L00_001B2D48[g] = 0;
             D_L00_001B2D40[g] = D_L00_001B2D50[g];
             qcopy(p, state + 0x30);
-            p[0] += func_002A7878(-0.5f, 0.5f);
-            p[1] += func_002A7878(-0.5f, 0.5f);
-            p[2] += func_002A7878(-0.5f, 0.5f);
-            func_00282CF0(delta, p, D_0018BE30);
-            func_00282F20(delta, delta, D_L00_001B100C);
-            func_00282CC0(delta, p, delta);
+            p[0] += RandomFloatRange(-0.5f, 0.5f);
+            p[1] += RandomFloatRange(-0.5f, 0.5f);
+            p[2] += RandomFloatRange(-0.5f, 0.5f);
+            FastVecSub(delta, p, D_0018BE30);
+            vec_scale_to_length(delta, delta, D_L00_001B100C);
+            FastVecAdd(delta, p, delta);
             for (i = 0; i < 10; i++) {
                 float t = i * 0.1f;
                 if (i == 9)
                     t = 1.0f;
-                func_L00_0031AA28(out, D_0018BE30, p, state + 0x40, delta, t);
+                InterpolateCubicVector_L00(out, D_0018BE30, p, state + 0x40, delta, t);
                 qcopy(D_L00_002563A0[g][i], out);
             }
         } else {
             for (j = 1; j < 10; j++) {
-                func_00282CF0(diffs[j], D_L00_002563A0[g][j], (&((Vector *)D_L00_002563A0)[g * 10 + j])[-1]);
-                diffs[j][0] += func_002A78D8(0.0f, 0.05f);
-                diffs[j][1] += func_002A78D8(0.0f, 0.05f);
-                diffs[j][2] += func_002A78D8(0.0f, 0.05f);
+                FastVecSub(diffs[j], D_L00_002563A0[g][j], (&((Vector *)D_L00_002563A0)[g * 10 + j])[-1]);
+                diffs[j][0] += RandomSignedFloatRange(0.0f, 0.05f);
+                diffs[j][1] += RandomSignedFloatRange(0.0f, 0.05f);
+                diffs[j][2] += RandomSignedFloatRange(0.0f, 0.05f);
             }
             qcopy(D_L00_002563A0[g][0], D_0018BE30);
             for (k = 1; k < 10; k++)
-                func_00282CC0(D_L00_002563A0[g][k], (&((Vector *)D_L00_002563A0)[g * 10 + k])[-1], diffs[k]);
+                FastVecAdd(D_L00_002563A0[g][k], (&((Vector *)D_L00_002563A0)[g * 10 + k])[-1], diffs[k]);
         }
         for (l = 2; l < 9; l++) {
             qcopy(p, D_L00_002563A0[0][l]);
-            p[0] += func_002A78D8(0.0f, D_L00_001B1004);
-            p[1] += func_002A78D8(0.0f, D_L00_001B1004);
-            p[2] += func_002A78D8(0.0f, D_L00_001B1004);
+            p[0] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[1] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[2] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
             qcopy(D_L00_002563A0[1][l], p);
         }
         for (n = 2; n < 9; n++) {
             qcopy(p, D_L00_002563A0[0][n]);
-            p[0] += func_002A78D8(0.0f, D_L00_001B1004);
-            p[1] += func_002A78D8(0.0f, D_L00_001B1004);
-            p[2] += func_002A78D8(0.0f, D_L00_001B1004);
+            p[0] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[1] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[2] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
             qcopy(D_L00_002563A0[2][n], p);
         }
         for (i = 2; i < 9; i++) {
             qcopy(p, D_L00_002563A0[0][i]);
-            p[0] += func_002A78D8(0.0f, D_L00_001B1004);
-            p[1] += func_002A78D8(0.0f, D_L00_001B1004);
-            p[2] += func_002A78D8(0.0f, D_L00_001B1004);
+            p[0] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[1] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[2] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
             qcopy(D_L00_002563A0[3][i], p);
         }
     }

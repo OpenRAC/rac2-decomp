@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char D_00189E20[];
 
@@ -22,20 +23,21 @@ typedef int V4_5098 __attribute__((mode(TI)));
    stores its answer back into the third word, then compares the block's +0x88 against the
    probe: when the difference is not greater than 0.3f the level's own setter runs and the
    probe is copied over the block's +0x80. */
+/* Checks that a probe point ahead of the hero has about the same height as the hero. If so it starts a move and stores the point. */
 void func_L00_002D5098(void)
 {
-    char *base = D_00189E20;
-    char *dst = base + 0x80;
-    V4_5098 local;
-    float x;
+    char *heroBase = gHeroState;
+    char *matrixPtr = heroBase + 0x80;
+    V4_5098 probe;
+    float heightDiff;
 
-    func_00282D30((char *)&local, base, -0.75f);
-    func_00282CC0(&local, &local, dst);
-    *(float *)((char *)&local + 8) = *(float *)((char *)&local + 8) + 0.5f;
-    *(float *)((char *)&local + 8) = func_002A89A8((char *)&local, 0, 0.5f);
-    x = func_00282C48(*(float *)(base + 0x88) - *(float *)((char *)&local + 8));
-    if (0.3f < x)
+    FastVecScale((char *)&probe, heroBase, -0.75f);
+    FastVecAdd(&probe, &probe, matrixPtr);
+    *(float *)((char *)&probe + 8) = *(float *)((char *)&probe + 8) + 0.5f;
+    *(float *)((char *)&probe + 8) = ProbeGroundHeightBelow((char *)&probe, 0, 0.5f);
+    heightDiff = FloatAbs(*(float *)(heroBase + 0x88) - *(float *)((char *)&probe + 8));
+    if (0.3f < heightDiff)
         return;
-    func_L00_002D40A0(dst, 1, *(float *)(base + 0x98));
-    *(V4_5098 *)dst = local;
+    StartHeroTargetState(matrixPtr, 1, *(float *)(heroBase + 0x98));
+    *(V4_5098 *)matrixPtr = probe;
 }

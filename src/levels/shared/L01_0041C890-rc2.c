@@ -29,25 +29,26 @@ extern void ref_L01_0041C890_00(void *, void *, void *);
 extern f32 ref_L01_0041C890_01(f32, f32);
 extern void ref_L01_0041C890_02(void *);
 
-void func_L01_0041C890(s8 *arg0) {
-    s8 *s0;
-    s8 *a0;
-    s8 *a2;
-    s32 v;
+/* Moves a falling piece with gravity and spin, and finishes it when its countdown reaches zero. */
+void func_L01_0041C890(s8 *moby) {
+    s8 *vars;
+    s8 *positionPtr;
+    s8 *rotationPtr;
+    s32 countdown;
 
-    a0 = arg0 + 0x10;
-    s0 = *(s8 **)(arg0 + 0x68);
-    *(f32 *)(arg0 + 0x2C) = *(f32 *)(*(s8 **)(arg0 + 0x24) + 0x24) * g_001B1B24;
-    *(f32 *)(s0 + 0x8) = *(f32 *)(s0 + 0x8) - 0.0041666668839752674103f;
-    ref_L01_0041C890_00(a0, a0, s0);
-    a2 = arg0 + 0xF0;
-    ref_L01_0041C890_00(a2, a2, s0 + 0x10);
-    *(f32 *)(arg0 + 0xF0) = ref_L01_0041C890_01(*(f32 *)(arg0 + 0xF0), *(f32 *)(s0 + 0x10));
-    *(f32 *)(arg0 + 0xF4) = ref_L01_0041C890_01(*(f32 *)(arg0 + 0xF4), *(f32 *)(s0 + 0x14));
-    *(f32 *)(arg0 + 0xF8) = ref_L01_0041C890_01(*(f32 *)(arg0 + 0xF8), *(f32 *)(s0 + 0x18));
-    v = *(u8 *)(arg0 + 0xBC) - 1;
-    *(u8 *)(arg0 + 0xBC) = v;
-    if ((v & 0xFF) == 0) {
-        ref_L01_0041C890_02(arg0);
+    positionPtr = moby + 0x10;
+    vars = *(s8 **)(moby + 0x68);
+    *(f32 *)(moby + 0x2C) = *(f32 *)(*(s8 **)(moby + 0x24) + 0x24) * g_001B1B24;
+    *(f32 *)(vars + 0x8) = *(f32 *)(vars + 0x8) - 0.0041666668839752674103f;
+    ref_L01_0041C890_00(positionPtr, positionPtr, vars);
+    rotationPtr = moby + 0xF0;
+    ref_L01_0041C890_00(rotationPtr, rotationPtr, vars + 0x10);
+    *(f32 *)(moby + 0xF0) = ref_L01_0041C890_01(*(f32 *)(moby + 0xF0), *(f32 *)(vars + 0x10));
+    *(f32 *)(moby + 0xF4) = ref_L01_0041C890_01(*(f32 *)(moby + 0xF4), *(f32 *)(vars + 0x14));
+    *(f32 *)(moby + 0xF8) = ref_L01_0041C890_01(*(f32 *)(moby + 0xF8), *(f32 *)(vars + 0x18));
+    countdown = *(u8 *)(moby + 0xBC) - 1;
+    *(u8 *)(moby + 0xBC) = countdown;
+    if ((countdown & 0xFF) == 0) {
+        ref_L01_0041C890_02(moby);
     }
 }

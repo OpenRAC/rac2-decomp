@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L23_0041B968 is a unit of its own: it reads $gp (hence -g8), and it is built with
    -mno-split-addresses, which keeps the threshold load as one `lwc1 $f2,D_L23_001B13CC` for
    the assembler to expand through $at, as retail has it. Measured on this body:
@@ -13,7 +14,7 @@ extern float D_L23_001B13CC __attribute__((nosda));
 
 /* Stores the index of the live slot with the greatest measure above the threshold (or -1). */
 void func_L23_0041B968(void) {
-    char *state = *(char **)(D_L23_001B1484 + 0x68);
+    char *state = *(char **)(gMothershipBossMoby + 0x68);
     int index;
     float best;
     int i;

@@ -7,6 +7,7 @@
    from __builtin_next_arg(arg1) minus the 0x30 of register-save area. */
 extern int func_00119BC8(int arg0, int arg1, void *arg2);
 
-void func_00115CF0(int arg0, int arg1, ...) {
-    func_00119BC8(arg0, arg1, (char *)__builtin_next_arg(arg1) - 0x30);
+/* Prints text to an output stream using a format string and extra values. */
+void func_00115CF0(int stream, int format, ...) {
+    VfprintfStream(stream, format, (char *)__builtin_next_arg(format) - 0x30);
 }

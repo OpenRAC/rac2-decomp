@@ -86,47 +86,50 @@ extern int D_L17_001B0EC0 __attribute__((sda));
 extern int D_L17_001B0EC4 __attribute__((sda));
 extern float D_L17_001B0EC8 __attribute__((sda));
 
+/* Updates the two-headed Smolgian snapper (moby class 3019): it sets itself up, walks along
+   its path, chases the player, bites when close, and is removed if it falls out of the
+   level. */
 void func_L17_003E7068(u8 *self) {
-    Hit h;
-    u8 *st = ((u8 *)((UView *)(self))->p[0x1A]);
-    float dist, ang, f20, fa, fb, fc, fd, fe, ff, fg;
-    Vec v30, v40, v50;
-    float f60;
-    int idx, a1, hit, n;
-    int idx2, idx3;
-    u8 *o2;
-    int cnt, hit8, near, hit13;
-    float fx;
-    Moby *pool;
+    Hit hitInfo;
+    u8 *vars = ((u8 *)((UView *)(self))->p[0x1A]);
+    float dist, ang, animProgress, animSpeed, attackProgress, chaseScale, biteProgress, turnAngle, height, idleProgress;
+    Vec targetPoint, probePoint, probeEnd;
+    float pathCost;
+    int attachedIndex, damageType, hitFlags, pointIndex;
+    int leaderIndex, attachedIndex2;
+    u8 *leader;
+    int attempts, moveFlags, nearGround, moveFlags13;
+    float fallbackDistance;
+    Moby *mobyPool;
 
-    func_L17_003E8A58();
-    dist = func_00282E80(self + 0x10, st + 0x240);
-    ang = func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]);
-    idx = *(int *)(st + 0x6B8);
-    if (idx != -1) {
-        if (((Moby *)D_L17_001B2C1C[0])[idx].oclass != 0x929) {
-            func_0026FEB8(D_L17_001B0ED0);
+    InitSnapperStateAndCheckHits();
+    dist = vec_distance_xy(self + 0x10, vars + 0x240);
+    ang = FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]);
+    attachedIndex = *(int *)(vars + 0x6B8);
+    if (attachedIndex != -1) {
+        if (((Moby *)gMobyPool_L17[0])[attachedIndex].oclass != 0x929 /* moby class 2345 */) {
+            STUB_printf(D_L17_001B0ED0);
         } else {
-            func_L17_003C7250((u8 *)&((Moby *)D_L17_001B2C1C[0])[idx], self);
+            SetPlatformPathIndex((u8 *)&((Moby *)gMobyPool_L17[0])[attachedIndex], self);
         }
     }
     switch (self[0x95]) {
     case 5:
-        func_002AD0E0(self, D_L17_001B2C1C[0] + (*(int *)(st + 0x6B8) << 8), self + 0x10, self + 0xF0, self + 0x10, self + 0xF0);
-        idx2 = *(int *)(st + 0x6DC);
-        if (idx2 == -1 || (o2 = D_L17_001B2C1C[0] + (idx2 << 8)) == self || o2 == 0 || o2[0x20] == 0xFE || o2[0x20] == 0xFD) {
-            idx3 = *(int *)(st + 0x6B8);
-            if (idx3 != -1) {
-                if (*(s16 *)(st + 0x69E) == 1 && func_L17_003C5B68(D_L17_001B2C1C[0] + (idx3 << 8))) {
-                    func_L17_003C5AF8(D_L17_001B2C1C[0] + (*(int *)(st + 0x6B8) << 8));
-                    if (((Moby *)D_L17_001B2C1C[0])[*(int *)(st + 0x6B8)].oclass == 0x929) {
-                        if (self[0x20] != 6) func_002A7750(self, 6, -1);
-                        pool = (Moby *)D_L17_001B2C1C[0];
+        TransformPointAndRotationByParent(self, gMobyPool_L17[0] + (*(int *)(vars + 0x6B8) << 8), self + 0x10, self + 0xF0, self + 0x10, self + 0xF0);
+        leaderIndex = *(int *)(vars + 0x6DC);
+        if (leaderIndex == -1 || (leader = gMobyPool_L17[0] + (leaderIndex << 8)) == self || leader == 0 || leader[0x20] == 0xFE || leader[0x20] == 0xFD) {
+            attachedIndex2 = *(int *)(vars + 0x6B8);
+            if (attachedIndex2 != -1) {
+                if (*(s16 *)(vars + 0x69E) == 1 && CanRidePlatformStart(gMobyPool_L17[0] + (attachedIndex2 << 8))) {
+                    StartRidePlatform(gMobyPool_L17[0] + (*(int *)(vars + 0x6B8) << 8));
+                    if (((Moby *)gMobyPool_L17[0])[*(int *)(vars + 0x6B8)].oclass == 0x929 /* moby class 2345 */) {
+                        if (self[0x20] != 6) SetMobyState(self, 6, -1);
+                        mobyPool = (Moby *)gMobyPool_L17[0];
                         ((UView *)(self))->uh[0x1A] = ((UView *)(self))->uh[0x1A] & 0xFFBE;
                         ((UView *)(self))->i[0x26] = *(int *)(((u8 *)((UView *)(self))->p[0x9]) + 0x10);
-                        ((UView *)(self))->f[0x3E] = pool[*(int *)(st + 0x6B8)].rotz;
+                        ((UView *)(self))->f[0x3E] = mobyPool[*(int *)(vars + 0x6B8)].rotz;
                     } else if (self[0x20] != 6) {
-                        func_002A7750(self, 6, -1);
+                        SetMobyState(self, 6, -1);
                     }
                 }
                 break;
@@ -136,359 +139,359 @@ void func_L17_003E7068(u8 *self) {
         break;
     case 0:
     case0:
-        if (*(s16 *)(st + 0x69E) == 1) {
-            if (*(int *)(st + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || func_L17_003E6DE8(self) != 0) {
-                func_002A7750(self, 0xF, 2);
+        if (*(s16 *)(vars + 0x69E) == 1) {
+            if (*(int *)(vars + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || ClaimNearestObjectSlot(self) != 0) {
+                SetMobyState(self, 0xF, 2);
             } else {
-                func_002A7750(self, 7, 6);
-                if (self[0x43] != 1) func_002A7470(self, 1, 0, D_L17_001B0E9C);
+                SetMobyState(self, 7, 6);
+                if (self[0x43] != 1) StartAnimationBlended(self, 1, 0, D_L17_001B0E9C);
             }
-            func_002B60B0(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
-            *(s16 *)(st + 0x69C) = 0xC8;
-            *(int *)(st + 0x148) = *(int *)(st + 0x148) | 0x10;
+            SetControllerSpeedLimits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+            *(s16 *)(vars + 0x69C) = 0xC8;
+            *(int *)(vars + 0x148) = *(int *)(vars + 0x148) | 0x10;
         }
         break;
     case 2:
-        if (*(s16 *)(st + 0x69E) == 1) *(s16 *)(st + 0x69C) = 0xC8;
-        if (func_00282978((short *)(st + 0x69C)) != 0) {
-            func_002A7750(self, 5, 4);
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != 3) func_002A7470(self, 3, 0, 0x14);
-            *(s16 *)(st + 0x69C) = 0xDC;
+        if (*(s16 *)(vars + 0x69E) == 1) *(s16 *)(vars + 0x69C) = 0xC8;
+        if (FastDecTimer((short *)(vars + 0x69C)) != 0) {
+            SetMobyState(self, 5, 4);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != 3) StartAnimationBlended(self, 3, 0, 0x14);
+            *(s16 *)(vars + 0x69C) = 0xDC;
         }
         break;
     case 4:
-        if (*(s16 *)(st + 0x69E) == 1) goto alert;
+        if (*(s16 *)(vars + 0x69E) == 1) goto alert;
         goto b62;
     case 6:
-        if (func_L17_003E6DE8(self) != 0) {
+        if (ClaimNearestObjectSlot(self) != 0) {
             if ((self[0x42] != 1 && self[0x43] != 1) || (self[0x60] & 2)) {
 alert:
-                func_002A7750(self, 0xB, 2);
-                func_002B60B0(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
-                *(s16 *)(st + 0x69C) = 0xC8;
-                *(int *)(st + 0x148) = *(int *)(st + 0x148) | 0x10;
+                SetMobyState(self, 0xB, 2);
+                SetControllerSpeedLimits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+                *(s16 *)(vars + 0x69C) = 0xC8;
+                *(int *)(vars + 0x148) = *(int *)(vars + 0x148) | 0x10;
             }
         } else {
-            f20 = func_0029F530(self);
-            if (*(s16 *)(st + 0x69E) == 1) *(s16 *)(st + 0x69C) = 0xC8;
-            if ((self[0x60] & 2) && self[0x42] == 3 && self[0x43] != 0xE) func_002A7470(self, 0xE, 0, D_L17_001B0E9C);
-            if (f20 >= 20.0f && self[0x42] == 0xE && self[0x43] != 3) func_002A7470(self, 3, 0, D_L17_001B0E9C);
+            animProgress = GetMobyAnimationValue(self);
+            if (*(s16 *)(vars + 0x69E) == 1) *(s16 *)(vars + 0x69C) = 0xC8;
+            if ((self[0x60] & 2) && self[0x42] == 3 && self[0x43] != 0xE) StartAnimationBlended(self, 0xE, 0, D_L17_001B0E9C);
+            if (animProgress >= 20.0f && self[0x42] == 0xE && self[0x43] != 3) StartAnimationBlended(self, 3, 0, D_L17_001B0E9C);
             if (self[0x60] & 2) {
                 if (self[0x42] == 1) {
-                    if (self[0x43] != 0xE) func_002A7470(self, 0xE, 0, D_L17_001B0E9C);
+                    if (self[0x43] != 0xE) StartAnimationBlended(self, 0xE, 0, D_L17_001B0E9C);
                     goto b60;
                 }
             } else {
 b60:
                 if (self[0x42] == 1) {
-                    func_002AA800(self + 0xF8, 0, func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
+                    StepAngleTowardTarget(self + 0xF8, 0, FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
                 }
             }
 b62:
-            if (func_00282978((short *)(st + 0x69C)) != 0) {
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-                if (self[0x43] != 2) func_002A7470(self, 2, 0, 0x14);
-                func_002A7750(self, 3, 0);
+            if (FastDecTimer((short *)(vars + 0x69C)) != 0) {
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != 2) StartAnimationBlended(self, 2, 0, 0x14);
+                SetMobyState(self, 3, 0);
             }
         }
         break;
     case 3:
-        if (func_002B3890(self) != 0) {
-            fa = ((UView *)(self))->f[0x12];
-            if (fa <= 0.0f || fa > 1.0f) ((UView *)(self))->f[0x12] = 1.0f;
-            func_002B60B0(self, (float)(D_L17_001B0E68 * 8) * 0.00027777778f, D_L17_001B0E70 * 0.13333334f, 0.10471977f, 0.10471977f);
+        if (SetSecondPendingFlag(self) != 0) {
+            animSpeed = ((UView *)(self))->f[0x12];
+            if (animSpeed <= 0.0f || animSpeed > 1.0f) ((UView *)(self))->f[0x12] = 1.0f;
+            SetControllerSpeedLimits(self, (float)(D_L17_001B0E68 * 8) * 0.00027777778f, D_L17_001B0E70 * 0.13333334f, 0.10471977f, 0.10471977f);
         }
         if (((UView *)(self))->f[0x6] < D_L17_001B0E3C) goto b262;
-        if (*(float *)(st + 0xE8) > 0.016666668f) {
-            *(float *)(st + 0xE8) = 0.016666668f;
-            func_0026FEB8(D_L17_001B0F10);
+        if (*(float *)(vars + 0xE8) > 0.016666668f) {
+            *(float *)(vars + 0xE8) = 0.016666668f;
+            STUB_printf(D_L17_001B0F10);
         }
-        hit = func_002B1C20(self, st + 0x60);
-        if (hit & 1) {
-            func_L01_003E9CF8(self, 0, 0);
-            func_002A6C58(self, 0, 3);
+        hitFlags = DispatchActionByKind(self, vars + 0x60);
+        if (hitFlags & 1) {
+            QueueMobyForGlowEffect(self, 0, 0);
+            SetDeathBits(self, 0, 3);
         }
-        fb = func_0029F530(self);
-        if (fb >= 13.0f && fb <= 14.0f && self[0x42] == self[0x43]
-            && func_00283C80(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
-            && func_00282E48(self + 0x10, st + 0x240) < D_L17_001B0E58) {
+        attackProgress = GetMobyAnimationValue(self);
+        if (attackProgress >= 13.0f && attackProgress <= 14.0f && self[0x42] == self[0x43]
+            && FastDiffRots(FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
+            && fast_vec_dist(self + 0x10, vars + 0x240) < D_L17_001B0E58) {
             if (self[0x42] == 4) {
-                if (func_L17_003E7010(self) != 0) {
-                    h.obj = self;
-                    h.flags = 0x10001;
-                    h.val = *(float *)(st + 0x700);
-                    h.sn = func_00283180(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]));
-                    h.cs = func_00283198(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]));
-                    h.one = 1.0f;
-                    h.big = 5627.925f;
-                    h.o = h.k = 1;
-                    h.z = 0;
-                    h.id = ((UView *)(self))->uh[0x55];
-                    a1 = self[0x42] == 4 ? D_L17_001B0EC4 : D_L17_001B0EC0;
-                    func_002A8D70(D_L17_001B0EC8, *(float *)(st + 0x700), 1.0f, self, a1, 0x10001, 0, 1, 0);
+                if (IsTargetReachable(self) != 0) {
+                    hitInfo.obj = self;
+                    hitInfo.flags = 0x10001;
+                    hitInfo.val = *(float *)(vars + 0x700);
+                    hitInfo.sn = FastSinOrCosA(FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]));
+                    hitInfo.cs = FastSinOrCosB(FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]));
+                    hitInfo.one = 1.0f;
+                    hitInfo.big = 5627.925f;
+                    hitInfo.o = hitInfo.k = 1;
+                    hitInfo.z = 0;
+                    hitInfo.id = ((UView *)(self))->uh[0x55];
+                    damageType = self[0x42] == 4 ? D_L17_001B0EC4 : D_L17_001B0EC0;
+                    TestHitAtBone(D_L17_001B0EC8, *(float *)(vars + 0x700), 1.0f, self, damageType, 0x10001, 0, 1, 0);
                 }
             }
         }
-        if ((self[0x42] == 4 || self[0x43] == 4) && !(fb > 13.0f)) {
-            func_L01_00321178(self, st + 0x240);
+        if ((self[0x42] == 4 || self[0x43] == 4) && !(attackProgress > 13.0f)) {
+            TurnMobyTowardTarget(self, vars + 0x240);
         }
-        if ((hit & 2) && D_L17_001B0EB0 <= fb) func_002A7750(self, 0xD, 2);
-        if (self[0x42] == 0xD && D_L17_001B0EB4 <= fb) {
-            if (self[0x43] != 4) func_002A7470(self, 4, 0, 8);
-            *(s16 *)(D_00189E20 + 0x1DC) = 0;
+        if ((hitFlags & 2) && D_L17_001B0EB0 <= attackProgress) SetMobyState(self, 0xD, 2);
+        if (self[0x42] == 0xD && D_L17_001B0EB4 <= attackProgress) {
+            if (self[0x43] != 4) StartAnimationBlended(self, 4, 0, 8);
+            *(s16 *)(gHeroState + 0x1DC) = 0;
         }
         break;
     }
     switch (self[0x20]) {
     case 3:
-        if (func_002B3868(self) != 0) {
-            if (func_002A77E0(2) == 0) {
-                if (self[0x43] != 2) func_002A7470(self, 2, 0, D_L17_001B0E9C);
+        if (SetFirstPendingFlag(self) != 0) {
+            if (RandomIntBelow(2) == 0) {
+                if (self[0x43] != 2) StartAnimationBlended(self, 2, 0, D_L17_001B0E9C);
             } else if (self[0x43] != 0xE) {
-                func_002A7470(self, 0xE, 0, D_L17_001B0E9C);
+                StartAnimationBlended(self, 0xE, 0, D_L17_001B0E9C);
             }
         }
-        fg = func_0029F530(self);
-        if ((self[0x42] == 2 && (self[0x60] & 2)) || (self[0x42] == 0xE && fg >= 20.0f)) {
-            if (func_002A77E0(2) == 0) {
-                if (self[0x43] != 2) func_002A7470(self, 2, 0, D_L17_001B0E9C);
+        idleProgress = GetMobyAnimationValue(self);
+        if ((self[0x42] == 2 && (self[0x60] & 2)) || (self[0x42] == 0xE && idleProgress >= 20.0f)) {
+            if (RandomIntBelow(2) == 0) {
+                if (self[0x43] != 2) StartAnimationBlended(self, 2, 0, D_L17_001B0E9C);
             } else if (self[0x43] != 0xE) {
-                func_002A7470(self, 0xE, 0, D_L17_001B0E9C);
+                StartAnimationBlended(self, 0xE, 0, D_L17_001B0E9C);
             }
         }
         break;
     case 8:
-        if (func_002B3868(self) != 0) {
-            cnt = 0;
+        if (SetFirstPendingFlag(self) != 0) {
+            attempts = 0;
             do {
-                n = func_L17_003E6F58(self);
-                qcopy(&v30, self + 0x10);
-                qcopy(&v40, &((Vec *)D_L17_001FE880[*(int *)(st + 0x684)])[n + 1]);
-                v30.f[2] = v30.f[2] + 1.0f;
-                v40.f[2] = v30.f[2];
-                if (func_002761F8(&v30, &v40, 0, self, 0) != 0) {
-                    if (!(func_00282E80(self + 0x10, &D_L17_001C0020) < 2.0f)) {
-                        qcopy(st + 0x710, &D_L17_001C0020);
+                pointIndex = PickRandomPathPointAway(self);
+                qcopy(&targetPoint, self + 0x10);
+                qcopy(&probePoint, &((Vec *)gPathTable_L17[*(int *)(vars + 0x684)])[pointIndex + 1]);
+                targetPoint.f[2] = targetPoint.f[2] + 1.0f;
+                probePoint.f[2] = targetPoint.f[2];
+                if (CollLine(&targetPoint, &probePoint, 0, self, 0) != 0) {
+                    if (!(vec_distance_xy(self + 0x10, &D_L17_001C0020) < 2.0f)) {
+                        qcopy(vars + 0x710, &D_L17_001C0020);
                         break;
                     }
                 } else {
-                    qcopy(st + 0x710, &v40);
+                    qcopy(vars + 0x710, &probePoint);
                     break;
                 }
-                cnt++;
-            } while (cnt < 5);
-            if (cnt != 5) {
-                if (self[0x43] != 0xC) func_002A7470(self, 0xC, 0, D_L17_001B0E9C);
+                attempts++;
+            } while (attempts < 5);
+            if (attempts != 5) {
+                if (self[0x43] != 0xC) StartAnimationBlended(self, 0xC, 0, D_L17_001B0E9C);
             } else {
-                func_002A7750(self, 3, -1);
+                SetMobyState(self, 3, -1);
                 break;
             }
         }
-        hit8 = func_L01_00321178(self, st + 0x710);
-        func_002AA800(self + 0xF8, 0, func_00283248(*(float *)(st + 0x710) - ((UView *)(self))->f[0x4], *(float *)(st + 0x714) - ((UView *)(self))->f[0x5]), 0.043633237f);
-        if (!(hit8 & 0x80) && *(int *)(st + 0x190) < 0xB && !(hit8 & 0x10F)) {
+        moveFlags = TurnMobyTowardTarget(self, vars + 0x710);
+        StepAngleTowardTarget(self + 0xF8, 0, FastMatrixHelperA(*(float *)(vars + 0x710) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x714) - ((UView *)(self))->f[0x5]), 0.043633237f);
+        if (!(moveFlags & 0x80) && *(int *)(vars + 0x190) < 0xB && !(moveFlags & 0x10F)) {
         } else {
-            func_002A7750(self, 3, -1);
+            SetMobyState(self, 3, -1);
         }
         break;
     case 6:
-        if (func_002B3868(self) != 0) {
-            if (((Moby *)D_L17_001B2C1C[0])[*(int *)(st + 0x6B8)].oclass != 0x929) {
-                if (self[0x43] != 1) func_002A7470(self, 1, 0, D_L17_001B0E9C);
-                func_002B60B0(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+        if (SetFirstPendingFlag(self) != 0) {
+            if (((Moby *)gMobyPool_L17[0])[*(int *)(vars + 0x6B8)].oclass != 0x929 /* moby class 2345 */) {
+                if (self[0x43] != 1) StartAnimationBlended(self, 1, 0, D_L17_001B0E9C);
+                SetControllerSpeedLimits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
             } else {
                 ((UView *)(self))->f[0x12] = -1.0f;
-                if (self[0x43] != 0xA) func_002A7470(self, 0xA, 0, D_L17_001B0E9C);
-                func_002B60B0(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+                if (self[0x43] != 0xA) StartAnimationBlended(self, 0xA, 0, D_L17_001B0E9C);
+                SetControllerSpeedLimits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
             }
-            ((UView *)(self))->f[0x6] = func_002A89A8(self + 0x10, 0, 3.0f);
-            qcopy(st + 0x6C0, self + 0x10);
+            ((UView *)(self))->f[0x6] = ProbeGroundHeightBelow(self + 0x10, 0, 3.0f);
+            qcopy(vars + 0x6C0, self + 0x10);
         }
         if (self[0x60] & 2) {
             if (self[0x42] == 1) {
                 ((UView *)(self))->f[0x12] = -1.0f;
-                if (self[0x43] != 0xA) func_002A7470(self, 0xA, 0, 0x14);
-                func_L01_00321178(self, self + 0x10);
+                if (self[0x43] != 0xA) StartAnimationBlended(self, 0xA, 0, 0x14);
+                TurnMobyTowardTarget(self, self + 0x10);
                 goto s6_157;
             }
             goto s6_159;
         }
 s6_157:
         if (self[0x42] == 1) {
-            ((UView *)(self))->f[0x6] = func_002A89A8(self + 0x10, 0, 3.0f);
+            ((UView *)(self))->f[0x6] = ProbeGroundHeightBelow(self + 0x10, 0, 3.0f);
             break;
         }
 s6_159:
         if (self[0x42] == 0xA) {
-            (&v30)->f[0] = func_00283180(((UView *)(self))->f[0x3E]) * 3.0f;
-            (&v30)->f[1] = func_00283198(((UView *)(self))->f[0x3E]) * 3.0f;
-            (&v30)->f[2] = 0.0f;
-            func_00282CC0(&v40, self + 0x10, (&v30));
-            ((UView *)(self))->f[0x6] = func_002A89A8(self + 0x10, 0, 0.5f);
-            func_L01_00321178(self, &v40);
-            if (!(func_00282E80(self + 0x10, st + 0x6C0) > 4.9f)) {
-            } else if (*(int *)(st + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || (((UView *)(self))->f[0x12] = 1.0f, func_L17_003E6DE8(self) != 0)) {
-                func_002A7750(self, 0xB, 2);
+            (&targetPoint)->f[0] = FastSinOrCosA(((UView *)(self))->f[0x3E]) * 3.0f;
+            (&targetPoint)->f[1] = FastSinOrCosB(((UView *)(self))->f[0x3E]) * 3.0f;
+            (&targetPoint)->f[2] = 0.0f;
+            FastVecAdd(&probePoint, self + 0x10, (&targetPoint));
+            ((UView *)(self))->f[0x6] = ProbeGroundHeightBelow(self + 0x10, 0, 0.5f);
+            TurnMobyTowardTarget(self, &probePoint);
+            if (!(vec_distance_xy(self + 0x10, vars + 0x6C0) > 4.9f)) {
+            } else if (*(int *)(vars + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || (((UView *)(self))->f[0x12] = 1.0f, ClaimNearestObjectSlot(self) != 0)) {
+                SetMobyState(self, 0xB, 2);
             } else {
-                func_002A7750(self, 7, 6);
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-                if (self[0x43] != 3) func_002A7470(self, 3, 0, 0x14);
+                SetMobyState(self, 7, 6);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != 3) StartAnimationBlended(self, 3, 0, 0x14);
             }
         }
         break;
     case 11:
-        if (func_002B3868(self) != 0) {
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != 0xA) func_002A7470(self, 0xA, 0, D_L17_001B0E9C);
-            fc = D_L17_001B0EB8;
-            ((UView *)(self))->f[0x12] = -fc;
-            func_002B60B0(self, (float)D_L17_001B0E68 * 0.00027777778f, fc * D_L17_001B0E70 * 0.016666668f, 0.05817765f, 0.05817765f);
+        if (SetFirstPendingFlag(self) != 0) {
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != 0xA) StartAnimationBlended(self, 0xA, 0, D_L17_001B0E9C);
+            chaseScale = D_L17_001B0EB8;
+            ((UView *)(self))->f[0x12] = -chaseScale;
+            SetControllerSpeedLimits(self, (float)D_L17_001B0E68 * 0.00027777778f, chaseScale * D_L17_001B0E70 * 0.016666668f, 0.05817765f, 0.05817765f);
         }
         if (self[0x42] == 0xA) {
             if (dist < D_L17_001B0E7C) {
-                qcopy((&v30), &D_L17_001B9BC0);
-                if (func_00282E80((&v30), self + 0x10) < D_L17_001B0EA4) {
-                    if (*(int *)(st + 0x738) < D_L17_001B0EA8) {
-                        (&v30)->f[2] = *(float *)(st + 0x248);
-                        func_00282CF0((&v30), st + 0x240, (&v30));
-                        func_00282F20((&v30), (&v30), 2.0f * D_L17_001B0EA4);
-                        func_00282CC0((&v30), &D_L17_001B9BC0, (&v30));
-                        v40.q = *(Quad *)(self + 0x10);
-                        func_L02_0032EF10(&v40, (&v30), (&v30), *(int *)(st + 0x684), 3.0f);
-                        fx = func_00282E80(self + 0x10, (&v30));
-                        if (D_L17_001B0EA4 + 0.3f < fx) {
-                            func_L01_00321178(self, (&v30));
-                            *(int *)(st + 0x738) = *(int *)(st + 0x738) + 1;
+                qcopy((&targetPoint), &D_L17_001B9BC0);
+                if (vec_distance_xy((&targetPoint), self + 0x10) < D_L17_001B0EA4) {
+                    if (*(int *)(vars + 0x738) < D_L17_001B0EA8) {
+                        (&targetPoint)->f[2] = *(float *)(vars + 0x248);
+                        FastVecSub((&targetPoint), vars + 0x240, (&targetPoint));
+                        vec_scale_to_length((&targetPoint), (&targetPoint), 2.0f * D_L17_001B0EA4);
+                        FastVecAdd((&targetPoint), &D_L17_001B9BC0, (&targetPoint));
+                        probePoint.q = *(Quad *)(self + 0x10);
+                        ClampMoveToPathArea(&probePoint, (&targetPoint), (&targetPoint), *(int *)(vars + 0x684), 3.0f);
+                        fallbackDistance = vec_distance_xy(self + 0x10, (&targetPoint));
+                        if (D_L17_001B0EA4 + 0.3f < fallbackDistance) {
+                            TurnMobyTowardTarget(self, (&targetPoint));
+                            *(int *)(vars + 0x738) = *(int *)(vars + 0x738) + 1;
                             break;
                         }
                     } else {
                         goto s11_184;
                     }
                 }
-                if (*(int *)(st + 0x738) >= D_L17_001B0EA8) {
+                if (*(int *)(vars + 0x738) >= D_L17_001B0EA8) {
 s11_184:
-                    func_0026FEB8(D_L17_001B0F20);
+                    STUB_printf(D_L17_001B0F20);
                 }
-                *(int *)(st + 0x738) = 0;
-                func_002A7750(self, 0xC, -1);
+                *(int *)(vars + 0x738) = 0;
+                SetMobyState(self, 0xC, -1);
                 ((UView *)(self))->f[0x12] = 1.0f;
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-                if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 2, 0x14);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != RandomIntBelow(2) + 4) StartAnimationBlended(self, RandomIntBelow(2) + 4, 2, 0x14);
             } else {
-                func_L02_0032E998(self + 0x10, st + 0x240, &f60, st + 0x280, *(int *)(st + 0x750), st + 0x758, st + 0x754, 0.0f, 0.5f);
-                func_002B50E0(self, st + 0x240, f60);
-                func_002AA800(self + 0xF8, 0, ang, 0.05817765f);
-                if (*(int *)(st + 0x190) >= 0x3D) {
-                    *(int *)(st + 0x704) = D_L17_001B0E8C;
-                    func_002A7750(self, 4, -1);
+                ComputeRegionRouteHeading(self + 0x10, vars + 0x240, &pathCost, vars + 0x280, *(int *)(vars + 0x750), vars + 0x758, vars + 0x754, 0.0f, 0.5f);
+                StepMovementController(self, vars + 0x240, pathCost);
+                StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
+                if (*(int *)(vars + 0x190) >= 0x3D) {
+                    *(int *)(vars + 0x704) = D_L17_001B0E8C;
+                    SetMobyState(self, 4, -1);
                     ((UView *)(self))->f[0x12] = 1.0f;
-                    if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-                    if (self[0x43] != 2) func_002A7470(self, 2, 0, 0x14);
+                    if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                    if (self[0x43] != 2) StartAnimationBlended(self, 2, 0, 0x14);
                 }
             }
         }
         break;
     case 15:
-        if (func_002B3868(self) != 0 && self[0x43] != 1) func_002A7470(self, 1, 0, 0x14);
-        func_002AA800(self + 0xF8, 0, func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
-        if (self[0x60] & 2) func_002A7750(self, 0xB, -1);
+        if (SetFirstPendingFlag(self) != 0 && self[0x43] != 1) StartAnimationBlended(self, 1, 0, 0x14);
+        StepAngleTowardTarget(self + 0xF8, 0, FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
+        if (self[0x60] & 2) SetMobyState(self, 0xB, -1);
         break;
     case 12:
-        func_002AA800(self + 0xF8, 0, ang, 0.05817765f);
-        fd = func_0029F530(self);
-        if (fd >= 13.0f && fd <= 14.0f && self[0x42] == self[0x43]
-            && func_00283C80(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
-            && func_00282E48(self + 0x10, st + 0x240) < D_L17_001B0E58
-            && func_L17_003E7010(self) != 0) {
-            h.obj = self;
-            h.flags = 0x10001;
-            h.val = *(float *)(st + 0x700);
-            h.sn = func_00283180(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]));
-            h.cs = func_00283198(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]));
-            h.one = 1.0f;
-            h.big = 5627.925f;
-            h.o = h.k = 1;
-            h.z = 0;
-            h.id = ((UView *)(self))->uh[0x55];
-            a1 = self[0x42] == 4 ? D_L17_001B0EC4 : D_L17_001B0EC0;
-            func_002A8D70(D_L17_001B0EC8, *(float *)(st + 0x700), 1.0f, self, a1, 0x10001, 0, 1, 0);
+        StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
+        biteProgress = GetMobyAnimationValue(self);
+        if (biteProgress >= 13.0f && biteProgress <= 14.0f && self[0x42] == self[0x43]
+            && FastDiffRots(FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
+            && fast_vec_dist(self + 0x10, vars + 0x240) < D_L17_001B0E58
+            && IsTargetReachable(self) != 0) {
+            hitInfo.obj = self;
+            hitInfo.flags = 0x10001;
+            hitInfo.val = *(float *)(vars + 0x700);
+            hitInfo.sn = FastSinOrCosA(FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]));
+            hitInfo.cs = FastSinOrCosB(FastMatrixHelperA(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]));
+            hitInfo.one = 1.0f;
+            hitInfo.big = 5627.925f;
+            hitInfo.o = hitInfo.k = 1;
+            hitInfo.z = 0;
+            hitInfo.id = ((UView *)(self))->uh[0x55];
+            damageType = self[0x42] == 4 ? D_L17_001B0EC4 : D_L17_001B0EC0;
+            TestHitAtBone(D_L17_001B0EC8, *(float *)(vars + 0x700), 1.0f, self, damageType, 0x10001, 0, 1, 0);
         }
-        if ((u32)(self[0x42] - 4) < 2U && D_L17_001B0EAC <= fd) func_002A7750(self, 0xD, -1);
+        if ((u32)(self[0x42] - 4) < 2U && D_L17_001B0EAC <= biteProgress) SetMobyState(self, 0xD, -1);
         break;
     case 4:
-        if (func_00282948(st + 0x704) != 0) {
-            func_002A7750(self, 0xC, -1);
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 0, 0x14);
+        if (FastFloatHelperD(vars + 0x704) != 0) {
+            SetMobyState(self, 0xC, -1);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != RandomIntBelow(2) + 4) StartAnimationBlended(self, RandomIntBelow(2) + 4, 0, 0x14);
         }
         break;
     case 13:
-        if (func_002B3868(self) != 0) {
-            fe = func_00283B98(((UView *)(self))->f[0x3E], 3.141593f);
-            (&v30)->f[0] = func_00283180(fe) * D_L17_001B0E88;
-            (&v30)->f[1] = func_00283198(fe) * D_L17_001B0E88;
-            (&v30)->f[2] = 0.0f;
-            func_00282CC0((&v30), (&v30), self + 0x10);
-            v40.q = *(Quad *)(self + 0x10);
-            func_L02_0032EF10(&v40, (&v30), (&v30), *(int *)(st + 0x684), 3.0f);
-            if (func_00282E48(self + 0x10, (&v30)) < D_L17_001B0E88 * 0.5f) {
-                func_L17_0032C070(self + 0x10, st + 0x240, (&v30), *(int *)(st + 0x684), D_L17_001B0E90, 1.0f);
+        if (SetFirstPendingFlag(self) != 0) {
+            turnAngle = FastAddRotations(((UView *)(self))->f[0x3E], 3.141593f);
+            (&targetPoint)->f[0] = FastSinOrCosA(turnAngle) * D_L17_001B0E88;
+            (&targetPoint)->f[1] = FastSinOrCosB(turnAngle) * D_L17_001B0E88;
+            (&targetPoint)->f[2] = 0.0f;
+            FastVecAdd((&targetPoint), (&targetPoint), self + 0x10);
+            probePoint.q = *(Quad *)(self + 0x10);
+            ClampMoveToPathArea(&probePoint, (&targetPoint), (&targetPoint), *(int *)(vars + 0x684), 3.0f);
+            if (fast_vec_dist(self + 0x10, (&targetPoint)) < D_L17_001B0E88 * 0.5f) {
+                FindClearSidePoint(self + 0x10, vars + 0x240, (&targetPoint), *(int *)(vars + 0x684), D_L17_001B0E90, 1.0f);
             }
-            qcopy(&v40, self + 0x10);
-            v40.f[2] += 0.5f;
-            qcopy(&v50, (&v30));
-            v50.f[2] += 0.5f;
-            if (func_002761F8(&v40, &v50, 2, 0, 0) != 0) qcopy((&v30), &D_L17_001C0020);
-            qcopy(st + 0x710, (&v30));
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != 0xA) func_002A7470(self, 0xA, 0, D_L17_001B0E9C);
-            func_002B60B0(self, (float)D_L17_001B0E6C * 0.00027777778f, D_L17_001B0E74 * 0.016666668f, 0.10471977f, 0.10471977f);
-            *(int *)(st + 0x708) = D_L17_001B0E94;
-            func_L17_003E6F20(self);
+            qcopy(&probePoint, self + 0x10);
+            probePoint.f[2] += 0.5f;
+            qcopy(&probeEnd, (&targetPoint));
+            probeEnd.f[2] += 0.5f;
+            if (CollLine(&probePoint, &probeEnd, 2, 0, 0) != 0) qcopy((&targetPoint), &D_L17_001C0020);
+            qcopy(vars + 0x710, (&targetPoint));
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != 0xA) StartAnimationBlended(self, 0xA, 0, D_L17_001B0E9C);
+            SetControllerSpeedLimits(self, (float)D_L17_001B0E6C * 0.00027777778f, D_L17_001B0E74 * 0.016666668f, 0.10471977f, 0.10471977f);
+            *(int *)(vars + 0x708) = D_L17_001B0E94;
+            ReleaseObjectSlot(self);
             ((UView *)(self))->f[0x12] = D_L17_001B0EB8;
         }
-        near = 0;
-        hit13 = func_L01_00321178(self, st + 0x710);
-        func_0029FCC0(self, 3, (&v30));
-        if (func_002A89A8((&v30), 0, 0.5f) < 10.0f) near = 1;
-        if (!(hit13 & 0x80) && *(int *)(st + 0x190) < 0xA && !(hit13 & 0xF) && near != 1) {
+        nearGround = 0;
+        moveFlags13 = TurnMobyTowardTarget(self, vars + 0x710);
+        TransformMobyJointToWorld(self, 3, (&targetPoint));
+        if (ProbeGroundHeightBelow((&targetPoint), 0, 0.5f) < 10.0f) nearGround = 1;
+        if (!(moveFlags13 & 0x80) && *(int *)(vars + 0x190) < 0xA && !(moveFlags13 & 0xF) && nearGround != 1) {
         } else {
             ((UView *)(self))->f[0x12] = 1.0f;
             if (dist < D_L17_001B0E7C + D_L17_001B0E80) {
-                func_002A7750(self, 0xC, -1);
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-                if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 0, 0x14);
+                SetMobyState(self, 0xC, -1);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != RandomIntBelow(2) + 4) StartAnimationBlended(self, RandomIntBelow(2) + 4, 0, 0x14);
             } else {
-                func_002A7750(self, 7, 6);
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-                if (self[0x43] != 3) func_002A7470(self, 3, 0, 0x14);
+                SetMobyState(self, 7, 6);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != 3) StartAnimationBlended(self, 3, 0, 0x14);
             }
         }
-        if (func_00282948(st + 0x708) != 0 && dist < D_L17_001B0E7C) {
-            func_002A7750(self, 0xC, -1);
+        if (FastFloatHelperD(vars + 0x708) != 0 && dist < D_L17_001B0E7C) {
+            SetMobyState(self, 0xC, -1);
             ((UView *)(self))->f[0x12] = 1.0f;
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 0, 0x14);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != RandomIntBelow(2) + 4) StartAnimationBlended(self, RandomIntBelow(2) + 4, 0, 0x14);
         }
-        func_002AA800(self + 0xF8, 0, ang, 0.05817765f);
+        StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
         break;
     case 9:
-        if (func_002B3868(self) != 0 && self[0x43] != 7) func_002A7470(self, 7, 0, 0x14);
-        qcopy((&v30), self + 0x10);
-        ff = ((UView *)(self))->f[0x6] - 0.050000004f;
-        (&v30)->f[2] = 70.0f;
-        ((UView *)(self))->f[0x6] = ff;
-        if (ff < 70.0f) {
+        if (SetFirstPendingFlag(self) != 0 && self[0x43] != 7) StartAnimationBlended(self, 7, 0, 0x14);
+        qcopy((&targetPoint), self + 0x10);
+        height = ((UView *)(self))->f[0x6] - 0.050000004f;
+        (&targetPoint)->f[2] = 70.0f;
+        ((UView *)(self))->f[0x6] = height;
+        if (height < 70.0f) {
 b262:
-            func_002A6C58(self, 0, 3);
-            func_0029F338(self);
+            SetDeathBits(self, 0, 3);
+            MarkMobySpawned(self);
             return;
         }
         break;
     }
-    func_0029FCC0(self, D_L17_001B3940[0], (&v30));
-    if (func_002A89A8((&v30), 0, 1.0f) < 20.0f && self[0x95] != 3 && self[0x20] != 9) {
-        if (self[0x20] == 0xD || self[0x20] == 0xB) func_002A7750(self, 9, 7);
+    TransformMobyJointToWorld(self, D_L17_001B3940[0], (&targetPoint));
+    if (ProbeGroundHeightBelow((&targetPoint), 0, 1.0f) < 20.0f && self[0x95] != 3 && self[0x20] != 9) {
+        if (self[0x20] == 0xD || self[0x20] == 0xB) SetMobyState(self, 9, 7);
     }
 }

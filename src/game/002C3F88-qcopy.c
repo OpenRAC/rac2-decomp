@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002C3F88 in its own unit for the grouped lq/sq profile. */
 
@@ -34,23 +35,24 @@ extern unsigned char *D_001F264C;
 
 /* Spawns a spark particle at position for owner; mode 0 fades it out over its
    life, a velocity is copied when given. */
+/* Creates a spark that belongs to an owner and can fade out over its life. */
 Particle_002C3F88 *func_002C3F88(int owner, TI128 *position, int life, int mode, int alpha,
-                                 float *velocity, float arg6, float arg7)
+                                 float *velocity, float extraA, float extraB)
 {
-    Particle_002C3F88 *p = func_002B9030(0x43);
+    Particle_002C3F88 *p = AllocParticle(0x43);
     typeof(p->motion) *m = &p->motion;
 
     if (p != 0) {
         p->position = *position;
         m->owner = owner;
-        m->unk10 = arg6;
-        m->unk14 = arg7;
+        m->unk10 = extraA;
+        m->unk14 = extraB;
         p->colour = alpha | 0x409B9B00;
-        p->unk09 = func_00283CF0(4.0f) + 0x40;
+        p->unk09 = FloatToInt(4.0f) + 0x40;
         p->unk01 = 0;
         p->unk03 = 0x48;
         p->unk0C = 52500.0f;
-        p->unk08 = func_002A77E0(0xFF);
+        p->unk08 = RandomIntBelow(0xFF);
         m->mode = mode;
         m->age = 0;
         if (mode == 0)
@@ -58,7 +60,7 @@ Particle_002C3F88 *func_002C3F88(int owner, TI128 *position, int life, int mode,
         else
             p->unk02 = D_001F264C[1];
         if (mode == 0)
-            m->fade = func_00283CF0(127.0f / func_00283CE0(life));
+            m->fade = FloatToInt(127.0f / IntToFloat(life));
         if (velocity != 0) {
             m->velocity[0] = velocity[0];
             m->velocity[1] = velocity[1];

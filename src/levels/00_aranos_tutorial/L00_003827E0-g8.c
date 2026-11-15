@@ -8,6 +8,7 @@ extern void func_002B0A68(char *, int, void *, unsigned char, float, float, floa
 extern void func_002E5CF8(int, int, char *);
 extern void func_0029F338(char *);
 
+/* Waits until the two linked objects are gone, then plays a spark effect and removes itself. */
 void func_L00_003827E0(char *obj) {
     char *child;
     char *table;
@@ -17,25 +18,25 @@ void func_L00_003827E0(char *obj) {
     child = *(char **)(obj + 0x68);
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         return;
     case 1:
         if (*(int *)(child + 4) > 0 && *(int *)(child + 8) > 0) {
             table = D_L00_001B1E9C + (*(int *)(child + 4) << 8);
             if (table == 0 || (value = *(unsigned char *)(table + 0x20)) == 0xFE || value == 0xFD) {
-                func_002A7750(obj, 2, -1);
+                SetMobyState(obj, 2, -1);
             } else {
                 table = D_L00_001B1E9C + (*(int *)(child + 8) << 8);
-                if (table == 0 || (value = *(unsigned char *)(table + 0x20)) == 0xFE || value == 0xFD) func_002A7750(obj, 2, -1);
+                if (table == 0 || (value = *(unsigned char *)(table + 0x20)) == 0xFE || value == 0xFD) SetMobyState(obj, 2, -1);
             }
         }
         return;
     case 2:
         words.q = 0;
         words.f[1] = 0.10000001f;
-        func_002B0A68(obj, 1, &words, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_002E5CF8(0, 0, obj);
-        func_0029F338(obj);
+        SpawnDebrisForMaskedParts(obj, 1, &words, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        PlayMobySound(0, 0, obj);
+        MarkMobySpawned(obj);
         return;
     default:
         return;

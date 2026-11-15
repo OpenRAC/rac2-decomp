@@ -34,6 +34,7 @@ typedef struct {
     s32 height_log2;
 } MipUpload;
 
+/* Uploads a texture and its mip levels to video memory and fills the three texture registers for it. */
 s32 func_00291850(MipTexture *tex, unsigned long *regs)
 {
     MipUpload upload;
@@ -45,7 +46,7 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
     unsigned long pal;
     unsigned long lod;
 
-    func_00282A60((unsigned int *)&upload, 0, sizeof(upload));
+    ClearMemory((unsigned int *)&upload, 0, sizeof(upload));
     switch (tex->psm) {
     case 0:
     case 2:
@@ -72,8 +73,8 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
     default:
         break;
     }
-    upload.width_log2 = func_00282A18(tex->width);
-    upload.height_log2 = func_00282A18(tex->height);
+    upload.width_log2 = log2dim(tex->width);
+    upload.height_log2 = log2dim(tex->height);
     upload.mip_addresses[0] = (s32)tex->data + upload.palette_size;
     switch (tex->psm) {
     case 0:
@@ -98,9 +99,9 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
             D_001A72D0 += upload.palette_size;
             func_00126288(&load_image, upload.palette_block, 1, tex->palette_psm, 0, 0, 16, 16);
         }
-        func_0011AEA0(0);
-        func_001265B0(&load_image, (void *)upload.palette_address);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        ExecGsLoadImage(&load_image, (void *)upload.palette_address);
+        WaitGsPathsIdle(0, 0);
     }
     for (i = 1; i < tex->mip_count; i++) {
         upload.mip_sizes[i] = upload.mip_sizes[i - 1] >> 2;
@@ -115,9 +116,9 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
         upload.blocks[i] = D_001A72D0 >> 8;
         func_00126288(&load_image, upload.blocks[i], *width, tex->psm, 0, 0,
                       tex->width >> i, tex->height >> i);
-        func_0011AEA0(0);
-        func_001265B0(&load_image, (void *)upload.mip_addresses[i]);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        ExecGsLoadImage(&load_image, (void *)upload.mip_addresses[i]);
+        WaitGsPathsIdle(0, 0);
         bytes = upload.mip_sizes[0] >> (i * 2);
         if (bytes <= 0xFF) {
             bytes = 0x100;

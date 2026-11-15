@@ -24,7 +24,7 @@ void func_L00_0039E7A8(char *actor) {
     int active;
     float point[4];
     if (*(u8 *)(actor + 0x30) < 0x20) *(u8 *)(actor + 0x30) = 0x20;
-    if (D_L00_001B19C8 == 0 && state[5] != -1) func_L00_0042A500(state[5]);
+    if (gFrameCounter_L00 == 0 && state[5] != -1) ResetCameraEntry(state[5]);
     {
         int currentFlags = state[2];
         int disabled = currentFlags & 8;
@@ -37,18 +37,18 @@ void func_L00_0039E7A8(char *actor) {
         state[8] = 0;
         return;
     }
-    if (state[6] != -1 && !(D_0019B2E8[state[6] + D_001A79F0 * 16] & 0x80)) return;
+    if (state[6] != -1 && !(D_0019B2E8[state[6] + gCurrentMapIndex * 16] & 0x80)) return;
     if ((flags & 2) && D_0018C0D4 != 1) return;
     if ((flags & 4) && D_0018C0D4 != 3 && D_0018C0D4 != 0) return;
     if ((flags & 16) && D_0018C0BC > 1 && D_0018C0BC != 9) return;
     if ((flags & 32) && D_0018C0B4 == 49) return;
-    if (state[3] == 2 && func_00282948(state + 8)) state[3] = 0;
-    active = func_002ACBC8(D_00189EA0, state[0]);
+    if (state[3] == 2 && FastFloatHelperD(state + 8)) state[3] = 0;
+    active = IsPointInCuboid(gHeroPosition, state[0]);
     if (active) goto activate;
     {
         unsigned short triggerId = *(u16 *)(actor + 0xB2);
         if (D_L00_0021DDB0.disabled[(short)triggerId]) goto activate;
-        bits = D_0019B4A8[((short)triggerId >> 1) + D_001A79F0 * 0x400];
+        bits = D_0019B4A8[((short)triggerId >> 1) + gCurrentMapIndex * 0x400];
         if (triggerId & 1) {
             if ((bits >> 4) & 7) goto activate;
             goto inactive;
@@ -59,17 +59,17 @@ activate:
     {
         if (state[3] && (state[4] == 0 || state[8] != 0)) goto finish;
         state[3] = 1;
-        func_002A0430(*(u8 *)(actor + 0xB0));
+        MarkTableEntryFlagged(*(u8 *)(actor + 0xB0));
         qcopy(point, (actor + 0x10));
-        point[2] = func_002A89A8(point, 0, 0.5f);
-        if (func_00282C48(*(float *)(actor + 0x18) - point[2]) > 2.0f) point[2] = *(float *)(actor + 0x18);
-        func_002DF3F8(point, actor + 0xF0);
+        point[2] = ProbeGroundHeightBelow(point, 0, 0.5f);
+        if (FloatAbs(*(float *)(actor + 0x18) - point[2]) > 2.0f) point[2] = *(float *)(actor + 0x18);
+        CaptureCheckpointState(point, actor + 0xF0);
         D_L00_0021D140.disabled[*(short *)(actor + 0xB2)] = 0;
         D_L00_0021DDB0.disabled[*(short *)(actor + 0xB2)] = 0;
         id = *(u16 *)(actor + 0xB2);
         {
             int index = (short)id >> 1;
-            index += D_001A79F0 * 0x400;
+            index += gCurrentMapIndex * 0x400;
             packed = D_0019B4A8 + index;
         }
         bits = *packed;
@@ -79,7 +79,7 @@ activate:
             *packed = value;
         }
         if (state[9] && D_L00_001AF440 != actor) {
-            func_002B0A18(0x2F36, 90);
+            SetEntryValueByIndex(0x2F36, 90);
             D_L00_001AF440 = actor;
         }
         state[8] = 900;
@@ -88,5 +88,5 @@ activate:
 inactive:
     if (state[3]) state[3] = 2;
 finish:
-    if (*(u8 *)(actor + 0x20) == 0 && (D_0019B2E8[*(u8 *)(actor + 0xB0) + D_001A79F0 * 16] & 0x80)) *(u8 *)(actor + 0x20) = 1;
+    if (*(u8 *)(actor + 0x20) == 0 && (D_0019B2E8[*(u8 *)(actor + 0xB0) + gCurrentMapIndex * 16] & 0x80)) *(u8 *)(actor + 0x20) = 1;
 }

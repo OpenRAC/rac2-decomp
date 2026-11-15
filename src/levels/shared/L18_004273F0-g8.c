@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L18_004273F0 is a unit of its own: it needs the opt-in quadword-copy profile
    (-frac2-qcopy, #262), which gives retail's grouped `lq`/`sq` with register addresses. It reads $gp data, hence -G8. */
@@ -24,70 +25,71 @@ extern void func_002A7750(u8 *a0, int a1, int a2);
 extern void func_L18_00427208(u8 *a0);
 extern float func_00282E80(void *a0, void *a1);
 
+/* Picks the closest idle enemy to this spawner's target point and wakes it up with the spawner's settings. */
 void func_L18_004273F0(u8 *obj)
 {
-    u8 *state = *(u8 **)(obj + 0x68);
-    u8 *best = 0;
-    int found = 0;
-    float best_d = 100000.0f;
-    float vec[4];
-    u16 *q;
-    u8 *e;
-    u8 *es;
-    float d;
+    u8 *vars = *(u8 **)(obj + 0x68);
+    u8 *bestObject = 0;
+    int foundPoint = 0;
+    float bestDistance = 100000.0f;
+    float targetPoint[4];
+    u16 *listEntry;
+    u8 *candidate;
+    u8 *candidateState;
+    float distance;
 
-    if (*(int *)(state + 0x378) == -1) {
-        if (*(int *)(state + 0x368) == -1) {
-            func_0026FEB8(D_L18_002C0A90, *(s16 *)(obj + 0xB2), D_L18_001B2348);
+    if (*(int *)(vars + 0x378) == -1) {
+        if (*(int *)(vars + 0x368) == -1) {
+            STUB_printf(D_L18_002C0A90, *(s16 *)(obj + 0xB2), D_L18_001B2348);
         } else {
-            func_L18_0035D5A8(vec, obj + 0x10, D_00189EA0, *(int *)(state + 0x368), 0.0f);
-            found = 1;
+            FindBestPointOnPathById(targetPoint, obj + 0x10, gHeroPosition, *(int *)(vars + 0x368), 0.0f);
+            foundPoint = 1;
         }
     } else {
-        *(TI128 *)vec = *(TI128 *)(D_001FE480[*(int *)(state + 0x378)] + 0x10);
+        *(TI128 *)targetPoint = *(TI128 *)(D_001FE480[*(int *)(vars + 0x378)] + 0x10);
     }
 
-    q = (u16 *)D_L18_001FB320[obj[0x21]];
-    while (obj[0x21] != 0xFF && obj[0x21] <= D_L18_001B2838 && q != 0 &&
-           ((q != 0 && (s16)q[-1] >= 0) || q == (u16 *)D_L18_001FB320[obj[0x21]])) {
-        e = (u8 *)(D_L18_001B281C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    listEntry = (u16 *)D_L18_001FB320[obj[0x21]];
+    while (obj[0x21] != 0xFF && obj[0x21] <= D_L18_001B2838 && listEntry != 0 &&
+           ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == (u16 *)D_L18_001FB320[obj[0x21]])) {
+        candidate = (u8 *)(gMobyTable_L18 + ((*listEntry & 0x7FFF) << 8));
+        if (candidate == 0)
             break;
-        es = *(u8 **)(e + 0x68);
-        d = func_00282E80(e + 0x10, vec);
-        if (es != 0 && (es[0x399] & 1) != 0 && d < best_d) {
-            best_d = d;
-            best = e;
+        candidateState = *(u8 **)(candidate + 0x68);
+        distance = vec_distance_xy(candidate + 0x10, targetPoint);
+        if (candidateState != 0 && (candidateState[0x399] & 1) != 0 && distance < bestDistance) {
+            bestDistance = distance;
+            bestObject = candidate;
         }
-        q++;
+        listEntry++;
     }
 
-    if (best != 0) {
-        u8 *bs;
-        u16 hw;
-        best[0x31] = 1;
-        *(u16 *)(best + 0x34) &= 0xFFFE;
-        bs = *(u8 **)(best + 0x68);
-        hw = D_L18_001B125C;
-        *(int *)(bs + 0x36C) = *(int *)(state + 0x36C);
-        *(int *)(bs + 0x370) = *(int *)(state + 0x370);
-        *(int *)(bs + 0x374) = *(int *)(state + 0x374);
-        *(int *)(bs + 0x378) = *(int *)(state + 0x378);
-        *(int *)(bs + 0x360) = *(int *)(state + 0x360);
-        *(int *)(bs + 0x364) = *(int *)(state + 0x364);
-        *(u16 *)(bs + 0x390) = hw;
-        *(int *)(bs + 0x38C) = *(int *)(state + 0x378);
-        bs[0x39A] = 1;
-        bs[0x399] = 2;
-        *(u16 *)(bs + 0x392) = state[0x398];
-        if (found) {
-            func_002A7750(best, 0, 4);
-        } else if (bs[0x3EA] != 0 && *(int *)(bs + 0x3B4) != -1 &&
-                   ((u8 *)((*(int *)(bs + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFE &&
-                   ((u8 *)((*(int *)(bs + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFD) {
-            func_L18_00427208(best);
+    if (bestObject != 0) {
+        u8 *bestState;
+        u16 timerValue;
+        bestObject[0x31] = 1;
+        *(u16 *)(bestObject + 0x34) &= 0xFFFE;
+        bestState = *(u8 **)(bestObject + 0x68);
+        timerValue = D_L18_001B125C;
+        *(int *)(bestState + 0x36C) = *(int *)(vars + 0x36C);
+        *(int *)(bestState + 0x370) = *(int *)(vars + 0x370);
+        *(int *)(bestState + 0x374) = *(int *)(vars + 0x374);
+        *(int *)(bestState + 0x378) = *(int *)(vars + 0x378);
+        *(int *)(bestState + 0x360) = *(int *)(vars + 0x360);
+        *(int *)(bestState + 0x364) = *(int *)(vars + 0x364);
+        *(u16 *)(bestState + 0x390) = timerValue;
+        *(int *)(bestState + 0x38C) = *(int *)(vars + 0x378);
+        bestState[0x39A] = 1;
+        bestState[0x399] = 2;
+        *(u16 *)(bestState + 0x392) = vars[0x398];
+        if (foundPoint) {
+            SetMobyState(bestObject, 0, 4);
+        } else if (bestState[0x3EA] != 0 && *(int *)(bestState + 0x3B4) != -1 &&
+                   ((u8 *)((*(int *)(bestState + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFE &&
+                   ((u8 *)((*(int *)(bestState + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFD) {
+            WakeLinkedEnemy(bestObject);
         } else {
-            func_002A7750(best, 0, 3);
+            SetMobyState(bestObject, 0, 3);
         }
     }
 }

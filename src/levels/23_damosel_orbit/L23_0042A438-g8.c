@@ -147,17 +147,17 @@ void func_L23_0042A438(u8 *moby) {
 
     if (D_L23_001B1484_2 != 0) {
         if (D_L23_001B1B94 != -1) {
-            func_00291450(D_L23_001B1B94);
+            FreePointLight(D_L23_001B1B94);
         }
-        func_00282D30(w, D_L23_001B1484_2 + 0xE0, 10.0f);
-        func_00282CC0(w, w, D_L23_001B1484_2 + 0x10);
-        f = func_002A7878(0.0f, D_L23_001B1C28);
+        FastVecScale(w, D_L23_001B1484_2 + 0xE0, 10.0f);
+        FastVecAdd(w, w, D_L23_001B1484_2 + 0x10);
+        f = RandomFloatRange(0.0f, D_L23_001B1C28);
         fa = D_L23_001B1C28 + f;
-        f = func_002A7878(0.0f, D_L23_001B1C2C);
+        f = RandomFloatRange(0.0f, D_L23_001B1C2C);
         fb = D_L23_001B1C2C + f;
-        f = func_002A7878(0.0f, D_L23_001B1C30 * 0.5f);
+        f = RandomFloatRange(0.0f, D_L23_001B1C30 * 0.5f);
         fc = D_L23_001B1C30 + f;
-        D_L23_001B1B94 = func_L00_002FCF18(w, 20.0f, 0.0f, fa, fb, fc);
+        D_L23_001B1B94 = AllocateEffectSlot_L00_2(w, 20.0f, 0.0f, fa, fb, fc);
         D_L23_001B1C00 = D_L23_001B1C00 - D_L23_001B1C04;
         D_L23_001B39D0 = D_L23_001B1470 * 0.94f;
         vars = ((L23Obj *)moby)->vars;
@@ -172,11 +172,11 @@ void func_L23_0042A438(u8 *moby) {
         reg |= (s64)vars->alpha << 32;
         pkt.tail[3] = reg;
         D_L23_001B1C18 = (float)vars->alpha * D_L23_001B1C1C;
-        tex = func_0027C878(D_L23_001B1C14);
+        tex = GetEffectTextureDescriptor(D_L23_001B1C14);
         pkt.tail[2] = 0xFF9000000260LL;
         pkt.tail[1] = tex;
         pkt.tail[0] = 0;
-        func_002FC560(0x47, 0x53001);
+        VU1_addGSregister(0x47, 0x53001);
         hero = D_L23_001B1484_2;
         qcopy_nc(&matrix.rows[0], hero + 0xC0);
         qcopy_nc(&matrix.rows[1], hero + 0xD0);
@@ -189,19 +189,19 @@ void func_L23_0042A438(u8 *moby) {
         basis = (float *)mp;
         qzero_nc(axis);
         ((float *)axis)[2] = vars->turn;
-        func_002833F0(rot, axis);
-        func_00283738(basis, basis, rot);
+        euler_rotation_basis(rot, axis);
+        multiply_matrix3x3(basis, basis, rot);
         pkt.col[0] = pkt.col[1] = D_L23_001B1BC4;
         pkt.col[2] = pkt.col[3] = D_L23_001B1BC8;
         for (i = 0; i < 0x48; i++) {
             if (D_L23_0025E8B0[i] != 0) {
                 alphaScale = D_L23_001B1C18;
-                func_002830C0(v120, &D_L23_002A75F0[i], &matrix);
-                func_00283098(v140, &D_L23_002A7170[i], mp);
-                func_00282CF0(v150, v120, D_L23_001BA640);
-                func_00282DD8(v160, v140, v150);
-                func_00282F20(v160, v160, alphaScale);
-                f = func_00282DF0(v150);
+                transform_vector(v120, &D_L23_002A75F0[i], &matrix);
+                matrix_mul_vec3(v140, &D_L23_002A7170[i], mp);
+                FastVecSub(v150, v120, gCameraPosition_L23);
+                FastVecCross(v160, v140, v150);
+                vec_scale_to_length(v160, v160, alphaScale);
+                f = FastVecLength(v150);
                 scaledLength = f * D_L23_001B1C10;
                 t = D_L23_001B3930;
                 ribbonWidth = scaledLength * t;
@@ -209,19 +209,19 @@ void func_L23_0042A438(u8 *moby) {
                 if (D_L23_001B3930 > 1.0f) {
                     D_L23_001B3930 = 1.0f;
                 }
-                func_00282D30(v130, v140, ribbonWidth);
-                func_00282CC0(v130, v130, v120);
-                func_00282CC0(&pkt.pos[0], v120, v160);
-                func_00282CF0(&pkt.pos[1], v120, v160);
-                func_00282CC0(&pkt.pos[2], v130, v160);
-                func_00282CF0(&pkt.pos[3], v130, v160);
+                FastVecScale(v130, v140, ribbonWidth);
+                FastVecAdd(v130, v130, v120);
+                FastVecAdd(&pkt.pos[0], v120, v160);
+                FastVecSub(&pkt.pos[1], v120, v160);
+                FastVecAdd(&pkt.pos[2], v130, v160);
+                FastVecSub(&pkt.pos[3], v130, v160);
                 pkt.uv[0][1] = 0.0f;
                 pkt.uv[1][1] = 1.0f;
                 pkt.uv[2][1] = 0.0f;
                 pkt.uv[3][1] = 1.0f;
                 pkt.uv[2][0] = pkt.uv[3][0] = D_L23_001B1C00 + 1.0f;
                 pkt.uv[0][0] = pkt.uv[1][0] = D_L23_001B1C00;
-                func_00280B90(&pkt, 0, 0);
+                draw_world_quad(&pkt, 0, 0);
             }
         }
     }

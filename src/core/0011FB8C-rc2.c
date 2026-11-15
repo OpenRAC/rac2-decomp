@@ -27,32 +27,33 @@
 extern s32 D_001A7000[];
 extern s32 D_001A0000[];
 
+/* Runs every shutdown function in a list, last one first. */
 void func_0011FB8C(void) {
-    s64 var_a1;
-    s32 var_s1;
-    s32 *var_s0;
-    s32 var_v0;
+    s64 count;
+    s32 remaining;
+    s32 *entry;
+    s32 callback;
 
-    var_a1 = D_001A7000[0];
-    if (var_a1 == -1) {
-        var_a1 = 0;
+    count = D_001A7000[0];
+    if (count == -1) {
+        count = 0;
         if (D_001A7000[1] != 0) {
             do {
-                var_a1 = var_a1 + 1;
-            } while (D_001A7000[var_a1 + 1] != 0);
+                count = count + 1;
+            } while (D_001A7000[count + 1] != 0);
         }
     }
-    var_s1 = var_a1;
-    if (var_s1 != 0) {
-        var_s0 = (s32 *) ((s8 *) D_001A0000 + 0x7000) + var_s1;
-        var_v0 = *var_s0;
+    remaining = count;
+    if (remaining != 0) {
+        entry = (s32 *) ((s8 *) D_001A0000 + 0x7000) + remaining;
+        callback = *entry;
         do {
-            var_s1 -= 1;
-            var_s0 -= 1;
-            ((void (*)(void)) var_v0)();
-            if (var_s1 != 0) {
-                var_v0 = *var_s0;
+            remaining -= 1;
+            entry -= 1;
+            ((void (*)(void)) callback)();
+            if (remaining != 0) {
+                callback = *entry;
             }
-        } while (var_s1 != 0);
+        } while (remaining != 0);
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char D_00189E20_8[];
 
@@ -48,49 +49,50 @@ typedef struct {
 /* Guards three fields of a level state block, calls one helper with two stack outputs, then copies a shared float into offset 72 of two optional objects. */
 void func_L00_002D1ED8(void)
 {
-    char *d = D_00189E20_8;
-    int a;
-    int b;
-    int *o;
+    char *level = D_00189E20_8;
+    int animA;
+    int animB;
+    int *linkedObj;
 
-    if (*(unsigned char *)(d + 8884) != 0)
+    if (*(unsigned char *)(level + 8884) != 0)
         return;
-    if (*(int *)(d + 4916) != 2)
+    if (*(int *)(level + 4916) != 2)
         return;
-    if (func_L00_002D1DA0(*(unsigned char *)(*(int *)(d + 8848) + 67), &a, &b) == 0)
+    if (PickLinkedAnimationPair(*(unsigned char *)(*(int *)(level + 8848) + 67), &animA, &animB) == 0)
         return;
-    o = (int *)*(int *)(d + 4880);
-    if (o != 0)
-        *(float *)((char *)o + 72) = *(float *)(d + 3104);
-    o = (int *)*(int *)(d + 4884);
-    if (o != 0)
-        *(float *)((char *)o + 72) = *(float *)(d + 3104);
+    linkedObj = (int *)*(int *)(level + 4880);
+    if (linkedObj != 0)
+        *(float *)((char *)linkedObj + 72) = *(float *)(level + 3104);
+    linkedObj = (int *)*(int *)(level + 4884);
+    if (linkedObj != 0)
+        *(float *)((char *)linkedObj + 72) = *(float *)(level + 3104);
 }
 
 /* A14-struct-2field-20 freshly exact-verified under family reservation */
 void func_L00_002D1F60(void) {
-    D_00189E20.a = 0;
-    D_00189E20.b = 0;
+    gHeroState.a = 0;
+    gHeroState.b = 0;
 }
 
 /* shared native body of family c68ad20a */
+/* Looks up a key in the current table and gives back its value. Returns 1 when found, otherwise 0. */
 int func_L00_002D1F78(int key, int *out)
 {
-    Entry *e = D_0018C2B8;
-    Entry *p;
+    Entry *table = D_0018C2B8;
+    Entry *entry;
 
-    if (e == 0)
+    if (table == 0)
         return 0;
-    if (e->key == -1)
+    if (table->key == -1)
         goto notfound;
-    p = e;
+    entry = table;
     for (;;) {
-        if (key == p->key) {
-            *out = p->val;
+        if (key == entry->key) {
+            *out = entry->val;
             return 1;
         }
-        p++;
-        if (p->key == -1)
+        entry++;
+        if (entry->key == -1)
             goto notfound;
     }
 notfound:
@@ -106,19 +108,19 @@ extern void func_002A7470(void *, int, int, int);
 /* Routes the object the state word names to the mode the helper reports: the helper's value
    and the caller's index are handed over with the caller's float as an int, otherwise the
    object's own flag picks the fixed mode 7. Same two gates as its sibling below. */
-void func_L00_002D1FD8(int a0, int a1, float f12)
+void func_L00_002D1FD8(int seq, int frame, float speed)
 {
     char *base = D_00189E20_2;
-    int out;
+    int animId;
 
     if (*(int *)(base + 0x2494) == 0)
         return;
     if (*(int *)(base + 0x2498) == 0)
         return;
-    if (func_L00_002D1F78(a0, &out) != 0) {
-        func_002A7470(*(void **)(base + 0x2494), out, a1, (int)f12);
+    if (LookupAnimationByKey(seq, &animId) != 0) {
+        StartAnimationBlended(*(void **)(base + 0x2494), animId, frame, (int)speed);
     } else if (*(unsigned char *)(*(char **)(base + 0x2494) + 0x43) != 0) {
-        func_002A7470(*(void **)(base + 0x2494), 0, 0, 7);
+        StartAnimationBlended(*(void **)(base + 0x2494), 0, 0, 7);
     }
 }
 
@@ -127,17 +129,17 @@ void func_L00_002D1FD8(int a0, int a1, float f12)
 void func_L00_002D2070(void)
 {
     char *base = D_00189E20_2;
-    int out;
-    int object;
+    int animId;
+    int linkedObj;
 
     if (*(int *)(base + 0x2494) == 0)
         return;
     if (*(int *)(base + 0x2498) == 0)
         return;
-    if (func_L00_002D1F78(*(unsigned char *)(*(char **)(base + 0x2290) + 0x43), &out) == 0)
+    if (LookupAnimationByKey(*(unsigned char *)(*(char **)(base + 0x2290) + 0x43), &animId) == 0)
         return;
-    object = *(int *)(base + 0x2494);
-    *(float *)(object + 0x48) = *(float *)(base + 0xC20);
+    linkedObj = *(int *)(base + 0x2494);
+    *(float *)(linkedObj + 0x48) = *(float *)(base + 0xC20);
 }
 
 
@@ -160,9 +162,9 @@ void func_L00_002D2470(Rac2Native_28c929cadd7aca24_s32 selected, Rac2Native_28c9
 
 /* Marks no slot as running and parks the cursor past the end of the list. */
 void func_L00_002D24B8(void) {
-    char *b = D_00189E20_8;
-    *(int *)(b + 0xC40) = -1;
-    *(int *)(b + 0xC48) = 0;
+    char *hero = D_00189E20_8;
+    *(int *)(hero + 0xC40) = -1;
+    *(int *)(hero + 0xC48) = 0;
 }
 
 /* The resident word published below. */
@@ -180,70 +182,71 @@ void func_L00_002D24D0(int value)
 /* func_L00_002D2E68 is in L00_002D1ED8-scan-g8.c. */
 
 /* shared native body of family ea34650e369e */
+/* Clears the flag bit on the hero and its attached objects, and sets other bits on them in some special cases. */
 void func_L00_002D3068(void)
 {
-    char *b = D_00189E20_17;
-    char *p;
+    char *hero = D_00189E20_17;
+    char *obj;
     int i;
 
-    p = *(char **)(b + 3096);
-    *(unsigned short *)(p + 52) &= 0xFFFE;
+    obj = *(char **)(hero + 3096);
+    *(unsigned short *)(obj + 52) &= 0xFFFE;
 
     for (i = 0; i < 7; i++) {
-        p = *(char **)(b + 4640 + i * 80);
-        if (p != 0)
-            *(unsigned short *)(p + 52) &= 0xFFFE;
-        p = *(char **)(b + 4644 + i * 80);
-        if (p != 0)
-            *(unsigned short *)(p + 52) &= 0xFFFE;
-        p = *(char **)(b + 4648 + i * 80);
-        if (p != 0)
-            *(unsigned short *)(p + 52) &= 0xFFFE;
+        obj = *(char **)(hero + 4640 + i * 80);
+        if (obj != 0)
+            *(unsigned short *)(obj + 52) &= 0xFFFE;
+        obj = *(char **)(hero + 4644 + i * 80);
+        if (obj != 0)
+            *(unsigned short *)(obj + 52) &= 0xFFFE;
+        obj = *(char **)(hero + 4648 + i * 80);
+        if (obj != 0)
+            *(unsigned short *)(obj + 52) &= 0xFFFE;
     }
 
     if (1) {
-        char *c = D_00189E20_17;
-        p = *(char **)(c + 4892);
-        if (p != 0)
-            *(unsigned short *)(p + 52) &= 0xFFFE;
+        char *heroBlock = D_00189E20_17;
+        obj = *(char **)(heroBlock + 4892);
+        if (obj != 0)
+            *(unsigned short *)(obj + 52) &= 0xFFFE;
     }
 
     if (1) {
-        char *c = D_00189E20_17;
-        if (*(unsigned char *)(c + 8884) == 1) {
-            c = D_00189E20_17;
-            p = *(char **)(c + 6244);
-            if (p != 0)
-                *(unsigned short *)(p + 52) &= 0xFFFE;
+        char *heroBlock = D_00189E20_17;
+        if (*(unsigned char *)(heroBlock + 8884) == 1) {
+            heroBlock = D_00189E20_17;
+            obj = *(char **)(heroBlock + 6244);
+            if (obj != 0)
+                *(unsigned short *)(obj + 52) &= 0xFFFE;
         }
     }
 
     if (1) {
-        char *c = D_00189E20_17;
-        if (*(short *)(c + 9468) != 0 || *(int *)(c + 8860) == 31) {
-            c = D_00189E20_17;
-            p = *(char **)(c + 4880);
-            if (p != 0)
-                *(unsigned short *)(p + 52) |= 0x41;
-            c = D_00189E20_17;
-            p = *(char **)(c + 4884);
-            if (p != 0)
-                *(unsigned short *)(p + 52) |= 0x41;
-            c = D_00189E20_17;
-            p = *(char **)(c + 4892);
-            if (p != 0)
-                *(unsigned short *)(p + 52) |= 0x41;
+        char *heroBlock = D_00189E20_17;
+        if (*(short *)(heroBlock + 9468) != 0 || *(int *)(heroBlock + 8860) == 31) {
+            heroBlock = D_00189E20_17;
+            obj = *(char **)(heroBlock + 4880);
+            if (obj != 0)
+                *(unsigned short *)(obj + 52) |= 0x41;
+            heroBlock = D_00189E20_17;
+            obj = *(char **)(heroBlock + 4884);
+            if (obj != 0)
+                *(unsigned short *)(obj + 52) |= 0x41;
+            heroBlock = D_00189E20_17;
+            obj = *(char **)(heroBlock + 4892);
+            if (obj != 0)
+                *(unsigned short *)(obj + 52) |= 0x41;
         }
     }
 
     if (1) {
-        char *c = D_00189E20_17;
-        if ((*(unsigned char *)(c + 8894) != 0 && *(int *)(c + 4680) == 10) ||
-            *(unsigned char *)(c + 8895) != 0) {
-            char *d = D_00189E20_17;
-            p = *(char **)(d + 4640);
-            if (p != 0)
-                *(unsigned short *)(p + 52) |= 0x41;
+        char *heroBlock = D_00189E20_17;
+        if ((*(unsigned char *)(heroBlock + 8894) != 0 && *(int *)(heroBlock + 4680) == 10) ||
+            *(unsigned char *)(heroBlock + 8895) != 0) {
+            char *heroBlock2 = D_00189E20_17;
+            obj = *(char **)(heroBlock2 + 4640);
+            if (obj != 0)
+                *(unsigned short *)(obj + 52) |= 0x41;
         }
     }
 }
@@ -286,36 +289,36 @@ typedef int TI128_L00_002D3290 __attribute__((mode(TI)));
 float func_L00_002D3290(void)
 {
     TI128_L00_002D3290 matrix[4];
-    float v[4];
-    float w1[4];
-    float w2[4];
-    float w3[4];
-    float a;
-    char *state;
+    float aimVec[4];
+    float rollRot[4];
+    float yawRot[4];
+    float aimCopy[4];
+    float angle;
+    char *heroState;
 
-    v[0] = func_00283180(0.0f);
-    v[1] = func_00283198(0.0f);
-    v[2] = 0.0f;
-    func_00283410(matrix, D_00189EB0);
-    func_002830C0(v, v, matrix);
-    state = D_00189EB0 - 0x90;
+    aimVec[0] = FastSinOrCosA(0.0f);
+    aimVec[1] = FastSinOrCosB(0.0f);
+    aimVec[2] = 0.0f;
+    euler_to_matrix(matrix, D_00189EB0);
+    transform_vector(aimVec, aimVec, matrix);
+    heroState = D_00189EB0 - 0x90;
 
-    if (*(float *)(state + 0x2A0) != 0.0f || *(float *)(state + 0x2A4) != 0.0f) {
-        *(TI128_L00_002D3290 *)w3 = *(TI128_L00_002D3290 *)(state + 0x2A0);
-        func_00282C88(w1);
-        func_00282C88(w2);
-        a = func_00283248(*(float *)(state + 0x2A0), *(float *)(state + 0x2A4));
-        w1[2] = -a;
-        func_00283410(matrix, w1);
-        func_002830C0(v, v, matrix);
-        func_002830C0(w3, w3, matrix);
-        w2[1] = -func_00283248(w3[2], w3[0]);
-        func_00283410(matrix, w2);
-        func_002830C0(v, v, matrix);
-        w1[2] = -w1[2];
-        func_00283410(matrix, w1);
-        func_002830C0(v, v, matrix);
+    if (*(float *)(heroState + 0x2A0) != 0.0f || *(float *)(heroState + 0x2A4) != 0.0f) {
+        *(TI128_L00_002D3290 *)aimCopy = *(TI128_L00_002D3290 *)(heroState + 0x2A0);
+        ClearVector128(rollRot);
+        ClearVector128(yawRot);
+        angle = FastMatrixHelperA(*(float *)(heroState + 0x2A0), *(float *)(heroState + 0x2A4));
+        rollRot[2] = -angle;
+        euler_to_matrix(matrix, rollRot);
+        transform_vector(aimVec, aimVec, matrix);
+        transform_vector(aimCopy, aimCopy, matrix);
+        yawRot[1] = -FastMatrixHelperA(aimCopy[2], aimCopy[0]);
+        euler_to_matrix(matrix, yawRot);
+        transform_vector(aimVec, aimVec, matrix);
+        rollRot[2] = -rollRot[2];
+        euler_to_matrix(matrix, rollRot);
+        transform_vector(aimVec, aimVec, matrix);
     }
 
-    return func_00283248(v[0], v[1]);
+    return FastMatrixHelperA(aimVec[0], aimVec[1]);
 }

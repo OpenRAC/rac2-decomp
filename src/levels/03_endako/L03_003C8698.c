@@ -28,34 +28,34 @@ typedef struct {
     TI128 q80;
 } L03_003C8698_Body;
 
-extern void func_002A8BD0(void *a0, void *a1, u32 a2, f32 a3);
-extern void func_002A8C28(void *a0, void *a1, s32 a2, f32 a3, f32 a4, f32 a5,
+extern void func_002A8BD0(void *moby, void *a1, u32 a2, f32 a3);
+extern void func_002A8C28(void *moby, void *a1, s32 a2, f32 a3, f32 a4, f32 a5,
                           s32 a6, s32 a7, s32 a8);
-extern void func_00283658(void *a0, void *a1);
-extern void func_002830C0(void *a0, void *a1, void *a2);
-extern void func_002761F8(void *a0, void *a1, void *a2, void *a3, void *a4);
+extern void func_00283658(void *moby, void *a1);
+extern void func_002830C0(void *moby, void *a1, void *a2);
+extern void func_002761F8(void *moby, void *a1, void *a2, void *a3, void *a4);
 extern L03_V4 D_L03_0029A8D0[];
 
 /* Seeds the actor's effect: the state, the aim, the effect track and then the
    four corners of the level's table. */
-void func_L03_003C8698(char *a0)
+void func_L03_003C8698(char *moby)
 {
     L03_003C8698_Body b;
     f32 one = 1.0f;
-    TI128 *aim = (TI128 *)(a0 + 0x10);
+    TI128 *aim = (TI128 *)(moby + 0x10);
     L03_V4 *p;
     int i;
 
-    func_002A8BD0(&b.st, a0, 0x10000, 2.0f);
-    func_002A8C28(a0, aim, 0x10000, 1.25f, 100.0f, one, 0, 1, 0);
-    func_00283658(&b.v[0], a0 + 0xC0);
+    InitEffectRecord_002A8BD0(&b.st, moby, 0x10000, 2.0f);
+    SweepCollisionFromObject(moby, aim, 0x10000, 1.25f, 100.0f, one, 0, 1, 0);
+    copy_matrix_rotation(&b.v[0], moby + 0xC0);
     qcopy(&b.q80, aim);
     *(f32 *)((u8 *)&b.q80 + 12) = one;
-    func_002830C0(&b.q30, &D_L03_0029A8D0[0], &b.v[0]);
+    transform_vector(&b.q30, &D_L03_0029A8D0[0], &b.v[0]);
     p = &D_L03_0029A8D0[1];
     for (i = 3; i >= 0; i--) {
-        func_002830C0(&b.q40, p, &b.v[0]);
-        func_002761F8(&b.q30, &b.q40, 0, a0, &b.st);
+        transform_vector(&b.q40, p, &b.v[0]);
+        CollLine(&b.q30, &b.q40, 0, moby, &b.st);
         qcopy(&b.q30, &b.q40);
         p++;
     }

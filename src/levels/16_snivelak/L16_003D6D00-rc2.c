@@ -36,33 +36,34 @@ extern s32 ref_L16_003D6D00_07();
 extern void ref_L16_003D6D00_08(s8 *, s32, s32);
 extern void ref_L16_003D6D00_09(s32, s32);
 
-void func_L16_003D6D00(s8 *arg0) {
-    s32 *temp_s2;
-    s8 *s1;
-    s8 *s0;
-    s8 *s2;
-    s8 buf[0x10];
+/* Pulls the hero to this object and hurts him when he is in range. */
+void func_L16_003D6D00(s8 *moby) {
+    s32 *vars;
+    s8 *hero;
+    s8 *heroBase;
+    s8 *heroPos;
+    s8 offset[0x10];
 
-    temp_s2 = (*(s32 **)((s8 *)(arg0) + (0x68)));
-    if ((*(u8 *)((s8 *)(arg0) + (0x20))) == 0) {
-        (*(u8 *)((s8 *)(arg0) + (0x30))) = 0xFF;
-        (*(u8 *)((s8 *)(arg0) + (0x20))) = 1;
+    vars = (*(s32 **)((s8 *)(moby) + (0x68)));
+    if ((*(u8 *)((s8 *)(moby) + (0x20))) == 0) {
+        (*(u8 *)((s8 *)(moby) + (0x30))) = 0xFF;
+        (*(u8 *)((s8 *)(moby) + (0x20))) = 1;
     }
-    s1 = D_00189EA0;
-    if (ref_L16_003D6D00_02(s1, *temp_s2) != 0) {
-        s0 = s1 - 0x80;
-        if ((*(s32 *)((s8 *)(s0) + (0x229C))) != 0xF) {
-            s2 = s1 + 0x270;
-            ref_L16_003D6D00_03(s2, ref_L16_003D6D00_00 + (*temp_s2 << 7) + 0x30, s1);
-            ref_L16_003D6D00_04(s2, s2, 1.0f);
-            (*(f32 *)((s8 *)(s0) + (0x2FC))) = 2.0f;
-            (*(s16 *)((s8 *)(s0) + (0x218))) = 5;
-            (*(s32 *)((s8 *)(s0) + (0x2F8))) = 0;
-            if ((*(s32 *)((s8 *)(s0) + (0x340))) != 0 && (*(s32 *)((s8 *)(s0) + (0x2294))) != 0x38) {
-                ref_L16_003D6D00_05(buf, s1, s2);
-                if (ref_L16_003D6D00_06(s1 + 0x60, buf, 0, (*(s32 *)((s8 *)(s0) + (0x2290))), 0) != 0 && ref_L16_003D6D00_07() != 2 && ref_L16_003D6D00_01.w0 == 0) {
-                    ref_L16_003D6D00_08(s1 + 0x244C, 0, (s32)((f32)D_001A7A00 * 0.333f));
-                    if ((*(s32 *)((s8 *)(s0) + (0x24CC))) != 0) {
+    hero = gHeroPosition;
+    if (ref_L16_003D6D00_02(hero, *vars) != 0) {
+        heroBase = hero - 0x80;
+        if ((*(s32 *)((s8 *)(heroBase) + (0x229C))) != 0xF) {
+            heroPos = hero + 0x270;
+            ref_L16_003D6D00_03(heroPos, ref_L16_003D6D00_00 + (*vars << 7) + 0x30, hero);
+            ref_L16_003D6D00_04(heroPos, heroPos, 1.0f);
+            (*(f32 *)((s8 *)(heroBase) + (0x2FC))) = 2.0f;
+            (*(s16 *)((s8 *)(heroBase) + (0x218))) = 5;
+            (*(s32 *)((s8 *)(heroBase) + (0x2F8))) = 0;
+            if ((*(s32 *)((s8 *)(heroBase) + (0x340))) != 0 && (*(s32 *)((s8 *)(heroBase) + (0x2294))) != 0x38) {
+                ref_L16_003D6D00_05(offset, hero, heroPos);
+                if (ref_L16_003D6D00_06(hero + 0x60, offset, 0, (*(s32 *)((s8 *)(heroBase) + (0x2290))), 0) != 0 && ref_L16_003D6D00_07() != 2 && ref_L16_003D6D00_01.w0 == 0) {
+                    ref_L16_003D6D00_08(hero + 0x244C, 0, (s32)((f32)D_001A7A00 * 0.333f));
+                    if ((*(s32 *)((s8 *)(heroBase) + (0x24CC))) != 0) {
                         ref_L16_003D6D00_09(0x38, 1);
                     }
                 }

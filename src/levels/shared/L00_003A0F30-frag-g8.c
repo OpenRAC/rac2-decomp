@@ -41,23 +41,23 @@ void func_L00_003A4480(char *moby)
     base[0] = 0.3f;
     base[1] = -1.0f;
     base[3] = 1.0f;
-    func_00283098(base, base, moby + 0xC0);
-    func_00282CC0(origin, moby + 0x10, base);
+    matrix_mul_vec3(base, base, moby + 0xC0);
+    FastVecAdd(origin, moby + 0x10, base);
     *(unsigned char *)(moby + 0xBC) = 6;
-    func_002ACEC0(base, &D_00189E20.f[460], &D_00189E20.f[464], 0.34906590f);
+    ApplyAxisRotationToQuaternion(base, &gHeroState.f[460], &gHeroState.f[464], 0.34906590f);
     qcopy(direction, base);
     for (count = 0; count < 20; count++) {
         char *fragment;
-        angle = func_00283B98(angle, func_002A7878(0.0f, 0.6283186078f));
-        func_00282D30(velocity, direction, func_002A7878(0.1000000089f, 0.3f));
-        fragment = func_L00_00333F90(origin, velocity);
+        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186078f));
+        FastVecScale(velocity, direction, RandomFloatRange(0.1000000089f, 0.3f));
+        fragment = SpawnStreakEffect_L00(origin, velocity);
         if (fragment) {
             char *tail = fragment + 0x30;
             float duration = 2.0f;
             float rate = 0.05f;
             float scale = 0.5f;
-            func_00282D30(velocity, direction, 0.75f);
-            func_00282CC0(fragment + 0x10, origin, velocity);
+            FastVecScale(velocity, direction, 0.75f);
+            FastVecAdd(fragment + 0x10, origin, velocity);
             qcopy(fragment + 0x20, origin);
             *(float *)(tail + 0xC) = duration;
             *(float *)(fragment + 0x1C) = rate;
@@ -65,37 +65,37 @@ void func_L00_003A4480(char *moby)
             *(int *)(fragment + 4) = 0x307F7F7F;
             *(int *)(fragment + 0xC) = 0x307F7F7F;
         }
-        if (func_00282C48(angle) > 0.00001f) {
-            func_002AB668(rotation, &D_00189E20.f[460], angle);
-            func_002ACDE8(direction, base, rotation);
+        if (FloatAbs(angle) > 0.00001f) {
+            BuildAxisAngleQuaternion(rotation, &gHeroState.f[460], angle);
+            RotateVectorByQuaternion(direction, base, rotation);
         }
     }
     angle = 0.0f;
-    func_002ACEC0(base, &D_00189E20.f[460], &D_00189E20.f[464], D_L00_001AF62C * 0.017453294f);
+    ApplyAxisRotationToQuaternion(base, &gHeroState.f[460], &gHeroState.f[464], D_L00_001AF62C * 0.017453294f);
     qcopy(direction, base);
     qzero_nc(drift);
-    if (D_00189E20.i[208])
-        func_00282D30(drift, &D_00189E20.f[68], 1.7f);
+    if (gHeroState.i[208])
+        FastVecScale(drift, &gHeroState.f[68], 1.7f);
     for (count = 0; count < 20; count++) {
         unsigned int color;
         int spin;
         float size;
-        angle = func_00283B98(angle, func_002A7878(0.0f, 0.6283186078f));
-        func_00282D30(velocity, direction, func_002A7878(D_L00_001AF644 * (1.0f / 60.0f),
+        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186078f));
+        FastVecScale(velocity, direction, RandomFloatRange(D_L00_001AF644 * (1.0f / 60.0f),
                                                        D_L00_001AF648 * (1.0f / 60.0f)));
-        func_00282CC0(velocity, velocity, drift);
+        FastVecAdd(velocity, velocity, drift);
         color = D_L00_001AF63C;
-        spin = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        jitter[0] = origin[0] + func_002A78D8(0.0f, D_L00_001AF630);
-        jitter[1] = origin[1] + func_002A78D8(0.0f, D_L00_001AF630);
-        jitter[2] = origin[2] + func_002A78D8(0.0f, D_L00_001AF630);
-        size = func_002A7878(D_L00_001AF64C, D_L00_001AF650) * 210000.0f;
-        func_00282CF0(jitter, jitter, velocity);
-        func_002C16C0(jitter, velocity, color, D_L00_001AF634, D_L00_001AF638, spin,
+        spin = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        jitter[0] = origin[0] + RandomSignedFloatRange(0.0f, D_L00_001AF630);
+        jitter[1] = origin[1] + RandomSignedFloatRange(0.0f, D_L00_001AF630);
+        jitter[2] = origin[2] + RandomSignedFloatRange(0.0f, D_L00_001AF630);
+        size = RandomFloatRange(D_L00_001AF64C, D_L00_001AF650) * 210000.0f;
+        FastVecSub(jitter, jitter, velocity);
+        SpawnBurstParticle_002C16C0(jitter, velocity, color, D_L00_001AF634, D_L00_001AF638, spin,
                       size, D_L00_001AF654, D_L00_001AF640, 0.0f, 0.0f);
-        if (func_00282C48(angle) > 0.00001f) {
-            func_002AB668(rotation, &D_00189E20.f[460], angle);
-            func_002ACDE8(direction, base, rotation);
+        if (FloatAbs(angle) > 0.00001f) {
+            BuildAxisAngleQuaternion(rotation, &gHeroState.f[460], angle);
+            RotateVectorByQuaternion(direction, base, rotation);
         }
     }
 }

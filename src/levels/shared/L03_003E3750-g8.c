@@ -6,30 +6,31 @@
 extern s32 D_L03_001B0B50 __attribute__((sda));
 extern s32 D_L03_0029BCD0[];
 
-s32 func_L03_003E3750(char *a0, s32 a1)
+/* Says whether the given object is one of the targets the current puzzle step asks for. */
+s32 func_L03_003E3750(char *moby, s32 candidate)
 {
-    char *a2 = *(char **)(a0 + 0x68);
-    s32 off;
+    char *vars = *(char **)(moby + 0x68);
+    s32 entryOffset;
     s32 kind;
     s32 i;
 
-    if (*(s16 *)(a2 + 0x5E) == D_L03_001B0B50 - 1)
+    if (*(s16 *)(vars + 0x5E) == D_L03_001B0B50 - 1)
         return 0;
-    off = *(s16 *)(a2 + 0x62) * 16;
-    kind = *(s32 *)((char *)D_L03_0029BCD0 + off);
+    entryOffset = *(s16 *)(vars + 0x62) * 16;
+    kind = *(s32 *)((char *)D_L03_0029BCD0 + entryOffset);
     switch (kind) {
     case 1:
     case 2:
-        i = *(s16 *)(a2 + 0x64) + 1;
-        if (a1 != *(s32 *)((i * 4 + off) + (char *)D_L03_0029BCD0))
+        i = *(s16 *)(vars + 0x64) + 1;
+        if (candidate != *(s32 *)((i * 4 + entryOffset) + (char *)D_L03_0029BCD0))
             break;
         return 1;
     case 3:
-        if (*(s16 *)(a2 + 0x64) != 0)
+        if (*(s16 *)(vars + 0x64) != 0)
             return 0;
-        if (a1 == *(s32 *)((char *)D_L03_0029BCD0 + off + 4))
+        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entryOffset + 4))
             return 1;
-        if (a1 == *(s32 *)((char *)D_L03_0029BCD0 + off + 8))
+        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entryOffset + 8))
             return 1;
         break;
     }

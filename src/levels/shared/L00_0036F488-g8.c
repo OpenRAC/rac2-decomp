@@ -78,122 +78,123 @@ extern void func_0029BCD8(void);
 extern void func_00289178(void);
 extern void func_002F52B8(void);
 
+/* Runs one frame of the game: checks button presses for death or pause menus and then runs the normal update steps. */
 void func_L00_0036F488(void)
 {
     int blocked;
     int special;
 
-    if (func_L00_002F43F8() && !func_002B49E0(4, 1, 1, 0, 0))
+    if (GetLevelFlagB() && !BeginSlotRequest(4, 1, 1, 0, 0))
         return;
-    if (!D_L00_001A8F00 && (D_001A7424 & 1) && !func_002B49E0(4, 1, 1, 0, 0))
+    if (!D_L00_001A8F00 && (gSaveMenuFlags & 1) && !BeginSlotRequest(4, 1, 1, 0, 0))
         return;
     if (ref_L00_0036F488_00())
         return;
 
     special = 0;
-    blocked = ((Hero *)D_00189E20)->state != 0x31;
-    if (((Hero *)D_00189E20)->object) {
-        int id = ((Hero *)D_00189E20)->object->id;
-        if (id == 0x905 || id == 0x85C || id == 0xEEF || id == 0x10EE)
+    blocked = ((Hero *)gHeroState)->state != 0x31;
+    if (((Hero *)gHeroState)->object) {
+        int id = ((Hero *)gHeroState)->object->id;
+        if (id == 0x905 /* Glider */ || id == 0x85C /* moby class 2140 */ || id == 0xEEF /* Mining Vehicle */ || id == 0x10EE)
             special = 1;
     }
     blocked |= special;
     blocked = (blocked != 0);
-    blocked |= func_L00_002D6728() != 0;
-    blocked |= func_L00_002D67A8(3) != 0;
-    blocked |= func_L00_002D6880() != 0;
-    func_L00_002FC058();
+    blocked |= IsLevelModeInSet() != 0;
+    blocked |= IsTrackedObjectOfSelectedClass(3) != 0;
+    blocked |= IsSpecificGameModeActive() != 0;
+    UpdateCountdownStateMachine();
 
-    if (func_L00_0032EF10(16, D_L00_001A8FB8, 0) && D_L00_001B19C4 >= 8) {
-        if (((Hero *)D_00189E20)->state != 0x6F && ((Hero *)D_00189E20)->mode != 2 && ((Hero *)D_00189E20)->state != 0x31 && blocked
-            && ((Hero *)D_00189E20)->state != 0x1C && !D_L00_001A8F00 && D_L00_001B18E0 < 0.2f
-            && ((Hero *)D_00189E20)->f22B4 < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
-            func_00290730();
-            if (func_00290748()) {
-                if (((Hero *)D_00189E20)->f22B4 != 1)
-                    func_L00_002CB218();
-                if (!func_002B49E0(4, 1, 7, 0, 0))
+    if (PadPressedWithin(16, D_L00_001A8FB8, 0) && D_L00_001B19C4 >= 8) {
+        if (((Hero *)gHeroState)->state != 0x6F && ((Hero *)gHeroState)->mode != 2 && ((Hero *)gHeroState)->state != 0x31 && blocked
+            && ((Hero *)gHeroState)->state != 0x1C && !D_L00_001A8F00 && D_L00_001B18E0 < 0.2f
+            && ((Hero *)gHeroState)->f22B4 < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
+            RequestHudOpen();
+            if (IsHudOpenDone()) {
+                if (((Hero *)gHeroState)->f22B4 != 1)
+                    UpdateHeroButtonHoldTimers();
+                if (!BeginSlotRequest(4, 1, 7, 0, 0))
                     return;
             }
         }
     }
 
-    if (!func_L00_0032B270()) {
-        if ((((PadState *)D_00138180)->pressed & 0x800) || D_001A7428) {
+    if (!IsCounterPositive()) {
+        if ((((PadState *)gPadState)->pressed & 0x800) || D_001A7428) {
             if (D_L00_001B19C4 < 8)
                 goto normal;
-            if (((Hero *)D_00189E20)->state != 0x6F && (((Hero *)D_00189E20)->mode != 2 || ((Hero *)D_00189E20)->submode == 10)) {
+            if (((Hero *)gHeroState)->state != 0x6F && (((Hero *)gHeroState)->mode != 2 || ((Hero *)gHeroState)->submode == 10)) {
                 if (!blocked || D_L00_001A8F00)
                     goto second;
-                if (!func_002B49E0(3, 1, 1, 0, 0)) {
-                    func_L00_0032B2A8(func_L00_002A3B80() != 0);
-                    func_002E5E58(18, 0, 0);
+                if (!BeginSlotRequest(3, 1, 1, 0, 0)) {
+                    SetGlobalSettingValue(GetLevelSettingValue() != 0);
+                    PlaySoundFromGlobalBank(18, 0, 0);
                     return;
                 }
             }
         }
     }
 second:
-    if (D_L00_001B19C4 >= 8 && (((PadState *)D_00138180)->pressed & 0x500)) {
-        if (((Hero *)D_00189E20)->f229C != 22 && ((Hero *)D_00189E20)->state != 0x6F && blocked && ((Hero *)D_00189E20)->state != 0x1C
+    if (D_L00_001B19C4 >= 8 && (((PadState *)gPadState)->pressed & 0x500)) {
+        if (((Hero *)gHeroState)->f229C != 22 && ((Hero *)gHeroState)->state != 0x6F && blocked && ((Hero *)gHeroState)->state != 0x1C
             && !D_L00_001A8F00) {
-            if (func_L00_002D6728()) {
-                if (func_L00_002D6768())
+            if (IsLevelModeInSet()) {
+                if (RunModeUpdateZero())
                     goto normal;
             }
             if (D_L00_001A8FF0 && !D_L00_001A8FF4) {
-                if ((D_001A79F0 == 26 || (((Hero *)D_00189E20)->state != 0x5B && ((Hero *)D_00189E20)->state != 0x58))
-                    && func_002B49E0(4, 1, 6, 0, 0)) {
-                    if (D_0018C750[35].count < 0xFFFF)
-                        D_0018C750[35].count++;
+                if ((gCurrentMapIndex == 26 || (((Hero *)gHeroState)->state != 0x5B && ((Hero *)gHeroState)->state != 0x58))
+                    && BeginSlotRequest(4, 1, 6, 0, 0)) {
+                    if (gProgressStatistics[35].count < 0xFFFF)
+                        gProgressStatistics[35].count++;
                 }
-                if (D_0018C750[35].maximum < D_001A7390)
-                    D_0018C750[35].maximum = D_001A7390;
-                D_0018C750[35].levels = (D_0018C750[35].levels | (1 << D_001A79F0)) | 0x80000000;
+                if (gProgressStatistics[35].maximum < D_001A7390)
+                    gProgressStatistics[35].maximum = D_001A7390;
+                gProgressStatistics[35].levels = (gProgressStatistics[35].levels | (1 << gCurrentMapIndex)) | 0x80000000;
                 return;
             }
-            if (!func_002B49E0(3, 1, 2, 0, 0)) {
-                func_L00_0032B2A8(func_L00_002A3B80() != 0);
-                if (D_0018C750[9].count < 0xFFFF)
-                    D_0018C750[9].count++;
+            if (!BeginSlotRequest(3, 1, 2, 0, 0)) {
+                SetGlobalSettingValue(GetLevelSettingValue() != 0);
+                if (gProgressStatistics[9].count < 0xFFFF)
+                    gProgressStatistics[9].count++;
                 {
                     u32 tick = D_001A7390;
-                    if (D_0018C750[9].maximum < tick)
-                        D_0018C750[9].maximum = tick;
+                    if (gProgressStatistics[9].maximum < tick)
+                        gProgressStatistics[9].maximum = tick;
                 }
-                D_0018C750[9].levels = (D_0018C750[9].levels | (1 << D_001A79F0)) | 0x80000000;
+                gProgressStatistics[9].levels = (gProgressStatistics[9].levels | (1 << gCurrentMapIndex)) | 0x80000000;
             }
             return;
         }
     }
 normal:
-    if (((Hero *)D_00189E20)->state != 0x1C)
-        func_L00_003266D8();
-    if (((PadState *)D_00138180)->pressed & 0x200) {
-        if (((Hero *)D_00189E20)->state != 0x1C && ((Hero *)D_00189E20)->state != 0x31) {
-            func_L00_0030C7F8(360);
+    if (((Hero *)gHeroState)->state != 0x1C)
+        UpdateHitStreakEffect();
+    if (((PadState *)gPadState)->pressed & 0x200) {
+        if (((Hero *)gHeroState)->state != 0x1C && ((Hero *)gHeroState)->state != 0x31) {
+            CallLoadedModuleHandlerWithArg_0034B000(360);
             func_L00_0030C710(180);
         }
     }
-    if (D_L00_001B1AE0 && !func_002B49E0(6, 1, 0, 0, 0)) {
-        func_L00_0032B2A8(func_L00_002A3B80() != 0);
+    if (D_L00_001B1AE0 && !BeginSlotRequest(6, 1, 0, 0, 0)) {
+        SetGlobalSettingValue(GetLevelSettingValue() != 0);
         D_L00_001B1AE0 = 0;
     } else {
-        func_002F5220();
-        func_L00_0037E5C0();
-        func_L00_00310048();
-        func_002B6658();
-        func_002E5F60();
-        func_L00_002A6DD0();
-        func_002B9390();
-        func_L00_002ED808();
-        func_00272368();
-        func_002E4AC8();
-        func_002914B8();
-        func_0029FFB8();
-        func_0028E138(1);
-        func_0029BCD8();
-        func_00289178();
-        func_002F52B8();
+        ResetFrameCounters();
+        RunPerFramePasses();
+        CountActiveRecords();
+        UpdateVisibleObjects();
+        RunSoundCallbacks();
+        UpdateHeroFrame_L00_2();
+        UpdateParticles();
+        UpdateEffectSlots_L00();
+        UpdateCameraState();
+        UpdateSoundVoices();
+        UpdateLightingEnvironment();
+        ComputeLightDirection();
+        UpdateHudRecordTimers(1);
+        RunLevelCallbacks();
+        UpdateSubtitleStateMachine();
+        UpdateIdleFrameCounters();
     }
 }

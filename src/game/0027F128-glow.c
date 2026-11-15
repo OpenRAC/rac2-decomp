@@ -30,37 +30,37 @@ void func_002824B8(void) {
     int dx,dy;
     int *base;
     unsigned long *packet;
-    func_002FC560(0x42,0x8000000048UL);
+    VU1_addGSregister(0x42,0x8000000048UL);
     for(i=0;i<16;i++) {
         table=D_001BAA40;
         g=&table[i];
         if(g->life<=0) continue;
-        func_00282CF0(v,g,D_001B5340);
+        FastVecSub(v,g,gCameraState_001B5340);
         v[3]=1.0f;
-        distance=func_00282DF0(v);
-        func_00282D30(v,v,1024.0f);
-        func_002830C0(v,v,D_001B5340-0x100);
-        func_00282D78(clip,v,D_001B91C0);
-        if(func_00282BE0(clip)) { func_00282A60(g,0,32); continue; }
-        func_00282D30(v,v,D_001B9040.scale/v[3]);
+        distance=FastVecLength(v);
+        FastVecScale(v,v,1024.0f);
+        transform_vector(v,v,gCameraState_001B5340-0x100);
+        multiply_vector_components(clip,v,D_001B91C0);
+        if(is_vector_outside_clip(clip)) { ClearMemory(g,0,32); continue; }
+        FastVecScale(v,v,D_001B9040.scale/v[3]);
         color=(g->alpha<<24)|0x808080;
-        x=func_00283CF0(v[0]*16.0f)+0x8000;
-        y=func_00283CF0(v[1]*16.0f)+0x8000;
-        center=((unsigned long)func_00283CF0(v[2]*0.9997f+D_001B9040.depth)<<32)|((unsigned long)y<<16)|(unsigned long)x;
+        x=FloatToInt(v[0]*16.0f)+0x8000;
+        y=FloatToInt(v[1]*16.0f)+0x8000;
+        center=((unsigned long)FloatToInt(v[2]*0.9997f+D_001B9040.depth)<<32)|((unsigned long)y<<16)|(unsigned long)x;
         if(distance>18.0f) distance=18.0f;
         else if(distance<2.0f) distance=2.0f;
-        radius=g->size*0.015625f*func_00283CE0(g->alpha+16);
+        radius=g->size*0.015625f*IntToFloat(g->alpha+16);
         radius=radius*16.0f*(24.0f-distance);
-        dx=func_00283CF0(radius*func_00283198(g->angle));
-        dy=func_00283CF0(radius*func_00283180(g->angle));
-        D_001B22A8[0][0]=0x10000009; D_001B22A8[0][1]=0; D_001B22A8[0][2]=0; D_001B22A8[0][3]=0x50000009;
-        base=D_001B22A8[0];
-        D_001B22A8[0]=base+4;
+        dx=FloatToInt(radius*FastSinOrCosB(g->angle));
+        dy=FloatToInt(radius*FastSinOrCosA(g->angle));
+        gDmaPacketCursor[0][0]=0x10000009; gDmaPacketCursor[0][1]=0; gDmaPacketCursor[0][2]=0; gDmaPacketCursor[0][3]=0x50000009;
+        base=gDmaPacketCursor[0];
+        gDmaPacketCursor[0]=base+4;
         qcopy(base+4,D_001AC8B0);
         packet=(unsigned long *)(base+8);
-        D_001B22A8[0]=(int *)packet;
+        gDmaPacketCursor[0]=(int *)packet;
         packet[0]=5;
-        packet[1]=func_0027C878(19);
+        packet[1]=GetEffectTextureDescriptor(19);
         packet[2]=0x154;
         packet[3]=color;
         packet[4]=0;
@@ -75,7 +75,7 @@ void func_002824B8(void) {
         packet[13]=0x2000200;
         packet[14]=center+((-dy)<<16)-dx;
         packet[15]=0;
-        D_001B22A8[0]+=32;
+        gDmaPacketCursor[0]+=32;
     }
-    func_002FC560(0x42,0x8000000044UL);
+    VU1_addGSregister(0x42,0x8000000044UL);
 }

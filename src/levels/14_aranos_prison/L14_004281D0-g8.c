@@ -97,93 +97,94 @@ extern char *D_L14_001B2200[] __attribute__((sda));
 extern char D_L14_001B2210[] __attribute__((sda));
 extern char D_L14_001B9500[];
 
+/* Shared guard logic: sets up its stats on the first frame, then checks for the player getting close, damage and the path to the player. */
 void func_L14_004281D0(char *self)
 {
-    PrisonGuardVars *s = *(PrisonGuardVars **)(self + 0x68);
+    PrisonGuardVars *vars = *(PrisonGuardVars **)(self + 0x68);
     int hit;
 
     if (B(self, 0x20) == 0) {
-        if (D_001A79F0[0] == 2 && F(self, 0x18) > 400.0f) {
+        if (gCurrentMapIndex[0] == 2 && F(self, 0x18) > 400.0f) {
             if (D_L14_001A8FF0 == 0)
                 return;
-            func_002B0178(self + 0x10, self, self + 0x10);
-            s->h338 = 1;
+            GetGroundDistanceBelowPosition(self + 0x10, self, self + 0x10);
+            vars->h338 = 1;
             W(self, 0x9C) = 3;
             UH(self, 0x34) |= 0x100;
-            s->f90 = func_00282E48(self + 0x10, D_L14_001B2210) - 1.5f;
+            vars->f90 = fast_vec_dist(self + 0x10, D_L14_001B2210) - 1.5f;
         } else {
             W(self, 0x9C) = 12;
-            s->f90 = F(self, 0x18) - 1.0f;
+            vars->f90 = F(self, 0x18) - 1.0f;
         }
-        if (s->i210 == -1) {
-            func_0029F338(self);
+        if (vars->i210 == -1) {
+            MarkMobySpawned(self);
             return;
         }
         {
-            char *e = D_L14_001B2200[0] + s->i210 * 0x30;
-            if (H(e, 0x30) != 0) {
-                s->i13C = s->i218 = **(int **)(e + 0x3C);
+            char *entry = D_L14_001B2200[0] + vars->i210 * 0x30;
+            if (H(entry, 0x30) != 0) {
+                vars->i13C = vars->i218 = **(int **)(entry + 0x3C);
             } else {
-                s->i218 = -1;
+                vars->i218 = -1;
             }
         }
-        s->f324 = func_002A7878(1.0f, 1.333f);
-        F(self, 0x2C) = F(*(char **)(self + 0x24), 0x24) * s->f324;
-        s->b48 = func_00283CF0(15.0f);
-        s->b4A = func_00283CF0(6.4f);
-        s->i98 = 3;
-        s->f80 = 0.2f;
-        s->f84 = 0.2f;
-        s->f8C = 0.4f;
-        s->f108 = 0.4f;
-        s->f134 = 0.05f;
-        s->b60 = 11;
-        s->b28 = 3;
-        s->f30 = 0.333f;
-        s->f104 = s->f324 * 0.2f;
-        s->f100 = s->f324 * 0.3f;
-        s->f10C = 0.4f;
-        s->f110 = 1.5707964897155762f;
-        s->f130 = 0.523598849773407f;
-        s->i138 |= 0x280;
-        s->f1DC = func_002A78D8(18.0f, 22.0f) * 0.01745329424738884f;
-        s->b1E8 = 7;
-        s->b1E9 = 6;
-        s->h1E2 = 120;
-        s->h1E4 = 180;
-        s->f1D4 = 3.0f;
-        s->f1D0 = D_L14_001B18B0 * 0.01666666753590107f;
-        s->f328 = func_002A7940();
-        if (s->i214 != 0) {
+        vars->f324 = RandomFloatRange(1.0f, 1.333f);
+        F(self, 0x2C) = F(*(char **)(self + 0x24), 0x24) * vars->f324;
+        vars->b48 = FloatToInt(15.0f);
+        vars->b4A = FloatToInt(6.4f);
+        vars->i98 = 3;
+        vars->f80 = 0.2f;
+        vars->f84 = 0.2f;
+        vars->f8C = 0.4f;
+        vars->f108 = 0.4f;
+        vars->f134 = 0.05f;
+        vars->b60 = 11;
+        vars->b28 = 3;
+        vars->f30 = 0.333f;
+        vars->f104 = vars->f324 * 0.2f;
+        vars->f100 = vars->f324 * 0.3f;
+        vars->f10C = 0.4f;
+        vars->f110 = 1.5707964897155762f;
+        vars->f130 = 0.523598849773407f;
+        vars->i138 |= 0x280;
+        vars->f1DC = RandomSignedFloatRange(18.0f, 22.0f) * 0.01745329424738884f;
+        vars->b1E8 = 7;
+        vars->b1E9 = 6;
+        vars->h1E2 = 120;
+        vars->h1E4 = 180;
+        vars->f1D4 = 3.0f;
+        vars->f1D0 = D_L14_001B18B0 * 0.01666666753590107f;
+        vars->f328 = RandomAngle();
+        if (vars->i214 != 0) {
             UH(self, 0x34) = (UH(self, 0x34) | 0x41) & ~0x1000;
             W(self, 0x98) = 0;
-            func_002A7750(self, 13, 4);
+            SetMobyState(self, 13, 4);
             if (B(self, 0x43) != 10)
-                func_002A7470(self, 10, 0, 0);
+                StartAnimationBlended(self, 10, 0, 0);
         } else {
-            func_002A7750(self, 1, 0);
+            SetMobyState(self, 1, 0);
             if (B(self, 0x43) != 0)
-                func_002A7470(self, 0, 0, 0);
+                StartAnimationBlended(self, 0, 0, 0);
         }
-        s->v2E0 = *(PrisonQword *)(self + 0x10);
+        vars->v2E0 = *(PrisonQword *)(self + 0x10);
     }
 
     if (B(self, 0x31) != 0) {
-        if (func_00282E48(self + 0x10, D_L14_001B9500) < 24.0f) {
-            func_002A93B0(self);
+        if (fast_vec_dist(self + 0x10, D_L14_001B9500) < 24.0f) {
+            UpdateMobyGroundCheck(self);
             B(self, 0x6F) = 22;
         }
     }
-    hit = func_002B0ED8(self, s->area50, 0);
+    hit = ApplyDamageToObject(self, vars->area50, 0);
     if (hit != 0) {
-        func_L14_004286F8((unsigned char *)self);
+        AlertGroupGuards((unsigned char *)self);
         if (hit >= 4)
-            func_002A7750(self, 12, -1);
+            SetMobyState(self, 12, -1);
     }
-    if (B(self, 0x20) != 12 && s->i1D8 == 1)
-        func_002A7750(self, 12, -1);
+    if (B(self, 0x20) != 12 && vars->i1D8 == 1)
+        SetMobyState(self, 12, -1);
     if ((u8)(B(self, 0x95) - 3) >= 2)
-        s->h314 = func_002B3BA8(self, s->i210, 0, 0, 16.0f, 0.0f);
-    if (s->h338 != 0)
-        func_002AFFD8(self + 0x10, s->area300, 0);
+        vars->h314 = SelectAimTarget_002B3BA8(self, vars->i210, 0, 0, 16.0f, 0.0f);
+    if (vars->h338 != 0)
+        ComputeViewDirection(self + 0x10, vars->area300, 0);
 }

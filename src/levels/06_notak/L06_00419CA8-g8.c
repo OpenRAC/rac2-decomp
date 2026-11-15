@@ -97,10 +97,10 @@ void func_L06_00419CA8(char *obj)
     unsigned char *save;
     char *nearby;
     int packed;
-    if (!ctx) { F(obj,0xF8)=func_00283B98(F(obj,0xF8),0.10471977f); return; }
-    if (D_00189E20.moveState!=0x37 && U(obj,0x20)==3) {
+    if (!ctx) { F(obj,0xF8)=FastAddRotations(F(obj,0xF8),0.10471977f); return; }
+    if (gHeroState.moveState!=0x37 && U(obj,0x20)==3) {
         U(obj,0x20)=1;
-        if (D_L06_001B9890[0]) func_003355A8(4);
+        if (D_L06_001B9890[0]) SetCameraModeState(4);
         return;
     }
     switch (U(obj,0x20)) {
@@ -109,40 +109,40 @@ void func_L06_00419CA8(char *obj)
     case 1:
         id=*(unsigned short *)(obj+0xB2);
         if (D_L06_0021E830.collected[(short)id]) goto used;
-        packed=U(D_0019B4A8,((short)id>>1)+(D_001A79F0<<10));
+        packed=U(D_0019B4A8,((short)id>>1)+(gCurrentMapIndex<<10));
         if ((id&1) ? ((packed>>4)&7) : (packed&7)) {
 used:
             U(obj,0x20)=5; F(obj,0x18)-=0.5f; F(ctx,0)=1.0f; break;
         }
-        if (func_00282E80(obj+0x10,D_00189E20.position)<1.75f && !D_00189E20.interactBusy && !D_00189E20.disabled
-            && func_00283C80(D_00189E20.yaw,func_00283248(F(obj,0x10)-D_00189E20.position[0],F(obj,0x14)-D_00189E20.position[1]))<1.5707965f
-            && func_00282C48(D_00189E20.position[2]-0.3f-F(obj,0x18))<0.2f && D_00189E20.groundState==10
-            && D_00189E20.canInteract && func_L00_0032EF10(0x80,7,0) && (unsigned)I(ctx,0x14)>=31
+        if (vec_distance_xy(obj+0x10,gHeroState.position)<1.75f && !gHeroState.interactBusy && !gHeroState.disabled
+            && FastDiffRots(gHeroState.yaw,FastMatrixHelperA(F(obj,0x10)-gHeroState.position[0],F(obj,0x14)-gHeroState.position[1]))<1.5707965f
+            && FloatAbs(gHeroState.position[2]-0.3f-F(obj,0x18))<0.2f && gHeroState.groundState==10
+            && gHeroState.canInteract && PadPressedWithin(0x80,7,0) && (unsigned)I(ctx,0x14)>=31
             && F(obj,0x18)==F(ctx,0x3C) && F(ctx,0)<1.0f) {
             I(ctx,0x14)=0; clear=1; D_L06_001B06E8=0;
             for(i=0,nearby=D_L06_001FB760[0]; nearby; nearby=D_L06_001FB760[++i]) {
-                if(func_00282E48(obj+0x10,nearby+0x10)<3.25f) {clear=0;break;}
+                if(fast_vec_dist(obj+0x10,nearby+0x10)<3.25f) {clear=0;break;}
             }
             if(clear) {
-                func_L00_002C42E0(0x37,1);
-                func_00335438(D_L06_001B9840.position,D_L06_001B9840.rotation,3,0xB4,0);
-                func_003353C8(D_L06_001B290C+(I(ctx,0x20)<<7)+0x70);
-                func_00335370(D_L06_001B290C+(I(ctx,0x20)<<7)+0x30);
-                func_L06_00478548(F(ctx,0x28),F(ctx,0x2C));
+                SetHeroAction_L00(0x37,1);
+                SetCamera5Pose(D_L06_001B9840.position,D_L06_001B9840.rotation,3,0xB4,0);
+                SetCameraStateRotation(D_L06_001B290C+(I(ctx,0x20)<<7)+0x70);
+                CopyVectorToSelectedObject(D_L06_001B290C+(I(ctx,0x20)<<7)+0x30);
+                SetKindFiveSettings(F(ctx,0x28),F(ctx,0x2C));
                 U(obj,0x20)=3; I(ctx,0x24)=0; F(ctx,0x18)=F(ctx,0)*6.2831854820251465f*F(ctx,0x30);
             }
             break;
         }
         if(F(ctx,0)<1.0f) {
             I(ctx,0x14)++;
-            func_002AA2E8(ctx,0.0f,0.016666668f);
-            if(F(ctx,0)>0.0f) F(obj,0xF8)=func_00283BE0(F(obj,0xF8),F(ctx,0x30)*0.104719765f);
+            ApproachValue(ctx,0.0f,0.016666668f);
+            if(F(ctx,0)>0.0f) F(obj,0xF8)=fast_subtract_rotations(F(obj,0xF8),F(ctx,0x30)*0.104719765f);
             F(obj,0x18)+=0.008333334f;
             if(F(obj,0x18)>=F(ctx,0x3C)) F(obj,0x18)=F(ctx,0x3C);
         } else if(I(ctx,0x38)) {
             if(I(ctx,0x34)!=-1 && !(U(D_0019B2E8,U(obj,0xB0)+(D_001A79F0_gp<<4))&0x80)) {
-                func_L06_0039A2F0(ctx,4,obj,2,D_L06_0021DC20); func_002A0430(U(obj,0xB0));
-                if(I(ctx,0x34)!=-1) func_002DF3F8(D_L06_001B290C+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C+(I(ctx,0x34)<<7)+0x70);
+                AddOrUpdateRecordEntry(ctx,4,obj,2,D_L06_0021DC20); MarkTableEntryFlagged(U(obj,0xB0));
+                if(I(ctx,0x34)!=-1) CaptureCheckpointState(D_L06_001B290C+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C+(I(ctx,0x34)<<7)+0x70);
             }
             F(obj,0x18)-=0.008333334f;
             if(F(obj,0x18)<=F(ctx,0x3C)-0.5f) F(obj,0x18)=F(ctx,0x3C)-0.5f;
@@ -150,81 +150,81 @@ used:
         break;
     case 3:
         temp.q=0; temp.f[2]=D_L06_001B9840.rotation[2]; axis.q=temp.q;
-        angle=func_00283248(D_00189E20.position[0]-F(obj,0x10),D_00189E20.position[1]-F(obj,0x14));
-        if((func_L00_0032EF10(0x80,7,0) && D_00189E20.modeTimer>=61) || F(ctx,0)==1.0f) {
-            func_L00_002C42E0(0,1);
+        angle=FastMatrixHelperA(gHeroState.position[0]-F(obj,0x10),gHeroState.position[1]-F(obj,0x14));
+        if((PadPressedWithin(0x80,7,0) && gHeroState.modeTimer>=61) || F(ctx,0)==1.0f) {
+            SetHeroAction_L00(0,1);
             if(I(ctx,0x38)) {U(obj,0x20)=1;}
             else
             if(F(ctx,0)==1.0f) {
-                func_L06_0039A2F0(ctx,4,obj,2,D_L06_0021DC20); U(obj,0x20)=4;
+                AddOrUpdateRecordEntry(ctx,4,obj,2,D_L06_0021DC20); U(obj,0x20)=4;
                 id=*(unsigned short *)(obj+0xB2);
                 if(id&1) {
-                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(D_001A79F0<<10));
+                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(gCurrentMapIndex<<10));
                     if(((*save>>4)&7)!=7) *save+=16;
                 } else {
-                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(D_001A79F0<<10));
+                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(gCurrentMapIndex<<10));
                     if((*save&7)!=7) ++*save;
                 }
-                func_002E5CF8(0,0,obj);
+                PlayMobySound(0,0,obj);
                 if(I(ctx,0x34)!=-1 && !(U(D_0019B2E8,U(obj,0xB0)+(D_001A79F0_gp<<4))&0x80)) {
-                    func_L06_0039A2F0(ctx,4,obj,2,D_L06_0021DC20); func_002A0430(U(obj,0xB0));
-                    if(I(ctx,0x34)!=-1) func_002DF3F8(D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x70);
+                    AddOrUpdateRecordEntry(ctx,4,obj,2,D_L06_0021DC20); MarkTableEntryFlagged(U(obj,0xB0));
+                    if(I(ctx,0x34)!=-1) CaptureCheckpointState(D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x70);
                 }
             }
-            func_003355A8(3); break;
+            SetCameraModeState(3); break;
         }
-        input.f[1]=-D_00189E20.stickY; input.f[0]=-D_00189E20.stickX;
-        inputLength=func_00282E20(&input);
-        if(inputLength>1.0f) func_00282D90(&input,&input,inputLength);
-        func_00283410(matrix,&axis); func_002830C0(&input,&input,matrix);
-        facing.f[0]=func_00283180(F(D_00189E20.moby,0xF8));
-        facing.f[1]=func_00283198(F(D_00189E20.moby,0xF8)); I(&facing,8)=0;
-        difference=func_00282DB0(&facing,&input)-F(ctx,0x1C);
+        input.f[1]=-gHeroState.stickY; input.f[0]=-gHeroState.stickX;
+        inputLength=vec_length_xy(&input);
+        if(inputLength>1.0f) divide_vector_xyz(&input,&input,inputLength);
+        euler_to_matrix(matrix,&axis); transform_vector(&input,&input,matrix);
+        facing.f[0]=FastSinOrCosA(F(gHeroState.moby,0xF8));
+        facing.f[1]=FastSinOrCosB(F(gHeroState.moby,0xF8)); I(&facing,8)=0;
+        difference=FastVecDot(&facing,&input)-F(ctx,0x1C);
         if(difference>0.001527777872979641f) difference=0.001527777872979641f;
         if(difference< -0.001527777872979641f) difference= -0.001527777872979641f;
         F(ctx,0x1C)+=difference;
         if(F(ctx,0x1C)>0.06166667118668556f) F(ctx,0x1C)=0.06166667118668556f;
         if(F(ctx,0x1C)<0) F(ctx,0x1C)=0;
-        if(func_00282C48(F(ctx,0x1C))<0.00038194446824491024f) F(ctx,0x1C)=0;
-        func_00282F20(&motion,&facing,F(ctx,0x1C));
-        if((D_00189E20.animFlags&2) && U(D_00189E20.moby,0x43)==0x44) func_L00_002D2168(0x3F,0,7.0f);
-        if(U(D_00189E20.moby,0x43)!=0x44 && !D_00189E20.animBusy) {
-            if(U(D_00189E20.moby,0x42)==0x40 && func_00282C48(F(ctx,0x1C))==0) func_L00_002D2168(0x3F,0,14.0f);
-            else if(U(D_00189E20.moby,0x42)==0x3F) {if(F(ctx,0x1C)>0) func_L00_002D2168(0x40,0,14.0f);}
-            else if(U(D_00189E20.moby,0x42)==0x40 && F(ctx,0x1C)>0.03700000420212746f) func_L00_002D2168(0x41,0,14.0f);
-            else if(U(D_00189E20.moby,0x42)==0x41 && F(ctx,0x1C)<0.024666668847203255f) func_L00_002D2168(0x40,0,16.0f);
+        if(FloatAbs(F(ctx,0x1C))<0.00038194446824491024f) F(ctx,0x1C)=0;
+        vec_scale_to_length(&motion,&facing,F(ctx,0x1C));
+        if((gHeroState.animFlags&2) && U(gHeroState.moby,0x43)==0x44) set_hero_animation(0x3F,0,7.0f);
+        if(U(gHeroState.moby,0x43)!=0x44 && !gHeroState.animBusy) {
+            if(U(gHeroState.moby,0x42)==0x40 && FloatAbs(F(ctx,0x1C))==0) set_hero_animation(0x3F,0,14.0f);
+            else if(U(gHeroState.moby,0x42)==0x3F) {if(F(ctx,0x1C)>0) set_hero_animation(0x40,0,14.0f);}
+            else if(U(gHeroState.moby,0x42)==0x40 && F(ctx,0x1C)>0.03700000420212746f) set_hero_animation(0x41,0,14.0f);
+            else if(U(gHeroState.moby,0x42)==0x41 && F(ctx,0x1C)<0.024666668847203255f) set_hero_animation(0x40,0,16.0f);
         }
-        heroZ=D_00189E20.position[2]; func_00282CC0(D_00189E20.position,D_00189E20.position,&motion);
-        turn=func_00283248(D_00189E20.position[0]-F(obj,0x10),D_00189E20.position[1]-F(obj,0x14));
-        motion.f[0]=func_00283180(turn)*1.05f; motion.f[1]=func_00283198(turn)*1.05f; I(&motion,8)=0;
-        func_00282CC0(&temp,obj+0x10,&motion); func_00282CF0(&delta,&temp,D_00189E20.position);
-        I(&delta,8)=0; distance=-func_00282E20(&delta);
-        func_002AA3A8(&distance,&D_L06_001B06E8,0.0f,0.015f,0.3f,0.116666675f);
-        func_00282F20(&delta,&delta,D_L06_001B06E8); func_00282CC0(D_00189E20.position,D_00189E20.position,&delta);
-        D_00189E20.position[2]=heroZ;
-        if (D_001A7A45) D_00189E20.targetYaw=func_00283B98(-1.5707964f,turn);
-        else D_00189E20.targetYaw=func_00283B98(1.5707964f,turn);
+        heroZ=gHeroState.position[2]; FastVecAdd(gHeroState.position,gHeroState.position,&motion);
+        turn=FastMatrixHelperA(gHeroState.position[0]-F(obj,0x10),gHeroState.position[1]-F(obj,0x14));
+        motion.f[0]=FastSinOrCosA(turn)*1.05f; motion.f[1]=FastSinOrCosB(turn)*1.05f; I(&motion,8)=0;
+        FastVecAdd(&temp,obj+0x10,&motion); FastVecSub(&delta,&temp,gHeroState.position);
+        I(&delta,8)=0; distance=-vec_length_xy(&delta);
+        SpringFloatToGoal(&distance,&D_L06_001B06E8,0.0f,0.015f,0.3f,0.116666675f);
+        vec_scale_to_length(&delta,&delta,D_L06_001B06E8); FastVecAdd(gHeroState.position,gHeroState.position,&delta);
+        gHeroState.position[2]=heroZ;
+        if (D_001A7A45) gHeroState.targetYaw=FastAddRotations(-1.5707964f,turn);
+        else gHeroState.targetYaw=FastAddRotations(1.5707964f,turn);
         {
         /* The yaw is part of the player state at offset 0x98. */
         float *playerYaw=D_00189EB8;
         CrankPlayer *player=(CrankPlayer *)((char *)playerYaw-0x98);
-        func_002AA800(playerYaw,player->targetYaw,0,0.10471977f);
+        StepAngleTowardTarget(playerYaw,player->targetYaw,0,0.10471977f);
         F(ctx,0x24)+=0.0027222223579883575f;
         player->position[2]-=F(ctx,0x24)-2.0f;
-        groundHeight=func_002A89A8(player->position,0,0.5f);
+        groundHeight=ProbeGroundHeightBelow(player->position,0,0.5f);
         player->position[2]-=2.0f;
         if(player->position[2]<groundHeight) {player->position[2]=groundHeight; I(ctx,0x24)=0;}
         if(U(player->moby,0x43)!=0x44) {
-            targetYaw=func_00283B98(0.26179942f,turn);
-            func_002AA800(obj+0xF8,targetYaw,0,0.052359886f);
-            if(func_00283BE0(F(obj,0xF8),targetYaw)>1.0471977f) F(obj,0xF8)=func_00283BE0(F(obj,0xF8),1.0471977f);
-            else if(func_00283BE0(F(obj,0xF8),targetYaw)< -1.0471977f) F(obj,0xF8)=func_00283B98(F(obj,0xF8),1.0471977f);
+            targetYaw=FastAddRotations(0.26179942f,turn);
+            StepAngleTowardTarget(obj+0xF8,targetYaw,0,0.052359886f);
+            if(fast_subtract_rotations(F(obj,0xF8),targetYaw)>1.0471977f) F(obj,0xF8)=fast_subtract_rotations(F(obj,0xF8),1.0471977f);
+            else if(fast_subtract_rotations(F(obj,0xF8),targetYaw)< -1.0471977f) F(obj,0xF8)=FastAddRotations(F(obj,0xF8),1.0471977f);
         }
-        F(ctx,0x18)+=func_00283C80(turn,angle);
+        F(ctx,0x18)+=FastDiffRots(turn,angle);
         F(ctx,0)=F(ctx,0x18)/(F(ctx,0x30)*6.2831854820251465f);
         if(F(ctx,0)>1) F(ctx,0)=1;
         if(F(ctx,0)<0) F(ctx,0)=0;
-        func_00282A88(D_00189E20.motionState,0xA0);
+        FastMemoryHelperB(gHeroState.motionState,0xA0);
         }
         break;
     case 4: {

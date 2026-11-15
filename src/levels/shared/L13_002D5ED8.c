@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L13_002D5ED8 is in the sibling file L13_002D5ED8-decider.c (its own profile). */
 
@@ -23,6 +24,7 @@ extern Table_389848 ref_L13_00232450_00;
 /* Adds the object's key to the level's list when it is not already there: the count at +0x100
  * bounds a linear search over the words at +0, and an absent key is appended at the count
  * before the count is bumped. */
+/* Remembers this object in the level list so it is only added once. */
 void func_L13_00389848(Obj_389848 *object)
 {
     int found = 0;
@@ -61,6 +63,7 @@ extern char D_00189E20[];
  * halves of thirty-two, and any other state does nothing.  D_00189EA0 is the pointer the
  * entry test hands to func_002ACBC8, and the map selection block D_00189E20 sits 0x80
  * before it. */
+/* Checks the listed objects each frame and sends the hero into a new state when the hero reaches one of them. */
 void func_L13_0038C1B8(Obj_38C1B8 *a0)
 {
     Table_389848 *t = a0->table;
@@ -77,22 +80,22 @@ void func_L13_0038C1B8(Obj_38C1B8 *a0)
         a0->flag = 0xFF;
         break;
     case 1:
-        q = (unsigned char *)D_00189E20;
+        q = (unsigned char *)gHeroState;
         e = t->entries + 32;
         for (i = 0; i < 32; i++) {
             v = t->entries[i];
             if (v < 0)
                 continue;
-            if (func_002ACBC8(D_00189EA0, v) == 0)
+            if (IsPointInCuboid(gHeroPosition, v) == 0)
                 continue;
             if (t->count != 0) {
                 *(float *)(q + 0x24C8) = 0.25f;
                 continue;
             }
-            m = (unsigned char *)D_00189EA0 - 0x80;
+            m = (unsigned char *)gHeroPosition - 0x80;
             if (m[0x22B4] != 0) {
-                func_0027D330(10);
-                func_L00_002B30E8();
+                FadeToBlack(10);
+                RecordHeroPlayCounters();
             } else if (*(int *)(m + 0x2294) != 0x74) {
                 ref_L13_0038C1B8_00(0x74, 1);
             }
@@ -101,10 +104,10 @@ void func_L13_0038C1B8(Obj_38C1B8 *a0)
             v = e[j];
             if (v < 0)
                 continue;
-            if (func_002ACBC8(D_00189EA0, v) == 0)
+            if (IsPointInCuboid(gHeroPosition, v) == 0)
                 continue;
-            func_0027D330(10);
-            func_L00_002B30E8();
+            FadeToBlack(10);
+            RecordHeroPlayCounters();
         }
         break;
     }
@@ -124,6 +127,7 @@ extern float func_00283B98(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
+/* Updates a levitator pad that lifts the hero, and makes its glow pulse. */
 void func_L13_003C5908(char *obj)
 {
     char *rig = *(char **)(obj + 0x68);
@@ -134,39 +138,39 @@ void func_L13_003C5908(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         *(unsigned short *)(obj + 0x34) |= 0x10;
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        if (func_002B3868(obj) != 0) {
+        if (SetFirstPendingFlag(obj) != 0) {
             word = *(int *)rig;
             if (word != -1) {
-                func_L00_00429020(word);
+                LockCameraEntry(word);
                 *(int *)rig = -1;
             }
         }
-        hero = D_00189E20;
+        hero = gHeroState;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
             if (D_001A7A40[0xC0] != 0) {
-                func_002B0CE0(0xC, 0x27F7, 1);
+                ForceClaimNotice(0xC, 0x27F7, 1);
                 *(short *)(hero + 0x1F2) = 0xA;
                 turn = *(float *)(rig + 0xC);
                 if (turn != 0.0f)
                     *(float *)(hero + 0x5B8) = turn;
             }
         } else {
-            other = D_00189E20;
+            other = gHeroState;
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
-                if (level >= 0 && func_002ACBC8(other + 0x80, level) != 0)
+                if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
                     ref_L13_003C5908_00(6, 1);
             }
         }
         break;
     }
     if (*(unsigned char *)(obj + 0x31) != 0) {
-        pulse = func_00283B98(*(float *)(rig + 4), 0.10471977f);
+        pulse = FastAddRotations(*(float *)(rig + 4), 0.10471977f);
         *(float *)(rig + 4) = pulse;
-        glow = func_00283CF0(func_00283198(pulse) * 128.0f);
+        glow = FloatToInt(FastSinOrCosB(pulse) * 128.0f);
         if (glow > 0x80)
             glow = 0x80;
         else if (glow < 0x20)
@@ -203,6 +207,7 @@ typedef struct {
     float fA8;
 } L13_CD48Vars;
 
+/* Keeps an enemy object alive, and when its health runs out makes a small explosion and removes it. */
 void func_L13_003ECD48(unsigned char *m)
 {
     L13_CD48Vars *v = *(L13_CD48Vars **)(m + 0x68);
@@ -211,24 +216,24 @@ void func_L13_003ECD48(unsigned char *m)
     float a[4] __attribute__((aligned(16)));
 
     if (m[0x20] == 0) {
-        func_L13_00389848((Obj_389848 *)m);
+        AddKeyToLevelList((Obj_389848 *)m);
         m[0x20] = 1;
     }
     v->b6A = 2;
     v->fA8 = 0.01f;
     v->b61 = 0xFF;
     v->b62 = 0xFF;
-    if (func_002B0ED8(m, v->sub50, 0) != 0) {
-        func_002E5CF8(0, 0, (char *)m);
+    if (ApplyDamageToObject(m, v->sub50, 0) != 0) {
+        PlayMobySound(0, 0, (char *)m);
     }
     if (v->f20 <= 0.0f) {
         qcopy(p, m + 0x10);
-        func_00282F20(a, m + 0xD0, -2.0f);
-        func_00282CC0(p, a, p);
-        func_00282F20(b, m + 0xC0, 1.5f);
-        func_00282CC0(p, b, p);
-        func_0032C700(p, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 0, 0, 0);
-        func_0029F338(m);
+        vec_scale_to_length(a, m + 0xD0, -2.0f);
+        FastVecAdd(p, a, p);
+        vec_scale_to_length(b, m + 0xC0, 1.5f);
+        FastVecAdd(p, b, p);
+        SpawnExplosion(p, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 0, 0, 0);
+        MarkMobySpawned(m);
     }
 }
 
@@ -240,6 +245,7 @@ extern char *D_L13_001B291C __attribute__((section(".sdata")));
  * the entity the state names at +0x2C8 decides the opponent by its kind at +0xAA (0xEA3
  * reads the partner state's +0x2CC, 0xEA4 its +0x2C4; any other kind is a draw). Returns
  * 2 for a draw, 1 when the object's choice wins (0 over 1, 1 over 2, 2 over 0), else 0. */
+/* Plays rock-paper-scissors for two creatures and says who wins: 2 is a draw, 1 means this one wins, 0 means it loses. */
 int func_L13_00406E30(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -247,10 +253,10 @@ int func_L13_00406E30(char *object)
     int mine;
     int other;
 
-    if (*(short *)(entity + 0xAA) == 0xEA3) {
+    if (*(short *)(entity + 0xAA) == 0xEA3 /* moby class 3747 */) {
         mine = *(int *)(state + 0x2CC);
         other = *(int *)(*(char **)(entity + 0x68) + 0x2CC);
-    } else if (*(short *)(entity + 0xAA) == 0xEA4) {
+    } else if (*(short *)(entity + 0xAA) == 0xEA4 /* moby class 3748 */) {
         mine = *(int *)(state + 0x2CC);
         other = *(int *)(*(char **)(entity + 0x68) + 0x2C4);
     } else {

@@ -19,10 +19,11 @@ extern void func_002AD7B8(int);
 extern void func_002B0A18(int, int);
 
 /* Corresponds to RAC1 process_unlock_code_input. */
+/* Checks the secret button code the player enters. A full 20-press code is matched against the table and unlocks the matching extra. */
 void func_002DDEC8(void) {
-    char *pad = D_00138180;
+    char *pad = gPadState;
     int lim0, lim;
-    int va, vb, vc;
+    int index55, index74, index80;
     int pressed, direction, j, code, index, matched;
     if ((*(long *)(pad + 0x1C0) & 0xF) == 6) {
         pressed = *(int *)(pad + 0x1C4);
@@ -55,21 +56,21 @@ void func_002DDEC8(void) {
             }
         }
         if (code == -1) return;
-        va = code - 55;
-        vb = code - 74;
-        vc = code - 80;
+        index55 = code - 55;
+        index74 = code - 74;
+        index80 = code - 80;
         if (code < 56) {
-            D_001A7AF8[code] = 1;
+            gItemOwnedFlags[code] = 1;
             D_001A7B30[code] = 1;
         } else if ((unsigned)(code - 56) < 18) {
-            func_002AD7B8(va);
-        } else if ((unsigned)vb < 6) {
-            D_001395B8[vb] = 1;
-        } else if ((unsigned)vc < 30) {
-            if (!D_001A7A60[vc]) {
-                D_001A7A60[vc] = 1;
-                func_002E5E58(1, 0, 0);
-                func_002B0A18(0x1233, -1);
+            MarkFlagAndAppendToList(index55);
+        } else if ((unsigned)index74 < 6) {
+            D_001395B8[index74] = 1;
+        } else if ((unsigned)index80 < 30) {
+            if (!D_001A7A60[index80]) {
+                D_001A7A60[index80] = 1;
+                PlaySoundFromGlobalBank(1, 0, 0);
+                SetEntryValueByIndex(0x1233, -1);
                 D_001A8CEC = 1;
             }
         }
@@ -78,8 +79,9 @@ void func_002DDEC8(void) {
     }
 }
 
-void func_002DF190(int a0, int a1)
+/* Plays a menu sound, but only when menu sounds are turned on. */
+void func_002DF190(int soundId, int soundParam)
 {
     if (ref_L00_002DF190_00 != 0)
-        func_002E5E58(a0, a1, 0);
+        PlaySoundFromGlobalBank(soundId, soundParam, 0);
 }

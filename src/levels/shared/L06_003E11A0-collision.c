@@ -11,6 +11,7 @@ extern void *func_001153D4(void *, const void *, unsigned int);
 extern int func_002A90C8(void *, void *, int, void *, float);
 extern char *D_L06_001C3D00[];
 
+/* Hits the nearby objects that touch a flat rectangle around this object. */
 void func_L06_003E11A0(char *object, char *params) {
     float matrix[12] __attribute__((aligned(16)));
     float center[4] __attribute__((aligned(16)));
@@ -25,29 +26,29 @@ void func_L06_003E11A0(char *object, char *params) {
     char *candidate;
     if (*(int *)(params + 8) & 0x100)
         return;
-    func_002833F0(matrix, object + 0xF0);
+    euler_rotation_basis(matrix, object + 0xF0);
     radius = *(float *)params > *(float *)(params + 4) ? *(float *)params : *(float *)(params + 4);
     radius *= 0.5f;
     /* Center is initialized here before it escapes to the vector callees. */
     qzero_nc(center);
     center[2] = radius;
     position = object + 0x10;
-    func_00283098(center, center, matrix);
-    func_00282CC0(center, center, position);
-    count = func_00277F48(center, 0x10, object, 0, radius);
+    matrix_mul_vec3(center, center, matrix);
+    FastVecAdd(center, center, position);
+    count = ProcessCollisionHit(center, 0x10, object, 0, radius);
     if (!count)
         return;
     {
         char *candidates[count];
 
-        func_001153D4(candidates, D_L06_001C3D00, count * 4);
+        memcpy_001153D4(candidates, D_L06_001C3D00, count * 4);
         for (i = 0; i < count; i++) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
                 continue;
-            func_00282CF0(delta, candidate + 0x10, object + 0x10);
-            func_00283698(inverse, matrix);
-            func_002830C0(local, delta, inverse);
+            FastVecSub(delta, candidate + 0x10, object + 0x10);
+            matrix_from_basis_rows(inverse, matrix);
+            transform_vector(local, delta, inverse);
             qcopy(point, local);
             if (point[0] < -(*(float *)params * 0.5f + *(float *)(params + 0x48)))
                 point[0] = -*(float *)params * 0.5f;
@@ -58,14 +59,14 @@ void func_L06_003E11A0(char *object, char *params) {
             else if (point[2] > *(float *)(params + 4) * 0.5f + *(float *)(params + 0x4C))
                 point[2] = *(float *)(params + 4) * 0.5f;
             point[1] = 0;
-            func_00283098(point, point, matrix);
-            func_00282CC0(point, point, object + 0x10);
-            n = func_00277F48(point, 0x10, object, 0, *(float *)(params + 0x48));
+            matrix_mul_vec3(point, point, matrix);
+            FastVecAdd(point, point, object + 0x10);
+            n = ProcessCollisionHit(point, 0x10, object, 0, *(float *)(params + 0x48));
             {
                 int j;
                 for (j = 0; j < n; j++) {
                     if (D_L06_001C3D00[j] == candidate)
-                        func_002A90C8(candidate, object, 0x10001, point, *(float *)(params + 0x50));
+                        StartEffectWithDefaultTable(candidate, object, 0x10001, point, *(float *)(params + 0x50));
                 }
             }
         }

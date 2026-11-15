@@ -18,23 +18,24 @@ extern long r1_func_0012AAC8(void *, int);
    compiler stack slots) instead of one, since a single int/4-int array
    both land in one slot here (frame still 0x10 short of retail's 0x70,
    see c1-c4). */
-void func_0012E110(void *arg0, unsigned int arg1, int arg2) {
-    char *p = (char *)arg0;
-    int r;
+/* Sends data to the video chip with DMA for color conversion, then waits until it is done. */
+void func_0012E110(void *decoder, unsigned int address, int blockCount) {
+    char *dec = (char *)decoder;
+    int intrState;
     int event[8];
 
     while (((int)IPU_CTRL) < 0) {
     }
-    r = r1_func_0011D960();
-    D3_MADR = arg1 & 0x0FFFFFFF;
-    D3_QWC = (unsigned int)arg2 << 6;
+    intrState = r1_func_0011D960();
+    D3_MADR = address & 0x0FFFFFFF;
+    D3_QWC = (unsigned int)blockCount << 6;
     D3_CHCR = 0x100;
-    if (r != 0) {
+    if (intrState != 0) {
         r1_func_0011D9A8();
     }
-    r1_func_00128560(arg0, arg2 | 0x70000000);
+    r1_func_00128560(decoder, blockCount | 0x70000000);
     event[0] = 4;
-    r1_func_0012BC78(*(int *)(p + 0x858), event);
+    r1_func_0012BC78(*(int *)(dec + 0x858), event);
     while (((D3_CHCR >> 8) & 1) != 0) {
     }
     while (((int)IPU_CTRL) < 0) {
@@ -63,49 +64,50 @@ typedef struct {
 
 /* rac1-decomp src/core/0012A2F0.c: func_0012E378 */
 /* libmpeg chunked DMA copy: arm the channel-3 callback with a progress record, start the transfer, wait for all chunks. */
-void func_0012E378(void *arg0, unsigned int arg1, int arg2) {
-    char *p = (char *)arg0;
+/* Sends a large block to the video chip in chunks using DMA and waits for every chunk to finish. */
+void func_0012E378(void *decoder, unsigned int address, int byteCount) {
+    char *dec = (char *)decoder;
     int event[8];
-    CscRec_2A558 rec;
-    CscRec_2A558 *rp;
-    int h;
-    int r;
+    CscRec_2A558 progress;
+    CscRec_2A558 *progressPtr;
+    int handlerId;
+    int intrState;
 
-    rec.total = arg2 / 0x3FF + 1;
-    rec.size = arg2;
-    rec.next = (arg1 + 0xFFC00) & 0x0FFFFFFF;
-    rec.err = 0;
-    rec.done = 0;
-    rp = &rec;
+    progress.total = byteCount / 0x3FF + 1;
+    progress.size = byteCount;
+    progress.next = (address + 0xFFC00) & 0x0FFFFFFF;
+    progress.err = 0;
+    progress.done = 0;
+    progressPtr = &progress;
     while (((int)IPU_CTRL) < 0) {
     }
-    h = r1_func_00118AC0_2A558(3, (void *)r1_func_0012A418_2A558, 0, rp);
+    handlerId = r1_func_00118AC0_2A558(3, (void *)r1_func_0012A418_2A558, 0, progressPtr);
     D_STAT = 8;
     r1_func_00119460_2A558(3);
-    r = r1_func_0011D960();
+    intrState = r1_func_0011D960();
     {
         volatile unsigned int *madr = &D3_MADR;
         volatile unsigned int *qwc = &D3_QWC;
         volatile unsigned int *chcr = &D3_CHCR;
-        *madr = arg1 & 0x0FFFFFFF;
+        *madr = address & 0x0FFFFFFF;
         *qwc = 0xFFC0;
         *chcr = 0x100;
     }
-    if (r != 0) {
+    if (intrState != 0) {
         r1_func_0011D9A8();
     }
     IPU_CMD = 0x700003FF;
     event[0] = 4;
-    r1_func_0012BC78(*(void **)(p + 0x858), event);
-    while (rec.done < rec.total) {
+    r1_func_0012BC78(*(void **)(dec + 0x858), event);
+    while (progress.done < progress.total) {
     }
-    if (rec.err != 0) {
-        r1_func_0012C468_a(p, r1_D_00153AB0);
+    if (progress.err != 0) {
+        r1_func_0012C468_a(dec, r1_D_00153AB0);
     }
     while (((int)IPU_CTRL) < 0) {
     }
     r1_func_001193F8(3);
-    r1_func_00118AD0(3, h);
+    r1_func_00118AD0(3, handlerId);
 }
 
 ASM_FUNC("asm/core", func_0012E538);
@@ -116,17 +118,18 @@ ASM_FUNC("asm/core", func_0012E538);
    at arg2, reading from arg1, and resets it. The store order is
    load-bearing (LEVERS.md lever 3): arg1's +0x8 store has to come before
    its +0xC store, after the other fields in retail's order. */
-void func_0012E890(void *arg0, int arg1, int arg2, int arg3) {
-    char *p = (char *)arg0;
-    *(int *)(p + 0x28) = arg3;
-    *(int *)(p + 0x8) = arg1;
-    *(long *)(p + 0x0) = 0;
-    *(int *)(p + 0x10) = 0;
-    *(long *)(p + 0x18) = 0;
-    *(int *)(p + 0x20) = arg2;
-    *(int *)(p + 0x24) = arg2 + arg3;
-    *(int *)(p + 0xC) = arg1;
-    r1_func_0012AAC8(arg0, 0);
+/* Sets up a bit stream reader on a ring buffer and resets it. */
+void func_0012E890(void *stream, int startAddr, int bufferStart, int bufferSize) {
+    char *bs = (char *)stream;
+    *(int *)(bs + 0x28) = bufferSize;
+    *(int *)(bs + 0x8) = startAddr;
+    *(long *)(bs + 0x0) = 0;
+    *(int *)(bs + 0x10) = 0;
+    *(long *)(bs + 0x18) = 0;
+    *(int *)(bs + 0x20) = bufferStart;
+    *(int *)(bs + 0x24) = bufferStart + bufferSize;
+    *(int *)(bs + 0xC) = startAddr;
+    r1_func_0012AAC8(stream, 0);
 }
 
 extern void r1_func_001193F8(int);
@@ -142,65 +145,66 @@ extern void r1_func_0012A558(void *, unsigned int, int);
 extern void r1_func_0012A718();
 
 /* rac1-decomp src/core/0012A2F0.c: func_0012E608 */
-void func_0012E608(void *arg0, int *arg1) {
-    char *p = (char *)arg0;
-    int ev[8];
-    int loc[4];
-    int n, small, r, addr;
+/* Copies a decoded picture to the video chip with DMA, then converts its colors. */
+void func_0012E608(void *decoder, int *picture) {
+    char *dec = (char *)decoder;
+    int event[8];
+    int transfer[4];
+    int blockCount, isSmall, intrState, picAddr;
     unsigned int mask;
-    void *h;
+    void *handlerId;
 
-    ev[0] = 2;
-    n = arg1[3] * arg1[4];
-    r1_func_0012BC78_result(*(void **)(p + 0x858), ev);
+    event[0] = 2;
+    blockCount = picture[3] * picture[4];
+    r1_func_0012BC78_result(*(void **)(dec + 0x858), event);
     if ((IPU_CTRL & 0x4000) != 0) {
         IPU_CTRL = 0x40000000;
     }
-    small = n < 0x400;
+    isSmall = blockCount < 0x400;
     while (((int)IPU_CTRL) < 0) {
     }
-    r1_func_00128560(arg0, 0);
-    addr = arg1[0];
+    r1_func_00128560(decoder, 0);
+    picAddr = picture[0];
     while (((int)IPU_CTRL) < 0) {
     }
     mask = 0x0FFFFFFF;
-    loc[1] = addr & mask;
-    loc[0] = n * 0x18;
-    if ((unsigned int)loc[0] > 0xFFFF) {
-        h = r1_func_00118AC0(4, (void *)r1_func_0012A718, 0, &loc[0]);
+    transfer[1] = picAddr & mask;
+    transfer[0] = blockCount * 0x18;
+    if ((unsigned int)transfer[0] > 0xFFFF) {
+        handlerId = r1_func_00118AC0(4, (void *)r1_func_0012A718, 0, &transfer[0]);
         D_STAT = 0x10;
         r1_func_00119460(4);
-        r = r1_func_0011D960();
-        D4_MADR = loc[1];
+        intrState = r1_func_0011D960();
+        D4_MADR = transfer[1];
         D4_QWC = 0xFFFF;
         D4_CHCR = 0x101;
-        if (r != 0) {
+        if (intrState != 0) {
             r1_func_0011D9A8();
         }
-        loc[1] = (loc[1] + 0xFFFF0) & mask;
-        loc[0] = loc[0] - 0xFFFF;
-        if (small) {
-            r1_func_0012A2F0(arg0, *(int *)(p + 0xD8), n);
+        transfer[1] = (transfer[1] + 0xFFFF0) & mask;
+        transfer[0] = transfer[0] - 0xFFFF;
+        if (isSmall) {
+            r1_func_0012A2F0(decoder, *(int *)(dec + 0xD8), blockCount);
         } else {
-            r1_func_0012A558(arg0, *(int *)(p + 0xD8), n);
+            r1_func_0012A558(decoder, *(int *)(dec + 0xD8), blockCount);
         }
         r1_func_001193F8(4);
-        r1_func_00118AD0(4, (int)h);
+        r1_func_00118AD0(4, (int)handlerId);
     } else {
-        r = r1_func_0011D960();
-        D4_MADR = arg1[0] & mask;
-        D4_QWC = loc[0];
+        intrState = r1_func_0011D960();
+        D4_MADR = picture[0] & mask;
+        D4_QWC = transfer[0];
         D4_CHCR = 0x101;
-        if (r != 0) {
+        if (intrState != 0) {
             r1_func_0011D9A8();
         }
-        loc[0] = 0;
-        if (small) {
-            r1_func_0012A2F0(arg0, *(int *)(p + 0xD8), n);
+        transfer[0] = 0;
+        if (isSmall) {
+            r1_func_0012A2F0(decoder, *(int *)(dec + 0xD8), blockCount);
         } else {
-            r1_func_0012A558(arg0, *(int *)(p + 0xD8), n);
+            r1_func_0012A558(decoder, *(int *)(dec + 0xD8), blockCount);
         }
     }
-    ev[0] = 3;
-    r1_func_0012BC78_result(*(void **)(p + 0x858), ev);
+    event[0] = 3;
+    r1_func_0012BC78_result(*(void **)(dec + 0x858), event);
 }

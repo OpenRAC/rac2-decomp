@@ -1,7 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int ref_L00_0030CDA0_00;
 
+/* Sets a stored level choice to -1, meaning nothing is selected. */
 void func_0029BCC8(void)
 {
     ref_L00_0030CDA0_00 = -1;
@@ -12,9 +14,10 @@ void func_0029BCC8(void)
 extern char *D_001A8CFC;
 extern void func_0034E4D8(void *);
 
+/* Draws the first on-screen menu panel, if the menu system exists. */
 void func_0029BE88(void) {
     if (D_001A8CFC != 0)
-        func_0034E4D8(D_001A8CFC + 0x36F28);
+        UpdateHudSubobjectAlt(D_001A8CFC + 0x36F28);
 }
 
 extern int D_001A9A50 __attribute__((sda));
@@ -22,396 +25,450 @@ extern int D_001A9A54 __attribute__((sda));
 extern int D_001A8C64;
 extern void func_0033A6D8(void *);
 
+/* Draws a menu panel, but only when the menu system exists and the game is in the right state. */
 void func_0029BEB8(void) {
-    if (D_001A9A50 != 0 && D_001A8C64 == 0 && D_001A9A54 != 0 && D_001A8CFC != 0)
-        func_0033A6D8(D_001A8CFC + 0x3F138);
+    if (D_001A9A50 != 0 && gNoticeOwner == 0 && D_001A9A54 != 0 && D_001A8CFC != 0)
+        DrawCircleMenu(D_001A8CFC + 0x3F138);
 }
 
 /* func_0029BF08 is in 0029BCC8-g8.c. */
 
+/* Does nothing. */
 void func_0029C0D0(void) {
 }
 
 extern void func_0034E478(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C0D8(void) {
     if (D_001A8CFC != 0)
-        func_0034E478(D_001A8CFC + 0x36F28);
+        UpdateHudSubsystems(D_001A8CFC + 0x36F28);
 }
 
 extern void func_0034E4F8(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C108(void) {
     if (D_001A8CFC != 0)
-        func_0034E4F8(D_001A8CFC + 0x36F28);
+        DrawItemBoltHud(D_001A8CFC + 0x36F28);
 }
 
 extern void func_00348EC0(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C138(void) {
     if (D_001A8CFC != 0)
-        func_00348EC0(D_001A8CFC + 0x39140);
+        DrawListMenuRows_00348EC0(D_001A8CFC + 0x39140);
 }
 
 extern int func_003489E8(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C168(int value) {
     if (D_001A8CFC != 0)
-        return func_003489E8(D_001A8CFC + 0x39140, value);
+        return UpdateMenuChoiceListWidgets(D_001A8CFC + 0x39140, value);
     return 0;
 }
 
 extern void func_003478F0(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C1A8(void) {
     if (D_001A8CFC != 0)
-        func_003478F0(D_001A8CFC + 0x39590);
+        DrawItemGridMenu(D_001A8CFC + 0x39590);
 }
 
 extern void func_003465D0(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C1D8(void) {
     if (D_001A8CFC != 0)
-        func_003465D0(D_001A8CFC + 0x39A98);
+        DrawLargeMenuScreenParts(D_001A8CFC + 0x39A98);
 }
 
 extern int func_00346C60(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C208(int value) {
     if (D_001A8CFC != 0)
-        return func_00346C60(D_001A8CFC + 0x39590, value);
+        return UpdateItemGridMenu(D_001A8CFC + 0x39590, value);
     return 0;
 }
 
 extern int func_00345F70(void *, int, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C248(int first, int second)
 {
     if (D_001A8CFC != 0)
-        return func_00345F70(D_001A8CFC + 0x39A98, first, second);
+        return UpdateSelectionMenuLayout(D_001A8CFC + 0x39A98, first, second);
     return 0;
 }
 
 extern int func_00339320(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C290(int value) {
     if (D_001A8CFC != 0)
-        return func_00339320(D_001A8CFC + 0x3B1F0, value);
+        return PlaceMissionScreenPartsAndUpdateStats(D_001A8CFC + 0x3B1F0, value);
     return 0;
 }
 
 extern void func_00339590(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C2D0(void) {
     if (D_001A8CFC != 0)
-        func_00339590(D_001A8CFC + 0x3B1F0);
+        DrawMissionScreenParts(D_001A8CFC + 0x3B1F0);
 }
 
 extern int func_00339F28(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C300(int value) {
     if (D_001A8CFC != 0)
-        return func_00339F28(D_001A8CFC + 0x3ADE8, value);
+        return LayoutListScreen(D_001A8CFC + 0x3ADE8, value);
     return 0;
 }
 
 extern void func_0033A3E0(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C340(void) {
     if (D_001A8CFC != 0)
-        func_0033A3E0(D_001A8CFC + 0x3ADE8);
+        DrawListScreen(D_001A8CFC + 0x3ADE8);
 }
 
 extern void func_0033B910(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C370(void) {
     if (D_001A8CFC != 0)
-        func_0033B910(D_001A8CFC + 0x3B490);
+        DrawMapScreen_0033B910(D_001A8CFC + 0x3B490);
 }
 
 extern int func_0033B540(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C3A0(int value) {
     if (D_001A8CFC != 0)
-        return func_0033B540(D_001A8CFC + 0x3B490, value);
+        return UpdateMapScreenLayout(D_001A8CFC + 0x3B490, value);
     return 0;
 }
 
 extern void func_0033F030(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C3E0(void) {
     if (D_001A8CFC != 0)
-        func_0033F030(D_001A8CFC + 0x3B7C0);
+        DestroyRadialMenuParts(D_001A8CFC + 0x3B7C0);
 }
 
 extern int func_0033EA60(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C410(int value) {
     if (D_001A8CFC != 0)
-        return func_0033EA60(D_001A8CFC + 0x3B7C0, value);
+        return UpdateInfoPanelMenu(D_001A8CFC + 0x3B7C0, value);
     return 0;
 }
 
 extern void func_00345358(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C450(void) {
     if (D_001A8CFC != 0)
-        func_00345358(D_001A8CFC + 0x39F38);
+        DrawMenuScreenParts(D_001A8CFC + 0x39F38);
 }
 
 extern int func_00344478(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C480(int value) {
     if (D_001A8CFC != 0)
-        return func_00344478(D_001A8CFC + 0x39F38, value);
+        return UpdateGridMenu(D_001A8CFC + 0x39F38, value);
     return 0;
 }
 
 extern void func_00341C20(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C4C0(void) {
     if (D_001A8CFC != 0)
-        func_00341C20(D_001A8CFC + 0x3BE08);
+        DrawTabbedMenu(D_001A8CFC + 0x3BE08);
 }
 
 extern int func_003418C0(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C4F0(int value) {
     if (D_001A8CFC != 0)
-        return func_003418C0(D_001A8CFC + 0x3BE08, value);
+        return UpdateTabbedMenu(D_001A8CFC + 0x3BE08, value);
     return 0;
 }
 
+/* Same as the other 3BE08 panel draw: draws the menu panel if the menu system exists. */
 void func_0029C530(void) {
     if (D_001A8CFC != 0)
-        func_00341C20(D_001A8CFC + 0x3BE08);
+        DrawTabbedMenu(D_001A8CFC + 0x3BE08);
 }
 
+/* Same as the other 3BE08 panel update: updates the menu panel and returns its answer. */
 int func_0029C560(int value) {
     if (D_001A8CFC != 0)
-        return func_003418C0(D_001A8CFC + 0x3BE08, value);
+        return UpdateTabbedMenu(D_001A8CFC + 0x3BE08, value);
     return 0;
 }
 
 extern void func_003438E8(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C5A0(void) {
     if (D_001A8CFC != 0)
-        func_003438E8(D_001A8CFC + 0x3C108);
+        DrawItemSelectMenu(D_001A8CFC + 0x3C108);
 }
 
 extern int func_00343798(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C5D0(int value) {
     if (D_001A8CFC != 0)
-        return func_00343798(D_001A8CFC + 0x3C108, value);
+        return UpdateItemSelectMenu(D_001A8CFC + 0x3C108, value);
     return 0;
 }
 
 extern void func_0033E620(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C610(void) {
     if (D_001A8CFC != 0)
-        func_0033E620(D_001A8CFC + 0x3C440);
+        DrawMenuFrame(D_001A8CFC + 0x3C440);
 }
 
 extern int func_0033E5C0(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C640(int value) {
     if (D_001A8CFC != 0)
-        return func_0033E5C0(D_001A8CFC + 0x3C440, value);
+        return UpdateSimpleMenuPage(D_001A8CFC + 0x3C440, value);
     return 0;
 }
 
 extern void func_0033D970(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C680(void) {
     if (D_001A8CFC != 0)
-        func_0033D970(D_001A8CFC + 0x3CDB0);
+        DrawTwoToggleOptionMenuB(D_001A8CFC + 0x3CDB0);
 }
 
 extern int func_0033D868(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C6B0(int value) {
     if (D_001A8CFC != 0)
-        return func_0033D868(D_001A8CFC + 0x3CDB0, value);
+        return UpdateTwoToggleOptionMenuB(D_001A8CFC + 0x3CDB0, value);
     return 0;
 }
 
 extern int func_0033C590(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C6F0(int value) {
     if (D_001A8CFC != 0)
-        return func_0033C590(D_001A8CFC + 0x3D060, value);
+        return UpdateFourOptionMenuInput(D_001A8CFC + 0x3D060, value);
     return 0;
 }
 
 extern void func_0033C738(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C730(void) {
     if (D_001A8CFC != 0)
-        func_0033C738(D_001A8CFC + 0x3D060);
+        DrawFourOptionMenu(D_001A8CFC + 0x3D060);
 }
 
 extern int func_0033CB18(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C760(int value) {
     if (D_001A8CFC != 0)
-        return func_0033CB18(D_001A8CFC + 0x3D310, value);
+        return UpdateTwoToggleOptionMenuA(D_001A8CFC + 0x3D310, value);
     return 0;
 }
 
 extern void func_0033CC20(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C7A0(void) {
     if (D_001A8CFC != 0)
-        func_0033CC20(D_001A8CFC + 0x3D310);
+        DrawTwoToggleOptionMenuA(D_001A8CFC + 0x3D310);
 }
 
 extern int func_0033D5A0(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C7D0(int value) {
     if (D_001A8CFC != 0)
-        return func_0033D5A0(D_001A8CFC + 0x3D900, value);
+        return UpdateSingleToggleOptionMenuA(D_001A8CFC + 0x3D900, value);
     return 0;
 }
 
 extern void func_0033D638(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C810(void) {
     if (D_001A8CFC != 0)
-        func_0033D638(D_001A8CFC + 0x3D900);
+        DrawSingleToggleOptionMenuA(D_001A8CFC + 0x3D900);
 }
 
 extern int func_0033BE98(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C840(int value) {
     if (D_001A8CFC != 0)
-        return func_0033BE98(D_001A8CFC + 0x3DBB0, value);
+        return UpdateScreenAdjustMenu(D_001A8CFC + 0x3DBB0, value);
     return 0;
 }
 
 extern void func_0033C028(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C880(void) {
     if (D_001A8CFC != 0)
-        func_0033C028(D_001A8CFC + 0x3DBB0);
+        DrawOnOffOptionWithHelp(D_001A8CFC + 0x3DBB0);
 }
 
 extern int func_0033C2D8(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C8B0(int value) {
     if (D_001A8CFC != 0)
-        return func_0033C2D8(D_001A8CFC + 0x3DE60, value);
+        return UpdateOnOffOptionMenu(D_001A8CFC + 0x3DE60, value);
     return 0;
 }
 
 extern void func_0033C378(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C8F0(void) {
     if (D_001A8CFC != 0)
-        func_0033C378(D_001A8CFC + 0x3DE60);
+        DrawOnOffOptionMenu(D_001A8CFC + 0x3DE60);
 }
 
 extern int func_0033E3A0(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C920(int value) {
     if (D_001A8CFC != 0)
-        return func_0033E3A0(D_001A8CFC + 0x3EDB8, value);
+        return UpdateListMenuPage(D_001A8CFC + 0x3EDB8, value);
     return 0;
 }
 
 extern void func_0033E428(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C960(void) {
     if (D_001A8CFC != 0)
-        func_0033E428(D_001A8CFC + 0x3EDB8);
+        DrawListMenuPage(D_001A8CFC + 0x3EDB8);
 }
 
 extern int func_0033D028(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029C990(int value) {
     if (D_001A8CFC != 0)
-        return func_0033D028(D_001A8CFC + 0x3D5C0, value);
+        return UpdateAudioOptionsMenu(D_001A8CFC + 0x3D5C0, value);
     return 0;
 }
 
 extern void func_0033D2C0(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029C9D0(void) {
     if (D_001A8CFC != 0)
-        func_0033D2C0(D_001A8CFC + 0x3D5C0);
+        DrawAudioOptionsMenu(D_001A8CFC + 0x3D5C0);
 }
 
 extern int func_0033DC30(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029CA00(int value) {
     if (D_001A8CFC != 0)
-        return func_0033DC30(D_001A8CFC + 0x3E5A8, value);
+        return UpdateSingleToggleOptionMenuC(D_001A8CFC + 0x3E5A8, value);
     return 0;
 }
 
 extern void func_0033DCC8(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029CA40(void) {
     if (D_001A8CFC != 0)
-        func_0033DCC8(D_001A8CFC + 0x3E5A8);
+        DrawSingleToggleOptionMenuC(D_001A8CFC + 0x3E5A8);
 }
 
 extern int func_003424C0(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029CA70(int value) {
     if (D_001A8CFC != 0)
-        return func_003424C0(D_001A8CFC + 0x3E1D8, value);
+        return UpdateListMenu(D_001A8CFC + 0x3E1D8, value);
     return 0;
 }
 
 extern void func_00342758(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029CAB0(void) {
     if (D_001A8CFC != 0)
-        func_00342758(D_001A8CFC + 0x3E1D8);
+        DrawMenuIfActive(D_001A8CFC + 0x3E1D8);
 }
 
 extern int func_00341EE8(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029CAE0(int value) {
     if (D_001A8CFC != 0)
-        return func_00341EE8(D_001A8CFC + 0x3E430, value);
+        return SetListMenuSelection(D_001A8CFC + 0x3E430, value);
     return 0;
 }
 
 extern void func_00341F38(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029CB20(void) {
     if (D_001A8CFC != 0)
-        func_00341F38(D_001A8CFC + 0x3E430);
+        DrawListMenuRows_00341F38(D_001A8CFC + 0x3E430);
 }
 
 
 extern void func_0028A2F8(void);
 
+/* Updates the bolt counter, if the menu system exists. */
 void func_0029CB58(void) {
     if (D_001A8CFC != 0)
-        func_0028A2F8();
+        UpdateBoltCounter();
 }
 
 extern void func_0028A670(void);
 
+/* Draws the bolt gain and loss numbers, if the menu system exists. */
 void func_0029CB80(void) {
     if (D_001A8CFC != 0)
-        func_0028A670();
+        DrawBoltCounterDeltas();
 }
 
 extern void func_0034CE98(void *, int);
 
+/* Gives a value to a menu panel, if the menu system exists. */
 void func_0029CBA8(int value) {
     if (D_001A8CFC != 0)
-        func_0034CE98(D_001A8CFC + 0x376C8, value);
+        SetScreenField0x2BC(D_001A8CFC + 0x376C8, value);
 }
 
 extern int func_0033FB98(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029CBE0(int value) {
     if (D_001A8CFC != 0)
         return func_0033FB98(D_001A8CFC + 0x3A388, value);
@@ -420,49 +477,56 @@ int func_0029CBE0(int value) {
 
 extern void func_00340250(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029CC20(void) {
     if (D_001A8CFC != 0)
-        func_00340250(D_001A8CFC + 0x3A388);
+        DrawRadialMenu(D_001A8CFC + 0x3A388);
 }
 
 extern void func_00338718(void *, int, int, int);
-void func_0029CC50(int a0, int a1, int a2) { if (D_001A8CFC != 0) func_00338718(D_001A8CFC + 0x36F28, a0, a1, a2); }
+/* Passes three values to the first menu panel, if the menu system exists. */
+void func_0029CC50(int first, int second, int third) { if (D_001A8CFC != 0) InitLocalizedMessageBox(D_001A8CFC + 0x36F28, first, second, third); }
 
 extern void func_003387A0(void *, int, int);
 
+/* Passes two values to the first menu panel, if the menu system exists. */
 void func_0029CC98(int first, int second) {
     if (D_001A8CFC != 0)
-        func_003387A0(D_001A8CFC + 0x36F28, first, second);
+        InitShortMessageBox(D_001A8CFC + 0x36F28, first, second);
 }
 
 extern void func_00338040(void *, int, int);
 
+/* Passes two other values to the first menu panel, if the menu system exists. */
 void func_0029CCD8(int first, int second) {
     if (D_001A8CFC != 0)
-        func_00338040(D_001A8CFC + 0x36F28, first, second);
+        InitLongMessageBox(D_001A8CFC + 0x36F28, first, second);
 }
 
+/* Does nothing. */
 void func_0029CD18(void) {
 }
 
 extern int D_001A7B90[] __attribute__((sda));
 extern void func_00335DC0(int);
 
+/* Tells the menu code whether a stored game flag is set. */
 void func_0029CD20(void) {
-    func_00335DC0(D_001A7B90[0] != 0);
+    SetScaleModeValues(gIsPalVideo[0] != 0);
 }
 
 /* func_0029CD48 is in 0029CD48.c. */
 
+/* If the menu system exists and the game is not paused, turns something on and runs a follow-up setup step. */
 void func_0029CE38(void)
 {
     extern int D_001A8C64;
     extern void func_0028E138(int);
     extern void func_0029BCD8(void);
     if (D_001A8CFC != 0) {
-        if (D_001A8C64 == 0) {
-            func_0028E138(1);
-            func_0029BCD8();
+        if (gNoticeOwner == 0) {
+            UpdateHudRecordTimers(1);
+            RunLevelCallbacks();
         }
     }
 }
@@ -472,16 +536,18 @@ void func_0029CE38(void)
 
 extern void func_003399B0(void *);
 
+/* Draws a menu panel, if the menu system exists. */
 void func_0029CED8(void) {
     if (D_001A8CFC != 0)
-        func_003399B0(D_001A8CFC + 0x3CAA8);
+        DrawMenuWithButtonPrompts(D_001A8CFC + 0x3CAA8);
 }
 
 extern int func_003398A8(void *, int);
 
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
 int func_0029CF08(int value) {
     if (D_001A8CFC != 0)
-        return func_003398A8(D_001A8CFC + 0x3CAA8, value);
+        return UpdatePopupPosition(D_001A8CFC + 0x3CAA8, value);
     return 0;
 }
 
@@ -530,20 +596,21 @@ extern ProgressBand D_00139A28[];
    already has at D_0026CA90 (twelve entries, one per condition) and jumps through it;
    `cases` only keeps the labels alive. The bodies are laid out in the retail's order,
    which puts the ninth condition's bit test before the eighth one's table lookup. */
+/* Checks one kind of progress condition (a flag, a counter, a bit, or a callback) and returns whether it is true. */
 int func_0029D9D0(short kind, int arg)
 {
     static void *cases[12] = {&&L0, &&L1, &&L2, &&L3, &&L4, &&L5, &&L6, &&L7, &&L9, &&L8, &&L10, &&L11};
-    int k = kind;
+    int kindIndex = kind;
 
-    if ((unsigned)k >= 12)
+    if ((unsigned)kindIndex >= 12)
         goto L11;
-    goto *D_0026CA90[k];
+    goto *D_0026CA90[kindIndex];
 L0:
     return 1;
 L1:
     return D_001A7BC8[arg] != 0;
 L2:
-    return D_001A7AF8[arg] != 0;
+    return gItemOwnedFlags[arg] != 0;
 L3:
     return D_001A7B30[arg] != 0;
 L4:
@@ -565,7 +632,7 @@ L9: {
 L8:
     return D_0019B278[(arg & 0xFFFF) + (arg >> 16) * 4] != 0;
 L10:
-    return func_002FC010(D_001C51D0[0], arg);
+    return TestSaveFlagBit(D_001C51D0[0], arg);
 L11:
     return 0;
 }
@@ -577,6 +644,7 @@ L11:
 extern int D_001397C4[];
 extern unsigned char D_001395D5[];
 
+/* Returns 1 when a progress counter is negative and its flag is set, otherwise 0. */
 int func_0029DCD0(void) {
     if (D_001397C4[0] < 0) {
         if (D_001395D5[0] != 0)

@@ -74,16 +74,16 @@ typedef struct GroundView {
     float footHeight[2];
     float footYaw[2];
     float footPitch[2];
-    float field_318;
-    float field_31c;
-    float field_320;
+    float groundHeight; /* 0x318 */
+    float groundDistance; /* 0x31C */
+    float slopeAngle; /* 0x320 */
     float field_324;
     float field_328;
-    float field_32c;
+    float slopeDirection; /* 0x32C */
     float field_330;
     float field_334;
     int field_338;
-    int field_33c;
+    int groundObject; /* 0x33C */
     int field_340;
     unsigned char pad344[6];
     short field_34a;
@@ -109,6 +109,7 @@ typedef struct GroundView {
 } GroundView;
 extern GroundView D_00189E20;
 
+/* Checks the ground under the hero each frame: finds the floor height and slope, and works out how his feet should tilt. */
 void func_L07_002B3580(void)
 {
     float end[4];
@@ -120,170 +121,170 @@ void func_L07_002B3580(void)
     float normal[4];
     float reach, scale;
     int side;
-    ++D_00189E20.field_34e;
-    D_00189E20.vector_2a0.field_2a8 = 1.0f;
-    ++D_00189E20.field_34c;
-    D_00189E20.vector_2a0.field_2a0 = 0;
-    D_00189E20.vector_2a0.field_2a4 = 0;
-    D_00189E20.field_320 = 0.0f;
-    D_00189E20.field_318 = 0.0f;
-    func_00282C88((GroundQuad *)(&D_00189E20.vector_2d0));
-    D_00189E20.field_34a = 0;
-    D_00189E20.field_31c = 32.0f;
-    D_00189E20.field_33c = 0;
+    ++gHeroState.field_34e;
+    gHeroState.vector_2a0.field_2a8 = 1.0f;
+    ++gHeroState.field_34c;
+    gHeroState.vector_2a0.field_2a0 = 0;
+    gHeroState.vector_2a0.field_2a4 = 0;
+    gHeroState.slopeAngle = 0.0f;
+    gHeroState.groundHeight = 0.0f;
+    ClearVector128((GroundQuad *)(&gHeroState.vector_2d0));
+    gHeroState.field_34a = 0;
+    gHeroState.groundDistance = 32.0f;
+    gHeroState.groundObject = 0;
     scale = 2.2f;
-    if (D_00189E20.field_338)
-        ++D_00189E20.field_338;
-    reach = D_00189E20.field_264 * scale;
-    if (D_00189E20.field_229c == 2)
-        reach = D_00189E20.field_264 * 2.9f;
-    if (func_L00_002ADF80())
+    if (gHeroState.field_338)
+        ++gHeroState.field_338;
+    reach = gHeroState.field_264 * scale;
+    if (gHeroState.field_229c == 2)
+        reach = gHeroState.field_264 * 2.9f;
+    if (IsHeroInSpecialKindOrMode())
         reach = 0.0f;
-    func_L00_002B47A8(start, end, 1, reach, -48.0f);
-    if (func_002761F8(start, end, 2, D_00189E20.field_2290, 0)) {
-        D_00189E20.field_149d = func_L00_002E2048();
+    BuildOffsetVectorPair(start, end, 1, reach, -48.0f);
+    if (CollLine(start, end, 2, gHeroState.field_2290, 0)) {
+        gHeroState.field_149d = func_L00_002E2048();
         if (D_L07_001BF640.object)
-            D_00189E20.field_149d = 0;
-        if (D_001A79F0 == 7 && D_L07_001BF640.object)
-            D_00189E20.field_149d = 1;
-        D_00189E20.field_1490 = func_00278E78();
-        if (!D_00189E20.field_1490) {
-            D_00189E20.field_330 = func_002A90F8(D_L07_001BF640.position, &D_00189E20.vector_2b0);
-            if (D_00189E20.vector_80.field_88 < D_00189E20.field_330 && D_00189E20.field_338 < 1)
-                D_00189E20.field_338 = 1;
-            if (!func_002761F8(start, end, 0x24, D_00189E20.field_2290, 0))
+            gHeroState.field_149d = 0;
+        if (gCurrentMapIndex == 7 && D_L07_001BF640.object)
+            gHeroState.field_149d = 1;
+        gHeroState.field_1490 = GetCollHitMaterial();
+        if (!gHeroState.field_1490) {
+            gHeroState.field_330 = GetGroundHeightAtPosition(D_L07_001BF640.position, &gHeroState.vector_2b0);
+            if (gHeroState.vector_80.field_88 < gHeroState.field_330 && gHeroState.field_338 < 1)
+                gHeroState.field_338 = 1;
+            if (!CollLine(start, end, 0x24, gHeroState.field_2290, 0))
                 goto contacts_done;
-            D_00189E20.field_149d = func_L00_002E2048();
+            gHeroState.field_149d = func_L00_002E2048();
         }
-        if (D_00189E20.field_1490 == 13) {
+        if (gHeroState.field_1490 == 13) {
             start[2] = D_L07_001BF640.position[2] - 0.01f;
-            D_00189E20.field_330 = D_L07_001BF640.position[2];
-            if (!func_002761F8(start, end, 4, D_00189E20.field_2290, 0))
+            gHeroState.field_330 = D_L07_001BF640.position[2];
+            if (!CollLine(start, end, 4, gHeroState.field_2290, 0))
                 goto contacts_done;
         }
-        if (D_00189E20.field_1490 == 3) {
+        if (gHeroState.field_1490 == 3) {
             start[2] = D_L07_001BF640.position[2] - 0.01f;
-            D_00189E20.field_334 = D_L07_001BF640.position[2];
-            if (!func_002761F8(start, end, 4, D_00189E20.field_2290, 0))
+            gHeroState.field_334 = D_L07_001BF640.position[2];
+            if (!CollLine(start, end, 4, gHeroState.field_2290, 0))
                 goto contacts_done;
         }
-        if (D_00189E20.field_1490 == 11) {
-            D_00189E20.field_334 = D_L07_001BF640.position[2];
+        if (gHeroState.field_1490 == 11) {
+            gHeroState.field_334 = D_L07_001BF640.position[2];
         } else {
             if (D_L07_001BF640.object) {
                 unsigned char *record;
-                if (func_002ABB78((char *)D_L07_001BF640.object))
-                    D_00189E20.field_34a = 1;
-                record = (unsigned char *)func_002AB1F0(D_L07_001BF640.object);
+                if (IsMobyInSpecialClassRange((char *)D_L07_001BF640.object))
+                    gHeroState.field_34a = 1;
+                record = (unsigned char *)GetMobyPrivateValue0(D_L07_001BF640.object);
                 if (record && (*(unsigned short *)(record + 0x1e) & 8))
-                    D_00189E20.field_34a = 1;
-                record = (unsigned char *)func_002AD0B0(D_L07_001BF640.object);
+                    gHeroState.field_34a = 1;
+                record = (unsigned char *)GetMobyPrivateValue2(D_L07_001BF640.object);
                 if (record && (*(unsigned int *)(record + 0x3c) & 8))
-                    D_00189E20.field_34a = 1;
+                    gHeroState.field_34a = 1;
             }
             if (D_L07_001BF640.count > 0) {
-                qcopy(&D_00189E20.vector_2d0, D_L07_001BF640.position);
-                D_00189E20.field_318 = D_L07_001BF640.position[2];
+                qcopy(&gHeroState.vector_2d0, D_L07_001BF640.position);
+                gHeroState.groundHeight = D_L07_001BF640.position[2];
                 if (D_L07_001A8FF0)
-                    D_00189E20.field_318 = func_002B0360((char *)D_L07_001BF640.position);
-                D_00189E20.field_31c = func_00282E48(&D_00189E20.vector_80, &D_00189E20.vector_2d0);
-                D_00189E20.field_33c = (int)D_L07_001BF640.object;
-                func_001290E0(&D_00189E20.vector_2a0, D_L07_001BF640.normal);
-                D_00189E20.field_320 = func_L00_002D3EA8(D_L07_001BF640.normal);
-                D_00189E20.field_32c = func_00283248(D_L07_001BF640.normal[0], D_L07_001BF640.normal[1]);
-                func_00282CF0(difference, &D_00189E20.vector_2d0, &D_00189E20.vector_80);
-                if (func_00282DB0(difference, &D_00189E20.vector_2a0) > 0.0f)
-                    D_00189E20.field_31c = -D_00189E20.field_31c;
-                if (D_00189E20.field_31c < 0.02f) {
-                    D_00189E20.field_34c = 0;
-                    if (D_00189E20.field_320 <= 0.8726646900177002f || D_00189E20.field_22c3) {
-                        D_00189E20.field_34e = 0;
-                        D_00189E20.field_c10 = (int)D_L07_001BF640.object;
+                    gHeroState.groundHeight = GetDistanceFromGravityCenter((char *)D_L07_001BF640.position);
+                gHeroState.groundDistance = fast_vec_dist(&gHeroState.vector_80, &gHeroState.vector_2d0);
+                gHeroState.groundObject = (int)D_L07_001BF640.object;
+                func_001290E0(&gHeroState.vector_2a0, D_L07_001BF640.normal);
+                gHeroState.slopeAngle = GetViewSpaceAngle(D_L07_001BF640.normal);
+                gHeroState.slopeDirection = FastMatrixHelperA(D_L07_001BF640.normal[0], D_L07_001BF640.normal[1]);
+                FastVecSub(difference, &gHeroState.vector_2d0, &gHeroState.vector_80);
+                if (FastVecDot(difference, &gHeroState.vector_2a0) > 0.0f)
+                    gHeroState.groundDistance = -gHeroState.groundDistance;
+                if (gHeroState.groundDistance < 0.02f) {
+                    gHeroState.field_34c = 0;
+                    if (gHeroState.slopeAngle <= 0.8726646900177002f || gHeroState.field_22c3) {
+                        gHeroState.field_34e = 0;
+                        gHeroState.field_c10 = (int)D_L07_001BF640.object;
                     }
                 }
             }
         }
     }
 contacts_done:
-    if (D_00189E20.vector_80.field_88 > D_00189E20.field_330)
-        D_00189E20.field_338 = 0;
-    if (D_00189E20.field_34e) {
-        D_00189E20.field_340 = 0;
+    if (gHeroState.vector_80.field_88 > gHeroState.field_330)
+        gHeroState.field_338 = 0;
+    if (gHeroState.field_34e) {
+        gHeroState.field_340 = 0;
     } else {
-        ++D_00189E20.field_340;
-        qcopy(&D_00189E20.vector_2e0, &D_00189E20.vector_2d0);
-        if (D_00189E20.field_2294 != 56)
-            D_00189E20.field_18c0 = 0;
+        ++gHeroState.field_340;
+        qcopy(&gHeroState.vector_2e0, &gHeroState.vector_2d0);
+        if (gHeroState.field_2294 != 56)
+            gHeroState.field_18c0 = 0;
     }
-    func_00282C88((GroundQuad *)(&D_00189E20.vector_2c0));
-    switch (D_00189E20.field_22c3) {
+    ClearVector128((GroundQuad *)(&gHeroState.vector_2c0));
+    switch (gHeroState.field_22c3) {
     case 0:
-        D_00189E20.vector_2c0.field_2c8 = -1.0f;
+        gHeroState.vector_2c0.field_2c8 = -1.0f;
         break;
     case 1:
         if (D_L07_001A8FF4) {
-            func_002AFF60((char *)&D_00189E20.vector_80, (char *)&D_00189E20.vector_2c0, 0);
+            ComputeFlatDirectionFromPoint((char *)&gHeroState.vector_80, (char *)&gHeroState.vector_2c0, 0);
         } else {
-            if (D_00189E20.vector_2f0.field_2fc != 0.0f) {
-                func_002AA2E8(&D_00189E20.vector_2f0.field_2fc, 0.0f, 1.0f);
-                qcopy(&D_00189E20.vector_2c0, &D_00189E20.vector_2f0);
+            if (gHeroState.vector_2f0.field_2fc != 0.0f) {
+                ApproachValue(&gHeroState.vector_2f0.field_2fc, 0.0f, 1.0f);
+                qcopy(&gHeroState.vector_2c0, &gHeroState.vector_2f0);
             } else {
-                qcopy(&D_00189E20.vector_2c0, &D_00189E20.vector_2a0);
-                func_00282D30(&D_00189E20.vector_2c0, &D_00189E20.vector_2c0, -1.0f);
+                qcopy(&gHeroState.vector_2c0, &gHeroState.vector_2a0);
+                FastVecScale(&gHeroState.vector_2c0, &gHeroState.vector_2c0, -1.0f);
             }
         }
         break;
     case 2:
         {
             float sign = -1.0f;
-            if (D_00189E20.vector_b0.field_bc > 0.0f)
+            if (gHeroState.vector_b0.field_bc > 0.0f)
                 sign = 1.0f;
-            func_00282CF0(&D_00189E20.vector_2c0, &D_00189E20.vector_b0, &D_00189E20.vector_80);
-            func_00282F20(&D_00189E20.vector_2c0, &D_00189E20.vector_2c0, sign);
+            FastVecSub(&gHeroState.vector_2c0, &gHeroState.vector_b0, &gHeroState.vector_80);
+            vec_scale_to_length(&gHeroState.vector_2c0, &gHeroState.vector_2c0, sign);
         }
         break;
     }
-    D_00189E20.field_324 = 0.0f;
-    D_00189E20.field_328 = 0.0f;
-    D_00189E20.footPitch[0] = 0;
-    D_00189E20.footPitch[1] = 0;
-    D_00189E20.footYaw[0] = 0;
-    D_00189E20.footYaw[1] = 0;
-    D_00189E20.footHeight[0] = 0;
-    D_00189E20.footHeight[1] = 0;
-    if (D_00189E20.field_31c < 0.25f &&
-        (D_00189E20.field_229c == 0 || D_00189E20.field_229c == 12 || D_00189E20.field_229c == 9 || D_00189E20.field_229c == 7 ||
-         (D_00189E20.field_229c == 4 && D_00189E20.field_49c) || D_00189E20.field_229c == 1)) {
-        func_L00_002B8E48(&D_00189E20.vector_2a0, difference);
+    gHeroState.field_324 = 0.0f;
+    gHeroState.field_328 = 0.0f;
+    gHeroState.footPitch[0] = 0;
+    gHeroState.footPitch[1] = 0;
+    gHeroState.footYaw[0] = 0;
+    gHeroState.footYaw[1] = 0;
+    gHeroState.footHeight[0] = 0;
+    gHeroState.footHeight[1] = 0;
+    if (gHeroState.groundDistance < 0.25f &&
+        (gHeroState.field_229c == 0 || gHeroState.field_229c == 12 || gHeroState.field_229c == 9 || gHeroState.field_229c == 7 ||
+         (gHeroState.field_229c == 4 && gHeroState.field_49c) || gHeroState.field_229c == 1)) {
+        ComputeAnglesToHeroLocalDirection(&gHeroState.vector_2a0, difference);
         if (difference[1] > -0.7853982448577881f && difference[1] < 0.7853982448577881f)
-            D_00189E20.field_324 = difference[1];
+            gHeroState.field_324 = difference[1];
         if (difference[0] > -0.7853982448577881f && difference[0] < 0.7853982448577881f)
-            D_00189E20.field_328 = difference[0];
+            gHeroState.field_328 = difference[0];
         for (side = 0; side < 2; ++side) {
             float angle = 1.5707964897155762f;
             if (side == 1)
                 angle = -angle;
-            func_L00_002D3638(left, 0.2f, angle, 1, 0.44999998807907104f);
-            func_L00_002D3638(right, 0.2f, angle, 1, -0.44999998807907104f);
-            if (func_002761F8(left, right, 0x22, D_00189E20.field_2290, 0)) {
+            BuildHeroRelativeOffset(left, 0.2f, angle, 1, 0.44999998807907104f);
+            BuildHeroRelativeOffset(right, 0.2f, angle, 1, -0.44999998807907104f);
+            if (CollLine(left, right, 0x22, gHeroState.field_2290, 0)) {
                 if (D_L07_001A8FF0) {
-                    float firstHeight = func_002B0360((char *)D_L07_001BF640.position);
-                    D_00189E20.footHeight[side] = firstHeight - func_002B0360((char *)&D_00189E20.vector_2d0);
+                    float firstHeight = GetDistanceFromGravityCenter((char *)D_L07_001BF640.position);
+                    gHeroState.footHeight[side] = firstHeight - GetDistanceFromGravityCenter((char *)&gHeroState.vector_2d0);
                 } else {
-                    D_00189E20.footHeight[side] = D_L07_001BF640.position[2] - D_00189E20.field_318;
+                    gHeroState.footHeight[side] = D_L07_001BF640.position[2] - gHeroState.groundHeight;
                 }
-                if (func_00282C48(D_00189E20.footHeight[side]) > 0.4f)
-                    D_00189E20.footHeight[side] = 0.0f;
+                if (FloatAbs(gHeroState.footHeight[side]) > 0.4f)
+                    gHeroState.footHeight[side] = 0.0f;
                 func_001290E0(normal, D_L07_001BF640.normal);
-                func_L00_002B8E48(normal, angles);
+                ComputeAnglesToHeroLocalDirection(normal, angles);
                 if (angles[1] > -0.7853982448577881f && angles[1] < 0.7853982448577881f)
-                    D_00189E20.footYaw[side] = angles[1];
+                    gHeroState.footYaw[side] = angles[1];
                 if (angles[0] > -0.7853982448577881f && angles[0] < 0.7853982448577881f)
-                    D_00189E20.footPitch[side] = angles[0];
+                    gHeroState.footPitch[side] = angles[0];
             } else {
-                D_00189E20.footHeight[side] = 0.0f;
-                D_00189E20.footYaw[side] = D_00189E20.field_324;
-                D_00189E20.footPitch[side] = D_00189E20.field_328;
+                gHeroState.footHeight[side] = 0.0f;
+                gHeroState.footYaw[side] = gHeroState.field_324;
+                gHeroState.footPitch[side] = gHeroState.field_328;
             }
         }
     }

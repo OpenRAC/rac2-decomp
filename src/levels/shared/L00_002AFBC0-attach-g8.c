@@ -60,6 +60,7 @@ extern struct {
     float scale1[3];
 } D_L00_0025BE10;
 
+/* Puts each item the hero carries on the right body joint every frame, and makes the glow on one of them. */
 void func_L00_002B0968(int value)
 {
     union {
@@ -74,68 +75,68 @@ void func_L00_002B0968(int value)
     int random_range = 120;
 
     if (!value)
-        value = D_0018C0B0;
+        value = gHeroMoby_0018C0B0;
     for (i = 0; i < 7; i++) {
         if (D_L00_001A8F00[0] == 2 || D_L00_001A8F00[0] == 6) {
-            if (!(i == 2 && D_00189E20.item2 == 47) && i != 1 && i != 4)
+            if (!(i == 2 && gHeroState.item2 == 47) && i != 1 && i != 4)
                 continue;
         }
-        joint_mtx = (u8 *)&D_00189E20 + 0xC50;
+        joint_mtx = (u8 *)&gHeroState + 0xC50;
         for (j = 0; j < 3; j++) {
             u8 *slot_mobys;
             if (j > 0 && i != 1 && i != 3 && i != 4)
                 break;
-            slot_mobys = (u8 *)&D_00189E20 + i * 80;
+            slot_mobys = (u8 *)&gHeroState + i * 80;
             moby = *(u8 **)(slot_mobys + 0x1220);
             if (j == 1)
                 moby = *(u8 **)(slot_mobys + 0x1224);
             else if (j == 2)
                 moby = *(u8 **)(slot_mobys + 0x1228);
             if (moby) {
-                u8 *slot = (u8 *)&D_00189E20 + i * 80;
-                *(u64 *)(moby + 0x38) = *(u64 *)(D_00189E20.moby + 0x38);
+                u8 *slot = (u8 *)&gHeroState + i * 80;
+                *(u64 *)(moby + 0x38) = *(u64 *)(gHeroState.moby + 0x38);
                 {
-                    u8 *def = D_L00_00262570 + D_00139568[*(int *)(slot + 0x1248)] * 224;
+                    u8 *def = gWeaponTable_L00 + gItemSlotToRecord[*(int *)(slot + 0x1248)] * 224;
                     joint = *(int *)(def + 0x10);
                     if (i == 1 && j == 1)
                         joint = 3;
                     if (slot[0x123A]) {
-                        qcopy((u8 *)&D_00189E20 + 0x1200 + i * 80, (u8 *)&D_00189E20 + 0xC80 + joint * 64);
-                        func_002AB6D8((u8 *)(joint * 64 + (int)joint_mtx), (u8 *)&D_00189E20 + 0x1210 + i * 80);
+                        qcopy((u8 *)&gHeroState + 0x1200 + i * 80, (u8 *)&gHeroState + 0xC80 + joint * 64);
+                        GetEulerAnglesFromMatrix((u8 *)(joint * 64 + (int)joint_mtx), (u8 *)&gHeroState + 0x1210 + i * 80);
                         func_002A05A8(moby);
                         func_002A0F48(moby);
                         *(u16 *)(moby + 0x34) &= 0xFFFB;
                     } else {
-                        qcopy(moby + 0x10, (u8 *)&D_00189E20 + 0xC80 + joint * 64);
+                        qcopy(moby + 0x10, (u8 *)&gHeroState + 0xC80 + joint * 64);
                         if (!D_L00_001A7CEC || !*(int *)(def + 0x1C)) {
                             if (i == 0)
-                                func_L00_002B0528(moby, (u8 *)(joint * 64 + (int)joint_mtx), 0);
-                            first = func_L00_002ADED8(i);
-                            second = func_L00_002ADF10(i);
-                            third = func_L00_002ADF38(i);
+                                FilterTransformHistory(moby, (u8 *)(joint * 64 + (int)joint_mtx), 0);
+                            first = IsHeroSlotItemWrench(i);
+                            second = IsHeroSlotItemSpecial(i);
+                            third = IsHeroSlotItemOneOfFour(i);
                             if (!first && !second && !third)
                                 func_002A05A8(moby);
                             func_002A0F48(moby);
-                            func_00283678(moby + 0xC0, (u8 *)(joint * 64 + (int)joint_mtx));
+                            copy_matrix3x4(moby + 0xC0, (u8 *)(joint * 64 + (int)joint_mtx));
                             if (!first && !second && !third)
-                                func_002AB028(moby + 0xC0);
+                                NormalizeMatrixColumns(moby + 0xC0);
                             scratch.direction[0] = 1.0f;
                             scratch.direction[1] = 0;
                             scratch.direction[2] = 0;
-                            func_00283098(scratch.direction, scratch.direction, moby + 0xC0);
+                            matrix_mul_vec3(scratch.direction, scratch.direction, moby + 0xC0);
                             *(float *)(moby + 0xF4) =
-                                -func_00283248(func_00282E20(scratch.direction), scratch.direction[2]);
-                            *(float *)(moby + 0xF8) = func_00283248(scratch.direction[0], scratch.direction[1]);
+                                -FastMatrixHelperA(vec_length_xy(scratch.direction), scratch.direction[2]);
+                            *(float *)(moby + 0xF8) = FastMatrixHelperA(scratch.direction[0], scratch.direction[1]);
                             func_002A10E8(moby);
                             *(u16 *)(moby + 0x34) |= 6;
                             if (first) {
-                                func_L00_002AA200(D_L00_0025BDC0, D_L00_001B2E00, *(int *)(moby + 0x24), 0, value);
+                                PackPose(D_L00_0025BDC0, D_L00_001B2E00, *(int *)(moby + 0x24), 0, value);
                                 *(int *)(moby + 0x44) = 0;
                                 *(int *)(moby + 0x40) = 0;
                                 *(u8 **)(moby + 0x58) = D_L00_001B2E00;
                                 *(u8 **)(moby + 0x5C) = D_L00_001B2E00;
                             } else if (second) {
-                                func_L00_002AA200(D_L00_001A7D08, D_L00_001B3000, *(int *)(moby + 0x24), 0, value);
+                                PackPose(D_L00_001A7D08, D_L00_001B3000, *(int *)(moby + 0x24), 0, value);
                                 *(int *)(moby + 0x44) = 0;
                                 *(int *)(moby + 0x40) = 0;
                                 *(u8 **)(moby + 0x58) = D_L00_001B3000;
@@ -161,11 +162,11 @@ void func_L00_002B0968(int value)
                                     D_L00_0025BE10.scale1[2] = 1;
                                 }
                                 if (!j) {
-                                    func_L00_002AA200(D_L00_001A7D18, D_L00_001B3200, *(int *)(moby + 0x24), 0, value);
+                                    PackPose(D_L00_001A7D18, D_L00_001B3200, *(int *)(moby + 0x24), 0, value);
                                     *(u8 **)(moby + 0x58) = D_L00_001B3200;
                                     *(u8 **)(moby + 0x5C) = D_L00_001B3200;
                                 } else {
-                                    func_L00_002AA200(D_L00_001A7D30, D_L00_001B3300, *(int *)(moby + 0x24), 0, value);
+                                    PackPose(D_L00_001A7D30, D_L00_001B3300, *(int *)(moby + 0x24), 0, value);
                                     *(u8 **)(moby + 0x58) = D_L00_001B3300;
                                     *(u8 **)(moby + 0x5C) = D_L00_001B3300;
                                 }
@@ -187,21 +188,21 @@ void func_L00_002B0968(int value)
                             u8 *p;
                             func_002A05A8(moby);
                             if (!D_L00_001A7CEC || i != 0)
-                                func_002AB6D8((u8 *)(joint * 64 + (int)joint_mtx), moby + 0xF0);
+                                GetEulerAnglesFromMatrix((u8 *)(joint * 64 + (int)joint_mtx), moby + 0xF0);
                             else
-                                func_L00_002B0528(moby, (u8 *)(joint * 64 + (int)joint_mtx), 1);
-                            p = (u8 *)&D_00189E20;
+                                FilterTransformHistory(moby, (u8 *)(joint * 64 + (int)joint_mtx), 1);
+                            p = (u8 *)&gHeroState;
                             if (*(float *)(p + 0x14F8) > 0 && !*(int *)(p + 0x1500)) {
                                 float step = D_L00_001A7CE4 * 0.00027777778f;
-                                func_002AA548((float *)(p + 0x14F8), (float *)(p + 0x14FC), 0.0f, step, step,
+                                StepValueTowardTarget((float *)(p + 0x14F8), (float *)(p + 0x14FC), 0.0f, step, step,
                                               D_L00_001A7CE0 * 0.016666668f);
-                                func_00283098(scratch.direction, p + 0x14A0, p);
-                                func_00282CC0(scratch.direction, scratch.direction, p + 0x80);
-                                func_00282D08(moby + 0x10, moby + 0x10, scratch.direction, *(float *)(p + 0x14F8));
-                                func_002A91F0(&scratch.saved[1], moby + 0xF0);
-                                func_00283810(quaternion, &scratch.saved[1], p + 0x14C0, *(float *)(p + 0x14F8));
-                                func_00283958(quaternion, moby + 0xC0);
-                                func_002AB6D8(moby + 0xC0, moby + 0xF0);
+                                matrix_mul_vec3(scratch.direction, p + 0x14A0, p);
+                                FastVecAdd(scratch.direction, scratch.direction, p + 0x80);
+                                lerp_vector(moby + 0x10, moby + 0x10, scratch.direction, *(float *)(p + 0x14F8));
+                                BuildRotationFromAngles(&scratch.saved[1], moby + 0xF0);
+                                FastVectorNormalize3(quaternion, &scratch.saved[1], p + 0x14C0, *(float *)(p + 0x14F8));
+                                quaternion_to_rotation_basis(quaternion, moby + 0xC0);
+                                GetEulerAnglesFromMatrix(moby + 0xC0, moby + 0xF0);
                             }
                             func_002A0F48(moby);
                             func_002A10E8(moby);
@@ -211,11 +212,11 @@ void func_L00_002B0968(int value)
                 }
             }
             if (i == 3 && j == 1 && moby) {
-                u8 *p = (u8 *)&D_00189E20;
+                u8 *p = (u8 *)&gHeroState;
                 u8 *effect;
                 u8 *created;
                 if (!*(u8 **)(p + 0x131C)) {
-                    *(u8 **)(p + 0x131C) = func_0029EFD0(0x4B4);
+                    *(u8 **)(p + 0x131C) = CreateMoby(0x4B4);
                     if (*(u8 **)(p + 0x131C)) {
                         *(int *)(*(u8 **)(p + 0x131C) + 0x78) = 0x801432D7;
                         created = *(u8 **)(p + 0x131C);
@@ -234,21 +235,21 @@ void func_L00_002B0968(int value)
                     if (((*(u16 *)(effect + 0x34) ^ 1) & 1) != 0) {
                         float angle;
                         int red, green, blue, color_red;
-                        func_0029FC20(moby, 8, matrix);
+                        TransformMobyJointPoint(moby, 8, matrix);
                         /* The glow position and its draw request, as one step. */
                         {
                             qcopy(p + 0x2010, matrix[3]);
-                            func_L00_002A7A10();
+                            QueueHeroGlowDrawRoutine();
                         }
                         qcopy(effect + 0x10, matrix[3]);
-                        func_00283678(effect + 0xC0, matrix);
+                        copy_matrix3x4(effect + 0xC0, matrix);
                         func_002A0F48(effect);
                         *(u64 *)(effect + 0x38) = *(u64 *)(*(u8 **)(p + 0x2290) + 0x38);
-                        angle = func_00283198(((float)(D_L00_001B19C8[0] % random_range) / func_00283CE0(random_range)
+                        angle = FastSinOrCosB(((float)(gFrameCounter_L00[0] % random_range) / IntToFloat(random_range)
                                                * 2.0f) * 3.1415927f + (-3.1415927f));
-                        color_red = func_00283CF0(angle * 90.0f);
-                        green = func_00283CF0(angle * 50.0f);
-                        blue = func_00283CF0(angle * 10.0f);
+                        color_red = FloatToInt(angle * 90.0f);
+                        green = FloatToInt(angle * 50.0f);
+                        blue = FloatToInt(angle * 10.0f);
                         blue = ((blue + 20) << 16) | 0x80000000;
                         red = color_red + 215;
                         if (red > 255)

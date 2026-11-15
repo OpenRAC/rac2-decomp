@@ -75,53 +75,53 @@ extern void func_L00_002A9760(void);
 
 /* Run the frame's ordered resident-player updates while its control mode is active. */
 void func_L00_002A6DD0(void) {
-    unsigned char *player = D_00189E20;
+    unsigned char *player = gHeroState;
     unsigned char *hero;
     *(short *)(player + 0x2162) = 0;
     *(short *)(player + 0x2160) = 0;
-    if (player[0x22B4]) { func_L00_002A65D8(); return; }
-    func_L00_002D24E8();
-    func_L00_002B36E0();
-    func_L00_002ACA08();
-    func_L00_002ACF88(player + 0x80, player + 0x90, player + 0x550);
-    func_L00_002ADB40();
-    func_L00_002ADD30();
-    func_L00_002CB3A8();
+    if (player[0x22B4]) { UpdateHeroFrame_L00(); return; }
+    AdvanceHeroAnimation();
+    UpdateHeroInputAndHistory();
+    ProcessHeroActionCommand();
+    FindHeroLedgeGrab(player + 0x80, player + 0x90, player + 0x550);
+    FindGrindRail();
+    FindHeroLedgeCandidate();
+    DecideHeroState_L00();
     if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
-        if (player[0x22B5]) func_L00_002D2E68();
-        else func_L00_002D3068();
+        if (player[0x22B5]) SetHeroObjectsFlagBit();
+        else ClearHeroObjectsFlagBit();
         return;
     }
-    func_L00_002AE0C8();
+    RebuildRegionObjectMembership();
     if (player[0x22B4]) return;
-    func_L00_002B9CA8();
-    func_L00_002AC1A0();
-    func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
-    func_L00_002A5368();
-    func_L00_002A9460();
-    func_L00_002AA178(0);
-    func_L00_002B2120();
-    func_L00_002B2318();
-    func_L00_002B2200();
-    func_L00_002AFBC0();
-    if (player[0x22B5] || func_L00_002D6418()) func_L00_002D2E68();
-    else func_L00_002D3068();
-    func_L00_002A7958();
-    func_L00_002A7748();
-    func_L00_002A67F8();
-    func_L00_002D5EB8();
-    func_L00_002A6420();
-    func_L00_002D5158();
-    hero = D_00189E20;
-    if ((*(int *)(hero + 0x229C) != 0x16 && *(int *)(hero + 0x229C) != 0x1F && *(int *)(hero + 0x2294) != 0x31) || func_L00_002A7000())
-        func_L00_003080D0(D_00189EA0);
-    { unsigned char *base = D_00189E20; func_002A677C(*(void **)(base + 0x2290)); }
-    func_L00_002A74A8();
-    func_L00_002A9760();
+    UpdateDelayedSounds();
+    UpdateHeroEasingTargetsAndPointEffects();
+    UpdateCameraBlendAngles();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
+    UpdateAllAttachmentRecords();
+    update_hero_moby();
+    SpawnEffectFromRecord(0);
+    UpdateHeroItemsAndFlags();
+    UpdateHeroLockOnWeaponFire();
+    PlayHeroVoiceLineForProgress();
+    UpdateHeroItemsFrame();
+    if (player[0x22B5] || IsHeroActionAllowed()) SetHeroObjectsFlagBit();
+    else ClearHeroObjectsFlagBit();
+    FadeScreenEffect();
+    ApplyHeroAxisScales();
+    UpdateHeroStatTrackers();
+    UpdateCollectionProgress();
+    CheckHeroTargetingTriggers();
+    UpdateHeroAimAndTransitions();
+    hero = gHeroState;
+    if ((*(int *)(hero + 0x229C) != 0x16 && *(int *)(hero + 0x229C) != 0x1F && *(int *)(hero + 0x2294) != 0x31) || IsHeroInSwingOrGrindMode())
+        ClearMapBitsAroundPosition(gHeroPosition);
+    { unsigned char *base = gHeroState; func_002A677C(*(void **)(base + 0x2290)); }
+    UpdateHeroBlinkAndItemTint();
+    UpdateHeroMobyProbedHeightBounds();
 }

@@ -32,7 +32,7 @@ typedef struct {
 extern char D_00189E20[];
 
 void func_L00_002D20D0(void) {
-    char *base = D_00189E20;
+    char *base = gHeroState;
     AnimState *obj = *(AnimState **)(base + 0x2494);
 
     if (obj == 0) {

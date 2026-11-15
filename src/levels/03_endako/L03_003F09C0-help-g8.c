@@ -61,6 +61,7 @@ extern int func_L03_003112F8(void);
 extern void func_L00_002E6CF0(void *,void *);
 extern void func_L00_003E4948(void *);
 #define I(p,n) (*(int *)((p)+(n)))
+/* Per-frame update of moby class 3109: at Endako it watches where the hero is and starts the right help voice-over lines. */
 void func_L03_003F09C0(u8 *entity) {
     u8 *state = *(u8 **)(entity+0x68);
     int mode = entity[0x20];
@@ -71,112 +72,112 @@ void func_L03_003F09C0(u8 *entity) {
     case 0:
         entity[0x30] = 0xFF;
         I(state,0x74) = 0;
-        if (D_001A79F8.mapDataSet) {
+        if (gPlayerBolts.mapDataSet) {
             if (!D_001395B8.bytes[0xD]) {
                 u8 *entry;
-                func_L00_003672F8();
+                SetFlagToOne();
                 entry = D_L03_001B2B0C[0] + I(state,0x70)*0x80;
-                func_L00_002B9D60(entry+0x30,entry+0x70,0,1);
-                func_002AD860(13);
+                ResetHeroPositionAndDirection(entry+0x30,entry+0x70,0,1);
+                HandleRequestSlotState(13);
             }
-            if (D_001A79F8.mapDataSet) {
+            if (gPlayerBolts.mapDataSet) {
                 for(p=D_L03_001FB5A0[I(state,0x80)];
                     (I(state,0x80)&255)!=255 && I(state,0x80)<=D_L03_001B2A38 && p &&
                     ((p != 0 && (short)p[-1]>=0) || p==D_L03_001FB5A0[I(state,0x80)]); p++) {
                     record = D_L03_001B2A1C[0] + ((*p&0x7fff)<<8);
                     if(!record) break;
-                    func_0029F338(record);
+                    MarkMobySpawned(record);
                 }
             }
         }
-        func_002A7750(entity,1,-1);
+        SetMobyState(entity,1,-1);
         break;
     case 1:
-        if (!D_001395B8.bytes[0xD] && func_002ACBC8(D_00189E20.position,I(state,0x6C)))
+        if (!D_001395B8.bytes[0xD] && IsPointInCuboid(gHeroState.position,I(state,0x6C)))
             D_001395B8.bytes[0xD] = mode;
-        if (!D_001395B8.bytes[9] && func_002ACBC8(D_00189E20.position,I(state,0x4C)) && func_00288AA0(D_L03_001BFB80,0x34)) {
-            func_00288BE8(D_L03_001BFB80);
+        if (!D_001395B8.bytes[9] && IsPointInCuboid(gHeroState.position,I(state,0x4C)) && PushRequestQueue(D_L03_001BFB80,0x34)) {
+            LaunchQueuedRequest(D_L03_001BFB80);
             D_001395B8.bytes[9]=1;
-            func_002F5CB8(func_L03_003F1470,entity);
+            SetStoredValuePair(StartBossAreaObjects,entity);
         }
-        if (!D_00189E20.field22B4 && func_002ACBC8(D_00189E20.position,I(state,8))) {
-            if (func_00282948(state+0x60)) {
-                func_00288E18(0x9CB,0x22);
+        if (!gHeroState.field22B4 && IsPointInCuboid(gHeroState.position,I(state,8))) {
+            if (FastFloatHelperD(state+0x60)) {
+                RequestSubtitleVoiceLine(0x9CB,0x22);
                 I(state,0x60)=600;
             }
-        } else if (func_002ACBC8(D_00189E20.position,I(state,0xC))) {
-            if(D_0018C958[34].count!=65535) {
-                D_0018C958[34].count=65535;
+        } else if (IsPointInCuboid(gHeroState.position,I(state,0xC))) {
+            if(gSubtitleHistory[34].count!=65535) {
+                gSubtitleHistory[34].count=65535;
                 if (D_L03_00282078.active || D_L03_00282078.key!=-1) {
-                    if (D_L03_00282078.type==0x22) func_00288D90();
+                    if (D_L03_00282078.type==0x22) BeginSubtitleClose();
                 }
             }
         }
-        if(func_002ACBC8(D_00189E20.position,I(state,0x10)) && !D_L03_00282078.active && D_L03_00282078.key==-1) {
-            u32 now = D_001A7390[0], prev = D_0018C958[35].time;
+        if(IsPointInCuboid(gHeroState.position,I(state,0x10)) && !D_L03_00282078.active && D_L03_00282078.key==-1) {
+            u32 now = D_001A7390[0], prev = gSubtitleHistory[35].time;
             if (now - prev > 120) {
-                func_00288E18(0x9CC,0x23);
-                if (D_0018C958[35].time < D_001A7390[0]) D_0018C958[35].time = D_001A7390[0];
+                RequestSubtitleVoiceLine(0x9CC,0x23);
+                if (gSubtitleHistory[35].time < D_001A7390[0]) gSubtitleHistory[35].time = D_001A7390[0];
             } else {
-                if (prev < now) D_0018C958[35].time = now;
+                if (prev < now) gSubtitleHistory[35].time = now;
             }
-        } else if(func_002ACBC8(D_00189E20.position,I(state,0x14))) {
-            if(D_0018C958[35].count!=65535) {
-                D_0018C958[35].count=65535;
-                if(D_L03_00282078.active || D_L03_00282078.key!=-1) func_00288D90();
+        } else if(IsPointInCuboid(gHeroState.position,I(state,0x14))) {
+            if(gSubtitleHistory[35].count!=65535) {
+                gSubtitleHistory[35].count=65535;
+                if(D_L03_00282078.active || D_L03_00282078.key!=-1) BeginSubtitleClose();
             }
         }
-        if(func_002ACBC8(D_00189E20.position,I(state,0x18))) {
-            if(D_001A7390[0]-D_0018C958[36].time>2400) func_00288E18(0x9CD,0x24);
-        } else if(func_002ACBC8(D_00189E20.position,I(state,0x1C))) {
+        if(IsPointInCuboid(gHeroState.position,I(state,0x18))) {
+            if(D_001A7390[0]-gSubtitleHistory[36].time>2400) RequestSubtitleVoiceLine(0x9CD,0x24);
+        } else if(IsPointInCuboid(gHeroState.position,I(state,0x1C))) {
             D_001395B8.bytes[0xA2]=1;
-            D_0018C958[36].count=65535;
-            if(D_L03_00282078.active || D_L03_00282078.key!=-1) func_00288D90();
+            gSubtitleHistory[36].count=65535;
+            if(D_L03_00282078.active || D_L03_00282078.key!=-1) BeginSubtitleClose();
         }
-        if(func_002ACBC8(D_00189E20.position,I(state,0x64)) && !D_0018C958[123].count) {
+        if(IsPointInCuboid(gHeroState.position,I(state,0x64)) && !gSubtitleHistory[123].count) {
             D_001395B8.bytes[0xA2]=1;
-            func_00288E18(0xA24,0x7B);
+            RequestSubtitleVoiceLine(0xA24,0x7B);
         }
-        func_L01_002EABA8(0x9D3,0x2A,0,I(state,0x20),-1);
-        if(func_002ACBC8(D_00189E20.position,I(state,0x24)) && ((D_001395B8.bytes[0x78] ^ 1) & 1)) {
-            u32 now=D_001A7390[0], prev=D_0018C958[131].time;
-            if(now-prev>1080 || !prev) func_00288E18(0xA2C,0x83);
-            else if(prev<now) D_0018C958[131].time=now;
+        TriggerSubtitleInCuboid(0x9D3,0x2A,0,I(state,0x20),-1);
+        if(IsPointInCuboid(gHeroState.position,I(state,0x24)) && ((D_001395B8.bytes[0x78] ^ 1) & 1)) {
+            u32 now=D_001A7390[0], prev=gSubtitleHistory[131].time;
+            if(now-prev>1080 || !prev) RequestSubtitleVoiceLine(0xA2C,0x83);
+            else if(prev<now) gSubtitleHistory[131].time=now;
         }
-        func_L01_002EABA8(0x9D5,0x2C,0,I(state,0x40),-1);
-        func_L01_002EABA8(0x9E5,0x3C,2,I(state,0x54),-1);
-        if(func_002ACBC8(D_00189E20.position,I(state,0x2C))) D_0018C958[43].count=65535;
-        else if(func_002ACBC8(D_00189E20.position,I(state,0x28))) {
-            if(D_00189E20.field2294==0x23 && D_00189E20.field1B8==1) ++I(state,0x30);
-            if(I(state,0x30)>=3 && D_00189E20.field2294==0x23) func_00288E18(0x9D4,0x2B);
+        TriggerSubtitleInCuboid(0x9D5,0x2C,0,I(state,0x40),-1);
+        TriggerSubtitleInCuboid(0x9E5,0x3C,2,I(state,0x54),-1);
+        if(IsPointInCuboid(gHeroState.position,I(state,0x2C))) gSubtitleHistory[43].count=65535;
+        else if(IsPointInCuboid(gHeroState.position,I(state,0x28))) {
+            if(gHeroState.field2294==0x23 && gHeroState.field1B8==1) ++I(state,0x30);
+            if(I(state,0x30)>=3 && gHeroState.field2294==0x23) RequestSubtitleVoiceLine(0x9D4,0x2B);
         }
-        if(D_00189E20.position[2]<155.5f) {
+        if(gHeroState.position[2]<155.5f) {
             point.q = 0;
             point.f[0]=400.0f;
             point.f[1]=222.0f;
             point.f[2]=155.0f;
-            if(func_00282E48(D_00189E20.position,point.f)<24.0f) D_0018C958[37].time=0;
+            if(fast_vec_dist(gHeroState.position,point.f)<24.0f) gSubtitleHistory[37].time=0;
         }
-        func_L01_002EABA8(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
-        func_L01_002EABA8(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
-        if(func_002ACBC8(D_00189E20.position,I(state,0x7C))) {
-            if(!D_0018C750.fieldF0 || D_001A7390[0]-D_0018C750.fieldF4>72000) {
-                u32 seen = D_0018C958[32].levels & (1 << D_001A79F0);
-                if (!seen) func_00288E18(0x9C9,0x20);
+        TriggerSubtitleInCuboid(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
+        TriggerSubtitleInCuboid(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
+        if(IsPointInCuboid(gHeroState.position,I(state,0x7C))) {
+            if(!gProgressStatistics.fieldF0 || D_001A7390[0]-gProgressStatistics.fieldF4>72000) {
+                u32 seen = gSubtitleHistory[32].levels & (1 << gCurrentMapIndex);
+                if (!seen) RequestSubtitleVoiceLine(0x9C9,0x20);
             }
         }
-        if(!D_001A79F8.field12 && D_L03_001B2548>0 && !(D_L03_001B2548&0x7F) && !D_001A7BED[0] && !func_L03_003112F8()) {
-            u32 count = D_0018C958[138].count;
+        if(!gPlayerBolts.field12 && gFrameCounter_L03>0 && !(gFrameCounter_L03&0x7F) && !D_001A7BED[0] && !CountActiveTypeOneEntries()) {
+            u32 count = gSubtitleHistory[138].count;
             if (count < 3) {
-                if (!count && func_002ACBC8(D_00189E20.position,I(state,0x78))) func_00288E18(0xA33,0x8A);
-                else if (D_001A7390[0] - D_0018C958[138].time > 36000) func_00288E18(0xA33,0x8A);
+                if (!count && IsPointInCuboid(gHeroState.position,I(state,0x78))) RequestSubtitleVoiceLine(0xA33,0x8A);
+                else if (D_001A7390[0] - gSubtitleHistory[138].time > 36000) RequestSubtitleVoiceLine(0xA33,0x8A);
             }
         }
-        if(D_001A7390[0]-D_0018C750.field70>108000 && func_002ACBC8(D_00189E20.position,I(state,0x78))) {
-            u32 seen = D_0018C958[12].levels & (1 << D_001A79F0);
-            if (!seen) func_00288E18(0x9B5,0xC);
+        if(D_001A7390[0]-gProgressStatistics.field70>108000 && IsPointInCuboid(gHeroState.position,I(state,0x78))) {
+            u32 seen = gSubtitleHistory[12].levels & (1 << gCurrentMapIndex);
+            if (!seen) RequestSubtitleVoiceLine(0x9B5,0xC);
         }
         break;
     }
-    if(D_L03_001B0F20) func_L00_002E6CF0(func_L00_003E4948,entity);
+    if(D_L03_001B0F20) AddDrawCallbackToList1(CallBlastHelperNoArgs,entity);
 }

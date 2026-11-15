@@ -26,31 +26,32 @@
 extern s32 ref_L18_00427B48_00;
 extern u16 *ref_L18_00427B48_01[];
 
-void func_L18_00427B48(s32 unused, s32 arg1) {
-    u16 *a;
-    u16 *v;
-    s8 *tmp;
-    s32 t;
+/* Marks every live shooter in the given group so it will start firing (sets a flag in its state). */
+void func_L18_00427B48(s32 unusedArg, s32 group) {
+    u16 *entry;
+    u16 *list;
+    s8 *target;
+    s32 entryValue;
 
-    if (arg1 != 0xFF) {
-        v = ref_L18_00427B48_01[arg1];
-        if (v != 0) {
-            a = v;
+    if (group != 0xFF) {
+        list = ref_L18_00427B48_01[group];
+        if (list != 0) {
+            entry = list;
             do {
-                tmp = (s8 *)ref_L18_00427B48_00 + ((*a & 0x7FFF) << 8);
-                if (tmp != 0) {
-                    if (*(s16 *)(tmp + 0xAA) == 0xEC0) {
-                        s32 b = *(u8 *)(tmp + 0x20);
-                        if (b != 0xFE) {
-                            if (b != 0xFD) {
-                                *(s8 *)(*(s8 **)(tmp + 0x68) + 0x39A) = 1;
+                target = (s8 *)ref_L18_00427B48_00 + ((*entry & 0x7FFF) << 8);
+                if (target != 0) {
+                    if (*(s16 *)(target + 0xAA) == 0xEC0 /* moby class 3776 */) {
+                        s32 stateId = *(u8 *)(target + 0x20);
+                        if (stateId != 0xFE) {
+                            if (stateId != 0xFD) {
+                                *(s8 *)(*(s8 **)(target + 0x68) + 0x39A) = 1;
                             }
                         }
                     }
                 }
-                t = *(s16 *)a;
-                a += 1;
-            } while (t >= 0);
+                entryValue = *(s16 *)entry;
+                entry += 1;
+            } while (entryValue >= 0);
         }
     }
 }

@@ -48,34 +48,35 @@ struct Fr {
     s8 b1[0x10];
 };
 
-void func_L00_003E9930(s8 *arg0, s8 *arg1, s8 *arg2, f32 fparg) {
-    struct Fr fr;
-    s32 cnt;
-    f32 f20v;
-    f32 f22v;
-    f32 t;
-    f32 u;
-    struct Ent *s0;
+/* Works out a sideways direction for the lightning arcs from two points on a small circle. */
+void func_L00_003E9930(s8 *moby, s8 *center, s8 *outDirection, f32 radius) {
+    struct Fr frame;
+    s32 remaining;
+    f32 angle;
+    f32 angleStep;
+    f32 sideValue;
+    f32 depthValue;
+    struct Ent *entry;
 
-    f20v = 0.0f;
-    f22v = 6.283185482025146484375f / ref_L00_003E9930_00(11);
-    cnt = 1;
-    s0 = &fr.e[0];
+    angle = 0.0f;
+    angleStep = 6.283185482025146484375f / ref_L00_003E9930_00(11);
+    remaining = 1;
+    entry = &frame.e[0];
     do {
-        f20v = ref_L00_003E9930_01(f20v, f22v);
-        s0->xc = 0;
-        t = ref_L00_003E9930_02(f20v) * fparg;
-        s0->x0 = 0;
-        s0->x4 = t;
-        u = ref_L00_003E9930_03(f20v);
-        s0->x8 = -u * fparg;
-        ref_L00_003E9930_04(s0, s0, arg0 + 0xC0);
-        ref_L00_003E9930_05(s0, s0, arg1);
-        s0 += 1;
-        cnt -= 1;
-    } while (cnt >= 0);
-    ref_L00_003E9930_06(fr.b0, &fr.e[0], arg1);
-    ref_L00_003E9930_06(fr.b1, &fr.e[1], arg1);
-    ref_L00_003E9930_07(arg2, fr.b0, fr.b1);
-    ref_L00_003E9930_08(arg2, arg2, 1.0f);
+        angle = ref_L00_003E9930_01(angle, angleStep);
+        entry->xc = 0;
+        sideValue = ref_L00_003E9930_02(angle) * radius;
+        entry->x0 = 0;
+        entry->x4 = sideValue;
+        depthValue = ref_L00_003E9930_03(angle);
+        entry->x8 = -depthValue * radius;
+        ref_L00_003E9930_04(entry, entry, moby + 0xC0);
+        ref_L00_003E9930_05(entry, entry, center);
+        entry += 1;
+        remaining -= 1;
+    } while (remaining >= 0);
+    ref_L00_003E9930_06(frame.b0, &frame.e[0], center);
+    ref_L00_003E9930_06(frame.b1, &frame.e[1], center);
+    ref_L00_003E9930_07(outDirection, frame.b0, frame.b1);
+    ref_L00_003E9930_08(outDirection, outDirection, 1.0f);
 }

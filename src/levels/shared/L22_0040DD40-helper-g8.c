@@ -19,6 +19,7 @@ extern void func_L00_002E6EF8(void (*callback)(char *), char *object);
  * state-1 body (a 16-byte copy of the record's vector, the pair update and the shared sub-object
  * test that promotes the record to state 2); state 2 destroys the record and returns; every other
  * state, and the end of the state-1 body, re-arms the record through the level callback. */
+/* Per-frame update for moby class 3933 (also used for 4494): moves the object, hands it to the level callback and removes it once its sub-object finishes. */
 void func_L22_0040DD40(char *a0)
 {
     char *handle = *(char **)(a0 + 0x68);
@@ -31,17 +32,17 @@ void func_L22_0040DD40(char *a0)
         char *p = a0 + 0x10;
 
         qcopy(local, p);
-        func_00282CC0(p, handle, p);
-        func_L22_0040DF28(a0, local);
-        if (func_00282948(handle + 0x10) != 0)
+        FastVecAdd(p, handle, p);
+        CheckProjectileHitAndExplode(a0, local);
+        if (FastFloatHelperD(handle + 0x10) != 0)
             *(unsigned char *)(a0 + 0x20) = 2;
         break;
     }
     case 2:
-        func_0029F338(a0);
+        MarkMobySpawned(a0);
         return;
     default:
         break;
     }
-    func_L00_002E6EF8(func_L22_0040E098, a0);
+    AddDrawCallbackToList3(UpdateScrollingParticleEffect, a0);
 }

@@ -12,6 +12,7 @@ extern void func_002C7BB8(void *, void *, int, int, float, int, int, float, floa
 extern char ref_00304128_00[];
 
 /* Emit an effect at a sampled surface point while its timer is active. */
+/* Spawns an effect at a random surface point each time the timer runs out. */
 void func_00304128(void *obj)
 {
     void *state = *(void **)((char *)obj + 0x68);
@@ -20,13 +21,13 @@ void func_00304128(void *obj)
     float distance;
 
     if (!(*(int *)((char *)state + 0x4C) & 8)) {
-        if (func_00282948((char *)state + 0x8C) != 0) {
-            func_00303568(obj, &position);
+        if (FastFloatHelperD((char *)state + 0x8C) != 0) {
+            GetRandomSurfacePoint(obj, &position);
             qcopy(&parameters, ref_00304128_00);
             parameters.f[2] = *(float *)((char *)state + 8);
-            distance = func_00303DA8(&position, 4.0f);
+            distance = GetDistanceIfInsideField(&position, 4.0f);
             if (1.0f < distance)
-                func_002C7BB8(&position, &parameters, *(int *)((char *)state + 0x80), 0x00808080,
+                SpawnSizeChangingParticle(&position, &parameters, *(int *)((char *)state + 0x80), 0x00808080,
                         *(float *)((char *)state + 0x78) * 210000.0f,
                         *(int *)((char *)state + 0x74), *(int *)((char *)state + 0x7C), 0.0f,
                         *(float *)((char *)state + 0x88), 0, 3);

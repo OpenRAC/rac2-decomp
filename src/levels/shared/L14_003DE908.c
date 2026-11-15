@@ -18,17 +18,18 @@ extern f32 func_00282E80(char *, char *);
 
 /* func_L14_003F0E68 is built with -G8: see L14_003DE908-g8.c. */
 
+/* Follows a path: when the object is close to the current point it moves to the next (or previous) point, and returns 0 when the path ends. */
 s32 func_L14_00423CD0(char *self, char *point, s32 route, s16 *index, s32 reverse, f32 radius) {
     char *path = D_L14_001FE1C0[route];
     qcopy(point, path + 16 + (*index << 4));
     if (reverse) {
-        if (func_00282E80(self + 16, point) < radius) --*index;
+        if (vec_distance_xy(self + 16, point) < radius) --*index;
         if (*index < 0) {
             *index = *(u16 *)path - 1;
             return 0;
         }
     } else {
-        if (func_00282E80(self + 16, point) < radius) ++*index;
+        if (vec_distance_xy(self + 16, point) < radius) ++*index;
         if (*index >= *(s32 *)path) {
             *index = 0;
             return 0;

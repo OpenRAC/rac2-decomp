@@ -7,14 +7,15 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern void func_00282D30(char *, char *, float);
 
-void func_L05_0041C7E8(char *a, char *b)
+/* Copies the owner's position and turn onto a part object, and flips one axis if the part is the mirrored one. */
+void func_L05_0041C7E8(char *owner, char *part)
 {
-    char *state = *(char **)(b + 0x68);
+    char *partVars = *(char **)(part + 0x68);
     int i;
 
-    qcopy(b + 0x10, a + 0x10);
+    qcopy(part + 0x10, owner + 0x10);
     for (i = 0; i < 3; i++)
-        qcopy(b + 0xC0 + i * 16, a + 0xC0 + i * 16);
-    if (*(int *)(state + 4) != 0)
-        func_00282D30(b + 0xD0, b + 0xD0, -1.0f);
+        qcopy(part + 0xC0 + i * 16, owner + 0xC0 + i * 16);
+    if (*(int *)(partVars + 4) != 0)
+        FastVecScale(part + 0xD0, part + 0xD0, -1.0f);
 }

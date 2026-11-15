@@ -1,12 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Qwen draft (branch qwen/autonomy, 3d350393), checked by tools/check.py */
 extern void func_00123028(long long, long long);
 
-int func_00131400(void *arg)
+/* Handles a square root error by calling a helper with the stored value, then reports no error handled. */
+int func_00131400(void *exception)
 {
-    long long val = *(long long *)(arg + 8);
-    func_00123028(val, val);
+    long long val = *(long long *)(exception + 8);
+    CompareDoubles(val, val);
     return 0;
 }
 

@@ -16,32 +16,32 @@ void func_L16_0040D258(u8 *moby)
     int bone, lifetime, size;
     for (bone = 5; bone < 8; bone++) {
         *(TI128 *)clear = 0;
-        clear[2] = -(func_002A7878(4.5f, 5.5f) * 0.016666668f);
+        clear[2] = -(RandomFloatRange(4.5f, 5.5f) * 0.016666668f);
         *(TI128 *)velocity = *(TI128 *)clear;
-        func_0029FCC0(moby, bone, position);
+        TransformMobyJointToWorld(moby, bone, position);
         if (D_L16_001B2648 & 1) {
-            size = func_002A7820(18, 22);
-            func_002BAE50(position, velocity, 0xcf0000ff, 0xcf, size, 180, -10, 1);
+            size = RandomIntRange(18, 22);
+            SpawnScalingParticle(position, velocity, 0xcf0000ff, 0xcf, size, 180, -10, 1);
         } else {
-            size = func_002A7820(20, 24);
-            func_002BAE50(position, velocity, 0x6000ffff, 0x80, size, 350, -10, 1);
+            size = RandomIntRange(20, 24);
+            SpawnScalingParticle(position, velocity, 0x6000ffff, 0x80, size, 350, -10, 1);
         }
-        lifetime = func_002A7820(20, 90);
-        size = func_002A7820(10, 15);
-        func_002BAE50(position, velocity, 0xefff7f4f, 0xff0000, size, lifetime, -lifetime, 1);
+        lifetime = RandomIntRange(20, 90);
+        size = RandomIntRange(10, 15);
+        SpawnScalingParticle(position, velocity, 0xefff7f4f, 0xff0000, size, lifetime, -lifetime, 1);
     }
     for (bone = 3; bone < 5; bone++) {
-        func_00282F20(velocity, moby + 0xc0, -(func_002A7878(4.5f, 5.5f) * 0.016666668f));
-        func_0029FCC0(moby, bone, position);
+        vec_scale_to_length(velocity, moby + 0xc0, -(RandomFloatRange(4.5f, 5.5f) * 0.016666668f));
+        TransformMobyJointToWorld(moby, bone, position);
         if (D_L16_001B2648 & 1) {
-            size = func_002A7820(18, 22);
-            func_002BAE50(position, velocity, 0xcf0000ff, 0xcf, size, 50, -10, 1);
+            size = RandomIntRange(18, 22);
+            SpawnScalingParticle(position, velocity, 0xcf0000ff, 0xcf, size, 50, -10, 1);
         } else {
-            size = func_002A7820(20, 24);
-            func_002BAE50(position, velocity, 0x6000ffff, 0x80, size, 100, -10, 1);
+            size = RandomIntRange(20, 24);
+            SpawnScalingParticle(position, velocity, 0x6000ffff, 0x80, size, 100, -10, 1);
         }
-        lifetime = func_002A7820(10, 25);
-        size = func_002A7820(10, 15);
-        func_002BAE50(position, velocity, 0xefff7f4f, 0xff0000, size, lifetime, -lifetime, 1);
+        lifetime = RandomIntRange(10, 25);
+        size = RandomIntRange(10, 15);
+        SpawnScalingParticle(position, velocity, 0xefff7f4f, 0xff0000, size, lifetime, -lifetime, 1);
     }
 }

@@ -24,6 +24,7 @@ extern void func_00283098(void *,void *,void *);
 extern void func_00282CC0(void *,void *,void *);
 extern int func_002AB1F0(u8 *);
 
+/* Works out the launch velocity to throw something from a start point to a target (or where the player aims). */
 void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
                    float minimum, float maximum,
                    float speed, float acceleration, char *sourceObject)
@@ -51,50 +52,50 @@ void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
     }
     output->f[0]=1.0f; output->f[1]=0.0f; output->f[2]=0.0f; output->f[3]=0.0f;
     if(H->h[0x348/2]!=0 && D_001A8CA4==0)
-        func_00282D30(&normal,H->ptr[0x2290/4]+0xe0,-1.0f);
-    else func_002AFFD8((char *)&sourcePosition,(char *)&normal,0);
+        FastVecScale(&normal,H->ptr[0x2290/4]+0xe0,-1.0f);
+    else ComputeViewDirection((char *)&sourcePosition,(char *)&normal,0);
     reach=maximum;
     if(!targetObject) {
-        if(H->i[0x2294/4]==1) func_0026F748(29,1);
+        if(H->i[0x2294/4]==1) EmptyStubF748(29,1);
         if((D_00138320&4)!=0 && H->b[0x22bc]==0) {
-            func_00282F20(&forward,CAMERA_BASIS,1.0f);
-            projection=func_00282DB0(&forward,&normal);
-            func_00282D30(&temporary,&normal,projection);
-            func_00282CF0(&projected,&forward,&temporary);
-            func_00282F20(&projected,&projected,1.0f);
-            func_00282DD8(&axis,&forward,&projected);
-            angle=func_00282DB0(&forward,&projected)*0.5f;
-            func_00282D30(&quaternion,&axis,func_00283198(angle));
-            quaternion.f[3]=func_00283180(angle);
-            func_00283958(&quaternion,rotation);
-            func_00283738(orientedBasis,rotation,CAMERA_BASIS);
-            planeOffset=-func_00282DB0(&sourcePosition,&normal);
-            func_00282F20(&testVector,CAMERA_BASIS,1.0f);
-            projection=func_00282DB0(&normal,&testVector);
+            vec_scale_to_length(&forward,CAMERA_BASIS,1.0f);
+            projection=FastVecDot(&forward,&normal);
+            FastVecScale(&temporary,&normal,projection);
+            FastVecSub(&projected,&forward,&temporary);
+            vec_scale_to_length(&projected,&projected,1.0f);
+            FastVecCross(&axis,&forward,&projected);
+            angle=FastVecDot(&forward,&projected)*0.5f;
+            FastVecScale(&quaternion,&axis,FastSinOrCosB(angle));
+            quaternion.f[3]=FastSinOrCosA(angle);
+            quaternion_to_rotation_basis(&quaternion,rotation);
+            multiply_matrix3x3(orientedBasis,rotation,CAMERA_BASIS);
+            planeOffset=-FastVecDot(&sourcePosition,&normal);
+            vec_scale_to_length(&testVector,CAMERA_BASIS,1.0f);
+            projection=FastVecDot(&normal,&testVector);
             if(projection>0.0f) {
-                factor=(func_00282DB0(&normal,D_001B5340)+planeOffset)/projection;
-                func_00282D30(&testVector,&testVector,factor);
-                func_00282CF0(&testVector,D_001B5340,&testVector);
-                func_00282CF0(&testVector,&testVector,D_001B5340);
-                func_00282D30(&temporary,&normal,func_00282DB0(&testVector,&normal));
-                func_00282CF0(&projected,&testVector,&temporary);
-                reach=func_00282DF0(&projected);
+                factor=(FastVecDot(&normal,gCameraState_001B5340)+planeOffset)/projection;
+                FastVecScale(&testVector,&testVector,factor);
+                FastVecSub(&testVector,gCameraState_001B5340,&testVector);
+                FastVecSub(&testVector,&testVector,gCameraState_001B5340);
+                FastVecScale(&temporary,&normal,FastVecDot(&testVector,&normal));
+                FastVecSub(&projected,&testVector,&temporary);
+                reach=FastVecLength(&projected);
                 if(maximum<reach) reach=maximum;
                 else if(reach<minimum) reach=minimum;
             }
-            reach=maximum*func_002A7798(reach/maximum);
-            func_00283098(output,output,orientedBasis);
+            reach=maximum*EaseOutQuad(reach/maximum);
+            matrix_mul_vec3(output,output,orientedBasis);
         } else {
-            func_00283098(output,output,sourceBasis);
+            matrix_mul_vec3(output,output,sourceBasis);
         }
-        func_00282F20(output,output,reach);
-        func_00282CC0(&target,output,&sourcePosition);
+        vec_scale_to_length(output,output,reach);
+        FastVecAdd(&target,output,&sourcePosition);
     } else {
-        if((unsigned)(*(unsigned short *)(targetObject+0xaa)-0xa8d)<=1 &&
-            (targetData=(float *)func_002AB1F0((u8 *)targetObject))!=0 && targetData[0]>0.0f) {
+        if((unsigned)(*(unsigned short *)(targetObject+0xaa)-0xa8d /* Swamp Monster I Arm or Eye */)<=1 &&
+            (targetData=(float *)GetMobyPrivateValue0((u8 *)targetObject))!=0 && targetData[0]>0.0f) {
             if(D_001A8CA0!=0 || H->h[0x348/2]!=0) {
-                func_00282D30(&quaternion,targetObject+0xe0,targetData[4]);
-                func_00282CC0(&target,targetObject+0x10,&quaternion);
+                FastVecScale(&quaternion,targetObject+0xe0,targetData[4]);
+                FastVecAdd(&target,targetObject+0x10,&quaternion);
             } else {
                 qcopy(&target,targetObject+0x10);
                 target.f[2]+=targetData[4];
@@ -103,21 +104,21 @@ void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
             qcopy(&target,targetObject+0x10);
         }
     }
-    func_00282CF0(&displacement,&target,origin);
-    func_00282D30(&temporary,&normal,func_00282DB0(&displacement,&normal));
-    func_00282CF0(&projected,&displacement,&temporary);
-    func_00282F20(output,&projected,speed);
-    duration=func_00282DF0(&projected);
+    FastVecSub(&displacement,&target,origin);
+    FastVecScale(&temporary,&normal,FastVecDot(&displacement,&normal));
+    FastVecSub(&projected,&displacement,&temporary);
+    vec_scale_to_length(output,&projected,speed);
+    duration=FastVecLength(&projected);
     duration=duration/speed;
     reciprocal=1.0f/duration;
-    projection=func_00282DB0(origin,&normal);
-    func_00282D30(&originProjection,&normal,projection);
-    projection=func_00282DB0(&target,&normal);
-    func_00282D30(&targetProjection,&normal,projection);
-    func_00282D30(&gravity,&normal,acceleration*(duration*duration)*0.5f);
-    func_00282CF0(&working,&originProjection,&targetProjection);
-    func_00282CC0(&working,&working,&gravity);
-    func_00282D30(&working,&working,-1.0f);
-    func_00282D30(&correction,&working,reciprocal);
-    func_00282CC0(output,output,&correction);
+    projection=FastVecDot(origin,&normal);
+    FastVecScale(&originProjection,&normal,projection);
+    projection=FastVecDot(&target,&normal);
+    FastVecScale(&targetProjection,&normal,projection);
+    FastVecScale(&gravity,&normal,acceleration*(duration*duration)*0.5f);
+    FastVecSub(&working,&originProjection,&targetProjection);
+    FastVecAdd(&working,&working,&gravity);
+    FastVecScale(&working,&working,-1.0f);
+    FastVecScale(&correction,&working,reciprocal);
+    FastVecAdd(output,output,&correction);
 }

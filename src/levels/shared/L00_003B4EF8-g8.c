@@ -36,26 +36,26 @@ void func_L00_003B4EF8(unsigned char *object)
         if (*timer == 0) {
             *timer = 4;
             D_L00_001B28B8[i] = 64;
-            func_002A7988(&direction, D_L00_001AFA14, D_L00_001AFA14);
+            SpawnRandomDirectionEffect(&direction, D_L00_001AFA14, D_L00_001AFA14);
             qcopy(&D_L00_0023D9E0[i][0], &position);
             sign = 1.0f;
             for (j = 1; j < 5; j++) {
-                func_00282CF0(&axis, &D_L00_0023D9E0_1[i][j - 1], &D_L00_001B8DC0);
-                angle = func_002A7878(0.17453295f, 0.78539824f) * sign;
+                FastVecSub(&axis, &D_L00_0023D9E0_1[i][j - 1], &gCameraPosition_L00);
+                angle = RandomFloatRange(0.17453295f, 0.78539824f) * sign;
                 sign = -sign;
-                func_002ACEC0(&direction, &direction, &axis, angle);
-                func_00282CC0(&D_L00_0023D9E0[i][j], &D_L00_0023D9E0_1[i][j - 1], &direction);
+                ApplyAxisRotationToQuaternion(&direction, &direction, &axis, angle);
+                FastVecAdd(&D_L00_0023D9E0[i][j], &D_L00_0023D9E0_1[i][j - 1], &direction);
             }
         } else {
             for (j = 1; j < 5; j++) {
-                func_00282CF0(&displacements[j], &D_L00_0023D9E0[i][j], &D_L00_0023D9E0_1[i][j - 1]);
-                displacements[j].v[0] += func_002A78D8(0.0f, 0.1f);
-                displacements[j].v[1] += func_002A78D8(0.0f, 0.1f);
-                displacements[j].v[2] += func_002A78D8(0.0f, 0.1f);
+                FastVecSub(&displacements[j], &D_L00_0023D9E0[i][j], &D_L00_0023D9E0_1[i][j - 1]);
+                displacements[j].v[0] += RandomSignedFloatRange(0.0f, 0.1f);
+                displacements[j].v[1] += RandomSignedFloatRange(0.0f, 0.1f);
+                displacements[j].v[2] += RandomSignedFloatRange(0.0f, 0.1f);
             }
             qcopy(&D_L00_0023D9E0[i][0], &position);
             for (j = 1; j < 5; j++)
-                func_00282CC0(&D_L00_0023D9E0[i][j], &D_L00_0023D9E0_1[i][j - 1], &displacements[j]);
+                FastVecAdd(&D_L00_0023D9E0[i][j], &D_L00_0023D9E0_1[i][j - 1], &displacements[j]);
             if (D_L00_001B28B0[i] > 0)
                 D_L00_001B28B8[i] = 32;
             else

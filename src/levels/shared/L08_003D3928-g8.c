@@ -9,12 +9,13 @@ extern s32 D_L08_001B1FA8 __attribute__((sda));
 
 extern s32 func_L08_003289D0(s32);
 
+/* Counts how many of three kinds of enemy are in the level and saves the total. */
 /* Totals three table lookups into one $-gp word and returns it. */
 s32 func_L08_00435938(void)
 {
-    s32 first = func_L08_003289D0(0x96A);
-    s32 second = func_L08_003289D0(0x1002);
-    s32 sum = first + second + func_L08_003289D0(0x8C4);
+    s32 first = CountMobysOfClass(0x96A /* Desert Crystal Shell */);
+    s32 second = CountMobysOfClass(0x1002 /* Desert Dune Monster */);
+    s32 sum = first + second + CountMobysOfClass(0x8C4 /* moby class 2244 */);
 
     D_L08_001B1FA8 = sum;
     return sum;
@@ -86,21 +87,23 @@ static __inline__ void CopyTarget(L08Target *dst, L08Target *src)
     d[2] = s[2];
 }
 
+/* Keeps track of the current lock-on target (moby class 2416): picks a new one once it has been
+   nearest long enough, and shows a marker on it or ahead of the hero's vehicle. */
 /* Per-frame target tracker: a vehicle mode places a marker ahead of the vehicle; on foot
    record [1] replaces record [0] once it has been nearest for long enough, a marker
    follows record [0]'s owner, and [1] is shifted into [2] and cleared for the next frame. */
-void func_L08_003D39F0(u8 *object)
+void func_L08_003D39F0(u8 *moby)
 {
     float offset[4] __attribute__((aligned(16)));
     u8 *vehicle;
-    int *data = *(int **)(object + 0x68);
-    int limit;
+    int *vars = *(int **)(moby + 0x68);
+    int holdFrames;
 
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        func_00115484(&D_L08_001B3490[0], 0, 48);
-        func_00115484(&D_L08_001B3490[1], 0, 48);
-        func_00115484(&D_L08_001B3490[2], 0, 48);
+        memset(&D_L08_001B3490[0], 0, 48);
+        memset(&D_L08_001B3490[1], 0, 48);
+        memset(&D_L08_001B3490[2], 0, 48);
         D_L08_001B3490[0].dist = 100000.0f;
         D_L08_001B3490[0].unk18 = 65535;
         D_L08_001B3490[1].dist = 100000.0f;
@@ -108,24 +111,24 @@ void func_L08_003D39F0(u8 *object)
         D_L08_001B3490[2].dist = 100000.0f;
         D_L08_001B3490[2].unk18 = 65535;
         D_L08_001B0318 = 0;
-        object[0x20] = 1;
+        moby[0x20] = 1;
         return;
     case 1:
         break;
     default:
         return;
     }
-    if (*data != -1 && func_002ACBC8(&D_L08_001B9B00, *data))
+    if (*vars != -1 && IsPointInCuboid(&D_L08_001B9B00, *vars))
         D_L08_001B258C = 2;
-    if (D_00189E20.mode == 0x31 && (vehicle = D_00189E20.vehicle) != 0) {
-        func_002AF000(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
-        func_00282CC0(&D_L08_001B3490[0].pos, offset, D_00189E20.vehicle + 0x10);
+    if (gHeroState.mode == 0x31 && (vehicle = gHeroState.vehicle) != 0) {
+        BuildSphericalOffset(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
+        FastVecAdd(&D_L08_001B3490[0].pos, offset, gHeroState.vehicle + 0x10);
         if (D_L08_001B0318 == 0) {
-            D_L08_001B0318 = func_L00_002D70A0(5);
+            D_L08_001B0318 = AllocCameraOverrideSlot(5);
             if (D_L08_001B0318 == 0)
                 goto shift;
         }
-        if (*(s16 *)(D_00189E20.vehicle + 0xAA) == 0x905) {
+        if (*(s16 *)(gHeroState.vehicle + 0xAA) == 0x905 /* Glider */) {
             D_L08_001B0318->x0 = D_L08_001B0304;
             D_L08_001B0318->xC = -1.0f;
             D_L08_001B0318->x8 = -1.0f;
@@ -135,17 +138,17 @@ void func_L08_003D39F0(u8 *object)
             D_L08_001B0318->x8 = D_L08_001B0314;
         }
         D_L08_001B0318->x1F = 1;
-        func_00282CF0(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
         goto shift;
     }
     if (D_L08_001B3490[2].owner == D_L08_001B3490[1].owner)
         D_L08_001B3490[1].unk1C = D_L08_001B3490[2].unk1C + 1;
     if (D_L08_001B3490[1].owner != D_L08_001B3490[0].owner && D_L08_001B3490[1].owner != 0) {
-        limit = D_L08_001B3490[1].unk1C;
-        if (limit < D_L08_001B02FC)
-            limit = D_L08_001B02FC;
+        holdFrames = D_L08_001B3490[1].unk1C;
+        if (holdFrames < D_L08_001B02FC)
+            holdFrames = D_L08_001B02FC;
         D_L08_001B3490[0].unk18++;
-        if (D_L08_001B3490[0].unk18 >= limit) {
+        if (D_L08_001B3490[0].unk18 >= holdFrames) {
             CopyTarget(&D_L08_001B3490[0], &D_L08_001B3490[1]);
             D_L08_001B3490[0].valid = 1;
         }
@@ -155,20 +158,20 @@ void func_L08_003D39F0(u8 *object)
     }
     if (D_L08_001B3490[0].owner != 0) {
         if (D_L08_001B0318 == 0) {
-            D_L08_001B0318 = func_L00_002D70A0(5);
+            D_L08_001B0318 = AllocCameraOverrideSlot(5);
             if (D_L08_001B0318 == 0)
                 goto shift;
         }
         D_L08_001B0318->x0 = 7.0f;
         D_L08_001B0318->x1F = 1;
-        func_00282CF0(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
     } else if (D_L08_001B0318 != 0) {
-        func_L00_002D7140(D_L08_001B0318);
+        EndCameraOverride(D_L08_001B0318);
         D_L08_001B0318 = 0;
     }
 shift:
     CopyTarget(&D_L08_001B3490[2], &D_L08_001B3490[1]);
-    func_00115484(&D_L08_001B3490[1], 0, 48);
+    memset(&D_L08_001B3490[1], 0, 48);
     D_L08_001B3490[1].unk18 = 65535;
     D_L08_001B3490[1].dist = 100000.0f;
     D_L08_001B3490[0].valid = 0;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Update a rising platform and retire it near either endpoint. */
 extern void func_002A7398(char *, int, int);
 extern float func_00283C80(float, float);
@@ -16,7 +17,7 @@ void func_L06_00400498(char *object)
     if (state == 0)
         return;
     if (*(unsigned char *)(object + 0x20) == 0) {
-        func_002A7398(object, 0, 0);
+        StartAnimationImmediate(object, 0, 0);
         *(int *)(object + 0x48) = 0;
         *(float *)(state + 0xc) = *(float *)(state + 4);
         *(unsigned char *)(object + 0x20) = 1;
@@ -28,11 +29,11 @@ void func_L06_00400498(char *object)
         if (parent != 0 && *(unsigned char *)(*(char **)(parent + 0x68) + 0x14) != 0)
             advance = 0;
     }
-    if (func_00283C80(*(float *)(state + 0xc), 0.0f) < D_L06_001AFE40 * 0.00029088824521750211716f ||
-        func_00283C80(*(float *)(state + 0xc), 3.14159297943115234375f) < D_L06_001AFE40 * 0.00029088824521750211716f)
-        func_002E5CF8(0, 0, object);
+    if (FastDiffRots(*(float *)(state + 0xc), 0.0f) < D_L06_001AFE40 * 0.00029088824521750211716f ||
+        FastDiffRots(*(float *)(state + 0xc), 3.14159297943115234375f) < D_L06_001AFE40 * 0.00029088824521750211716f)
+        PlayMobySound(0, 0, object);
     if (advance)
-        *(float *)(state + 0xc) = func_00283B98(*(float *)(state + 0xc), D_L06_001AFE40 * 0.00029088824521750211716f);
-    wave = func_00283198(*(float *)(state + 0xc));
+        *(float *)(state + 0xc) = FastAddRotations(*(float *)(state + 0xc), D_L06_001AFE40 * 0.00029088824521750211716f);
+    wave = FastSinOrCosB(*(float *)(state + 0xc));
     *(float *)(object + 0x18) = (*(float *)(state + 8) - 2.0f) + (wave + wave);
 }

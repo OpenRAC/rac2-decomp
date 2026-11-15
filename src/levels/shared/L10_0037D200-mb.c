@@ -5,20 +5,21 @@ typedef struct { char pad[0x34]; unsigned short flags; char pad2[0x68 - 0x36]; f
 extern unsigned short *D_L10_001FB1E0[];
 extern Moby *D_L10_001B251C MACRO_ADDR;
 
+/* Counts how many mobys in the same group are still alive. */
 int func_L10_0037D200(u8 *self) {
     unsigned short *list = D_L10_001FB1E0[self[0x21]];
-    unsigned short *p;
+    unsigned short *entry;
     Moby *object;
     float *health;
     int count = 0;
     if (!list) return 0;
-    p = list;
+    entry = list;
     do {
-        object = (Moby *)((*p & 0x7FFF) * 0x100 + (int)D_L10_001B251C);
+        object = (Moby *)((*entry & 0x7FFF) * 0x100 + (int)D_L10_001B251C);
         if (object->flags & 0x20) {
             health = *object->health;
             if (health && *health > 0.0f) count++;
         }
-    } while (*(short *)(p++) >= 0);
+    } while (*(short *)(entry++) >= 0);
     return count;
 }

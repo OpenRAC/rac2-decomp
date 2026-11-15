@@ -1,3 +1,4 @@
+#include "names.h"
 /* Related hero layout and control flow adapted from OpenRAC/rac1-decomp
  * src/overlays/shared/hero_idle_and_animation.c (GPL-3.0). */
 
@@ -56,6 +57,7 @@ extern float func_002A7878(float, float);
 extern void func_L00_00335558(void *, void *, float);
 
 /* Drive articulated offsets and emit the active pair of joint effects. */
+/* Swings the hero arms and body parts as the hero moves, and makes small effects at the hands when needed. */
 void func_L00_002AC1A0(void)
 {
     Quadword position;
@@ -63,23 +65,23 @@ void func_L00_002AC1A0(void)
     float left, right, draw;
     int index;
 
-    if (D_00189E20.f1270) {
+    if (gHeroState.f1270) {
         D_L00_0025BE10.f36C = 0.01f;
         D_L00_0025BE10.f41C = 0.01f;
     }
-    if (func_L00_002ADF80())
+    if (IsHeroInSpecialKindOrMode())
         return;
-    if ((func_00282C48(D_00189E20.f300) > 0.015f ||
-         func_00282C48(D_00189E20.f304) > 0.015f ||
-         func_00282C48(D_00189E20.f308) > 0.01745329424738884f ||
-         func_00282C48(D_00189E20.f30C) > 0.01745329424738884f ||
-         func_00282C48(D_00189E20.f310) > 0.01745329424738884f ||
-         func_00282C48(D_00189E20.f314) > 0.01745329424738884f) &&
-        D_00189E20.f348 != 1) {
-        D_L00_0025BE10.f324 = -D_00189E20.f308;
-        D_L00_0025BE10.f3D4 = -D_00189E20.f30C;
-        left = func_00283248(0.2f, D_00189E20.f300) * 1.2f;
-        right = -func_00283248(0.2f, D_00189E20.f304) * 1.2f;
+    if ((FloatAbs(gHeroState.f300) > 0.015f ||
+         FloatAbs(gHeroState.f304) > 0.015f ||
+         FloatAbs(gHeroState.f308) > 0.01745329424738884f ||
+         FloatAbs(gHeroState.f30C) > 0.01745329424738884f ||
+         FloatAbs(gHeroState.f310) > 0.01745329424738884f ||
+         FloatAbs(gHeroState.f314) > 0.01745329424738884f) &&
+        gHeroState.f348 != 1) {
+        D_L00_0025BE10.f324 = -gHeroState.f308;
+        D_L00_0025BE10.f3D4 = -gHeroState.f30C;
+        left = FastMatrixHelperA(0.2f, gHeroState.f300) * 1.2f;
+        right = -FastMatrixHelperA(0.2f, gHeroState.f304) * 1.2f;
         if (left > 0.785398244857788f)
             left = 0.785398244857788f;
         if (left < -0.174532949924469f)
@@ -90,31 +92,31 @@ void func_L00_002AC1A0(void)
             right = -0.785398244857788f;
         D_L00_0025BE10.f480 = left;
         D_L00_0025BE10.f530 = right;
-        D_L00_0025BE10.f320 = -func_00283BE0(D_00189E20.f310, -left);
-        D_L00_0025BE10.f3D0 = -func_00283BE0(D_00189E20.f314, -right);
+        D_L00_0025BE10.f320 = -fast_subtract_rotations(gHeroState.f310, -left);
+        D_L00_0025BE10.f3D0 = -fast_subtract_rotations(gHeroState.f314, -right);
     }
-    if (!(D_00189E20.f143E & 0x80)) {
-        if (D_00189E20.f2294 == 3)
-            func_L00_002D3248(1, 2, 1, 0, 0.021f, 0.002f);
-        if (D_00189E20.f229C == 4 && D_00189E20.f49C && D_00189E20.f49C < 12)
-            func_L00_002D3248(1, 2, 0, 1, 0.016f, 0.002f);
-        if (D_00189E20.f1438 > 0 && D_00189E20.f143C) {
+    if (!(gHeroState.f143E & 0x80)) {
+        if (gHeroState.f2294 == 3)
+            SetHeroLevelClockAndBytes(1, 2, 1, 0, 0.021f, 0.002f);
+        if (gHeroState.f229C == 4 && gHeroState.f49C && gHeroState.f49C < 12)
+            SetHeroLevelClockAndBytes(1, 2, 0, 1, 0.016f, 0.002f);
+        if (gHeroState.f1438 > 0 && gHeroState.f143C) {
             matrix = 0;
-            if (D_00189E20.f143E & 1)
-                matrix = D_00189E20.f2290 + 0xC0;
-            --D_00189E20.f1438;
-            func_0029FCC0((char *)D_00189E20.f2290, 22, (char *)&position);
-            for (index = 0; index < D_00189E20.f143C; ++index) {
-                draw = func_002A7878(-D_00189E20.f1434, D_00189E20.f1434);
-                func_L00_00335558(&position, matrix, D_00189E20.f1430 + draw);
+            if (gHeroState.f143E & 1)
+                matrix = gHeroState.f2290 + 0xC0;
+            --gHeroState.f1438;
+            TransformMobyJointToWorld((char *)gHeroState.f2290, 22, (char *)&position);
+            for (index = 0; index < gHeroState.f143C; ++index) {
+                draw = RandomFloatRange(-gHeroState.f1434, gHeroState.f1434);
+                SpawnSparkEffect(&position, matrix, gHeroState.f1430 + draw);
             }
-            func_0029FCC0((char *)D_00189E20.f2290, 23, (char *)&position);
-            for (index = 0; index < D_00189E20.f143C; ++index) {
-                draw = func_002A7878(-D_00189E20.f1434, D_00189E20.f1434);
-                func_L00_00335558(&position, matrix, D_00189E20.f1430 + draw);
+            TransformMobyJointToWorld((char *)gHeroState.f2290, 23, (char *)&position);
+            for (index = 0; index < gHeroState.f143C; ++index) {
+                draw = RandomFloatRange(-gHeroState.f1434, gHeroState.f1434);
+                SpawnSparkEffect(&position, matrix, gHeroState.f1430 + draw);
             }
         }
     } else {
-        D_00189E20.f1438 = 0;
+        gHeroState.f1438 = 0;
     }
 }

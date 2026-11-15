@@ -17,99 +17,99 @@ extern float func_00283CE0(int);
 extern void func_0026FEB8(char *,...);
 /* Tracks up to five linked entities, syncs the target's position/rotation, and steps the
    target's timed state. */
-void func_L17_0041F478(unsigned char *o)
+void func_L17_0041F478(unsigned char *moby)
 {
-    unsigned char *s=*(unsigned char **)(o+0x68),*target;
-    Link *row=(Link *)(s+0x18),*r;
+    unsigned char *vars=*(unsigned char **)(moby+0x68),*target;
+    Link *row=(Link *)(vars+0x18),*link;
     int active,id,bits,half;
-    float f;
-    if(*(int *)(s+0x54)!=-1) {
-        unsigned char *e=(unsigned char *)entity_base_abs[0]+(*(int *)(s+0x10)<<8);
-        e[0x20]=2;
-        if(!func_002B38B8(o)) {
-            unsigned short flags=*(unsigned short *)(o+0x34);
-            *(int *)(o+0x98)=0;
-            o[0x31]=0;
-            *(unsigned short *)(o+0x34)=flags|0x41;
+    float factor;
+    if(*(int *)(vars+0x54)!=-1) {
+        unsigned char *linked=(unsigned char *)entity_base_abs[0]+(*(int *)(vars+0x10)<<8);
+        linked[0x20]=2;
+        if(!IsThirdPendingFlagSet(moby)) {
+            unsigned short flags=*(unsigned short *)(moby+0x34);
+            *(int *)(moby+0x98)=0;
+            moby[0x31]=0;
+            *(unsigned short *)(moby+0x34)=flags|0x41;
             return;
         }
-        *(int *)(s+0x54)=-1;
-        func_L00_003294F0(o,0);
-        e[0x20]=1;
+        *(int *)(vars+0x54)=-1;
+        SetObjectFlagBit(moby,0);
+        linked[0x20]=1;
     }
     active=0;
     target=0;
-    if(*(int *)(s+0x10)!=-1)target=(unsigned char *)entity_base_abs[0]+(*(int *)(s+0x10)<<8);
-    if((o[0xb0]==0xff || !(D_0019B2E8[o[0xb0]+(D_001A79F0<<4)]&0x80)) && o[0x20]!=0) {
+    if(*(int *)(vars+0x10)!=-1)target=(unsigned char *)entity_base_abs[0]+(*(int *)(vars+0x10)<<8);
+    if((moby[0xb0]==0xff || !(D_0019B2E8[moby[0xb0]+(gCurrentMapIndex<<4)]&0x80)) && moby[0x20]!=0) {
         int i;
-        r=row;
-        for(i=0;i<5;++i,++r) {
-            if(r->index==-1)goto next_row;
+        link=row;
+        for(i=0;i<5;++i,++link) {
+            if(link->index==-1)goto next_row;
             {
-                unsigned char *e=(unsigned char *)entity_base_gp+(r->index<<8);
-                if(func_002B38B8(o))goto next_row;
-                if(!e || *(short *)(e+0xaa)!=r->uid || e[0x20]==0xfe || e[0x20]==0xfd)goto clear_active;
-                id=*(unsigned short *)(e+0xb2);
+                unsigned char *linked=(unsigned char *)entity_base_gp+(link->index<<8);
+                if(IsThirdPendingFlagSet(moby))goto next_row;
+                if(!linked || *(short *)(linked+0xaa)!=link->uid || linked[0x20]==0xfe || linked[0x20]==0xfd)goto clear_active;
+                id=*(unsigned short *)(linked+0xb2);
                 half=(short)id;
-                bits=D_0019B4A8[(half>>1)+(D_001A79F0<<10)];
+                bits=D_0019B4A8[(half>>1)+(gCurrentMapIndex<<10)];
                 if(id&1)bits=(bits>>4)&7;else bits&=7;
                 if(bits)goto clear_active;
                 ++active;
-                if(r->state==-1)goto next_row;
-                if(e[0x20]!=r->state)goto next_row;
+                if(link->state==-1)goto next_row;
+                if(linked[0x20]!=link->state)goto next_row;
             }
 clear_active:
             active=0;
 next_row:;
         }
     }
-    switch(o[0x20]) {
+    switch(moby[0x20]) {
     case 0:
         if(target) {
-            *(unsigned short *)(s+0x14)=*(unsigned short *)(target+0xaa);
-            *(float *)(s+0x44)=func_00283CE0(target[0x23]);
-            if(*(int *)(s+8)&0x10)qcopy(o+0x10,target+0x10);
-            else if(*(int *)(s+8)&0x40)qcopy(target+0x10,o+0x10);
-            if(*(int *)(s+8)&0x20)qcopy(o+0xf0,target+0xf0);
-            else if(*(int *)(s+8)&0x80)qcopy(target+0xf0,o+0xf0);
-        } else func_0026FEB8(D_L17_001B1FB8);
+            *(unsigned short *)(vars+0x14)=*(unsigned short *)(target+0xaa);
+            *(float *)(vars+0x44)=IntToFloat(target[0x23]);
+            if(*(int *)(vars+8)&0x10)qcopy(moby+0x10,target+0x10);
+            else if(*(int *)(vars+8)&0x40)qcopy(target+0x10,moby+0x10);
+            if(*(int *)(vars+8)&0x20)qcopy(moby+0xf0,target+0xf0);
+            else if(*(int *)(vars+8)&0x80)qcopy(target+0xf0,moby+0xf0);
+        } else STUB_printf(D_L17_001B1FB8);
         { int i; unsigned char *diag;
         for(diag=(unsigned char *)row,i=0;i<5;++i,diag+=8) {
             if(*(int *)diag!=-1) {
                 char *base=entity_base_abs[0];
                 unsigned int offset=*(int *)diag<<8;
-                unsigned char *e=(unsigned char *)(offset+(unsigned int)base);
-                *(unsigned short *)(diag+4)=*(unsigned short *)(e+0xaa);
-                func_0026FEB8(D_L17_001B1FE8,((char *)o-base)>>8,i,*(int *)diag,*(short *)(diag+4));
-            } else func_0026FEB8(D_L17_001B2018,((char *)o-entity_base_abs[0])>>8,i);
+                unsigned char *linked=(unsigned char *)(offset+(unsigned int)base);
+                *(unsigned short *)(diag+4)=*(unsigned short *)(linked+0xaa);
+                STUB_printf(D_L17_001B1FE8,((char *)moby-base)>>8,i,*(int *)diag,*(short *)(diag+4));
+            } else STUB_printf(D_L17_001B2018,((char *)moby-entity_base_abs[0])>>8,i);
         }
         }
-        { float factor=*(float *)(*(char **)(o+0x24)+0x24);
-        float width=*(float *)s,height=*(float *)(s+4);
-        o[0x20]=1;
-        *(float *)(o+0x2c)=(height>width?height:width)*factor; }
+        { float factor=*(float *)(*(char **)(moby+0x24)+0x24);
+        float width=*(float *)vars,height=*(float *)(vars+4);
+        moby[0x20]=1;
+        *(float *)(moby+0x2c)=(height>width?height:width)*factor; }
         break;
     case 1:
         if(!active) {
-            if(target && *(signed char *)(s+0x16)!=-1)target[0x20]=s[0x16];
-            *(int *)(s+0x40)=*(int *)(s+0xc);
-            o[0x20]=2;
+            if(target && *(signed char *)(vars+0x16)!=-1)target[0x20]=vars[0x16];
+            *(int *)(vars+0x40)=*(int *)(vars+0xc);
+            moby[0x20]=2;
         }
-        func_L17_0041F180(o,s);
+        HitMobysInsideBox(moby,vars);
         break;
     case 2:
-        if(target && !(*(int *)(s+8)&2)) {
-            f=func_00283CE0(*(int *)(s+0x40));
-            f=*(float *)(s+0x44)*f/func_00283CE0(*(int *)(s+0xc));
-            target[0x23]=func_00283CF0(f);
+        if(target && !(*(int *)(vars+8)&2)) {
+            factor=IntToFloat(*(int *)(vars+0x40));
+            factor=*(float *)(vars+0x44)*factor/IntToFloat(*(int *)(vars+0xc));
+            target[0x23]=FloatToInt(factor);
         }
-        if(!(*(int *)(s+8)&4) && target && *(signed char *)(s+0x17)!=-1 && target[0x20]==*(signed char *)(s+0x17))o[0x20]=3;
-        if(!(*(int *)(s+8)&8) && func_00282948(s+0x40))o[0x20]=3;
-        func_L17_0041F180(o,s);
+        if(!(*(int *)(vars+8)&4) && target && *(signed char *)(vars+0x17)!=-1 && target[0x20]==*(signed char *)(vars+0x17))moby[0x20]=3;
+        if(!(*(int *)(vars+8)&8) && FastFloatHelperD(vars+0x40))moby[0x20]=3;
+        HitMobysInsideBox(moby,vars);
         break;
     case 3:
-        if(target && !(*(int *)(s+8)&1))func_0029F338(target);
-        func_0029F338(o);
+        if(target && !(*(int *)(vars+8)&1))MarkMobySpawned(target);
+        MarkMobySpawned(moby);
         break;
     case 4:
         break;

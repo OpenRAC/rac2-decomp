@@ -20,9 +20,10 @@ extern int func_00131730(int);
 extern int func_00131760(int);
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D340 */
+/* Checks whether this console is the kind that reports itself with a T in the ROM version. */
 int func_001315E0(void) {
     if (r1_D_001331D8[0] == 0) {
-        func_00131540();
+        GetRomVersion();
     }
     return r1_D_001331D8[4] == 0x54;
 }
@@ -31,13 +32,14 @@ extern unsigned char D_00138152 NOT_SDA;
 
 extern void func_0011ACD0(unsigned int *);
 
+/* Gets the console region number from stored data or from the hardware. */
 int func_00131620(void) {
     unsigned int local;
 
-    if (func_001315E0() != 0) {
+    if (IsRomVersionTool() != 0) {
         return D_00138152;
     }
-    func_0011ACD0(&local);
+    GetOsdConfigParam(&local);
     return (local >> 1) & 3;
 }
 
@@ -45,12 +47,13 @@ int func_00131620(void) {
 /* rac1-decomp src/core/0012CC90.c: func_0012D3F0 */
 /* `r` assigned in both arms and returned once: a direct `return
    r1_D_001331D0;` loads straight into $v0 and moves the address to $v1. */
+/* Gets the console model or version number. */
 int func_00131670(void) {
     unsigned int local;
     unsigned int bits;
     int r;
 
-    if (func_001315E0() != 0) {
+    if (IsRomVersionTool() != 0) {
         r = r1_D_001331D0;
     } else {
         r1_func_00118CF0(&local);
@@ -67,11 +70,12 @@ int func_00131670(void) {
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D448 */
 /* One return, and r1_func_00118DC0 returns int. */
+/* Gets a single on/off flag from the console hardware info. */
 int func_001316C8(void) {
     unsigned char buf[16];
     int r;
 
-    if (func_001315E0() != 0) {
+    if (IsRomVersionTool() != 0) {
         r = r1_D_001331D6[0];
     } else {
         r1_func_00118CF0(buf);
@@ -86,8 +90,9 @@ int func_001316C8(void) {
 }
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D4B0 */
-int func_00131730(int arg0) {
-    unsigned int v = arg0 & 0xFF;
+/* Turns a normal number (0-99) into a BCD byte. */
+int func_00131730(int value) {
+    unsigned int v = value & 0xFF;
     return ((v / 10) * 6 + v) & 0xFF;
 }
 
@@ -114,8 +119,9 @@ int func_00131730(int arg0) {
    `mflo` (the plain int form picks the R5900 three-operand mult). */
 /* The product goes through an unsigned char local: that gives retail's
    generic mult $0 + mflo instead of the three-operand mult. */
-int func_00131760(int arg0) {
-    unsigned char v = arg0;
+/* Turns a BCD byte into a normal number. */
+int func_00131760(int bcd) {
+    unsigned char v = bcd;
     unsigned char t = (v >> 4) * 6;
     return (unsigned char)(v - t);
 }

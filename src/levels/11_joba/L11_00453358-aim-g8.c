@@ -72,41 +72,41 @@ s32 func_L11_004566C0(AimObject *obj)
     vec[2] = obj->position[2];
     vec[3] = 2.0f;
     *(TI128 *)copy = *(TI128 *)vec;
-    if (func_00283DB8(copy, 128.0f) <= 0)
+    if (FastMathHelperA(copy, 128.0f) <= 0)
         return 0;
     if (state->group == -1)
         return 0;
 
-    for (ids = D_L11_001FC420[state->group];
+    for (ids = gGroupIdLists[state->group];
          (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && ids != 0 &&
-         ((ids != 0 && (s16)ids[-1] >= 0) || ids == D_L11_001FC420[state->group]);
+         ((ids != 0 && (s16)ids[-1] >= 0) || ids == gGroupIdLists[state->group]);
          ids++) {
-        entity = D_L11_001B359C[0] + (*ids & 0x7FFF);
+        entity = gMobyTable_L11[0] + (*ids & 0x7FFF);
         if (entity == 0)
             return 0;
-        if (!func_L02_003D7300(entity))
+        if (!GetMobyBusyFlag(entity))
             continue;
-        if (!(func_00282E80(obj->position, entity->position) < D_L11_001B1D94))
+        if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1D94))
             continue;
 
-        angle = func_00283248(entity->position[0] - obj->position[0],
+        angle = FastMatrixHelperA(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
-        if (!(func_00283C80(obj->heading, angle) < D_L11_001B1D98 * 0.017453294f))
+        if (!(FastDiffRots(obj->heading, angle) < D_L11_001B1D98 * 0.017453294f))
             continue;
         if (ids == 0)
             return 0;
 
-        func_00282CF0(vec, obj->position, entity->position);
+        FastVecSub(vec, obj->position, entity->position);
         turn = D_L11_001B1D9C * 0.017453294f;
-        angle = func_00283248(entity->position[0] - obj->position[0],
+        angle = FastMatrixHelperA(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
-        func_002ACEC0(vec, vec, obj->axis,
-                      func_00283BE0(obj->heading, angle) >= 0.0f ? -turn : turn);
-        func_00282CC0(vec, vec, entity->position);
+        ApplyAxisRotationToQuaternion(vec, vec, obj->axis,
+                      fast_subtract_rotations(obj->heading, angle) >= 0.0f ? -turn : turn);
+        FastVecAdd(vec, vec, entity->position);
 
         savedTurnRate = state->turnRate;
         state->turnRate = 0.0001f;
-        func_L11_00456070(obj, vec);
+        WalkJobaFighterWithDust(obj, vec);
         state->turnRate = savedTurnRate;
         return 1;
     }

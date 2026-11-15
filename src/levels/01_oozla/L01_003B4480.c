@@ -21,31 +21,32 @@ extern void func_L01_003B4200(void *a0, int a1, int a2, int a3);
 /* The float the second argument of func_002C19D8 points at. */
 extern f32 D_L01_001AFE18[];
 
-void func_L01_003B4480(u8 *arg0)
+/* Makes bubbles rise from the object when the game is in the right mode, and a splash when the object is moving fast. */
+void func_L01_003B4480(u8 *object)
 {
-    u8 *state = *(u8 **)(arg0 + 0x68);
-    float v[4];
-    float f;
+    u8 *state = *(u8 **)(object + 0x68);
+    float bubblePos[4];
+    float value;
     int i;
 
-    func_002A89A8(arg0 + 0x10, 0, 0.5f);
-    if (func_00278E78() != 3)
+    ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
+    if (GetCollHitMaterial() != 3)
         return;
     {
-        u8 *p = arg0 + 0x10;
-        u8 *q = state + 0xE0;
+        u8 *srcPos = object + 0x10;
+        u8 *speedVec = state + 0xE0;
         i = 0;
         while (i >= 0) {
-            *(V4 *)v = *(V4 *)p;
-            func_002ACB48(v, 0.15f);
-            v[2] = func_L01_003BAFB0();
-            f = func_002A7878(0.3f, 2.5f);
-            func_002C19D8((char *)v, (int)D_L01_001AFE18,
-                          (int)((((u32)func_002A77E0(6) + 0x14) << 24) | 0x5060), f, 11000.0f);
+            *(V4 *)bubblePos = *(V4 *)srcPos;
+            AddRandomOffsetToVector(bubblePos, 0.15f);
+            bubblePos[2] = GetWaterHeight();
+            value = RandomFloatRange(0.3f, 2.5f);
+            SpawnDriftingParticle_002C19D8((char *)bubblePos, (int)D_L01_001AFE18,
+                          (int)((((u32)RandomIntBelow(6) + 0x14) << 24) | 0x5060), value, 11000.0f);
             i--;
         }
-        f = 0.0333333333f;
-        if (f < func_00282DF0(q) || f < func_00282DF0(state + 0x2F0))
-            func_L01_003B4200(arg0, 3, 10, 1);
+        value = 0.0333333333f;
+        if (value < FastVecLength(speedVec) || value < FastVecLength(state + 0x2F0))
+            SpawnWaterSplashEffects_L01(object, 3, 10, 1);
     }
 }

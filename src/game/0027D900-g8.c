@@ -10,6 +10,7 @@ extern unsigned char D_001A7BB0[] __attribute__((sda));
 typedef union { int *words; char *bytes; int address; } PacketCursor;
 extern PacketCursor ref_0027D900_01;
 extern char ref_0027D900_02[], ref_0027D900_03[];
+/* Slides black bars in at the top and bottom of the screen, or back out again. */
 void func_0027D900(void) {
     int h;
 
@@ -57,14 +58,14 @@ void func_0027D900(void) {
         long *p;
         ref_0027D900_01.words = base + 4;
         p = (long *)ref_0027D900_01.words;
-        p[0] = D_001A7350[0] | ((long)D_001A7354[0] << 16) | ((long)0xFFFFF3 << 32);
-        p[1] = D_001A7350[0] | ((long)(D_001A7354[0] + h) << 16) | ((long)0xFFFFF3 << 32);
-        p[2] = D_001A7358[0] | ((long)D_001A7354[0] << 16) | ((long)0xFFFFF3 << 32);
-        p[3] = D_001A7358[0] | ((long)(D_001A7354[0] + h) << 16) | ((long)0xFFFFF3 << 32);
+        p[0] = gScreenOffsetX[0] | ((long)gScreenOffsetY[0] << 16) | ((long)0xFFFFF3 << 32);
+        p[1] = gScreenOffsetX[0] | ((long)(gScreenOffsetY[0] + h) << 16) | ((long)0xFFFFF3 << 32);
+        p[2] = D_001A7358[0] | ((long)gScreenOffsetY[0] << 16) | ((long)0xFFFFF3 << 32);
+        p[3] = D_001A7358[0] | ((long)(gScreenOffsetY[0] + h) << 16) | ((long)0xFFFFF3 << 32);
         p[4] = D_001A7358[0] | ((long)D_001A735C[0] << 16) | ((long)0xFFFFF3 << 32);
         p[5] = D_001A7358[0] | ((long)(D_001A735C[0] - h) << 16) | ((long)0xFFFFF3 << 32);
-        p[6] = D_001A7350[0] | ((long)D_001A735C[0] << 16) | ((long)0xFFFFF3 << 32);
-        p[7] = D_001A7350[0] | ((long)(D_001A735C[0] - h) << 16) | ((long)0xFFFFF3 << 32);
+        p[6] = gScreenOffsetX[0] | ((long)D_001A735C[0] << 16) | ((long)0xFFFFF3 << 32);
+        p[7] = gScreenOffsetX[0] | ((long)(D_001A735C[0] - h) << 16) | ((long)0xFFFFF3 << 32);
     }
     ref_0027D900_01.words = (int *)((char *)ref_0027D900_01.words + 0x40);
 }

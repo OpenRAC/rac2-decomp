@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned int u32;
@@ -19,21 +20,22 @@ extern void func_328A38(s32 a, s32 b);
 
 /* Walks the 0x68 context's two counters: one stamps the record's byte 0x20D and the other
    gives the modulus the first is folded by, or zero when it is not positive. */
-void func_L08_00424ED0(char *a0) {
-    char *q;
-    s32 d;
-    if (*(u8 *)(a0 + 0x21) == 0xFF) {
+/* Passes the turn to the next member of the creature's group. */
+void func_L08_00424ED0(char *moby) {
+    char *vars;
+    s32 groupSize;
+    if (*(u8 *)(moby + 0x21) == 0xFF) {
         return;
     }
-    q = *(char **)(a0 + 0x68);
-    if (*(u8 *)(q + 0x20D) == *(s32 *)(*(char **)(q + 0x1F8))) {
-        *(s32 *)(*(char **)(q + 0x1F8)) = *(u8 *)(q + 0x20D) + 1;
+    vars = *(char **)(moby + 0x68);
+    if (*(u8 *)(vars + 0x20D) == *(s32 *)(*(char **)(vars + 0x1F8))) {
+        *(s32 *)(*(char **)(vars + 0x1F8)) = *(u8 *)(vars + 0x20D) + 1;
     }
-    d = *(s32 *)(*(char **)(q + 0x1FC));
-    if (d > 0) {
-        *(s32 *)(*(char **)(q + 0x1F8)) = *(s32 *)(*(char **)(q + 0x1F8)) % d;
+    groupSize = *(s32 *)(*(char **)(vars + 0x1FC));
+    if (groupSize > 0) {
+        *(s32 *)(*(char **)(vars + 0x1F8)) = *(s32 *)(*(char **)(vars + 0x1F8)) % groupSize;
     } else {
-        *(s32 *)(*(char **)(q + 0x1F8)) = 0;
+        *(s32 *)(*(char **)(vars + 0x1F8)) = 0;
     }
 }
 
@@ -44,52 +46,55 @@ void func_L08_00424ED0(char *a0) {
    max.s pattern, so the ternary and the if-assignment both come out eight bytes larger. */
 
 
-void func_L08_00425448(char *a0) {
-    char *s0;
-    s0 = *(char **)(a0 + 0x68);
-    if (*(u8 *)(a0 + 0x21) != 0xFF) {
-        func_328A38(*(u8 *)(a0 + 0x21), 1);
+/* Stops the sounds this creature is playing and marks it as finished. */
+void func_L08_00425448(char *moby) {
+    char *vars;
+    vars = *(char **)(moby + 0x68);
+    if (*(u8 *)(moby + 0x21) != 0xFF) {
+        func_328A38(*(u8 *)(moby + 0x21), 1);
     }
-    if (*(s32 *)(s0 + 0x224) != -1) {
-        func_328A38(*(s32 *)(s0 + 0x224), 1);
+    if (*(s32 *)(vars + 0x224) != -1) {
+        func_328A38(*(s32 *)(vars + 0x224), 1);
     }
-    if (*(s32 *)(s0 + 0x228) != -1) {
-        func_328A38(*(s32 *)(s0 + 0x224), 1);
+    if (*(s32 *)(vars + 0x228) != -1) {
+        func_328A38(*(s32 *)(vars + 0x224), 1);
     }
-    *(u8 *)(a0 + 0xBC) = 1;
+    *(u8 *)(moby + 0xBC) = 1;
 }
 
-s32 func_L08_004254D0(s32 a0) {
-    s32 v1;
-    s32 v0;
-    s32 v2;
-    v1 = D_L08_001B29DC;
-    if (a0 != -1) {
-        v0 = a0 << 8;
-        v2 = v1 + v0;
-        a0 = 0;
-        if (v2 == 0 || *(u8 *)(v2 + 0x20) == 0xFE || *(u8 *)(v2 + 0x20) == 0xFD) {
-            a0 = 1;
+/* Returns 1 when the moby with this handle is missing or gone, otherwise 0. */
+s32 func_L08_004254D0(s32 handle) {
+    s32 table;
+    s32 offset;
+    s32 entry;
+    table = D_L08_001B29DC;
+    if (handle != -1) {
+        offset = handle << 8;
+        entry = table + offset;
+        handle = 0;
+        if (entry == 0 || *(u8 *)(entry + 0x20) == 0xFE || *(u8 *)(entry + 0x20) == 0xFD) {
+            handle = 1;
         }
-        return a0;
+        return handle;
     }
     return 1;
 }
 
-s32 func_L08_00425518(s32 a0) {
-    s32 v1;
-    s32 v0;
+/* Returns 1 when the moby with this handle is missing, gone, or past its early states, otherwise 0. */
+s32 func_L08_00425518(s32 handle) {
+    s32 entry;
+    s32 offset;
     u8 state;
-    if (a0 != -1) {
-        v0 = a0 << 8;
-        v1 = D_L08_001B29DC;
-        v1 = v1 + v0;
-        state = *(u8 *)(v1 + 0x20);
-        a0 = 0;
-        if (state >= 3 || v1 == 0 || state == 0xFE || state == 0xFD) {
-            a0 = 1;
+    if (handle != -1) {
+        offset = handle << 8;
+        entry = D_L08_001B29DC;
+        entry = entry + offset;
+        state = *(u8 *)(entry + 0x20);
+        handle = 0;
+        if (state >= 3 || entry == 0 || state == 0xFE || state == 0xFD) {
+            handle = 1;
         }
-        return a0;
+        return handle;
     }
     return 1;
 }
@@ -108,27 +113,28 @@ extern char D_00189EA0[];
 extern void func_L08_00425628(char *);
 
 /* The swing angle is folded into the moby's frame and the subobject is ticked. */
-void func_L08_004257A0(char *a0) {
-    char *s0 = *(char **)(a0 + 0x68);
+/* Picks a random spot around the creature (kept away from the hero), then picks its final target point. */
+void func_L08_004257A0(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
     f32 local[4];
-    f32 f21 = -3.1415927f;
-    f32 f20 = 3.1415927f;
-    f32 t;
+    f32 minAngle = -3.1415927f;
+    f32 maxAngle = 3.1415927f;
+    f32 angle;
 
-    t = func_002A7878(f21, f20);
-    *(f32 *)(s0 + 0x180) = func_00283180(t) * (f32)*(u8 *)(s0 + 0x20F);
-    t = func_002A7878(f21, f20);
-    *(f32 *)(s0 + 0x184) = func_00283198(t) * (f32)*(u8 *)(s0 + 0x20F);
-    *(f32 *)(s0 + 0x188) = 0.0f;
-    func_00282CC0(s0 + 0x180, s0 + 0x180, s0 + 0x170);
-    *(f32 *)(s0 + 0x188) = *(f32 *)(s0 + 0x188) + 6.5f;
-    if (*(s16 *)(s0 + 0x1B6) != 0) {
-        func_00282CF0(local, s0 + 0x180, (void *)D_00189EA0);
+    angle = RandomFloatRange(minAngle, maxAngle);
+    *(f32 *)(vars + 0x180) = FastSinOrCosA(angle) * (f32)*(u8 *)(vars + 0x20F);
+    angle = RandomFloatRange(minAngle, maxAngle);
+    *(f32 *)(vars + 0x184) = FastSinOrCosB(angle) * (f32)*(u8 *)(vars + 0x20F);
+    *(f32 *)(vars + 0x188) = 0.0f;
+    FastVecAdd(vars + 0x180, vars + 0x180, vars + 0x170);
+    *(f32 *)(vars + 0x188) = *(f32 *)(vars + 0x188) + 6.5f;
+    if (*(s16 *)(vars + 0x1B6) != 0) {
+        FastVecSub(local, vars + 0x180, (void *)gHeroPosition);
         *(s32 *)&local[2] = 0;
-        func_00282F20(local, local, 3.0f);
-        func_00282CC0(s0 + 0x180, s0 + 0x180, local);
+        vec_scale_to_length(local, local, 3.0f);
+        FastVecAdd(vars + 0x180, vars + 0x180, local);
     }
-    func_L08_00425628(a0);
+    UpdateTaboraSwingTarget(moby);
 }
 
 extern void func_00282CF0(void *, void *, void *);
@@ -142,66 +148,69 @@ extern int *D_L08_001FE7C0[];
 /* The actor's per-frame world transform: the record's own position goes through the
    model's matrix, is scaled, and is folded into the model; when the actor names a part,
    the part's table entry replaces it, and the model's own length ends up in the radius. */
-void func_L08_004258D0(char *a0) {
-    f32 v0[4];
-    f32 v1[4];
-    f32 v2[4];
-    f32 v3[4];
-    char *s1 = a0;
-    char *s4 = *(char **)(a0 + 0x68);
+/* Works out the spot the creature aims at, bent around its leader when close, and shifts it by the path points. */
+void func_L08_004258D0(char *moby) {
+    f32 offset[4];
+    f32 ownOffset[4];
+    f32 sideways[4];
+    f32 bend[4];
+    char *self = moby;
+    char *vars = *(char **)(moby + 0x68);
     s32 idx;
 
-    idx = *(s32 *)(s4 + 0x1E8);
+    idx = *(s32 *)(vars + 0x1E8);
     if (idx == -1) {
-        func_00282CF0(v0, s1 + 0x10, s4 + 0x120);
-        func_00282F20(v0, v0, 15.0f);
-        v0[2] = 0.0f;
-        func_00282CC0(s4 + 0x180, v0, s4 + 0x120);
+        FastVecSub(offset, self + 0x10, vars + 0x120);
+        vec_scale_to_length(offset, offset, 15.0f);
+        offset[2] = 0.0f;
+        FastVecAdd(vars + 0x180, offset, vars + 0x120);
     } else {
         s32 base = D_L08_001B29DC + (idx << 8);
 
-        func_00282CF0(v0, (char *)base + 0x10, s4 + 0x120);
-        v0[2] = 0.0f;
-        if (func_00282DF0(v0) < 9.0f) {
-            func_00282CF0(v1, s1 + 0x10, s4 + 0x120);
-            v1[2] = 0.0f;
-            func_00282F20(v1, v1, 15.0f);
-            func_00282CC0(s4 + 0x180, v1, s4 + 0x120);
-            func_00282DD8(v2, v0, v1);
-            func_00282DD8(v3, v0, v2);
-            func_00282F20(v3, v3, 1.0f);
-            func_00282CC0(s4 + 0x180, s4 + 0x180, v3);
+        FastVecSub(offset, (char *)base + 0x10, vars + 0x120);
+        offset[2] = 0.0f;
+        if (FastVecLength(offset) < 9.0f) {
+            FastVecSub(ownOffset, self + 0x10, vars + 0x120);
+            ownOffset[2] = 0.0f;
+            vec_scale_to_length(ownOffset, ownOffset, 15.0f);
+            FastVecAdd(vars + 0x180, ownOffset, vars + 0x120);
+            FastVecCross(sideways, offset, ownOffset);
+            FastVecCross(bend, offset, sideways);
+            vec_scale_to_length(bend, bend, 1.0f);
+            FastVecAdd(vars + 0x180, vars + 0x180, bend);
         } else {
-            func_00282F20(v0, v0, 15.0f);
-            func_00282CC0(s4 + 0x180, v0, s4 + 0x120);
+            vec_scale_to_length(offset, offset, 15.0f);
+            FastVecAdd(vars + 0x180, offset, vars + 0x120);
         }
     }
-    idx = *(s32 *)(s4 + 0x1E4);
+    idx = *(s32 *)(vars + 0x1E4);
     if (idx != -1) {
         int *list = D_L08_001FE7C0[idx];
 
-        func_L01_00337A60(s4 + 0x180, s4 + 0x180, (char *)list + 0x10, *list);
+        ClosestPointOnPolygonEdge(vars + 0x180, vars + 0x180, (char *)list + 0x10, *list);
     }
-    *(f32 *)(s4 + 0x188) = *(f32 *)(s4 + 0x1C8);
+    *(f32 *)(vars + 0x188) = *(f32 *)(vars + 0x1C8);
 }
 
 /* func_L08_00425AA8 is isolated in L08_00425AA8.c. */
 
-void func_L08_00425EB0(char *a0) {
-    char *p;
-    char *q;
-    s16 v1;
-    p = func_32A170((s32)a0, -1, 1);
-    if (p == 0) {
+/* Halves the size of the linked effect when it belongs to one of four certain kinds of moby. */
+void func_L08_00425EB0(char *moby) {
+    char *link;
+    char *target;
+    s16 classId;
+    link = func_32A170((s32)moby, -1, 1);
+    if (link == 0) {
         return;
     }
-    q = *(char **)(p + 0x20);
-    if (q == 0) {
+    target = *(char **)(link + 0x20);
+    if (target == 0) {
         return;
     }
-    v1 = *(s16 *)(q + 0xAA);
-    if (v1 == 0xA66 || v1 == 0xA82 || v1 == 0xCBB || v1 == 0xCF3) {
-        *(f32 *)(p + 0x2C) = *(f32 *)(p + 0x2C) * 0.5f;
+    classId = *(s16 *)(target + 0xAA);
+    if (classId == 0xA66 /* moby class 2662 */ || classId == 0xA82 /* moby class 2690 */ ||
+        classId == 0xCBB /* moby class 3259 */ || classId == 0xCF3 /* moby class 3315 */) {
+        *(f32 *)(link + 0x2C) = *(f32 *)(link + 0x2C) * 0.5f;
     }
 }
 
@@ -213,30 +222,31 @@ extern char D_00189EA0[];
 
 /* The record's whole per-frame pass: the sibling step, the aim vector copied out of the
    sub-object, the shared sprite pass, then the dispatch the shared tag call returns. */
-void func_L08_00425F28(char *a0) {
-    char *q = *(char **)(a0 + 0x68);
-    int r;
+/* Runs the creature's body each frame and reacts to hits: pushes it back, and cleans up on death. */
+void func_L08_00425F28(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    int hitResult;
 
-    func_L08_00425398(a0);
-    *(f32 *)(a0 + 0x2C) = *(f32 *)(*(char **)(a0 + 0x24) + 0x24);
-    func_L08_00425EB0(a0);
-    r = func_002B0ED8(a0, q + 0x50, 0);
-    if (r == 0) {
+    UpdateGroundHeightProbe(moby);
+    *(f32 *)(moby + 0x2C) = *(f32 *)(*(char **)(moby + 0x24) + 0x24);
+    HalveLinkedMobyScale(moby);
+    hitResult = ApplyDamageToObject(moby, vars + 0x50, 0);
+    if (hitResult == 0) {
         return;
     }
-    if (r == 1) {
-        float v[4];
+    if (hitResult == 1) {
+        float push[4];
 
-        func_00282CF0(v, a0 + 0x10, D_00189EA0);
-        func_00282F20(q + 0x1A0, v, 0.16666667f);
+        FastVecSub(push, moby + 0x10, gHeroPosition);
+        vec_scale_to_length(vars + 0x1A0, push, 0.16666667f);
     } else {
-        if (r == 4) {
-            *(unsigned char *)(q + 0xC6) = 0;
-            *(s32 *)(q + 0xCC) = -1;
+        if (hitResult == 4) {
+            *(unsigned char *)(vars + 0xC6) = 0;
+            *(s32 *)(vars + 0xCC) = -1;
         }
-        func_L08_00424ED0(a0);
+        AdvanceGroupTurn(moby);
     }
-    func_L08_00425448(a0);
+    ReleaseCreatureSounds(moby);
 }
 
 /* func_L08_00425FE8 is isolated in L08_00425FE8.c. */

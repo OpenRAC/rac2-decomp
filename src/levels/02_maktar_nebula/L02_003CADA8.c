@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003CADA8 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -9,9 +10,10 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void func_002A7750(char *, int, int);
 
 /* Sets the object's state to 7, then copies the 16-byte vector at A1 into its state at +0xF0. */
-void func_L02_003CADA8(char *arg0, char *arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Makes the enemy start falling, pushed with the given speed. */
+void func_L02_003CADA8(char *self, char *velocity) {
+    char *state = *(char **)(self + 0x68);
 
-    func_002A7750(arg0, 7, -1);
-    *(TI128 *)(state + 0xF0) = *(TI128 *)arg1;
+    SetMobyState(self, 7, -1);
+    *(TI128 *)(state + 0xF0) = *(TI128 *)velocity;
 }

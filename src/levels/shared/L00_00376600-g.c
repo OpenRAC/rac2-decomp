@@ -14,6 +14,7 @@ extern double func_00122A98(double, double);
 extern int func_00123130(double);
 extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 
+/* Draws the row of item icons with a pulsing highlight box around the selected one, fading them at the edges. */
 void func_L00_00376600(void) {
     unsigned int colors[4];
     char *model;
@@ -36,39 +37,39 @@ void func_L00_00376600(void) {
     double distance;
     unsigned int tint;
     initial_y = (int)(D_L00_001B25E0[0] * 185.0f + 0.5f);
-    initial_y += D_001A7B90[0] ? 4 : 0;
-    func_002FC620(48, 298, (int)(D_L00_001B25E0[0] * 120.0f + 0.5f), initial_y);
-    scroll = D_L00_0022F7C0;
+    initial_y += gIsPalVideo[0] ? 4 : 0;
+    SetGsScissorClamped(48, 298, (int)(D_L00_001B25E0[0] * 120.0f + 0.5f), initial_y);
+    scroll = gPurchaseMenuModel;
     if (*(int *)(scroll + 0x6C) < 0) *(int *)(scroll + 0x6C) += 4;
     else if (*(int *)(scroll + 0x6C) > 0) *(int *)(scroll + 0x6C) -= 4;
-    model = D_L00_0022F7C0;
-    pulse = func_00282C30(((*(int *)(model + 4) * 4) & 63) - 32) + 64;
+    model = gPurchaseMenuModel;
+    pulse = subtract_integer_with_clamp(((*(int *)(model + 4) * 4) & 63) - 32) + 64;
     if (*(int *)(model + 0x144 + *(int *)(model + 0x80) * 12) > 0) {
         shade = pulse * 0x10202;
         outer_top = (int)(D_L00_001B25E0[0] * 123.0f + 0.5f);
         outer_bottom = (int)(D_L00_001B25E0[0] * 179.0f + 0.5f);
-        outer_top += D_001A7B90[0] ? 4 : 0; outer_bottom += D_001A7B90[0] ? 4 : 0;
-        func_00285548(101, outer_top, 157, outer_bottom, D_001A7340[0], D_001A7344[0],
+        outer_top += gIsPalVideo[0] ? 4 : 0; outer_bottom += gIsPalVideo[0] ? 4 : 0;
+        DrawFramebufferRect(101, outer_top, 157, outer_bottom, gScreenWidth[0], gScreenHeight[0],
                       shade | 0x80000000u);
         inner_top = (int)(D_L00_001B25E0[0] * 125.0f + 0.5f);
         inner_bottom = (int)(D_L00_001B25E0[0] * 177.0f + 0.5f);
-        inner_top += D_001A7B90[0] ? 4 : 0; inner_bottom += D_001A7B90[0] ? 4 : 0;
-        func_00285548(103, inner_top, 155, inner_bottom, D_001A7340[0], D_001A7344[0], 0x80442D00);
+        inner_top += gIsPalVideo[0] ? 4 : 0; inner_bottom += gIsPalVideo[0] ? 4 : 0;
+        DrawFramebufferRect(103, inner_top, 155, inner_bottom, gScreenWidth[0], gScreenHeight[0], 0x80442D00);
     }
     x = *(int *)(model + 0x6C) - 63;
     for (relative = -3; relative < 5; relative++, x += 56) {
-        loop_model = D_L00_0022F7C0;
+        loop_model = gPurchaseMenuModel;
         slot = relative + *(int *)(loop_model + 0x80);
         if (slot < 0) continue;
         if (slot >= *(int *)(loop_model + 0x740)) continue;
         tint = 0xF0F0B0;
-        handle = func_0028E588(*(int *)(D_L00_0022F7C0 + 0x140 + slot * 12), 0);
-        distance = func_001234F0(150.0f - (float)(x + 2));
-        if (func_00123028(distance, 0.0) < 0) distance = func_00122A98(0.0, distance);
-        first_alpha = 128 - func_00123130(distance);
-        distance = func_001234F0(150.0f - (float)(x + 40));
-        if (func_00123028(distance, 0.0) < 0) distance = func_00122A98(0.0, distance);
-        second_alpha = 128 - func_00123130(distance);
+        handle = GetIconFrame(*(int *)(gPurchaseMenuModel + 0x140 + slot * 12), 0);
+        distance = FloatToDouble(150.0f - (float)(x + 2));
+        if (CompareDoubles(distance, 0.0) < 0) distance = SubtractDoubles(0.0, distance);
+        first_alpha = 128 - DoubleToInt(distance);
+        distance = FloatToDouble(150.0f - (float)(x + 40));
+        if (CompareDoubles(distance, 0.0) < 0) distance = SubtractDoubles(0.0, distance);
+        second_alpha = 128 - DoubleToInt(distance);
         if (first_alpha < 0) first_alpha = 0;
         if (second_alpha < 0) second_alpha = 0;
         first_alpha <<= 24;
@@ -78,7 +79,7 @@ void func_L00_00376600(void) {
         colors[3] = second_alpha | tint;
         colors[2] = first_alpha | tint;
         y = (int)(D_L00_001B25E0[0] * 129.0f + 0.5f);
-        y += D_001A7B90[0] ? 4 : 0;
-        func_0028EA58(handle, x + 2, y, 40, (int)(D_L00_001B25E0[0] * 40.0f + 0.5f), colors);
+        y += gIsPalVideo[0] ? 4 : 0;
+        DrawHudSpriteGradient(handle, x + 2, y, 40, (int)(D_L00_001B25E0[0] * 40.0f + 0.5f), colors);
     }
 }

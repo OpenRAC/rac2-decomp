@@ -110,14 +110,14 @@ void func_L05_00421100(u8 *actor)
         objects = func_00379EB8();
         found = func_00379EC8();
         for (n = 0; n < found; n++) {
-            if (*(s16 *)(objects[n] + 0xAA) == 0xF82) {
+            if (*(s16 *)(objects[n] + 0xAA) == 0xF82 /* moby class 3970 */) {
                 func_0037B280(objects[n], 1);
             }
         }
         path = D_L05_001FE380[*(s32 *)(state + 0x20)];
         while ((!D_L05_001B13B4 || !D_L05_001B13B8) && D_L05_001B13CC != path->count) {
             if (path->points[D_L05_001B13CC].f[3] != -1.0f) {
-                gate = func_00328508(0x114A);
+                gate = func_00328508(0x114A /* moby class 4426 */);
                 gate->opacity = 255;
                 gate->mode = 0x1FF;
                 gate->flags |= 0x100;
@@ -147,16 +147,16 @@ void func_L05_00421100(u8 *actor)
         }
     }
     if (!D_L05_001B13B4 && !D_L05_001B13B8 && !D_L05_001B13E4) {
-        func_L05_00420788(actor, 3);
+        UpdateFeltzinMissionReward(actor, 3);
         return;
     }
     if (func_L05_00417748(func_00379ED0(0xF82))) {
         D_L05_001B13E4 = 1;
-        func_L05_004209D8(actor, 3);
+        HandleFeltzinMissionFailure(actor, 3);
         func_0037B210();
     } else if (D_L05_001B13D0 >= 12) {
         D_L05_001B13E4 = 1;
-        func_L05_004209D8(actor, 3);
+        HandleFeltzinMissionFailure(actor, 3);
         func_0037B210();
     }
     if (D_L05_001B13E4) {
@@ -189,7 +189,7 @@ void func_L05_00421100(u8 *actor)
         D_L05_001B13B8 = 0;
         while (!D_L05_001B13B8 && D_L05_001B13CC != path->count) {
             if (path->points[D_L05_001B13CC].f[3] != -1.0f) {
-                gate = func_00328508(0x114A);
+                gate = func_00328508(0x114A /* moby class 4426 */);
                 gate->opacity = 255;
                 gate->mode = 0x1FF;
                 gate->flags |= 0x100;
@@ -217,17 +217,17 @@ void func_L05_00421100(u8 *actor)
     D_L05_001B13C0 = dotPlayer;
     D_L05_001B13C4 = dotOther;
     if (D_L05_001B13B4) {
-        func_L05_00424980((void *)D_L05_001B13B4, 1);
+        SetEffectEnabled((void *)D_L05_001B13B4, 1);
         if (D_L05_001B13B8) {
-            func_L05_00424970((void *)D_L05_001B13B4, 0x40008000);
+            SetEffectColor((void *)D_L05_001B13B4, 0x40008000);
         } else {
-            func_L05_00424970((void *)D_L05_001B13B4, 0x4000C6FF);
+            SetEffectColor((void *)D_L05_001B13B4, 0x4000C6FF);
         }
     }
     if (D_L05_001B13B8) {
-        func_L05_00424980((void *)D_L05_001B13B8, 1);
-        func_L05_00424970((void *)D_L05_001B13B8, 0x40808000);
-    } else if (!D_L05_001B13D0 && !D_L05_001B13BC && !D_0019B278[D_001A79F0 * 4]) {
-        D_L05_001B13BC = func_L05_0042C928(&D_L05_001B13B4->position, 0, -1, -1);
+        SetEffectEnabled((void *)D_L05_001B13B8, 1);
+        SetEffectColor((void *)D_L05_001B13B8, 0x40808000);
+    } else if (!D_L05_001B13D0 && !D_L05_001B13BC && !D_0019B278[gCurrentMapIndex * 4]) {
+        D_L05_001B13BC = SpawnCollectibleIfNotTaken(&D_L05_001B13B4->position, 0, -1, -1);
     }
 }

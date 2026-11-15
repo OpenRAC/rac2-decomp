@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002887B0: the switch only sets a flag (retail's jump table lands on one shared
  * a1 = 1), one call per arm is cross-jumped into retail's single call, and the per-class
  * word is cleared when the call succeeds. The table it clears is D_00139868 (lui 0x14 /
@@ -56,25 +57,26 @@ extern int D_00139868[];
 
 extern int func_00287FF8(int, int);
 
-int func_002887B0(int a0)
+/* Starts a help entry with the short or long variant depending on its id. Returns whether it started. */
+int func_002887B0(int helpId)
 {
-    ClassRecord *record = &D_00239BA0[D_00139568[a0]];
+    ClassRecord *record = &gWeaponTable_00239BA0[gItemSlotToRecord[helpId]];
     int result = 0;
 
     if (record->word00 != 0) {
-        int small = 0;
+        int isSmall = 0;
 
-        switch (a0) {
+        switch (helpId) {
         case 0xC: case 0xE: case 0x11: case 0x12: case 0x35:
-            small = 1;
+            isSmall = 1;
             break;
         }
-        if (small)
-            result = func_00287FF8(a0, 1);
+        if (isSmall)
+            result = SeekChainEntry(helpId, 1);
         else
-            result = func_00287FF8(a0, 2);
+            result = SeekChainEntry(helpId, 2);
         if (result != 0)
-            D_00139868[a0] = 0;
+            D_00139868[helpId] = 0;
     }
     return result;
 }

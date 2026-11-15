@@ -27,6 +27,7 @@ typedef struct { int a; int b; } r1_D_00131358_pair;
  * Under 2.95.3 reorg fills the slot with the `addiu $4,$4,4` bump, 52
  * bytes against 56, which is what kept this a stub.
  */
+/* Copies a block of words from one place to another and returns zero. */
 int func_0011FA70(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
@@ -49,6 +50,7 @@ ASM_FUNC("asm/core", func_0011FAA8);
  * r1_func_0011DDD0 rewrites it. All three callees are handwritten
  * syscall wrappers.
  */
+/* Sets up the system call entries and copies start-up code into memory, unless this was already done. */
 void func_0011FAB8(void) {
     int *t;
     r1_D_00131358_pair *p;
@@ -86,6 +88,7 @@ extern int D_001417EC;
 
 extern void func_0011FB98(void);
 
+/* Runs the program shutdown code only once. */
 void func_0011FC48(void) {
     if (D_001417EC == 0) {
         D_001417EC = 1;

@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int s32;
 typedef float f32;
 typedef int Quad __attribute__((mode(TI)));
@@ -27,14 +28,14 @@ void func_L18_003FCC48(char *self) {
     s32 count, i, kind;
     *(Quad *)direction = 0;
     direction[2] = 1.0f;
-    count = func_002A77E0(2);
+    count = RandomIntBelow(2);
     for (i = 0; i < count + 1; i++) {
-        func_00283098(point, D_L18_001B0610, self + 0xC0);
-        func_00282CC0(point, point, self + 0x10);
-        func_002ACB48(point, 0.5f);
-        func_00282F20(direction, direction, func_002A7878(8.0f, 12.0f) * 0.01666666753590107f);
-        func_002ACB48(direction, 0.06666667014360428f);
-        kind = func_002A77E0(2);
-        func_L02_003449D8(point, direction, &D_L18_001B06F8, (void *)kind, func_002A7820(-2, 2));
+        matrix_mul_vec3(point, D_L18_001B0610, self + 0xC0);
+        FastVecAdd(point, point, self + 0x10);
+        AddRandomOffsetToVector(point, 0.5f);
+        vec_scale_to_length(direction, direction, RandomFloatRange(8.0f, 12.0f) * 0.01666666753590107f);
+        AddRandomOffsetToVector(direction, 0.06666667014360428f);
+        kind = RandomIntBelow(2);
+        SpawnEnemyRecord(point, direction, &D_L18_001B06F8, (void *)kind, RandomIntRange(-2, 2));
     }
 }

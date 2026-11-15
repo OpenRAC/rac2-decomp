@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 /* Kept separate so existing wrappers retain external call bindings. */
 typedef struct Timestamp_351578 {
     long pts;
@@ -33,37 +34,38 @@ static inline int ts_dist(int a, int size) {
 }
 
 /* func_00351578(VideoBuffer_351578 *, Timestamp_351578 *) */
-int func_00351578(VideoBuffer_351578 *vb, Timestamp_351578 *ts) {
+/* Finds the timestamp that belongs to the data the decoder is reading now and hands it back. */
+int func_00351578(VideoBuffer_351578 *buf, Timestamp_351578 *timestamp) {
     unsigned int madr = D4_MADR;
     unsigned int top = IPU_BP;
-    int bp = *(unsigned int *)((char *)vb + 0x38) & 0x7F;
-    int size = vb->count << 11;
+    int bp = *(unsigned int *)((char *)buf + 0x38) & 0x7F;
+    int size = buf->count << 11;
     int found = 0;
     int pos;
     int n;
     int end;
-    int j;
+    int i;
 
     madr -= (((top >> 16) & 3) + ((top >> 8) & 0xF)) << 4;
-    func_0011AC60(vb->sema);
-    ts->pts = -1;
-    ts->dts = -1;
+    WaitSema(buf->sema);
+    timestamp->pts = -1;
+    timestamp->dts = -1;
     madr += bp >> 3;
     madr += size;
-    pos = (madr - vb->base) % size;
-    n = vb->f58;
-    end = vb->f5C;
-    for (j = 0; j < n && !found; j++) {
-        int k = (end - n + vb->ntbl + j) % vb->ntbl;
-        if (ts_dist(pos + size - ((Timestamp_351578 *)vb->tbl)[k].pos, size) < ((Timestamp_351578 *)vb->tbl)[k].len) {
+    pos = (madr - buf->base) % size;
+    n = buf->f58;
+    end = buf->f5C;
+    for (i = 0; i < n && !found; i++) {
+        int k = (end - n + buf->ntbl + i) % buf->ntbl;
+        if (ts_dist(pos + size - ((Timestamp_351578 *)buf->tbl)[k].pos, size) < ((Timestamp_351578 *)buf->tbl)[k].len) {
             found = 1;
-            ts->pts = ((Timestamp_351578 *)vb->tbl)[k].pts;
-            ts->dts = ((Timestamp_351578 *)vb->tbl)[k].dts;
-            ((Timestamp_351578 *)vb->tbl)[k].pts = -1;
-            ((Timestamp_351578 *)vb->tbl)[k].dts = -1;
-            vb->f58 -= (vb->f58 < 2) ? vb->f58 : 1;
+            timestamp->pts = ((Timestamp_351578 *)buf->tbl)[k].pts;
+            timestamp->dts = ((Timestamp_351578 *)buf->tbl)[k].dts;
+            ((Timestamp_351578 *)buf->tbl)[k].pts = -1;
+            ((Timestamp_351578 *)buf->tbl)[k].dts = -1;
+            buf->f58 -= (buf->f58 < 2) ? buf->f58 : 1;
         }
     }
-    func_0011AC40(vb->sema);
+    SignalSema(buf->sema);
     return 1;
 }

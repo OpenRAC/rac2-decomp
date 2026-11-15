@@ -7,6 +7,7 @@ typedef union { int address; unsigned long *words; } SpriteCursor;
 extern SpriteCursor D_L05_001B2C88[] __attribute__((sda));
 extern int D_001A7350, D_001A7354;
 /* Counterpart: RAC1 append_rotated_textured_screen_quad. Emits one rotated sprite packet. */
+/* Draws one flat sprite on the screen, turned by the given angle, by writing a packet for the graphics hardware. */
 void func_L05_00444FD0(float center_x, float center_y, float width, float height,
                       float angle, int texture_width, int texture_height,
                       long texture, int depth, int red, int green, int blue, int alpha)
@@ -45,14 +46,14 @@ void func_L05_00444FD0(float center_x, float center_y, float width, float height
 
     center[0] = center_x;
     center[1] = center_y;
-    vertical[0] = height * func_00283198(angle);
-    vertical[1] = height * func_00283180(angle);
-    horizontal[0] = width * func_00283180(angle);
-    horizontal[1] = -width * func_00283198(angle);
-    func_00282CC0(upper_left, center, vertical);
-    func_00282CF0(upper_left, upper_left, horizontal);
-    func_00282CC0(upper_right, center, vertical);
-    func_00282CF0(lower_left, center, horizontal);
+    vertical[0] = height * FastSinOrCosB(angle);
+    vertical[1] = height * FastSinOrCosA(angle);
+    horizontal[0] = width * FastSinOrCosA(angle);
+    horizontal[1] = -width * FastSinOrCosB(angle);
+    FastVecAdd(upper_left, center, vertical);
+    FastVecSub(upper_left, upper_left, horizontal);
+    FastVecAdd(upper_right, center, vertical);
+    FastVecSub(lower_left, center, horizontal);
     qcopy(lower_right, center);
 
     *(int *)(D_L05_001B2C88[0].address + 0) = 0x10000007;
@@ -84,30 +85,30 @@ void func_L05_00444FD0(float center_x, float center_y, float width, float height
     packet[5] = initial_uv;
 
     {
-        int pixel_x = func_00283CF0(upper_left[0] * subpixel_scale);
-        int pixel_y = func_00283CF0(upper_left[1] * subpixel_scale);
+        int pixel_x = FloatToInt(upper_left[0] * subpixel_scale);
+        int pixel_y = FloatToInt(upper_left[1] * subpixel_scale);
 
-        packet[6] = (unsigned long)(pixel_x + D_001A7350 - 8) | ((unsigned long)(pixel_y + D_001A7354 - 8) << 16) | depth_bits;
+        packet[6] = (unsigned long)(pixel_x + gScreenOffsetX - 8) | ((unsigned long)(pixel_y + gScreenOffsetY - 8) << 16) | depth_bits;
         packet[7] = texture_u;
     }
     {
-        int pixel_x = func_00283CF0(upper_right[0] * subpixel_scale);
-        int pixel_y = func_00283CF0(upper_right[1] * subpixel_scale);
-        packet[8] = (unsigned long)(pixel_x + D_001A7350 - 8) | ((unsigned long)(pixel_y + D_001A7354 - 8) << 16) | depth_bits;
+        int pixel_x = FloatToInt(upper_right[0] * subpixel_scale);
+        int pixel_y = FloatToInt(upper_right[1] * subpixel_scale);
+        packet[8] = (unsigned long)(pixel_x + gScreenOffsetX - 8) | ((unsigned long)(pixel_y + gScreenOffsetY - 8) << 16) | depth_bits;
         packet[9] = texture_v;
     }
     {
-        int pixel_x = func_00283CF0(lower_left[0] * subpixel_scale);
-        int pixel_y = func_00283CF0(lower_left[1] * subpixel_scale);
+        int pixel_x = FloatToInt(lower_left[0] * subpixel_scale);
+        int pixel_y = FloatToInt(lower_left[1] * subpixel_scale);
         texture_v = texture_v + texture_u;
-        packet[10] = (unsigned long)(pixel_x + D_001A7350 - 8) | ((unsigned long)(pixel_y + D_001A7354 - 8) << 16) | depth_bits;
+        packet[10] = (unsigned long)(pixel_x + gScreenOffsetX - 8) | ((unsigned long)(pixel_y + gScreenOffsetY - 8) << 16) | depth_bits;
         packet[11] = texture_v;
     }
     {
-        int pixel_x = func_00283CF0(lower_right[0] * subpixel_scale);
-        int pixel_y = func_00283CF0(lower_right[1] * subpixel_scale);
+        int pixel_x = FloatToInt(lower_right[0] * subpixel_scale);
+        int pixel_y = FloatToInt(lower_right[1] * subpixel_scale);
         packet[13] = 0;
-        packet[12] = (unsigned long)(pixel_x + D_001A7350 - 8) | ((unsigned long)(pixel_y + D_001A7354 - 8) << 16) | depth_bits;
+        packet[12] = (unsigned long)(pixel_x + gScreenOffsetX - 8) | ((unsigned long)(pixel_y + gScreenOffsetY - 8) << 16) | depth_bits;
     }
 
     D_L05_001B2C88[0].address += 0x70;

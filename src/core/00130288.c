@@ -7,23 +7,25 @@ extern void func_00130240(void *);
 
 extern void func_0012FB70(void *);
 extern unsigned int func_0012FB80(void *, void *, unsigned int, unsigned int);
+/* Fills in nine DMA addresses that point at the three picture buffers and their halves. */
 extern void func_001306D0(unsigned int *, unsigned int *, unsigned int *, unsigned int *,
                           unsigned int *, unsigned int *, unsigned int *, unsigned int *,
                           unsigned int *, int, int, int, int, int);
 
-/* rac1-decomp src/core/0012AC80.c: func_0012C468 */
-void func_00130288(void *arg0, void *arg1) {
-    char *a = (char *)arg0;
-    void *t = *(void **)(a + 0x858);
-    /* the arg0 null test is retail's, after it has already dereferenced
-       arg0 -- one of the "dead-looking guards" that must be written out */
-    if (t != 0 && arg0 != 0 && *(int *)(a + 0xC) != 0) {
-        int buf[4];
-        buf[0] = 0;
-        buf[1] = (int)arg1;
-        func_0012FA98(t, buf);
+/* rac1-decomp src/core/0012AC80.bufferC: func_0012C468 */
+/* Reports bufferA video error through the registered callback, or prints it if there is none. */
+void func_00130288(void *mpeg, void *message) {
+    char *bytes = (char *)mpeg;
+    void *callbackOwner = *(void **)(bytes + 0x858);
+    /* the mpeg null test is retail's, after it has already dereferenced
+       mpeg -- one of the "dead-looking guards" that must be written out */
+    if (callbackOwner != 0 && mpeg != 0 && *(int *)(bytes + 0xC) != 0) {
+        int event[4];
+        event[0] = 0;
+        event[1] = (int)message;
+        DispatchMpegCallback(callbackOwner, event);
     } else {
-        func_00130240(arg1);
+        PrintMpegError(message);
     }
 }
 
@@ -31,12 +33,13 @@ void func_00130288(void *arg0, void *arg1) {
 /* Store the two sizes and their 16-pixel macroblock counts. (An old note
    here recorded 4/32 with the 0x4/0x8 stores swapped; the function is
    exact under both compilers now.) */
-int func_001302E0(void *arg0, int arg1, int arg2) {
-    char *p = (char *)arg0;
-    *(int *)(p + 0x4) = arg1;
-    *(int *)(p + 0x8) = arg2;
-    *(int *)(p + 0xC) = arg1 >> 4;
-    *(int *)(p + 0x10) = arg2 >> 4;
+/* Stores a picture width and height and the same sizes counted in 16-pixel blocks. */
+int func_001302E0(void *sizeInfo, int width, int height) {
+    char *bytes = (char *)sizeInfo;
+    *(int *)(bytes + 0x4) = width;
+    *(int *)(bytes + 0x8) = height;
+    *(int *)(bytes + 0xC) = width >> 4;
+    *(int *)(bytes + 0x10) = height >> 4;
     return 1;
 }
 
@@ -83,116 +86,118 @@ extern char r1_D_00133100[];
  * extensionAndUserData (r1_func_00128E68) and a tail call into _initSeq
  * (r1_func_0012C608) with the object read back from +0x858.
  */
-void func_00130300(void *arg0) {
-    char *s = (char *)arg0;
-    unsigned int v;
-    int mid;
-    unsigned int flag;
+/* Reads the video sequence header: picture size, bit rate and quantizer tables. */
+void func_00130300(void *decoder) {
+    char *bytes = (char *)decoder;
+    unsigned int bits;
+    int height;
+    unsigned int hasMatrix;
 
-    *(unsigned int *)(s + 0xD4) = 0;
+    *(unsigned int *)(bytes + 0xD4) = 0;
 
-    v = r1_func_00128A58(s, 0x20);
-    *(unsigned int *)(s + 0x124) = v >> 20;
-    mid = (v >> 8) & 0xFFF;
-    *(unsigned int *)(s + 0x128) = mid;
-    if (mid >= 0xAF1) {
-        r1_func_0012C468(s, r1_D_00153BE8);
+    bits = r1_func_00128A58(bytes, 0x20);
+    *(unsigned int *)(bytes + 0x124) = bits >> 20;
+    height = (bits >> 8) & 0xFFF;
+    *(unsigned int *)(bytes + 0x128) = height;
+    if (height >= 0xAF1) {
+        r1_func_0012C468(bytes, r1_D_00153BE8);
     }
 
-    v = r1_func_00128A58(s, 0x1E);
-    *(unsigned int *)(s + 0x134) = v >> 12;
-    *(unsigned int *)(s + 0x138) = (v >> 1) & 0x3FF;
+    bits = r1_func_00128A58(bytes, 0x1E);
+    *(unsigned int *)(bytes + 0x134) = bits >> 12;
+    *(unsigned int *)(bytes + 0x138) = (bits >> 1) & 0x3FF;
 
-    flag = r1_func_00128A58(s, 1);
-    *(unsigned int *)(s + 0x840) = flag;
-    if (flag != 0) {
-        r1_func_00128590(s);
-        r1_func_00128560(s, 0x50000000);
-        r1_func_00128590(s);
+    hasMatrix = r1_func_00128A58(bytes, 1);
+    *(unsigned int *)(bytes + 0x840) = hasMatrix;
+    if (hasMatrix != 0) {
+        r1_func_00128590(bytes);
+        r1_func_00128560(bytes, 0x50000000);
+        r1_func_00128590(bytes);
     } else {
-        r1_func_0012C990(s, 0x50000000, (int)r1_D_001330C0);
+        r1_func_0012C990(bytes, 0x50000000, (int)r1_D_001330C0);
     }
 
-    flag = r1_func_00128A58(s, 1);
-    *(unsigned int *)(s + 0x844) = flag;
-    if (flag != 0) {
-        r1_func_00128590(s);
-        r1_func_00128560(s, 0x58000000);
-        r1_func_00128590(s);
+    hasMatrix = r1_func_00128A58(bytes, 1);
+    *(unsigned int *)(bytes + 0x844) = hasMatrix;
+    if (hasMatrix != 0) {
+        r1_func_00128590(bytes);
+        r1_func_00128560(bytes, 0x58000000);
+        r1_func_00128590(bytes);
     } else {
-        r1_func_0012C990(s, 0x58000000, (int)r1_D_00133100);
+        r1_func_0012C990(bytes, 0x58000000, (int)r1_D_00133100);
     }
 
-    r1_func_00128E68(s);
-    r1_func_0012C608(*(void **)(s + 0x858));
+    r1_func_00128E68(bytes);
+    r1_func_0012C608(*(void **)(bytes + 0x858));
 }
 
 /* rac1-decomp src/core/0012AC80.c: mpeg_init_seq (func_0012C608) */
-void func_00130428(void *arg0) {
-    int *a = (int *)arg0;
-    char *s = *(char **)((char *)arg0 + 0x40);
-    int f = *(int *)(s + 0x848);
-    int h, mbw, mbh;
-    unsigned int n, t;
-    unsigned int *q0, *q1, *q2, *q3, *q4, *q5, *q6, *q7, *q8;
+/* Works out the picture size in blocks and sets up the picture buffers when the size changes. */
+void func_00130428(void *sizeInfo) {
+    int *sizes = (int *)sizeInfo;
+    char *decoder = *(char **)((char *)sizeInfo + 0x40);
+    int started = *(int *)(decoder + 0x848);
+    int blockRows, widthPixels, heightPixels;
+    unsigned int bufferSize, rowSize;
+    unsigned int *desc0, *desc1, *desc2, *desc3, *desc4, *desc5, *desc6, *desc7, *desc8;
 
-    if (f == 0) {
-        *(int *)(s + 0x174) = 3;
-        *(int *)(s + 0x13C) = 1;
-        *(int *)(s + 0x140) = 1;
-        *(int *)(s + 0x188) = 1;
-        *(int *)(s + 0x17C) = 1;
-        *(int *)(s + 0x144) = 5;
+    if (started == 0) {
+        *(int *)(decoder + 0x174) = 3;
+        *(int *)(decoder + 0x13C) = 1;
+        *(int *)(decoder + 0x140) = 1;
+        *(int *)(decoder + 0x188) = 1;
+        *(int *)(decoder + 0x17C) = 1;
+        *(int *)(decoder + 0x144) = 5;
     }
-    *(int *)(s + 0x12C) = (*(int *)(s + 0x124) + 0xF) >> 4;
-    if (f != 0 && *(int *)(s + 0x13C) == 0)
-        h = ((*(int *)(s + 0x128) + 0x1F) >> 5) << 1;
+    *(int *)(decoder + 0x12C) = (*(int *)(decoder + 0x124) + 0xF) >> 4;
+    if (started != 0 && *(int *)(decoder + 0x13C) == 0)
+        blockRows = ((*(int *)(decoder + 0x128) + 0x1F) >> 5) << 1;
     else
-        h = (*(int *)(s + 0x128) + 0xF) >> 4;
-    *(int *)(s + 0x130) = h;
-    mbh = h << 4;
-    mbw = *(int *)(s + 0x12C) << 4;
+        blockRows = (*(int *)(decoder + 0x128) + 0xF) >> 4;
+    *(int *)(decoder + 0x130) = blockRows;
+    heightPixels = blockRows << 4;
+    widthPixels = *(int *)(decoder + 0x12C) << 4;
     {
-    unsigned int *p;
-    if (mbw != a[0]) {
-        p = (unsigned int *)(s + 0x528);
+    unsigned int *outDesc;
+    if (widthPixels != sizes[0]) {
+        outDesc = (unsigned int *)(decoder + 0x528);
     } else {
-        if (mbh == a[1])
+        if (heightPixels == sizes[1])
             return;
-        p = (unsigned int *)(s + 0x528);
+        outDesc = (unsigned int *)(decoder + 0x528);
     }
-    a[0] = mbw;
-    a[1] = mbh;
-    if ((mbw & 0xF) && (mbw & 0xE))
-        p = q8;
-    q8 = p;
-    t = mbh * 0x180;
-    q0 = (unsigned int *)(s + 0x1E8);
-    q1 = (unsigned int *)(s + 0x250);
-    q2 = (unsigned int *)(s + 0x2B8);
-    q3 = (unsigned int *)(s + 0x320);
-    q4 = (unsigned int *)(s + 0x388);
-    q5 = (unsigned int *)(s + 0x3F0);
-    q6 = (unsigned int *)(s + 0x458);
-    q7 = (unsigned int *)(s + 0x4C0);
-    n = (mbw * t) >> 8;
-    func_0012FB70(s + 0x108);
-    *(unsigned int *)(s + 0xFC) = func_0012FB80(s, s + 0x108, n, 0x40);
-    *(unsigned int *)(s + 0x100) = func_0012FB80(s, s + 0x108, n, 0x40);
-    *(unsigned int *)(s + 0x104) = func_0012FB80(s, s + 0x108, n, 0x40);
-    func_001306D0(q0, q1, q2,
-                  q3, q4, q5,
-                  q6, q7, q8,
-                  *(int *)(s + 0xFC), *(int *)(s + 0x100), *(int *)(s + 0x104), mbw, mbh);
-    func_001302E0(q0, mbw, mbh);
-    func_001302E0(q1, mbw, mbh);
-    func_001302E0(q2, mbw, mbh);
-    func_001302E0(q3, mbw, mbh >> 1);
-    func_001302E0(q4, mbw, mbh >> 1);
-    func_001302E0(q5, mbw, mbh >> 1);
-    func_001302E0(q6, mbw, mbh >> 1);
-    func_001302E0(q7, mbw, mbh >> 1);
-    func_001302E0(q8, mbw, mbh >> 1);
+    sizes[0] = widthPixels;
+    sizes[1] = heightPixels;
+    if ((widthPixels & 0xF) && (widthPixels & 0xE))
+        outDesc = desc8;
+    desc8 = outDesc;
+    rowSize = heightPixels * 0x180;
+    desc0 = (unsigned int *)(decoder + 0x1E8);
+    desc1 = (unsigned int *)(decoder + 0x250);
+    desc2 = (unsigned int *)(decoder + 0x2B8);
+    desc3 = (unsigned int *)(decoder + 0x320);
+    desc4 = (unsigned int *)(decoder + 0x388);
+    desc5 = (unsigned int *)(decoder + 0x3F0);
+    desc6 = (unsigned int *)(decoder + 0x458);
+    desc7 = (unsigned int *)(decoder + 0x4C0);
+    bufferSize = (widthPixels * rowSize) >> 8;
+    RestoreMpegCounter(decoder + 0x108);
+    *(unsigned int *)(decoder + 0xFC) = AllocMpegAligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    *(unsigned int *)(decoder + 0x100) = AllocMpegAligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    *(unsigned int *)(decoder + 0x104) = AllocMpegAligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    FillMpegBufferAddresses(desc0, desc1, desc2,
+                  desc3, desc4, desc5,
+                  desc6, desc7, desc8,
+                  *(int *)(decoder + 0xFC), *(int *)(decoder + 0x100), *(int *)(decoder + 0x104), widthPixels, heightPixels);
+    SetMpegPictureSize(desc0, widthPixels, heightPixels);
+    SetMpegPictureSize(desc1, widthPixels, heightPixels);
+    SetMpegPictureSize(desc2, widthPixels, heightPixels);
+    SetMpegPictureSize(desc3, widthPixels, heightPixels >> 1);
+    SetMpegPictureSize(desc4, widthPixels, heightPixels >> 1);
+    SetMpegPictureSize(desc5, widthPixels, heightPixels >> 1);
+    SetMpegPictureSize(desc6, widthPixels, heightPixels >> 1);
+    SetMpegPictureSize(desc7, widthPixels, heightPixels >> 1);
+    SetMpegPictureSize(desc8, widthPixels, heightPixels >> 1);
     }
 }
 
@@ -228,25 +233,25 @@ extern void func_001307B0(void *, int, int);
    at addr to IPU_TO (tag 4 qwords, chcr 0x101) with interrupts held
    off, send command cmd and wait, and report type 3. Adapted from
    Lombyte's project (GPL-3.0) for PAL. */
-void func_001307B0(void *arg, int cmd, int addr) {
-    char *mp = arg;
-    int cb[8];
-    int intr;
+void func_001307B0(void *decoder, int cmd, int addr) {
+    char *bytes = decoder;
+    int event[8];
+    int interruptsWereOn;
 
-    cb[0] = 2;
-    r1_func_0012BC78(*(void **)(mp + 0x858), cb);
-    r1_func_00128590(mp);
+    event[0] = 2;
+    r1_func_0012BC78(*(void **)(bytes + 0x858), event);
+    r1_func_00128590(bytes);
     IPU_CMD = 0;
-    r1_func_00128590(mp);
-    intr = r1_func_0011D960();
+    r1_func_00128590(bytes);
+    interruptsWereOn = r1_func_0011D960();
     D4_MADR = addr & 0x0FFFFFFF;
     D4_QWC = 4;
     D4_CHCR = 0x101;
-    if (intr != 0) {
+    if (interruptsWereOn != 0) {
         r1_func_0011D9A8();
     }
-    r1_func_00128560(mp, cmd);
-    r1_func_00128590(mp);
-    cb[0] = 3;
-    r1_func_0012BC78(*(void **)(mp + 0x858), cb);
+    r1_func_00128560(bytes, cmd);
+    r1_func_00128590(bytes);
+    event[0] = 3;
+    r1_func_0012BC78(*(void **)(bytes + 0x858), event);
 }

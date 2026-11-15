@@ -71,46 +71,46 @@ static __inline__ int hud_coord(float value, float scale, float half)
     return result;
 }
 
-void func_L11_00443D78(unsigned char *object) {
+void func_L11_00443D78(unsigned char *moby) {
     unsigned char box[32]; char buffer[64];
-    unsigned char *state; char *text,*label,*unit,*str,*t1,*t2,*t3,*t4,*t5; int i,value,y2,y3,y4,y5,y6,y7,y8,one,bx,by,bh; u64 c1,c2,c3,c4,c5,c6,c7,c8; float half;
+    unsigned char *state; char *text,*label,*unit,*lineText,*labelText,*nextHintText,*t3,*t4,*t5; int i,value,valueY,countY,prevHintY,nextHintY,hintY1,hintY2,hintY3,one,bx,by,bh; u64 headerColor,valueColor,countColor,prevHintColor,nextHintColor,hintColor1,hintColor2,hintColor3; float half;
     one=1;
-    func_L11_00443940(object,1);
-    state=*(unsigned char **)(object+0x68);
-    text=((char *)func_00288FB8(func_L11_00443CE0(SEL)));
+    DrawJobaMenuHelpPrompts(moby,1);
+    state=*(unsigned char **)(moby+0x68);
+    text=((char *)GetLocalizedString(GetChallengeTitleTextId(SEL)));
     bx=hud_coord((float)D_L11_001B1660, D_L11_001B3E04, 0.5f);
     by=hud_coord((float)D_L11_001B1664, D_L11_001B3E04, 0.5f);
     bh=hud_coord((float)D_L11_001B1658, D_L11_001B3E04, 0.5f);
-    func_002802E0(box,bx,by,D_L11_001B1668,D_L11_001B166C,D_L11_001B1654,bh,D_L11_001B1670,3);
-    c1=D_L11_001B1650; func_00280270(box,c1,text,func_001157AC(text));
-    if(SEL==0 && !D_001395B8[func_L11_0043E108(0)]) goto counts;
-    if(SEL==one && !D_001395B8[func_L11_0043E108(one)]) goto counts;
+    FontSetWindow(box,bx,by,D_L11_001B1668,D_L11_001B166C,D_L11_001B1654,bh,D_L11_001B1670,3);
+    headerColor=D_L11_001B1650; DrawTextWindowLargeFont(box,headerColor,text,strlen_001157AC(text));
+    if(SEL==0 && !D_001395B8[GetChallengeFlagIndex(0)]) goto counts;
+    if(SEL==one && !D_001395B8[GetChallengeFlagIndex(one)]) goto counts;
     {
         do {
-            text=((char *)func_00288FB8(0x2f44)); unit=((char *)func_00288FB8(0x2f5e)); value=func_L11_00442958(SEL);
-            if(value<10000) { func_00115DA8(buffer,D_L11_001B15A0,text,value,unit); str=buffer; goto draw1; }
-            func_00115DA8(buffer,D_L11_001B16E8,text,value);
+            text=((char *)GetLocalizedString(0x2f44)); unit=((char *)GetLocalizedString(0x2f5e)); value=func_L11_00442958(SEL);
+            if(value<10000) { Sprintf(buffer,D_L11_001B15A0,text,value,unit); lineText=buffer; goto draw1; }
+            Sprintf(buffer,D_L11_001B16E8,text,value);
         } while(0);
-        str=buffer;
+        lineText=buffer;
     draw1:
-        y2=hud_coord((float)D_L11_001B167C, D_L11_001B3E04, 0.5f); c2=D_L11_001B1680; func_0027F5B8(D_L11_001B1678,y2,c2,str,func_001157AC(str));
+        valueY=hud_coord((float)D_L11_001B167C, D_L11_001B3E04, 0.5f); valueColor=D_L11_001B1680; DrawTextMediumFont(D_L11_001B1678,valueY,valueColor,lineText,strlen_001157AC(lineText));
     }
 counts:
-    if(D_001395B8[func_L11_0043E108(SEL)]) {
-        t1=((char *)func_00288FB8(0x2f3e));
-        func_00115DA8(buffer,D_L11_001B16E8,t1,D_001395B8[func_L11_0043E108(SEL)]); str=buffer;
-        y3=(int)((float)D_L11_001B16AC * D_L11_001B3E04 + 0.5f); do { c3=D_L11_001B16B0; } while(0); func_0027F5B8(D_L11_001B16A8,y3,c3,str,func_001157AC(str));
+    if(D_001395B8[GetChallengeFlagIndex(SEL)]) {
+        labelText=((char *)GetLocalizedString(0x2f3e));
+        Sprintf(buffer,D_L11_001B16E8,labelText,D_001395B8[GetChallengeFlagIndex(SEL)]); lineText=buffer;
+        countY=(int)((float)D_L11_001B16AC * D_L11_001B3E04 + 0.5f); do { countColor=D_L11_001B16B0; } while(0); DrawTextMediumFont(D_L11_001B16A8,countY,countColor,lineText,strlen_001157AC(lineText));
     }
-    if(SEL!=0) { t1=((char *)func_00288FB8(0x2f40)); y4=hud_coord((float)D_L11_001B168C, D_L11_001B3E04, 0.5f); c4=D_L11_001B1690; func_0027F538(D_L11_001B1688,y4,c4,t1,func_001157AC(t1)); }
+    if(SEL!=0) { labelText=((char *)GetLocalizedString(0x2f40)); prevHintY=hud_coord((float)D_L11_001B168C, D_L11_001B3E04, 0.5f); prevHintColor=D_L11_001B1690; DrawTextSmallFont(D_L11_001B1688,prevHintY,prevHintColor,labelText,strlen_001157AC(labelText)); }
     for(i=SEL+1;i<13;i++) {
         half=0.5f;
-        if(!D_001395B8[func_L11_0043E108(TABLE[i][2])]) continue;
-        if(i>=11 && !func_00288D58()) continue;
-        if(i==8 && !((MenuRecord *)(D_L11_00279BA0 + D_00139568[0x1e] * 0xe0))->enabled) continue;
-        t2=((char *)func_00288FB8(0x2f41)); y5=hud_coord((float)D_L11_001B169C, D_L11_001B3E04, half); c5=D_L11_001B16A0; func_0027F538(D_L11_001B1698,y5,c5,t2,func_001157AC(t2)); break;
+        if(!D_001395B8[GetChallengeFlagIndex(TABLE[i][2])]) continue;
+        if(i>=11 && !IsFlagByteSet()) continue;
+        if(i==8 && !((MenuRecord *)(D_L11_00279BA0 + gItemSlotToRecord[0x1e] * 0xe0))->enabled) continue;
+        nextHintText=((char *)GetLocalizedString(0x2f41)); nextHintY=hud_coord((float)D_L11_001B169C, D_L11_001B3E04, half); nextHintColor=D_L11_001B16A0; DrawTextSmallFont(D_L11_001B1698,nextHintY,nextHintColor,nextHintText,strlen_001157AC(nextHintText)); break;
     }
     half=0.5f;
-    text=((char *)func_00288FB8(0x2f3f)); y6=hud_coord((float)D_L11_001B16BC, D_L11_001B3E04, half); c6=D_L11_001B16C0; func_0027F538(D_L11_001B16B8,y6,c6,text,func_001157AC(text));
-    text=((char *)func_00288FB8(0x2f42)); y7=hud_coord((float)D_L11_001B16DC, D_L11_001B3E04, half); c7=D_L11_001B16E0; func_0027F538(D_L11_001B16D8,y7,c7,text,func_001157AC(text));
-    text=((char *)func_00288FB8(0x2f43)); y8=hud_coord((float)D_L11_001B16CC, D_L11_001B3E04, half); c8=D_L11_001B16D0; func_0027F538(D_L11_001B16C8,y8,c8,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f3f)); hintY1=hud_coord((float)D_L11_001B16BC, D_L11_001B3E04, half); hintColor1=D_L11_001B16C0; DrawTextSmallFont(D_L11_001B16B8,hintY1,hintColor1,text,strlen_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f42)); hintY2=hud_coord((float)D_L11_001B16DC, D_L11_001B3E04, half); hintColor2=D_L11_001B16E0; DrawTextSmallFont(D_L11_001B16D8,hintY2,hintColor2,text,strlen_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f43)); hintY3=hud_coord((float)D_L11_001B16CC, D_L11_001B3E04, half); hintColor3=D_L11_001B16D0; DrawTextSmallFont(D_L11_001B16C8,hintY3,hintColor3,text,strlen_001157AC(text));
 }

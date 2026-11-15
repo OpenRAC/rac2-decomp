@@ -23,16 +23,17 @@ extern int func_0011D620(const void *, int, int, int *, int, unsigned int *, int
 extern int D_001A71C4 MACRO_ADDR;
 extern char D_001A7600[], D_001A7630[];
 extern int func_00133580(int);
+/* Starts reading a sound bank from disc and remembers the function to call when it is done. */
 void func_00132498(int bank, int offset, int callback, long callback_data) {
     D_001A7488 = 0;
     if (D_001A74C8 != 0) {
         if (D_001A74F8 != 0) return;
-        func_00115D48(D_001A7600);
+        Printf(D_001A7600);
         return;
     }
-    if (func_00133580(1) == 1) {
+    if (snd_CheckLoadInProgress(1) == 1) {
         if (D_001A74F8 != 0) return;
-        func_00115D48(D_001A7630);
+        Printf(D_001A7630);
         return;
     }
     D_001A71C0 = bank;
@@ -40,11 +41,11 @@ void func_00132498(int bank, int offset, int callback, long callback_data) {
     D_001A7180 = -1u;
     D_001A74D0 = callback;
     D_001A74D0_1[1] = callback_data;
-    while (func_0011D810(&D_001A7140)) {
-        if (D_001A74F8 == 0) func_00115D48(D_001A7578);
-        func_00132028();
-        func_0011AEA0(0);
+    while (IsRpcHandleValid(&D_001A7140)) {
+        if (D_001A74F8 == 0) Printf(D_001A7578);
+        snd_Pump();
+        FlushCache(0);
     }
     D_001A74C8 = 1;
-    func_0011D620(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0);
+    CallRpcServer(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0);
 }

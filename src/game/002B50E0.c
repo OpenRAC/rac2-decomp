@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002B50E0 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt). Its two returns
@@ -19,36 +20,37 @@ extern void func_002B62A0(void);
 
 typedef int PoseVector128 __attribute__((mode(TI)));
 
+/* Runs one movement step for an object that has a movement controller: finds the ground, moves it toward the target, resolves collisions and returns the controller status. */
 int func_002B50E0(void *self, void *target, float amount)
 {
-    char *data = func_002B5D28(self);
+    char *data = GetMovementController(self);
     PoseVector128 work[3];
 
     if (data == 0)
         return 8;
-    if (D_001B1688 == *(int *)(data + 0xBC))
+    if (gGameTime == *(int *)(data + 0xBC))
         return *(int *)(data + 0x94);
     *(int *)(data + 0x98) = *(int *)(data + 0x94);
     *(int *)(data + 0x94) = 0;
     if (!(*(int *)(data + 0x38) & 0x100))
-        func_002B5CD8(self, data);
+        CheckGroundObjectTouch(self, data);
     {
         PoseVector128 *src = (PoseVector128 *)((char *)self + 0x10);
         work[0] = *src;
     }
-    if (D_001B1688 - *(int *)(data + 0xBC) >= 2 || *(int *)(data + 0xBC) == 0) {
-        func_002B5BC0(self, data, 0.0f);
+    if (gGameTime - *(int *)(data + 0xBC) >= 2 || *(int *)(data + 0xBC) == 0) {
+        FindGroundBelowObject(self, data, 0.0f);
         *(unsigned char *)(data + 0xEA) = 0xFF;
         *(int *)(data + 0x9C) &= ~2;
         *(float *)(data + 0xB4) = 0.0f;
         *(int *)(data + 0x80) = 0;
-        func_00282C88(data + 0xA0);
+        ClearVector128(data + 0xA0);
     }
-    *(int *)(data + 0xBC) = D_001B1688;
-    func_002B52A0(self, data, target, &work[1], &work[2], amount);
-    func_002B5678(self, data, &work[0], &work[2]);
-    func_002B5828(self, data, target, &work[0]);
-    func_002B5EF8(self, data, amount);
-    func_002B62A0();
+    *(int *)(data + 0xBC) = gGameTime;
+    UpdateControllerVelocity(self, data, target, &work[1], &work[2], amount);
+    ApplyVelocityAndResolveCollisions(self, data, &work[0], &work[2]);
+    UpdateGroundContactState_002B5828(self, data, target, &work[0]);
+    UpdateFootTiltAngles(self, data, amount);
+    AccumulateTimerTicks();
     return *(int *)(data + 0x94);
 }

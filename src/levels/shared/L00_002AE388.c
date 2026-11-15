@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -124,19 +125,19 @@ void func_L00_002AF568(void)
     HeldAnimationSlot *slot;
     HeldAnimationItem *definition;
 
-    item = func_L00_002ADEA0(0);
+    item = hero_slot_item_id(0);
     if (item == -1 || item == 0)
         return;
-    D_00189E20.item = item;
-    definition = &D_L00_00262570[D_00139568[item]];
+    gHeroState.item = item;
+    definition = &gWeaponTable_L00[gItemSlotToRecord[item]];
     primary = definition->primaryAnimation;
     held = definition->heldAnimation;
-    if (D_00189E20.controlMode == 12)
+    if (gHeroState.controlMode == 12)
         held = definition->alternateAnimation;
-    D_00189E20.active = 1;
-    { int flags = definition->flags; D_00189E20.flags = flags; }
+    gHeroState.active = 1;
+    { int flags = definition->flags; gHeroState.flags = flags; }
     duration = -1;
-    if (D_L00_00262570[D_00139568[item]].category == 0)
+    if (gWeaponTable_L00[gItemSlotToRecord[item]].category == 0)
         duration = 11;
     else if (primary == 0x36)
         duration = 2;
@@ -147,32 +148,33 @@ void func_L00_002AF568(void)
     blendDuration = duration;
     if (blendDuration < 0)
         blendDuration = 11;
-    func_L00_002AB3E0();
-    D_00189E20.idleTimer = func_002A7820(90, 120);
-    if (D_00189E20.controlMode == 0 && D_00189E20.suppressed == 0) {
-        D_00189E20.animation = primary;
-        func_L00_002D2168((void *)primary, 0, (float)duration);
+    ClearHeroSlotRecords();
+    gHeroState.idleTimer = RandomIntRange(90, 120);
+    if (gHeroState.controlMode == 0 && gHeroState.suppressed == 0) {
+        gHeroState.animation = primary;
+        set_hero_animation((void *)primary, 0, (float)duration);
         return;
     }
     if (held == -1)
         return;
-    for (i = 0; i < 2 && (i != 1 || D_00189E20.dual == 2); i++) {
-        if (D_00189E20.slots[i])
-            func_L00_00310C88(D_00189E20.moby, &D_00189E20.slots[i]);
-        slot = func_L00_00310BC8(D_00189E20.moby, D_L00_001A7D00[i]);
-        D_00189E20.slots[i] = slot;
+    for (i = 0; i < 2 && (i != 1 || gHeroState.dual == 2); i++) {
+        if (gHeroState.slots[i])
+            release_moby_animation_slot(gHeroState.moby, &gHeroState.slots[i]);
+        slot = allocate_moby_animation_slot(gHeroState.moby, D_L00_001A7D00[i]);
+        gHeroState.slots[i] = slot;
         if (slot) {
-            D_00189E20.animation = held;
-            D_00189E20.cancel = 0;
+            gHeroState.animation = held;
+            gHeroState.cancel = 0;
             slot->weight = 1.0f;
             slot->firstMatrices = D_L00_001B7400[i].first;
             slot->secondMatrices = D_L00_001B7400[i].second;
-            func_L00_00311080(D_00189E20.moby, slot, D_00189E20.animation, 0, blendDuration, 1);
+            initialize_moby_animation_blend(gHeroState.moby, slot, gHeroState.animation, 0, blendDuration, 1);
         }
     }
 }
 
 /* guards a fixed data block on an enable byte, takes one of two early exits (setting a pending word and a flag, or skipping), calls two leaves with a scaled value when a byte field matches a threshold word, then clears a byte pair of the block */
+/* Stops the current held item action and resets the flags that go with it. */
 void func_L00_002AF7D0(void)
 {
     if (D_00189E20_26[8888] == 0)
@@ -181,7 +183,7 @@ void func_L00_002AF7D0(void)
         *(int *)(D_00189E20_26 + 3748) = 1;
     } else if (*(int *)(D_00189E20_26 + 8852) == 0) {
         if (*(unsigned char *)(*(int *)(D_00189E20_26 + 8848) + 67) == *(int *)(D_00189E20_26 + 9392)) {
-            func_L00_002D2168(func_L00_002A4E48(0), 0, -2.0f);
+            set_hero_animation(GetHeroWeaponOrFormId(0), 0, -2.0f);
         }
     }
     D_00189E20_26[8888] = 0;
@@ -193,15 +195,15 @@ void func_L00_002AF7D0(void)
  * the rail angles or look target in control mode 15, otherwise from the moby's matrix */
 void func_L00_002AF860(void)
 {
-    HeldAnimationHero *owner = &D_00189E20;
+    HeldAnimationHero *owner = &gHeroState;
     int i;
 
     if (owner->active != 0 && owner->flags != 0) {
-        if (func_L00_002D4040(-1) == 0)
-            func_L00_002AF7D0();
+        if (get_ammo(-1) == 0)
+            cancel_hero_item_animation();
     }
     for (i = 0; i < 2; i++) {
-        HeldAnimationHero *slotOwner = &D_00189E20;
+        HeldAnimationHero *slotOwner = &gHeroState;
         HeldAnimationSlot **slot = slotOwner->slots + i;
         HeldAnimationSlot **current;
         int item, animation;
@@ -210,33 +212,33 @@ void func_L00_002AF860(void)
             continue;
         (*slot)->firstMatrices = D_L00_001B7400[i].first;
         (*slot)->secondMatrices = D_L00_001B7400[i].second;
-        item = func_L00_002ADEA0(0);
+        item = hero_slot_item_id(0);
         if (item == slotOwner->item) {
-            HeldAnimationItem *definition = &D_L00_00262570[D_00139568[item]];
+            HeldAnimationItem *definition = &gWeaponTable_L00[gItemSlotToRecord[item]];
             animation = definition->heldAnimation;
             if (slotOwner->controlMode == 12)
                 animation = definition->alternateAnimation;
             if (animation != -1 && (*slot)->animation != animation) {
                 slotOwner->animation = animation;
-                func_L00_00311080(slotOwner->moby, *slot, slotOwner->animation, 0, 8, 1);
+                initialize_moby_animation_blend(slotOwner->moby, *slot, slotOwner->animation, 0, 8, 1);
             }
         }
         current = slotOwner->slots + i;
         {
-            HeldAnimationHero *poseOwner = &D_00189E20;
-            func_L00_00310D30(poseOwner->moby, *current);
+            HeldAnimationHero *poseOwner = &gHeroState;
+            AdvanceAndDecodeAnimationFrames(poseOwner->moby, *current);
             if (poseOwner->cancel != 0) {
                 if (poseOwner->cancel == 2)
-                    func_002AA2E8(&(*current)->weight, 0.0f, 0.25f);
+                    ApproachValue(&(*current)->weight, 0.0f, 0.25f);
                 else
-                    func_002AA2E8(&(*current)->weight, 0.0f, 0.07f);
-                owner = &D_00189E20;
+                    ApproachValue(&(*current)->weight, 0.0f, 0.07f);
+                owner = &gHeroState;
                 if ((*slot)->weight != 0.0f)
                     continue;
-                func_L00_00310C88(owner->moby, slot);
+                release_moby_animation_slot(owner->moby, slot);
                 return;
             } else {
-                func_002AA2E8(&(*current)->weight, 1.0f, 0.2f);
+                ApproachValue(&(*current)->weight, 1.0f, 0.2f);
                 if (((*current)->state & 2) == 0)
                     continue;
                 if (poseOwner->flags == 0) {
@@ -249,25 +251,25 @@ void func_L00_002AF860(void)
         }
     }
     {
-        HeldAnimationHero *poseOwner = &D_00189E20;
+        HeldAnimationHero *poseOwner = &gHeroState;
         if (poseOwner->controlMode == 15) {
             float *target = poseOwner->lookTarget;
             if (target != 0) {
                 poseOwner->pose.q = poseOwner->rotation.q;
-                poseOwner->pose.f[2] = func_00283248(target[4] - poseOwner->position[0],
+                poseOwner->pose.f[2] = FastMatrixHelperA(target[4] - poseOwner->position[0],
                                                      target[5] - poseOwner->position[1]);
                 poseOwner->pose.f[1] = -poseOwner->railPitch;
             } else {
                 poseOwner->pose.q = poseOwner->rotation.q;
-                poseOwner->pose.f[2] = func_00283B98(poseOwner->railYaw, poseOwner->railLean);
+                poseOwner->pose.f[2] = FastAddRotations(poseOwner->railYaw, poseOwner->railLean);
                 poseOwner->pose.f[1] = -poseOwner->railPitch;
             }
             {
-                char *basis = (char *)D_00189E20.basis;
-                func_002833F0(basis, basis + 0x40);
-                func_00282C88(basis + 0x30);
+                char *basis = (char *)gHeroState.basis;
+                euler_rotation_basis(basis, basis + 0x40);
+                ClearVector128(basis + 0x30);
                 *(float *)(basis + 0x30) = 1.0f;
-                func_00283098(basis + 0x30, basis + 0x30, basis);
+                matrix_mul_vec3(basis + 0x30, basis + 0x30, basis);
             }
         } else {
             unsigned char *moby = poseOwner->moby;
@@ -276,12 +278,12 @@ void func_L00_002AF860(void)
             basis[0].q = *(HeldQuad *)(moby + 0xC0);
             basis[1].q = *(HeldQuad *)(moby + 0xD0);
             basis[2].q = *(HeldQuad *)(moby + 0xE0);
-            func_00282C88(offset);
+            ClearVector128(offset);
             poseOwner->facing.f[0] = 1.0f;
-            func_00283098(offset, offset, basis);
+            matrix_mul_vec3(offset, offset, basis);
             poseOwner->pose.q = poseOwner->rotation.q;
             if (poseOwner->transformed == 0)
-                poseOwner->pose.f[2] = func_00283B98(poseOwner->pose.f[2], 0.0f);
+                poseOwner->pose.f[2] = FastAddRotations(poseOwner->pose.f[2], 0.0f);
         }
     }
 }

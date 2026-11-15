@@ -17,6 +17,7 @@ extern void func_00283738(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
 
 /* Update the pickup's anchor, turn it, and compose the visible orientation. */
+/* Keeps a bolt pickup attached to what it sits on, spins it and works out its drawn position and angle. */
 void func_00301F18(u8 *object, void *outPosition, void *outAngles)
 {
     char *state=*(char **)(object+0x68);
@@ -27,7 +28,7 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     int detach;
     u8 *origin; char *slot;
     if (*(char **)(state+0x5c)) {
-        func_002AD470(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
+        ApplyCollisionPushToObject(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
     } else {
         qcopy(&position, state);
         qcopy(&angles, state+0x10);
@@ -39,18 +40,18 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
         detach=0;
         if (*(u8 *)(parent+0x20)==254) detach=1;
         else if (*(u8 *)(parent+0x20)==253) detach=1;
-        else if (!func_00277258(object+0x10,0x22,object,0.25f)) detach=1;
+        else if (!TestPointAgainstCollision(object+0x10,0x22,object,0.25f)) detach=1;
         if (detach) {
             object[0x20]=1;
-            func_00282C88((ParticleWord *)(state+0x30));
+            ClearVector128((ParticleWord *)(state+0x30));
             *(float *)(state+0x3c)=1.0f;
-            parent=(char *)func_002AD0B0((u8 *)*(char **)(state+0x5c));
+            parent=(char *)GetMobyPrivateValue2((u8 *)*(char **)(state+0x5c));
             slot = state+0x5c;
             if (parent) {
                 qcopy(state+0x20, parent+0x10);
                 *(char **)slot=0;
             } else {
-                func_00282C88((ParticleWord *)(state+0x20));
+                ClearVector128((ParticleWord *)(state+0x20));
                 *(char **)slot=0;
             }
         }
@@ -62,22 +63,22 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     default: step=0.0175f; tilt=-0.35f; radius=0.135f; lift=0.3f; break;
     }
     if (*(u8 *)(state+0x55)&1) {
-        *(float *)(state+0x50)=func_00283B98(*(float *)(state+0x50),step);
-        *(float *)(state+0x58)=func_00283B98(*(float *)(state+0x58),-0.0125f);
+        *(float *)(state+0x50)=FastAddRotations(*(float *)(state+0x50),step);
+        *(float *)(state+0x58)=FastAddRotations(*(float *)(state+0x58),-0.0125f);
     } else {
-        *(float *)(state+0x50)=func_00283BE0(*(float *)(state+0x50),step);
-        *(float *)(state+0x58)=func_00283BE0(*(float *)(state+0x58),-0.0125f);
+        *(float *)(state+0x50)=fast_subtract_rotations(*(float *)(state+0x50),step);
+        *(float *)(state+0x58)=fast_subtract_rotations(*(float *)(state+0x58),-0.0125f);
     }
     qcopy(&rotation, state+0x50);
     rotation.f[1]=tilt;
-    func_002833F0(spinMatrix,&rotation);
-    func_002833F0(anchorMatrix,&angles);
-    func_00283738(object+0xc0,anchorMatrix,spinMatrix);
-    func_00282D30(origin,&anchorMatrix[2],radius);
-    func_00282D30(&offset,object+0xc0,lift);
-    func_00282CC0(origin,origin,&offset);
+    euler_rotation_basis(spinMatrix,&rotation);
+    euler_rotation_basis(anchorMatrix,&angles);
+    multiply_matrix3x3(object+0xc0,anchorMatrix,spinMatrix);
+    FastVecScale(origin,&anchorMatrix[2],radius);
+    FastVecScale(&offset,object+0xc0,lift);
+    FastVecAdd(origin,origin,&offset);
     } while (0);
-    slot = (char *)origin; func_00282CC0(slot,slot,&position);
+    slot = (char *)origin; FastVecAdd(slot,slot,&position);
     if (outPosition) qcopy(outPosition, &position);
     if (outAngles) qcopy(outAngles, &angles);
 }

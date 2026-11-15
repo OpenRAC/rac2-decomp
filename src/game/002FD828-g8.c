@@ -32,6 +32,7 @@ extern void func_00282DD8(f32 *, f32 *, f32 *);
 extern void func_00282F20(f32 *, f32 *, f32) ;
 
 /* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/textbin/fun_00239f58.c, func_002FD828. */
+/* Finds the water surface height (and optionally its slope) at a point; returns 0 if no patch is there. */
 s32 func_002FD828(f32 *height, f32 *normal, f32 x, f32 y, f32 z) {
     f32 x_tangent[4] __attribute__((aligned(16)));
     f32 y_tangent[4] __attribute__((aligned(16)));
@@ -49,21 +50,21 @@ s32 func_002FD828(f32 *height, f32 *normal, f32 x, f32 y, f32 z) {
     f32 weight_x;
     f32 weight_y;
 
-    tile_index = func_002FCFC8(x, y, z);
+    tile_index = FindSurfaceBoxAtPoint(x, y, z);
     if (tile_index < 0) {
         return 0;
     }
-    tile = &D_001B22D0[0][tile_index];
+    tile = &gSurfaceHeightTiles[0][tile_index];
     fraction_x = tile->x;
     fraction_y = tile->y;
     fraction_x += ref_L00_002FD828_00.origin_x;
     fraction_y += ref_L00_002FD828_00.origin_y;
     fraction_x = x - fraction_x;
     fraction_y = y - fraction_y;
-    column = func_00283CF0(fraction_x / ref_L00_002FD828_00.cell_width);
-    row = func_00283CF0(*&fraction_y / ref_L00_002FD828_00.cell_height);
-    fraction_x -= func_00283CE0(column) * ref_L00_002FD828_00.cell_width; weight_x = fraction_x / ref_L00_002FD828_00.cell_width;
-    fraction_y -= func_00283CE0(row) * ref_L00_002FD828_00.cell_height;
+    column = FloatToInt(fraction_x / ref_L00_002FD828_00.cell_width);
+    row = FloatToInt(*&fraction_y / ref_L00_002FD828_00.cell_height);
+    fraction_x -= IntToFloat(column) * ref_L00_002FD828_00.cell_width; weight_x = fraction_x / ref_L00_002FD828_00.cell_width;
+    fraction_y -= IntToFloat(row) * ref_L00_002FD828_00.cell_height;
     /* Divide the signed remainder after rounding the row, before choosing the sample bank. */
     weight_y = fraction_y / ref_L00_002FD828_00.cell_height;
     h00 = tile->layers[ref_L00_002FD828_01].samples[row][column];
@@ -102,8 +103,8 @@ s32 func_002FD828(f32 *height, f32 *normal, f32 x, f32 y, f32 z) {
         y_tangent[1] = ref_L00_002FD828_00.cell_height;
         y_tangent[2] = h01 - h00;
         y_tangent[3] = 1.0f;
-        func_00282DD8(normal, x_tangent, y_tangent);
-        func_00282F20(normal, normal, 1.0f);
+        FastVecCross(normal, x_tangent, y_tangent);
+        vec_scale_to_length(normal, normal, 1.0f);
     }
     return 1;
 }

@@ -83,67 +83,68 @@ extern int func_L00_002B9B88(int, int);
 extern void func_L00_002B2C58(int, int, float, float);
 extern void func_L00_002D3C68(char *, char *, float);
 
+/* Checks whether the hero is being hit or pushed by something. If asked to apply it, it changes the hero state and knocks the hero away. */
 int func_L11_002CB130(long apply)
 {
     Vector direction;
     ContactEntry *entry;
     u8 *object, *contact;
     int special;
-    if (D_00189E20.movement == 20 || D_00189E20.movement == 7) return 0;
-    if (D_00189E20.state == 0x31) return 0;
-    if (D_00189E20.timer) return 0;
+    if (gHeroState.movement == 20 || gHeroState.movement == 7) return 0;
+    if (gHeroState.state == 0x31) return 0;
+    if (gHeroState.timer) return 0;
     if (D_L11_001A8F00) return 0;
-    D_00189E20.contact = 0;
-    object = D_00189E20.object;
+    gHeroState.contact = 0;
+    object = gHeroState.object;
     if (object[0xa8] == 0xff) return 0;
     entry = &D_L11_001C4F80[object[0xa8]];
     if (entry->owner != object) return 0;
     if (!(entry->flags & 9)) return 0;
     if (entry->strength != 0.0f) {
-        D_001A7A33 = 0; D_001A7A32 = 1;
+        D_001A7A33 = 0; gBoltMultiplier = 1;
     }
-    if (func_L00_0037E668() != 0.0f && !D_00189E20.mode) {
-        entry->strength = func_L00_0037E5F0(entry->strength);
+    if (GetFadeValue() != 0.0f && !gHeroState.mode) {
+        entry->strength = ReduceFadeValue(entry->strength);
         if (entry->strength == 0.0f) return 0;
     }
-    D_00189E20.contact = entry->object;
+    gHeroState.contact = entry->object;
     if (!apply) return 1;
     special = 0;
-    func_L00_002A6708();
+    ClearTrackedSlots();
     if (entry->directionFlags & 1) {
         direction.word = entry->direction.word;
         if (entry->direction.f[3] == 5627.9248046875f) special = 1;
     } else if (entry->object) {
-        func_00282CF0(&direction, &D_00189E20.position, entry->object+0x10);
-    } else func_L00_002D36E0((float *)&direction, 0, -1.0f, 0.0f, 0.0f);
-    switch (D_00189E20.mode) {
+        FastVecSub(&direction, &gHeroState.position, entry->object+0x10);
+    } else BuildHeroRelativePoint((float *)&direction, 0, -1.0f, 0.0f, 0.0f);
+    switch (gHeroState.mode) {
     case 0:
-        contact = D_00189E20.contact;
-        if (contact && (*(short *)(contact+0xaa) == 0x4eb || *(short *)(contact+0xaa) == 0x558)) {
-            func_L11_002D8EF8(0x7d, 1); return 1;
+        contact = gHeroState.contact;
+        if (contact && (*(short *)(contact+0xaa) == 0x4eb /* moby class 1259 */ || *(short *)(contact+0xaa) == 0x558 /* moby class 1368 */)) {
+            EnterHeroState_L11(0x7d, 1); return 1;
         }
-        if ((D_00189E20.state == 1 || D_00189E20.state == 0x1d || D_00189E20.interrupted) && !(entry->flags & 8)) {
-            u8 *hit = func_002A9640(D_00189E20.object, 1, 0);
-            if (hit) func_L00_002A4EF8(func_00283CF0(*(float *)(hit+0x2c)));
-            if (!D_00189E20.health) func_L11_002D8EF8(0x16, 1);
-            D_00189E20.timer = 0x4d;
-            if (!D_00189E20.soundTimer) D_00189E20.soundTimer = 0x12;
-            func_L00_002B9B88(0x14, 0); return 0;
+        if ((gHeroState.state == 1 || gHeroState.state == 0x1d || gHeroState.interrupted) && !(entry->flags & 8)) {
+            u8 *hit = FindOwnedEffectSlot(gHeroState.object, 1, 0);
+            if (hit) AdjustPlayerHealth(FloatToInt(*(float *)(hit+0x2c)));
+            if (!gHeroState.health) EnterHeroState_L11(0x16, 1);
+            gHeroState.timer = 0x4d;
+            if (!gHeroState.soundTimer) gHeroState.soundTimer = 0x12;
+            PlayHeroSound(0x14, 0); return 0;
         }
-        if (entry->flags & 8) func_L11_002D8EF8(0x8c, 1);
-        else func_L11_002D8EF8(0x16, 1);
-        if (D_00189E20.state == 0x8c) qzero(&direction);
+        if (entry->flags & 8) EnterHeroState_L11(0x8c, 1);
+        else EnterHeroState_L11(0x16, 1);
+        if (gHeroState.state == 0x8c) qzero(&direction);
         else {
-            func_L00_002B2C58((int)&direction, special, D_00189E20.jumpPressed ? 0.0f : 0.055000003f, 0.028333336f);
-            if (special && entry->kind == 4) func_L00_002D3C68((char *)&direction, (char *)&direction, 2.0f);
+            FlattenPushVectorAndSetStrength((int)&direction, special, gHeroState.jumpPressed ? 0.0f : 0.055000003f, 0.028333336f);
+            if (special && entry->kind == 4) ScaleViewSpaceHeight((char *)&direction, (char *)&direction, 2.0f);
         }
         break;
     case 1:
-        func_L11_002D8EF8(0x42, 1);
-        func_L00_002B2C58((int)&direction, special, 0.083333336f, 0.050000004f);
+        EnterHeroState_L11(0x42, 1);
+        FlattenPushVectorAndSetStrength((int)&direction, special, 0.083333336f, 0.050000004f);
         break;
     }
-    func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &direction);
-    func_00282CC0(&D_00189E20.motion, &D_00189E20.motion, &direction);
+    FastVecAdd(&gHeroState.velocity, &gHeroState.velocity, &direction);
+    FastVecAdd(&gHeroState.motion, &gHeroState.motion, &direction);
     return 1;
 }

@@ -1,13 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
-unsigned int func_L00_0032C638(unsigned int param_1)
+/* Reads a value from the object's private data. */
+unsigned int func_L00_0032C638(unsigned int object)
 {
-    unsigned int inner_ptr;
+    unsigned int vars;
     unsigned int result;
 
-    inner_ptr = *(unsigned int *)(param_1 + 0x68);
-    result = *(unsigned int *)(inner_ptr + 0x18);
+    vars = *(unsigned int *)(object + 0x68);
+    result = *(unsigned int *)(vars + 0x18);
     return result;
 }
 
@@ -16,6 +18,7 @@ unsigned int func_L00_0032C638(unsigned int param_1)
 
 /* func_L00_0032CF60 is in L00_0032CF60-g8.c (-G8 -g). */
 
+/* Writes a value to the given memory address if it is not null. */
 void func_L00_0032D100(int value, long address) {
     int *target = (int *)(int)address;
     if (target != 0)
@@ -36,22 +39,22 @@ void func_L00_0032D208(int index)
     int i;
     int address;
     for (i = 0; i < 3; i++) {
-        ResidentState *rs = &D_00188660;
+        ResidentState *rs = &gSoundState;
         unsigned int *handle = &rs->handles[i + 1];
         if (*handle != 0) {
-            func_00132858(*handle);
+            SendSoundCommand6(*handle);
             *handle = 0;
         }
     }
-    func_00133230();
-    while (func_00132028() != 0) { }
+    ClearSoundFlagAndUpdate();
+    while (snd_Pump() != 0) { }
     func_00132828();
-    while (func_00132028() != 0) { }
-    address = D_0014B540.entries[index][0];
+    while (snd_Pump() != 0) { }
+    address = gCopySetupData.entries[index][0];
     if (address != 0) {
-        address += D_0014B540.base;
-        D_00188660.handles[index + 1] = -1;
-        D_00188660.handles[index + 1] = func_00132318(address, 0);
+        address += gCopySetupData.base;
+        gSoundState.handles[index + 1] = -1;
+        gSoundState.handles[index + 1] = snd_BankLoadByLoc(address, 0);
     }
     func_00132828();
 }

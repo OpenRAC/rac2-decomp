@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned char u8;
@@ -86,28 +87,28 @@ void func_L04_00412EC0(RouteObject *object)
     if (state->homeRoute == -1)
         return;
 
-    if (D_001A79F0 == 11) {
-        if (state->route == D_L04_001FE340[state->homeRoute] && state->animFrame >= 186 &&
+    if (gCurrentMapIndex == 11) {
+        if (state->route == gRoutePathTable[state->homeRoute] && state->animFrame >= 186 &&
             state->animFrame < 205 && state->f70C >= 5) {
-            state->route = D_L04_001FE340[state->f708];
+            state->route = gRoutePathTable[state->f708];
             state->pathPoint = 0;
             state->pathOffset = 0;
             state->routeSpeed = 4.0f;
-            func_002C96F8(4.0f, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
+            SampleKeyTrack(4.0f, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
             state->pathTimer = -1000;
         }
         if (!state->switching && state->f314 == -1 && state->animFrame >= 44 && state->animFrame < 51) {
             if (((RouteObject *)(ref_L04_00412EC0_00 + (state->objectIndex << 8)))->state->f14 == 0) {
-                state->route = D_L04_001FE340[state->links[1]];
-                amount = func_00283CE0(func_L04_00400AB0(object, state->route, 0)) * state->route->f1C;
+                state->route = gRoutePathTable[state->links[1]];
+                amount = IntToFloat(FindNearestRoutePointIndex(object, state->route, 0)) * state->route->f1C;
                 state->routeSpeed = amount + (ref_L04_00412EC0_01 ? 20.0f : 5.0f);
-                func_002C96F8(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
-                state->pathOffset += func_002A7878(-0.25f, 0.25f);
+                SampleKeyTrack(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
+                state->pathOffset += RandomFloatRange(-0.25f, 0.25f);
                 if (state->pathOffset > 1.5f)
                     state->pathOffset = 1.5f;
                 if (state->pathOffset < -1.5f)
                     state->pathOffset = -1.5f;
-                state->pathTimer = func_00283CF0(func_002A7878(3.0f, 6.0f) * 60.0f);
+                state->pathTimer = FloatToInt(RandomFloatRange(3.0f, 6.0f) * 60.0f);
                 state->switching = 1;
                 state->switchTimer = 180;
             } else {
@@ -118,46 +119,46 @@ void func_L04_00412EC0(RouteObject *object)
         }
     }
 
-    if (D_001A79F0 == 4) {
-        if (state->route == D_L04_001FE340[state->homeRoute] && state->animFrame >= 426 &&
-            state->animFrame < 432 && state->f70C >= 6 && func_002ACBC8(object->pos, state->f1A0)) {
-            state->route = D_L04_001FE340[state->f708];
+    if (gCurrentMapIndex == 4) {
+        if (state->route == gRoutePathTable[state->homeRoute] && state->animFrame >= 426 &&
+            state->animFrame < 432 && state->f70C >= 6 && IsPointInCuboid(object->pos, state->f1A0)) {
+            state->route = gRoutePathTable[state->f708];
             state->pathPoint = 0;
             state->pathOffset = 0;
             state->routeSpeed = 2.0f;
-            func_002C96F8(2.0f, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
+            SampleKeyTrack(2.0f, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
             state->pathTimer = -1000;
         }
-        if (state->route == D_L04_001FE340[state->altLinks[0]] && state->animFrame >= 171 &&
+        if (state->route == gRoutePathTable[state->altLinks[0]] && state->animFrame >= 171 &&
             state->animFrame < 175 && state->f70C >= 4) {
-            state->route = D_L04_001FE340[state->homeRoute];
-            amount = func_00283CE0(func_L04_00400AB0(object, state->route, 0)) * state->route->f1C;
+            state->route = gRoutePathTable[state->homeRoute];
+            amount = IntToFloat(FindNearestRoutePointIndex(object, state->route, 0)) * state->route->f1C;
             state->routeSpeed = amount + (ref_L04_00412EC0_01 ? 20.0f : 5.0f);
-            func_002C96F8(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
+            SampleKeyTrack(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
         }
     }
 
-    if (func_00282948(&state->switchTimer) && !state->switching && allowed &&
-        state->route == D_L04_001FE340[state->homeRoute]) {
+    if (FastFloatHelperD(&state->switchTimer) && !state->switching && allowed &&
+        state->route == gRoutePathTable[state->homeRoute]) {
         for (i = 0; i < 5; i++) {
             if (state->links[i] != -1) {
-                route = D_L04_001FE340[state->links[i]];
-                func_00282CF0(delta, route->point0, state->pos);
+                route = gRoutePathTable[state->links[i]];
+                FastVecSub(delta, route->point0, state->pos);
                 if (func_L00_002EE290(delta) < 25.0f) {
-                    if (func_002A77E0(2) == 0)
+                    if (RandomIntBelow(2) == 0)
                         state->route = route;
                     else
                         state->switchTimer = 120;
                 }
             }
         }
-        if (D_L04_002C63C0[ref_L04_00412EC0_02].flags & 4) {
+        if (gRaceChallengeTable[ref_L04_00412EC0_02].flags & 4) {
             for (i = 0; i < 4; i++) {
                 if (state->altLinks[i] != -1) {
-                    route = D_L04_001FE340[state->altLinks[i]];
-                    func_00282CF0(delta, route->point0, state->pos);
+                    route = gRoutePathTable[state->altLinks[i]];
+                    FastVecSub(delta, route->point0, state->pos);
                     if (func_L00_002EE290(delta) < 25.0f) {
-                        if (func_002A77E0(2) == 0)
+                        if (RandomIntBelow(2) == 0)
                             state->route = route;
                         else
                             state->switchTimer = 120;
@@ -165,28 +166,28 @@ void func_L04_00412EC0(RouteObject *object)
                 }
             }
         }
-        if (state->route != D_L04_001FE340[state->homeRoute]) {
-            amount = func_00283CE0(func_L04_00400AB0(object, state->route, 0)) * state->route->f1C;
+        if (state->route != gRoutePathTable[state->homeRoute]) {
+            amount = IntToFloat(FindNearestRoutePointIndex(object, state->route, 0)) * state->route->f1C;
             state->routeSpeed = amount + (ref_L04_00412EC0_01 ? 20.0f : 5.0f);
-            func_002C96F8(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
-            state->pathOffset += func_002A7878(-0.25f, 0.25f);
+            SampleKeyTrack(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
+            state->pathOffset += RandomFloatRange(-0.25f, 0.25f);
             if (state->pathOffset > 1.5f)
                 state->pathOffset = 1.5f;
             if (state->pathOffset < -1.5f)
                 state->pathOffset = -1.5f;
-            state->pathTimer = func_00283CF0(func_002A7878(3.0f, 6.0f) * 60.0f);
+            state->pathTimer = FloatToInt(RandomFloatRange(3.0f, 6.0f) * 60.0f);
         }
-    } else if (state->route != D_L04_001FE340[state->homeRoute] && state->pathPoint == state->route->count - 1) {
-        state->route = D_L04_001FE340[state->homeRoute];
-        amount = func_00283CE0(func_L04_00400AB0(object, state->route, 0)) * state->route->f1C;
+    } else if (state->route != gRoutePathTable[state->homeRoute] && state->pathPoint == state->route->count - 1) {
+        state->route = gRoutePathTable[state->homeRoute];
+        amount = IntToFloat(FindNearestRoutePointIndex(object, state->route, 0)) * state->route->f1C;
         state->routeSpeed = amount + (ref_L04_00412EC0_01 ? 20.0f : 5.0f);
-        func_002C96F8(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
-        state->pathOffset += func_002A7878(-0.25f, 0.25f);
+        SampleKeyTrack(state->routeSpeed, state->route->f1C, state->route, &state->pathPoint, &state->f6D4, state->pos);
+        state->pathOffset += RandomFloatRange(-0.25f, 0.25f);
         if (state->pathOffset > 1.5f)
             state->pathOffset = 1.5f;
         if (state->pathOffset < -1.5f)
             state->pathOffset = -1.5f;
-        state->pathTimer = func_00283CF0(func_002A7878(3.0f, 6.0f) * 60.0f);
+        state->pathTimer = FloatToInt(RandomFloatRange(3.0f, 6.0f) * 60.0f);
     }
 
     if (state->switchTimer <= 0)

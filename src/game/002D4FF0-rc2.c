@@ -28,17 +28,18 @@ extern s32 D_001AAA38 __attribute__((sda));
 extern s8 D_0025B9C0[];
 extern s8 D_0025BA80[];
 
-s32 func_002D4FF0(s32 arg0) {
-    s32 temp_a1;
-    s32 idx;
+/* Sets the given menu item to show the current choice and starts it sliding in from the side when the choice changed, then moves on to the next choice. */
+s32 func_002D4FF0(s32 display) {
+    s32 choiceNumber;
+    s32 byteOffset;
 
-    temp_a1 = *(s32 *)D_0025B9C0;
-    if (D_001ABAA0 != temp_a1) {
-        (*(s32 *)((s8 *)(arg0) + (0x3C))) = -0x2BC;
-        D_001ABAA0 = temp_a1;
+    choiceNumber = *(s32 *)D_0025B9C0;
+    if (D_001ABAA0 != choiceNumber) {
+        (*(s32 *)((s8 *)(display) + (0x3C))) = -0x2BC;
+        D_001ABAA0 = choiceNumber;
     }
-    idx = temp_a1 * 4;
-    (*(s32 *)((s8 *)(arg0) + (0x34))) = *(s32 *)((s8 *)&D_001AAA38 + idx);
-    *(s32 *)D_0025BA80 = temp_a1 + 1;
+    byteOffset = choiceNumber * 4;
+    (*(s32 *)((s8 *)(display) + (0x34))) = *(s32 *)((s8 *)&D_001AAA38 + byteOffset);
+    *(s32 *)D_0025BA80 = choiceNumber + 1;
     return 0;
 }

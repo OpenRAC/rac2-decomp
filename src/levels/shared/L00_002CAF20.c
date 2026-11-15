@@ -36,25 +36,26 @@ extern int func_L00_002C42E0(int a0, int a1);
 extern void func_L00_002D2168(void *, int, f32);
 extern void func_002AC9F8(float *, float);
 
+/* Tries to start the hero's grab onto the nearby object, and returns 1 when it started. */
 int func_L00_002CAF20(void)
 {
-    Hero_2CAF20 *h = &D_00189E20;
+    Hero_2CAF20 *h = &gHeroState;
     int idx;
     void *moby;
 
     if (h->b22B8 != 0 && h->b22BA != 0 && h->h24EC == 0) {
-    idx = func_L00_002ADEA0(0);
+    idx = hero_slot_item_id(0);
     if (idx != h->f24B4) {
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
         return 0;
     }
-    moby = (D_L00_00262570 + D_00139568[idx])->moby;
-    if (func_L00_002C42E0(0, 0) == 0)
+    moby = (gWeaponTable_L00 + gItemSlotToRecord[idx])->moby;
+    if (SetHeroAction_L00(0, 0) == 0)
         return 0;
-    func_002AC9F8(h->v160, 0.0250000015f);
+    ClampVectorLength(h->v160, 0.0250000015f);
     if (0.0250000015f < h->f1B4)
         h->f1B4 = 0.0250000015f;
-    func_L00_002D2168(moby, 0, 11.0f);
+    set_hero_animation(moby, 0, 11.0f);
     if (h->fE98 != 0)
         h->fEA4 = 1;
     h->f24B0 = moby;

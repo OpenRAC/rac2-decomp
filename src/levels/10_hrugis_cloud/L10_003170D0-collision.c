@@ -64,39 +64,39 @@ s32 func_L10_00423788(Moby *moby, s32 keep)
     MobyHit *hit;
     s32 destroyed = 0;
 
-    hit = func_002A9640(moby, 0x230000, 0);
+    hit = FindOwnedEffectSlot(moby, 0x230000, 0);
     moby->hitSlot = 0xFF;
     flash = moby->vars->flash;
     health = moby->vars->health;
     if (flash != 0)
-        func_002AB8C0(moby, flash);
+        UpdateColorFade(moby, flash);
     if (*health <= 0.0f)
         return 0;
 
     if (hit != 0) {
-        if (moby->oClass == 0xCBE) {
-            if (hit->source == 0 || hit->source->oClass != 0xF93)
+        if (moby->oClass == 0xCBE /* moby class 3262 */) {
+            if (hit->source == 0 || hit->source->oClass != 0xF93 /* moby class 3987 */)
                 return 0;
         }
         if (flash != 0) {
             flash->flashColor[0] = 0xFF;
-            func_002AB800(moby, flash);
+            StartColorFade(moby, flash);
         }
         *health -= hit->damage;
-        if (moby->oClass != 0xB73 && moby->oClass != 0xF8E)
-            func_002E5DA0(0xD, 0, moby, 0xFBF);
-        if (func_00282948(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E) {
-            func_002E5DA0(3, 0, moby, 0xF8E);
-            D_L10_001B354C = func_00283CF0(func_002A7878(10.0f, 20.0f));
+        if (moby->oClass != 0xB73 /* moby class 2931 */ && moby->oClass != 0xF8E /* moby class 3982 */)
+            PlaySoundFromClassBank(0xD, 0, moby, 0xFBF);
+        if (FastFloatHelperD(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E /* moby class 3982 */) {
+            PlaySoundFromClassBank(3, 0, moby, 0xF8E);
+            D_L10_001B354C = FloatToInt(RandomFloatRange(10.0f, 20.0f));
         }
         if (*health <= 0.0f) {
             *health = 0.0f;
-            func_L05_00424990(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
-            func_L10_00425508(moby, 0, 0xA);
-            if (func_L05_0037BBB8(moby) != 0)
-                func_L05_0037BE98(moby);
+            SpawnShockwaveBurst(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
+            DropRewardAtObject(moby, 0, 0xA);
+            if (IsObjectInUse(moby) != 0)
+                ReleaseObjectFromGroup(moby);
             if (keep == 0)
-                func_L05_0037AE40(moby);
+                ResetObjectActionState(moby);
             destroyed = 1;
         }
     }

@@ -6,24 +6,25 @@ typedef unsigned char u8;
 
 extern u8 D_L01_001A63A8[];
 
-void func_L01_00323310(int a0, int a1)
+/* Queues a request key and value in a small table, unless the same key is already set and nothing is waiting. */
+void func_L01_00323310(int requestKey, int requestValue)
 {
-    u8 *b = D_L01_001A63A8;
+    u8 *requestTable = D_L01_001A63A8;
 
-    if (*(short *)(b + 0x48) == a0 && *(short *)(b + 0x3C) == -1)
+    if (*(short *)(requestTable + 0x48) == requestKey && *(short *)(requestTable + 0x3C) == -1)
         return;
-    if (a0 != -1)
-        a0 &= 0xFF;
-    if (a1 != -1)
-        a0 &= 0xFF;
-    if (*(short *)(b + 0x4E) == 0 && *(short *)(b + 0x96) == 0) {
-        *(short *)(b + 0x48) = a0;
+    if (requestKey != -1)
+        requestKey &= 0xFF;
+    if (requestValue != -1)
+        requestKey &= 0xFF;
+    if (*(short *)(requestTable + 0x4E) == 0 && *(short *)(requestTable + 0x96) == 0) {
+        *(short *)(requestTable + 0x48) = requestKey;
         return;
     }
     {
-        u8 *c = D_L01_001A63A8;
+        u8 *tableAgain = D_L01_001A63A8;
 
-        *(short *)(c + 0x3C) = a0;
-        *(short *)(c + 0x3E) = a1;
+        *(short *)(tableAgain + 0x3C) = requestKey;
+        *(short *)(tableAgain + 0x3E) = requestValue;
     }
 }

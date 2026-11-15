@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003DB030 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -21,30 +22,31 @@ extern void func_00282F20(void *, void *, float);
 extern float func_00282DB0(void *, void *);
 extern void func_L00_00325AE8(void *, int, float, float);
 
-void func_L02_003DB030(char *arg0) {
-    float a[4];
-    float b[4];
-    float c[16];
-    float d[4];
-    float e[4];
-    float f[4];
-    float len;
+/* Draws a glow at joint 4 of the boss, brighter when it faces the camera. */
+void func_L02_003DB030(char *moby) {
+    float jointPos[4];
+    float jointPosCopy[4];
+    float jointMatrix[16];
+    float localOffset[4];
+    float toCamera[4];
+    float axisCopy[4];
+    float alignment;
     unsigned int color;
-    char *st = *(char **)(*(char **)(arg0 + 0xB8) + 0x68);
+    char *vars = *(char **)(*(char **)(moby + 0xB8) + 0x68);
 
-    func_0029FCC0(arg0, 4, a);
-    *(TI128 *)b = *(TI128 *)a;
-    func_0029FC20(arg0, 4, c);
-    func_002830C0(d, &D_L02_001B0460, c);
-    func_00282CC0(a, a, d);
-    func_00282CF0(e, D_L02_001BA500, a);
-    func_00282F20(e, e, 1.0f);
-    *(TI128 *)f = *(TI128 *)c;
-    len = func_00282DB0(e, f);
-    if (D_L02_001B0470 < len) {
-        color = *(unsigned int *)(st + 0x250);
-        len = len * len;
-        func_L00_00325AE8(a, (color & 0xFFFFFF) | ((int)(len * (float)(int)(color >> 24)) << 24),
+    TransformMobyJointToWorld(moby, 4, jointPos);
+    *(TI128 *)jointPosCopy = *(TI128 *)jointPos;
+    TransformMobyJointPoint(moby, 4, jointMatrix);
+    transform_vector(localOffset, &D_L02_001B0460, jointMatrix);
+    FastVecAdd(jointPos, jointPos, localOffset);
+    FastVecSub(toCamera, gCameraPosition_L02, jointPos);
+    vec_scale_to_length(toCamera, toCamera, 1.0f);
+    *(TI128 *)axisCopy = *(TI128 *)jointMatrix;
+    alignment = FastVecDot(toCamera, axisCopy);
+    if (D_L02_001B0470 < alignment) {
+        color = *(unsigned int *)(vars + 0x250);
+        alignment = alignment * alignment;
+        DrawBillboardQuad_L00(jointPos, (color & 0xFFFFFF) | ((int)(alignment * (float)(int)(color >> 24)) << 24),
                           D_L02_001B0454, D_L02_001B0450);
     }
 }

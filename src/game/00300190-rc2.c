@@ -29,12 +29,13 @@ extern s32 D_0018C0B0[];
 extern void func_002AD0E0(s32, s32, void *, void *, void *, void *);
 typedef int TI __attribute__((mode(TI)));
 
-void func_00300190(void *arg0, void *arg1) {
-    s8 tmp[16];
-    s32 d = D_001AD7EC;
-    if (d != 0) {
-        func_002AD0E0(D_0018C0B0[0], d, arg1, &D_001A8BD0, arg0, tmp);
+/* Copies a 4-float vector, passing it through the current transform when one is set. */
+void func_00300190(void *dest, void *source) {
+    s8 scratch[16];
+    s32 transform = D_001AD7EC;
+    if (transform != 0) {
+        TransformPointAndRotationByParent(gHeroMoby_0018C0B0[0], transform, source, &D_001A8BD0, dest, scratch);
         return;
     }
-    *(TI *)arg0 = *(TI *)arg1;
+    *(TI *)dest = *(TI *)source;
 }

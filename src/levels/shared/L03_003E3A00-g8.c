@@ -125,9 +125,9 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_L03_003E3A00(u8 *p)
+void func_L03_003E3A00(u8 *moby)
 {
-    PuzzleState *q = *(PuzzleState **)(p + 0x68);
+    PuzzleState *vars = *(PuzzleState **)(moby + 0x68);
     int color, i;
     float a, b, half, t;
 
@@ -136,44 +136,44 @@ void func_L03_003E3A00(u8 *p)
         PuzzleNode tip, axis;
         Matrix rotation;
 
-        if (q->mode == D_L03_001B0B50)
+        if (vars->mode == D_L03_001B0B50)
             color = D_L03_001B0B88;
         else
             color = D_L03_001B0B84;
         i = 0;
-        if (q->route[1] != 255)
+        if (vars->route[1] != 255)
             do {
                 j = i + 1;
-                func_L03_003E4148(p, color, color, &D_L03_0029BBF0[q->route[i]],
-                                  &D_L03_0029BBF0[q->route[j]], q->phase, D_L03_001B0B94);
+                DrawPathPuzzleLinkStrip(moby, color, color, &D_L03_0029BBF0[vars->route[i]],
+                                  &D_L03_0029BBF0[vars->route[j]], vars->phase, D_L03_001B0B94);
                 i = j;
                 if (i >= 15)
                     break;
-            } while (q->route[i + 1] != 255);
+            } while (vars->route[i + 1] != 255);
 
         {
             int i, j, k, found;
 
             for (i = 0; i < 6; i++) {
-                k = D_0024A7B0[q->node][i];
-                if (k == q->previous || k == -1)
+                k = D_0024A7B0[vars->node][i];
+                if (k == vars->previous || k == -1)
                     continue;
-                if (q->mode == D_L03_001B0B50 && k == q->path[1])
+                if (vars->mode == D_L03_001B0B50 && k == vars->path[1])
                     continue;
                 found = 0;
-                for (j = 0; j < 6 && q->visited[j] != 255; j++)
-                    if (q->visited[j] == k) {
+                for (j = 0; j < 6 && vars->visited[j] != 255; j++)
+                    if (vars->visited[j] == k) {
                         found = 1;
                         break;
                     }
-                func_00282DD8(&axis, &D_L03_0029BBF0[q->node], &D_L03_0029BBF0[k]);
-                func_002ACE78(&axis, &axis, 0.17453294992446899f);
-                func_00283958(&axis, &rotation);
-                func_00283098(&tip, &D_L03_0029BBF0[q->node], &rotation);
-                func_00282F20(&tip, &tip, 1.0f);
+                FastVecCross(&axis, &D_L03_0029BBF0[vars->node], &D_L03_0029BBF0[k]);
+                SetDirectionWithComplement(&axis, &axis, 0.17453294992446899f);
+                quaternion_to_rotation_basis(&axis, &rotation);
+                matrix_mul_vec3(&tip, &D_L03_0029BBF0[vars->node], &rotation);
+                vec_scale_to_length(&tip, &tip, 1.0f);
                 if (found)
-                    func_L03_003E4148(p, D_L03_001B0B8C & 0xFFFFFF, D_L03_001B0B8C, &tip,
-                                      &D_L03_0029BBF0[q->node], -q->phase, 0);
+                    DrawPathPuzzleLinkStrip(moby, D_L03_001B0B8C & 0xFFFFFF, D_L03_001B0B8C, &tip,
+                                      &D_L03_0029BBF0[vars->node], -vars->phase, 0);
             }
         }
     }
@@ -183,51 +183,51 @@ void func_L03_003E3A00(u8 *p)
         float z, half;
 
         half = 0.5f;
-        s = func_00336D50(D_L03_001A904C + entry, 0xCB);
+        s = FindTableEntryById(D_L03_001A904C + entry, 0xCB);
         y = label_y(s, D_L03_001B0BCC, D_L03_001B3284[0], half, 1);
         z = 0.0f;
-        func_00300A00(s, 0x60442D00, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
-        s = func_00336D50(D_L03_001A904C + entry, 0xCC);
+        DrawScaledObjectTwoAxes(s, 0x60442D00, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
+        s = FindTableEntryById(D_L03_001A904C + entry, 0xCC);
         y = label_y(s, D_L03_001B0BCC, D_L03_001B3284[0], half, 1);
-        func_00300A00(s, 0x55F0C070, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
+        DrawScaledObjectTwoAxes(s, 0x55F0C070, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
     }
     half = 0.5f;
     {
         int x, left, top, right, bottom;
         int pulse;
 
-        pulse = func_00283D38(0x80F0C070, 0x40F0C070,
-                          func_00283198(func_00283CE0(D_L03_001B2548 % 60) * 0.10471976548433304f
+        pulse = FastTweenColor(0x80F0C070, 0x40F0C070,
+                          FastSinOrCosB(IntToFloat(gFrameCounter_L03 % 60) * 0.10471976548433304f
                                         - 3.14159274f) * half + half);
-        a = func_00283CE0(q->amount);
-        b = func_00283CE0(D_L03_001B0B58);
+        a = IntToFloat(vars->amount);
+        b = IntToFloat(D_L03_001B0B58);
         left = D_L03_001B0BA8 + 2;
-        x = func_00283CF0((float)(D_L03_001B0BA8_1[1] - D_L03_001B0BA8_1[3] - 4) * a / b
+        x = FloatToInt((float)(D_L03_001B0BA8_1[1] - D_L03_001B0BA8_1[3] - 4) * a / b
                           + (float)(D_L03_001B0BA8_1[3] - 2));
         t = D_L03_001B3284[0];
         top = scaled_coord(x, t, half, 1);
         right = D_L03_001B0BA8_1[2] - 2;
         bottom = scaled_coord(D_L03_001B0BA8_1[3] - 2, t, half, 1);
-        func_0028FC48(left, top, right, bottom, pulse, 0);
+        AppendScreenRectPacket(left, top, right, bottom, pulse, 0);
     }
     {
         int x, end, top, bottom, left, right;
         float step, fx;
 
-        a = func_00283CE0(D_L03_001B0BB8_1[1] - D_L03_001B0BB8_1[3]);
-        b = func_00283CE0(D_L03_001B0B50);
+        a = IntToFloat(D_L03_001B0BB8_1[1] - D_L03_001B0BB8_1[3]);
+        b = IntToFloat(D_L03_001B0B50);
         step = a / b;
         for (i = 0; i < D_L03_001B0B50; i++) {
             float scale;
 
-            x = func_00283CF0((float)D_L03_001B0BB8_1[3] + (float)i * step);
+            x = FloatToInt((float)D_L03_001B0BB8_1[3] + (float)i * step);
             fx = (float)x;
-            end = func_00283CF0(fx + step + 3.0f);
+            end = FloatToInt(fx + step + 3.0f);
             scale = D_L03_001B3284_1;
-            if (i >= q->count) {
+            if (i >= vars->count) {
                 bottom = scaled_coord(end, scale, half, 1);
                 top = hud_size(D_L03_001B3280, fx, scale, half);
-                func_0028FC48(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[2], 0);
+                AppendScreenRectPacket(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[2], 0);
                 {
                     float t;
 
@@ -236,12 +236,12 @@ void func_L03_003E3A00(u8 *p)
                     bottom = scaled_coord(end + 2, t, half, 1);
                     right = D_L03_001B0BB8_1[2] - 2;
                     top = scaled_coord(x - 2, t, half, 1);
-                    func_0028FC48(left, bottom, right, top, D_L03_001B0B98, 0);
+                    AppendScreenRectPacket(left, bottom, right, top, D_L03_001B0B98, 0);
                 }
             } else {
                 bottom = scaled_coord(end, scale, half, 1);
                 top = hud_size(D_L03_001B3280, fx, scale, half);
-                func_0028FC48(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[1], 0);
+                AppendScreenRectPacket(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[1], 0);
             }
         }
     }
@@ -255,16 +255,16 @@ void func_L03_003E3A00(u8 *p)
         for (i = 0; i < 4; i++) {
             float a, offset;
 
-            func_00115DA8(text, D_L03_001B0C18, func_00288FB8(ids.x[i]));
-            x = func_00283CF0(D_L03_001B0BD8[i * 2]);
+            Sprintf(text, D_L03_001B0C18, GetLocalizedString(ids.x[i]));
+            x = FloatToInt(D_L03_001B0BD8[i * 2]);
             offset = (float)offs.x[i];
             a = D_L03_001B0BDC[i * 2] * D_L03_001B3284[0] + 0.5f;
             if (D_L03_001B3280 == 1)
                 y = (int)(a + offset);
             else
                 y = (int)a;
-            y = func_00283CF0((float)y);
-            func_0027FB40(x, y, 0x80808080, text, 128);
+            y = FloatToInt((float)y);
+            DrawTextCenteredMediumFont(x, y, 0x80808080, text, 128);
         }
     }
 }

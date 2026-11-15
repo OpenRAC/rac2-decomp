@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef void *V;
 
@@ -8,10 +9,11 @@ extern void func_00282C98(V);
 
 extern void func_002AFFD8(V,V,int);
 
-void func_L00_003252C8(V p,V q) {
+/* Clears the vector, or computes it from the object when the global switch is set. */
+void func_L00_003252C8(V object,V vector) {
  if(D_001A8FF0==0) {
-  func_00282C98(q);
+  VectorCopyHelperA(vector);
   return;
  }
- func_002AFFD8(p,q,1);
+ ComputeViewDirection(object,vector,1);
 }

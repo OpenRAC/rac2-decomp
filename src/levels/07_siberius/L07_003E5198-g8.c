@@ -23,79 +23,81 @@ extern float D_L07_001B0A98[] __attribute__((sda));
 struct PlayerState1310 { char pad[0x229C]; int state; char pad2[0x1FC]; void *target; };
 extern struct PlayerState1310 D_00189E20;
 /* Advance the entity state machine, movement and recovery scaling. */
-void func_L07_003E5198(unsigned char *o)
+/* Per-frame update for moby class 3357: runs its behaviour states and eases the object toward
+   its goals. */
+void func_L07_003E5198(unsigned char *moby)
 {
-    float v[4] __attribute__((aligned(16)));
-    float len[2];
-    char *p=*(char **)(o+0x68);
+    float goalPos[4] __attribute__((aligned(16)));
+    float lengths[2];
+    char *vars=*(char **)(moby+0x68);
     int i;
-    func_L07_003E56B8(o);
-    switch(o[0x95]) {
+    UpdateGroupEntityBase(moby);
+    switch(moby[0x95]) {
     case 0:
-        if (*(int *)(p+0x114)==1) func_002A7750(o,5,2);
+        if (*(int *)(vars+0x114)==1) SetMobyState(moby,5,2);
         break;
     case 2:
-        if (*(int *)(p+0x114)!=1) func_002A7750(o,1,0);
+        if (*(int *)(vars+0x114)!=1) SetMobyState(moby,1,0);
         break;
     }
-    switch(o[0x20]) {
+    switch(moby[0x20]) {
     case 1:
-        if (func_002B3868(o) && o[0x43]) func_002A7470(o,0,0,20);
-        if (*(char **)(p+0x260)) {
-            func_00283098(v,p+0x220,*(char **)(p+0x260)+0xC0);
-            func_00282CC0(v,v,*(char **)(p+0x260)+0x10);
-        } else qcopy(v,p+0x220);
-        func_L07_003E5910(o,v,0,1);
+        if (SetFirstPendingFlag(moby) && moby[0x43]) StartAnimationBlended(moby,0,0,20);
+        if (*(char **)(vars+0x260)) {
+            matrix_mul_vec3(goalPos,vars+0x220,*(char **)(vars+0x260)+0xC0);
+            FastVecAdd(goalPos,goalPos,*(char **)(vars+0x260)+0x10);
+        } else qcopy(goalPos,vars+0x220);
+        MoveEntityToTrackedHeight(moby,goalPos,0,1);
         break;
     case 3:
-        if(func_002B3868(o)) *(float *)(p+0x250)=func_002A78D8(D_L07_001B0A98[0],D_L07_001B0A98[1])*0.01745329424738884f;
-        if(func_L07_003E5910(o,p+0x100,*(float *)(p+0x250),1)<2) func_002A7750(o,4,-1);
+        if(SetFirstPendingFlag(moby)) *(float *)(vars+0x250)=RandomSignedFloatRange(D_L07_001B0A98[0],D_L07_001B0A98[1])*0.01745329424738884f;
+        if(MoveEntityToTrackedHeight(moby,vars+0x100,*(float *)(vars+0x250),1)<2) SetMobyState(moby,4,-1);
         break;
     case 4:
-        if(func_002B3868(o) && o[0x43]!=2) func_002A7470(o,2,0,5);
-        func_L07_003E5910(o,p+0x100,*(float *)(p+0x250),1);
-        if(o[0x60]&2) func_002A7750(o,5,-1);
+        if(SetFirstPendingFlag(moby) && moby[0x43]!=2) StartAnimationBlended(moby,2,0,5);
+        MoveEntityToTrackedHeight(moby,vars+0x100,*(float *)(vars+0x250),1);
+        if(moby[0x60]&2) SetMobyState(moby,5,-1);
         break;
     case 5:
-        if(func_002B3868(o) && o[0x43]!=3) func_002A7470(o,3,0,2);
-        func_L07_003E5910(o,p+0x100,*(float *)(p+0x250),1);
-        if(*(unsigned short *)(o+0x96)>10)
-            func_002A8C28(o,o+0x10,D_L07_001B0A94,(float)*(unsigned char *)(p+0x34),1,0x4000001,0,1,0);
-        if(*(unsigned short *)(o+0x96)>30 &&
-            (D_00189E20.state==7 || D_00189E20.state==20) &&
-            D_00189E20.target==o) func_002A7750(o,6,-1);
+        if(SetFirstPendingFlag(moby) && moby[0x43]!=3) StartAnimationBlended(moby,3,0,2);
+        MoveEntityToTrackedHeight(moby,vars+0x100,*(float *)(vars+0x250),1);
+        if(*(unsigned short *)(moby+0x96)>10)
+            SweepCollisionFromObject(moby,moby+0x10,D_L07_001B0A94,(float)*(unsigned char *)(vars+0x34),1,0x4000001,0,1,0);
+        if(*(unsigned short *)(moby+0x96)>30 &&
+            (gHeroState.state==7 || gHeroState.state==20) &&
+            gHeroState.target==moby) SetMobyState(moby,6,-1);
         break;
     case 6:
-        if(func_002B3868(o) && o[0x43]!=4) func_002A7470(o,4,0,1);
-        if(o[0x60]&2) func_002A7750(o,5,-1);
+        if(SetFirstPendingFlag(moby) && moby[0x43]!=4) StartAnimationBlended(moby,4,0,1);
+        if(moby[0x60]&2) SetMobyState(moby,5,-1);
         break;
     case 9: {
         float tolerance=0.08333333582f;
-        func_00282CF0(v,p+0x230,o+0x10);
-        if(func_00282DF0(v)>tolerance) func_002AC9F8(v,tolerance);
-        else func_002A7750(o,10,-1);
-        func_00282CC0(o+0x10,o+0x10,v);
-        func_L07_003E5FA8(o);
+        FastVecSub(goalPos,vars+0x230,moby+0x10);
+        if(FastVecLength(goalPos)>tolerance) ClampVectorLength(goalPos,tolerance);
+        else SetMobyState(moby,10,-1);
+        FastVecAdd(moby+0x10,moby+0x10,goalPos);
+        SpawnEntityParticlePair(moby);
         break;
     }
     case 10:
-        if(func_002B3868(o)) *(int *)(o+0x98)=*(int *)(*(char **)(o+0x24)+0x10);
-        len[1]=func_00282DF0(o+0xC0);
-        len[0]=func_00282DF0(o+0xE0);
+        if(SetFirstPendingFlag(moby)) *(int *)(moby+0x98)=*(int *)(*(char **)(moby+0x24)+0x10);
+        lengths[1]=FastVecLength(moby+0xC0);
+        lengths[0]=FastVecLength(moby+0xE0);
         {
             float a=D_L07_001B0A88*0.0002777777845f;
             float b=D_L07_001B0A8C*0.01666666754f;
-            func_002AA548(&len[0],1,p+0x254,a,a,b);
-            if(len[0]>D_L07_001B0A90) func_002AA548(&len[1],1,p+0x258,a,a,b);
+            StepValueTowardTarget(&lengths[0],1,vars+0x254,a,a,b);
+            if(lengths[0]>D_L07_001B0A90) StepValueTowardTarget(&lengths[1],1,vars+0x258,a,a,b);
         }
-        for(i=0;i<2;i++) func_00282F20(o+0xC0+i*16,o+0xC0+i*16,len[1]);
-        func_00282F20(o+0xE0,o+0xE0,len[0]);
-        if(len[1]>=1) {
-            for(i=0;i<3;i++) func_00282F20(o+0xC0+i*16,o+0xC0+i*16,1);
-            func_002A7750(o,3,2);
+        for(i=0;i<2;i++) vec_scale_to_length(moby+0xC0+i*16,moby+0xC0+i*16,lengths[1]);
+        vec_scale_to_length(moby+0xE0,moby+0xE0,lengths[0]);
+        if(lengths[1]>=1) {
+            for(i=0;i<3;i++) vec_scale_to_length(moby+0xC0+i*16,moby+0xC0+i*16,1);
+            SetMobyState(moby,3,2);
         }
-        func_L07_003E5FA8(o);
+        SpawnEntityParticlePair(moby);
         break;
     }
-    func_L07_003E5A70(o);
+    TickEntityTimers(moby);
 }

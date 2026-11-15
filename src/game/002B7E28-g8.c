@@ -37,49 +37,50 @@ typedef struct {
     float v[4];
 } Vec4_002BABE8;
 
+/* Updates one animated effect each frame: moves it, and blends its color and size through its fade-in, hold and fade-out phases. */
 void func_002BABE8(char *self)
 {
-    char *s2 = self;
-    char *s3 = self + 0x20;
-    Vec4_002BABE8 t0, t1, t2;
-    float f;
+    char *effect = self;
+    char *anim = self + 0x20;
+    Vec4_002BABE8 step, fromStep, toStep;
+    float progress;
 
-    if (D_001B1688 & 1) {
-        *(unsigned char *)(s2 + 8) = *(unsigned char *)(s2 + 8) + 1;
+    if (gGameTime & 1) {
+        *(unsigned char *)(effect + 8) = *(unsigned char *)(effect + 8) + 1;
     }
-    if (*(short *)(s3 + 0x10) != 0) {
+    if (*(short *)(anim + 0x10) != 0) {
         D_10000000[0] = 0;
-        func_002AE838((char *)&t0, s3);
-        func_00282CC0(s2 + 0x10, s2 + 0x10, (char *)&t0);
-        f = func_00283CE0(*(short *)(s2 + 0xA)) / func_00283CE0(*(short *)(s3 + 0x10));
-        *(int *)(s2 + 4) = func_00283D38(*(int *)(s3 + 8) & 0xFFFFFF, *(int *)(s3 + 8), 1.0f - f);
-        *(float *)(s2 + 0xC) = (float)(*(short *)(s3 + 0x16) * 1000);
-        if (func_00282978((short *)(s2 + 0xA)) != 0) {
-            *(short *)(s3 + 0x10) = 0;
-            *(short *)(s2 + 0xA) = *(unsigned short *)(s3 + 0x12);
+        DecodeByteColorVector((char *)&step, anim);
+        FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
+        progress = IntToFloat(*(short *)(effect + 0xA)) / IntToFloat(*(short *)(anim + 0x10));
+        *(int *)(effect + 4) = FastTweenColor(*(int *)(anim + 8) & 0xFFFFFF, *(int *)(anim + 8), 1.0f - progress);
+        *(float *)(effect + 0xC) = (float)(*(short *)(anim + 0x16) * 1000);
+        if (FastDecTimer((short *)(effect + 0xA)) != 0) {
+            *(short *)(anim + 0x10) = 0;
+            *(short *)(effect + 0xA) = *(unsigned short *)(anim + 0x12);
         }
-    } else if (*(short *)(s3 + 0x12) != 0) {
-        func_002AE838((char *)&t1, s3);
-        func_002AE838((char *)&t2, s2 + 0x24);
-        f = func_00283CE0(*(short *)(s2 + 0xA)) / func_00283CE0(*(short *)(s3 + 0x12));
-        func_00282D08((float *)&t0, (char *)&t2, (char *)&t1, f);
-        func_00282CC0(s2 + 0x10, s2 + 0x10, (char *)&t0);
-        *(float *)(s2 + 0xC) = ((float)(*(short *)(s3 + 0x16) - *(short *)(s3 + 0x18)) * f
-                               + (float)*(short *)(s3 + 0x18)) * 1000.0f;
-        *(int *)(s2 + 4) = func_00283D38(*(int *)(s3 + 0xC), *(int *)(s3 + 8), f);
-        if (func_00282978((short *)(s2 + 0xA)) != 0) {
-            *(short *)(s3 + 0x12) = 0;
-            *(short *)(s2 + 0xA) = *(unsigned short *)(s3 + 0x14);
+    } else if (*(short *)(anim + 0x12) != 0) {
+        DecodeByteColorVector((char *)&fromStep, anim);
+        DecodeByteColorVector((char *)&toStep, effect + 0x24);
+        progress = IntToFloat(*(short *)(effect + 0xA)) / IntToFloat(*(short *)(anim + 0x12));
+        lerp_vector((float *)&step, (char *)&toStep, (char *)&fromStep, progress);
+        FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
+        *(float *)(effect + 0xC) = ((float)(*(short *)(anim + 0x16) - *(short *)(anim + 0x18)) * progress
+                               + (float)*(short *)(anim + 0x18)) * 1000.0f;
+        *(int *)(effect + 4) = FastTweenColor(*(int *)(anim + 0xC), *(int *)(anim + 8), progress);
+        if (FastDecTimer((short *)(effect + 0xA)) != 0) {
+            *(short *)(anim + 0x12) = 0;
+            *(short *)(effect + 0xA) = *(unsigned short *)(anim + 0x14);
         }
     } else {
-        func_002AE838((char *)&t0, s2 + 0x24);
-        func_00282CC0(s2 + 0x10, s2 + 0x10, (char *)&t0);
-        *(int *)(s2 + 4) = func_00283D38(*(int *)(s3 + 0xC) & 0xFFFFFF, *(int *)(s3 + 0xC),
-                                         func_00283CE0(*(short *)(s2 + 0xA))
-                                             / func_00283CE0(*(short *)(s3 + 0x14)));
-        *(float *)(s2 + 0xC) = (float)(*(short *)(s3 + 0x18) * 1000);
-        if (func_00282978((short *)(s2 + 0xA)) != 0) {
-            func_002B9180(s2);
+        DecodeByteColorVector((char *)&step, effect + 0x24);
+        FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
+        *(int *)(effect + 4) = FastTweenColor(*(int *)(anim + 0xC) & 0xFFFFFF, *(int *)(anim + 0xC),
+                                         IntToFloat(*(short *)(effect + 0xA))
+                                             / IntToFloat(*(short *)(anim + 0x14)));
+        *(float *)(effect + 0xC) = (float)(*(short *)(anim + 0x18) * 1000);
+        if (FastDecTimer((short *)(effect + 0xA)) != 0) {
+            KillParticle(effect);
         }
     }
 }
@@ -150,6 +151,7 @@ extern int func_00115DA8(char *, const char *, ...);
 /* The class-record lookups are written index-first, i[D_00139568] and
    (j)[D_00239BA0]: retail adds each index to its base in that operand order
    (blocker 28), which is also what orders the loads in the switch cases. */
+/* Runs one step of a dialogue script: shows the current line, checks its condition and moves on to the next line. */
 void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
 {
     DialogNode_002B8108 *node = &st->nodes[st->cur];
@@ -165,7 +167,7 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     }
     if (enter) {
         st->prev = st->cur;
-        st->startTime = D_001B1688;
+        st->startTime = gGameTime;
         if (st->cur != node->next) {
             unsigned short flags = node->flags;
             st->cur = node->next;
@@ -177,9 +179,9 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
                 D_001B178C.data = st;
                 sound = node->sound;
                 if (sound & 0x4000) {
-                    func_002B49E0(1, 1, 0, (short)(sound ^ 0x4000), 0);
+                    BeginSlotRequest(1, 1, 0, (short)(sound ^ 0x4000), 0);
                 } else {
-                    func_002B49E0(2, 1, (short)sound, 0, 0);
+                    BeginSlotRequest(2, 1, (short)sound, 0, 0);
                 }
             }
         }
@@ -191,25 +193,25 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     kind = node->kind;
     if (kind == 6) {
         seps = D_001AA250;
-        func_00115690((char *)0x70000000, func_00288FB8(node->message));
+        strcpy((char *)0x70000000, GetLocalizedString(node->message));
         {
-            char *p = func_001163E0((char *)0x70000000, D_001AA288);
+            char *p = Strstr((char *)0x70000000, D_001AA288);
             if (p != 0) {
                 p[1] = 's';
             }
         }
         {
-            int price = (node->arg[D_00139568])[D_00239BA0].price;
-            func_00115DA8(number, D_001AA278, price / 1000, seps.s[D_001A7BB4 % 6], price % 1000);
+            int price = (node->arg[gItemSlotToRecord])[gWeaponTable_00239BA0].price;
+            Sprintf(number, D_001AA278, price / 1000, seps.s[D_001A7BB4 % 6], price % 1000);
         }
-        func_00115DA8(text, (char *)0x70000000, number);
+        Sprintf(text, (char *)0x70000000, number);
     } else {
-        func_00115DA8(text, func_00288FB8(node->message));
+        Sprintf(text, GetLocalizedString(node->message));
     }
     if (D_001B178C.message != 0) {
-        func_0028BCA0(text);
+        PlayHudSoundEffect(text);
     } else if (D_001AA2B8 != -1) {
-        func_0028B5D0(D_001AA2B8);
+        CloseHudElementByKey(D_001AA2B8);
         D_001AA2B8 = -1;
     }
     if (node->kind == 0) {
@@ -217,19 +219,19 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     }
     switch (node->kind) {
     case 1:
-        cond = D_001A79F8 >= (node->arg[D_00139568])[D_00239BA0].cost;
+        cond = gPlayerBolts >= (node->arg[gItemSlotToRecord])[gWeaponTable_00239BA0].cost;
         break;
     case 2:
-        cond = D_001A7AF8[node->arg] != 0;
+        cond = gItemOwnedFlags[node->arg] != 0;
         break;
     case 3:
-        cond = D_001A7AF8[node->arg] != 0 && D_001A7B30[node->arg] == 0;
+        cond = gItemOwnedFlags[node->arg] != 0 && D_001A7B30[node->arg] == 0;
         break;
     case 5:
-        cond = func_002B0D70() >= node->arg;
+        cond = CountItemsAboveBaseline() >= node->arg;
         break;
     case 6:
-        cond = D_001A79F8 >= (node->arg[D_00139568])[D_00239BA0].price && func_002B0D70() >= 4;
+        cond = gPlayerBolts >= (node->arg[gItemSlotToRecord])[gWeaponTable_00239BA0].price && CountItemsAboveBaseline() >= 4;
         break;
     case 7:
         cond = D_001A7A1A >= node->arg;
@@ -245,10 +247,10 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     }
     if (next != st->cur) {
         st->cur = next;
-        st->startTime = D_001B1688;
+        st->startTime = gGameTime;
         node = &st->nodes[next];
         st->skippable = node->flags & 1;
-        func_002B8108(owner, st, 0);
+        RunDialogueNode(owner, st, 0);
     }
 }
 
@@ -287,9 +289,10 @@ typedef struct {
 
 extern PadPollState D_00138180;
 
-void func_002B85F8(void *arg)
+/* Reads the state of one controller each frame, fetching its button and vibration profile when it connects, and sends the vibration levels. */
+void func_002B85F8(void *padArg)
 {
-    PadPollState *p = arg;
+    PadPollState *p = padArg;
     unsigned char buf[64];
     short vibration;
     int status, n, i;
@@ -298,14 +301,14 @@ void func_002B85F8(void *arg)
     p->prev_held = p->latched_held;
     p->prev_raw_held = p->raw_held;
     p->raw_held = 0;
-    status = func_00128C18(p->socket);
+    status = ScePad2GetState(p->socket);
     p->device_state = status;
     if (status == 1) {
         switch (p->profile_state) {
         case 0: {
             int n;
 
-            n = func_00128B28(p->socket, buf);
+            n = ReadPad2ButtonMask(p->socket, buf);
             if (*(unsigned int *)buf == 0xFFFFFFFF)
                 p->profile_mask = 0x79;
             else
@@ -329,7 +332,7 @@ void func_002B85F8(void *arg)
             }
             for (i = n; i < 4; i++)
                 p->act[i] = buf[i];
-            func_002B8888(p);
+            ClearPadInput(p);
             break;
         }
         case 1:
@@ -342,18 +345,18 @@ void func_002B85F8(void *arg)
 
                 vibration = shifted | (p->vibration0 & 1);
             }
-            func_00128FD0(p->socket, 1, p->act, 2, &vibration);
-            func_002B88F0(p, buf, n);
+            sceVibSetActParam(p->socket, 1, p->act, 2, &vibration);
+            DecodePadReading(p, buf, n);
             break;
         case 2:
-            func_002B8888(p);
+            ClearPadInput(p);
             break;
         }
     } else {
-        func_002B8888(p);
+        ClearPadInput(p);
         p->profile_state = 0;
     }
     p->vibration0 = 0;
     p->vibration1 = 0;
-    D_001A7428 = D_00138180.device_state == 0;
+    D_001A7428 = gPadState.device_state == 0;
 }

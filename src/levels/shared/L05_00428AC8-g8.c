@@ -64,6 +64,7 @@ typedef struct BurstObject {
     u8 pad6C[0x54];
     float forward[4], right[4];
 } BurstObject;
+/* Makes an explosion with fire flares, smoke and sparks, a slightly different look from the one at 00425058. */
 void func_L05_00428AC8(BurstObject *object)
 {
     float position[4] __attribute__((aligned(16)));
@@ -78,19 +79,19 @@ void func_L05_00428AC8(BurstObject *object)
         u8 *effect;
         inner = D_L05_001B1584 * state->scale * 210000.0f;
         outer = D_L05_001B1588 * state->scale * 210000.0f;
-        effect = func_002C65A0(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF78E38, 0, 100, 0, inner,
+        effect = SpawnGravityFadeParticle(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF78E38, 0, 100, 0, inner,
             outer, 0.0f, 0);
         if (effect) effect[2] = D_L05_001FF240[92][0];
-        effect = func_002C65A0(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF76300, 0, 100, 0, inner,
+        effect = SpawnGravityFadeParticle(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF76300, 0, 100, 0, inner,
             outer, 0.0f, 0);
         if (effect) effect[2] = D_L05_001FF240[92][0];
         for (i = 1; i >= 0; i--) {
-            effect = func_002C65A0(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF78E38, 0, 127, 0,
+            effect = SpawnGravityFadeParticle(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF78E38, 0, 127, 0,
                 inner, outer, 0.0f, 0);
             if (effect) effect[2] = D_L05_001FF240[92][5];
         }
         for (i = 1; i >= 0; i--) {
-            effect = func_002C65A0(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF78E38, 0, 127, 0,
+            effect = SpawnGravityFadeParticle(object->position, D_L05_001A8F20, D_L05_001B158C, 0xF78E38, 0, 127, 0,
                 inner, outer, 0.0f, 0);
             if (effect) effect[2] = D_L05_001FF240[92][6];
         }
@@ -101,17 +102,17 @@ void func_L05_00428AC8(BurstObject *object)
             float size;
             int phase, lifetime;
             u8 *effect;
-            phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-            lifetime = func_002A7820(40, 50);
-            position[0] = object->position[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            position[1] = object->position[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            position[2] = object->position[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            size = func_002A7878(0.6f, 1.0f) * state->scale;
-            func_002A7988(velocity, 0.3f, 0.6f);
-            func_002C7970(position, velocity, lifetime, 0x407FFF, phase, 127, 127, size * 210000.0f,
+            phase = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+            lifetime = RandomIntRange(40, 50);
+            position[0] = object->position[0] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            position[1] = object->position[1] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            position[2] = object->position[2] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            size = RandomFloatRange(0.6f, 1.0f) * state->scale;
+            SpawnRandomDirectionEffect(velocity, 0.3f, 0.6f);
+            SpawnFadingDriftParticle(position, velocity, lifetime, 0x407FFF, phase, 127, 127, size * 210000.0f,
                 state->scale * 2100.0f, 0.00405555591f, 1);
             phase *= 2;
-            effect = func_002C7970(position, velocity, lifetime, 0xFF2000, -phase, 48, 48, size * 1260000.0f,
+            effect = SpawnFadingDriftParticle(position, velocity, lifetime, 0xFF2000, -phase, 48, 48, size * 1260000.0f,
                 state->scale * 4200.0f, 0.00405555591f, 0);
             if (effect) effect[2] = D_L05_001FF240[53][0];
         }
@@ -121,14 +122,14 @@ void func_L05_00428AC8(BurstObject *object)
         for (i = 0; i < state->count24; i++) {
             float size;
             int phase, lifetime;
-            phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-            lifetime = func_002A7820(40, 50);
-            position[0] = object->position[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            position[1] = object->position[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            position[2] = object->position[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            size = func_002A7878(0.75f, 1.5f) * state->scale;
-            func_002A7988(velocity, 0.3f, 0.6f);
-            func_002C7970(position, velocity, lifetime, 0xFF8F00, phase, 127, 127, size * 210000.0f,
+            phase = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+            lifetime = RandomIntRange(40, 50);
+            position[0] = object->position[0] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            position[1] = object->position[1] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            position[2] = object->position[2] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            size = RandomFloatRange(0.75f, 1.5f) * state->scale;
+            SpawnRandomDirectionEffect(velocity, 0.3f, 0.6f);
+            SpawnFadingDriftParticle(position, velocity, lifetime, 0xFF8F00, phase, 127, 127, size * 210000.0f,
                 state->scale * 2100.0f, 0.00405555591f, 5);
         }
     }
@@ -137,14 +138,14 @@ void func_L05_00428AC8(BurstObject *object)
         for (i = 0; i < state->count28; i++) {
             float size;
             int phase, lifetime;
-            phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-            lifetime = func_002A7820(40, 50);
-            position[0] = object->position[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            position[1] = object->position[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            position[2] = object->position[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
-            size = func_002A7878(0.6f, 1.0f) * state->scale;
-            func_002A7988(velocity, 0.3f, 0.6f);
-            func_002C7970(position, velocity, lifetime, 0xFF6430, phase, 127, 127, size * 210000.0f,
+            phase = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+            lifetime = RandomIntRange(40, 50);
+            position[0] = object->position[0] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            position[1] = object->position[1] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            position[2] = object->position[2] + RandomSignedFloatRange(0.0f, 0.1f) * state->scale;
+            size = RandomFloatRange(0.6f, 1.0f) * state->scale;
+            SpawnRandomDirectionEffect(velocity, 0.3f, 0.6f);
+            SpawnFadingDriftParticle(position, velocity, lifetime, 0xFF6430, phase, 127, 127, size * 210000.0f,
                 state->scale * 2100.0f, 0.00405555591f, 3);
         }
     }
@@ -153,51 +154,51 @@ void func_L05_00428AC8(BurstObject *object)
         for (i = 0; i < state->count30; i++) {
             float speed, roll, turn;
             int lifetime;
-            speed = func_002A7878(15.0f, 20.0f) * state->scale * 0.016666668f;
-            func_00282D30(position, object->forward, speed);
-            roll = func_002A78D8(0.26179942f, 1.3962636f);
-            turn = func_002A78D8(0.26179942f, 1.3962636f);
-            func_002AB668(rotation, (int)(object->right), roll);
-            func_002ACDE8(velocity, position, rotation);
-            func_002AB668(rotation, (int)(object->forward), turn);
-            func_002ACDE8(velocity, velocity, rotation);
-            lifetime = func_002A7820(20, 35);
-            func_002C6DD8(object->position, velocity, lifetime, 0.00405555591f);
+            speed = RandomFloatRange(15.0f, 20.0f) * state->scale * 0.016666668f;
+            FastVecScale(position, object->forward, speed);
+            roll = RandomSignedFloatRange(0.26179942f, 1.3962636f);
+            turn = RandomSignedFloatRange(0.26179942f, 1.3962636f);
+            BuildAxisAngleQuaternion(rotation, (int)(object->right), roll);
+            RotateVectorByQuaternion(velocity, position, rotation);
+            BuildAxisAngleQuaternion(rotation, (int)(object->forward), turn);
+            RotateVectorByQuaternion(velocity, velocity, rotation);
+            lifetime = RandomIntRange(20, 35);
+            SpawnTrailParticle_002C6DD8(object->position, velocity, lifetime, 0.00405555591f);
         }
     }
     if (state->enabled34) {
         *(Quad *)velocity = 0;
         velocity[2] = state->scale * 0.05000000447f;
         *(Quad *)position = *(Quad *)velocity;
-        func_00308408(object, object->position, position, 16, 255, 0, 0, 40, state->scale * 3.0f);
+        SpawnShockwaveRing(object, object->position, position, 16, 255, 0, 0, 40, state->scale * 3.0f);
     }
-    func_002ABBB8(object, D_L05_001A8F20, object->position, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1,
+    SpawnExplosionEffects(object, D_L05_001A8F20, object->position, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1,
         state->scale * 20.0f, 0, 0, -1, 0, 0x810001);
     {
         int sign = 1, i;
         float angle;
-        angle = func_00283248(D_L05_001B9580.f140[0] - object->position[0],
+        angle = FastMatrixHelperA(D_L05_001B9580.f140[0] - object->position[0],
             D_L05_001B9580.f140[1] - object->position[1]);
         for (i = 0; i < state->count2C; i++) {
             float radius, roll, turn;
             u8 *effect;
-            position[0] = object->position[0] + func_002A78D8(0.0f, 1.0f) * state->scale;
+            position[0] = object->position[0] + RandomSignedFloatRange(0.0f, 1.0f) * state->scale;
             sign = -sign;
-            position[1] = object->position[1] + func_002A78D8(0.0f, 1.0f) * state->scale;
-            position[2] = object->position[2] + func_002A78D8(0.0f, 1.0f) * state->scale;
-            radius = func_002A7878(0.016666668f, 0.033333335f) * state->scale;
-            roll = func_002A78D8(0.0f, 1.3962636f);
-            turn = func_00283B98(angle, func_002A78D8(0.0f, 1.5707965f));
-            func_002AF000(velocity, radius, turn, roll);
-            effect = func_002BDCE8(position, 0.0f, 1.0f, sign, velocity, 0x7F60A0FF, 1.01f,
+            position[1] = object->position[1] + RandomSignedFloatRange(0.0f, 1.0f) * state->scale;
+            position[2] = object->position[2] + RandomSignedFloatRange(0.0f, 1.0f) * state->scale;
+            radius = RandomFloatRange(0.016666668f, 0.033333335f) * state->scale;
+            roll = RandomSignedFloatRange(0.0f, 1.3962636f);
+            turn = FastAddRotations(angle, RandomSignedFloatRange(0.0f, 1.5707965f));
+            BuildSphericalOffset(velocity, radius, turn, roll);
+            effect = SpawnSpinningSparkParticle(position, 0.0f, 1.0f, sign, velocity, 0x7F60A0FF, 1.01f,
                 state->scale * 315000.0f, 0);
             if (effect) {
                 BurstParticle *particle = (BurstParticle *)effect;
                 BurstPayload *payload = &particle->payload;
-                particle->lifetime = func_002A7820(40, 70);
-                particle->rate = func_00283CF0(4.0f) + 64;
+                particle->lifetime = RandomIntRange(40, 70);
+                particle->rate = FloatToInt(4.0f) + 64;
                 payload->kind = 3;
-                payload->size = func_00283CE0(func_002A7820(1, 10));
+                payload->size = IntToFloat(RandomIntRange(1, 10));
                 payload->alpha = 64;
                 payload->fade = particle->lifetime;
             }

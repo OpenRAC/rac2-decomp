@@ -39,19 +39,20 @@ extern void func_L05_0042AFE0(void *);
 
 typedef union { float f[0x40]; int i[0x40]; u16 uh[0x80]; } Fields;
 
+/* Updates a stream of seven moving pieces that slide along a line and wrap around to the start, and draws them. */
 void func_L05_0042AC30(u8 *actor)
 {
     Vector position, step, rotation;
     u8 *state = *(u8 **)(actor + 0x68);
-    if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
-        func_0029F338(actor);
+    if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+        MarkMobySpawned(actor);
         return;
     }
     if (actor[0x20] == 0) {
         float span;
         float phase = 0.0f;
         ((Fields *)actor)->uh[0x34 / 2] |= 0x41;
-        func_002833F0(actor + 0xC0, actor + 0xF0);
+        euler_rotation_basis(actor + 0xC0, actor + 0xF0);
         actor[0x30] = 0xFF;
         actor[0x20] = 1;
         ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * (D_L05_001B1680 * D_L05_001B1688);
@@ -60,8 +61,8 @@ void func_L05_0042AC30(u8 *actor)
         D_L05_001B16FC = D_L05_001B16F8 = D_L05_001B16E4 = D_L05_001B1690 = 0.0f;
         D_L05_001B16E8 = D_L05_001B16D4 = D_L05_001B170C = D_L05_001B1704 = 0.0f;
         ((Fields *)state)->f[0x20 / 4] = span;
-        func_00282D30(&position, actor + 0xC0, span);
-        func_00282CC0(&position, &position, actor + 0x10);
+        FastVecScale(&position, actor + 0xC0, span);
+        FastVecAdd(&position, &position, actor + 0x10);
         {
             float *head = (float *)(state + 0x24);
             head[0] = position.f[0];
@@ -69,15 +70,15 @@ void func_L05_0042AC30(u8 *actor)
             head[2] = position.f[2];
         }
         span *= 0.14285715f;
-        func_00282D30(&step, actor + 0xC0, -span);
-        func_002AB600(&rotation, actor + 0xC0);
+        FastVecScale(&step, actor + 0xC0, -span);
+        TransformMatrixViaCopy(&rotation, actor + 0xC0);
         {
         char **child = (char **)state;
         int i;
         for (i = 6; i >= 0; i--, child++) {
-            *child = func_L05_0042BCE0(&position, &rotation, D_L05_001B1680, phase);
+            *child = SpawnStreamPiece(&position, &rotation, D_L05_001B1680, phase);
             phase += span;
-            func_00282CC0(&position, &position, &step);
+            FastVecAdd(&position, &position, &step);
         }
         }
         D_L05_001B1728 = actor;
@@ -91,8 +92,8 @@ void func_L05_0042AC30(u8 *actor)
             float *pos = (float *)(object + 0x10);
             u8 *objectState;
             amount += amount;
-            func_00282D30(&position, actor + 0xC0, -amount);
-            func_00282CC0(pos, pos, &position);
+            FastVecScale(&position, actor + 0xC0, -amount);
+            FastVecAdd(pos, pos, &position);
             objectState = *(u8 **)(object + 0x68);
             ((Fields *)objectState)->f[0x10 / 4] += amount;
             if (((Fields *)state)->f[0x20 / 4] <= ((Fields *)objectState)->f[0x10 / 4]) {
@@ -107,13 +108,13 @@ void func_L05_0042AC30(u8 *actor)
     }
     }
     if (*(int *)(*(char **)(D_L05_001B251C + (((Fields *)state)->i[0x1C / 4] << 8) + 0x68) + 0x34) != 0) {
-        D_L05_001B168C = func_002702C8(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1698, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16D8 = func_002702C8(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16E0, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16EC = func_002702C8(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F4, 0.02f, 0.2f, 0.0f);
+        D_L05_001B168C = StepSpringDamperClamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1698, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16D8 = StepSpringDamperClamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16E0, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16EC = StepSpringDamperClamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F4, 0.02f, 0.2f, 0.0f);
     } else {
-        D_L05_001B168C = func_002702C8(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1694, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16D8 = func_002702C8(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16DC, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16EC = func_002702C8(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F0, 0.02f, 0.2f, 0.0f);
+        D_L05_001B168C = StepSpringDamperClamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1694, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16D8 = StepSpringDamperClamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16DC, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16EC = StepSpringDamperClamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F0, 0.02f, 0.2f, 0.0f);
     }
-    func_L00_002E6CF0(func_L05_0042AFE0, actor);
+    AddDrawCallbackToList1(DrawScrollingStreamLayers, actor);
 }

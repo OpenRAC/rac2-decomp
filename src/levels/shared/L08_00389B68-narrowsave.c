@@ -9,6 +9,7 @@ extern PacketCursor ref_L08_00389B68_00 __attribute__((sda));
 extern u32 *ref_L08_00389B68_01 MACRO_ADDR;
 extern void func_00282AB0(void *, void *, int);
 void func_L08_00389B68(int count, ...) __attribute__((register_precision(ra, 64)));
+/* Adds a block of vector values passed as arguments to the graphics packet and moves the packet write position on. */
 void func_L08_00389B68(int count, ...) {
     if (count) {
         ref_L08_00389B68_00.cur[0] = (count + 1) | 0x10000000;
@@ -20,7 +21,7 @@ void func_L08_00389B68(int count, ...) {
         ref_L08_00389B68_00.cur[6] = 14;
         ref_L08_00389B68_00.cur[7] = 0;
         ref_L08_00389B68_01 = (u32 *)(ref_L08_00389B68_00.cur + 8);
-        func_00282AB0(ref_L08_00389B68_01, (char *)__builtin_next_arg(count) - 0x38, count * 16);
+        CopyMemoryAligned(ref_L08_00389B68_01, (char *)__builtin_next_arg(count) - 0x38, count * 16);
         ref_L08_00389B68_00.cur = (u32 *)((char *)ref_L08_00389B68_00.cur + count * 16);
     }
 }

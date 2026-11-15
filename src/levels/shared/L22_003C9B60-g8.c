@@ -38,38 +38,38 @@ void func_L22_003C9B60(char *obj)
     SparkTimers *timers = (SparkTimers *)(*(char **)(obj + 0x68) + 0x10);
     int i = 0;
     s32 count = 3;
-    float step, t;
-    float c, s;
-    s32 color, id;
+    float step, life;
+    float angle, radius;
+    s32 color, particleType;
 
     do {
         step = timers->phase[i] + timers->rate[i];
         timers->phase[i] = step;
         if (step >= 1.0f) {
             timers->phase[i] = 0.0f;
-            timers->rate[i] = func_002A7878(D_L22_001AFF08, D_L22_001AFF0C[0]) * 0.016666668f;
-            timers->value[i] = func_002A7878(D_L22_001AFF10, D_L22_001AFF14[0]);
+            timers->rate[i] = RandomFloatRange(D_L22_001AFF08, D_L22_001AFF0C[0]) * 0.016666668f;
+            timers->value[i] = RandomFloatRange(D_L22_001AFF10, D_L22_001AFF14[0]);
         }
         count--;
         i++;
     } while (count >= 0);
-    if (func_002A77E0(D_L22_001AFF50) != 0) {
+    if (RandomIntBelow(D_L22_001AFF50) != 0) {
         qzero_nc(&spark);
-        spark.f[2] = func_002A7878(D_L22_001AFF28, D_L22_001AFF2C[0]) * 0.016666668f;
-        func_00283098(&spark, &spark, obj + 0xC0);
-        c = func_002A7940();
-        s = func_002A7878(D_L22_001AFF48, D_L22_001AFF4C[0]);
-        aim.f[0] = func_00283180(c) * s;
-        aim.f[1] = func_00283198(c) * s;
+        spark.f[2] = RandomFloatRange(D_L22_001AFF28, D_L22_001AFF2C[0]) * 0.016666668f;
+        matrix_mul_vec3(&spark, &spark, obj + 0xC0);
+        angle = RandomAngle();
+        radius = RandomFloatRange(D_L22_001AFF48, D_L22_001AFF4C[0]);
+        aim.f[0] = FastSinOrCosA(angle) * radius;
+        aim.f[1] = FastSinOrCosB(angle) * radius;
         aim.f[2] = 0.0f;
-        func_00283098(&aim, &aim, obj + 0xC0);
-        func_00282CC0(&aim, &aim, obj + 0x10);
-        color = func_002A7820(D_L22_001AFF40, D_L22_001AFF44[0]);
-        t = func_002A7878(D_L22_001AFF30, D_L22_001AFF34[0]);
-        if (func_002A77E0(2) != 0)
-            id = D_L22_001AFF38;
+        matrix_mul_vec3(&aim, &aim, obj + 0xC0);
+        FastVecAdd(&aim, &aim, obj + 0x10);
+        color = RandomIntRange(D_L22_001AFF40, D_L22_001AFF44[0]);
+        life = RandomFloatRange(D_L22_001AFF30, D_L22_001AFF34[0]);
+        if (RandomIntBelow(2) != 0)
+            particleType = D_L22_001AFF38;
         else
-            id = D_L22_001AFF3C[0];
-        func_002C3150(&aim, &spark, id, t, color & 0xFF, func_002A77E0(0xFF) & 0xFF, 0);
+            particleType = D_L22_001AFF3C[0];
+        SpawnHeroRelativeParticle(&aim, &spark, particleType, life, color & 0xFF, RandomIntBelow(0xFF) & 0xFF, 0);
     }
 }

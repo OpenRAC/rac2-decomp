@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 #ifndef RAC2_T_VEC_F6BF9CE42
 #define RAC2_T_VEC_F6BF9CE42
@@ -25,25 +26,26 @@ extern int func_002A9588(int a, int b, int c, int d, int e);
 
 extern int func_00285548(int a, int b, int c, int d, int e, int f, int g);
 
-void func_00343068(VEC_F6bf9ce42 **pobj)
+/* Draws the coloured frame around a menu panel at its current position. */
+void func_00343068(VEC_F6bf9ce42 **positionPtr)
 {
-    int s0, s1, s2, s3;
-    int r;
+    int left, top, bottom, right;
+    int colour;
 
 
-    VEC_F6bf9ce42 *v;
-    v = *pobj;
-    s0 = (int)((float)D_L04_001AE478 + v->x - (float)D_L04_001AE488);
-    s1 = (int)((float)D_L04_001AE47C + v->y - (float)D_L04_001AE48C);
-    s3 = (int)((float)D_L04_001AE480 + v->x + (float)D_L04_001AE488);
-    s2 = (int)((float)D_L04_001AE484 + v->y + (float)D_L04_001AE48C);
+    VEC_F6bf9ce42 *position;
+    position = *positionPtr;
+    left = (int)((float)D_L04_001AE478 + position->x - (float)D_L04_001AE488);
+    top = (int)((float)D_L04_001AE47C + position->y - (float)D_L04_001AE48C);
+    right = (int)((float)D_L04_001AE480 + position->x + (float)D_L04_001AE488);
+    bottom = (int)((float)D_L04_001AE484 + position->y + (float)D_L04_001AE48C);
 
-    r = func_002A9588(0x60241700, 0x55F0C070, 20, 0, 0);
-    func_00285548(s0, s1, s3, s2, D_001A7340, D_001A7344, r);
+    colour = PingPongBlendValues(0x60241700, 0x55F0C070, 20, 0, 0);
+    DrawFramebufferRect(left, top, right, bottom, gScreenWidth, gScreenHeight, colour);
 
-    v = *pobj;
-    func_00285548((int)((float)D_L04_001AE478 + v->x), (int)((float)D_L04_001AE47C + v->y),
-            (int)((float)D_L04_001AE480 + v->x), (int)((float)D_L04_001AE484 + v->y),
-            D_001A7340, D_001A7344, 0x60241700);
+    position = *positionPtr;
+    DrawFramebufferRect((int)((float)D_L04_001AE478 + position->x), (int)((float)D_L04_001AE47C + position->y),
+            (int)((float)D_L04_001AE480 + position->x), (int)((float)D_L04_001AE484 + position->y),
+            gScreenWidth, gScreenHeight, 0x60241700);
 
 }

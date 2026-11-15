@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *func_002ED688(char *object, int flag);
 
@@ -19,46 +20,47 @@ extern int D_L05_00221D10[];
 /* Initialises a spawned sub-object from the owner's fields and increments a shared counter, then runs three follow-up calls and conditionally two more. */
 void func_L05_0037AEC0(char *object, int flag)
 {
-    char *s;
-    int **slot;
+    char *sub;
+    int **slotPtr;
 
-    s = func_002ED688(object, flag);
-    if (s == 0)
+    sub = GetMobyMotionData(object, flag);
+    if (sub == 0)
         return;
 
     *(short *)(object + 50) = 511;
     *(unsigned char *)(object + 48) = 255;
     *(short *)(object + 52) = *(unsigned short *)(object + 52) & 0xfffc;
     *(int *)(object + 152) = *(int *)(*(int *)(object + 36) + 16);
-    *(int *)(s + 272) = 1;
-    *(int *)(s + 248) = 0;
-    func_00282C88_2(s + 112);
-    *(int *)(s + 268) = 0;
-    *(int *)(s + 280) = 0;
-    *(int *)(s + 252) = 0;
-    *(int *)(s + 308) = 0;
-    *(int *)(s + 332) = 1;
-    *(int *)(s + 348) = 0;
-    slot = *(int ***)(object + 104);
-    *(float *)*slot = (float)*(int *)(s + 328);
+    *(int *)(sub + 272) = 1;
+    *(int *)(sub + 248) = 0;
+    func_00282C88_2(sub + 112);
+    *(int *)(sub + 268) = 0;
+    *(int *)(sub + 280) = 0;
+    *(int *)(sub + 252) = 0;
+    *(int *)(sub + 308) = 0;
+    *(int *)(sub + 332) = 1;
+    *(int *)(sub + 348) = 0;
+    slotPtr = *(int ***)(object + 104);
+    *(float *)*slotPtr = (float)*(int *)(sub + 328);
     D_L05_00221D10[4] = D_L05_00221D10[4] + 1;
-    func_L05_0037BB28(object);
-    func_002EE678(object, 1);
-    func_L05_0037CDD8(object, 1);
+    ClearObjectLinks(object);
+    SetFollowerState(object, 1);
+    SetObjectStateValue(object, 1);
     if (flag)
-        func_002EE7B8(object);
+        StartFollowerRandomPush(object);
     if (D_L05_00221D10[13] == 1)
-        func_L05_0037AE40(object);
+        ResetObjectActionState(object);
 }
 
 /* The spawned sub-object's stored pointer, or zero. */
+/* Returns the stored value of an object, or zero if it has none. */
 int func_L05_0037AFD0(char *object, int flag)
 {
-    char *s = func_002ED688(object, flag);
+    char *sub = GetMobyMotionData(object, flag);
 
-    if (s == 0)
+    if (sub == 0)
         return 0;
-    return *(int *)(s + 0x110);
+    return *(int *)(sub + 0x110);
 }
 
 /* func_L05_0037B108 is defined in L05_0037B108.c for its absolute-symbol profile. */

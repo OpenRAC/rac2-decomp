@@ -17,54 +17,55 @@ extern long D_001A7470;
 extern void func_00282A88();
 extern int func_00125F20(void *, short, short, short, short, short);
 
+/* Builds the drawing packet for a picture used as a screen-sized sprite. It records the picture size and where it lives in video memory. */
 void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
-    DrawState *s = D_001A6480;
+    DrawState *drawState = gScreenAdjustOffsets;
     s32 tbw;
     long tex;
-    u8 *p;
-    long *q;
+    u8 *bytes;
+    long *packet;
     long w;
     long w2;
 
     tbw = tw - 6;
     if (tbw <= 0) tbw = 1;
-    s->h166 = tbp >> 13;
-    s->h160 = 1 << tw;
-    s->h162 = 1 << th;
+    drawState->h166 = tbp >> 13;
+    drawState->h160 = 1 << tw;
+    drawState->h162 = 1 << th;
     tex = (tbp >> 8) | ((long)(1 << tbw) << 14);
     tex |= (long)tw << 26;
     tex |= (long)th << 30;
     tex |= 0x8000UL << 19;
     D_001A7470 = tex;
-    func_00282A88(D_001B22A8[0], 0xF0);
-    *(u32 *)(D_001B22A8[0] + 0) = 0x1000000E;
-    *(u32 *)(D_001B22A8[0] + 4) = 0;
-    *(u32 *)(D_001B22A8[0] + 8) = 0;
-    *(u32 *)(D_001B22A8[0] + 0xC) = 0x5000000E;
+    FastMemoryHelperB(gDmaPacketCursor[0], 0xF0);
+    *(u32 *)(gDmaPacketCursor[0] + 0) = 0x1000000E;
+    *(u32 *)(gDmaPacketCursor[0] + 4) = 0;
+    *(u32 *)(gDmaPacketCursor[0] + 8) = 0;
+    *(u32 *)(gDmaPacketCursor[0] + 0xC) = 0x5000000E;
     w = 0x4410;
     w2 = 0x106;
     {
-        long *t = (long *)(D_001B22A8[0] + 0x10);
-        D_001B22A8[0] = (s32)t;
+        long *t = (long *)(gDmaPacketCursor[0] + 0x10);
+        gDmaPacketCursor[0] = (s32)t;
         t[0] = 0x1000000000000008UL;
         t[1] = 0xE;
     }
-    p = (u8 *)D_001B22A8[0];
-    q = (long *)(p + 0x10);
-    D_001B22A8[0] = (s32)q;
-    func_00125F20(q, s->h164, s->h160, s->h162, 3, 0);
-    ((TexBits *)(p + 0x10))->lo = s->h166;
+    bytes = (u8 *)gDmaPacketCursor[0];
+    packet = (long *)(bytes + 0x10);
+    gDmaPacketCursor[0] = (s32)packet;
+    sceGsSetDefDrawEnv(packet, drawState->h164, drawState->h160, drawState->h162, 3, 0);
+    ((TexBits *)(bytes + 0x10))->lo = drawState->h166;
     if (mode == 0) {
-        q[2] = s->h16E | ((long)(s->h16C & 0xF) << 24);
+        packet[2] = drawState->h16E | ((long)(drawState->h16C & 0xF) << 24);
     } else {
         s32 n = tw + th;
         if (n > 16) n = 16;
-        q[2] = ((tbp - (4 << n)) >> 13) | ((long)(s->h16C & 0xF) << 24);
+        packet[2] = ((tbp - (4 << n)) >> 13) | ((long)(drawState->h16C & 0xF) << 24);
     }
     {
-        long *t = (long *)(D_001B22A8[0] + 0x80);
-        DrawState *s2 = D_001A6480;
-        D_001B22A8[0] = (s32)t;
+        long *t = (long *)(gDmaPacketCursor[0] + 0x80);
+        DrawState *s2 = gScreenAdjustOffsets;
+        gDmaPacketCursor[0] = (s32)t;
         t[0] = 0x1000000000000001UL;
         t[1] = 0xE;
         t[2] = 0x30003;
@@ -76,5 +77,5 @@ void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
         t[8] = (0x8000 - s2->h160 * 8) | ((long)(0x8000 - s2->h162 * 8) << 16);
         t[9] = (s2->h160 * 8 + 0x8000) | ((long)(s2->h162 * 8 + 0x7FF0) << 16);
     }
-    D_001B22A8[0] += 0x50;
+    gDmaPacketCursor[0] += 0x50;
 }

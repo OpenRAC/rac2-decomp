@@ -11,24 +11,24 @@ extern void ref_L03_003CA148_00(char *, float *, float *, int);
 extern void ref_L03_003CA148_04(float *, float *, float);
 extern void ref_L03_003CA148_05(float *, float *, char *);
 
-void func_L03_003CA148(char *obj, float *a, float *b) {
-    float v[4] __attribute__((aligned(16)));
-    float m[16] __attribute__((aligned(16)));
-    float n[16] __attribute__((aligned(16)));
-    float s;
+void func_L03_003CA148(char *moby, float *offset, float *output) {
+    float local[4] __attribute__((aligned(16)));
+    float matrix[16] __attribute__((aligned(16)));
+    float inverse[16] __attribute__((aligned(16)));
+    float step;
 
-    ref_L03_003CA148_01(m, obj + 0xF0);
-    ref_L03_003CA148_02(n, m);
-    ref_L03_003CA148_03(v, a, obj + 0x10);
-    ref_L03_003CA148_00(obj, v, v, 0);
-    if (*(short *)(obj + 0xAA) == 0xE87) {
-        s = D_L03_001B02D0;
+    ref_L03_003CA148_01(matrix, moby + 0xF0);
+    ref_L03_003CA148_02(inverse, matrix);
+    ref_L03_003CA148_03(local, offset, moby + 0x10);
+    ref_L03_003CA148_00(moby, local, local, 0);
+    if (*(short *)(moby + 0xAA) == 0xE87 /* moby class 3719 */) {
+        step = D_L03_001B02D0;
     } else {
-        s = D_L03_001B02D4;
+        step = D_L03_001B02D4;
     }
-    if (v[0] < 0.0f) {
-        s = -s;
+    if (local[0] < 0.0f) {
+        step = -step;
     }
-    ref_L03_003CA148_04(b, m, s);
-    ref_L03_003CA148_05(b, b, obj + 0x10);
+    ref_L03_003CA148_04(output, matrix, step);
+    ref_L03_003CA148_05(output, output, moby + 0x10);
 }

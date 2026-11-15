@@ -12,74 +12,75 @@ extern s32 func_00282948(void *);
 extern s32 func_002A77E0(s32);
 extern int func_L11_00445D28(char *, int);
 
-void func_L11_00445DF8(char *a0, s32 a1, float a2, float a3) {
-    char *state = *(char **)(a0 + 0x68);
-    char *g = D_001A63A8;
+/* Collects the actions the Joba boss may use now and starts a random one after a random cooldown. */
+void func_L11_00445DF8(char *moby, s32 countDelta, float accumDelta, float levelValue) {
+    char *state = *(char **)(moby + 0x68);
+    char *world = gMusicState;
     char *hero;
     char *hero2;
     s32 id23;
     s32 id24;
     s32 off;
-    s32 list[12];
-    s32 *lp;
-    s32 n;
+    s32 candidates[12];
+    s32 *listPtr;
+    s32 numCandidates;
     s32 j;
     s32 k;
-    s32 count;
-    float acc;
+    s32 counter;
+    float accum;
 
-    if (*(s32 *)(g + 0x68) != 0)
+    if (*(s32 *)(world + 0x68) != 0)
         return;
-    if (*(s32 *)(g + 0x24) != -1)
+    if (*(s32 *)(world + 0x24) != -1)
         return;
     if (*(s32 *)(state + 0x190) != 0)
         return;
-    n = 0;
-    acc = *(float *)(state + 0x194) + a2;
-    count = *(s32 *)(state + 0x198) + a1;
-    *(s32 *)(state + 0x198) = count;
-    *(float *)(state + 0x194) = acc;
-    if (ref_L11_00445DF8_00 < acc || ref_L11_00445DF8_01 < count) {
-        lp = list;
+    numCandidates = 0;
+    accum = *(float *)(state + 0x194) + accumDelta;
+    counter = *(s32 *)(state + 0x198) + countDelta;
+    *(s32 *)(state + 0x198) = counter;
+    *(float *)(state + 0x194) = accum;
+    if (ref_L11_00445DF8_00 < accum || ref_L11_00445DF8_01 < counter) {
+        listPtr = candidates;
         for (j = 0; j < 4; j++) {
             s32 id;
 
             id = j + 0x14;
             if (*(s16 *)(state + 0x2A0 + id * 2) == 0)
-                lp[n++] = id;
+                listPtr[numCandidates++] = id;
         }
         *(s32 *)(state + 0x198) = 0;
         *(s32 *)(state + 0x194) = 0;
     }
-    if (func_00282948(state + 0x1B0) != 0) {
+    if (FastFloatHelperD(state + 0x1B0) != 0) {
         *(s32 *)(state + 0x198) = 0;
         *(s32 *)(state + 0x1B0) = 300;
         *(s32 *)(state + 0x194) = 0;
     }
-    if (ref_L11_00445DF8_02 < a3) {
-        lp = list;
+    if (ref_L11_00445DF8_02 < levelValue) {
+        listPtr = candidates;
         for (k = 0; k < 2; k++) {
             s32 id = k + 0x12;
 
             if (*(s16 *)(state + 0x2A0 + id * 2) == 0)
-                lp[n++] = id;
+                listPtr[numCandidates++] = id;
         }
     }
-    hero = D_00189E20;
+    hero = gHeroState;
     if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * ref_L11_00445DF8_03) {
         id23 = 0x18;
         if (*(s16 *)(state + 0x2D0) == 0)
-            list[n++] = id23;
+            candidates[numCandidates++] = id23;
     }
-    hero2 = D_00189E20;
+    hero2 = gHeroState;
     if (*(s32 *)(hero2 + 0x24CC) <= 0) {
-        id24 = func_002A77E0(2) + 0x19;
+        id24 = RandomIntBelow(2) + 0x19;
         off = id24 * 2;
         if (*(s16 *)(state + off + 0x2A0) == 0)
-            list[n++] = id24;
+            candidates[numCandidates++] = id24;
     }
-    if (n != 0) {
-        func_L11_00445D28(a0, list[func_002A77E0(n)]);
-        *(s32 *)(state + 0x190) = ref_L11_00445DF8_04 + func_002A77E0(ref_L11_00445DF8_04);
+    if (numCandidates != 0) {
+        QueueArenaVoiceLine(moby, candidates[RandomIntBelow(numCandidates)]);
+        *(s32 *)(state + 0x190) = ref_L11_00445DF8_04 + RandomIntBelow(ref_L11_00445DF8_04);
     }
 }

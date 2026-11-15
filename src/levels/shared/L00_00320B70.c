@@ -11,44 +11,45 @@ extern void func_00282F20(char *, char *, float);
 extern float func_00283180(float);
 extern void func_002ACDE8(char *, char *, char *);
 
-void func_L00_00320B70(char *from, char *vec, char *to, int mode, float p0, float p1, float p2, char *side, float p3,
-                       char *out)
+/* Turns a facing vector part of the way toward a target, easing the turn, and can give back the rotation used. */
+void func_L00_00320B70(char *origin, char *forward, char *target, int mode, float turnParamA, float turnParamB, float turnParamC, char *sideVec, float closeRange,
+                       char *outQuat)
 {
-    char delta[16];
+    char toTarget[16];
     char axis[16];
     char quat[16];
-    float length;
-    float dot;
-    float norm;
+    float distance;
+    float dotProduct;
+    float lengthProduct;
     float angle;
-    float half;
+    float halfAngle;
 
-    func_00282CF0(delta, to, from);
-    length = func_00282DF0(delta);
-    if (length == 0.0f)
+    FastVecSub(toTarget, target, origin);
+    distance = FastVecLength(toTarget);
+    if (distance == 0.0f)
         return;
-    func_00282DD8(axis, delta, vec);
-    dot = func_00282DB0(vec, delta);
-    norm = func_00282DF0(vec);
-    norm *= func_00282DF0(delta);
-    if (norm == 0.0f)
+    FastVecCross(axis, toTarget, forward);
+    dotProduct = FastVecDot(forward, toTarget);
+    lengthProduct = FastVecLength(forward);
+    lengthProduct *= FastVecLength(toTarget);
+    if (lengthProduct == 0.0f)
         return;
-    angle = 1.5707964f - func_002831B0(dot / norm);
+    angle = 1.5707964f - FastAngleHelper(dotProduct / lengthProduct);
     if (angle > 2.8797936f) {
-        func_00282DD8(quat, vec, side);
-        func_00282DD8(axis, quat, vec);
-        side = quat;
+        FastVecCross(quat, forward, sideVec);
+        FastVecCross(axis, quat, forward);
+        sideVec = quat;
     } else {
-        side = quat;
-        if (length < p3 && angle < 1.5707965f) {
-            p1 = 1.0f;
-            p0 = 0.5f;
+        sideVec = quat;
+        if (distance < closeRange && angle < 1.5707965f) {
+            turnParamB = 1.0f;
+            turnParamA = 0.5f;
         }
     }
-    half = func_002703B0(mode, 0.0f, angle, p0, p1, p2) * 0.5f;
-    func_00282F20(side, axis, func_00283198(half));
-    *(float *)(quat + 12) = func_00283180(half);
-    func_002ACDE8(vec, vec, side);
-    if (out != 0)
-        qcopy(out, side);
+    halfAngle = StepSpringDamperStored(mode, 0.0f, angle, turnParamA, turnParamB, turnParamC) * 0.5f;
+    vec_scale_to_length(sideVec, axis, FastSinOrCosB(halfAngle));
+    *(float *)(quat + 12) = FastSinOrCosA(halfAngle);
+    RotateVectorByQuaternion(forward, forward, sideVec);
+    if (outQuat != 0)
+        qcopy(outQuat, sideVec);
 }

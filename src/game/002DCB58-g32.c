@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002DCB58 in its own unit, a sibling of func_002DCFE8: retail reads its small scalars
    absolute and through $gp, so the file is compiled at -G32 (config/cflags.txt). The word at
    D_0025E9E0 gets its own %hi, not one derived from D_0025E870's, so it is its own global. */
@@ -36,99 +37,100 @@ extern int func_00287E70(void);
 extern int func_002857B0(void);
 extern int func_002E5E58(int, unsigned int, void *);
 
+/* Handles the save-game slot menu: moves the cursor over the four slots, asks before overwriting a used slot, and updates the slot summary after a save finishes. */
 int func_002DCB58(SaveMenu *menu)
 {
-    int old;
+    int oldCursor;
     int buttons;
 
-    if (*(SaveMenu **)(D_001F2840.owner + 0xE8) != menu)
+    if (*(SaveMenu **)(gPauseMenuState.owner + 0xE8) != menu)
         return 0;
     if (D_001A8CFC != 0)
-        func_00339790(D_001A8CFC + 0x3CAA8, menu->cursor);
-    if (menu->stage == 0 && D_001F2840.screen == (char *)&D_0025E870 && D_0025E870.f12c != 0)
+        SetPopupRow(D_001A8CFC + 0x3CAA8, menu->cursor);
+    if (menu->stage == 0 && gPauseMenuState.screen == (char *)&D_0025E870 && D_0025E870.f12c != 0)
         menu->stage = 1;
     if (menu->stage == 1) {
-        func_002DE858(menu->f48, menu->cursor);
-        D_001F2840.busy = 1;
-        D_001F2840.delay = 0x2DFC;
+        StartSaveGameToSlot(menu->f48, menu->cursor);
+        gPauseMenuState.busy = 1;
+        gPauseMenuState.delay = 0x2DFC;
         D_001B1A3C = 0;
     }
     menu->stage = 2;
-    old = menu->cursor;
-    if (D_001F2840.busy != 0) {
-        if (D_001393E0.f15c >= 3)
+    oldCursor = menu->cursor;
+    if (gPauseMenuState.busy != 0) {
+        if (gMemcardState.f15c >= 3)
             return 0;
-        if (D_001393E0.f164 >= 0)
+        if (gMemcardState.f164 >= 0)
             return 0;
-        if (D_001F2840.ready < 11)
+        if (gPauseMenuState.ready < 11)
             return 0;
-        D_001F2840.busy = 0;
-        if (D_001393E0.f16c != 0 || D_001393E0.f10 != 0 || D_001B1A3C != 0) {
-            D_001A7424 |= 0x80;
-            if (D_001393E0.f17c != 0) {
-                D_001393E0.f17c = 0;
-                func_00287E98();
+        gPauseMenuState.busy = 0;
+        if (gMemcardState.f16c != 0 || gMemcardState.f10 != 0 || D_001B1A3C != 0) {
+            gSaveMenuFlags |= 0x80;
+            if (gMemcardState.f17c != 0) {
+                gMemcardState.f17c = 0;
+                SetConfirmPending();
             }
-            if (func_002B49E0(4, 1, 1, (int)D_001F2840.owner, 0) == 0)
+            if (BeginSlotRequest(4, 1, 1, (int)gPauseMenuState.owner, 0) == 0)
                 return 0;
         } else {
-            D_001393E0.f17c = 1;
-            D_001393E0.slots[D_001393E0.slot].balance = D_001A79F8;
-            D_001393E0.slots[D_001393E0.slot].status = D_001A79F0;
-            D_001393E0.slots[D_001393E0.slot].ticks = D_001A7BC0;
+            gMemcardState.f17c = 1;
+            gMemcardState.slots[gMemcardState.slot].balance = gPlayerBolts;
+            gMemcardState.slots[gMemcardState.slot].status = gCurrentMapIndex;
+            gMemcardState.slots[gMemcardState.slot].ticks = D_001A7BC0;
             {
-                Stamp *stamp = &D_001393E0.slots[D_001393E0.slot].stamp;
+                Stamp *stamp = &gMemcardState.slots[gMemcardState.slot].stamp;
                 *stamp = D_001A7360;
             }
-            D_001393E0.slots[D_001393E0.slot].level = D_001A7A0A;
+            gMemcardState.slots[gMemcardState.slot].level = D_001A7A0A;
         }
     }
-    if ((D_00138180.flags & 0x900) && D_001F2840.fallback == 0)
+    if ((gPadState.flags & 0x900) && gPauseMenuState.fallback == 0)
         return 1;
-    if (D_00138180.flags & 0x10) {
-        int value = *(int *)(D_001F2840.owner + 0xE0);
-        int status;
-        if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+    if (gPadState.flags & 0x10) {
+        int parentScreen = *(int *)(gPauseMenuState.owner + 0xE0);
+        int result;
+        if (parentScreen != 0)
+            gPauseMenuState.value = parentScreen;
+        else if (gPauseMenuState.fallback == 0) {
+            result = -1;
             goto finish;
         }
-        status = 0;
+        result = 0;
 finish:
-        return status;
+        return result;
     }
-    if (D_001A7420 == 9)
-        func_002D5B38(4, D_001A8C88 ? D_00260EE8 : D_0025DA38);
-    else if (D_001A7420 != 16 && D_001A7420 != 1) {
-        if (func_00287E70() == 0 && func_002857B0() == 1)
-            func_002B49E0(4, 1, 1, (int)D_001F2840.owner, 0);
+    if (gSaveMenuScreen == 9)
+        SendMenuRequest(4, D_001A8C88 ? D_00260EE8 : D_0025DA38);
+    else if (gSaveMenuScreen != 16 && gSaveMenuScreen != 1) {
+        if (GetMenuCounter() == 0 && GetMenuMode() == 1)
+            BeginSlotRequest(4, 1, 1, (int)gPauseMenuState.owner, 0);
         else {
-            int value = *(int *)(D_001F2840.owner + 0xE0);
-            int status;
-            if (value != 0)
-                D_001F2840.value = value;
-            else if (D_001F2840.fallback == 0) {
-                status = -1;
+            int parentScreen = *(int *)(gPauseMenuState.owner + 0xE0);
+            int result;
+            if (parentScreen != 0)
+                gPauseMenuState.value = parentScreen;
+            else if (gPauseMenuState.fallback == 0) {
+                result = -1;
                 goto done;
             }
-            status = 0;
+            result = 0;
 done:
-            return status;
+            return result;
         }
     }
-    if (D_001393E0.f15c >= 3)
+    if (gMemcardState.f15c >= 3)
         return 0;
-    if (D_001393E0.f164 >= 0)
+    if (gMemcardState.f164 >= 0)
         return 0;
-    if (D_001F2840.ready < 11)
+    if (gPauseMenuState.ready < 11)
         return 0;
-    if (D_001393E0.mode != 2)
+    if (gMemcardState.mode != 2)
         return 0;
     if (menu->flags & 1)
-        buttons = D_00138180.alt;
+        buttons = gPadState.alt;
     else
-        buttons = D_00138180.flags;
+        buttons = gPadState.flags;
     menu->cursor = D_001A7C08;
     if ((buttons & 0x1000) && D_001A7C08 != 0)
         menu->cursor = D_001A7C08 - 1;
@@ -136,18 +138,18 @@ done:
         menu->cursor = menu->cursor + 1;
     D_001A7C08 = menu->cursor;
     if (buttons & 0x40) {
-        SaveState *save = &D_001393E0;
+        SaveState *save = &gMemcardState;
         if (save->mode == 2) {
-            func_002E5E58(4, 0, 0);
+            PlaySoundFromGlobalBank(4, 0, 0);
             if (save->slots[menu->cursor].status != -1) {
-                D_001F2840.fe4 = 0;
-                D_001F2840.value = (int)&D_0025E870;
+                gPauseMenuState.fe4 = 0;
+                gPauseMenuState.value = (int)&D_0025E870;
                 D_0025E9E0[0] = menu->cursor;
             } else
                 menu->stage = 1;
         }
     }
-    if (menu->cursor != old)
-        func_002E5E58(3, 0, 0);
+    if (menu->cursor != oldCursor)
+        PlaySoundFromGlobalBank(3, 0, 0);
     return 0;
 }

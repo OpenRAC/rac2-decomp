@@ -46,24 +46,24 @@ int func_L23_0041A038(char *object, char *target) {
     char *direction;
     float speed, dot, angle;
     unsigned int mode;
-    func_00282C88(&local.zero);
+    ClearVector128(&local.zero);
     ((float *)&local.zero)[3] = 1.0f;
     ((unsigned char *)state)[0x473] = 1;
     *(Quad *)(state + 0x480) = local.zero;
-    func_0029FC20(object, 39, (char *)local.matrix);
+    TransformMobyJointPoint(object, 39, (char *)local.matrix);
     qcopy(&D_L23_001B3850, &local.matrix[3]);
     qcopy(&D_L23_001B3870, &local.matrix[0]);
     if (D_L23_001B1438) return 0;
     local.axis = 0;
     ((float *)&local.axis)[2] = 1.0f;
     ((float *)&local.axis)[3] = 1.0f;
-    func_00282D30(state + 0x4A0, (char *)&local.axis,
+    FastVecScale(state + 0x4A0, (char *)&local.axis,
         (float)D_L23_001B1440 * D_L23_001B1448 * D_L23_001B144C);
-    func_0029FCC0(object, 42, (char *)&local.axis);
-    func_00282CF0((char *)&local.direction, target, (char *)&local.axis);
-    func_00282F20((char *)&local.direction, (char *)&local.direction, 1.0f);
-    D_L23_001B3728 = func_00282DB0((char *)&local.direction, (char *)&D_L23_001B3870);
-    D_L23_001B3784 = func_002761F8(D_L23_001B3860, D_L23_001B36C0, 16, D_0018C0B0, 0) == 0;
+    TransformMobyJointToWorld(object, 42, (char *)&local.axis);
+    FastVecSub((char *)&local.direction, target, (char *)&local.axis);
+    vec_scale_to_length((char *)&local.direction, (char *)&local.direction, 1.0f);
+    D_L23_001B3728 = FastVecDot((char *)&local.direction, (char *)&D_L23_001B3870);
+    D_L23_001B3784 = CollLine(D_L23_001B3860, D_L23_001B36C0, 16, gHeroMoby_0018C0B0, 0) == 0;
     direction = (char *)&local.direction;
     speed = D_L23_001B1580 * 0.00029088825f;
     if (((unsigned char *)state)[0x404] && ((unsigned char *)state)[0x405]) {
@@ -72,17 +72,17 @@ int func_L23_0041A038(char *object, char *target) {
             if ((unsigned char)mode == 16) speed = D_L23_001B1584 * 0.00029088825f;
             else if ((unsigned)(mode - 13) < 3) speed = D_L23_001B1588 * 0.00029088825f;
         }
-        func_00282DD8((char *)&local.cross, direction, (char *)&D_L23_001B3870);
-        dot = func_00282DB0((char *)&local.cross, object + 0xD0);
-        angle = func_002831B0(dot);
-        func_00283C28(angle + 1.5707964f);
+        FastVecCross((char *)&local.cross, direction, (char *)&D_L23_001B3870);
+        dot = FastVecDot((char *)&local.cross, object + 0xD0);
+        angle = FastAngleHelper(dot);
+        FastFloatHelperG(angle + 1.5707964f);
         if (dot < 0.0f) *(float *)(state + 0x57C) = -speed;
         else *(float *)(state + 0x57C) = speed;
-        *(float *)(state + 0x578) = func_00283B98(*(float *)(state + 0x578), *(float *)(state + 0x57C));
-        if (((unsigned char *)state)[0x4B1] == 0) func_0029F978((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
-        func_00283898(state + 0x4C0, 1, *(float *)(state + 0x578));
-        *(float *)(state + 0x578) = func_00283BE0(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
-        func_L23_0041BF18(object, 1.0f, 1.0f);
+        *(float *)(state + 0x578) = FastAddRotations(*(float *)(state + 0x578), *(float *)(state + 0x57C));
+        if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
+        build_axis_rotation_quaternion(state + 0x4C0, 1, *(float *)(state + 0x578));
+        *(float *)(state + 0x578) = fast_subtract_rotations(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
+        TurnBossJoints(object, 1.0f, 1.0f);
         return 1;
     }
     if ((unsigned)((unsigned char)object[0x20] - 13) < 2) D_L23_001B140C = 1;
@@ -90,10 +90,10 @@ int func_L23_0041A038(char *object, char *target) {
         *(float *)(state + 0x57C) = -(D_L23_001B158C * 0.00029088825f);
         if (*(float *)(state + 0x578) > 0.0f) {
             *(float *)(state + 0x578) += *(float *)(state + 0x57C);
-            if (((unsigned char *)state)[0x4B1] == 0) func_0029F978((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
-            func_00283898(state + 0x4C0, 1, *(float *)(state + 0x578));
-            *(float *)(state + 0x578) = func_00283BE0(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
-            func_L23_0041BF18(object, -1.0f, -1.0f);
+            if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
+            build_axis_rotation_quaternion(state + 0x4C0, 1, *(float *)(state + 0x578));
+            *(float *)(state + 0x578) = fast_subtract_rotations(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
+            TurnBossJoints(object, -1.0f, -1.0f);
         }
     }
     return 0;

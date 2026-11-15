@@ -14,6 +14,8 @@ extern InitEntry12 D_L26_0021CCB0[];
 extern int * volatile D_L26_001AA7F0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L26_001C9160;
 
+/* Fills the menu entry table from the list of unlocked items, then finds which one is currently
+   selected and stores its position in the object. */
 int func_L26_003547D8(char *obj) {
     int i, entry;
     int *list;

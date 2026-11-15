@@ -74,38 +74,39 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
+/* Draws the gauge pop-up: a dark panel with scale bars filled up to the current amount. */
 int func_002900B8(void)
 {
-    float saved;
-    float pulse;
+    float savedOpacity;
+    float blend;
     float scale;
     float zero;
     float y;
-    char *text;
-    int first;
-    int second;
+    char *panelTexture;
+    int backColor;
+    int frameColor;
     int one;
     float half;
 
-    if (D_001A8CFC[0] != 0 && D_00254E78.active == 0 && D_00254E78.unk24 == -1) {
+    if (D_001A8CFC[0] != 0 && gSubtitleState.active == 0 && gSubtitleState.unk24 == -1) {
         one = 1;
         half = 0.5f;
-        saved = D_001B9040.opacity;
+        savedOpacity = D_001B9040.opacity;
         D_001B9040.opacity = 0.62f;
-        func_0027AB40();
-        pulse = func_00283CE0(D_001A9000) * 0.1f;
-        first = func_00283D38(0x442D00, 0x60442D00, pulse);
-        second = func_00283D38(0xF0C070, 0x55F0C070, pulse);
-        text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA6);
-        y = (float)label_y(text, 206.0f, D_001B23A4[0], half, one);
+        UpdateViewContext();
+        blend = IntToFloat(gGaugePopupBlend) * 0.1f;
+        backColor = FastTweenColor(0x442D00, 0x60442D00, blend);
+        frameColor = FastTweenColor(0xF0C070, 0x55F0C070, blend);
+        panelTexture = FindTableEntryById(D_001A8CFC[0] + 0x8710, 0xA6);
+        y = (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one);
         scale = 1.0f;
         zero = 0.0f;
-        func_00300A00(text, first, 484.0f, y, scale, scale, zero);
-        text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA7);
-        func_00300A00(text, second, 484.0f, (float)label_y(text, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
-        switch (D_001A9004) {
+        DrawScaledObjectTwoAxes(panelTexture, backColor, 484.0f, y, scale, scale, zero);
+        panelTexture = FindTableEntryById(D_001A8CFC[0] + 0x8710, 0xA7);
+        DrawScaledObjectTwoAxes(panelTexture, frameColor, 484.0f, (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
+        switch (gGaugePopupMode) {
         case 0:
-            if (zero <= D_001A9008 && D_001A9008 <= scale) {
+            if (zero <= gGaugePopupAmount && gGaugePopupAmount <= scale) {
                 int color1;
                 int color2;
                 int top;
@@ -117,10 +118,10 @@ int func_002900B8(void)
                 float edge2;
                 float s;
 
-                color1 = func_00283D38(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
-                color2 = func_00283D38(D_001A9010 & 0xFFFFFF, D_001A9010, pulse);
+                color1 = FastTweenColor(gGaugePopupColorA & 0xFFFFFF, gGaugePopupColorA, blend);
+                color2 = FastTweenColor(gGaugePopupColorB & 0xFFFFFF, gGaugePopupColorB, blend);
                 s = D_001B23A4[0];
-                top = hud_coord((float)(285 - (int)((scale - D_001A9008) * 157.0f)), s, half, one);
+                top = hud_coord((float)(285 - (int)((scale - gGaugePopupAmount) * 157.0f)), s, half, one);
                 s = (float)hud_coord(128.0f, D_001B23A4[0], half, one);
                 step = s * 0.25f;
                 lower = (float)hud_coord(285.0f, D_001B23A4[0], half, one);
@@ -130,7 +131,7 @@ int func_002900B8(void)
                     scale = (float)top;
                     if (upper <= scale)
                         upper = scale;
-                    func_0027DE50((int)upper, (int)lower, 477, 489, color1);
+                    DrawColoredRectangle((int)upper, (int)lower, 477, 489, color1);
                     lower -= step;
                     upper -= step;
                     if (lower <= scale)
@@ -143,7 +144,7 @@ int func_002900B8(void)
                 for (i = 0; i < 5; i++) {
                                         if ((float)top <= lower)
                         lower = (float)top;
-                    func_0027DE50((int)upper, (int)lower, 476, 488, color2);
+                    DrawColoredRectangle((int)upper, (int)lower, 476, 488, color2);
                     upper += step;
                     lower += step;
                     if ((float)top <= upper)
@@ -163,9 +164,9 @@ int func_002900B8(void)
             float s;
             float edge;
 
-            color = func_00283D38(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
+            color = FastTweenColor(gGaugePopupColorA & 0xFFFFFF, gGaugePopupColorA, blend);
             s = D_001B23A4[0];
-            top = hud_coord((float)(285 - (int)((1.0f - D_001A9008) * 157.0f)), s, 0.5f, 1);
+            top = hud_coord((float)(285 - (int)((1.0f - gGaugePopupAmount) * 157.0f)), s, 0.5f, 1);
             s = (float)hud_coord(128.0f, D_001B23A4[0], 0.5f, 1);
             step = s * 0.25f;
             lower = (float)hud_coord(285.0f, D_001B23A4[0], 0.5f, 1);
@@ -175,7 +176,7 @@ int func_002900B8(void)
                 limit = (float)top;
                 if (upper <= limit)
                     upper = limit;
-                func_0027DE50((int)upper, (int)lower, 476, 488, color);
+                DrawColoredRectangle((int)upper, (int)lower, 476, 488, color);
                 lower -= step;
                 upper -= step;
                 if (lower <= limit)
@@ -183,8 +184,8 @@ int func_002900B8(void)
             }
         }
         }
-        D_001B9040.opacity = saved;
-        func_0027AB40();
+        D_001B9040.opacity = savedOpacity;
+        UpdateViewContext();
     }
     return D_001A8D40;
 }

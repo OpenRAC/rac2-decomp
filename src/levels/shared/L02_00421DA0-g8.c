@@ -32,51 +32,51 @@ void func_L02_00421DA0(void *origin,int count,int inner)
     int i,sign;
     float size,angle,speed;
     u8 *particle;
-    func_00282CF0(base,D_L02_001BA3C0.position,origin);
+    FastVecSub(base,D_L02_001BA3C0.position,origin);
     base[2]=0;
     axis[0]=0;axis[1]=0;axis[2]=1;axis[3]=1;
     for(i=0;i<count;i++) {
-        size=func_002A7878(D_L02_001B1FBC,D_L02_001B1FC0);
-        sign=func_002A77E0(2);
+        size=RandomFloatRange(D_L02_001B1FBC,D_L02_001B1FC0);
+        sign=RandomIntBelow(2);
         if (!sign) sign--;
-        angle=func_002A7878(-1.0471977f,1.0471977f);
-        func_002ACEC0(velocity,base,axis,angle);
-        speed=func_002A7878(D_L02_001B1FA8,D_L02_001B1FAC)*0.016666668f;
-        func_00282F20(velocity,velocity,speed);
-        velocity[2]=func_002A7878(D_L02_001B1FB0,D_L02_001B1FB4)*0.016666668f;
+        angle=RandomFloatRange(-1.0471977f,1.0471977f);
+        ApplyAxisRotationToQuaternion(velocity,base,axis,angle);
+        speed=RandomFloatRange(D_L02_001B1FA8,D_L02_001B1FAC)*0.016666668f;
+        vec_scale_to_length(velocity,velocity,speed);
+        velocity[2]=RandomFloatRange(D_L02_001B1FB0,D_L02_001B1FB4)*0.016666668f;
         qcopy(position,origin);
-        position[0]+=func_002A78D8(0,0.15f);
-        position[1]+=func_002A78D8(0,0.15f);
-        position[2]+=func_002A78D8(0,0.15f);
+        position[0]+=RandomSignedFloatRange(0,0.15f);
+        position[1]+=RandomSignedFloatRange(0,0.15f);
+        position[2]+=RandomSignedFloatRange(0,0.15f);
         if(!inner) {
-            if(!(func_001163B0()&1)) {
-                func_00282D30(velocity,velocity,1.5f);
-                particle=func_002C2210(position,60,D_L02_001B1FC8,size*0.35f,size,0,sign,velocity,0,D_L02_001B1FB8);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,60,D_L02_001B1FCC,size*0.245f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+            if(!(Rand()&1)) {
+                FastVecScale(velocity,velocity,1.5f);
+                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FC8,size*0.35f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FCC,size*0.245f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             } else {
-                func_00282CF0(toward,D_L02_001BA3C0.position,position);
-                func_00282F20(toward,toward,speed);
-                func_00282CC0(velocity,velocity,toward);
-                particle=func_002C2210(position,40,D_L02_001B1FC8,size*2.05f,size,0,sign,velocity,0,D_L02_001B1FB8);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,40,D_L02_001B1FCC,size*1.4350001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+                FastVecSub(toward,D_L02_001BA3C0.position,position);
+                vec_scale_to_length(toward,toward,speed);
+                FastVecAdd(velocity,velocity,toward);
+                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FC8,size*2.05f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FCC,size*1.4350001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             }
         } else {
-            if(!(func_001163B0()&1)) {
-                func_00282D30(velocity,velocity,1.5f);
-                particle=func_002C2210(position,60,D_L02_001B1FC8,size*0.3f,size,0,sign,velocity,0,D_L02_001B1FB8);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,60,D_L02_001B1FCC,size*0.21000001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+            if(!(Rand()&1)) {
+                FastVecScale(velocity,velocity,1.5f);
+                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FC8,size*0.3f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FCC,size*0.21000001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             } else {
-                func_00282CF0(toward,D_L02_001BA3C0.position,position);
-                func_00282F20(toward,toward,speed);
-                func_00282CC0(velocity,velocity,toward);
-                particle=func_002C2210(position,40,D_L02_001B1FC8,size*0.25f,size,0,sign,velocity,0,D_L02_001B1FB8);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,40,D_L02_001B1FCC,size*0.175f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+                FastVecSub(toward,D_L02_001BA3C0.position,position);
+                vec_scale_to_length(toward,toward,speed);
+                FastVecAdd(velocity,velocity,toward);
+                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FC8,size*0.25f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FCC,size*0.175f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             }
         }
-        if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
+        if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
     }
 }

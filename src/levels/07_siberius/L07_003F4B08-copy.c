@@ -28,33 +28,34 @@ extern void func_00283698(void *, void *);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_00283098(void *, void *, void *);
 /* Copy both complete vectors, retaining the new object's support record. */
+/* Spawns a beam object (moby class 3624) at the owner, running from the first point to the second and optionally attached to a support object. */
 u8 *func_L07_003F4B08(u8 *owner, u8 *support, void *first, void *second, float scale)
 {
     float inverse[16] __attribute__((aligned(16)));
-    u8 *record;
+    u8 *vars;
     u8 *next;
     u8 *supportPosition;
-    u8 *created = func_0029EFD0(0xE28);
-    if (created != 0) {
-        qcopy(created + 0x10, owner + 0x10);
-        record = *(u8 **)(created + 0x68);
-        created[0x30] = 255;
-        *(u8 **)(created + 0xB8) = owner;
-        qcopy(record, first);
-        next = record + 0x10;
+    u8 *beam = CreateMoby(0xE28 /* moby class 3624 */);
+    if (beam != 0) {
+        qcopy(beam + 0x10, owner + 0x10);
+        vars = *(u8 **)(beam + 0x68);
+        beam[0x30] = 255;
+        *(u8 **)(beam + 0xB8) = owner;
+        qcopy(vars, first);
+        next = vars + 0x10;
         qcopy(next, second);
-        *(u8 **)(record + 0x20) = support;
-        *(u32 *)(record + 0x24) = 0;
-        *(float *)(record + 0x28) = func_002A7940();
-        *(float *)(record + 0x2C) = scale;
+        *(u8 **)(vars + 0x20) = support;
+        *(u32 *)(vars + 0x24) = 0;
+        *(float *)(vars + 0x28) = RandomAngle();
+        *(float *)(vars + 0x2C) = scale;
         if (support != 0) {
-            func_00283698(inverse, support + 0xC0);
+            matrix_from_basis_rows(inverse, support + 0xC0);
             supportPosition = support + 0x10;
-            func_00282CF0(record, record, supportPosition);
-            func_00282CF0(next, next, supportPosition);
-            func_00283098(record, record, inverse);
-            func_00283098(next, next, inverse);
+            FastVecSub(vars, vars, supportPosition);
+            FastVecSub(next, next, supportPosition);
+            matrix_mul_vec3(vars, vars, inverse);
+            matrix_mul_vec3(next, next, inverse);
         }
     }
-    return created;
+    return beam;
 }

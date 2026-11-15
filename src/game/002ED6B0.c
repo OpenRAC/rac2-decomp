@@ -1,6 +1,7 @@
 /* func_002ED6B0 in its own unit, so that its call to func_002ED870 (C in 002ED578.c)
    is a plain external call. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned char u8;
@@ -21,39 +22,41 @@ extern void func_002C2210(void *, unsigned int, unsigned int, unsigned int, s32,
 extern unsigned int func_002ED870(void);
 extern int func_002EE6A8();
 
-void func_002ED6B0(u8 *a0)
+/* Keeps a follower object inside its allowed range of its target. When its counter
+   reaches 7 it resets the counter and throws out a burst of 20 sparks. */
+void func_002ED6B0(u8 *owner)
 {
-    u8 *s2;
-    float v[4] __attribute__((aligned(16)));
-    float w[4] __attribute__((aligned(16)));
-    float r;
-    float f;
-    float lim;
+    u8 *vars;
+    float offset[4] __attribute__((aligned(16)));
+    float sparkVel[4] __attribute__((aligned(16)));
+    float radius;
+    float dist;
+    float maxDist;
     int i;
-    Rec128 *s0;
-    float *s3;
+    Rec128 *tuning;
+    float *tuneVec;
 
-    s2 = (u8 *)func_002ED688(a0);
-    if (s2 != 0 && !func_002ED870() && func_002EE6A8(a0) != 2) {
-        s0 = &D_001B1C54[0][D_00214F90[0]];
-        s3 = s0->v;
-        func_00282CF0(v, a0 + 0x10, s3);
-        f = func_00282DF0(v);
-        r = *(float *)(a0 + 0xC) * 0.00097656f;
-        f = f + r;
-        lim = s0->lim;
-        if (lim < f) {
-            func_00282F20(v, v, lim - r);
-            func_00282CC0(a0 + 0x10, v, s3);
+    vars = (u8 *)GetMobyMotionData(owner);
+    if (vars != 0 && !GetSceneStateWord() && GetFollowerState(owner) != 2) {
+        tuning = &D_001B1C54[0][D_00214F90[0]];
+        tuneVec = tuning->v;
+        FastVecSub(offset, owner + 0x10, tuneVec);
+        dist = FastVecLength(offset);
+        radius = *(float *)(owner + 0xC) * 0.00097656f;
+        dist = dist + radius;
+        maxDist = tuning->lim;
+        if (maxDist < dist) {
+            vec_scale_to_length(offset, offset, maxDist - radius);
+            FastVecAdd(owner + 0x10, offset, tuneVec);
         }
-        if (*(int *)(s2 + 0x15C) >= 7) {
-            func_00283028(s2 + 0x90, s2 + 0x90, s2 + 0xD0);
-            *(int *)(s2 + 0x15C) = 0;
+        if (*(int *)(vars + 0x15C) >= 7) {
+            FastVectorNormalize(vars + 0x90, vars + 0x90, vars + 0xD0);
+            *(int *)(vars + 0x15C) = 0;
             for (i = 0x13; i >= 0; i--) {
-                float a = func_002A7940();
-                float b = func_002A7940();
-                func_002AF000(w, 0.16666667f, a, b);
-                func_002C2210(a0 + 0x10, 0x3C, 0x4000FF7F, 0, 2, w, 0.2f, 1.25f, 0.0f, 0);
+                float randA = RandomAngle();
+                float randB = RandomAngle();
+                BuildSphericalOffset(sparkVel, 0.16666667f, randA, randB);
+                SpawnGroundEffectParticle(owner + 0x10, 0x3C, 0x4000FF7F, 0, 2, sparkVel, 0.2f, 1.25f, 0.0f, 0);
             }
         }
     }

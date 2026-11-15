@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -151,49 +152,51 @@ extern float func_002702C8_1(int *dst, float a, float b, float c, float d, float
 
 
 /* shared native body of family 5a97ab89858c */
-void func_L00_0041AEF8(char *p)
+/* Fills a sprite packet with default corner positions, colors and draw settings. */
+void func_L00_0041AEF8(char *packet)
 {
-    *(long long *)(p + 112) = 0;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 0x0000FF9000000260LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(packet + 112) = 0;
+    *(float *)(packet + 8) = -1.0f;
+    *(float *)(packet + 24) = 1.0f;
+    *(float *)(packet + 40) = -1.0f;
+    *(float *)(packet + 56) = 1.0f;
+    *(float *)(packet + 4) = -1.0f;
+    *(float *)(packet + 36) = 1.0f;
+    *(float *)(packet + 52) = 1.0f;
+    *(int *)(packet + 0) = 0;
+    *(int *)(packet + 16) = 0;
+    *(int *)(packet + 32) = 0;
+    *(int *)(packet + 48) = 0;
+    *(float *)(packet + 12) = 1.0f;
+    *(float *)(packet + 28) = 1.0f;
+    *(float *)(packet + 44) = 1.0f;
+    *(long long *)(packet + 128) = 0x0000FF9000000260LL;
+    *(float *)(packet + 20) = -1.0f;
+    *(float *)(packet + 60) = 1.0f;
 }
 
 /* shared native body of family 9a8a2404 */
-void func_L00_0041AF60(char *p)
+/* Fills a sprite packet like the one before, but with a wider (double size) shape. */
+void func_L00_0041AF60(char *packet)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 8) = 0;
-    *(float *)(p + 24) = 2.0f;
-    *(int *)(p + 40) = 0;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 0x0000FF9000000260LL;
-    *(float *)(p + 56) = 2.0f;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(packet + 112) = 0LL;
+    *(int *)(packet + 8) = 0;
+    *(float *)(packet + 24) = 2.0f;
+    *(int *)(packet + 40) = 0;
+    *(float *)(packet + 4) = -1.0f;
+    *(float *)(packet + 36) = 1.0f;
+    *(float *)(packet + 52) = 1.0f;
+    *(int *)(packet + 0) = 0;
+    *(int *)(packet + 16) = 0;
+    *(int *)(packet + 32) = 0;
+    *(int *)(packet + 48) = 0;
+    *(float *)(packet + 12) = 1.0f;
+    *(float *)(packet + 28) = 1.0f;
+    *(float *)(packet + 44) = 1.0f;
+    *(long long *)(packet + 128) = 0x0000FF9000000260LL;
+    *(float *)(packet + 56) = 2.0f;
+    *(float *)(packet + 20) = -1.0f;
+    *(float *)(packet + 60) = 1.0f;
 }
 
 
@@ -217,7 +220,7 @@ void func_L00_0041AFD8(void *unused, float *a, int k, float f)
     local.z84 = 0;
     local.z88 = 0;
     local.z100 = 0;
-    local.v120 = func_0027C878(44);
+    local.v120 = GetEffectTextureDescriptor(44);
     local.v128 = 0x0000FF9000000260LL;
     local.v136 = 0x0000008000000048LL;
     local.k3 = k;
@@ -226,22 +229,22 @@ void func_L00_0041AFD8(void *unused, float *a, int k, float f)
     local.k0 = k;
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = func_00283248(D_L00_001B8C80.f140 - a[0], D_L00_001B8C80.f144 - a[1]);
-    x = func_00282E80(a, &D_L00_001B8C80.f140);
-    local.f212 = -func_00283248(x, D_L00_001B8C80.f148 - a[2]);
-    local.v208 = func_002A7940();
-    func_00283410(&local.m00, &local.v208);
-    func_00282CF0(v, &D_L00_001B8C80.f140, a);
-    func_00282F20(v, v, 0.25f);
+    local.f216 = FastMatrixHelperA(D_L00_001B8C80.f140 - a[0], D_L00_001B8C80.f144 - a[1]);
+    x = vec_distance_xy(a, &D_L00_001B8C80.f140);
+    local.f212 = -FastMatrixHelperA(x, D_L00_001B8C80.f148 - a[2]);
+    local.v208 = RandomAngle();
+    euler_to_matrix(&local.m00, &local.v208);
+    FastVecSub(v, &D_L00_001B8C80.f140, a);
+    vec_scale_to_length(v, v, 0.25f);
     local.v192 = a[0] + v[0];
     local.v196 = a[1] + v[1];
     local.v200 = a[2] + v[2];
     local.v204 = 1.0f;
-    func_00282D30(&local.b0, &local.b0, f);
-    func_00282D30(&local.b1, &local.b1, f);
-    func_00282D30(&local.b2, &local.b2, f);
-    func_00282D30(&local.b3, &local.b3, f);
-    func_00280B90(&local, &local.m00, 0);
+    FastVecScale(&local.b0, &local.b0, f);
+    FastVecScale(&local.b1, &local.b1, f);
+    FastVecScale(&local.b2, &local.b2, f);
+    FastVecScale(&local.b3, &local.b3, f);
+    draw_world_quad(&local, &local.m00, 0);
 }
 
 /* func_L00_0041B1B8 is in L00_0041ABB8-trail-g8.c. */
@@ -265,7 +268,7 @@ void func_L00_0041C160(void *unused, float *b, float *a, int k, float f)
     local.z84 = 0;
     local.z88 = 0;
     local.z100 = 0;
-    local.v120 = func_0027C878(11);
+    local.v120 = GetEffectTextureDescriptor(11);
     local.v128 = 0xFF9000000260LL;
     local.v136 = 0x0000008000000048LL;
     local.k3 = k;
@@ -274,20 +277,20 @@ void func_L00_0041C160(void *unused, float *b, float *a, int k, float f)
     local.k0 = k;
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = func_00283248(a[0], a[1]);
-    x = func_00283248(func_00282E20(a), a[2]);
+    local.f216 = FastMatrixHelperA(a[0], a[1]);
+    x = FastMatrixHelperA(vec_length_xy(a), a[2]);
     local.f212 = -x;
     local.v208 = 0.0f;
-    func_00283410(&local.m00, &local.v208);
+    euler_to_matrix(&local.m00, &local.v208);
     local.v192 = b[0];
     local.v196 = b[1];
     local.v200 = b[2];
     local.v204 = 1.0f;
-    func_00282D30(&local.b0, &local.b0, f);
-    func_00282D30(&local.b1, &local.b1, f);
-    func_00282D30(&local.b2, &local.b2, f);
-    func_00282D30(&local.b3, &local.b3, f);
-    func_00280B90(&local, &local.m00, 0);
+    FastVecScale(&local.b0, &local.b0, f);
+    FastVecScale(&local.b1, &local.b1, f);
+    FastVecScale(&local.b2, &local.b2, f);
+    FastVecScale(&local.b3, &local.b3, f);
+    draw_world_quad(&local, &local.m00, 0);
 }
 
 
@@ -327,9 +330,9 @@ typedef struct {
    is the record's number), asks the level's builder for a matrix with the flags the object's
    own word selects, then reads the record's two colour bytes and hands the level's renderer
    the object's record. */
-void func_L00_0041E4A8(void *arg0)
+void func_L00_0041E4A8(void *moby)
 {
-    unsigned char *self = arg0;
+    unsigned char *self = moby;
     unsigned char *rec;
     int handle;
     int flags;
@@ -340,12 +343,12 @@ void func_L00_0041E4A8(void *arg0)
     unsigned int c2;
 
     rec = *(unsigned char **)(self + 0x68);
-    handle = func_L00_0032A088(*(int *)(rec + 0x50), *(int *)(rec + 0x3C));
+    handle = GetSlotBody(*(int *)(rec + 0x50), *(int *)(rec + 0x3C));
     if (handle == 0) {
-        func_002FEE50(*(int *)(rec + 0x6C));
-        func_0029F338(self);
+        ClearEntryFlag(*(int *)(rec + 0x6C));
+        MarkMobySpawned(self);
     } else {
-        if (((Entry262570 *)(D_L00_00262570 + D_00139568[0x16] * 224))->flag != 0) {
+        if (((Entry262570 *)(gWeaponTable_L00 + gItemSlotToRecord[0x16] * 224))->flag != 0) {
             flags = 0x802080;
             if (*(int *)(rec + 0x68) != 0)
                 flags = 0x802020;
@@ -354,14 +357,14 @@ void func_L00_0041E4A8(void *arg0)
             flags = 0x202080;
             mode = 0x50;
         }
-        func_L00_0041E648(self, flags, mode);
-        if (((Entry262570 *)(D_L00_00262570 + D_00139568[0x16] * 224))->flag == 0)
+        DrawRocketRibbonStrip(self, flags, mode);
+        if (((Entry262570 *)(gWeaponTable_L00 + gItemSlotToRecord[0x16] * 224))->flag == 0)
             return;
-        base = handle + func_L00_0032A0B8(*(int *)(rec + 0x50), *(int *)(rec + 0x3C))[2];
-        scale = func_002A7878(0.5f, 1.0f);
-        c1 = (unsigned int)func_00283CF0(scale * 127.0f) << 24;
-        c2 = (unsigned int)func_00283CF0(scale * 48.0f) << 24;
-        func_L00_002EBE88(*(int *)((char *)base + *(int *)(rec + 0x30) * 4),
+        base = handle + GetSlotHeader(*(int *)(rec + 0x50), *(int *)(rec + 0x3C))[2];
+        scale = RandomFloatRange(0.5f, 1.0f);
+        c1 = (unsigned int)FloatToInt(scale * 127.0f) << 24;
+        c2 = (unsigned int)FloatToInt(scale * 48.0f) << 24;
+        DrawTwoLayerPolylineRibbon(*(int *)((char *)base + *(int *)(rec + 0x30) * 4),
                           0x17, 0xE, 0x7,
                           0xFF5050 | c1, 0xFF1010 | c2,
                           0.0f, 3.0f, 0.0f);
@@ -410,25 +413,25 @@ void func_L00_004200F0(float *pos)
     int n;
     int id;
 
-    func_00282CF0(v, D_L00_001B8DC0, pos);
-    f28 = func_00283248(v[0], v[1]);
+    FastVecSub(v, gCameraPosition_L00, pos);
+    f28 = FastMatrixHelperA(v[0], v[1]);
     n = 19;
     do {
         n--;
-        f21 = func_002A7878(0.5f, 1.0f);
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        size = func_002A7878(0.05f, 0.2f) * 210000.0f;
-        f20 = func_002A7878(0.0f, 1.3962636f);
-        r = func_00283B98(f28, func_002A78D8(0.0f, 1.3962636f));
-        func_002AF000(dir, f21 * (1.0f / 60.0f), r, f20);
-        r = func_002A78D8(0.0f, 0.1f);
+        f21 = RandomFloatRange(0.5f, 1.0f);
+        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        size = RandomFloatRange(0.05f, 0.2f) * 210000.0f;
+        f20 = RandomFloatRange(0.0f, 1.3962636f);
+        r = FastAddRotations(f28, RandomSignedFloatRange(0.0f, 1.3962636f));
+        BuildSphericalOffset(dir, f21 * (1.0f / 60.0f), r, f20);
+        r = RandomSignedFloatRange(0.0f, 0.1f);
         out[0] = pos[0] + r;
-        r = func_002A78D8(0.0f, 0.1f);
+        r = RandomSignedFloatRange(0.0f, 0.1f);
         out[1] = pos[1] + r;
-        r = func_002A78D8(0.0f, 0.1f);
+        r = RandomSignedFloatRange(0.0f, 0.1f);
         out[2] = pos[2] + r;
-        func_002C16C0(out, dir, 30, 127, 0x7F7F7F, id,
-                      func_002A7878(0.05f, 0.2f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
+        SpawnBurstParticle_002C16C0(out, dir, 30, 127, 0x7F7F7F, id,
+                      RandomFloatRange(0.05f, 0.2f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
     } while (n >= 0);
 }
 
@@ -437,9 +440,9 @@ int func_L00_00420310(char *object)
 {
     float *p;
 
-    if (func_002ABB78(object) != 0)
+    if (IsMobyInSpecialClassRange(object) != 0)
         return 0;
-    p = func_002AB1F0(object);
+    p = GetMobyPrivateValue0(object);
     if (p == 0)
         return 0;
     if (0.0f < *p)
@@ -448,6 +451,7 @@ int func_L00_00420310(char *object)
 }
 
 
+/* Tells whether a point touches the level collision grid. */
 int func_L00_004204A0(TI128 *src)
 {
     TI128 local;
@@ -472,18 +476,18 @@ void func_L00_004208C8(MoveObject *object, TI128 *input)
     float height, along;
 
     delta = *input;
-    ground = D_00189E20.ground;
+    ground = gHeroState.ground;
     if (ground != 0) {
         if (D_L00_001A8FF0[0] == 0) {
-            if (D_00189E20.flag348 == 0) {
+            if (gHeroState.flag348 == 0) {
                 if (ground == view->ground) {
                     height = ground->height - view->groundHeight;
                     if (height > 0.0f && ((float *)step)[2] < height)
                         ((float *)step)[2] = height;
-                    view->groundHeight = D_00189E20.ground->height;
+                    view->groundHeight = gHeroState.ground->height;
                 } else {
                     view->ground = ground;
-                    view->groundHeight = D_00189E20.ground->height;
+                    view->groundHeight = gHeroState.ground->height;
                 }
             } else
                 view->ground = 0;
@@ -492,33 +496,33 @@ void func_L00_004208C8(MoveObject *object, TI128 *input)
     } else
         view->ground = 0;
 
-    func_00282CC0(&object->position, step, &object->position);
-    func_00282CC0(&view->v60, step, &view->v60);
-    func_00282CC0(&view->v00, step, &view->v00);
-    func_00282CC0(&view->v90, step, &view->v90);
-    func_00282CC0(&view->v30, step, &view->v30);
-    func_00282CC0(&state->v00, step, &state->v00);
-    along = func_00282DB0(step, &cam->axis);
-    func_00282D30(&projected, &cam->axis, along);
-    func_00282CC0(&view->v10, &view->v10, &projected);
-    if (D_00189E20.flag348 == 0 &&
-        !(D_00189E20.ground != 0 && D_00189E20.ground->type == 0x22D &&
+    FastVecAdd(&object->position, step, &object->position);
+    FastVecAdd(&view->v60, step, &view->v60);
+    FastVecAdd(&view->v00, step, &view->v00);
+    FastVecAdd(&view->v90, step, &view->v90);
+    FastVecAdd(&view->v30, step, &view->v30);
+    FastVecAdd(&state->v00, step, &state->v00);
+    along = FastVecDot(step, &cam->axis);
+    FastVecScale(&projected, &cam->axis, along);
+    FastVecAdd(&view->v10, &view->v10, &projected);
+    if (gHeroState.flag348 == 0 &&
+        !(gHeroState.ground != 0 && gHeroState.ground->type == 0x22D &&
           D_L00_001B9084 < 31))
         object->state->f1E0 = ((float *)step)[3];
-    if ((unsigned int)(D_00189E20.state - 11) < 2) {
+    if ((unsigned int)(gHeroState.state - 11) < 2) {
         MoveState *next = object->state;
 
         next->h10 = 0;
-        func_00282D30(&correction, &cam->v80, cam->fA4);
-        along = func_00282DB0(&cam->axis, step);
-        func_00282D30(&remainder, &cam->axis, along);
-        func_00282CF0(&remainder, step, &remainder);
-        func_00282CF0(&correction, &correction, &remainder);
-        func_00282CC0(&object->position, &correction, &object->position);
-        func_00282CC0(&view->v60, &correction, &view->v60);
-        func_00282CC0(&view->v00, &correction, &view->v00);
-        func_00282CC0(&view->v90, &correction, &view->v90);
-        func_00282CC0(&next->v00, &correction, &next->v00);
+        FastVecScale(&correction, &cam->v80, cam->fA4);
+        along = FastVecDot(&cam->axis, step);
+        FastVecScale(&remainder, &cam->axis, along);
+        FastVecSub(&remainder, step, &remainder);
+        FastVecSub(&correction, &correction, &remainder);
+        FastVecAdd(&object->position, &correction, &object->position);
+        FastVecAdd(&view->v60, &correction, &view->v60);
+        FastVecAdd(&view->v00, &correction, &view->v00);
+        FastVecAdd(&view->v90, &correction, &view->v90);
+        FastVecAdd(&next->v00, &correction, &next->v00);
     }
 }
 

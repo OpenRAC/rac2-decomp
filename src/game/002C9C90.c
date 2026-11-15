@@ -21,14 +21,14 @@ extern s32 D_001B5580;
 extern s32 D_001B5590;
 
 void func_002C9C90(void) {
-    D_001B5200.pos[0] = 256.0f;
-    D_001B5200.pos[2] = 64.0f;
-    D_001B5200.pos[1] = 256.0f;
-    qzero_nc(&D_001B5200.matrix[0].f[0]);
+    gActiveCamera.pos[0] = 256.0f;
+    gActiveCamera.pos[2] = 64.0f;
+    gActiveCamera.pos[1] = 256.0f;
+    qzero_nc(&gActiveCamera.matrix[0].f[0]);
     qzero_nc(&D_001B5580);
     qzero_nc(&D_001B5590);
-    D_001B5200.matrix[0].f[0] = 1.0f;
-    D_001B5200.matrix[1].f[1] = 1.0f;
-    D_001B5200.matrix[2].f[2] = 1.0f;
-    D_001B5200.matrix[2].f[3] = 1.0f;
+    gActiveCamera.matrix[0].f[0] = 1.0f;
+    gActiveCamera.matrix[1].f[1] = 1.0f;
+    gActiveCamera.matrix[2].f[2] = 1.0f;
+    gActiveCamera.matrix[2].f[3] = 1.0f;
 }

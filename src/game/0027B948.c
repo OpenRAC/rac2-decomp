@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 /* Rotated sprite construction follows RAC1 draw.c (GPL-3.0). */
@@ -66,6 +67,7 @@ extern int Ff67aa9df_D_001A7354 __attribute__((sda));
 
 extern void func_0027EA28(void *v, void *x);
 
+/* Sets the graphics chip's display registers (background colour, screen buffers) to their start-up values. */
 void func_0027B948(void)
 {
     GsRegisterValue framebuffer, display;
@@ -82,6 +84,7 @@ void func_0027B948(void)
 }
 
 /* Set up aligned GS buffer state and emit pinned register/clear helper calls; source identity and matching require complete-unit qualification */
+/* Sets up a small off-screen drawing buffer near the end of video memory and clears it. */
 void func_0027B9C0(int width, int height)
 {
     int sum = width + height;
@@ -91,29 +94,31 @@ void func_0027B9C0(int width, int height)
         sum = 16;
     address = 0x3ff000 - (4 << sum);
     address = (address >> 13) << 13;
-    func_00285030(width, height, address, 1);
-    func_002FC560(0x47, 0x30000UL);
-    func_002FC560(0x42, 0x8000000044UL);
-    func_00285398(0x100, 0x100);
-    func_002FC560(0x42, 0x8000000044UL);
+    BuildScreenSpritePacket(width, height, address, 1);
+    VU1_addGSregister(0x47, 0x30000UL);
+    VU1_addGSregister(0x42, 0x8000000044UL);
+    DrawCenteredCaptureBackground(0x100, 0x100);
+    VU1_addGSregister(0x42, 0x8000000044UL);
 }
 
+/* Calls a graphics helper and returns. */
 void func_0027BA48(void)
 {
-  func_00284EA8();
+  AppendDrawListHeader();
   return;
 }
 
 /* Defined in 0027BD70-g8.c. */
 
 
+/* Draws a frame with every basic layer switched on. */
 void func_0027C480(void) {
     extern void func_00284F40(int);
     extern void func_0027BD70(void);
     extern int D_001B1594 __attribute__((sda));
-    func_00284F40(0);
+    AppendDrawListBufferTag(0);
     D_001B1594 = 0x7F;
-    func_0027BD70();
+    RenderFrame();
 }
 
 extern unsigned int func_00285850(void);
@@ -123,22 +128,24 @@ extern void func_0027BD70(void);
 extern void func_002CBC58(int);
 extern void func_002859C8(void);
 
+/* Draws a frame with extra layers switched on when the screen mode asks for it, then finishes the frame. */
 void func_0027C4A8(void)
 {
-    if (func_00285850() == 1) {
-        func_00284F40(0);
+    if (GetSecondMenuValue() == 1) {
+        AppendDrawListBufferTag(0);
         D_001B1594 = 0x100FF;
-        func_0027BD70();
-    } else if (func_00285850() == 0) {
-        func_002CBC58(1);
+        RenderFrame();
+    } else if (GetSecondMenuValue() == 0) {
+        DrawPauseMenuPanels(1);
     }
-    func_002859C8();
+    DrawMenuMessagePanel();
 }
 
 
+/* Calls a frame helper with zero. */
 void func_0027C520(void)
 {
-  func_002CBC58(0);
+  DrawPauseMenuPanels(0);
   return;
 }
 
@@ -152,6 +159,7 @@ extern int D_001B1608[] __attribute__((sda));
 extern fn_t D_001B9E40[];
 extern int D_001B9F40[];
 
+/* Adds a draw callback and its argument to a list of up to 64. */
 void func_0027CDC8(fn_t first, int second) {
     int index = D_001B1608[0];
     if (index < 64) {
@@ -161,6 +169,7 @@ void func_0027CDC8(fn_t first, int second) {
     }
 }
 
+/* Calls every draw callback in that list, each with its own argument. */
 void func_0027CE18(void) {
     int index;
     for (index = 0; index < D_001B1608[0]; ++index)
@@ -171,6 +180,7 @@ extern int D_001B1610[] __attribute__((sda));
 extern fn_t D_001BA240[];
 extern int D_001BA340[];
 
+/* Adds a draw callback and its argument to a second list of up to 64. */
 void func_0027CE90(fn_t first, int second) {
     int index = D_001B1610[0];
     if (index < 64) {
@@ -180,6 +190,7 @@ void func_0027CE90(fn_t first, int second) {
     }
 }
 
+/* Calls every draw callback in the second list. */
 void func_0027CEE0(void) {
     int index;
     for (index = 0; index < D_001B1610[0]; ++index)
@@ -190,6 +201,7 @@ extern int D_001B1614[] __attribute__((sda));
 extern fn_t D_001BA440[];
 extern int D_001BA540[];
 
+/* Calls every draw callback in a third list. */
 void func_0027CF58(void) {
     int index;
     for (index = 0; index < D_001B1614[0]; ++index)
@@ -200,6 +212,7 @@ extern int D_001B160C[] __attribute__((sda));
 extern fn_t D_001BA040[];
 extern int D_001BA140[];
 
+/* Adds a draw callback and its argument to a fourth list of up to 64. */
 void func_0027CFD0(fn_t first, int second) {
     int index = D_001B160C[0];
     if (index < 64) {
@@ -209,6 +222,7 @@ void func_0027CFD0(fn_t first, int second) {
     }
 }
 
+/* Calls every draw callback in the fourth list. */
 void func_0027D020(void) {
     int index;
     for (index = 0; index < D_001B160C[0]; ++index)
@@ -219,6 +233,7 @@ extern int D_001B1638[] __attribute__((sda));
 extern fn_t D_001B1618[] __attribute__((sda));
 extern int D_001B1628[] __attribute__((sda));
 
+/* Adds a callback and its argument to a short list that holds only 4 entries. */
 void func_0027D098(fn_t callback, int argument) {
     int index = D_001B1638[0];
     if (index < 4) {
@@ -231,6 +246,7 @@ void func_0027D098(fn_t callback, int argument) {
 /* shared native body of family 489bf28ebf58470c */
   /* argument table        */
 
+/* Calls every callback in the short list, each with its own argument. */
 void func_0027D0E8(void) {
     int i;
     for (i = 0; i < D_L02_001B3078; i++) {
@@ -254,31 +270,32 @@ extern unsigned char *func_00288FB8(int);
 
 extern int func_0027FB40(int, int, long, unsigned char *, int);
 
+/* Draws a line of text that slowly changes colour back and forth. */
 void func_0027D4B8(void)
 {
     int y;
     long style;
     unsigned char *text;
-    float f;
-    int v;
+    float wave;
+    int counter;
 
     y = 0x148;
     if (D_001A7BB1) {
         y = 0x17C;
     }
-    v = D_L00_001BCAF4;
-    f = (float)(v % 100) * 0.02f - 1.0f;
-    if (f < -1.0f) {
-        f = -1.0f;
+    counter = D_L00_001BCAF4;
+    wave = (float)(counter % 100) * 0.02f - 1.0f;
+    if (wave < -1.0f) {
+        wave = -1.0f;
     }
-    if (1.0f < f) {
-        f = 1.0f;
+    if (1.0f < wave) {
+        wave = 1.0f;
     }
-    f = func_00283180(f * 3.14159274f);
-    f = f + 1.0f;
-    style = func_00283D38(f * 0.5f, 0x7FE0E0E0, 0x5FF0C070);
-    text = func_00288FB8(0x2F20);
-    func_0027FB40(0x5A, y, style, text, -1);
+    wave = FastSinOrCosA(wave * 3.14159274f);
+    wave = wave + 1.0f;
+    style = FastTweenColor(wave * 0.5f, 0x7FE0E0E0, 0x5FF0C070);
+    text = GetLocalizedString(0x2F20);
+    DrawTextCenteredMediumFont(0x5A, y, style, text, -1);
 }
 
 /* Subtitle layout and window path adapted from OpenRAC/rac1-decomp src/game/draw.c's
@@ -298,53 +315,54 @@ extern void func_0027F5B8(int, int, unsigned long, unsigned char *, int);
 extern unsigned int func_001157AC(unsigned char *);
 extern void func_0027EB88(int, int, int, int, int, int);
 
+/* Shows the subtitle that matches the current time, as plain text or in a dark box. */
 void func_0027D5C0(void)
 {
     SubtitleRecord *p;
     int idx;
-    if (!D_001B8840.subs) return;
+    if (!gScenePlaybackState.subs) return;
     idx = 0;
     if ((unsigned int)(D_001A7BB4[0] - 2) < 4) idx = D_001A7BB4[0] - 1;
-    for (p = (SubtitleRecord *)D_001B8840.subs; p->start >= 0; ++p) {
-        if (D_001B8840.time < p->start) continue;
-        if (p->end < D_001B8840.time) continue;
-        if (!D_001A7B96[0] && D_001B8840.subs[p->text[idx]] != '*') continue;
-        if (D_001B8840.subs[p->text[idx]] == '*') {
+    for (p = (SubtitleRecord *)gScenePlaybackState.subs; p->start >= 0; ++p) {
+        if (gScenePlaybackState.time < p->start) continue;
+        if (p->end < gScenePlaybackState.time) continue;
+        if (!D_001A7B96[0] && gScenePlaybackState.subs[p->text[idx]] != '*') continue;
+        if (gScenePlaybackState.subs[p->text[idx]] == '*') {
             int y = 0x40;
             int alpha = 0xB0000000;
             unsigned char *str;
-            if (D_001B8840.subs[p->text[idx] + 1] != '*') y = D_001A7340[1] - 0xC8;
+            if (gScenePlaybackState.subs[p->text[idx] + 1] != '*') y = gScreenWidth[1] - 0xC8;
             else if (D_001A7BB1) y = 0x18;
-            if (p->end - D_001B8840.time < 0x12)
-                alpha = (int)(p->end - (long)(D_001B8840.time - 1)) << 27;
-            else if (D_001B8840.time - p->start < 0x12)
-                alpha = (int)(D_001B8840.time - (long)(p->start - 1)) << 27;
-            str = D_001B8840.subs + p->text[idx];
+            if (p->end - gScenePlaybackState.time < 0x12)
+                alpha = (int)(p->end - (long)(gScenePlaybackState.time - 1)) << 27;
+            else if (gScenePlaybackState.time - p->start < 0x12)
+                alpha = (int)(gScenePlaybackState.time - (long)(p->start - 1)) << 27;
+            str = gScenePlaybackState.subs + p->text[idx];
             if (str[1] != '*')
-                func_0027FB40(0x100, 0xD0, alpha | 0xE0E0E0, str, -1);
+                DrawTextCenteredMediumFont(0x100, 0xD0, alpha | 0xE0E0E0, str, -1);
             else
-                func_0027F5B8(0x20, y, alpha | 0xE0E0E0, str, -1);
+                DrawTextMediumFont(0x20, y, alpha | 0xE0E0E0, str, -1);
         } else {
             unsigned short win[16];
             short w, h;
             int hw, hh;
-            int extent = D_001A7340[1];
-            func_002802E0(win, 0xC8, 0x1A4, 0x28, 0x1D8, 0x100,
+            int extent = gScreenWidth[1];
+            FontSetWindow(win, 0xC8, 0x1A4, 0x28, 0x1D8, 0x100,
                           D_001A7BB1 ? extent - 0x36 : extent - 0x64, 0x12, 7);
-            func_00280200(win, 0x80B0B0B0UL, &D_001B8840.subs[p->text[idx]], -1);
+            DrawTextWindowMediumFont(win, 0x80B0B0B0UL, &gScenePlaybackState.subs[p->text[idx]], -1);
             win[5] -= 4;
             w = win[6];
             h = win[7];
             hh = (h >> 1) + 5;
             hw = (w >> 1) + 10;
-            if ((short)win[5] + hh > D_001A7340[1] - 0x14)
-                win[5] = D_001A7340[1] - ((h >> 1) + 0x19);
-            func_0027EB88((short)win[5] - hh, (short)win[5] + hh, 0x100 - hw, 0x100 + hw, 0x60, 0x40404);
+            if ((short)win[5] + hh > gScreenWidth[1] - 0x14)
+                win[5] = gScreenWidth[1] - ((h >> 1) + 0x19);
+            DrawRoundedBox((short)win[5] - hh, (short)win[5] + hh, 0x100 - hw, 0x100 + hw, 0x60, 0x40404);
             win[9] &= ~4;
-            if (func_001157AC(&D_001B8840.subs[p->text[idx]]) < 0x96)
-                func_00280200(win, 0x80B0B0B0UL, &D_001B8840.subs[p->text[idx]], -1);
+            if (strlen_001157AC(&gScenePlaybackState.subs[p->text[idx]]) < 0x96)
+                DrawTextWindowMediumFont(win, 0x80B0B0B0UL, &gScenePlaybackState.subs[p->text[idx]], -1);
             else
-                func_00280200(win, 0x80B0B0B0UL, D_001A8998, -1);
+                DrawTextWindowMediumFont(win, 0x80B0B0B0UL, D_001A8998, -1);
             return;
         }
     }
@@ -368,13 +386,14 @@ void func_0027D5C0(void)
 /* Adapted from OpenRAC/rac1-decomp src/game/draw.c's emit_textured_rectangle (GPL-3.0).
  * RAC2 writes a 16-word GS packet with a per-vertex colour, a closing (5, 0) pair and
  * z in the top of each XYZ word; the CLAMP word is built up in retail's OR order. */
+/* Draws a picture on a rectangle, with a separate colour for each corner. */
 void func_0027E1A0(float x, float y, float w, float h, int u, int v, int uw, int vh,
                    const unsigned int *rgba, unsigned long tex)
 {
-    int x0 = func_00283CF0(x * 16.0f) + D_001A7340[4] - 8;
-    int x1 = func_00283CF0((x + w) * 16.0f) + D_001A7340[4] - 8;
-    int y0 = func_00283CF0(y * 16.0f) + D_001A7340[5] - 8;
-    int y1 = func_00283CF0((y + h) * 16.0f) + D_001A7340[5] - 8;
+    int x0 = FloatToInt(x * 16.0f) + gScreenWidth[4] - 8;
+    int x1 = FloatToInt((x + w) * 16.0f) + gScreenWidth[4] - 8;
+    int y0 = FloatToInt(y * 16.0f) + gScreenWidth[5] - 8;
+    int y1 = FloatToInt((y + h) * 16.0f) + gScreenWidth[5] - 8;
     int vb;
     int ub;
     int s0, s1;
@@ -390,22 +409,22 @@ void func_0027E1A0(float x, float y, float w, float h, int u, int v, int uw, int
     z = (long)0xFFFFF0 << 32;
     s0 = u * 16;
     s1 = ub * 16;
-    D_001B22A8.tag->tag = 0x10000009;
-    D_001B22A8.tag->addr = 0;
-    D_001B22A8.tag->vif0 = 0;
-    D_001B22A8.tag->vif1 = 0x50000009;
+    gDmaPacketCursor.tag->tag = 0x10000009;
+    gDmaPacketCursor.tag->addr = 0;
+    gDmaPacketCursor.tag->vif0 = 0;
+    gDmaPacketCursor.tag->vif1 = 0x50000009;
     wide_u = u;
     max_u = ((long)ub << 14) | 0xA;
     min_u = (wide_u << 4) | max_u;
     min_v = min_u | ((long)v << 24);
     vb = v + vh;
     clamp = min_v | ((long)vb << 34);
-    header = D_001B22A8.tag;
-    D_001B22A8.tag = header + 1;
+    header = gDmaPacketCursor.tag;
+    gDmaPacketCursor.tag = header + 1;
     *(long *)(header + 1) = 0x0400000000008001;
-    *(long *)&D_001B22A8.tag->vif0 = 0x8531531531531068;
-    tag = D_001B22A8.tag;
-    D_001B22A8.tag = tag + 1;
+    *(long *)&gDmaPacketCursor.tag->vif0 = 0x8531531531531068;
+    tag = gDmaPacketCursor.tag;
+    gDmaPacketCursor.tag = tag + 1;
     p = (long *)(tag + 1);
     p[0] = clamp;
     p[1] = tex;
@@ -423,13 +442,14 @@ void func_0027E1A0(float x, float y, float w, float h, int u, int v, int uw, int
     p[13] = (vb << 20) + s1;
     p[14] = x1 | ((long)y1 << 16) | z;
     p[15] = 5;
-    D_001B22A8.bytes += 0x80;
+    gDmaPacketCursor.bytes += 0x80;
 }
 
 
 /* Adapted from OpenRAC/rac1-decomp src/game/draw.c's append_rotated_sprite_quad,
  * itself adapted from Lombyte src/rendering/append_rotated_sprite_quad.c
  * (GPL-3.0). RAC2 ends the packet with a zero word. */
+/* Draws a picture that can be turned to any angle, turned around a chosen centre point. */
 void func_0027E4A8(float center_x, float center_y, float quad_width, float quad_height,
                    float angle, int texture_width, int texture_height,
                    long texture_tex0, long z_and_fog, int color,
@@ -470,34 +490,34 @@ void func_0027E4A8(float center_x, float center_y, float quad_width, float quad_
     center.x = center_x;
     center.y = center_y;
     inverse_pivot_v = 1.0f - pivot_v;
-    vertical_edge.x = quad_height * func_00283198(angle);
-    vertical_edge.y = quad_height * func_00283180(angle);
-    horizontal_edge.x = quad_width * func_00283180(angle);
-    horizontal_edge.y = -quad_width * func_00283198(angle);
+    vertical_edge.x = quad_height * FastSinOrCosB(angle);
+    vertical_edge.y = quad_height * FastSinOrCosA(angle);
+    horizontal_edge.x = quad_width * FastSinOrCosA(angle);
+    horizontal_edge.y = -quad_width * FastSinOrCosB(angle);
     inverse_pivot_u = 1.0f - pivot_u;
-    func_00282D30(&temporary, &vertical_edge, inverse_pivot_v);
-    func_00282CC0(&top_left, &center, &temporary);
-    func_00282D30(&temporary, &horizontal_edge, inverse_pivot_u);
-    func_00282CF0(&top_left, &top_left, &temporary);
-    func_00282D30(&temporary, &vertical_edge, inverse_pivot_v);
-    func_00282CC0(&top_right, &center, &temporary);
-    func_00282D30(&temporary, &horizontal_edge, pivot_u);
-    func_00282CC0(&top_right, &top_right, &temporary);
-    func_00282D30(&temporary, &vertical_edge, pivot_v);
-    func_00282CF0(&bottom_left, &center, &temporary);
-    func_00282D30(&temporary, &horizontal_edge, inverse_pivot_u);
-    func_00282CF0(&bottom_left, &bottom_left, &temporary);
-    func_00282D30(&temporary, &vertical_edge, pivot_v);
-    func_00282CF0(&bottom_right, &center, &temporary);
-    func_00282D30(&temporary, &horizontal_edge, pivot_u);
-    func_00282CC0(&bottom_right, &bottom_right, &temporary);
-    D_001B22A8.tag->tag = 0x10000007;
-    D_001B22A8.tag->addr = 0;
-    D_001B22A8.tag->vif0 = 0;
-    D_001B22A8.tag->vif1 = 0x50000007;
-    tag = D_001B22A8.tag;
+    FastVecScale(&temporary, &vertical_edge, inverse_pivot_v);
+    FastVecAdd(&top_left, &center, &temporary);
+    FastVecScale(&temporary, &horizontal_edge, inverse_pivot_u);
+    FastVecSub(&top_left, &top_left, &temporary);
+    FastVecScale(&temporary, &vertical_edge, inverse_pivot_v);
+    FastVecAdd(&top_right, &center, &temporary);
+    FastVecScale(&temporary, &horizontal_edge, pivot_u);
+    FastVecAdd(&top_right, &top_right, &temporary);
+    FastVecScale(&temporary, &vertical_edge, pivot_v);
+    FastVecSub(&bottom_left, &center, &temporary);
+    FastVecScale(&temporary, &horizontal_edge, inverse_pivot_u);
+    FastVecSub(&bottom_left, &bottom_left, &temporary);
+    FastVecScale(&temporary, &vertical_edge, pivot_v);
+    FastVecSub(&bottom_right, &center, &temporary);
+    FastVecScale(&temporary, &horizontal_edge, pivot_u);
+    FastVecAdd(&bottom_right, &bottom_right, &temporary);
+    gDmaPacketCursor.tag->tag = 0x10000007;
+    gDmaPacketCursor.tag->addr = 0;
+    gDmaPacketCursor.tag->vif0 = 0;
+    gDmaPacketCursor.tag->vif1 = 0x50000007;
+    tag = gDmaPacketCursor.tag;
     packet_words = (unsigned long *)(tag + 1);
-    D_001B22A8.tag = tag + 1;
+    gDmaPacketCursor.tag = tag + 1;
     packet_words[0] = 0xB400000000008001;
     packet_words[1] = 0x53535353106;
     packet_words[2] = texture_tex0;
@@ -505,26 +525,26 @@ void func_0027E4A8(float center_x, float center_y, float quad_width, float quad_
     packet_words[4] = color;
     packet_words[5] = texture_left | texture_top;
     packet_words[6] =
-        (func_00283CF0(top_left.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
-        ((unsigned long)(func_00283CF0(top_left.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
+        (FloatToInt(top_left.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
+        ((unsigned long)(FloatToInt(top_left.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
         ((unsigned long)z_and_fog << 32);
     packet_words[7] = texture_right | texture_top;
     packet_words[8] =
-        (func_00283CF0(top_right.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
-        ((unsigned long)(func_00283CF0(top_right.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
+        (FloatToInt(top_right.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
+        ((unsigned long)(FloatToInt(top_right.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
         ((unsigned long)z_and_fog << 32);
     packet_words[9] = texture_left | texture_bottom;
     packet_words[10] =
-        (func_00283CF0(bottom_left.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
-        ((unsigned long)(func_00283CF0(bottom_left.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
+        (FloatToInt(bottom_left.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
+        ((unsigned long)(FloatToInt(bottom_left.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
         ((unsigned long)z_and_fog << 32);
     packet_words[11] = texture_right | texture_bottom;
     packet_words[12] =
-        (func_00283CF0(bottom_right.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
-        ((unsigned long)(func_00283CF0(bottom_right.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
+        (FloatToInt(bottom_right.x * 16.0f) + Ff67aa9df_D_001A7350 - 8) |
+        ((unsigned long)(FloatToInt(bottom_right.y * 16.0f) + Ff67aa9df_D_001A7354 - 8) << 16) |
         ((unsigned long)z_and_fog << 32);
     packet_words[13] = 0;
-    D_001B22A8.tag = (QuadDmaTag *)((unsigned char *)D_001B22A8.tag + 0x70);
+    gDmaPacketCursor.tag = (QuadDmaTag *)((unsigned char *)gDmaPacketCursor.tag + 0x70);
 }
 
 
@@ -532,55 +552,58 @@ void func_0027E4A8(float center_x, float center_y, float quad_width, float quad_
 
 /* Defined in 0027EA28.c. */
 
+/* Draws a plain rectangle from two x values and two y values. */
 void func_0027EAE8(int i0, int i1, int i2, int i3, int tag, void *x)
 {
-    long long v[4];
+    long long corners[4];
 
-    v[0] = (((i0 << 4) + Ff67aa9df_D_001A7350) - 8)
+    corners[0] = (((i0 << 4) + Ff67aa9df_D_001A7350) - 8)
          | ((long long)(((i1 << 4) + Ff67aa9df_D_001A7354) - 8) << 16)
          | ((long long)tag << 32);
-    v[1] = (((i2 << 4) + Ff67aa9df_D_001A7350) - 8)
+    corners[1] = (((i2 << 4) + Ff67aa9df_D_001A7350) - 8)
          | ((long long)(((i1 << 4) + Ff67aa9df_D_001A7354) - 8) << 16)
          | ((long long)tag << 32);
-    v[2] = (((i0 << 4) + Ff67aa9df_D_001A7350) - 8)
+    corners[2] = (((i0 << 4) + Ff67aa9df_D_001A7350) - 8)
          | ((long long)(((i3 << 4) + Ff67aa9df_D_001A7354) - 8) << 16)
          | ((long long)tag << 32);
-    v[3] = (((i2 << 4) + Ff67aa9df_D_001A7350) - 8)
+    corners[3] = (((i2 << 4) + Ff67aa9df_D_001A7350) - 8)
          | ((long long)(((i3 << 4) + Ff67aa9df_D_001A7354) - 8) << 16)
          | ((long long)tag << 32);
-    func_0027EA28(v, x);
+    AppendFlatQuadPacket(corners, x);
 }
 
 extern void func_0027DE50(int a, int b, int c, int d, unsigned long e);
 
+/* Draws a box with stepped, rounded corners from a stack of thin rectangles. */
 void func_0027EB88(int x, int y, int z, int w, int hi, int lo)
 {
     int c = (hi << 24) | lo;
 
-    func_0027DE50(x, y, z, w, c);
-    func_0027DE50(x + 1, y - 1, z - 2, z, c);
-    func_0027DE50(x + 2, y - 2, z - 3, z - 2, c);
-    func_0027DE50(x + 4, y - 4, z - 4, z - 3, c);
-    func_0027DE50(x + 1, y - 1, w, w + 2, c);
-    func_0027DE50(x + 2, y - 2, w + 2, w + 3, c);
-    func_0027DE50(x + 4, y - 4, w + 3, w + 4, c);
+    DrawColoredRectangle(x, y, z, w, c);
+    DrawColoredRectangle(x + 1, y - 1, z - 2, z, c);
+    DrawColoredRectangle(x + 2, y - 2, z - 3, z - 2, c);
+    DrawColoredRectangle(x + 4, y - 4, z - 4, z - 3, c);
+    DrawColoredRectangle(x + 1, y - 1, w, w + 2, c);
+    DrawColoredRectangle(x + 2, y - 2, w + 2, w + 3, c);
+    DrawColoredRectangle(x + 4, y - 4, w + 3, w + 4, c);
 }
 
 extern void func_0027DE50(int a, int b, int c, int d, unsigned long e);
 
+/* Draws an outline made of small rectangles around a box. */
 void func_0027ECC8(int x, int y, int z, int w, int v)
 {
     int c = (v & 0xFF000000) | 4;
 
-    func_0027DE50(x, y, z, w, c);
-    func_0027DE50(x - 1, x + 1, z + 3, w + 5, v);
-    func_0027DE50(x - 3, x - 5, z - 1, w - 3, v);
-    func_0027DE50(x - 5, y - 3, z - 1, z + 1, v);
-    func_0027DE50(x + 3, y + 1, z - 3, z - 5, v);
-    func_0027DE50(y - 1, y + 1, z - 3, w - 3, v);
-    func_0027DE50(y + 3, y + 5, z + 3, w + 1, v);
-    func_0027DE50(x + 3, y + 3, w - 1, w + 1, v);
-    func_0027DE50(x + 1, y - 3, w + 3, w + 5, v);
+    DrawColoredRectangle(x, y, z, w, c);
+    DrawColoredRectangle(x - 1, x + 1, z + 3, w + 5, v);
+    DrawColoredRectangle(x - 3, x - 5, z - 1, w - 3, v);
+    DrawColoredRectangle(x - 5, y - 3, z - 1, z + 1, v);
+    DrawColoredRectangle(x + 3, y + 1, z - 3, z - 5, v);
+    DrawColoredRectangle(y - 1, y + 1, z - 3, w - 3, v);
+    DrawColoredRectangle(y + 3, y + 5, z + 3, w + 1, v);
+    DrawColoredRectangle(x + 3, y + 3, w - 1, w + 1, v);
+    DrawColoredRectangle(x + 1, y - 3, w + 3, w + 5, v);
 }
 
 

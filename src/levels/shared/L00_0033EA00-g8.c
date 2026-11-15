@@ -18,6 +18,7 @@ extern void func_00282D30(void *,void *,float);
 extern int func_002A7820(int,int);
 extern void func_002BCB00(void *,void *,int,int,int,int,int,int,float,int);
 extern int D_L00_001B19C8 MACRO_ADDR;
+/* Moves a particle and fades its color over its life. It can also throw off small sparks in random directions. */
 void func_L00_0033EA00(char *p)
 {
     float old[4], velocity[4], random[4];
@@ -26,30 +27,30 @@ void func_L00_0033EA00(char *p)
     char *initial;
     float t, length;
     int life;
-    if (func_00282978((short *)(p+10))) { func_002B9180(p); return; }
+    if (FastDecTimer((short *)(p+10))) { KillParticle(p); return; }
     initial=p+16;
-    t=func_00283CE0(FS(p,10));
-    t=t/func_00283CE0(FS(q,24));
-    FI(p,4)=func_L00_0031C998(FI(q,20),FI(q,16),t);
-    func_00282CC0(initial,initial,q);
+    t=IntToFloat(FS(p,10));
+    t=t/IntToFloat(FS(q,24));
+    FI(p,4)=LerpIntegerFraction(FI(q,20),FI(q,16),t);
+    FastVecAdd(initial,initial,q);
     FF(q,8)-=FF(q,12);
     qcopy(old,initial);
     pos=initial;
     if (FF(p,28)!=0.0f) {
-        if (FF(p,28)==2.0f) func_00300190(pos,pos);
+        if (FF(p,28)==2.0f) TransformVectorOrCopy(pos,pos);
         FF(p,28)=2.0f;
     }
-    if (FS(q,26) && (D_L00_001B19C8&1)) {
+    if (FS(q,26) && (gFrameCounter_L00&1)) {
         *(EffectQuad *)random=0;
-        random[0]=func_002A7878(-1.0f,1.0f);
-        random[1]=func_002A7878(-1.0f,1.0f);
-        random[2]=func_002A7878(-1.0f,1.0f);
+        random[0]=RandomFloatRange(-1.0f,1.0f);
+        random[1]=RandomFloatRange(-1.0f,1.0f);
+        random[2]=RandomFloatRange(-1.0f,1.0f);
         *(EffectQuad *)velocity=*(EffectQuad *)random;
-        length=func_00282DF0(q);
-        func_00282F20(velocity,velocity,length*func_002A7878(0.15f,0.25f));
-        func_00282CC0(velocity,velocity,q);
-        func_00282D30(velocity,velocity,func_002A7878(0.75f,0.95f));
-        life=func_002A7820(15,30);
-        func_002BCB00(pos,velocity,FI(p,4),FI(q,20),life,0,FB(p,2),FB(p,3),FF(p,12),func_00283CF0(FF(p,28)));
-    } else func_00282D30(q,q,0.96f);
+        length=FastVecLength(q);
+        vec_scale_to_length(velocity,velocity,length*RandomFloatRange(0.15f,0.25f));
+        FastVecAdd(velocity,velocity,q);
+        FastVecScale(velocity,velocity,RandomFloatRange(0.75f,0.95f));
+        life=RandomIntRange(15,30);
+        SpawnSparkParticle_002BCB00(pos,velocity,FI(p,4),FI(q,20),life,0,FB(p,2),FB(p,3),FF(p,12),FloatToInt(FF(p,28)));
+    } else FastVecScale(q,q,0.96f);
 }

@@ -25,60 +25,61 @@ extern TI128 D_L03_001B0010[3] __attribute__((sda));
 extern TI128 D_L03_0029A880[5];
 
 
-void func_L03_003C4800(unsigned char *a0) {
-    unsigned short *q;
-    unsigned char *e;
-    int *ids;
-    TI128 *vecs;
-    int n;
+/* Visits the objects in a group and spawns an effect at each of their fixed attachment points. */
+void func_L03_003C4800(unsigned char *object) {
+    unsigned short *idList;
+    unsigned char *entity;
+    int *boneIds;
+    TI128 *offsets;
+    int count;
     int j;
-    float w;
-    float m[16] __attribute__((aligned(16)));
-    float v[4] __attribute__((aligned(16)));
+    float radius;
+    float matrix[16] __attribute__((aligned(16)));
+    float point[4] __attribute__((aligned(16)));
     float *vp;
 
-    for (q = D_L03_001FB5A0[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L03_001B2A38 && q != 0 &&
-         ((q != 0 && (short)q[-1] >= 0) || q == D_L03_001FB5A0[a0[0x21]]);
-         q++) {
-        e = D_L03_001B2A1C + ((*q & 0x7FFF) << 8);
-        if (e == 0)
+    for (idList = D_L03_001FB5A0[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L03_001B2A38 && idList != 0 &&
+         ((idList != 0 && (short)idList[-1] >= 0) || idList == D_L03_001FB5A0[object[0x21]]);
+         idList++) {
+        entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        if (e[0x31] == 0)
+        if (entity[0x31] == 0)
             continue;
-        if (e[0x20] == 0xFE)
+        if (entity[0x20] == 0xFE)
             continue;
-        if (e[0x20] == 0xFD)
+        if (entity[0x20] == 0xFD)
             continue;
-        switch (*(short *)(e + 0xAA)) {
-        case 0x940:
-            ids = D_L03_001AFF88;
-            vecs = D_L03_001AFFE0;
-            n = 3;
+        switch (*(short *)(entity + 0xAA)) {
+        case 0x940: /* Bridgebot */
+            boneIds = D_L03_001AFF88;
+            offsets = D_L03_001AFFE0;
+            count = 3;
             break;
-        case 0x93C:
-            ids = D_L03_001AFF78;
-            vecs = D_L03_001AFFB0;
-            n = 3;
+        case 0x93C: /* moby class 2364 */
+            boneIds = D_L03_001AFF78;
+            offsets = D_L03_001AFFB0;
+            count = 3;
             break;
-        case 0x964:
-            ids = D_L03_001AFF60;
-            vecs = D_L03_0029A880;
-            n = 5;
+        case 0x964: /* Gadgebot */
+            boneIds = D_L03_001AFF60;
+            offsets = D_L03_0029A880;
+            count = 5;
             break;
         default:
-            ids = D_L03_001AFF98;
-            vecs = D_L03_001B0010;
-            n = 3;
+            boneIds = D_L03_001AFF98;
+            offsets = D_L03_001B0010;
+            count = 3;
             break;
         }
-        for (j = 0; j < n; j++) {
-            func_0029FC20((char *)e, ids[j], (char *)m);
-            qcopy(v, &vecs[j]);
-            w = v[3];
-            v[3] = 1.0f;
-            func_002830C0(v, v, m);
-            func_L00_00325AE8(v, *(int *)(e + 0x78), w, 0.08f);
+        for (j = 0; j < count; j++) {
+            TransformMobyJointPoint((char *)entity, boneIds[j], (char *)matrix);
+            qcopy(point, &offsets[j]);
+            radius = point[3];
+            point[3] = 1.0f;
+            transform_vector(point, point, matrix);
+            DrawBillboardQuad_L00(point, *(int *)(entity + 0x78), radius, 0.08f);
         }
     }
 }

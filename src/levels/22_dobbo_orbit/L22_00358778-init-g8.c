@@ -14,6 +14,7 @@ extern InitEntry12 D_L22_0021DDB0[];
 extern int * volatile D_L22_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L22_001CA260;
 
+/* Fills in the rows of a level-select menu in level order and sets the menu to the currently chosen entry. */
 int func_L22_00358778(char *obj) {
     int i, entry;
     int *list;

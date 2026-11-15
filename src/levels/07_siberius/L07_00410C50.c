@@ -14,54 +14,55 @@ extern int func_002E5CF8(int, int, void *);
 extern void func_002B0A68(void *, int, void *, float, float, float, float, int);
 extern void func_0029F338(void *);
 
-void func_L07_00410C50(unsigned char *object)
+/* Updates a falling Siberius debris piece (moby class 4776): it drifts down, hurts what it touches, then bursts into an effect and disappears. */
+void func_L07_00410C50(unsigned char *moby)
 {
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     TI128 effect;
     float length, ratio;
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        *(unsigned short *)(object + 0x34) |= 0x100;
-        func_002833F0(object + 0xc0, object + 0xf0);
-        if (*(int *)(state + 0xc) == 1) func_00282D30(object + 0xe0, object + 0xe0, 2.0f);
-        else if (*(int *)(state + 0xc) == -1) func_00282D30(object + 0xe0, object + 0xe0, 0.5f);
-        if (*(int *)(state + 0x24) == 0) {
-            *(int *)(state + 0x10) = 0;
-            *(int *)(state + 0x14) = 0;
-            *(float *)(state + 0x18) = -(func_002A7878(3.0f, 6.0f) * 0.016666668f);
-        } else func_00282D30(state + 0x10, state + 0x10, 0.016666668f);
-        *(float *)(state + 4) = func_002A7878(13.0f, 20.0f) * 0.00027777778f;
-        length = func_00282DF0(object + 0xe0);
-        ratio = *(float *)(object + 0x2c) / *(float *)(*(char **)(object + 0x24) + 0x24);
+        *(unsigned short *)(moby + 0x34) |= 0x100;
+        euler_rotation_basis(moby + 0xc0, moby + 0xf0);
+        if (*(int *)(vars + 0xc) == 1) FastVecScale(moby + 0xe0, moby + 0xe0, 2.0f);
+        else if (*(int *)(vars + 0xc) == -1) FastVecScale(moby + 0xe0, moby + 0xe0, 0.5f);
+        if (*(int *)(vars + 0x24) == 0) {
+            *(int *)(vars + 0x10) = 0;
+            *(int *)(vars + 0x14) = 0;
+            *(float *)(vars + 0x18) = -(RandomFloatRange(3.0f, 6.0f) * 0.016666668f);
+        } else FastVecScale(vars + 0x10, vars + 0x10, 0.016666668f);
+        *(float *)(vars + 4) = RandomFloatRange(13.0f, 20.0f) * 0.00027777778f;
+        length = FastVecLength(moby + 0xe0);
+        ratio = *(float *)(moby + 0x2c) / *(float *)(*(char **)(moby + 0x24) + 0x24);
         ratio *= length * -10.0f;
-        *(float *)(state + 0x20) = ratio;
-        if (*(float *)(state + 8) == 0.0f)
-            *(float *)(state + 8) = func_002A89A8(object + 0x10, 0, 0.5f);
-        func_002A7750(object, 1, -1);
+        *(float *)(vars + 0x20) = ratio;
+        if (*(float *)(vars + 8) == 0.0f)
+            *(float *)(vars + 8) = ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002A9640(object, 0x4010000, 0) && !*(int *)state)
-            func_002A7750(object, 2, -1);
-        object[0xa8] = 255;
+        if (FindOwnedEffectSlot(moby, 0x4010000, 0) && !*(int *)vars)
+            SetMobyState(moby, 2, -1);
+        moby[0xa8] = 255;
         break;
     case 2:
-        func_00282CC0(object + 0x10, object + 0x10, state + 0x10);
-        *(float *)(state + 0x18) -= *(float *)(state + 4);
-        if (*(int *)(state + 0x24)) {
-            func_L01_0031A278(object, &effect, 0.0f, 0.0f, *(float *)(state + 0x20));
-            func_002A8C28(object, &effect, 0x4010000, 0, 1, 0, 2.0f * (*(float *)(object + 0x2c) / *(float *)(*(char **)(object + 0x24) + 0x24)), 8.0f, 1.0f);
+        FastVecAdd(moby + 0x10, moby + 0x10, vars + 0x10);
+        *(float *)(vars + 0x18) -= *(float *)(vars + 4);
+        if (*(int *)(vars + 0x24)) {
+            ComputeMobyLocalPoint(moby, &effect, 0.0f, 0.0f, *(float *)(vars + 0x20));
+            SweepCollisionFromObject(moby, &effect, 0x4010000, 0, 1, 0, 2.0f * (*(float *)(moby + 0x2c) / *(float *)(*(char **)(moby + 0x24) + 0x24)), 8.0f, 1.0f);
         }
-        if (*(float *)(object + 0x18) + *(float *)(state + 0x20) < *(float *)(state + 8))
-            func_002A7750(object, 4, -1);
+        if (*(float *)(moby + 0x18) + *(float *)(vars + 0x20) < *(float *)(vars + 8))
+            SetMobyState(moby, 4, -1);
         break;
     case 4:
-        func_002E5CF8(0, 0, object);
-        if (object[0x31]) {
+        PlayMobySound(0, 0, moby);
+        if (moby[0x31]) {
             effect = 0;
             ((float *)&effect)[2] = 0.050000004f;
-            func_002B0A68(object, 3, &effect, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            SpawnDebrisForMaskedParts(moby, 3, &effect, 3.0f, 6.0f, 3.0f, 6.0f, 255);
         }
-        func_0029F338(object);
+        MarkMobySpawned(moby);
         break;
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002BE7E8 in its own unit for the grouped lq/sq profile. */
 
@@ -25,26 +26,26 @@ extern char D_001B5340[];
    target or follows one of its bones, pulled 0.4 toward D_001B5340. */
 void func_002BE7E8(char *effect)
 {
-    Follow_002BE7E8 *f;
+    Follow_002BE7E8 *follow;
     float bone[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
 
     if (effect == 0)
         return;
-    f = (Follow_002BE7E8 *)(effect + 0x20);
-    if (func_00282978(effect + 0x24) != 0 || f->target == 0 || f->target[0x20] < 0) {
-        func_002B9180(effect);
+    follow = (Follow_002BE7E8 *)(effect + 0x20);
+    if (FastDecTimer(effect + 0x24) != 0 || follow->target == 0 || follow->target[0x20] < 0) {
+        KillParticle(effect);
         return;
     }
-    if (f->timer < f->duration / 5)
+    if (follow->timer < follow->duration / 5)
         *(int *)(effect + 4) = (*(int *)(effect + 4) & 0xFFFFFF)
-                               + ((f->alpha * f->timer) / (f->duration / 3) << 24);
-    if (f->bone == -1) {
-        *(TI128 *)(effect + 0x10) = *(TI128 *)(f->target + 0x10);
+                               + ((follow->alpha * follow->timer) / (follow->duration / 3) << 24);
+    if (follow->bone == -1) {
+        *(TI128 *)(effect + 0x10) = *(TI128 *)(follow->target + 0x10);
     } else {
-        func_0029FCC0(f->target, f->bone, bone);
-        func_00282CF0(dir, D_001B5340, bone);
-        func_00282F20(dir, dir, 0.4f);
-        func_00282CC0(effect + 0x10, bone, dir);
+        TransformMobyJointToWorld(follow->target, follow->bone, bone);
+        FastVecSub(dir, gCameraState_001B5340, bone);
+        vec_scale_to_length(dir, dir, 0.4f);
+        FastVecAdd(effect + 0x10, bone, dir);
     }
 }

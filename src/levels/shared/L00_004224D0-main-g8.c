@@ -134,6 +134,7 @@ extern void func_L00_00424A50(float,float),func_L00_00424A08(int,float,float);
 extern void func_L00_00424A88(int,float,float),func_L00_00424B70(float,float);
 extern void func_L00_00424B48(int);
 
+/* Updates the follow camera each frame: sets its distance, height and speed to suit what the hero is doing, eases toward a locked-on target, and tracks whether something is blocking the view. */
 void func_L00_004224D0(CameraMoby *obj)
 {
     float local[4];
@@ -141,78 +142,78 @@ void func_L00_004224D0(CameraMoby *obj)
     int *state=p->state;
     CameraRates *r=&p->rates;
     CameraOffsets *q=&p->offsets;
-    int special=0, mode=func_L00_002D71A0(), i, count;
+    int special=0, mode=UpdateCameraOverrides(), i, count;
     float a,b;
-    if (D_00189E20.state==124 || D_00189E20.state==120) r->h4e=1;
-    if (!D_00189E20.i340 || q->ticks) {
+    if (gHeroState.state==124 || gHeroState.state==120) r->h4e=1;
+    if (!gHeroState.i340 || q->ticks) {
         float a=q->fF0;
         if (a>2.0f) a=2.0f;
         q->weight=(D_L00_001B14A4-0.002f)*(a*0.5f)+0.002f;
-        if (D_00189E20.i340) func_00282948(&q->ticks);
+        if (gHeroState.i340) FastFloatHelperD(&q->ticks);
         else q->ticks=15;
     }
-    if (D_00189E20.moveState==30) {
+    if (gHeroState.moveState==30) {
         obj->vars->offsets.distance=0.75f;
         ref_L00_004224D0_00(0.04f,0.2f);
     }
-    if (D_001A79F0==1 && D_00189E20.state==48 && D_00189E20.position[2]>75.0f && D_00189E20.position[2]<105.0f) {
-        func_L00_00424B20(0.8726646900177002f);
-        func_L00_00424C60();
+    if (gCurrentMapIndex==1 && gHeroState.state==48 && gHeroState.position[2]>75.0f && gHeroState.position[2]<105.0f) {
+        SetCameraTuningValue(0.8726646900177002f);
+        SetCameraInputFlags();
     }
-    if (D_00189E20.i24a0==13 && D_00189E20.h21a) {
-        a=func_00283B98(D_00189E20.f574,3.1415929794311523f);
-        local[0]=func_00283180(a);
-        local[1]=func_00283198(a);
+    if (gHeroState.i24a0==13 && gHeroState.h21a) {
+        a=FastAddRotations(gHeroState.f574,3.1415929794311523f);
+        local[0]=FastSinOrCosA(a);
+        local[1]=FastSinOrCosB(a);
         local[2]=0;
-        func_L00_00424F00((char *)local,0.20943953f,local[2]);
-        func_L00_00424C28();
+        SetCameraStrengthAndSteer((char *)local,0.20943953f,local[2]);
+        SetCameraLockFlag();
     }
-    if (D_00189E20.moveState==17) {
+    if (gHeroState.moveState==17) {
         obj->vars->offsets.distance=0.25f;
-        func_L00_00424A50(0.5f,0.003f);
+        follow_camera_set_height(0.5f,0.003f);
     }
-    if (D_00189E20.moveState==5 && !D_L00_001A8FF0) {
+    if (gHeroState.moveState==5 && !D_L00_001A8FF0) {
         CameraOffsets *specialVars=&obj->vars->offsets; special=1;
-        if (D_00189E20.b22b4==1 && mode==-1) {
+        if (gHeroState.b22b4==1 && mode==-1) {
             specialVars->distance=0.25f;
-            func_L00_00424A50(1.5f,0.003f);
+            follow_camera_set_height(1.5f,0.003f);
         } else {
             specialVars->distance=0.25f;
-            func_L00_00424A50(2.5f,0.003f);
+            follow_camera_set_height(2.5f,0.003f);
         }
     }
-    if (D_00189E20.moveState==16) obj->vars->offsets.distance=0.25f;
-    if (D_00189E20.b22b4==1) {
+    if (gHeroState.moveState==16) obj->vars->offsets.distance=0.25f;
+    if (gHeroState.b22b4==1) {
         if (!state[0] && mode==-1) {
             CameraOffsets *followVars=&obj->vars->offsets;
-            func_L00_00424A08(1,3.0f,0.003f);
-            if (!special) { followVars->distance=1.0f;func_L00_00424A50(1.0f,0.003f); }
+            follow_camera_set_distance(1,3.0f,0.003f);
+            if (!special) { followVars->distance=1.0f;follow_camera_set_height(1.0f,0.003f); }
         }
         obj->vars->rates.f3c=0.6f;
     }
-    if (D_00189E20.b22b4==2) {
+    if (gHeroState.b22b4==2) {
         if (state[4]<2) {
-            func_L00_00424A88(0,D_L00_001B1594,0.005f);
-            func_L00_00424A08(1,D_L00_001B1598,0.003f);
-            func_L00_00424A50(D_L00_001B159C,0.003f);
+            SetCameraAimOffsetTarget(0,D_L00_001B1594,0.005f);
+            follow_camera_set_distance(1,D_L00_001B1598,0.003f);
+            follow_camera_set_height(D_L00_001B159C,0.003f);
             if (D_L00_001B8C80.state<2) {
                 CameraVars *base=obj->vars;
                 FollowParameters *follow=&base->follow;
-                float *pos=obj->position,*dir=D_00189E20.position,*aim=q->vector50;
+                float *pos=obj->position,*dir=gHeroState.position,*aim=q->vector50;
                 follow->distance=D_L00_001B1598;
                 follow->height=D_L00_001B159C;
                 q->distance=D_L00_001B1594;
-                func_L00_00423038(1);
+                UpdateFollowCameraOrientation(1);
                 {
                 CameraRates *rates=&obj->vars->rates;
                 CameraVars *vars=obj->vars;
                 CameraParams *params=&vars->params;
-                func_00282D30(local,D_00189E20.direction,-follow->height);
-                func_00282CC0(aim,dir,local);
-                func_00282CF0(follow,pos,aim);
+                FastVecScale(local,gHeroState.direction,-follow->height);
+                FastVecAdd(aim,dir,local);
+                FastVecSub(follow,pos,aim);
                 qcopy(base->follow.copy,follow->vector);
-                func_00282D30(local,D_00189E20.direction,-q->distance);
-                func_00282CC0(q->vector40,dir,local);
+                FastVecScale(local,gHeroState.direction,-q->distance);
+                FastVecAdd(q->vector40,dir,local);
                 qcopy(q->vector90,q->vector40);
                 qcopy(q->position,dir);
                 qcopy(q->vector60,q->position);
@@ -231,7 +232,7 @@ void func_L00_004224D0(CameraMoby *obj)
                 }
             }
         }
-        func_L00_00424C00();
+        SetCameraSnapFlag();
         {
             CameraRates *rates=&obj->vars->rates;
             rates->f3c=D_L00_001B15A4;
@@ -250,58 +251,58 @@ void func_L00_004224D0(CameraMoby *obj)
         if (targetState==254) camera->target=0;
         else if (targetState==253) camera->target=0;
         else {
-            if (func_00282C48(D_00138180.stickX)>=0.3f || func_00282C48(D_00138180.stickY)>=0.3f) camera->targetTicks=640;
+            if (FloatAbs(gPadState.stickX)>=0.3f || FloatAbs(gPadState.stickY)>=0.3f) camera->targetTicks=640;
             if (D_L00_001B8C80.targetTicks>400) {
-                func_00282948(&D_L00_001B8C80.targetTicks);
+                FastFloatHelperD(&D_L00_001B8C80.targetTicks);
                 if (D_L00_001B8C80.targetTicks<401) D_L00_001B8C80.targetTicks=0;
             } else {
                 D_L00_001B8C80.targetTicks++;
                 if (D_L00_001B8C80.targetTicks>400) D_L00_001B8C80.targetTicks=400;
-                a=func_00283CE0(D_L00_001B8C80.targetTicks);a/=func_00283CE0(400);
-                func_L00_00424F58(D_L00_001B8C80.target+0x10,a*1.5707964897155762f,0.0f);
-                func_L00_00424C28();func_L00_00424B70(0.03f,0.2f);
+                a=IntToFloat(D_L00_001B8C80.targetTicks);a/=IntToFloat(400);
+                SetCameraStrengthAndSteerToTarget(D_L00_001B8C80.target+0x10,a*1.5707964897155762f,0.0f);
+                SetCameraLockFlag();SetCameraSpeedsIfNonZero(0.03f,0.2f);
             }
         }
     }
     }
-    if (D_00189E20.p1450 && *(signed char *)(D_00189E20.p1450+0x20)>=0) {
+    if (gHeroState.p1450 && *(signed char *)(gHeroState.p1450+0x20)>=0) {
         D_L00_001B8C80.targetTicks++;
         if (D_L00_001B8C80.targetTicks>400) D_L00_001B8C80.targetTicks=400;
-        a=func_00283CE0(D_L00_001B8C80.targetTicks);a/=func_00283CE0(400);
-        func_L00_00424F58(D_00189E20.p1450+0x10,a*1.5707964897155762f,0.0f);
-        func_L00_00424C28();func_L00_00424B70(0.03f,0.2f);
+        a=IntToFloat(D_L00_001B8C80.targetTicks);a/=IntToFloat(400);
+        SetCameraStrengthAndSteerToTarget(gHeroState.p1450+0x10,a*1.5707964897155762f,0.0f);
+        SetCameraLockFlag();SetCameraSpeedsIfNonZero(0.03f,0.2f);
     }
-    if (!D_L00_001B8C80.target && !D_00189E20.p1450) D_L00_001B8C80.targetTicks=0;
-    if (D_00189E20.state==129) {
-        func_L00_00424C28();func_L00_00424B70(1,1);
-        ref_L00_004224D0_00(0.06f,0.2f);func_L00_00424C00();
+    if (!D_L00_001B8C80.target && !gHeroState.p1450) D_L00_001B8C80.targetTicks=0;
+    if (gHeroState.state==129) {
+        SetCameraLockFlag();SetCameraSpeedsIfNonZero(1,1);
+        ref_L00_004224D0_00(0.06f,0.2f);SetCameraSnapFlag();
     }
-    if (D_00189E20.state==123) {
-        func_L00_00424B70(0.04f,0.2f);
-        func_L00_00424F00(D_00189E20.p2290+0xc0,0.7853982448577881f,0);
-        func_L00_00424A08(0,3,0.003f);func_L00_00424C00();
+    if (gHeroState.state==123) {
+        SetCameraSpeedsIfNonZero(0.04f,0.2f);
+        SetCameraStrengthAndSteer(gHeroState.p2290+0xc0,0.7853982448577881f,0);
+        follow_camera_set_distance(0,3,0.003f);SetCameraSnapFlag();
     }
-    if (state[4]<2 && D_00189E20.state!=129 &&
-        (D_00189E20.state==126 || D_00189E20.state==130 || D_00189E20.h1454) && (D_00138180.buttons&3)) {
+    if (state[4]<2 && gHeroState.state!=129 &&
+        (gHeroState.state==126 || gHeroState.state==130 || gHeroState.h1454) && (gPadState.buttons&3)) {
         CameraVars *resetVars;
-        func_L00_00424B48(0);func_L00_00424C28();func_L00_00424B70(0.04f,0.2f);
+        set_follow_camera_orbit_clamp_mode(0);SetCameraLockFlag();SetCameraSpeedsIfNonZero(0.04f,0.2f);
         resetVars=obj->vars;resetVars->timer16=0;resetVars->timer12=0;resetVars->timer14=0;
     } else if (D_L00_001B1590) {
         CameraVars *timerVars=obj->vars;a=0;
-        for(i=0;i<4;i++) { local[i]=func_00283C80(D_L00_001B8E20.samples[i],D_L00_001B8E20.samples[i+1]);a+=local[i]; }
+        for(i=0;i<4;i++) { local[i]=FastDiffRots(D_L00_001B8E20.samples[i],D_L00_001B8E20.samples[i+1]);a+=local[i]; }
         b=5.0f;a*=0.25f;b=a*b;if(b>1)b=1;b=1-b;
         if (b<D_L00_001B1578) timerVars->timer12=32;
         if (timerVars->timer12) {
-            if (func_00282978(&timerVars->timer12)) timerVars->timer14=45;
-            func_L00_00424C28();timerVars->timer16++;
+            if (FastDecTimer(&timerVars->timer12)) timerVars->timer14=45;
+            SetCameraLockFlag();timerVars->timer16++;
             if (timerVars->timer16>30) timerVars->timer16=30;
-            a=func_00283CE0(timerVars->timer16);a/=func_00283CE0(30);
-            func_L00_00424B70((D_L00_001B157C-0.015f)*a+0.015f,0.2f);
+            a=IntToFloat(timerVars->timer16);a/=IntToFloat(30);
+            SetCameraSpeedsIfNonZero((D_L00_001B157C-0.015f)*a+0.015f,0.2f);
             D_L00_001A8900=0;
         } else {
             if (timerVars->timer14) {
-                func_00282978(&timerVars->timer14);
-                a=func_00283CE0(timerVars->timer14);a/=func_00283CE0(45);
+                FastDecTimer(&timerVars->timer14);
+                a=IntToFloat(timerVars->timer14);a/=IntToFloat(45);
                 a*=-0.85f;
                 a+=0.85f;
                 D_L00_001A8900=a;
@@ -313,11 +314,11 @@ void func_L00_004224D0(CameraMoby *obj)
         }
     }
     state[4]=0;
-    count=func_00277F48(D_00189E20.position,1,(int)D_00189E20.p2290,0,15.0f);
+    count=ProcessCollisionHit(gHeroState.position,1,(int)gHeroState.p2290,0,15.0f);
     if (count>0) {
     int targetIndex;
     for(targetIndex=0;targetIndex<count;targetIndex++) {
-        char *candidate=func_002AB1F0(D_L00_001C3280[targetIndex]);
+        char *candidate=GetMobyPrivateValue0(gAreaHitTargets[targetIndex]);
         if (candidate && (float)B(candidate,0xd)!=0.0f) { state[4]=1;break; }
     }
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 typedef signed short s16;
 typedef unsigned char u8;
 typedef signed int s32;
@@ -18,10 +19,11 @@ extern s32 D_L05_00221D10[];
 extern s32 D_L05_001B2048;
 extern u8 *D_L05_001B2614;
 
-void func_L05_00420FB0(u8 *arg0) {
-    s32 n;
+/* Controls the third Feltzin mission: sets up the scene once, then starts the reward. */
+void func_L05_00420FB0(u8 *moby) {
+    s32 remaining;
     s32 count;
-    u8 **p;
+    u8 **objects;
 
     if (D_L05_001B1364 == 0) {
         D_L05_00221D10[11] = 0;
@@ -29,21 +31,21 @@ void func_L05_00420FB0(u8 *arg0) {
         func_003404B8();
         func_0037B210();
         func_00379F18(0);
-        p = func_00379EB8();
+        objects = func_00379EB8();
         count = func_00379EC8();
         if (count > 0) {
-            n = count;
+            remaining = count;
             do {
-                if (*(s16 *)(*p + 0xAA) == 0xF73) {
-                    func_0037B280(*p, 1);
-                    func_0037CEE0(*p, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
-                    func_0037D608(*p, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
+                if (*(s16 *)(*objects + 0xAA) == 0xF73 /* moby class 3955 */) {
+                    func_0037B280(*objects, 1);
+                    func_0037CEE0(*objects, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
+                    func_0037D608(*objects, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
                 }
-                n--;
-                p++;
-            } while (n);
+                remaining--;
+                objects++;
+            } while (remaining);
         }
     }
     if (D_L05_00221D10[4] == 0 && D_L05_001B2048 >= 6)
-        func_L05_00420788(arg0, 2);
+        UpdateFeltzinMissionReward(moby, 2);
 }

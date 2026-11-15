@@ -12,32 +12,33 @@ extern void func_003476C8(void *, float, float, float, float);
 extern void func_L18_00426F28(void *, int, int, float);
 extern void func_00335668(void *, int, int);
 extern void func_002C27F0(void *, int);
-int func_L18_00428138(u8 *obj) {
-    u8 *state = *(u8 **)(obj + 0x68);
+/* Checks whether the player is close enough for the enemy to notice. If so, it starts the alert move and returns 1. */
+int func_L18_00428138(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
     float range;
     if (D_L18_001AFBB0 || D_L18_00189E20.guard || D_L18_00189E20.mode == 0x6F) return 0;
     range = D_L18_001B1284;
-    switch (*(s16 *)(obj + 0xAA)) {
-    case 0xEC0:
-        if (func_00308AD0(obj + 0x10, state + 0x220) < D_L18_001B126C && !*(s16 *)(state + 0x396) && !D_L18_001AFBB0 && D_L18_00189E20.mode != 0x6F) {
-            func_003476C8(obj, *(float *)(state + 0x3CC) * 0.00027777778f, *(float *)(state + 0x3C8) * 0.016666668f, *(float *)(state + 0x3DC) * 0.0000048481374f, *(float *)(state + 0x3D8) * 0.00029088824f);
+    switch (*(s16 *)(moby + 0xAA)) {
+    case 0xEC0 /* moby class 3776 */:
+        if (func_00308AD0(moby + 0x10, state + 0x220) < D_L18_001B126C && !*(s16 *)(state + 0x396) && !D_L18_001AFBB0 && D_L18_00189E20.mode != 0x6F) {
+            func_003476C8(moby, *(float *)(state + 0x3CC) * 0.00027777778f, *(float *)(state + 0x3C8) * 0.016666668f, *(float *)(state + 0x3DC) * 0.0000048481374f, *(float *)(state + 0x3D8) * 0.00029088824f);
             *(u16 *)(state + 0x392) = D_L18_001B1240;
-            func_L18_00426F28(obj, 10, 0, 10.0f);
-            func_00335668(obj, 6, -1);
+            StartOrForwardAnimation(moby, 10, 0, 10.0f);
+            func_00335668(moby, 6, -1);
             return 1;
         }
         return 0;
-    case 0xED4:
+    case 0xED4 /* moby class 3796 */:
         range = D_L18_001B1280;
-    case 0xEE1:
-        if (func_00308AD0(obj + 0x10, state + 0x220) < range && !*(s16 *)(state + 0x396) && !D_L18_001AFBB0 && D_L18_00189E20.mode != 0x6F) {
-            func_L18_00426F28(obj, 10, 0, 10.0f);
-            func_00335668(obj, 6, -1);
+    case 0xEE1 /* Receiver Bot */:
+        if (func_00308AD0(moby + 0x10, state + 0x220) < range && !*(s16 *)(state + 0x396) && !D_L18_001AFBB0 && D_L18_00189E20.mode != 0x6F) {
+            StartOrForwardAnimation(moby, 10, 0, 10.0f);
+            func_00335668(moby, 6, -1);
             return 1;
         }
         return 0;
     default:
-        func_002C27F0(D_L18_001B1308, *(s16 *)(obj + 0xAA));
+        func_002C27F0(D_L18_001B1308, *(s16 *)(moby + 0xAA));
         return 0;
     }
 }

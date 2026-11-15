@@ -48,21 +48,21 @@ extern void func_L03_003E3430(u8 *);
    0.5, or above -0.1 when none of the node's components is zero); then sets the orientation
    from the angles at +0xF0, builds the path (func_L03_003E2968, func_L03_003E2C08) and the
    choice list, and starts the walk at node 0 with the starting timer. */
-void func_L03_003E26C8(u8 *p) {
-    PuzzlePath *q = *(PuzzlePath **)(p + 0x68);
+void func_L03_003E26C8(u8 *moby) {
+    PuzzlePath *pathState = *(PuzzlePath **)(moby + 0x68);
     u8 *position;
     u8 *rotation;
     PuzzleNode *node;
     int k, row, col, i, j, n, m;
-    f32 d, t;
+    f32 similarity, limit;
 
     for (k = 0; k < 14; k++) {
-        func_00282F20(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
-        q->facing[k] = 255;
+        vec_scale_to_length(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
+        pathState->facing[k] = 255;
     }
-    q->facing[14] = 255;
-    rotation = p + 0xC0;
-    position = p + 0xF0;
+    pathState->facing[14] = 255;
+    rotation = moby + 0xC0;
+    position = moby + 0xF0;
 
     for (row = 0; row < 14; row++)
         for (col = 0; col < 6; col++)
@@ -73,36 +73,36 @@ void func_L03_003E26C8(u8 *p) {
         for (j = 0; j < 14; j++) {
             if (i != j) {
                 node = &D_L03_0029BBF0[i];
-                d = func_00282DB0(node, &D_L03_0029BBF0[j]);
-                t = 0.5f;
+                similarity = FastVecDot(node, &D_L03_0029BBF0[j]);
+                limit = 0.5f;
                 if (node->x != 0.0f && node->y != 0.0f && node->z != 0.0f)
-                    t = -0.1f;
-                if (d > t)
+                    limit = -0.1f;
+                if (similarity > limit)
                     D_0024A7B0[i][n++] = j;
             }
         }
     }
 
-    func_002AB6D8(rotation, position);
-    func_002A91F0(D_L03_001B36B0, position);
-    func_001163A0(q->sound);
-    func_L03_003E2968(p);
-    func_L03_003E2C08(p);
-    func_L03_003E3308(p);
-    func_L03_003E3430(p);
+    GetEulerAnglesFromMatrix(rotation, position);
+    BuildRotationFromAngles(D_L03_001B36B0, position);
+    Srand(pathState->sound);
+    GeneratePathPuzzleRoute(moby);
+    SelectPathStepNodes(moby);
+    BuildChoiceList(moby);
+    ChoosePathPuzzleNextNode(moby);
 
     for (m = 0; m < 16; m++) {
-        q->order[m] = 255;
-        q->visited[m] = 0;
+        pathState->order[m] = 255;
+        pathState->visited[m] = 0;
     }
-    q->order[0] = 0;
-    q->visited[0] = 1;
-    q->pending = -1;
-    q->timer = D_L03_001B0B5C;
-    q->current = 0;
-    q->last = 0;
-    q->next = 0;
-    q->cursor = 0;
-    q->depth = 0;
-    q->length = 0;
+    pathState->order[0] = 0;
+    pathState->visited[0] = 1;
+    pathState->pending = -1;
+    pathState->timer = D_L03_001B0B5C;
+    pathState->current = 0;
+    pathState->last = 0;
+    pathState->next = 0;
+    pathState->cursor = 0;
+    pathState->depth = 0;
+    pathState->length = 0;
 }

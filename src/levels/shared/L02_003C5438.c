@@ -8,19 +8,19 @@ extern void *func_002C2210(void *, u32, u32, f32, f32, u32, s32, void *, f32, s3
 extern char D_L02_001A8F20[] __attribute__((sda));
 
 /* Spawn one particle and, when both secondary parameters are set, its opposite. */
-void func_L02_003C5438(void *a0, void *a1, void *a2, void *a3, void *a4)
+void func_L02_003C5438(void *pos, void *primaryA, void *primaryB, void *secondaryA, void *secondaryB)
 {
-    TI128 v;
-    float f20;
-    float f21 = 0.0f;
-    int s2;
+    TI128 posCopy;
+    float scale;
+    float zero = 0.0f;
+    int sign;
 
-    v = *(TI128 *)a0;
-    f20 = func_002A7878(2.0f, 4.0f);
-    s2 = func_002A77E0(2);
-    if (s2 == 0)
-        s2--;
-    func_002C2210(&v, (u32)a1, (u32)a2, f20 * 0.3f, f20, 0, s2, D_L02_001A8F20, f21, 0);
-    if (a3 != 0 && a4 != 0)
-        func_002C2210(&v, (u32)a3, (u32)a4, f20 * 0.04f, f20 * 0.4f, 1, -s2, D_L02_001A8F20, f21, 0);
+    posCopy = *(TI128 *)pos;
+    scale = RandomFloatRange(2.0f, 4.0f);
+    sign = RandomIntBelow(2);
+    if (sign == 0)
+        sign--;
+    SpawnGroundEffectParticle(&posCopy, (u32)primaryA, (u32)primaryB, scale * 0.3f, scale, 0, sign, D_L02_001A8F20, zero, 0);
+    if (secondaryA != 0 && secondaryB != 0)
+        SpawnGroundEffectParticle(&posCopy, (u32)secondaryA, (u32)secondaryB, scale * 0.04f, scale * 0.4f, 1, -sign, D_L02_001A8F20, zero, 0);
 }

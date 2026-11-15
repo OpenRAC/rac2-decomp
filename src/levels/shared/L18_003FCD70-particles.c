@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int s32;
 typedef float f32;
 typedef int Quad __attribute__((mode(TI)));
@@ -22,11 +23,11 @@ void func_L18_003FCD70(char *self) {
     char *state = *(char **)(self + 0x68);
     s32 count, i;
     *(Quad *)direction = 0;
-    count = func_002A77E0(5);
+    count = RandomIntBelow(5);
     for (i = 0; i < count + 1; i++) {
         *(Quad *)point = *(Quad *)(state + 0x90);
-        func_002ACB48(point, 0.5f);
-        func_002ACB48(direction, 0.008333333767950535f);
-        func_L02_003449D8(point, direction, &D_L18_001B0730, (void *)1, func_002A7820(-5, 5));
+        AddRandomOffsetToVector(point, 0.5f);
+        AddRandomOffsetToVector(direction, 0.008333333767950535f);
+        SpawnEnemyRecord(point, direction, &D_L18_001B0730, (void *)1, RandomIntRange(-5, 5));
     }
 }

@@ -42,6 +42,7 @@ extern void func_00280B90(void *, int, int);
    The locals are declared together at the top, the counter and the two pointers last: gcc numbers
    a pseudo at its declaration, and PRE's reaching registers take their stack slots in the order of
    the hash of the base register, so these declarations decide the order of the spill slots. */
+/* Draws the rippling inner blast shell as 143 quads and starts a spark effect on each quad that faces the camera. */
 void func_L00_003E6030(char *object)
 {
     Quad6030 q;
@@ -60,7 +61,7 @@ void func_L00_003E6030(char *object)
     int index = 0;
     char *data = *(char **)(object + 0x68);
     tex_index = D_L00_001B0634;
-    tex_reg = func_0027C878(tex_index);
+    tex_reg = GetEffectTextureDescriptor(tex_index);
     q.gs[1] = tex_reg;
     alpha_a = D_L00_001B0620;
     alpha_b = D_L00_001B0624;
@@ -75,9 +76,9 @@ void func_L00_003E6030(char *object)
     frame_reg = 0xFF9000000260UL;
     q.gs[2] = frame_reg;
     q.gs[0] = 0;
-    func_00282C88(matrix[0]);
-    func_00282C88(matrix[1]);
-    func_00282C88(matrix[2]);
+    ClearVector128(matrix[0]);
+    ClearVector128(matrix[1]);
+    ClearVector128(matrix[2]);
     scale_x = *(float *)(data + 16) * 0.0625f + 1.0f;
     matrix[0][0] = scale_x;
     scale_y = *(float *)(data + 16) * 0.0625f + 1.0f;
@@ -92,7 +93,7 @@ void func_L00_003E6030(char *object)
         for (i = 0; i < 4; i++) {
             vertex_index = D_L00_0029A090[index][i][0];
             uv_index = D_L00_0029A090[index][i][1];
-            func_00282D30(q.vertices[i], D_L00_00299830[vertex_index], D_L00_001B063C);
+            FastVecScale(q.vertices[i], D_L00_00299830[vertex_index], D_L00_001B063C);
             u = D_L00_0029A990[uv_index][0];
             q.uv[i][0] = u;
             base_v = D_L00_0029A990[uv_index][1];
@@ -100,51 +101,51 @@ void func_L00_003E6030(char *object)
             v = base_v - scroll;
             q.uv[i][1] = v;
         }
-        func_00282C88(center);
+        ClearVector128(center);
         for (i = 0; i < 4; i++) {
-            func_00283098(q.vertices[i], q.vertices[i], matrix);
-            length = func_00282E20(q.vertices[i]);
+            matrix_mul_vec3(q.vertices[i], q.vertices[i], matrix);
+            length = vec_length_xy(q.vertices[i]);
             height = 1.5f - length * (2.0f / 3.0f);
             clamped = height > 0.0f ? height : 0.0f;
             amount = clamped * (2.0f / 3.0f);
-            swell = func_002A7798(amount);
+            swell = EaseOutQuad(amount);
             ripple = *(float *)(data + 16) * 1.5f;
             swell *= ripple;
             swell *= 0.00825f;
             q.vertices[i][2] += swell;
             lift = *(float *)(data + 16) * 0.15f;
             q.vertices[i][2] += lift;
-            func_00283098(q.vertices[i], q.vertices[i], moby + 192);
+            matrix_mul_vec3(q.vertices[i], q.vertices[i], moby + 192);
             px = *(float *)(moby + 16);
             q.vertices[i][0] += px;
             py = *(float *)(moby + 20);
             q.vertices[i][1] += py;
             pz = *(float *)(moby + 24);
             q.vertices[i][2] += pz;
-            func_00282CC0(center, center, q.vertices[i]);
+            FastVecAdd(center, center, q.vertices[i]);
         }
-        func_00282D30(center, center, 0.25f);
+        FastVecScale(center, center, 0.25f);
         qcopy(saved_center, center);
-        func_00282CF0(normal, center, D_L00_001B8DC0);
-        func_00282F20(normal, normal, 1.0f);
-        func_00282CF0(edge1, q.vertices[2], q.vertices[0]);
-        func_00282CF0(edge2, q.vertices[2], q.vertices[1]);
-        func_00282DD8(center, edge1, edge2);
-        func_00282F20(center, center, 1.0f);
-        facing = func_00282DB0(normal, center);
+        FastVecSub(normal, center, gCameraPosition_L00);
+        vec_scale_to_length(normal, normal, 1.0f);
+        FastVecSub(edge1, q.vertices[2], q.vertices[0]);
+        FastVecSub(edge2, q.vertices[2], q.vertices[1]);
+        FastVecCross(center, edge1, edge2);
+        vec_scale_to_length(center, center, 1.0f);
+        facing = FastVecDot(normal, center);
         if (facing > 0.0f) {
             if (D_L00_001B2B58[index] == 0) {
                 if (*(unsigned char *)(moby + 32) != 6)
-                    D_L00_001B2B58[index] = func_L00_003E6778(D_L00_001B2B50, 1, 0.0f, 0.0f, saved_center);
+                    D_L00_001B2B58[index] = AllocateOwnedEffectParticle(D_L00_001B2B50, 1, 0.0f, 0.0f, saved_center);
             } else if (*(int *)(D_L00_001B2B58[index] + 124) == 0) {
                 if (*(unsigned char *)(moby + 32) != 6)
-                    D_L00_001B2B58[index] = func_L00_003E6778(D_L00_001B2B50, 1, 0.0f, 0.0f, saved_center);
+                    D_L00_001B2B58[index] = AllocateOwnedEffectParticle(D_L00_001B2B50, 1, 0.0f, 0.0f, saved_center);
                 else
                     D_L00_001B2B58[index] = 0;
             }
             if (D_L00_001B2B58[index])
                 qcopy((void *)D_L00_001B2B58[index], saved_center);
-            func_00280B90(&q, 0, 0);
+            draw_world_quad(&q, 0, 0);
         }
     } while (++index < 143);
 }

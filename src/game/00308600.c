@@ -22,88 +22,89 @@ extern u8 *func_002BD8B0(V4 *, V4 *, s32, s32, s32, s32, f32);
 extern u8 *func_002BDCE8(V4 *, f32, f32, f32, f32, s32, V4 *, u32, s32);
 
 /* Adapted from RAC1 emit_beam_trail_particles (OpenRAC, GPL-3.0). */
-void func_00308DB8(X *x) {
-    V4 l0;
-    V4 a;
-    V4 d;
-    V4 t;
-    N *g;
-    f32 s;
-    f32 q;
-    u32 col;
+/* Spawns the smoke and spark particles that trail behind the beam at the player's hand. */
+void func_00308DB8(X *moby) {
+    V4 velocity;
+    V4 emitPos;
+    V4 trailDelta;
+    V4 midPoint;
+    N *vars;
+    f32 spacing;
+    f32 sizeFactor;
+    u32 color;
     s32 i;
-    s32 n;
-    s32 m;
-    u8 *p;
+    s32 count;
+    s32 heroWeapon;
+    u8 *particle;
 
-    g = x->f68;
-    l0.f[0] = func_00283180(func_002A7940()) * 0.05f;
-    l0.f[1] = func_00283198(func_002A7940()) * 0.05f;
-    l0.f[2] = 0.0f;
-    l0.f[2] = -func_002A7878(0.01f, 0.03f);
-    func_00283098(&l0, &l0, &x->vC0);
-    func_00282CC0(&l0, &l0, &D_00189E20.v150);
-    qcopy(&a, &x->v10);
-    if (D_00189E20.i2294 == 0x7B) {
-        if (D_001B1688 % 3 == 0) {
-            func_002BD8B0(&a, &l0, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
+    vars = moby->f68;
+    velocity.f[0] = FastSinOrCosA(RandomAngle()) * 0.05f;
+    velocity.f[1] = FastSinOrCosB(RandomAngle()) * 0.05f;
+    velocity.f[2] = 0.0f;
+    velocity.f[2] = -RandomFloatRange(0.01f, 0.03f);
+    matrix_mul_vec3(&velocity, &velocity, &moby->vC0);
+    FastVecAdd(&velocity, &velocity, &gHeroState.v150);
+    qcopy(&emitPos, &moby->v10);
+    if (gHeroState.i2294 == 0x7B) {
+        if (gGameTime % 3 == 0) {
+            SpawnTrailingSparkParticle(&emitPos, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
         }
     } else {
-        func_002BD8B0(&a, &l0, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
+        SpawnTrailingSparkParticle(&emitPos, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
     }
-    if (g->f0C) {
-        s = func_00282E48(&g->v10, &a) * 0.5f;
-        func_00282CF0(&d, &g->v10, &a);
+    if (vars->f0C) {
+        spacing = fast_vec_dist(&vars->v10, &emitPos) * 0.5f;
+        FastVecSub(&trailDelta, &vars->v10, &emitPos);
         for (i = 1; i < 2; i++) {
-            func_00282F20(&t, &d, s * (f32)i);
-            func_00282CC0(&t, &a, &t);
-            func_002BD8B0(&t, &l0, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
+            vec_scale_to_length(&midPoint, &trailDelta, spacing * (f32)i);
+            FastVecAdd(&midPoint, &emitPos, &midPoint);
+            SpawnTrailingSparkParticle(&midPoint, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
         }
     }
-    g->f00 = func_002A77E0(10);
-    q = 1.075f;
-    col = 0x808080;
-    l0.f[0] = 0.0f;
-    l0.f[1] = 0.0f;
-    l0.f[2] = -0.3f;
-    l0.f[3] = 1.0f;
-    func_00283098(&l0, &l0, &x->vC0);
-    func_00282CC0(&a, &x->v10, &l0);
-    l0.f[3] = 1.0f;
-    l0.f[2] = -0.075f;
-    l0.f[0] = 0.0f;
-    l0.f[1] = 0.0f;
-    func_00283098(&l0, &l0, &x->vC0);
-    l0.f[2] = 0.025f;
-    func_00282CC0(&l0, &l0, &D_00189E20.v150);
-    if (D_00189E20.i2294 == 8) {
-        col = 0xA0A0A0;
-        q = 1.0165f;
-        l0.f[2] -= 0.0833333358f;
+    vars->f00 = RandomIntBelow(10);
+    sizeFactor = 1.075f;
+    color = 0x808080;
+    velocity.f[0] = 0.0f;
+    velocity.f[1] = 0.0f;
+    velocity.f[2] = -0.3f;
+    velocity.f[3] = 1.0f;
+    matrix_mul_vec3(&velocity, &velocity, &moby->vC0);
+    FastVecAdd(&emitPos, &moby->v10, &velocity);
+    velocity.f[3] = 1.0f;
+    velocity.f[2] = -0.075f;
+    velocity.f[0] = 0.0f;
+    velocity.f[1] = 0.0f;
+    matrix_mul_vec3(&velocity, &velocity, &moby->vC0);
+    velocity.f[2] = 0.025f;
+    FastVecAdd(&velocity, &velocity, &gHeroState.v150);
+    if (gHeroState.i2294 == 8) {
+        color = 0xA0A0A0;
+        sizeFactor = 1.0165f;
+        velocity.f[2] -= 0.0833333358f;
     }
-    if (D_00189E20.i2294 == 0x7B) {
-        col = 0xA0A0A0;
-        q = 1.037f;
-        l0.f[2] -= 0.0500000045f;
+    if (gHeroState.i2294 == 0x7B) {
+        color = 0xA0A0A0;
+        sizeFactor = 1.037f;
+        velocity.f[2] -= 0.0500000045f;
     }
-    p = func_002BDCE8(&a, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
-    if (p) p[3] = 0x44;
-    if (g->f0C) {
-        s = func_00282E48(&g->v10, &a) * 0.16667f;
-        func_00282CF0(&d, &g->v10, &a);
-        m = D_00189E20.i2294;
-        n = 4;
-        if (m == 8) n = 2;
-        if (m == 0x7B) n = 1;
-        for (i = 1; i < n; i++) {
-            func_00282F20(&t, &d, s * (f32)i);
-            func_00282CC0(&t, &a, &t);
-            p = func_002BDCE8(&t, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
-            if (p) p[3] = 0x44;
+    particle = SpawnSpinningSparkParticle(&emitPos, 0.05f, 1.01f, sizeFactor, 30000.0f, 6, &velocity, color, 0);
+    if (particle) particle[3] = 0x44;
+    if (vars->f0C) {
+        spacing = fast_vec_dist(&vars->v10, &emitPos) * 0.16667f;
+        FastVecSub(&trailDelta, &vars->v10, &emitPos);
+        heroWeapon = gHeroState.i2294;
+        count = 4;
+        if (heroWeapon == 8) count = 2;
+        if (heroWeapon == 0x7B) count = 1;
+        for (i = 1; i < count; i++) {
+            vec_scale_to_length(&midPoint, &trailDelta, spacing * (f32)i);
+            FastVecAdd(&midPoint, &emitPos, &midPoint);
+            particle = SpawnSpinningSparkParticle(&midPoint, 0.05f, 1.01f, sizeFactor, 30000.0f, 6, &velocity, color, 0);
+            if (particle) particle[3] = 0x44;
         }
     }
-    qcopy(&g->v10, &a);
-    g->f0C = 1;
+    qcopy(&vars->v10, &emitPos);
+    vars->f0C = 1;
 }
 
 
@@ -144,38 +145,39 @@ extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void func_002AB8C0(char *, char *);
 
+/* Checks whether something hit the object. It takes damage from each hit and bursts when its health runs out. */
 void func_0030E700(char *object)
 {
-    char *state = *(char **)(object + 0x68);
-    char *hit = func_002A9640(object, 0x30001, 0);
+    char *vars = *(char **)(object + 0x68);
+    char *hit = FindOwnedEffectSlot(object, 0x30001, 0);
     float direction[4];
 
-    func_00282948((int *)(state + 0x28));
-    func_00282948((int *)(state + 0x2C));
-    if (hit != 0 && (*(int *)(hit + 0x20) != *(int *)(state + 0x34) ||
-                     *(int *)(state + 0x28) == 0)) {
-        *(int *)(state + 0x34) = *(int *)(hit + 0x20);
-        *(int *)(state + 0x28) = 30;
-        if (*(int *)(state + 0x2C) == 0) {
-            if (*(unsigned short *)(hit + 0x28) == 0x101 && *(int *)(state + 0x30) == 0) {
-                *(int *)(state + 0x2C) = 100;
-                *(int *)(state + 0x30) = 1;
+    FastFloatHelperD((int *)(vars + 0x28));
+    FastFloatHelperD((int *)(vars + 0x2C));
+    if (hit != 0 && (*(int *)(hit + 0x20) != *(int *)(vars + 0x34) ||
+                     *(int *)(vars + 0x28) == 0)) {
+        *(int *)(vars + 0x34) = *(int *)(hit + 0x20);
+        *(int *)(vars + 0x28) = 30;
+        if (*(int *)(vars + 0x2C) == 0) {
+            if (*(unsigned short *)(hit + 0x28) == 0x101 && *(int *)(vars + 0x30) == 0) {
+                *(int *)(vars + 0x2C) = 100;
+                *(int *)(vars + 0x30) = 1;
             } else {
-                *(int *)(state + 0x30) = 0;
+                *(int *)(vars + 0x30) = 0;
             }
         }
-        func_002E5CF8(0, 0, object);
-        *(float *)(state + 0x24) -= *(float *)(hit + 0x2C);
-        func_002AB800(object, state);
-        if (*(float *)(state + 0x24) < 0.0f) {
-            func_002ACB48(direction, 0.5f);
-            func_002ABBB8(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
+        PlayMobySound(0, 0, object);
+        *(float *)(vars + 0x24) -= *(float *)(hit + 0x2C);
+        StartColorFade(object, vars);
+        if (*(float *)(vars + 0x24) < 0.0f) {
+            AddRandomOffsetToVector(direction, 0.5f);
+            SpawnExplosionEffects(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             object[0x20] = 6;
         }
     }
     ((unsigned char *)object)[0xA8] = 0xFF;
-    func_002AB8C0(object, state);
+    UpdateColorFade(object, vars);
 }
 
 /* func_0030E8A8 is defined in 00308600-spring.c. */

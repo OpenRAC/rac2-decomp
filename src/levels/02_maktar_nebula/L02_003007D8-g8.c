@@ -43,58 +43,59 @@ extern char D_L02_001A9420[8] __attribute__((sda));
    The unit is built with -g: the line label that then precedes the first div.s (the scheduler moves the
    next line's `li` above it) makes the assembler pad it with the two nops retail has, and the second
    div.s, which has no label in front of it, stays unpadded. */
+/* During the intro cutscene, shows the timed picture overlays and fades them into each other. */
 void func_L02_003007D8(void *unused) {
-    L02_Table10 tab;
-    int k, n, alpha, id, id2, extra;
-    float frac;
+    L02_Table10 frameTable;
+    int tableIndex, fadeFrame, alpha, overlayId, fadeOutId, extra;
+    float fadeFraction;
 
-    if (D_001A79F0 == 2) {
+    if (gCurrentMapIndex == 2) {
         int first_end = 0x136, second_end = 0x17C, third_end = 0x190;
 
-        tab = D_L02_001A9460;
+        frameTable = D_L02_001A9460;
         if (D_L02_001BE200.time >= 0x10B) {
             if (D_L02_001BE200.time < 0x115) {
-                k = D_L02_001BE200.time - 0x10B;
-                if (k < 10)
-                    D_L02_001B2FE4 = tab.v[k];
+                tableIndex = D_L02_001BE200.time - 0x10B;
+                if (tableIndex < 10)
+                    D_L02_001B2FE4 = frameTable.v[tableIndex];
             }
         }
-        id = -1;
-        id2 = -1;
+        overlayId = -1;
+        fadeOutId = -1;
         alpha = 0x80;
         extra = 0;
         if (D_L02_001BE200.time > 0 && D_L02_001BE200.time <= first_end) {
-            n = D_L02_001BE200.time - 0x10E;
-            id = 0x46;
-            if (n > 0) {
-                id = 0x47;
-                frac = func_00283CE0(n);
-                frac = frac / func_00283CE0(0x28);
-                id2 = 0x46;
-                alpha = func_00283CF0(frac * 127.0f);
+            fadeFrame = D_L02_001BE200.time - 0x10E;
+            overlayId = 0x46;
+            if (fadeFrame > 0) {
+                overlayId = 0x47;
+                fadeFraction = IntToFloat(fadeFrame);
+                fadeFraction = fadeFraction / IntToFloat(0x28);
+                fadeOutId = 0x46;
+                alpha = FloatToInt(fadeFraction * 127.0f);
             }
         } else if (D_L02_001BE200.time > first_end && D_L02_001BE200.time <= second_end) {
-            id = 0x47;
+            overlayId = 0x47;
         } else if (D_L02_001BE200.time > second_end && D_L02_001BE200.time < third_end) {
-            extra = func_002A7820(0, 3);
-            id = 0x49;
+            extra = RandomIntRange(0, 3);
+            overlayId = 0x49;
         } else if (D_L02_001BE200.time > third_end && D_L02_001BE200.time < 0x1B5) {
-            n = D_L02_001BE200.time - 0x1A1;
-            id = 0x48;
-            if (n > 0) {
-                frac = func_00283CE0(n);
-                frac = frac / func_00283CE0(0xF);
-                alpha = 0x7F - func_00283CF0(frac * 127.0f);
+            fadeFrame = D_L02_001BE200.time - 0x1A1;
+            overlayId = 0x48;
+            if (fadeFrame > 0) {
+                fadeFraction = IntToFloat(fadeFrame);
+                fadeFraction = fadeFraction / IntToFloat(0xF);
+                alpha = 0x7F - FloatToInt(fadeFraction * 127.0f);
             }
             if (alpha < 0)
                 alpha = 0;
         }
-        if (id != -1) {
-            if (id2 == -1 || id == id2) {
-                func_L01_002E2608(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
+        if (overlayId != -1) {
+            if (fadeOutId == -1 || overlayId == fadeOutId) {
+                DrawQuadWithRotatedUVs(D_L02_001A9420, overlayId, 0, (alpha << 24) | 0x808080, extra);
             } else {
-                func_L01_002E2608(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
-                func_L01_002E2608(D_L02_001A9420, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, overlayId, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, fadeOutId, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
             }
         }
     }

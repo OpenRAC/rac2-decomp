@@ -74,6 +74,7 @@ extern int func_00128440(int);
 /* sceMcSync(mode, &cmd, &result): polls the pending memory card command
    (or waits for it when mode is 0) and hands back its result. Exact
    only under 2.9-ee: 2.95.3's gcse leaves two extra %hi copies. */
+/* Checks whether the last memory card command has finished, and can wait for it to finish. */
 int func_00127B88(int mode, int *cmd, int *result) {
     int r;
 
@@ -83,7 +84,7 @@ int func_00127B88(int mode, int *cmd, int *result) {
     r = r1_func_0011B6B8(r1_D_00159B00);
     if (mode == 0 && r != 0) {
         while (r1_func_0011B6B8(r1_D_00159B00) != 0) {
-            func_00127B40(0x3C);
+            McDelayThread(0x3C);
         }
         r = 0;
     }
@@ -102,23 +103,25 @@ int func_00127B88(int mode, int *cmd, int *result) {
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124010 */
-void func_00127C68(int arg0) {
-    char *p = (char *)(arg0 | 0x20000000);
-    if (r1_D_00159B28 != 0) *r1_D_00159B28 = *(int *)(p + 0x0);
-    if (r1_D_00159B2C != 0) *r1_D_00159B2C = *(int *)(p + 0x4);
-    if (r1_D_00159B30 != 0) *r1_D_00159B30 = *(int *)(p + 0x90);
+/* Copies the card type, free space and format state out of the reply to the caller's variables. */
+void func_00127C68(int replyAddr) {
+    char *reply = (char *)(replyAddr | 0x20000000);
+    if (r1_D_00159B28 != 0) *r1_D_00159B28 = *(int *)(reply + 0x0);
+    if (r1_D_00159B2C != 0) *r1_D_00159B2C = *(int *)(reply + 0x4);
+    if (r1_D_00159B30 != 0) *r1_D_00159B30 = *(int *)(reply + 0x90);
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124068 */
 /* sceMcGetInfo-style RPC 1 (libmc): asks for the card type, free space
    and format state (each only when its result pointer is given); the
    reply lands in r1_D_0015A000 and func_00127C68 copies it out. */
+/* Asks the memory card for its type, free space and format state. */
 int func_00127CC0(int port, int slot, int *type, int *free, int *format) {
-    int r;
+    int rpcResult;
 
     {
-        char *cd = r1_D_00159B00;
-        if (*(int *)(cd + 0x24) == 0) {
+        char *client = r1_D_00159B00;
+        if (*(int *)(client + 0x24) == 0) {
             return -100;
         }
     }
@@ -147,13 +150,13 @@ int func_00127CC0(int port, int slot, int *type, int *free, int *format) {
     r1_D_00159B2C = free;
     r1_D_00159B30 = format;
     r1_func_0011AD70(r1_D_0015A000, 0xC0);
-    r = r1_func_0011B4C8(r1_D_00159B00, 1, 1, r1_D_00159B80_a, 0x30, r1_D_0015B0C0, 4, func_00127C68, r1_D_0015A000);
-    if (r == 0) {
+    rpcResult = r1_func_0011B4C8(r1_D_00159B00, 1, 1, r1_D_00159B80_a, 0x30, r1_D_0015B0C0, 4, CopyMcGetInfoReply, r1_D_0015A000);
+    if (rpcResult == 0) {
         r1_D_00132EA8 = 1;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return rpcResult;
 }
 
 
@@ -166,12 +169,13 @@ int func_00127CC0(int port, int slot, int *type, int *free, int *format) {
    through cd_base. Nonzero (queued) result SignalSemas and returns the
    handle; 0 records the command and returns 0 -- the same idiom as
    func_00127888/sceMcRead. */
+/* Deletes a file on a memory card. */
 int func_00128068(int port, int slot, char *fname) {
-    char *cd = r1_D_00159B00;
-    char *fp;
-    int r;
+    char *client = r1_D_00159B00;
+    char *request;
+    int rpcResult;
 
-    if (*(int *)(cd + 0x24) == 0) {
+    if (*(int *)(client + 0x24) == 0) {
         return -100;
     }
     if (r1_func_00118CC0(r1_D_00132EAC) < 0) {
@@ -182,46 +186,48 @@ int func_00128068(int port, int slot, char *fname) {
         return -210;
     }
     r1_func_00116B00(r1_D_00159BB0 + 0x14, fname, 0x3FF);
-    fp = r1_D_00159BB0;
-    *(int *)(fp + 0x0) = port;
-    *(int *)(fp + 0x4) = slot;
-    fp[0x413] = 0;
-    *(int *)(fp + 0x8) = 0;
-    r = r1_func_0011B4C8(cd, 0xF, 1, fp, 0x414, r1_D_0015B0C0, 4, 0, 0);
-    if (r == 0) {
+    request = r1_D_00159BB0;
+    *(int *)(request + 0x0) = port;
+    *(int *)(request + 0x4) = slot;
+    request[0x413] = 0;
+    *(int *)(request + 0x8) = 0;
+    rpcResult = r1_func_0011B4C8(client, 0xF, 1, request, 0x414, r1_D_0015B0C0, 4, 0, 0);
+    if (rpcResult == 0) {
         r1_D_00132EA8 = 0xF;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return rpcResult;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124528 */
 /* RPC 0x11, the same shape with two request words. */
-int func_00128180(int arg0, int arg1) {
-    char *cd = r1_D_00159B00;
-    int *buf;
-    int r;
+/* Sends a memory card command that takes a port and a slot (probably the unformat command). */
+int func_00128180(int port, int slot) {
+    char *client = r1_D_00159B00;
+    int *request;
+    int rpcResult;
 
-    if (*(int *)(cd + 0x24) == 0) {
+    if (*(int *)(client + 0x24) == 0) {
         return -100;
     }
     if (r1_func_00118CC0(r1_D_00132EAC) < 0) {
         return -200;
     }
-    buf = &r1_D_00159B80;
-    buf[1] = arg0;
-    buf[2] = arg1;
-    r = r1_func_0011B4C8(cd, 0x11, 1, buf, 0x30, r1_D_0015B0C0, 4, 0, 0);
-    if (r == 0) {
+    request = &r1_D_00159B80;
+    request[1] = port;
+    request[2] = slot;
+    rpcResult = r1_func_0011B4C8(client, 0x11, 1, request, 0x30, r1_D_0015B0C0, 4, 0, 0);
+    if (rpcResult == 0) {
         r1_D_00132EA8 = 0x11;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return rpcResult;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_001245F8 */
+/* Asks the controller server for its version number. */
 int func_00128250(void) {
     r1_func_0011B4C8(r1_D_0015B108, 0x80000963, 0, &r1_D_0015B180, 0x400,
                   &r1_D_0015B180, 0x400, 0, 0);
@@ -234,14 +240,15 @@ int func_00128250(void) {
    (func_00128250: major 2), clear the 16-word table r1_D_0015B600 and read
    the configuration into r1_D_0015B580. Returns 1, or 0 on a version
    mismatch. */
+/* Connects to the controller servers, checks their version and sets up the shared tables. */
 int func_001282A8(void) {
     int i;
-    int v;
+    int version;
 
     r1_func_0011AE20(0);
     for (;;) {
         if (r1_func_0011B2F8(r1_D_0015B108, 0x80000900, 0) < 0) {
-            func_00128898(r1_D_001535D8);
+            DebugPrintStub(r1_D_001535D8);
             r1_func_001138B8(-1);
         }
         if (*(int *)(r1_D_0015B108 + 0x24) != 0) {
@@ -253,7 +260,7 @@ int func_001282A8(void) {
     }
     for (;;) {
         if (r1_func_0011B2F8(r1_D_0015B130, 0x8000091B, 0) < 0) {
-            func_00128898(r1_D_001535D8);
+            DebugPrintStub(r1_D_001535D8);
             r1_func_001138B8(-1);
         }
         if (*(int *)(r1_D_0015B130 + 0x24) != 0) {
@@ -263,16 +270,16 @@ int func_001282A8(void) {
         while (i--) {
         }
     }
-    v = func_00128250();
-    if (v >> 8 != 2) {
+    version = GetDbcServerVersion();
+    if (version >> 8 != 2) {
         r1_func_0011A6C8(r1_D_001535F0);
-        r1_func_0011A6C8(r1_D_00153618, 2, 0, v >> 8, v & 0xFF);
+        r1_func_0011A6C8(r1_D_00153618, 2, 0, version >> 8, version & 0xFF);
         return 0;
     }
     for (i = 15; i >= 0; i--) {
         r1_D_0015B600[i] = 0;
     }
-    func_00128898(r1_D_00153640, r1_D_0015B580);
-    func_00128440((int)r1_D_0015B580);
+    DebugPrintStub(r1_D_00153640, r1_D_0015B580);
+    SetDbcDmaBuffer((int)r1_D_0015B580);
     return 1;
 }

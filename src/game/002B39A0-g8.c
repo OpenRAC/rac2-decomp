@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002B39A0 picks one of the candidates D_001B17BC[index] lists. It returns 0 when index is
  * outside 0..*(int *)D_001B17C0 - 1, when D_001B1688 is below 2 or when the list is empty. Before
  * that last test it writes the short 10 at +0x0A of the 0x30-byte record 0x30 * (index + 1) of the
@@ -27,13 +28,14 @@ extern Pick8_2B39A0 **D_001B17BC;
 extern int D_001B1688;
 extern float func_002B38C8(char *, char *);
 
+/* Picks the best target from the list for the given slot: the only one if there is one, else the one with the lowest aim rating. */
 char *func_002B39A0(char *self, int index, int *out)
 {
     int i;
     char *result;
     float best;
 
-    if (index < 0 || !(index < *(int *)D_001B17C0) || D_001B1688 < 2)
+    if (index < 0 || !(index < *(int *)D_001B17C0) || gGameTime < 2)
         return 0;
     D_001B17C0[index + 1].mark = 10;
     if (D_001B17BC[index]->count == 0)
@@ -46,7 +48,7 @@ char *func_002B39A0(char *self, int index, int *out)
     result = 0;
     for (i = 0; i < D_001B17BC[index]->count; i++) {
         if (D_001B17BC[index][i].target != 0) {
-            float d = func_002B38C8(self, D_001B17BC[index][i].target);
+            float d = RateAimTarget(self, D_001B17BC[index][i].target);
             if (d < best) {
                 best = d;
                 result = D_001B17BC[index][i].target;

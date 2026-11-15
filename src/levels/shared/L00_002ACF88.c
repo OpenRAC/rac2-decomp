@@ -49,124 +49,125 @@ typedef struct {
 extern LedgeProbeHit D_L00_001BF200;
 #define FL(p,o) (*(float *)((char *)(p)+(o)))
 #define IN(p,o) (*(int *)((char *)(p)+(o)))
+/* Checks whether the hero can grab a ledge in front of it. Returns 1 and fills in the grab position if it can. */
 int func_L00_002ACF88(void *position, void *unused, char *out)
 {
-    float v0[4], v1[4], v2[4], v3[4], v4[4], v5[4], v6[4], v7[4], v8[4], v9[4], v10[4], v11[4], v12[4], v13[4], v14[4], v15[4], v16[4], v17[4], v18[4], v19[4];
-    char *a, *b;
+    float probeBase[4], upperPoint[4], lowerPoint[4], stepOffset[4], scratchOffset[4], toLedge[4], ledgePoint[4], aboveLedge[4], behindLedge[4], probeStart[4], edgeStep[4], probeEnd[4], edgeNormal[4], sweepEndA[4], sweepEndB[4], nearOffset[4], farOffset[4], downOffset[4], sweepPoint[4], backOffset[4];
+    char *mobyData, *mobyInfo;
     void *object;
-    int go, found, i, kind, ok;
+    int canGrab, found, i, kind, grabbable;
     int edge, j;
     float height;
     float step, max;
-    float down, fwd, up, top, drop, rise, back, d, length;
+    float down, fwd, up, top, drop, rise, back, sweepDistance, length;
     if (out) IN(out,0x28)=0;
-    if (D_00189E20.cooldown) return 0;
-    go=0;
-    if (D_00189E20.vehicle==0) {
-        if ((D_00189E20.control==4 && (D_00189E20.pastApex || func_L00_002D3B00((char *)&D_00189E20+0xf0)<0.05833333730697632f)) || D_00189E20.control==2 || D_00189E20.state==8 || D_00189E20.state==25 || D_00189E20.state==26) go=1;
-        if (D_00189E20.state==14 && D_00189E20.frame<37.0f) go=0;
+    if (gHeroState.cooldown) return 0;
+    canGrab=0;
+    if (gHeroState.vehicle==0) {
+        if ((gHeroState.control==4 && (gHeroState.pastApex || GetViewSpaceHeight((char *)&gHeroState+0xf0)<0.05833333730697632f)) || gHeroState.control==2 || gHeroState.state==8 || gHeroState.state==25 || gHeroState.state==26) canGrab=1;
+        if (gHeroState.state==14 && gHeroState.frame<37.0f) canGrab=0;
     }
-    if (D_00189E20.vehicle==1) {
-        if ((D_00189E20.control==4 && D_00189E20.pastApex) || D_00189E20.control==2 || D_00189E20.state==75 || D_00189E20.state==73 || D_00189E20.state==74) go=1;
+    if (gHeroState.vehicle==1) {
+        if ((gHeroState.control==4 && gHeroState.pastApex) || gHeroState.control==2 || gHeroState.state==75 || gHeroState.state==73 || gHeroState.state==74) canGrab=1;
     }
-    if (out != (char *)&D_00189E20+0x550) go=1;
-    if (!go) return 0;
+    if (out != (char *)&gHeroState+0x550) canGrab=1;
+    if (!canGrab) return 0;
     down=-0.7f; fwd=0.3f; up=1.5f; top=1.15f; drop=-1.43f; rise=1.8f; back=0.5f;
     found=0;
-    if (D_00189E20.vehicle==1) { down=-0.4f; fwd=0.25f; up=0.725f; top=0.7f; drop=-0.71f; rise=0.7f; back=0.32f; }
-    qcopy(v0,position);
-    func_00282F20(v4,(char *)&D_00189E20,D_00189E20.radius);
-    func_00282CC0(v0,v0,v4);
-    func_00282F20(v4,(char *)&D_00189E20+0x20,up+0.15f);
-    func_00282CC0(v1,v0,v4);
-    func_00282F20(v4,(char *)&D_00189E20+0x20,-top);
-    func_00282CC0(v2,v0,v4);
-    func_00282F20(v3,(char *)&D_00189E20,fwd*0.25f);
+    if (gHeroState.vehicle==1) { down=-0.4f; fwd=0.25f; up=0.725f; top=0.7f; drop=-0.71f; rise=0.7f; back=0.32f; }
+    qcopy(probeBase,position);
+    vec_scale_to_length(scratchOffset,(char *)&gHeroState,gHeroState.radius);
+    FastVecAdd(probeBase,probeBase,scratchOffset);
+    vec_scale_to_length(scratchOffset,(char *)&gHeroState+0x20,up+0.15f);
+    FastVecAdd(upperPoint,probeBase,scratchOffset);
+    vec_scale_to_length(scratchOffset,(char *)&gHeroState+0x20,-top);
+    FastVecAdd(lowerPoint,probeBase,scratchOffset);
+    vec_scale_to_length(stepOffset,(char *)&gHeroState,fwd*0.25f);
     for(i=0; i<4; i++) {
-        func_00282CC0(v1,v1,v3);
-        func_00282CC0(v2,v2,v3);
-        if(func_002761F8(v1,v2,4,D_00189E20.moby,0)) {
-            kind=func_00278E78();
-            if(kind!=9 && kind!=12 && kind!=0 && func_L00_002D3EA8(D_L00_001BF200.normal)<0.349065899848938f) found=1;
+        FastVecAdd(upperPoint,upperPoint,stepOffset);
+        FastVecAdd(lowerPoint,lowerPoint,stepOffset);
+        if(CollLine(upperPoint,lowerPoint,4,gHeroState.moby,0)) {
+            kind=GetCollHitMaterial();
+            if(kind!=9 && kind!=12 && kind!=0 && GetViewSpaceAngle(gCollisionResult.normal)<0.349065899848938f) found=1;
         }
         if(found) break;
     }
     object=0;
     if(!found) goto fail;
-    if(D_L00_001BF200.moby) {
-        ok=0;
-        a=func_002AB1F0(D_L00_001BF200.moby);
-        b=func_002AD0B0(D_L00_001BF200.moby);
-        if(a && (*(unsigned short *)(a+0x1e)&1)) ok=1;
-        else if(b) ok=IN(b,0x3c)&1;
-        if(!ok) return 0;
-        object=D_L00_001BF200.moby;
+    if(gCollisionResult.moby) {
+        grabbable=0;
+        mobyData=GetMobyPrivateValue0(gCollisionResult.moby);
+        mobyInfo=GetMobyPrivateValue2(gCollisionResult.moby);
+        if(mobyData && (*(unsigned short *)(mobyData+0x1e)&1)) grabbable=1;
+        else if(mobyInfo) grabbable=IN(mobyInfo,0x3c)&1;
+        if(!grabbable) return 0;
+        object=gCollisionResult.moby;
     }
-    if(out) *(void **)(out+0x38)=D_L00_001BF200.moby;
-    qcopy(v6,D_L00_001BF200.position);
-    func_00282CF0(v5,v6,position);
-    if(up<func_L00_002D3B00(v5)) return 0;
-    func_00282F20(v7,(char *)&D_00189E20+0x20,0.005f);
-    func_00282CC0(v7,v7,v6);
-    func_00282F20(v8,(char *)&D_00189E20,-1.0f);
-    func_00282CC0(v8,v8,v7);
-    if(func_002761F8(v8,v7,2,D_00189E20.moby,0)) {
-        if(!D_L00_001BF200.moby || D_L00_001BF200.moby!=object) return 0;
+    if(out) *(void **)(out+0x38)=gCollisionResult.moby;
+    qcopy(ledgePoint,gCollisionResult.position);
+    FastVecSub(toLedge,ledgePoint,position);
+    if(up<GetViewSpaceHeight(toLedge)) return 0;
+    vec_scale_to_length(aboveLedge,(char *)&gHeroState+0x20,0.005f);
+    FastVecAdd(aboveLedge,aboveLedge,ledgePoint);
+    vec_scale_to_length(behindLedge,(char *)&gHeroState,-1.0f);
+    FastVecAdd(behindLedge,behindLedge,aboveLedge);
+    if(CollLine(behindLedge,aboveLedge,2,gHeroState.moby,0)) {
+        if(!gCollisionResult.moby || gCollisionResult.moby!=object) return 0;
     }
     if(out) {
-        func_00282F20(v9,(char *)&D_00189E20+0x20,0.6f);
-        func_00282CC0(v9,v9,v6);
-        if(func_00277258(v9,4,D_00189E20.moby,0.45f)) IN(out,0x34)|=1;
+        vec_scale_to_length(probeStart,(char *)&gHeroState+0x20,0.6f);
+        FastVecAdd(probeStart,probeStart,ledgePoint);
+        if(TestPointAgainstCollision(probeStart,4,gHeroState.moby,0.45f)) IN(out,0x34)|=1;
         else IN(out,0x34)&=~1;
     }
-    height=func_L00_002D3B00(v5);
-    if(height+D_00189E20.groundHeight<rise || height<0.5f) return 0;
-    *(V4_Fbfdc087a *)v11=0; FL(v11,0)=1.0f; FL(v11,8)=down;
-    func_00283098(v11,v11,(char *)&D_00189E20);
+    height=GetViewSpaceHeight(toLedge);
+    if(height+gHeroState.groundHeight<rise || height<0.5f) return 0;
+    *(V4_Fbfdc087a *)probeEnd=0; FL(probeEnd,0)=1.0f; FL(probeEnd,8)=down;
+    matrix_mul_vec3(probeEnd,probeEnd,(char *)&gHeroState);
     edge=0;
-    func_00282CC0(v11,v11,v6);
-    func_00282CF0(v9,position,v11);
-    func_L00_002D3B58(v9,v9,0.0f);
-    func_00282CC0(v9,v9,v11);
-    func_00282F20(v10,(char *)&D_00189E20+0x20,-down*0.2f);
+    FastVecAdd(probeEnd,probeEnd,ledgePoint);
+    FastVecSub(probeStart,position,probeEnd);
+    SetViewSpaceHeight(probeStart,probeStart,0.0f);
+    FastVecAdd(probeStart,probeStart,probeEnd);
+    vec_scale_to_length(edgeStep,(char *)&gHeroState+0x20,-down*0.2f);
     for(j=0;j<5;j++) {
-        if(func_002761F8(v9,v11,2,0,0)) {
-            func_00282F20(v12,D_L00_001BF200.normal,1.0f);
+        if(CollLine(probeStart,probeEnd,2,0,0)) {
+            vec_scale_to_length(edgeNormal,gCollisionResult.normal,1.0f);
             edge=1;
-            func_L00_002D3B58(v12,v12,0.0f);
+            SetViewSpaceHeight(edgeNormal,edgeNormal,0.0f);
             break;
         }
-        func_00282CC0(v9,v9,v10);
-        func_00282CC0(v11,v11,v10);
+        FastVecAdd(probeStart,probeStart,edgeStep);
+        FastVecAdd(probeEnd,probeEnd,edgeStep);
     }
     if(!edge) return 0;
-    length=func_00282DB0((char *)&D_00189E20,v12);
-    if(!(length<func_00283180(1.134464144706726f))) return 0;
+    length=FastVecDot((char *)&gHeroState,edgeNormal);
+    if(!(length<FastSinOrCosA(1.134464144706726f))) return 0;
     step=0.03f;
     max=2.4f;
-    qcopy(v18,v6);
-    func_00282F20(v17,(char *)&D_00189E20+0x2c0,-0.05f);
-    func_00282F20(v16,v12,step);
-    func_00282CC0(v15,v16,v17);
-    func_00282CF0(v16,v16,v17);
-    func_00282CC0(v13,v18,v16);
-    func_00282CC0(v14,v18,v15);
-    for(d=0.0f;d<max;d+=step) {
-        if(!func_002761F8(v14,v13,4,D_00189E20.moby,0)) {
+    qcopy(sweepPoint,ledgePoint);
+    vec_scale_to_length(downOffset,(char *)&gHeroState+0x2c0,-0.05f);
+    vec_scale_to_length(farOffset,edgeNormal,step);
+    FastVecAdd(nearOffset,farOffset,downOffset);
+    FastVecSub(farOffset,farOffset,downOffset);
+    FastVecAdd(sweepEndA,sweepPoint,farOffset);
+    FastVecAdd(sweepEndB,sweepPoint,nearOffset);
+    for(sweepDistance=0.0f;sweepDistance<max;sweepDistance+=step) {
+        if(!CollLine(sweepEndB,sweepEndA,4,gHeroState.moby,0)) {
             if(out) {
-                qcopy(out+0x10,v18);
-                func_00282F20(v19,v12,back);
-                func_00282F20(out,(char *)&D_00189E20+0x2c0,-drop);
-                func_00282CC0(out,v19,out);
-                func_00282CC0(out,out+0x10,out);
-                FL(out,0x24)=func_00283248(FL(v12,0),FL(v12,4));
+                qcopy(out+0x10,sweepPoint);
+                vec_scale_to_length(backOffset,edgeNormal,back);
+                vec_scale_to_length(out,(char *)&gHeroState+0x2c0,-drop);
+                FastVecAdd(out,backOffset,out);
+                FastVecAdd(out,out+0x10,out);
+                FL(out,0x24)=FastMatrixHelperA(FL(edgeNormal,0),FL(edgeNormal,4));
                 IN(out,0x28)=1;
             }
             return 1;
         }
-        qcopy(v18,D_L00_001BF200.position);
-        func_00282CC0(v14,v18,v15);
-        func_00282CC0(v13,v18,v16);
+        qcopy(sweepPoint,gCollisionResult.position);
+        FastVecAdd(sweepEndB,sweepPoint,nearOffset);
+        FastVecAdd(sweepEndA,sweepPoint,farOffset);
     }
 fail:
     return 0;

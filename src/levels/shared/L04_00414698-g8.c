@@ -109,88 +109,88 @@ void func_L04_00414698(u8 *object, u8 *st)
 
     flag = 0;
     start.q = *(Quad *)(object + 0x10);
-    ground = func_002A89A8((char *)(object + 0x10), 0, 0.5f);
+    ground = ProbeGroundHeightBelow((char *)(object + 0x10), 0, 0.5f);
     height = OF(0x18) - ground;
-    if ((func_00278E78() != 0 || S(0x274) != 0) && func_002E59B0(object, I(0x3BC)) != 0) {
+    if ((GetCollHitMaterial() != 0 || S(0x274) != 0) && IsVoicePlayingForOwner(object, I(0x3BC)) != 0) {
         SND_STOP(0x3BC)
     }
-    if (object[0x20] == 3) func_L04_004135B8(object, st);
+    if (object[0x20] == 3) UpdateHoverbikeRouteSteering(object, st);
     if (object[0xBC] == 5) {
         if (object[0x20] != 3) {
-            func_L00_002A9D38(&v20, st + 0x2C0, 0.12f);
-            D_00189FC0 = func_00283B98(CFG->f158,
-                                       func_00283248(func_00282C48(v20.f[1]), v20.f[0]));
+            ClampStickToUnitRange(&v20, st + 0x2C0, 0.12f);
+            D_00189FC0 = FastAddRotations(CFG->f158,
+                                       FastMatrixHelperA(FloatAbs(v20.f[1]), v20.f[0]));
         } else {
-            float t = func_00283248(F(0x6A0) - OF(0x10), F(0x6A4) - OF(0x14));
+            float t = FastMatrixHelperA(F(0x6A0) - OF(0x10), F(0x6A4) - OF(0x14));
             HEAD = t;
-            if (I(0x750) >= 11) HEAD = func_00283B98(t, (float)I(0x750) * 0.01f);
+            if (I(0x750) >= 11) HEAD = FastAddRotations(t, (float)I(0x750) * 0.01f);
         }
         idle = 1;
         if (st[0x348] != 0 && I(0x4D8) == 0) {
             idle = 0;
-            func_002AA2E8((float *)(st + 0x30C), 0.050000004f, 0.0030555557f);
+            ApproachValue((float *)(st + 0x30C), 0.050000004f, 0.0030555557f);
         } else {
-            if (func_00278E78() == 0 && S(0x274) == 0) {
+            if (GetCollHitMaterial() == 0 && S(0x274) == 0) {
                 u8 *s0;
                 float yaw, z;
                 if (F(0x30C) > 0.19166668f) {
                     idle = 0;
-                    func_002AA2E8((float *)(st + 0x30C), 0.19166668f, 0.0031944446f);
+                    ApproachValue((float *)(st + 0x30C), 0.19166668f, 0.0031944446f);
                 }
                 I(0x278) = 0;
-                func_00282D30(&v70, (object + 0xC0), 0.95f);
+                FastVecScale(&v70, (object + 0xC0), 0.95f);
                 s0 = object + 0xD0;
-                func_00282D30(&v80, s0, 0.45f);
-                func_00282D30(&v90, s0, -0.45f);
-                func_0029FCC0(object, 0, &vA0);
-                func_00282CC0(&vA0, &vA0, &v70);
-                func_00282CC0(&vA0, &vA0, &v80);
+                FastVecScale(&v80, s0, 0.45f);
+                FastVecScale(&v90, s0, -0.45f);
+                TransformMobyJointToWorld(object, 0, &vA0);
+                FastVecAdd(&vA0, &vA0, &v70);
+                FastVecAdd(&vA0, &vA0, &v80);
                 z = ground - 0.25f;
                 vA0.f[2] = ground;
-                func_L04_0040BD50(&vA0, 1, 0, z, F(0x30C));
-                func_0029FCC0(object, 1, &vB0);
-                func_00282CC0(&vB0, &vB0, &v70);
-                func_00282CC0(&vB0, &vB0, &v90);
+                SpawnImpactSmokeAndSparks(&vA0, 1, 0, z, F(0x30C));
+                TransformMobyJointToWorld(object, 1, &vB0);
+                FastVecAdd(&vB0, &vB0, &v70);
+                FastVecAdd(&vB0, &vB0, &v90);
                 vB0.f[2] = ground;
-                func_L04_0040BD50(&vB0, 1, 0, z, F(0x30C));
+                SpawnImpactSmokeAndSparks(&vB0, 1, 0, z, F(0x30C));
                 qcopy(&vD0, &vB0);
                 qcopy(&vE0, &vA0);
                 yaw = OF(0xF8);
-                vC0.f[0] = func_00283180(yaw) * func_002A7878(0.031666666f, 0.06666667f);
-                vC0.f[1] = func_00283198(yaw) * func_002A7878(0.031666666f, 0.06666667f);
+                vC0.f[0] = FastSinOrCosA(yaw) * RandomFloatRange(0.031666666f, 0.06666667f);
+                vC0.f[1] = FastSinOrCosB(yaw) * RandomFloatRange(0.031666666f, 0.06666667f);
                 vC0.f[2] = F(0x30C) * 0.5f;
-                if (func_002A77E0(func_00283CF0(1.0f / F(0x30C)) - 1) == 0) {
+                if (RandomIntBelow(FloatToInt(1.0f / F(0x30C)) - 1) == 0) {
                     if (F(0x30C) >= 0.1f) {
-                        func_L04_00362768(&vD0, &vC0, 0x40, 0.6f);
-                        func_00282D30(&v70, (object + 0xC0), -0.4f);
-                        func_00282CC0(&vD0, &vD0, &v70);
-                        func_L04_00362768(&vD0, &vC0, 0x40, 0.7f);
-                        func_00282CC0(&vD0, &vD0, &v70);
-                        func_L04_00362768(&vD0, &vC0, 0x40, 0.8f);
-                        func_L04_00362768(&vE0, &vC0, 0x40, 0.6f);
-                        func_00282D30(&v70, (object + 0xC0), -0.4f);
-                        func_00282CC0(&vE0, &vE0, &v70);
-                        func_L04_00362768(&vE0, &vC0, 0x40, 0.7f);
-                        func_00282CC0(&vE0, &vE0, &v70);
-                        func_L04_00362768(&vE0, &vC0, 0x40, 0.8f);
+                        SpawnSparkleEffect(&vD0, &vC0, 0x40, 0.6f);
+                        FastVecScale(&v70, (object + 0xC0), -0.4f);
+                        FastVecAdd(&vD0, &vD0, &v70);
+                        SpawnSparkleEffect(&vD0, &vC0, 0x40, 0.7f);
+                        FastVecAdd(&vD0, &vD0, &v70);
+                        SpawnSparkleEffect(&vD0, &vC0, 0x40, 0.8f);
+                        SpawnSparkleEffect(&vE0, &vC0, 0x40, 0.6f);
+                        FastVecScale(&v70, (object + 0xC0), -0.4f);
+                        FastVecAdd(&vE0, &vE0, &v70);
+                        SpawnSparkleEffect(&vE0, &vC0, 0x40, 0.7f);
+                        FastVecAdd(&vE0, &vE0, &v70);
+                        SpawnSparkleEffect(&vE0, &vC0, 0x40, 0.8f);
                     }
                 }
-                if (F(0x30C) <= 0.1f && func_002A77E0(2) == 0) {
-                    func_00282D30(&v70, (object + 0xC0), 0.5f);
-                    func_00282CC0(&vF0, (object + 0x10), &v70);
+                if (F(0x30C) <= 0.1f && RandomIntBelow(2) == 0) {
+                    FastVecScale(&v70, (object + 0xC0), 0.5f);
+                    FastVecAdd(&vF0, (object + 0x10), &v70);
                     vF0.f[2] = ground;
-                    func_002C19D8(&vF0, 0, 0x40645050, 0.8f, 14700.0f);
+                    SpawnDriftingParticle_002C19D8(&vF0, 0, 0x40645050, 0.8f, 14700.0f);
                 }
-                if (func_002E59B0(object, I(0x3BC)) == 0 && object[0x20] != 3) {
-                    I(0x3BC) = func_002E5CF8(0x10, 4, object);
-                    if (height < 0.5f) func_002E5CF8(6, 0, object);
+                if (IsVoicePlayingForOwner(object, I(0x3BC)) == 0 && object[0x20] != 3) {
+                    I(0x3BC) = PlayMobySound(0x10, 4, object);
+                    if (height < 0.5f) PlayMobySound(6, 0, object);
                 }
             }
         }
-        if (func_00278E78() == 7 && S(0x274) == 0) {
-            if (D_L04_001B08F0 == 0) func_002E5CF8(0x11, 0, object);
-            if (func_002E59B0(object, I(0x748)) == 0) I(0x748) = func_002E5CF8(0x12, 4, object);
-            if (func_002E59B0(object, I(0x74C)) == 0) I(0x74C) = func_002E5CF8(0x13, 4, object);
+        if (GetCollHitMaterial() == 7 && S(0x274) == 0) {
+            if (D_L04_001B08F0 == 0) PlayMobySound(0x11, 0, object);
+            if (IsVoicePlayingForOwner(object, I(0x748)) == 0) I(0x748) = PlayMobySound(0x12, 4, object);
+            if (IsVoicePlayingForOwner(object, I(0x74C)) == 0) I(0x74C) = PlayMobySound(0x13, 4, object);
             D_L04_001B08F0 = 1;
         } else {
             SND_STOP(0x748)
@@ -199,11 +199,11 @@ void func_L04_00414698(u8 *object, u8 *st)
         }
         if (idle) {
             if ((D_00138320 & 0x40) || object[0x20] == 3) {
-                func_002AA3A8((float *)(st + 0x30C), (float *)(st + 0x288), 0.33333334f,
+                SpringFloatToGoal((float *)(st + 0x30C), (float *)(st + 0x288), 0.33333334f,
                               D_L04_001B08F0 != 0 ? 0.011f : 0.022f, 0.5f,
                               D_L04_001B08F0 != 0 ? 0.013888889f : 0.027777778f);
             } else {
-                func_002AA2E8((float *)(st + 0x30C), 0.050000004f, 0.0027777778f);
+                ApproachValue((float *)(st + 0x30C), 0.050000004f, 0.0027777778f);
             }
         }
         speed = F(0x30C) + F(0x27C);
@@ -213,7 +213,7 @@ void func_L04_00414698(u8 *object, u8 *st)
     grip = F(0x30C) * 3.0f;
     damping = 0.016f;
     if (grip > 1.0f) grip = 1.0f;
-    limit = func_002AA140(0.05817765f, I(0x338) != 0 ? 0.01658063f : 0.021816619f, grip);
+    limit = LerpFloat_002AA140(0.05817765f, I(0x338) != 0 ? 0.01658063f : 0.021816619f, grip);
     factor = (1.0f - grip) + 1.0f;
     if (factor > 1.9f) factor = 1.9f;
     if (D_L04_001B08F0 != 0) {
@@ -228,58 +228,58 @@ void func_L04_00414698(u8 *object, u8 *st)
     if (object[0xBC] == 5) {
         if (object[0x20] != 3) limit = limit * HERO->turnScale;
         if (limit < 0.000029088826f) limit = 0.000029088826f;
-        func_002AA898((float *)(object + 0xF8), HEAD, (float *)(st + 0x308), damping, 0.3f, limit, 0);
+        ApproachWithVelocity((float *)(object + 0xF8), HEAD, (float *)(st + 0x308), damping, 0.3f, limit, 0);
     }
     if (D_L04_001B08F0 != 0) {
         if (I(0x64C) != 0 && I(0x71C) != 0) {
-            func_00282D30(&v20, st + 0x2F0, (float)I(0x64C) * 0.025f);
-            func_00282CF0((st + 0x290), (st + 0x290), &v20);
+            FastVecScale(&v20, st + 0x2F0, (float)I(0x64C) * 0.025f);
+            FastVecSub((st + 0x290), (st + 0x290), &v20);
             I(0x71C) = 0;
         }
-        func_002AF000(v20.f, speed, OF(0xF8), 0.0f);
-        func_00282D30(&v20, &v20, 0.025f);
-        func_00282CC0((st + 0x290), (st + 0x290), &v20);
-        func_002AC9F8((float *)(st + 0x290), speed);
+        BuildSphericalOffset(v20.f, speed, OF(0xF8), 0.0f);
+        FastVecScale(&v20, &v20, 0.025f);
+        FastVecAdd((st + 0x290), (st + 0x290), &v20);
+        ClampVectorLength((float *)(st + 0x290), speed);
     } else {
-        func_002AF000((float *)(st + 0x290), speed, OF(0xF8), 0.0f);
-        func_002AC9F8((float *)(st + 0x290), speed);
+        BuildSphericalOffset((float *)(st + 0x290), speed, OF(0xF8), 0.0f);
+        ClampVectorLength((float *)(st + 0x290), speed);
         qcopy(&v20, object + 0xD0);
-        func_00282F20(v20.f, v20.f, F(0x30C) * (F(0x308) * -1.75f));
-        func_00282CC0((st + 0x290), (st + 0x290), &v20);
+        vec_scale_to_length(v20.f, v20.f, F(0x30C) * (F(0x308) * -1.75f));
+        FastVecAdd((st + 0x290), (st + 0x290), &v20);
     }
-    if (func_00282948(st + 0x64C) == 0) {
+    if (FastFloatHelperD(st + 0x64C) == 0) {
         extern int D_001A7CC0;
-        func_00282D30(&v20, st + 0x2F0, (float)I(0x64C) * 0.025f);
-        func_00282CC0((st + 0x290), (st + 0x290), &v20);
+        FastVecScale(&v20, st + 0x2F0, (float)I(0x64C) * 0.025f);
+        FastVecAdd((st + 0x290), (st + 0x290), &v20);
         I(0x71C) = 1;
         dbg = D_001A7CC0;
     } else {
         dbg = D_001A7CC0;
     }
     if (dbg != 0) qcopy(&D_001B9900, &v20);
-    func_L04_00412C58(object, st, height, 0.2f, 0.23f, 12.0f, 0.1f);
+    ComputeBikeTargetHeight(object, st, height, 0.2f, 0.23f, 12.0f, 0.1f);
     if (height > 0.44f) {
         S(0x274) = 1;
         U16(0x276) = U16(0x276) + 1;
     } else {
-        if (S(0x274) != 0 && S(0x276) >= 13 && F(0x358) < 0.0f && func_00278E78() != 0) {
+        if (S(0x274) != 0 && S(0x276) >= 13 && F(0x358) < 0.0f && GetCollHitMaterial() != 0) {
             if (S(0x276) >= 46) {
-                func_00282D30(&v30, (st + 0x2A0), 0.5f);
-                func_00282CD8(&v70, &v30, (object + 0x10));
+                FastVecScale(&v30, (st + 0x2A0), 0.5f);
+                add_vectors(&v70, &v30, (object + 0x10));
                 v40.q = *(Quad *)(st + 0x2A0);
                 v30.f[2] = OF(0x18);
                 v40.f[2] = 0.016666668f;
-                func_00282D30(&v40, &v40, 0.85f);
-                func_L04_0040BED0(&v30, &v40, 0, object, F(0x30C));
-                func_L04_0040C0C0(&v30, &v40, 8, 1);
+                FastVecScale(&v40, &v40, 0.85f);
+                SpawnSparkAndSmokeBurst(&v30, &v40, 0, object, F(0x30C));
+                SpawnParticleBurst_L04(&v30, &v40, 8, 1);
                 if (object[0x20] != 3) {
                     SND_STOP(0x328)
-                    I(0x328) = func_002E5CF8(4, 4, object);
+                    I(0x328) = PlayMobySound(4, 4, object);
                     I(0x32C) = 4;
                     I(0x324) = 15;
                 }
             }
-            if (st[0x349] == 0 && func_00278E78() != 5) {
+            if (st[0x349] == 0 && GetCollHitMaterial() != 5) {
                 float sink;
                 if (F(0x358) > -0.05f) F(0x358) = -0.05f;
                 sink = F(0x358);
@@ -299,24 +299,24 @@ void func_L04_00414698(u8 *object, u8 *st)
     x = OF(0xF0);
     if (st[0x349] != 0) {
         OF(0xF4) = OF(0xF4) + F(0x354);
-        func_00282948(st + 0x34C);
+        FastFloatHelperD(st + 0x34C);
         if (I(0x34C) == 0) st[0x349] = 0;
     } else if (S(0x274) == 0) {
-        func_00282F20((float *)(st + 0x2B0), D_001BFB00, 1.0f);
-        func_L04_00347AB8(object + 0xC0, object + 0xF0, st + 0x304, (st + 0x2B0), 0.03f, 0.3f, 0.0f);
+        vec_scale_to_length((float *)(st + 0x2B0), D_001BFB00, 1.0f);
+        AimMatrixWithSpring(object + 0xC0, object + 0xF0, st + 0x304, (st + 0x2B0), 0.03f, 0.3f, 0.0f);
     } else {
-        func_002AF000((float *)(st + 0x2B0), 1.0f, func_00283B98(OF(0xF8), 3.1415927f), 0.99483776f);
-        func_L04_00347AB8(object + 0xC0, object + 0xF0, st + 0x304, (st + 0x2B0), 0.03f, 0.3f, 0.0f);
+        BuildSphericalOffset((float *)(st + 0x2B0), 1.0f, FastAddRotations(OF(0xF8), 3.1415927f), 0.99483776f);
+        AimMatrixWithSpring(object + 0xC0, object + 0xF0, st + 0x304, (st + 0x2B0), 0.03f, 0.3f, 0.0f);
     }
     OF(0xF0) = x;
-    func_L04_00412E38(object, st, 0.15f, 0.004f);
+    StepAngleOffset(object, st, 0.15f, 0.004f);
     *(Quad *)(st + 0x2A0) = *(Quad *)(st + 0x290);
     F(0x358) = F(0x2A8);
     {
-    int result = func_L04_00413A38(object, (object + 0x10), (st + 0x290), (st + 0x2A0), &v30, &v50, (st + 0x2B0), &flag, 1, &flag2,
+    int result = ResolveVehicleMovementCollisions(object, (object + 0x10), (st + 0x290), (st + 0x2A0), &v30, &v50, (st + 0x2B0), &flag, 1, &flag2,
                                    F(0x30C) + F(0x27C), F(0x280), 0.16666667f, F(0x24), F(0x20));
     if (result != 0) {
-        if (D_L04_001B08F0 != 0) func_00282D30((st + 0x290), (st + 0x290), 0.85f);
+        if (D_L04_001B08F0 != 0) FastVecScale((st + 0x290), (st + 0x290), 0.85f);
         if (flag2 != 0)
             I(0x70C) = I(0x70C) + 1;
         else
@@ -324,8 +324,8 @@ void func_L04_00414698(u8 *object, u8 *st)
         switch (result) {
         case 1:
             if (I(0x1DC) != -1) {
-                u8 *target = D_L04_001B24DC + (I(0x1DC) << 8);
-                float a = func_00283BE0(OF(0xF8), func_00283248(v30.f[0] - OF(0x10), v30.f[1] - OF(0x14)));
+                u8 *target = gMobyPool_L04 + (I(0x1DC) << 8);
+                float a = fast_subtract_rotations(OF(0xF8), FastMatrixHelperA(v30.f[0] - OF(0x10), v30.f[1] - OF(0x14)));
                 int dir;
                 if (a > 0.52359885f && a < 2.617994f) {
                     dir = 3;
@@ -338,7 +338,7 @@ void func_L04_00414698(u8 *object, u8 *st)
                 } else {
                     I(0x36C) = 30;
                     S(0x34A) = dir;
-                    func_002A7470(target, dir, 3, 3);
+                    StartAnimationBlended(target, dir, 3, 3);
                 }
             }
             switch (flag) {
@@ -346,7 +346,7 @@ void func_L04_00414698(u8 *object, u8 *st)
                 if (object[0x20] != 3) {
                     if (I(0x32C) != 4) {
                         SND_STOP(0x328)
-                        I(0x328) = func_002E5CF8(4, 4, object);
+                        I(0x328) = PlayMobySound(4, 4, object);
                         I(0x32C) = 4;
                         I(0x324) = 15;
                     } else {
@@ -358,7 +358,7 @@ void func_L04_00414698(u8 *object, u8 *st)
                 if (object[0x20] != 3) {
                     if (I(0x32C) != 5) {
                         SND_STOP(0x328)
-                        I(0x328) = func_002E5CF8(5, 4, object);
+                        I(0x328) = PlayMobySound(5, 4, object);
                         I(0x32C) = 5;
                         I(0x324) = 15;
                     } else {
@@ -367,55 +367,55 @@ void func_L04_00414698(u8 *object, u8 *st)
                 }
                 break;
             case 2:
-                if (object[0x20] != 3) func_002E5CF8(2, 0, object);
+                if (object[0x20] != 3) PlayMobySound(2, 0, object);
                 break;
             case 3:
                 if (I(0x4D8) == 0) F(0x30C) = F(0x30C) * 0.25f;
                 break;
             }
             v30.f[2] = OF(0x18) + 0.05f;
-            func_L04_0040BED0(&v30, (Vec *)(st + 0x290), flag, object, F(0x30C));
+            SpawnSparkAndSmokeBurst(&v30, (Vec *)(st + 0x290), flag, object, F(0x30C));
             break;
         case 2:
             if (I(0x4D8) == 0) {
                 if (object[0x20] != 3) {
                     char *tag;
                     Vec *dir;
-                    func_L04_0040E248(object, st);
+                    ReleaseRacerSoundHandles(object, st);
                     CFG->f188 = 0x5A;
                     CFG->f168 = 0x3C;
                     CFG->f160 = 0.2f;
                     CFG->f180 = 0.1f;
                     tag = D_L04_001A8F20;
                     CFG->f16C = 0;
-                    func_L00_002D6900(0x1C);
-                    func_0032C700((object + 0x10), 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.666f, 20.0f, 1, 1, 0, 0);
-                    func_L00_00322EC8(st + 0x4E0);
-                    func_002E5CF8(3, 0, object);
+                    QueueRecordsByIndex(0x1C);
+                    SpawnExplosion((object + 0x10), 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+                    ReleaseSlotList(st + 0x4E0);
+                    PlayMobySound(3, 0, object);
                     object[0xBC] = 6;
                     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xFBFF;
                     *(s16 *)(object + 0x96) = 0x64;
-                    func_00282D30(&v50, &v50, func_002A7878(0.1f, 0.2f));
+                    FastVecScale(&v50, &v50, RandomFloatRange(0.1f, 0.2f));
                     dir = &v70;
-                    SPAWN(0xB3D, 0.0f, 0.05f)
-                    SPAWN(0xB3E, 0.0f, 0.05f)
-                    SPAWN(0xB3F, 0.0f, 0.0f)
-                    SPAWN(0xB40, 0.0f, 0.05f)
-                    SPAWN(0xB40, 0.0f, 0.05f)
+                    SPAWN(0xB3D /* moby class 2877 */, 0.0f, 0.05f)
+                    SPAWN(0xB3E /* moby class 2878 */, 0.0f, 0.05f)
+                    SPAWN(0xB3F /* moby class 2879 */, 0.0f, 0.0f)
+                    SPAWN(0xB40 /* moby class 2880 */, 0.0f, 0.05f)
+                    SPAWN(0xB40 /* moby class 2880 */, 0.0f, 0.05f)
                     if (I(0x1DC) != -1) {
                         v90.q = *(Quad *)(object + 0x10);
                         v90.f[2] = v90.f[2] + 0.25f;
-                        v80.f[0] = func_00283180(OF(0xF8));
-                        v80.f[1] = func_00283198(OF(0xF8));
+                        v80.f[0] = FastSinOrCosA(OF(0xF8));
+                        v80.f[1] = FastSinOrCosB(OF(0xF8));
                         v80.f[2] = 0.0f;
-                        func_00282CD8(&vA0, &v80, &v90);
-                        if (func_002761F8(&v90, &v80, 2, 0, 0) != 0) {
-                            if (func_00278E78() != result) {
+                        add_vectors(&vA0, &v80, &v90);
+                        if (CollLine(&v90, &v80, 2, 0, 0) != 0) {
+                            if (GetCollHitMaterial() != result) {
                                 L04_HoverTarget *hit = (L04_HoverTarget *)D_001BFAC0;
                                 float f20;
-                                x = func_00283248(hit->v[2], func_00282E20(hit->v));
-                                f20 = func_00283B98(func_00283248(hit->v[0], hit->v[1]), 3.1415927f);
-                                func_00283C80(func_00283248(v80.f[0], v80.f[1]), f20);
+                                x = FastMatrixHelperA(hit->v[2], vec_length_xy(hit->v));
+                                f20 = FastAddRotations(FastMatrixHelperA(hit->v[0], hit->v[1]), 3.1415927f);
+                                FastDiffRots(FastMatrixHelperA(v80.f[0], v80.f[1]), f20);
                                 if (x > 1.2217306f) height = 0.0f;
                             }
                         }
@@ -428,14 +428,14 @@ void func_L04_00414698(u8 *object, u8 *st)
         I(0x750) = 0;
     }
     }
-    func_00282CF0(&v20, &start, (object + 0x10));
+    FastVecSub(&v20, &start, (object + 0x10));
     v20.i[2] = 0;
-    F(0x280) = func_00282DF0(&v20);
+    F(0x280) = FastVecLength(&v20);
     if (F(0x280) < 0.01f) I(0x750) = I(0x750) + 1;
     {
         Quad q = *(Quad *)(object + 0x10);
-        *(Quad *)D_00189EA0 = q;
-        *(Quad *)(D_00189EA0 + 0x10) = *(Quad *)(object + 0xF0);
-        func_L04_002DAD10(q);
+        *(Quad *)gHeroPosition = q;
+        *(Quad *)(gHeroPosition + 0x10) = *(Quad *)(object + 0xF0);
+        Hero_ProbeGround(q);
     }
 }

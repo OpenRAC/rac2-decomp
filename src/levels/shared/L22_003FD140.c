@@ -8,6 +8,7 @@ extern void func_L00_00325600(void *, void *, int);
 
 /* Turns the object's frame (a three-row rotation) by a small fixed angle about z, then places it from the
    state's +0x10 block. */
+/* Per-frame update for moby class 3644: slowly turns the object and places it on its path. */
 void func_L22_003FD140(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -16,8 +17,8 @@ void func_L22_003FD140(u8 *object)
 
     qzero(angles);
     angles[2] = 0.018907737f;
-    func_002833F0(matrix, angles);
-    func_00283738(object + 0xC0, object + 0xC0, matrix);
-    func_002AFFD8(object + 0x10, state + 0x10, 0);
-    func_L00_00325600(object + 0xC0, state + 0x10, 0);
+    euler_rotation_basis(matrix, angles);
+    multiply_matrix3x3(object + 0xC0, object + 0xC0, matrix);
+    ComputeViewDirection(object + 0x10, state + 0x10, 0);
+    NegateAndForwardVector(object + 0xC0, state + 0x10, 0);
 }

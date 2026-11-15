@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002B5828 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -52,6 +53,7 @@ typedef struct {
     unsigned char bE6, bE7, bE8, bE9, bEA;   /* 0xE6 */
 } Ctl_002B5828;
 
+/* Checks the object against the ground after moving: marks falls, climbs and slopes, resets a bad position, and plays or changes animations to match. */
 void func_002B5828(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *newpos)
 {
     int changed;
@@ -59,7 +61,7 @@ void func_002B5828(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *n
     float angle, dist, div, ratio;
     unsigned char b;
 
-    func_002B5BC0(self, ctl, 0.0f);
+    FindGroundBelowObject(self, ctl, 0.0f);
     changed = 0;
     if (self->pos[2] < ctl->f90 - ctl->f08) {
         changed = 1;
@@ -72,7 +74,7 @@ void func_002B5828(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *n
         }
     }
     if (ctl->hC0 != 0) {
-        angle = func_00283248(ctl->v50[2], func_00282E20(ctl->v50));
+        angle = FastMatrixHelperA(ctl->v50[2], vec_length_xy(ctl->v50));
         if (ctl->f10 < angle) {
             changed = 1;
             ctl->flags94 |= 4;
@@ -81,7 +83,7 @@ void func_002B5828(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *n
     position = self->pos;
     if (changed) {
         *(Quad_002B5828 *)position = *(Quad_002B5828 *)newpos;
-        func_002B5BC0(self, ctl, 0.0f);
+        FindGroundBelowObject(self, ctl, 0.0f);
     }
     if (self->pos[2] <= ctl->f90) {
         if (ctl->f90 <= self->pos[2] - ctl->fA8)
@@ -92,12 +94,12 @@ void func_002B5828(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *n
         ctl->hC0 = 0;
         ctl->hC2++;
     }
-    dist = func_00282E80(position, target);
+    dist = vec_distance_xy(position, target);
     ctl->fCC = dist;
     if (dist <= ctl->f34)
         ctl->flags94 |= 0x80;
     if (ctl->flags9C & 1) {
-        if (func_002B6318(self))
+        if (CheckObjectInsidePolygon(self))
             ctl->flags9C &= ~1;
         else
             ctl->flags94 |= 0x100;
@@ -117,17 +119,17 @@ void func_002B5828(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *n
         if ((ctl->flags9C & 2) && ctl->fB4 != 0.0f) {
             if (self->b43 == ctl->bE8 || self->b43 == ctl->bE9) {
                 ctl->bEA = self->b43;
-                func_002A7470(self, 0.0f < ctl->fB4 ? ctl->bE6 : ctl->bE7, 0, 10);
+                StartAnimationBlended(self, 0.0f < ctl->fB4 ? ctl->bE6 : ctl->bE7, 0, 10);
             }
         } else {
             if (self->b43 == ctl->bE6 || self->b43 == ctl->bE7) {
                 if (ctl->bEA != 0xFF)
-                    func_002A7470(self, ctl->bEA, 0, 10);
+                    StartAnimationBlended(self, ctl->bEA, 0, 10);
             }
         }
     }
     if (ctl->flags38 & 0x200) {
-        if (func_002B63C0(self, ctl))
-            func_002A90C8(self, 0, 0x10000, position, 255.0f);
+        if (IsObjectWellAboveGround(self, ctl))
+            StartEffectWithDefaultTable(self, 0, 0x10000, position, 255.0f);
     }
 }

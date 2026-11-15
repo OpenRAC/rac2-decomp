@@ -17,6 +17,7 @@ extern int func_0011F8D0(void);
  * Under 2.95.3 reorg fills the slot with the `addiu $4,$4,4` bump, 52
  * bytes against 56, which is what kept this a stub.
  */
+/* Copies a block of words from one place to another and returns zero. */
 int func_0011F888(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
@@ -32,6 +33,7 @@ ASM_FUNC("asm/core", func_0011F8C0);
    pushes it back, re-reads it and restores the original. Returns whether
    the field read back as 0. `srl` (not `sra`) at the end is the tell that
    the scratch word is unsigned. */
+/* Tests a hardware setting by changing it, reading it back and restoring it. Returns whether the test passed. */
 int func_0011F8D0(void) {
     unsigned int saved;
     unsigned int cur;

@@ -91,35 +91,35 @@ void func_L08_003C5940(char *object)
     test = PackGaugeFlag(test, D_L08_001AFAEB, 16);
     alpha = PackGaugeFlag(alpha, D_L08_001AFAE2, 4);
     alpha = PackGaugeFlag(alpha, D_L08_001AFAE3, 6);
-    func_L08_00389B68(2, 0x47, test | ((unsigned long)D_L08_001AFAEC << 17),
+    AppendVectorsToPacket(2, 0x47, test | ((unsigned long)D_L08_001AFAEC << 17),
         0x42, alpha | ((unsigned long)D_L08_001AFAE4 << 32));
-    func_00282978(&state->message);
-    if (D_001A79F0 == 8) {
+    FastDecTimer(&state->message);
+    if (gCurrentMapIndex == 8) {
         if (state->message != 0) {
             float t, scale, alpha;
             char *msg;
-            t = func_00283CE0(D_L08_001AFAD0 - state->message);
-            t /= func_00283CE0(D_L08_001AFAD0);
-            scale = func_002A7798(t) * 2.0f + 0.5f;
-            alpha = func_L08_003277C0(3, 1.0f - t) * 127.0f;
-            fade = func_00283CF0(alpha * 0.5f) << 24;
-            msg = func_00288FB8(0x2F59);
-            func_L08_002F5CB8(0x100, 0x20, fade | 0x80, (u8 *)msg, 0x11, scale * 0.96f);
-            fade = func_00283CF0(alpha * 0.75f) << 24;
-            func_L08_002F5CB8(0x100, 0x20, fade | 0x60, (u8 *)msg, 0x11, scale * 0.98f);
-            fade = func_00283CF0(alpha) << 24;
-            func_L08_002F5CB8(0x100, 0x20, fade | 0x40, (u8 *)msg, 0x11, scale);
+            t = IntToFloat(D_L08_001AFAD0 - state->message);
+            t /= IntToFloat(D_L08_001AFAD0);
+            scale = EaseOutQuad(t) * 2.0f + 0.5f;
+            alpha = IntegerPower(3, 1.0f - t) * 127.0f;
+            fade = FloatToInt(alpha * 0.5f) << 24;
+            msg = GetLocalizedString(0x2F59);
+            DrawCenteredScaledText(0x100, 0x20, fade | 0x80, (u8 *)msg, 0x11, scale * 0.96f);
+            fade = FloatToInt(alpha * 0.75f) << 24;
+            DrawCenteredScaledText(0x100, 0x20, fade | 0x60, (u8 *)msg, 0x11, scale * 0.98f);
+            fade = FloatToInt(alpha) << 24;
+            DrawCenteredScaledText(0x100, 0x20, fade | 0x40, (u8 *)msg, 0x11, scale);
         } else if (state->active != 0) {
             if (state->limit > D_L08_001B031C) {
-                func_0027FB40(0x100, 0x18, 0x80008000, func_00288FB8(0x2F55), 10);
-                func_00115DA8(text, D_L08_001AFB28, func_001234F0(state->limit));
-                func_0027FBD8(0x100, 0x28, 0x80008000, (u8 *)text, 3);
-                func_0027FB40(0x100, 0x38, 0x80008000, func_00288FB8(0x2F56), 6);
+                DrawTextCenteredMediumFont(0x100, 0x18, 0x80008000, GetLocalizedString(0x2F55), 10);
+                Sprintf(text, D_L08_001AFB28, FloatToDouble(state->limit));
+                DrawTextCenteredLargeFont(0x100, 0x28, 0x80008000, (u8 *)text, 3);
+                DrawTextCenteredMediumFont(0x100, 0x38, 0x80008000, GetLocalizedString(0x2F56), 6);
             } else if (D_00138320[0] & 4) {
-                func_L08_002F5CB8(0x100, 0x20, 0x80802020, (u8 *)func_00288FB8(0x2F57), 13, 1.4f);
+                DrawCenteredScaledText(0x100, 0x20, 0x80802020, (u8 *)GetLocalizedString(0x2F57), 13, 1.4f);
             } else {
-                float pulse = func_00283198(func_002ABB18(func_00283CE0(D_L08_001B2508) * 0.1f)) * 0.1f + 1.2f;
-                func_L08_002F5CB8(0x100, 0x20, 0x80202080, (u8 *)func_00288FB8(0x2F58), 0x11, pulse);
+                float pulse = FastSinOrCosB(WrapAngleToPi(IntToFloat(D_L08_001B2508) * 0.1f)) * 0.1f + 1.2f;
+                DrawCenteredScaledText(0x100, 0x20, 0x80202080, (u8 *)GetLocalizedString(0x2F58), 0x11, pulse);
             }
         }
         if (state->hitCount != 0) {
@@ -129,62 +129,62 @@ void func_L08_003C5940(char *object)
             float size, x, y;
             int color;
             float t, base, a, b, angleA, angleB;
-            t = func_00283CE0(state->hitTimer);
-            t /= func_00283CE0(D_L08_001AFB14);
-            size = func_002A7790(t) * 32.0f;
-            base = D_L08_001AFB1C * func_002A7798(t);
-            fade = func_00283CF0(t * 128.0f) << 24;
+            t = IntToFloat(state->hitTimer);
+            t /= IntToFloat(D_L08_001AFB14);
+            size = Square(t) * 32.0f;
+            base = D_L08_001AFB1C * EaseOutQuad(t);
+            fade = FloatToInt(t * 128.0f) << 24;
             y = 16.0f - size * 0.5f;
             x = base - size * 0.5f;
-            angleA = func_002ABB18(func_00283CE0(D_L08_001B2508) * 0.025f);
-            angleB = func_002ABB18(func_00283CE0(D_L08_001B2508) * 0.033333335f);
-            a = func_00283198(angleA) * 2.0f * state->shake;
-            b = func_00283180(angleB) * 2.0f * state->shake;
-            tex = func_0027C878(D_L08_001AFA40 + state->texture);
+            angleA = WrapAngleToPi(IntToFloat(D_L08_001B2508) * 0.025f);
+            angleB = WrapAngleToPi(IntToFloat(D_L08_001B2508) * 0.033333335f);
+            a = FastSinOrCosB(angleA) * 2.0f * state->shake;
+            b = FastSinOrCosA(angleB) * 2.0f * state->shake;
+            tex = GetEffectTextureDescriptor(D_L08_001AFA40 + state->texture);
             color = fade | 0x808080;
-            func_L05_003008C0(x + a, D_L08_001AFB20 + b + (1.0f - state->shake) * 4.0f + y, size, size, 0, 0, 0x20, 0x20, color, tex);
-            tex = func_0027C878(D_L08_001AFA48 + state->texture);
-            func_L05_003008C0(x, D_L08_001AFB20 + 32.0f, size, 32.0f, 0, 0, 0x20, 0x20, color, tex);
-            tex = func_0027C878(D_L08_001AFA4C + state->texture);
+            AppendSubpixelTexturedScreenQuad(x + a, D_L08_001AFB20 + b + (1.0f - state->shake) * 4.0f + y, size, size, 0, 0, 0x20, 0x20, color, tex);
+            tex = GetEffectTextureDescriptor(D_L08_001AFA48 + state->texture);
+            AppendSubpixelTexturedScreenQuad(x, D_L08_001AFB20 + 32.0f, size, 32.0f, 0, 0, 0x20, 0x20, color, tex);
+            tex = GetEffectTextureDescriptor(D_L08_001AFA4C + state->texture);
             do {
-                float z = func_00283CE0(offset);
+                float z = IntToFloat(offset);
                 i--;
                 offset += 0x20;
-                func_L05_003008C0(x, D_L08_001AFB20 + z, size, 32.0f, 0, 0, 0x20, 0x20, *colors | fade, tex);
+                AppendSubpixelTexturedScreenQuad(x, D_L08_001AFB20 + z, size, 32.0f, 0, 0, 0x20, 0x20, *colors | fade, tex);
                 colors++;
             } while (i >= 0);
             if (state->hitCount < 3) {
-                tex = func_0027C878(D_L08_001AFA44 + state->texture);
-                func_L05_003008C0(x, D_L08_001AFB20 + (float)state->extra + 32.0f + y, size, size, 0, 0, 0x20, 0x20, fade | 0x808080, tex);
+                tex = GetEffectTextureDescriptor(D_L08_001AFA44 + state->texture);
+                AppendSubpixelTexturedScreenQuad(x, D_L08_001AFB20 + (float)state->extra + 32.0f + y, size, size, 0, 0, 0x20, 0x20, fade | 0x808080, tex);
             }
         }
     }
-    tex = func_0027C878(D_L08_001AFA34 + state->texture);
-    func_0027E018(func_00283CF0(D_L08_001AFA68), D_001A7344 - 0x50, 0x40, 0x40, 0, 0, 0x40, 0x40, D_L08_001AFA30, tex);
-    tex = func_0027C878(D_L08_001AFA38 + state->texture);
-    func_0027E018(func_00283CF0(D_L08_001AFA68) + 0x40, D_001A7344 - 0x50, 0x40, 0x40, 0, 0, 0x40, 0x40, D_L08_001AFA30, tex);
-    tex = func_0027C878(D_L08_001AFA3C + state->texture);
+    tex = GetEffectTextureDescriptor(D_L08_001AFA34 + state->texture);
+    DrawTexturedQuad(FloatToInt(D_L08_001AFA68), gScreenHeight - 0x50, 0x40, 0x40, 0, 0, 0x40, 0x40, D_L08_001AFA30, tex);
+    tex = GetEffectTextureDescriptor(D_L08_001AFA38 + state->texture);
+    DrawTexturedQuad(FloatToInt(D_L08_001AFA68) + 0x40, gScreenHeight - 0x50, 0x40, 0x40, 0, 0, 0x40, 0x40, D_L08_001AFA30, tex);
+    tex = GetEffectTextureDescriptor(D_L08_001AFA3C + state->texture);
     {
-        float distance = D_L08_001AFA58 * (func_00282DF0(state) * 0.017453294f);
+        float distance = D_L08_001AFA58 * (FastVecLength(state) * 0.017453294f);
         float frame = D_L08_001AF9C4 * 0.016666668f;
-        angle = func_00283B98(distance / frame, D_L08_001AFA5C * 0.017453294f);
+        angle = FastAddRotations(distance / frame, D_L08_001AFA5C * 0.017453294f);
     }
-    func_0027E4A8(D_L08_001AFA68 + 32.0f, (float)(D_001A7344 - 0x30), 32.0f, 32.0f, angle, 0x20, 0x20, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
+    AppendRotatedSpriteQuad(D_L08_001AFA68 + 32.0f, (float)(gScreenHeight - 0x30), 32.0f, 32.0f, angle, 0x20, 0x20, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
     {
-        float rate = func_00282C48(state->speed) * 0.017453294f;
+        float rate = FloatAbs(state->speed) * 0.017453294f;
         float scaled = D_L08_001AFA60 * rate;
-        angle = func_00283B98(D_L08_001AFA64 * 0.017453294f, scaled);
+        angle = FastAddRotations(D_L08_001AFA64 * 0.017453294f, scaled);
     }
-    func_0027E4A8(D_L08_001AFA68 + 64.0f + 32.0f, (float)(D_001A7344 - 0x30), 32.0f, 32.0f, angle, 0x20, 0x20, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
-    delta = D_00189E20.health - state->shown;
+    AppendRotatedSpriteQuad(D_L08_001AFA68 + 64.0f + 32.0f, (float)(gScreenHeight - 0x30), 32.0f, 32.0f, angle, 0x20, 0x20, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
+    delta = gHeroState.health - state->shown;
     delta *= 0.2f;
     {
-        float d = func_00282C48(delta);
+        float d = FloatAbs(delta);
         if (d > 1.0f)
             delta /= d;
     }
     state->shown += delta;
-    level = func_00283CF0(state->shown * 251.0f / D_00189E20.maxHealth) + 2;
+    level = FloatToInt(state->shown * 251.0f / gHeroState.maxHealth) + 2;
     if (level > 0xFD)
         level = 0xFD;
     if (level < 2)
@@ -199,14 +199,14 @@ void func_L08_003C5940(char *object)
             (*(unsigned **)&D_L08_001AFAD8)[index] = 0x80000000;
         }
     }
-    tex = func_0027C878(state->texture + D_L08_001AFA50);
-    func_0027E018(0x170, D_001A7344 - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
-    tex = func_0027C878(state->texture + D_L08_001AFA54);
-    func_0027E018(0x170, D_001A7344 - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
+    tex = GetEffectTextureDescriptor(state->texture + D_L08_001AFA50);
+    DrawTexturedQuad(0x170, gScreenHeight - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
+    tex = GetEffectTextureDescriptor(state->texture + D_L08_001AFA54);
+    DrawTexturedQuad(0x170, gScreenHeight - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
     state->segments = level;
-    if (D_00189E20.health < D_00189E20.maxHealth * 0.1f) {
+    if (gHeroState.health < gHeroState.maxHealth * 0.1f) {
         if ((D_L08_001B2508 / 90) & 1)
-            func_0027FB40(0x100, 0x172, 0x80000080, func_00288FB8(0x1149), 100);
+            DrawTextCenteredMediumFont(0x100, 0x172, 0x80000080, GetLocalizedString(0x1149), 100);
     }
-    func_L08_00389B68(2, 0x47, 0x5340B, 0x42, 0x8000000044ULL);
+    AppendVectorsToPacket(2, 0x47, 0x5340B, 0x42, 0x8000000044ULL);
 }

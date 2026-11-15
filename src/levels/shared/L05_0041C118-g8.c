@@ -30,26 +30,26 @@ extern void func_L05_0041C410(Moby_L05_0041C118 *);
 
 /* Spawns a moby of class 0x10CF at the caller's position with a random turn, remembers the
    last moby of class 0xFBF in the list the first time, and sets up the new moby's state. */
-Moby_L05_0041C118 *func_L05_0041C118(Moby_L05_0041C118 *object)
+Moby_L05_0041C118 *func_L05_0041C118(Moby_L05_0041C118 *caller)
 {
     Moby_L05_0041C118 *moby;
-    Moby_L05_0041C118 *m;
+    Moby_L05_0041C118 *other;
 
-    moby = func_0029EFD0(0x10CF);
+    moby = CreateMoby(0x10CF /* moby class 4303 */);
     if (moby != 0) {
         moby->updateDist = 0xFF;
         moby->drawDist = 0xFF;
         moby->drawn = 1;
-        qcopy(moby->position, object->position);
-        func_00282C88(moby->rot);
-        moby->rot[2] = func_002A7940();
-        if (D_L05_001B1300 == 0) {
-            for (m = D_L05_001B2528; m != 0; m = m->pChain) {
-                if (m->oClass == 0xFBF)
-                    D_L05_001B1300 = m;
+        qcopy(moby->position, caller->position);
+        ClearVector128(moby->rot);
+        moby->rot[2] = RandomAngle();
+        if (gHomingPickupTarget == 0) {
+            for (other = D_L05_001B2528; other != 0; other = other->pChain) {
+                if (other->oClass == 0xFBF /* moby class 4031 */)
+                    gHomingPickupTarget = other;
             }
         }
-        func_L05_0041C410(moby);
+        InitGlowRingState_L05(moby);
         moby->scale = *(float *)(moby->pClass + 0x24);
         return moby;
     }

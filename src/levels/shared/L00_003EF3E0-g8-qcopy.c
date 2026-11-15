@@ -1,3 +1,4 @@
+#include "names.h"
 /* Reconstructed from retail; standalone all-placement checks pass in all three releases.
  * The lead must still verify strict linked builds. */
 typedef int TI128 __attribute__((mode(TI)));
@@ -22,10 +23,12 @@ extern void func_0029F338(void *);
 extern char *D_L00_001B0838 __attribute__((sda));
 extern char D_0018C0B0[];
 
+/* Creates a blast moby (class 3301) at the given spot, stores its direction, turns it to match
+   the surface, and replaces the previous blast moby. */
 char *func_L00_003EF3E0(TI128 *position, TI128 *direction)
 {
     LocalF3E0 local;
-    char *p = func_0029EFD0(0xCE5);
+    char *p = CreateMoby(0xCE5 /* moby class 3301 */);
     char *data = *(char **)(p + 0x68);
     char *basis;
     char *axis;
@@ -44,17 +47,17 @@ char *func_L00_003EF3E0(TI128 *position, TI128 *direction)
         *(TI128 *)data = *direction;
         basis = p + 0xC0;
         axis = p + 0xE0;
-        func_002833F0(basis, *(char **)D_0018C0B0 + 0xF0);
-        func_002AFFD8(point, &local.v2, 1);
-        func_00282F20(&local.v2, &local.v2, 1.0f);
-        func_00282DD8(&local.v1, axis, &local.v2);
-        half = func_00282DB0(axis, &local.v2) * 0.5f;
-        func_00282D30(&local.v0, &local.v1, func_00283198(half));
-        *(float *)((char *)&local.v0 + 12) = func_00283180(half);
-        func_00283958(&local.v0, local.matrix);
-        func_00283738(basis, local.matrix, basis);
+        euler_rotation_basis(basis, *(char **)gHeroMoby_0018C0B0 + 0xF0);
+        ComputeViewDirection(point, &local.v2, 1);
+        vec_scale_to_length(&local.v2, &local.v2, 1.0f);
+        FastVecCross(&local.v1, axis, &local.v2);
+        half = FastVecDot(axis, &local.v2) * 0.5f;
+        FastVecScale(&local.v0, &local.v1, FastSinOrCosB(half));
+        *(float *)((char *)&local.v0 + 12) = FastSinOrCosA(half);
+        quaternion_to_rotation_basis(&local.v0, local.matrix);
+        multiply_matrix3x3(basis, local.matrix, basis);
         if (D_L00_001B0838 != 0)
-            func_0029F338(D_L00_001B0838);
+            MarkMobySpawned(D_L00_001B0838);
         D_L00_001B0838 = p;
     }
     return p;

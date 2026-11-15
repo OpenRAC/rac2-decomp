@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int unk00;
@@ -32,33 +33,33 @@ extern void func_0028A278(void);
 /* Clears the thirteen HUD slots and lazily allocates their drawing buffers. */
 void func_0028AB70(void)
 {
-    int *base = (int *)D_00255330;
-    int *q;
+    int *cursor = (int *)gHudElements;
+    int *slotWords;
     int i = 0;
 
-    D_001B1870 = 0;
+    gHudState = 0;
     D_001B1874 = 0;
     do {
-        q = base + 9;
-        q[16] = -1;
-        q[-1] = 0x10000;
-        func_0028B3D0(i, 0xffff, 0, 0, 0, 0, 1);
+        slotWords = cursor + 9;
+        slotWords[16] = -1;
+        slotWords[-1] = 0x10000;
+        SetHudSlotContents(i, 0xffff, 0, 0, 0, 0, 1);
         i++;
-        q[22] = 0;
-        q[18] = -6;
-        q[-8] = 0;
-        q[0] = 0;
-        base = q + 27;
+        slotWords[22] = 0;
+        slotWords[18] = -6;
+        slotWords[-8] = 0;
+        slotWords[0] = 0;
+        cursor = slotWords + 27;
     } while (i < 13);
     if (D_001B18D8 == 0) {
-        char *file = ref_L00_0028AB70_00;
-        D_001B18D8 = func_0028B2B8(0x2800, 0, file, 0x2AB);
-        D_001B18E4 = (int)func_0028B2B8(0x1400, 0, file, 0x2AC);
+        char *sourceFile = ref_L00_0028AB70_00;
+        D_001B18D8 = AllocHudMemory(0x2800, 0, sourceFile, 0x2AB);
+        D_001B18E4 = (int)AllocHudMemory(0x1400, 0, sourceFile, 0x2AC);
     }
     D_001B18E0_1 = D_001B18D8 + 0x2800;
     D_001B18DC_1 = D_001B18D8;
-    func_00282A88(D_001B18D8, 0x2800);
+    FastMemoryHelperB(D_001B18D8, 0x2800);
     *((unsigned char *)D_001B18D8 + 0x20) = 0xFF;
-    func_0028BCE8();
-    func_0028A278();
+    InitWeaponMenuSlots();
+    ResetBoltCounterDisplay();
 }

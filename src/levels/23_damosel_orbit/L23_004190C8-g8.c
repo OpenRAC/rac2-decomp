@@ -64,8 +64,8 @@ extern float func_00282C48(float);
 
 /* Picks one of the targets whose bits are set in the mask: at random, or the one nearest,
    farthest or best aligned, and latches its side and result in the state. */
-void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
-    PickState *state = arg0->state;
+void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
+    PickState *state = moby->state;
     int idx[4];
     float *pts[4];
     int res[4];
@@ -85,7 +85,7 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
     int k;
     int best;
 
-    n = func_L23_00418F30(arg0, mask, idx, check);
+    n = CollectMaskedPathIndices(moby, mask, idx, check);
     if (n == 0) {
         state->dir *= -1;
         return;
@@ -94,28 +94,28 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
         int k;
         int v;
 
-        k = idx[func_002A77E0(n)];
-        v = func_L23_00418FD0(arg0, k, state->kind);
+        k = idx[RandomIntBelow(n)];
+        v = TestPathEndMask(moby, k, state->kind);
 
         state->dir = v == 0 ? 1 : -1;
         state->res = v;
-        func_L23_00419088(arg0, k);
+        PushPathHistory(moby, k);
         return;
     }
     for (i = 0; i < n; i++) {
         int v;
         float (*e)[4];
         k = idx[i];
-        v = func_L23_00418FD0(arg0, k, state->kind);
+        v = TestPathEndMask(moby, k, state->kind);
 
         res[i] = v;
-        e = D_L23_001FF300[state->group[k]];
+        e = gPathLists[state->group[k]];
         if (v == 0) {
             pts[i] = e[*(int *)e];
-            keys[i] = &D_L23_002595C8[state->group[k]].miss;
+            keys[i] = &gPathEndMasks[state->group[k]].miss;
         } else {
             pts[i] = e[1];
-            keys[i] = &D_L23_002595C8[state->group[k]].hit;
+            keys[i] = &gPathEndMasks[state->group[k]].hit;
         }
     }
     best = 0;
@@ -129,8 +129,8 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
             float d;
 
             if (check != 0)
-                ok = func_L23_00419CE0(*keys[j]);
-            d = func_00282E48(pts[j], state->ref);
+                ok = IsSingleRejectedBit(*keys[j]);
+            d = fast_vec_dist(pts[j], state->ref);
             if ((d < f && ok == 0) || n == 1) {
                 best = j;
                 f = d;
@@ -147,10 +147,10 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
             float d;
 
             if (check != 0)
-                ok = func_L23_00419CE0(*keys[j]);
-            func_00282CF0(d1, (float *)D_00189EA0, arg0->pos);
-            func_00282CF0(d2, pts[j], arg0->pos);
-            d = func_00282DB0(d1, d2);
+                ok = IsSingleRejectedBit(*keys[j]);
+            FastVecSub(d1, (float *)gHeroPosition, moby->pos);
+            FastVecSub(d2, pts[j], moby->pos);
+            d = FastVecDot(d1, d2);
             if ((f < d && ok == 0) || n == 1) {
                 best = j;
                 f = d;
@@ -169,10 +169,10 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
                 float d;
 
                 if (check != 0)
-                    ok = func_L23_00419CE0(*keys[j]);
-                func_00282CF0(d1, (float *)D_00189EA0, arg0->pos);
-                func_00282CF0(d2, pts[j], arg0->pos);
-                d = func_00282DB0(d1, d2);
+                    ok = IsSingleRejectedBit(*keys[j]);
+                FastVecSub(d1, (float *)gHeroPosition, moby->pos);
+                FastVecSub(d2, pts[j], moby->pos);
+                d = FastVecDot(d1, d2);
                 if ((d < f && ok == 0) || n == 1) {
                     best = j;
                     f = d;
@@ -188,20 +188,20 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
                 float d;
 
                 if (check != 0)
-                    ok = func_L23_00419CE0(*keys[j]);
-                func_00282CF0(d1, state->target, state->origin);
-                func_00282CF0(d2, pts[j], state->origin);
-                func_00282F20(n1, d1, 1.0f);
-                func_00282F20(n2, d2, 1.0f);
+                    ok = IsSingleRejectedBit(*keys[j]);
+                FastVecSub(d1, state->target, state->origin);
+                FastVecSub(d2, pts[j], state->origin);
+                vec_scale_to_length(n1, d1, 1.0f);
+                vec_scale_to_length(n2, d2, 1.0f);
                 qcopy(a ,n1);
                 qcopy(b ,n2);
-                qcopy(up1,&arg0->up);
-                qcopy(up2,&arg0->up);
-                func_00282DD8(c1, up1, a);
-                func_00282DD8(c2, up2, b);
-                func_L00_00325600(a, state->frame, 0);
-                func_L00_00325600(b, state->frame, 0);
-                d = func_00282C48(func_00282DB0(a, b) - lim);
+                qcopy(up1,&moby->up);
+                qcopy(up2,&moby->up);
+                FastVecCross(c1, up1, a);
+                FastVecCross(c2, up2, b);
+                NegateAndForwardVector(a, state->frame, 0);
+                NegateAndForwardVector(b, state->frame, 0);
+                d = FloatAbs(FastVecDot(a, b) - lim);
                 if ((d < f && ok == 0) || n == 1) {
                     best = j;
                     f = d;
@@ -218,5 +218,5 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
         state->dir = -1;
     }
     state->res = res[best];
-    func_L23_00419088(arg0, k);
+    PushPathHistory(moby, k);
 }

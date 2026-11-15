@@ -13,32 +13,33 @@ extern float func_00282DB0(void *, void *);
 extern float func_00282DF0(void *);
 extern float func_002831B0(float);
 
-float func_003348A8(u8 *self, float t) {
-    float m[4] __attribute__((aligned(16)));
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    int *root = D_001B53A0;
-    float along;
-    float d;
-    float len;
-    float r;
+/* Works out how far, as a signed angle, a point in front of the camera is turned away from the object. */
+float func_003348A8(u8 *moby, float distance) {
+    float base[4] __attribute__((aligned(16)));
+    float offset[4] __attribute__((aligned(16)));
+    float toPoint[4] __attribute__((aligned(16)));
+    float projected[4] __attribute__((aligned(16)));
+    int *camera = D_001B53A0;
+    float alongDot;
+    float sideDot;
+    float length;
+    float angle;
 
-    func_00334710((int)self, (TI *)m);
-    func_00282D30(a, root + 8, t);
-    func_00282CC0(a, a, m);
-    func_00282CF0(b, a, self + 0x30);
-    along = func_00282DB0(b, self + 0x10);
-    func_00282D30(c, self + 0x10, along);
-    func_00282CF0(b, b, c);
-    d = func_00282DB0(b, self);
-    len = func_00282DF0(b);
-    if (len == 0.0f) {
+    CopyHeroVectorToOut((int)moby, (TI *)base);
+    FastVecScale(offset, camera + 8, distance);
+    FastVecAdd(offset, offset, base);
+    FastVecSub(toPoint, offset, moby + 0x30);
+    alongDot = FastVecDot(toPoint, moby + 0x10);
+    FastVecScale(projected, moby + 0x10, alongDot);
+    FastVecSub(toPoint, toPoint, projected);
+    sideDot = FastVecDot(toPoint, moby);
+    length = FastVecLength(toPoint);
+    if (length == 0.0f) {
         return 0.0f;
     }
-    r = 1.5707964f - func_002831B0(d / len);
-    if (func_00282DB0(b, self + 0x20) < 0.0f) {
-        r = -r;
+    angle = 1.5707964f - FastAngleHelper(sideDot / length);
+    if (FastVecDot(toPoint, moby + 0x20) < 0.0f) {
+        angle = -angle;
     }
-    return r;
+    return angle;
 }

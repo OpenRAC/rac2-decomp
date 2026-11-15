@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_003D5358 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections). */
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float v[4]; } Vector;
@@ -31,25 +32,26 @@ extern int func_L00_002AE888(void *axis, int mode, int flag, float value, float 
 extern void func_002FDF40(void *velocity, void *position, int handle, int mode, float a, float b, float c, float d);
 extern void func_002ACEC0(void *out, void *source, void *axis, float angle);
 
+/* Turns the object toward a target point, easing its angle with the given speed, damping and limit. */
 void func_L00_003D5358(char *object, void *target, float *velocity, float acceleration, float damping, float limit)
 {
     Vector difference, projection;
     char *base;
     float angle, magnitude;
     float zero;
-    func_00282CF0(&difference, target, object + 0x10);
-    base = D_00189E20;
+    FastVecSub(&difference, target, object + 0x10);
+    base = gHeroState;
     zero = 0.0f;
-    angle = func_00282DB0(&difference, *(char **)(base + 0x2290) + 0xe0);
-    func_00282D30(&projection, *(char **)(base + 0x2290) + 0xe0, angle);
-    func_00282CF0(&difference, &difference, &projection);
-    angle = func_00282DB0(&difference, *(char **)(base + 0x2290) + 0xc0);
-    magnitude = func_00282DF0(&difference);
+    angle = FastVecDot(&difference, *(char **)(base + 0x2290) + 0xe0);
+    FastVecScale(&projection, *(char **)(base + 0x2290) + 0xe0, angle);
+    FastVecSub(&difference, &difference, &projection);
+    angle = FastVecDot(&difference, *(char **)(base + 0x2290) + 0xc0);
+    magnitude = FastVecLength(&difference);
     if (magnitude != zero) {
-        angle = func_002831B0(angle / magnitude);
+        angle = FastAngleHelper(angle / magnitude);
         angle = 1.5707964f - angle;
-        if (func_00282DB0(&difference, *(char **)(base + 0x2290) + 0xd0) < zero)
+        if (FastVecDot(&difference, *(char **)(base + 0x2290) + 0xd0) < zero)
             angle = -angle;
-        func_002AA898((float *)(object + 0xf8), angle, velocity, acceleration, damping, limit, 0);
+        ApproachWithVelocity((float *)(object + 0xf8), angle, velocity, acceleration, damping, limit, 0);
     }
 }

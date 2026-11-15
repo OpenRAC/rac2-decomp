@@ -32,13 +32,13 @@ void func_L18_003FB620(u8 *object)
     int count;
     int i;
 
-    count = func_002A77E0(D_L18_001B05D4) + 1;
+    count = RandomIntBelow(D_L18_001B05D4) + 1;
     for (i = 0; i < count; i++) {
         qcopy(position, object + 0x10);
-        func_002ACB48(position, D_L18_001B05C8);
-        func_00282F20(direction, object + 0xC0,
-                      -(func_002A7878(D_L18_001B05CC, D_L18_001B05D0) * 0.016666668f));
-        func_L02_003449D8(position, direction, &D_L18_001B05B0, func_002A77E0(2),
-                          func_002A7820(-2, 2));
+        AddRandomOffsetToVector(position, D_L18_001B05C8);
+        vec_scale_to_length(direction, object + 0xC0,
+                      -(RandomFloatRange(D_L18_001B05CC, D_L18_001B05D0) * 0.016666668f));
+        SpawnEnemyRecord(position, direction, &D_L18_001B05B0, RandomIntBelow(2),
+                          RandomIntRange(-2, 2));
     }
 }

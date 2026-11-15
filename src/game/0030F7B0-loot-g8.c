@@ -14,7 +14,7 @@ void func_00311F70(unsigned char *self)
     int item = *(short *)(data + 0xC6) == 0;
     int n, i;
 
-    if (*(short *)(self + 0xAA) == 0x1F5 || *(short *)(self + 0xAA) == 0x200)
+    if (*(short *)(self + 0xAA) == 0x1F5 /* Nanotech Crate */ || *(short *)(self + 0xAA) == 0x200 /* Purple Nanotech Crate */)
         item = 0;
     if (item) {
         if (D_001AF0FC >= 21)
@@ -23,9 +23,9 @@ void func_00311F70(unsigned char *self)
             i = 1;
         else
             i = 2;
-        func_002A6C58(self, 256, func_002A77E0(2) + i);
+        SetDeathBits(self, 256, RandomIntBelow(2) + i);
     } else {
-        if (*(short *)(self + 0xAA) != 0x1F5 && *(short *)(self + 0xAA) != 0x200) {
+        if (*(short *)(self + 0xAA) != 0x1F5 /* Nanotech Crate */ && *(short *)(self + 0xAA) != 0x200 /* Purple Nanotech Crate */) {
             {
                 int kind = data[0xCB];
                 if (kind == 4)
@@ -51,17 +51,17 @@ void func_00311F70(unsigned char *self)
             selected:
                 ;
             }
-            n = func_002A68A8(self, &item);
+            n = PickAmmoDropItem(self, &item);
             if (n > 0) {
                 i = n;
                 do {
-                    func_003202E8(self + 0x10, item, -1, 0);
+                    SpawnWeaponAmmoPickup(self + 0x10, item, -1, 0);
                     --i;
                 } while (i);
             }
         }
         if (*(short *)(self + 0xB4))
             *(short *)(self + 0xB4) = 0;
-        func_002A6C58(self, 256, 0);
+        SetDeathBits(self, 256, 0);
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -19,27 +20,27 @@ extern void func_L05_0037CEE0(void *, void *, f32);
 /* func_L05_0037D608 is matched in its own unit, src/levels/shared/L05_0037D608.c (default flags). */
 
 /* Offers every live entry to the handler that takes one pointer through the loop. */
-void func_L25_003752D8(u8 *a0) {
+void func_L25_003752D8(u8 *entryArg) {
     s32 i;
     for (i = 0; i < D_L25_001AC4D8; i++) {
-        func_L05_0037B280(D_L25_00225910[i], a0);
+        SpawnEntryListObjectsWithFlag(D_L25_00225910[i], entryArg);
     }
 }
 
 /* Offers every live entry to the handler that carries one float through the loop. */
-void func_L25_00376FE0(u8 *a0, f32 f12) {
+void func_L25_00376FE0(u8 *entryArg, f32 extraValue) {
     s32 i;
     for (i = 0; i < D_L25_001AC4D8; i++) {
-        func_L05_0037CEE0(D_L25_00225910[i], a0, f12);
+        func_L05_0037CEE0(D_L25_00225910[i], entryArg, extraValue);
     }
 }
 
 extern void func_L05_0037D608(void *, void *, f32);
 
 /* Offers every live entry to the handler that carries one float through the loop. */
-void func_L25_00377608(u8 *a0, f32 f12) {
+void func_L25_00377608(u8 *entryArg, f32 extraValue) {
     s32 i;
     for (i = 0; i < D_L25_001AC4D8; i++) {
-        func_L05_0037D608(D_L25_00225910[i], a0, f12);
+        func_L05_0037D608(D_L25_00225910[i], entryArg, extraValue);
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     char pad0[0x2290];
     char *moby;
@@ -21,22 +22,23 @@ extern void func_L00_002D4A38(void);
 extern void func_L00_002A7E60(void);
 extern void func_L00_002B1F90(void);
 
+/* Sets the hero lock flags for the current state, then updates the hero item slots and related effects. */
 void func_L00_002B2120(void)
 {
-    int m = D_00189E20.mode;
+    int mode = gHeroState.mode;
 
-    if ((unsigned int)(m - 0x15) < 2 || m == 0x1F || func_L00_002ADF80() != 0) {
-        D_00189E20.b22B7 = 1;
-        D_00189E20.b22BC = 1;
+    if ((unsigned int)(mode - 0x15) < 2 || mode == 0x1F || IsHeroInSpecialKindOrMode() != 0) {
+        gHeroState.b22B7 = 1;
+        gHeroState.b22BC = 1;
     }
-    if (func_L00_002ADF80() != 0 || D_00189E20.state == 0x31 || D_00189E20.mode == 3 ||
-        D_00189E20.state == 0x12 || D_00189E20.state == 0x82)
-        D_00189E20.b22BE = 1;
+    if (IsHeroInSpecialKindOrMode() != 0 || gHeroState.state == 0x31 || gHeroState.mode == 3 ||
+        gHeroState.state == 0x12 || gHeroState.state == 0x82)
+        gHeroState.b22BE = 1;
     else
-        D_00189E20.b22BE = 0;
-    func_L00_002AFBF0();
-    func_L00_002B0968(D_00189E20.moby);
-    func_L00_002D4A38();
-    func_L00_002A7E60();
-    func_L00_002B1F90();
+        gHeroState.b22BE = 0;
+    SpawnHeroItemMobies();
+    update_hero_item_mobys(gHeroState.moby);
+    FadeLevelGlowColors();
+    UpdateEquippedItemGlow();
+    UpdateHeroSlotCallbacks();
 }

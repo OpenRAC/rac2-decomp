@@ -29,9 +29,10 @@
 extern void *r1_D_00154A40 NOT_SDA;
 
 /* rac1-decomp src/core/00119868.c: func_00119868 */
-void *func_0011BAC8(void *arg0) {
+/* Sets up an empty character ring buffer and returns it. */
+void *func_0011BAC8(void *ringSize) {
     char *self = (char *)&r1_D_00154A40;
-    r1_D_00154A40 = arg0;
+    r1_D_00154A40 = ringSize;
     *(int *)(self + 0x4) = 0;
     *(void **)(self + 0xC) = self + 0x10;
     *(void **)(self + 0x8) = self + 0x10;

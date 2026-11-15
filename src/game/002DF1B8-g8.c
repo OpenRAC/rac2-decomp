@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* -G8 sibling for src/game/002DF1B8.c: the two argument words go out through
    $gp, so this body needs the small-data addressing mode. */
@@ -31,14 +32,15 @@ extern int ref_L00_002DF380_00[];
 extern char *ref_L00_002DF380_01;
 extern char *ref_L00_002DF380_02;
 
+/* Shows every game object again by clearing the hidden mark on each one. */
 void func_002DF380(void)
 {
     char *start;
     char *end;
     char *p;
 
-    func_002B4B70(0, 0);
-    func_00284E18(ref_L00_002DF380_00[0x8F], ref_L00_002DF380_00[0x90], ref_L00_002DF380_00[0x91]);
+    EndSlotRequest(0, 0);
+    SetBackgroundColor(ref_L00_002DF380_00[0x8F], ref_L00_002DF380_00[0x90], ref_L00_002DF380_00[0x91]);
     start = ref_L00_002DF380_02;
     end = ref_L00_002DF380_01;
     for (p = start; p < end; p += 0x100) {
@@ -46,27 +48,29 @@ void func_002DF380(void)
     }
 }
 
-void func_002DF7A8(int a0, int a1, int a2)
+/* Adds a shadow drawing step to the packet list and starts it. */
+void func_002DF7A8(int pass, int tableIndex, int recordIndex)
 {
-    *(int *)(*(char *volatile *)&D_001B22A8 + 0x0) = 0x30000003;
-    *(int *)(*(char *volatile *)&D_001B22A8 + 0x4) = (int)(D_00261D10 + a2 * 0x30);
-    *(int *)(*(char *volatile *)&D_001B22A8 + 0x8) = 0x13000000;
-    *(int *)(*(char *volatile *)&D_001B22A8 + 0xC) = 0x50000003;
-    D_001B22A8 = *(char *volatile *)&D_001B22A8 + 0x10;
-    func_002E0C40(a0, D_001ABD88[a1]);
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 0x0) = 0x30000003;
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 0x4) = (int)(D_00261D10 + recordIndex * 0x30);
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 0x8) = 0x13000000;
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 0xC) = 0x50000003;
+    gDmaPacketCursor = *(char *volatile *)&gDmaPacketCursor + 0x10;
+    DrawShadowPass(pass, D_001ABD88[tableIndex]);
 }
 
-void func_002DF2E0(int a0, int a1)
+/* Hides every game object by setting a hidden mark on each one, and remembers the two arguments. */
+void func_002DF2E0(int firstArg, int secondArg)
 {
     char *start;
     char *end;
     char *p;
 
-    func_002B49E0(7, 1, 0, 0, 0);
-    D_001ABD84 = a1;
-    D_001ABD80 = a0;
+    BeginSlotRequest(7, 1, 0, 0, 0);
+    D_001ABD84 = secondArg;
+    D_001ABD80 = firstArg;
     D_001B1608[0] = 0;
-    func_00284E18(0, 0, 0);
+    SetBackgroundColor(0, 0, 0);
     start = D_001B1B5C;
     end = D_001B1B64;
     for (p = start; p < end; p += 0x100) {
@@ -82,31 +86,32 @@ extern int func_002E2988(void *);
 extern void func_002FC748(void);
 extern void func_0026FEB8(const char *, ...);
 
+/* Links the two graphics packet lists together, checks how big the frame got, warns if it is too large and keeps the biggest size seen. */
 void func_002E0F98(void)
 {
     char *other = *(char *volatile *)&D_001B20B4;
-    char *saved = *(char *volatile *)&D_001B22A8;
+    char *saved = *(char *volatile *)&gDmaPacketCursor;
     char *next;
     int size;
-    D_001B22A8 = saved + 16;
+    gDmaPacketCursor = saved + 16;
     *(unsigned int *)other = 0x20000000;
-    *(int *)(*(char *volatile *)&D_001B20B4 + 4) = (int)*(char *volatile *)&D_001B22A8;
+    *(int *)(*(char *volatile *)&D_001B20B4 + 4) = (int)*(char *volatile *)&gDmaPacketCursor;
     *(int *)(*(char *volatile *)&D_001B20B4 + 8) = 0;
     *(int *)(*(char *volatile *)&D_001B20B4 + 12) = 0;
-    size = func_002E2988(D_001A72D0);
-    func_002FC748();
+    size = BuildShrubTextureDma(D_001A72D0);
+    AppendVu1DmaChainTable1();
     if (size > 0x400000)
-        func_0026FEB8(D_001ABD90);
+        STUB_printf(D_001ABD90);
     if (*(volatile int *)&D_001B20BC < size)
         D_001B20BC = size;
-    *(unsigned int *)(*(char *volatile *)&D_001B22A8) = 0x20000000;
+    *(unsigned int *)(*(char *volatile *)&gDmaPacketCursor) = 0x20000000;
     next = *(char *volatile *)&D_001B20B4 + 16;
-    *(int *)(*(char *volatile *)&D_001B22A8 + 4) = (int)next;
-    *(int *)(*(char *volatile *)&D_001B22A8 + 8) = 0;
-    *(int *)(*(char *volatile *)&D_001B22A8 + 12) = 0;
-    *(char *volatile *)&D_001B22A8 = *(char *volatile *)&D_001B22A8 + 16;
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 4) = (int)next;
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 8) = 0;
+    *(int *)(*(char *volatile *)&gDmaPacketCursor + 12) = 0;
+    *(char *volatile *)&gDmaPacketCursor = *(char *volatile *)&gDmaPacketCursor + 16;
     *(unsigned int *)saved = 0x20000000;
-    *(int *)(saved + 4) = (int)*(char *volatile *)&D_001B22A8;
+    *(int *)(saved + 4) = (int)*(char *volatile *)&gDmaPacketCursor;
     *(int *)(saved + 8) = 0;
     *(int *)(saved + 12) = 0;
 }
@@ -117,6 +122,7 @@ extern const char D_001AB998[];
 extern const char D_001AB9F8[];
 extern struct { int text; int pad; } D_00258D70[];
 
+/* Builds the text for a location name into the buffer. Most locations get a prefix word first. */
 char *func_002DF1F8(char *buf, int kind) {
     int flag;
 
@@ -135,9 +141,9 @@ char *func_002DF1F8(char *buf, int kind) {
         break;
     }
     if (flag) {
-        func_00115DA8(buf, D_001AB998, func_00288FB8(0xB44), func_00288FB8(D_00258D70[kind].text));
+        Sprintf(buf, D_001AB998, GetLocalizedString(0xB44), GetLocalizedString(D_00258D70[kind].text));
     } else {
-        func_00115DA8(buf, D_001AB9F8, func_00288FB8(D_00258D70[kind].text));
+        Sprintf(buf, D_001AB9F8, GetLocalizedString(D_00258D70[kind].text));
     }
     return buf;
 }

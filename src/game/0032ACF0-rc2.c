@@ -35,37 +35,38 @@ extern void func_002ACEC0(s8 *, s8 *, s8 *, f32);
 extern void func_002FE8D8(s32, s8 *);
 extern void func_0032AE30(s32, s8 *, s32);
 
-void func_0032ACF0(s32 arg0) {
-    s8 sp[16];
-    s8 sp10[16];
-    f32 temp_f20;
-    f32 temp_f20_2;
-    s8 *var_s3;
-    s8 *var_s0;
-    s8 *end;
-    s8 *base;
-    s8 *p5;
+/* Moves the flying debris pieces of an owner, leaves a glowing trail node behind each, and removes a piece when its life runs out. */
+void func_0032ACF0(s32 owner) {
+    s8 targetOffset[16];
+    s8 trailPos[16];
+    f32 lifeNow;
+    f32 lifeRatio;
+    s8 *lifePtr;
+    s8 *piece;
+    s8 *tableEnd;
+    s8 *table;
+    s8 *hero;
 
-    base = D_00232760;
-    var_s3 = base + 0x18;
-    var_s0 = base;
-    end = var_s0 + 0x240;
-    p5 = D_00189E20;
+    table = gDebrisPieces;
+    lifePtr = table + 0x18;
+    piece = table;
+    tableEnd = piece + 0x240;
+    hero = gHeroState;
     do {
-        if ((*(s32 *)((s8 *)(var_s0) + (0x1C))) == arg0) {
-            func_002FE8D8((*(s32 *)((s8 *)(p5) + (0x2290))) + 0x10, sp);
-            temp_f20 = func_00283CE0((*(s32 *)((s8 *)(var_s0) + (0x18))));
-            temp_f20_2 = temp_f20 / func_00283CE0(0x25);
-            func_002ACEC0(sp10, var_s0, sp, (*(f32 *)((s8 *)(var_s0) + (0x10))));
-            func_0032AE30(arg0, sp10, func_00283CF0(temp_f20_2 * 128.0f));
-            (*(f32 *)((s8 *)(var_s0) + (0x10))) = func_00283B98((*(f32 *)((s8 *)(var_s0) + (0x10))), (*(f32 *)((s8 *)(var_s0) + (0x14))));
-            func_00282F20(sp, sp, 0.04f);
-            func_00282CC0(var_s0, var_s0, sp);
-            if (func_00282948(var_s3) != 0) {
-                (*(s32 *)((s8 *)(var_s0) + (0x1C))) = 0;
+        if ((*(s32 *)((s8 *)(piece) + (0x1C))) == owner) {
+            GetObjectFacingDirection((*(s32 *)((s8 *)(hero) + (0x2290))) + 0x10, targetOffset);
+            lifeNow = IntToFloat((*(s32 *)((s8 *)(piece) + (0x18))));
+            lifeRatio = lifeNow / IntToFloat(0x25);
+            ApplyAxisRotationToQuaternion(trailPos, piece, targetOffset, (*(f32 *)((s8 *)(piece) + (0x10))));
+            ClaimTrailNode(owner, trailPos, FloatToInt(lifeRatio * 128.0f));
+            (*(f32 *)((s8 *)(piece) + (0x10))) = FastAddRotations((*(f32 *)((s8 *)(piece) + (0x10))), (*(f32 *)((s8 *)(piece) + (0x14))));
+            vec_scale_to_length(targetOffset, targetOffset, 0.04f);
+            FastVecAdd(piece, piece, targetOffset);
+            if (FastFloatHelperD(lifePtr) != 0) {
+                (*(s32 *)((s8 *)(piece) + (0x1C))) = 0;
             }
         }
-        var_s0 += 0x30;
-        var_s3 += 0x30;
-    } while ((s32)var_s0 < (s32)end);
+        piece += 0x30;
+        lifePtr += 0x30;
+    } while ((s32)piece < (s32)tableEnd);
 }

@@ -44,23 +44,24 @@ extern float func_00283B98(float, float);
 extern int func_002A77E0(int);
 extern void func_L01_00397A28(Obj_397870 *);
 
-void func_L01_00397870(Obj_397870 *a0)
+/* Keeps a moby bobbing up and down and turning toward its target angles while it is in its running state. */
+void func_L01_00397870(Obj_397870 *moby)
 {
-    State_397870 *s1 = a0->st;
-    float f;
+    State_397870 *vars = moby->st;
+    float bobSine;
 
-    a0->f2C = a0->cls->f24 * D_L01_001AF50C;
+    moby->f2C = moby->cls->f24 * D_L01_001AF50C;
 
-    if (a0->b20 == 1) {
-        f = func_00283198(a0->fFC);
-        a0->f18 = s1->f18 + D_L01_001AF510 + D_L01_001AF514 * f;
-        a0->fF0 = func_00283B98(a0->fF0, s1->f68);
-        a0->fF4 = func_00283B98(a0->fF4, s1->f64);
-        a0->fF8 = func_00283B98(a0->fF8, s1->f60);
-        a0->fFC = func_00283B98(a0->fFC, 0.0002908882452175021f * D_L01_001AF528);
+    if (moby->b20 == 1) {
+        bobSine = FastSinOrCosB(moby->fFC);
+        moby->f18 = vars->f18 + D_L01_001AF510 + D_L01_001AF514 * bobSine;
+        moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
+        moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
+        moby->fF8 = FastAddRotations(moby->fF8, vars->f60);
+        moby->fFC = FastAddRotations(moby->fFC, 0.0002908882452175021f * D_L01_001AF528);
     }
 
-    func_L01_00397A28(a0);
-    if (func_002A77E0(D_L01_001AF54C) == 0)
-        func_L01_00397EB0(a0);
+    DrawBoltGlowRings(moby);
+    if (RandomIntBelow(D_L01_001AF54C) == 0)
+        SpawnSparkleTrailAboveGround(moby);
 }

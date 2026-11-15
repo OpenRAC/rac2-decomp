@@ -5,6 +5,7 @@ extern char D_00134640[];
 
 extern char *func_001184D0(char *arg0);
 
+/* Writes a whole number as text in the given number base. */
 char *func_00118548(int input, char *buf, unsigned int base) {
     unsigned int value = input;
     unsigned int neg = (unsigned int)input >> 31;
@@ -22,5 +23,5 @@ char *func_00118548(int input, char *buf, unsigned int base) {
     if (neg)
         buf[len++] = '-';
     buf[len] = '\0';
-    return func_001184D0(buf);
+    return ReverseString(buf);
 }

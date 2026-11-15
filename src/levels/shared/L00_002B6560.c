@@ -35,73 +35,73 @@ typedef struct {
 /* Apply gravity and the current jump or hovering motion to the hero's velocity. */
 void func_L00_002B6560(void)
 {
-    float v[4], w[4], u[4], len;
+    float offset[4], rayEnd[4], rayStart[4], currentSpeed;
     float speed, distance;
     int near, clear;
 
     {
-        char *g = (char *)&D_00189E20;
-        int state = *(int *)(g + 0x2294), age;
+        char *hero = (char *)&gHeroState;
+        int state = *(int *)(hero + 0x2294), age;
 
-        if (!((state == 27 && *(int *)(g + 0x1B8) < 10) ||
-              (state == 137 && (age = *(int *)(g + 0x1B8)) < 12) ||
-              (state == 72 && *(int *)(g + 0x1B8) < 13))) {
-            if (*(int *)(g + 0x1B8) < *(short *)(g + 0x4AC)) {
-                func_L00_002D3B58(g + 0xF0, g + 0xF0, 0.0f);
-                func_L00_002D34C0(g + 0xF0, g + 0xF0, 0.013333334f);
-            } else if (*(unsigned char *)(g + 0x49C)) {
-                func_L00_002D3B58(g + 0xF0, g + 0xF0, 0.0f);
-                func_L00_002D34C0(g + 0xF0, g + 0xF0, 0.015000001f);
+        if (!((state == 27 && *(int *)(hero + 0x1B8) < 10) ||
+              (state == 137 && (age = *(int *)(hero + 0x1B8)) < 12) ||
+              (state == 72 && *(int *)(hero + 0x1B8) < 13))) {
+            if (*(int *)(hero + 0x1B8) < *(short *)(hero + 0x4AC)) {
+                SetViewSpaceHeight(hero + 0xF0, hero + 0xF0, 0.0f);
+                ApplyHeroModeTransform(hero + 0xF0, hero + 0xF0, 0.013333334f);
+            } else if (*(unsigned char *)(hero + 0x49C)) {
+                SetViewSpaceHeight(hero + 0xF0, hero + 0xF0, 0.0f);
+                ApplyHeroModeTransform(hero + 0xF0, hero + 0xF0, 0.015000001f);
             } else {
-                float z;
+                float fallSpeed;
 
-                func_L00_002D34C0(g + 0xF0, g + 0xF0, *(float *)(g + 0x520));
-                z = func_L00_002D3B00(g + 0xF0);
-                if (z < -*(float *)(g + 0x4A0))
-                    z = -*(float *)(g + 0x4A0);
-                func_L00_002D3B58(g + 0xF0, g + 0xF0, z);
+                ApplyHeroModeTransform(hero + 0xF0, hero + 0xF0, *(float *)(hero + 0x520));
+                fallSpeed = GetViewSpaceHeight(hero + 0xF0);
+                if (fallSpeed < -*(float *)(hero + 0x4A0))
+                    fallSpeed = -*(float *)(hero + 0x4A0);
+                SetViewSpaceHeight(hero + 0xF0, hero + 0xF0, fallSpeed);
             }
         }
     }
     {
-        char *g = (char *)&D_00189E20;
+        char *hero = (char *)&gHeroState;
 
-        if (*(int *)(g + 0x2294) == 14) {
+        if (*(int *)(hero + 0x2294) == 14) {
             speed = 0.116666675f;
             near = 0;
-            if (D_001A7AF8[2] && *(short *)(g + 0x24FC) == 0)
-                near = func_L00_002ADEA0(3) == 3;
+            if (gItemOwnedFlags[2] && *(short *)(hero + 0x24FC) == 0)
+                near = hero_slot_item_id(3) == 3;
             {
-                char *position = D_00189EA0;
+                char *position = gHeroPosition;
 
-                func_00282CF0(v, position, position + 0x3E0);
-                distance = func_L00_002D3B00(v);
+                FastVecSub(offset, position, position + 0x3E0);
+                distance = GetViewSpaceHeight(offset);
                 clear = 1;
                 if (near) {
-                    char *g = position - 0x80;
+                    char *hero = position - 0x80;
 
-                    if (!*(unsigned char *)(g + 0x49E)) {
-                        func_L00_002B9BB0(4, *(int *)(g + 0x2290), 13);
+                    if (!*(unsigned char *)(hero + 0x49E)) {
+                        UpdateSoundSlotObject(4, *(int *)(hero + 0x2290), 13);
                     } else {
-                        int index = *(int *)(g + 0x243C);
+                        int index = *(int *)(hero + 0x243C);
 
                         if (index != -1) {
-                            char *entry = D_00188660 + index * 112;
+                            char *entry = gSoundState + index * 112;
 
-                            if (*(int *)(entry + 0x88) == *(int *)(g + 0x2290) &&
+                            if (*(int *)(entry + 0x88) == *(int *)(hero + 0x2290) &&
                                 *(unsigned char *)(entry + 0x74)) {
-                                func_002E59F8(index);
+                                StopSoundVoice(index);
                             }
                         }
                         {
-                            char *h = (char *)D_00189E20;
+                            char *heroAlt = (char *)gHeroState;
 
-                            *(int *)(h + 0x243C) = -1;
+                            *(int *)(heroAlt + 0x243C) = -1;
                         }
                     }
-                    func_L00_002D36E0(u, 0.0f, 0.0f, 1.0f, 1);
-                    func_L00_002D36E0(w, 0.0f, 0.0f, 2.7f, 1);
-                    if (func_002761F8(u, w, 2, 0, 0))
+                    BuildHeroRelativePoint(rayStart, 0.0f, 0.0f, 1.0f, 1);
+                    BuildHeroRelativePoint(rayEnd, 0.0f, 0.0f, 2.7f, 1);
+                    if (CollLine(rayStart, rayEnd, 2, 0, 0))
                         clear = 0;
                 }
             }
@@ -116,75 +116,75 @@ void func_L00_002B6560(void)
                 else if (distance > 1.7f)
                     speed *= 0.7f;
             }
-            if (func_L00_002ADEA0(3) == 3) {
-                char *g = (char *)D_00189E20;
+            if (hero_slot_item_id(3) == 3) {
+                char *hero = (char *)gHeroState;
 
-                if (*(short *)(g + 0x24FC) == 0) {
+                if (*(short *)(hero + 0x24FC) == 0) {
                     if (clear)
                         speed *= 1.25f;
                 }
             }
             {
-                char *g = (char *)&D_00189E20;
+                char *hero = (char *)&gHeroState;
 
-                if (*(int *)(g + 0x1B8) < 8) {
-                    len = func_L00_002D3B00(g + 0xF0);
-                    if (len < speed)
-                        func_002AA2E8(&len, speed, 0.041666668f);
-                    func_L00_002D3B58(g + 0xF0, g + 0xF0, len);
+                if (*(int *)(hero + 0x1B8) < 8) {
+                    currentSpeed = GetViewSpaceHeight(hero + 0xF0);
+                    if (currentSpeed < speed)
+                        ApproachValue(&currentSpeed, speed, 0.041666668f);
+                    SetViewSpaceHeight(hero + 0xF0, hero + 0xF0, currentSpeed);
                 }
             }
         } else {
             int zero = 0;
-            char *k;
+            char *heroCheck;
 
-            if (*(float *)(g + 0x4B0) == 0.0f && *(float *)(g + 0x4B4) == 0.0f)
+            if (*(float *)(hero + 0x4B0) == 0.0f && *(float *)(hero + 0x4B4) == 0.0f)
                 zero = 1;
             if ((D_00138320[0] & 0x40) || zero ||
-                (k = (char *)D_00189E20, *(int *)(k + 0x2294) == 18)) {
-                char *g = (char *)&D_00189E20;
+                (heroCheck = (char *)gHeroState, *(int *)(heroCheck + 0x2294) == 18)) {
+                char *hero = (char *)&gHeroState;
 
-                if (*(float *)(g + 0x4A8) < *(float *)(g + 0x50C) &&
-                    *(int *)(g + 0x1B8) <= *(short *)(g + 0x518)) {
-                    *(float *)(g + 0x4A8) +=
-                        (*(float *)(g + 0x50C) - *(float *)(g + 0x508)) /
-                        (float)*(short *)(g + 0x518);
-                    if (*(float *)(g + 0x50C) < *(float *)(g + 0x4A8))
-                        *(float *)(g + 0x4A8) = *(float *)(g + 0x50C);
-                    *(float *)(g + 0x4B0) +=
-                        func_00282C10(*(float *)(g + 0x4A8) * 2.0f * *(float *)(g + 0x520)) -
-                        *(float *)(g + 0x4B4) - *(float *)(g + 0x4B0);
+                if (*(float *)(hero + 0x4A8) < *(float *)(hero + 0x50C) &&
+                    *(int *)(hero + 0x1B8) <= *(short *)(hero + 0x518)) {
+                    *(float *)(hero + 0x4A8) +=
+                        (*(float *)(hero + 0x50C) - *(float *)(hero + 0x508)) /
+                        (float)*(short *)(hero + 0x518);
+                    if (*(float *)(hero + 0x50C) < *(float *)(hero + 0x4A8))
+                        *(float *)(hero + 0x4A8) = *(float *)(hero + 0x50C);
+                    *(float *)(hero + 0x4B0) +=
+                        square_root(*(float *)(hero + 0x4A8) * 2.0f * *(float *)(hero + 0x520)) -
+                        *(float *)(hero + 0x4B4) - *(float *)(hero + 0x4B0);
                 }
             }
             {
-                char *g = (char *)&D_00189E20;
+                char *hero = (char *)&gHeroState;
 
-                if (*(int *)(g + 0x1B8) >= *(short *)(g + 0x4AC) &&
-                    *(float *)(g + 0x4B0) > 0.0f) {
-                    func_L00_002D38A0(g + 0xF0, g + 0xF0, *(float *)(g + 0x4B0));
-                    *(float *)(g + 0x4B4) += *(float *)(g + 0x4B0);
-                    *(float *)(g + 0x4B0) = 0.0f;
+                if (*(int *)(hero + 0x1B8) >= *(short *)(hero + 0x4AC) &&
+                    *(float *)(hero + 0x4B0) > 0.0f) {
+                    OffsetPointInViewSpace(hero + 0xF0, hero + 0xF0, *(float *)(hero + 0x4B0));
+                    *(float *)(hero + 0x4B4) += *(float *)(hero + 0x4B0);
+                    *(float *)(hero + 0x4B0) = 0.0f;
                 }
             }
             {
-                char *g = (char *)&D_00189E20;
+                char *hero = (char *)&gHeroState;
 
-                if (*(unsigned char *)(g + 0x49D) &&
-                    *(int *)(g + 0x1B8) >= *(int *)(g + 0x430) &&
-                    *(int *)(g + 0x1B8) < *(int *)(g + 0x434)) {
-                    HeroMotionSequence *p = (HeroMotionSequence *)(g + 0x430);
+                if (*(unsigned char *)(hero + 0x49D) &&
+                    *(int *)(hero + 0x1B8) >= *(int *)(hero + 0x430) &&
+                    *(int *)(hero + 0x1B8) < *(int *)(hero + 0x434)) {
+                    HeroMotionSequence *sequence = (HeroMotionSequence *)(hero + 0x430);
 
-                    p->ticks++;
-                    while (p->index == -1 || p->ticks >= p->entries[p->index].duration) {
-                        p->ticks = 0;
-                        p->index++;
-                        if (p->entries[p->index].initial != -999999.0f)
-                            p->value = p->entries[p->index].initial * 0.00027777778450399637f;
+                    sequence->ticks++;
+                    while (sequence->index == -1 || sequence->ticks >= sequence->entries[sequence->index].duration) {
+                        sequence->ticks = 0;
+                        sequence->index++;
+                        if (sequence->entries[sequence->index].initial != -999999.0f)
+                            sequence->value = sequence->entries[sequence->index].initial * 0.00027777778450399637f;
                     }
-                    if (p->ticks > 0)
-                        p->value += p->entries[p->index].acceleration * 0.00027777778450399637f;
-                    func_L00_002D38A0((char *)&D_00189E20 + 0xF0,
-                                     (char *)&D_00189E20 + 0xF0, p->value);
+                    if (sequence->ticks > 0)
+                        sequence->value += sequence->entries[sequence->index].acceleration * 0.00027777778450399637f;
+                    OffsetPointInViewSpace((char *)&gHeroState + 0xF0,
+                                     (char *)&gHeroState + 0xF0, sequence->value);
                 }
             }
         }

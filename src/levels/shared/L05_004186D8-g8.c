@@ -38,6 +38,7 @@ extern int func_L05_0037AC00(void);
 extern void func_L05_00418E90(char *);
 typedef int BeamVec __attribute__((mode(TI)));
 
+/* Draws the bright flame lines behind the object. They are wider and longer when a Spaceship Attachment is fitted, and they grow with a timer. */
 void func_L05_004186D8(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -45,7 +46,7 @@ void func_L05_004186D8(char *object)
     float pos[4], direction[4], offset[4], offset2[4], offset3[4];
     float offsetX, offsetZ;
 
-    if (attachment && *(short *)(attachment + 0xAA) == 0x10D9) {
+    if (attachment && *(short *)(attachment + 0xAA) == 0x10D9 /* Spaceship Attachment */) {
         float factor, length, length2, width, height, width2, height2, extent, extent2;
         int count, count2, color, color2;
 
@@ -56,16 +57,16 @@ void func_L05_004186D8(char *object)
         offset[0] = offsetX;
         offset[2] = offsetZ;
         offset[3] = 1.0f;
-        func_00283098(pos, offset, object + 0xC0);
-        func_00282CC0(pos, pos, object + 0x10);
-        factor = func_00283CE0(*(int *)(state + 0x34)) / func_00283CE0(8);
+        matrix_mul_vec3(pos, offset, object + 0xC0);
+        FastVecAdd(pos, pos, object + 0x10);
+        factor = IntToFloat(*(int *)(state + 0x34)) / IntToFloat(8);
         factor *= 0.5f;
         length = D_L05_001B0FCC + (D_L05_001B1000 - D_L05_001B0FCC) * factor;
         length2 = D_L05_001B0FE4 + (D_L05_001B1018 - D_L05_001B0FE4) * factor;
-        count = func_00283CF0((float)D_L05_001B0FD4 + (float)(D_L05_001B1008 - D_L05_001B0FD4) * factor);
+        count = FloatToInt((float)D_L05_001B0FD4 + (float)(D_L05_001B1008 - D_L05_001B0FD4) * factor);
         length = -length;
         length2 = -length2;
-        count2 = func_00283CF0((float)D_L05_001B0FEC + (float)(D_L05_001B1020 - D_L05_001B0FEC) * factor);
+        count2 = FloatToInt((float)D_L05_001B0FEC + (float)(D_L05_001B1020 - D_L05_001B0FEC) * factor);
         width = (D_L05_001B0FC4 + (D_L05_001B0FF8 - D_L05_001B0FC4) * factor) * 0.5f;
         width2 = (D_L05_001B0FDC + (D_L05_001B1010 - D_L05_001B0FDC) * factor) * 0.5f;
         height = (D_L05_001B0FC8 + (D_L05_001B0FFC - D_L05_001B0FC8) * factor) * 0.5f;
@@ -73,33 +74,33 @@ void func_L05_004186D8(char *object)
         extent = D_L05_001B0FD0 + (D_L05_001B1004 - D_L05_001B0FD0) * factor;
         extent2 = D_L05_001B0FE8 + (D_L05_001B101C - D_L05_001B0FE8) * factor;
 
-        color = func_00283D38(D_L05_001B0FC0, D_L05_001B0FF4, factor);
-        color2 = func_00283D38(D_L05_001B0FD8, D_L05_001B100C, factor);
-        func_00282D30(direction, object + 0xC0, length);
-        func_L05_00418D68(pos, direction, count, width, height, extent, color);
-        func_00282D30(direction, object + 0xC0, length2);
-        func_L05_00418D68(pos, direction, count2, width2, height2, extent2, color2);
+        color = FastTweenColor(D_L05_001B0FC0, D_L05_001B0FF4, factor);
+        color2 = FastTweenColor(D_L05_001B0FD8, D_L05_001B100C, factor);
+        FastVecScale(direction, object + 0xC0, length);
+        SpawnSpriteLine(pos, direction, count, width, height, extent, color);
+        FastVecScale(direction, object + 0xC0, length2);
+        SpawnSpriteLine(pos, direction, count2, width2, height2, extent2, color2);
         *(BeamVec *)offset2 = 0;
         offset2[1] = -0.045f;
         offset2[0] = offsetX;
         offset2[2] = offsetZ;
         offset2[3] = 1.0f;
-        func_00283098(pos, offset2, object + 0xC0);
-        func_00282CC0(pos, pos, object + 0x10);
-        func_00282D30(direction, object + 0xC0, length);
-        func_L05_00418D68(pos, direction, count, width, height, extent, color);
-        func_00282D30(direction, object + 0xC0, length2);
-        func_L05_00418D68(pos, direction, count2, width2, height2, extent2, color2);
+        matrix_mul_vec3(pos, offset2, object + 0xC0);
+        FastVecAdd(pos, pos, object + 0x10);
+        FastVecScale(direction, object + 0xC0, length);
+        SpawnSpriteLine(pos, direction, count, width, height, extent, color);
+        FastVecScale(direction, object + 0xC0, length2);
+        SpawnSpriteLine(pos, direction, count2, width2, height2, extent2, color2);
         *(BeamVec *)offset3 = 0;
         offset3[2] = 0.07f;
         offset3[0] = offsetX;
         offset3[3] = 1.0f;
-        func_00283098(pos, offset3, object + 0xC0);
-        func_00282CC0(pos, pos, object + 0x10);
-        func_00282D30(direction, object + 0xC0, length);
-        func_L05_00418D68(pos, direction, count, width + width, height + height, extent, color);
-        func_00282D30(direction, object + 0xC0, length2);
-        func_L05_00418D68(pos, direction, count2, width2 + width2, height2 + height2, extent2, color2);
+        matrix_mul_vec3(pos, offset3, object + 0xC0);
+        FastVecAdd(pos, pos, object + 0x10);
+        FastVecScale(direction, object + 0xC0, length);
+        SpawnSpriteLine(pos, direction, count, width + width, height + height, extent, color);
+        FastVecScale(direction, object + 0xC0, length2);
+        SpawnSpriteLine(pos, direction, count2, width2 + width2, height2 + height2, extent2, color2);
     } else {
         float factor, length, length2, width, height, width2, height2, extent, extent2;
         int count, count2, color, color2;
@@ -108,27 +109,27 @@ void func_L05_004186D8(char *object)
         offset[0] = -0.135f;
         offset[2] = 0.07f;
         offset[3] = 1.0f;
-        func_00283098(pos, offset, object + 0xC0);
-        func_00282CC0(pos, pos, object + 0x10);
-        factor = func_00283CE0(*(int *)(state + 0x34)) / func_00283CE0(8);
+        matrix_mul_vec3(pos, offset, object + 0xC0);
+        FastVecAdd(pos, pos, object + 0x10);
+        factor = IntToFloat(*(int *)(state + 0x34)) / IntToFloat(8);
         length = D_L05_001B0FCC + (D_L05_001B1000 - D_L05_001B0FCC) * factor;
         length2 = D_L05_001B0FE4 + (D_L05_001B1018 - D_L05_001B0FE4) * factor;
-        count = func_00283CF0((float)D_L05_001B0FD4 + (float)(D_L05_001B1008 - D_L05_001B0FD4) * factor);
-        count2 = func_00283CF0((float)D_L05_001B0FEC + (float)(D_L05_001B1020 - D_L05_001B0FEC) * factor);
+        count = FloatToInt((float)D_L05_001B0FD4 + (float)(D_L05_001B1008 - D_L05_001B0FD4) * factor);
+        count2 = FloatToInt((float)D_L05_001B0FEC + (float)(D_L05_001B1020 - D_L05_001B0FEC) * factor);
         width = D_L05_001B0FC4 + (D_L05_001B0FF8 - D_L05_001B0FC4) * factor;
         width2 = D_L05_001B0FDC + (D_L05_001B1010 - D_L05_001B0FDC) * factor;
         height = D_L05_001B0FC8 + (D_L05_001B0FFC - D_L05_001B0FC8) * factor;
         height2 = D_L05_001B0FE0 + (D_L05_001B1014 - D_L05_001B0FE0) * factor;
         extent = D_L05_001B0FD0 + (D_L05_001B1004 - D_L05_001B0FD0) * factor;
         extent2 = D_L05_001B0FE8 + (D_L05_001B101C - D_L05_001B0FE8) * factor;
-        color = func_00283D38(D_L05_001B0FC0, D_L05_001B0FF4, factor);
-        color2 = func_00283D38(D_L05_001B0FD8, D_L05_001B100C, factor);
-        func_00282D30(direction, object + 0xC0, -length);
-        func_L05_00418D68(pos, direction, count, width, height, extent, color);
-        func_00282D30(direction, object + 0xC0, -length2);
-        func_L05_00418D68(pos, direction, count2, width2, height2, extent2, color2);
+        color = FastTweenColor(D_L05_001B0FC0, D_L05_001B0FF4, factor);
+        color2 = FastTweenColor(D_L05_001B0FD8, D_L05_001B100C, factor);
+        FastVecScale(direction, object + 0xC0, -length);
+        SpawnSpriteLine(pos, direction, count, width, height, extent, color);
+        FastVecScale(direction, object + 0xC0, -length2);
+        SpawnSpriteLine(pos, direction, count2, width2, height2, extent2, color2);
     }
-    func_L05_00419370(object);
-    if (func_L05_0037AC00())
-        func_L05_00418E90(object);
+    UpdateBeamTrailParticles(object);
+    if (GetShieldSlotValue())
+        DrawThrusterGlow(object);
 }

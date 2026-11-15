@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef float f32;
 typedef int TI128 __attribute__((mode(TI)));
@@ -29,6 +30,7 @@ extern void func_0029F338(char *);
 extern void func_0032C700(void *, int, int, int, int, int, int, int, int, int, int, int,
                           f32, f32);
 
+/* Updates an enemy that loses health over time, and makes a small explosion and removes it when its health runs out. */
 void func_L13_003ECEA8(char *a0)
 {
     char *self = a0;
@@ -45,12 +47,12 @@ void func_L13_003ECEA8(char *a0)
     state = *(unsigned char *)(self + 0x20);
     switch (state) {
     case 0:
-        func_L13_00389848((Obj_389848 *)self);
+        AddKeyToLevelList((Obj_389848 *)self);
         *(unsigned char *)(self + 0x20) = 1;
     case 1:
-        func_002AB8C0(self, ctl + 0x50);
-        child = (char *)func_002A9640(self, 1, 0);
-        if (func_00282978(ctl + 0x26) == 0)
+        UpdateColorFade(self, ctl + 0x50);
+        child = (char *)FindOwnedEffectSlot(self, 1, 0);
+        if (FastDecTimer(ctl + 0x26) == 0)
             child = 0;
         if (child != 0) {
             scale = *(f32 *)(child + 0x2C);
@@ -60,7 +62,7 @@ void func_L13_003ECEA8(char *a0)
                     *(f32 *)(child + 0x2C) = scale * *(f32 *)(ctl + 0xF8);
             }
         } else {
-            child = (char *)func_002A9640(self, 0x10000, 0);
+            child = (char *)FindOwnedEffectSlot(self, 0x10000, 0);
             if (child != 0) {
                 scale = *(f32 *)(child + 0x2C);
                 scale *= 0.5f;
@@ -72,22 +74,22 @@ void func_L13_003ECEA8(char *a0)
                 }
             }
         }
-        scale = func_002A96A0(self, child);
+        scale = UpdateAimTargetStrength(self, child);
         *(unsigned char *)(self + 0xA8) = 0xFF;
         *(f32 *)(ctl + 0x20) -= scale;
-        func_002B3380(self, ctl + 0x100, ctl + 0x20);
+        SpawnDamageDebrisOnHealthLoss(self, ctl + 0x100, ctl + 0x20);
         if (*(f32 *)(ctl + 0x20) <= 0.0f) {
             {
             f32 *v = vec;
             *(TI128 *)v = *(TI128 *)(self + 0x10);
             }
-            func_00282F20(tmp2, self + 0xD0, -2.0f);
-            func_00282CC0(vec, tmp2, vec);
-            func_00282F20(tmp1, self + 0xC0, 1.5f);
-            func_00282CC0(vec, tmp1, vec);
-            func_0032C700(vec, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0,
+            vec_scale_to_length(tmp2, self + 0xD0, -2.0f);
+            FastVecAdd(vec, tmp2, vec);
+            vec_scale_to_length(tmp1, self + 0xC0, 1.5f);
+            FastVecAdd(vec, tmp1, vec);
+            SpawnExplosion(vec, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0,
                           0.75f, 20.0f);
-            func_0029F338(self);
+            MarkMobySpawned(self);
         }
     }
 }

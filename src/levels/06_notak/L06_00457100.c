@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -9,41 +10,42 @@ extern void func_002B0A68(char *, int, char *, float, float, float, float, int);
 extern int func_002E5CF8(int, int, char *);
 extern void func_0029F338(char *);
 
-void func_L06_00457100(char *a0)
+/* A rotating trigger that waits to be hit, remembers if a certain object hit it, then bursts and removes itself. */
+void func_L06_00457100(char *obj)
 {
-    int state = *(unsigned char *)(a0 + 0x20);
-    char *o = *(char **)(a0 + 0x68);
+    int stateId = *(unsigned char *)(obj + 0x20);
+    char *vars = *(char **)(obj + 0x68);
     float vec[4];
-    char *p;
-    char *m;
+    char *hit;
+    char *hitMoby;
 
-    switch (state) {
+    switch (stateId) {
     case 0:
-        *(int *)(o + 4) = 0;
-        func_002A7750(a0, 1, -1);
+        *(int *)(vars + 4) = 0;
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        func_L00_00322A18(a0, 0.0f, 0.0f, -(*(float *)o * 0.0002908882452175021f));
-        p = func_002A9640(a0, 0x4010000, 0);
-        if (p != 0) {
-            m = *(char **)(p + 0x20);
-            if (m != 0 && *(short *)(m + 0xAA) == 0x12C4) {
-                *(int *)(o + 4) = state;
+        ApplyOffsetToObjectMatrix(obj, 0.0f, 0.0f, -(*(float *)vars * 0.0002908882452175021f));
+        hit = FindOwnedEffectSlot(obj, 0x4010000, 0);
+        if (hit != 0) {
+            hitMoby = *(char **)(hit + 0x20);
+            if (hitMoby != 0 && *(short *)(hitMoby + 0xAA) == 0x12C4 /* moby class 4804 */) {
+                *(int *)(vars + 4) = stateId;
             }
-            func_002A7750(a0, 2, -1);
+            SetMobyState(obj, 2, -1);
         }
-        *(unsigned char *)(a0 + 0xA8) = 0xFF;
+        *(unsigned char *)(obj + 0xA8) = 0xFF;
         break;
     case 2:
         *(TI128 *)vec = 0;
-        if (*(int *)(o + 4) != 0) {
+        if (*(int *)(vars + 4) != 0) {
             vec[0] = -0.16666667f;
         } else {
             vec[0] = 0.16666667f;
         }
-        func_002B0A68(a0, 0x1FE, (char *)vec, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
-        func_002E5CF8(0, 0, a0);
-        func_0029F338(a0);
+        SpawnDebrisForMaskedParts(obj, 0x1FE, (char *)vec, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        PlayMobySound(0, 0, obj);
+        MarkMobySpawned(obj);
         break;
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -18,27 +19,29 @@ extern void func_00343058(unsigned char *owner);
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-unsigned long func_003427B0(unsigned long param_1)
+/* Returns the value it is given. */
+unsigned long func_003427B0(unsigned long value)
 {
-  return param_1;
+  return value;
 }
 
 
 extern void *func_00336E40(void *);
 extern void *func_00336DA8(void *, void *);
 extern void *func_00115484(void *, int, int);
+/* Sets up an empty menu list: allocates its position, and resets its counts, sizes and scroll state. */
 void func_003428E0(char *object, void *argument)
 {
     *(void **)(object + 0x8C) = argument;
     if (argument) {
-        int *allocation = func_00336DA8((void *)16, func_00336E40(argument));
+        int *allocation = ReturnSecondArgument((void *)16, AllocPoolCell(argument));
         *(int **)object = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
         allocation[3] = 0;
         allocation[0] = 0;
     }
-    func_00115484(object + 0x28, 0, 0x64);
+    memset(object + 0x28, 0, 0x64);
     *(int *)(object + 0x10) = 0;
     *(int *)(object + 0x20) = 0;
     *(int *)(object + 0x24) = 0;
@@ -53,8 +56,9 @@ void func_003428E0(char *object, void *argument)
 }
 
 
-s32 func_00342BC0(u8 *a0) {
- if(*(s32 *)(a0+0x10)!=0) return *(s32 *)((u32)a0+(*(s32 *)(a0+0x14)<<2)+0x28);
+/* Returns the id of the entry the menu list has selected, or 0 when the list is empty. */
+s32 func_00342BC0(u8 *list) {
+ if(*(s32 *)(list+0x10)!=0) return *(s32 *)((u32)list+(*(s32 *)(list+0x14)<<2)+0x28);
  return 0;
 }
 
@@ -73,7 +77,7 @@ void func_00342F70(char *owner, char *list)
 
     *(s32 *)(owner + 0x10) = 0;
     for (i = 0; i < 25 && *(s16 *)(list + i * 10 + 6) >= 0; i++) {
-        u8 *table = D_001A7AF8;
+        u8 *table = gItemOwnedFlags;
         s32 *ids = (s32 *)(owner + 0x28);
 
         id = *(s16 *)(list + i * 10 + 6);
@@ -87,25 +91,30 @@ void func_00342F70(char *owner, char *list)
         }
     }
     *(s32 *)(owner + 0x14) = *(s32 *)(owner + 0x10) / 2;
-    func_00342978(owner, 0);
+    UpdateListSelection(owner, 0);
 }
 
 
 /* lot11 -- measured bodies with sizes recorded in the catalogue. */
 
 
-void func_00343028(u8 *a0, f32 a1, f32 a2) { *(f32 *)(a0 + 0x8) = a1; *(f32 *)(a0 + 0xc) = a2; }
+/* Sets the two spacing values of a menu list, the second being the row height. */
+void func_00343028(u8 *list, f32 spacing, f32 rowHeight) { *(f32 *)(list + 0x8) = spacing; *(f32 *)(list + 0xc) = rowHeight; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00343038(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x4) = a1; }
+/* Sets the icon size of a menu list. */
+void func_00343038(u8 *list, f32 iconSize) { *(f32 *)(list + 0x4) = iconSize; }
 
+/* Sets the on-screen position of a menu list. */
 void func_00343040(float **position, float x, float y) {
     (*position)[0] = x;
     (*position)[1] = y;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00343058(u8 *a0) { *(s32 *)(a0 + 0x90) = 0; }
+/* Clears a state value inside a menu list. */
+void func_00343058(u8 *list) { *(s32 *)(list + 0x90) = 0; }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00343060(u8 *a0) { return *(s32 *)(a0 + 0x10); }
+/* Returns how many entries the menu list holds. */
+s32 func_00343060(u8 *list) { return *(s32 *)(list + 0x10); }

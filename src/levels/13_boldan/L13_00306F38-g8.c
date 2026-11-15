@@ -21,22 +21,23 @@ extern int D_001BD5F0 __attribute__((nosda));
 extern Node *D_L13_001B2928[1] __attribute__((sda));
 
 /* state 0 starts the effect, state 1 flags every live node of four ids */
-void func_L13_0038C328(u8 *a0) {
-    Node *p;
+/* Starts an effect, then in state 1 marks every live object of four kinds with a flag while the level is in a special mode. */
+void func_L13_0038C328(u8 *moby) {
+    Node *node;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        a0[0x30] = 0xFF;
-        a0[0x20] = 1;
+        moby[0x30] = 0xFF;
+        moby[0x20] = 1;
         break;
     case 1:
         if (D_L13_001A8F00 == 2 && D_001BD5F0 == 3) {
-            for (p = D_L13_001B2928[0]; p != 0; p = p->next) {
-                s16 k = p->fAA;
+            for (node = D_L13_001B2928[0]; node != 0; node = node->next) {
+                s16 classId = node->fAA;
 
-                if (k == 0x1F4 || k == 0xEA3 || k == 0xEA4 || k == 0x11EB) {
-                    p->f98 = 0;
-                    p->flags = (p->flags | 0x41) & 0xEFFF;
+                if (classId == 0x1F4 || classId == 0xEA3 || classId == 0xEA4 || classId == 0x11EB) {
+                    node->f98 = 0;
+                    node->flags = (node->flags | 0x41) & 0xEFFF;
                 }
             }
         }

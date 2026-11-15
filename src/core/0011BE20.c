@@ -38,32 +38,32 @@ extern void func_0011BB38();
 /* Opens the TTY DECI2 endpoint and initializes its uncached packet headers. */
 s32 func_0011BE20(void) {
     struct TtyInitState *state = &r1_D_00154B50;
-    struct TtyMmio *p;
-    struct TtyMmio *q;
+    struct TtyMmio *txBlock;
+    struct TtyMmio *rxBlock;
     u32 mask;
     s32 baud;
     s32 cmd;
 
     r1_func_00118D80(0);
-    *(volatile s32 *)&state->unk0 = r1_func_00119718(0x210, state, &func_0011BB38);
+    *(volatile s32 *)&state->unk0 = r1_func_00119718(0x210, state, &HandleTtyDeci2Event);
     if (state->unk0 < 0) {
         return 0;
     }
     state->unkC = 0;
     mask = 0x20000000;
-    q = (struct TtyMmio *)((u32)r1_D_00154CC0 | mask);
+    rxBlock = (struct TtyMmio *)((u32)r1_D_00154CC0 | mask);
     state->unk4 = 0;
-    p = (struct TtyMmio *)((u32)r1_D_00154B80 | mask);
+    txBlock = (struct TtyMmio *)((u32)r1_D_00154B80 | mask);
     state->unk8 = 0;
-    state->unk14 = (s32)q;
-    state->unk10 = (s32)p;
+    state->unk14 = (s32)rxBlock;
+    state->unk10 = (s32)txBlock;
     baud = 0x210;
     cmd = 0x45;
-    p->unk2 = 0;
-    p->unk4 = baud;
-    p->unk6 = cmd;
-    p->unk7 = 0x48;
-    p->unk8 = 0;
+    txBlock->unk2 = 0;
+    txBlock->unk4 = baud;
+    txBlock->unk6 = cmd;
+    txBlock->unk7 = 0x48;
+    txBlock->unk8 = 0;
     state->unk18 = r1_func_00119868_tty(0x100);
     return 1;
 }

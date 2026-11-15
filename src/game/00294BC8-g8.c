@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_00297F98 needs the small-data profile: it materialises the address of
    the pair of 16-byte records through $gp.  Its other globals stay absolute. */
@@ -18,12 +19,13 @@ typedef struct {
 
 extern Quad16 D_00255ED0[];
 
-int func_00297F98(int a0)
+/* Returns the map scaling values for a level; on level 20 it picks one of two special sets. */
+int func_00297F98(int levelIndex)
 {
-    if (D_001A79F0 == 20) {
+    if (gCurrentMapIndex == 20) {
         int value = D_001C4F40;
 
         return (int)((char *)&D_001A9428 + (value % 2) * 16);
     }
-    return (int)&D_00255ED0[a0];
+    return (int)&D_00255ED0[levelIndex];
 }

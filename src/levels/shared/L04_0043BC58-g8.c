@@ -19,38 +19,39 @@ extern int D_L04_001B13B0 SDATA(D_L04_001B13B0);
 extern int D_L04_001B13B4 SDATA(D_L04_001B13B4);
 extern int D_L04_001B13B8 SDATA(D_L04_001B13B8);
 extern int D_L04_001B13BC SDATA(D_L04_001B13BC);
-void func_L04_0043BC58(unsigned char *m)
+/* Updates a spark burst: waits, grows along its path with sparkles, then explodes and fades out. */
+void func_L04_0043BC58(unsigned char *moby)
 {
     float temporary[4];
-    unsigned char *p = *(unsigned char **)(m + 0x68);
-    switch (m[0x20]) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    switch (moby[0x20]) {
     case 0:
-        func_002A7750(m, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        func_L00_002E6CF0(func_L04_0043BEE8, m);
-        func_002AA2E8(p + 0x4c, 1.0f, *(float *)(p + 0x5c));
-        if (*(float *)(p + 0x4c) >= 1.0f) {
-            func_002A7750(m, 2, -1);
-            func_0032C700(p + 0x20, 0, D_L04_001B1398, D_L04_001B139C, D_L04_001B13A0, D_L04_001B13A4, D_L04_001B13A8, D_L04_001B13AC, D_L04_001B13B0, D_L04_001B13B4, D_L04_001B13B8, D_L04_001B13BC, *(int *)(p + 0x44), 20.0f);
+        AddDrawCallbackToList1(DrawSparkBurstGlows, moby);
+        ApproachValue(vars + 0x4c, 1.0f, *(float *)(vars + 0x5c));
+        if (*(float *)(vars + 0x4c) >= 1.0f) {
+            SetMobyState(moby, 2, -1);
+            SpawnExplosion(vars + 0x20, 0, D_L04_001B1398, D_L04_001B139C, D_L04_001B13A0, D_L04_001B13A4, D_L04_001B13A8, D_L04_001B13AC, D_L04_001B13B0, D_L04_001B13B4, D_L04_001B13B8, D_L04_001B13BC, *(int *)(vars + 0x44), 20.0f);
         }
         break;
     case 2:
-        if (!(*(float *)(p + 0x58) < 1.0f)) {
-            *(unsigned short *)(*(unsigned char **)(p + 0x48) + 0x34) = *(unsigned short *)(p + 0x50);
-            func_002A0488(*(void **)(p + 0x48), p[0x54], p[0x55], p[0x56]);
-            func_0029F338(m);
+        if (!(*(float *)(vars + 0x58) < 1.0f)) {
+            *(unsigned short *)(*(unsigned char **)(vars + 0x48) + 0x34) = *(unsigned short *)(vars + 0x50);
+            set_moby_color(*(void **)(vars + 0x48), vars[0x54], vars[0x55], vars[0x56]);
+            MarkMobySpawned(moby);
             return;
         }
-        func_L04_0043BE40(m);
-        func_002AA2E8(p + 0x58, 1.0f, D_L04_001B1394 * 0.016666668f);
+        ApplyFadeColorToLinkedMoby(moby);
+        ApproachValue(vars + 0x58, 1.0f, D_L04_001B1394 * 0.016666668f);
         break;
     }
-    if (*(int *)(p + 0x40))
-        func_002AD0E0(m, *(void **)(p + 0x40), p, temporary, p, temporary);
-    if (*(int *)(p + 0x44)) {
-        unsigned char *other = *(unsigned char **)(p + 0x48);
-        func_002AD0E0(other, *(void **)(p + 0x44), other + 0x10, other + 0xf0, other + 0x10, other + 0xf0);
-        qcopy(p + 0x20, other + 0x10);
+    if (*(int *)(vars + 0x40))
+        TransformPointAndRotationByParent(moby, *(void **)(vars + 0x40), vars, temporary, vars, temporary);
+    if (*(int *)(vars + 0x44)) {
+        unsigned char *other = *(unsigned char **)(vars + 0x48);
+        TransformPointAndRotationByParent(other, *(void **)(vars + 0x44), other + 0x10, other + 0xf0, other + 0x10, other + 0xf0);
+        qcopy(vars + 0x20, other + 0x10);
     }
 }

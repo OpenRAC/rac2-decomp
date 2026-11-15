@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef int s32;
@@ -29,16 +30,16 @@ s32 func_00288BE8(BarlowUtilityQueueView *queue) {
         queue->field44 = 1;
         request[0] = 0;
         request[1] = 0;
-        func_00288A00(queue, &request[0], &request[1]);
+        PopRequestQueue(queue, &request[0], &request[1]);
         status = 0;
         mode = 1;
         if ((u32)(D_L04_001A8F00 - 1) < 2) mode = 2;
         queue->field40 = mode;
         if (request[1] == 0)
-            status = func_002B49E0(1, mode, 0, request[0], 0);
+            status = BeginSlotRequest(1, mode, 0, request[0], 0);
         else if (request[1] == 1)
-            status = func_002B49E0(2, mode, request[0], 0, 0);
-        if (status < 0) func_L00_002F4180(queue);
+            status = BeginSlotRequest(2, mode, request[0], 0, 0);
+        if (status < 0) InitOwnerObject(queue);
         return status == 0;
     }
     return 0;
@@ -63,21 +64,22 @@ extern s32 D_001B1680_1;
 extern void func_00288D68(void);
 extern void func_0029B3E0(s32, s32);
 
-void func_00288CB0(int a0, int a1)
+/* Stores a new value in the small data words and, when asked, resets the related state. */
+void func_00288CB0(int newValue, int refresh)
 {
     D_001A8B84 = 1;
-    D_001B1680 = a0;
-    if (a0 == -1) {
-        if (D_001393E0.field17C != 0) {
-            D_001393E0.field17C = 0;
+    D_001B1680 = newValue;
+    if (newValue == -1) {
+        if (gMemcardState.field17C != 0) {
+            gMemcardState.field17C = 0;
         }
-        if (D_001393E0.field18 >= 0) {
-            D_001393E0.field18 = (short)a0;
+        if (gMemcardState.field18 >= 0) {
+            gMemcardState.field18 = (short)newValue;
         }
-        D_001A7424 &= ~0x200;
+        gSaveMenuFlags &= ~0x200;
     }
-    if (a1 != 0) {
-        func_00288D68();
-        func_0029B3E0(0, D_001B1680_1);
+    if (refresh != 0) {
+        ClearFlagWord();
+        MemcardSave(0, D_001B1680_1);
     }
 }

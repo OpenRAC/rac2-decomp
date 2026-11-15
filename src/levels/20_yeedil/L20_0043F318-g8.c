@@ -17,35 +17,36 @@ extern float func_002A7878(float, float);
 extern float D_L20_001B1F98 __attribute__((sda));
 
 
-char *func_L20_0043F318(char *arg0, char *arg1, int arg2, int arg3, int arg4, float f) {
-    char *obj = (char *)func_0029EFD0(0x119D);
+/* Spawns a projectile next to its owner and points it at the hero. It also sets the speed, the delay before it moves, its lifetime and its damage. */
+char *func_L20_0043F318(char *owner, char *spawnPos, int lifetime, int side, int counterPtr, float damage) {
+    char *obj = (char *)CreateMoby(0x119D /* moby class 4509 */);
     char *state;
     float v[4] __attribute__((aligned(16)));
-    float r;
+    float randomValue;
     float timer;
     int i;
 
     if (obj == 0) {
         goto out;
     }
-    func_002B37E8(obj, arg0);
-    qcopy(obj + 0x10, arg1);
-    func_00282CF0(v, (void *)(obj + 0x10), arg0 + 0x10);
+    InitChildObjectFromParent(obj, owner);
+    qcopy(obj + 0x10, spawnPos);
+    FastVecSub(v, (void *)(obj + 0x10), owner + 0x10);
     state = *(char **)(obj + 0x68);
-    *(float *)(state + 0x40) = func_00282E20(v);
-    *(float *)(state + 0x44) = func_00283248(v[0], v[1]);
-    *(float *)(state + 0x5C) = *(float *)(arg0 + 0x18);
-    r = func_002A7878(1.0f, 4.0f);
-    *(float *)(state + 0x4C) = *(float *)(state + 0x5C) + r;
-    r = func_002A7878(0.0f, 1.0f);
-    timer = D_L20_001B1F98 + r;
-    *(int *)(state + 0x64) = arg2;
-    *(int *)(state + 0x68) = arg3;
-    *(int *)(state + 0x6C) = arg4;
-    *(float *)(state + 0x70) = f;
+    *(float *)(state + 0x40) = vec_length_xy(v);
+    *(float *)(state + 0x44) = FastMatrixHelperA(v[0], v[1]);
+    *(float *)(state + 0x5C) = *(float *)(owner + 0x18);
+    randomValue = RandomFloatRange(1.0f, 4.0f);
+    *(float *)(state + 0x4C) = *(float *)(state + 0x5C) + randomValue;
+    randomValue = RandomFloatRange(0.0f, 1.0f);
+    timer = D_L20_001B1F98 + randomValue;
+    *(int *)(state + 0x64) = lifetime;
+    *(int *)(state + 0x68) = side;
+    *(int *)(state + 0x6C) = counterPtr;
+    *(float *)(state + 0x70) = damage;
     *(float *)(state + 0x48) = timer;
     for (i = 0; i < 3; i++) {
-        qcopy(state + 0x10 + i * 0x10, arg1);
+        qcopy(state + 0x10 + i * 0x10, spawnPos);
     }
 out:
     return obj;

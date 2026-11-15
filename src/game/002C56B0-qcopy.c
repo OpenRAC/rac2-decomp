@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002C56B0 in its own unit for the grouped lq/sq profile. */
 
@@ -39,29 +40,30 @@ extern unsigned char *D_001F2628;
 
 /* Spawns a debris particle at position: mode 0 sits still for life frames, mode 1
    flies off at a random speed and direction for life1 frames. */
-Particle_002C56B0 *func_002C56B0(TI128 *position, unsigned char arg1, unsigned char mode, short life,
-                                 unsigned char arg4, unsigned char life1, int arg6, float arg7,
+/* Creates a piece of debris that either stays still or flies away in a random direction. */
+Particle_002C56B0 *func_002C56B0(TI128 *position, unsigned char byteA, unsigned char mode, short life,
+                                 unsigned char byteB, unsigned char life1, int userData, float userScale,
                                  float speed)
 {
-    Particle_002C56B0 *p = func_002B9030(0x51);
+    Particle_002C56B0 *p = AllocParticle(0x51);
     typeof(p->motion) *m;
-    float v;
-    float a;
+    float launchSpeed;
+    float launchAngle;
 
     if (p != 0) {
         p->position = *position;
         m = &p->motion;
-        p->unk09 = func_00283CF0(0.0f) + 0x70;
+        p->unk09 = FloatToInt(0.0f) + 0x70;
         p->unk01 = 0;
         p->unk03 = 0x44;
-        p->unk02 = D_001F2628[func_001163B0() & 7];
+        p->unk02 = D_001F2628[Rand() & 7];
         p->size = 21000.0f;
-        p->unk08 = func_001163B0();
+        p->unk08 = Rand();
         m->mode = mode;
-        m->unk13 = arg4;
-        m->unk18 = arg6;
-        m->unk1C = arg7;
-        m->unk17 = arg1;
+        m->unk13 = byteB;
+        m->unk18 = userData;
+        m->unk1C = userScale;
+        m->unk17 = byteA;
         m->unk10 = life;
         m->unk15 = life1;
         switch (m->mode) {
@@ -71,11 +73,11 @@ Particle_002C56B0 *func_002C56B0(TI128 *position, unsigned char arg1, unsigned c
             m->unk14 = 0;
             break;
         case 1:
-            v = func_002A7878(3.0f, 9.0f) * speed * 0.016666668f;
-            a = func_002A7940();
-            func_002AF000(m, v, a, func_002A7878(1.343903660774231f, 1.7976893186569214f));
+            launchSpeed = RandomFloatRange(3.0f, 9.0f) * speed * 0.016666668f;
+            launchAngle = RandomAngle();
+            BuildSphericalOffset(m, launchSpeed, launchAngle, RandomFloatRange(1.343903660774231f, 1.7976893186569214f));
             p->size = 42000.0f;
-            m->alpha = (func_001163B0() & 0x1F) + 0x10;
+            m->alpha = (Rand() & 0x1F) + 0x10;
             p->colour = (m->alpha << 24) | 0x808080;
             p->life = life1;
             m->unk14 = 1;

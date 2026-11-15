@@ -66,6 +66,7 @@ typedef struct {
     int groupIndex; /* 0x1858 */
 } State;
 
+/* Runs the big enemy death. It stops its sounds, removes nearby leftovers, damages everything in its two groups and bursts out sparks and debris. */
 void func_L20_004441D8(char *self) {
     State *s = (State *)P(self, 0x68);
     char *selfPos;
@@ -81,7 +82,7 @@ void func_L20_004441D8(char *self) {
     int d;
     float sample;
 
-    func_002E5CF8(17, 0, self);
+    PlayMobySound(17, 0, self);
     {
         unsigned short *list = D_L20_001A9014[s->groups[s->groupIndex]];
 
@@ -109,25 +110,25 @@ void func_L20_004441D8(char *self) {
         for (;;) {
             unsigned short type = *(unsigned short *)(obj + 0xAA);
 
-            if ((unsigned short)(type - 0x1233) < 2) {
+            if ((unsigned short)(type - 0x1233 /* moby classes 4659, 4660 */) < 2) {
                 goto hit;
             }
-            if ((short)type == 0x1231) {
+            if ((short)type == 0x1231 /* moby class 4657 */) {
                 goto hit;
             }
-            if ((short)type == 0x1232) {
+            if ((short)type == 0x1232 /* moby class 4658 */) {
                 goto hit;
             }
-            if ((short)type != 0x1357) {
+            if ((short)type != 0x1357 /* moby class 4951 */) {
                 bound = D_L20_001B2FA0;
                 goto nextObject;
             }
         hit:
-            if (!(func_00282C48(F(self, 0x18) - F(obj, 0x18)) < 10.0f)) {
+            if (!(FloatAbs(F(self, 0x18) - F(obj, 0x18)) < 10.0f)) {
                 bound = D_L20_001B2FA0;
                 goto nextObject;
             }
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
             bound = D_L20_001B2FA0;
         nextObject:
             obj += 256;
@@ -156,14 +157,14 @@ objectsDone:
             }
             if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
                 if (damage == 0.0f) {
-                    char *info = func_002AB1F0(e);
+                    char *info = GetMobyPrivateValue0(e);
 
                     if (info == 0) {
                         continue;
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                func_002A8F70(e, (int)D_0018C0B0, 0x10000, damage, e + 0x10, D_L20_001A8F20);
+                QueueImpactEffect(e, (int)gHeroMoby_0018C0B0, 0x10000, damage, e + 0x10, D_L20_001A8F20);
             }
         }
     }
@@ -182,58 +183,58 @@ objectsDone:
             }
             if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
                 if (damage == 0.0f) {
-                    char *info = func_002AB1F0(e);
+                    char *info = GetMobyPrivateValue0(e);
 
                     if (info == 0) {
                         continue;
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                func_002A8F70(e, (int)D_0018C0B0, 0x10000, damage, e + 0x10, D_L20_001A8F20);
+                QueueImpactEffect(e, (int)gHeroMoby_0018C0B0, 0x10000, damage, e + 0x10, D_L20_001A8F20);
             }
         }
     }
-    sample = func_002A89A8(selfPos, 0, 0.5f) - 2.0f;
+    sample = ProbeGroundHeightBelow(selfPos, 0, 0.5f) - 2.0f;
     height = F(self, 0x18) - 0.5f;
     D_L20_001B2BE8 = sample;
     {
         int i;
 
         for (i = 0; i < D_L20_001B220C; i++) {
-            func_00282C90(&pos);
-            pos.f[0] = func_002A7878(-1.0f, 1.0f);
-            pos.f[1] = func_002A7878(-1.0f, 1.0f);
-            func_002830C0(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
-            pos.f[2] = height + func_002A7878(-0.5f, 0.5f);
-            sample = func_002A7878(0.0f, 1.0f);
-            a = func_00283D38(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
-            sample = func_002A7878(0.0f, 1.0f);
-            b = func_00283D38(D_L20_001B2210[2], D_L20_001B2210[3], sample);
-            scale = D_L20_001B2220[func_002A77E0(2)];
-            func_00282C88(&vel);
+            StoreVectorHelper(&pos);
+            pos.f[0] = RandomFloatRange(-1.0f, 1.0f);
+            pos.f[1] = RandomFloatRange(-1.0f, 1.0f);
+            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            pos.f[2] = height + RandomFloatRange(-0.5f, 0.5f);
+            sample = RandomFloatRange(0.0f, 1.0f);
+            a = FastTweenColor(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
+            sample = RandomFloatRange(0.0f, 1.0f);
+            b = FastTweenColor(D_L20_001B2210[2], D_L20_001B2210[3], sample);
+            scale = D_L20_001B2220[RandomIntBelow(2)];
+            ClearVector128(&vel);
             vel.f[3] = scale;
-            func_00282C88(&acc);
+            ClearVector128(&acc);
             acc.f[3] = scale;
-            acc.f[2] = func_002A7878(D_L20_001B2240_gp[0], D_L20_001B2240[1]) * 0.0166666675f;
-            c = func_002A7820(1, D_L20_001B2230_gp);
-            d = func_002A7820(D_L20_001B2230[1], D_L20_001B2230[2]);
-            func_002BAA28(&pos, &vel, &acc, a, b, c, d, 60, D_L20_001B222C);
+            acc.f[2] = RandomFloatRange(D_L20_001B2240_gp[0], D_L20_001B2240[1]) * 0.0166666675f;
+            c = RandomIntRange(1, D_L20_001B2230_gp);
+            d = RandomIntRange(D_L20_001B2230[1], D_L20_001B2230[2]);
+            SpawnTrailParticle_002BAA28(&pos, &vel, &acc, a, b, c, d, 60, D_L20_001B222C);
         }
     }
     {
         int i;
 
         for (i = 0; i < D_L20_001B2248; i++) {
-            func_00282C90(&pos);
-            pos.f[0] = func_002A7878(-1.0f, 1.0f);
-            pos.f[1] = func_002A7878(-1.0f, 1.0f);
-            func_002830C0(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
-            pos.f[2] = height + func_002A7878(-0.5f, 0.5f);
+            StoreVectorHelper(&pos);
+            pos.f[0] = RandomFloatRange(-1.0f, 1.0f);
+            pos.f[1] = RandomFloatRange(-1.0f, 1.0f);
+            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            pos.f[2] = height + RandomFloatRange(-0.5f, 0.5f);
             qzero_nc(&vel);
-            vel.f[2] = func_002A7940();
+            vel.f[2] = RandomAngle();
             qzero_nc(&acc);
-            acc.f[2] = func_002A7878(D_L20_001B2240_gp[4], D_L20_001B2250[1]) * 0.0166666675f;
-            func_L20_00448A18(self, (char *)&pos, (char *)&vel, (char *)&acc);
+            acc.f[2] = RandomFloatRange(D_L20_001B2240_gp[4], D_L20_001B2250[1]) * 0.0166666675f;
+            SpawnDebrisPiece_L20(self, (char *)&pos, (char *)&vel, (char *)&acc);
         }
     }
 }

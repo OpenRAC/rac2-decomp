@@ -61,62 +61,64 @@ static __inline__ int hud_coord(float value, float scale, float half)
     return result;
 }
 
-void func_L08_004207D0(u8 *object)
+/* Draws the radar on screen: three text labels, a centre marker, and a fading dot for every
+   nearby object, placed by its direction and distance from the hero's vehicle. */
+void func_L08_004207D0(u8 *vehicle)
 {
-    Vector difference, euler;
+    Vector offset, euler;
     f32 rotation[12], inverse[12];
-    u8 *state, *entry, *anchor;
-    char *first, *second, *third;
-    u16 *cursor, *p;
-    f32 y, distance, size, x;
-    s32 alpha;
-    s64 color;
+    u8 *vars, *blip, *anchorObj;
+    char *label1, *label2, *label3;
+    u16 *listStart, *idCursor;
+    f32 dotY, distance, dotSize, dotX;
+    s32 dotAlpha;
+    s64 dotColor;
     u64 texture;
     f32 half;
-    func_L08_00300090();
-    func_L08_00300100();
-    state = *(u8 **)(object + 0x68);
-    first = func_00336D50(D_L08_001A904C + 0x8710, 0xBA);
-    second = func_00336D50(D_L08_001A904C + 0x8710, 0xBB);
-    third = func_00336D50(D_L08_001A904C + 0x8710, 0xBC);
-    func_00300A00(first, 0x60442D00, D_L08_001B1B84 + 4.0f, (f32)label_y(first, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    BeginSavedFloatHold();
+    SetSavedFloatAndUpdate();
+    vars = *(u8 **)(vehicle + 0x68);
+    label1 = FindTableEntryById(D_L08_001A904C + 0x8710, 0xBA);
+    label2 = FindTableEntryById(D_L08_001A904C + 0x8710, 0xBB);
+    label3 = FindTableEntryById(D_L08_001A904C + 0x8710, 0xBC);
+    DrawScaledObjectTwoAxes(label1, 0x60442D00, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
     half = 0.5f;
-    func_00300A00(second, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(first, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
-    func_00300A00(third, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(third, D_L08_001B1B88 + 4.0f, D_L08_001B3244, half, 1), 0.8f, -0.8f, 0.0f);
-    y = (f32)label_y(object, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
-    texture = func_0027C878(D_L08_001B1BA0);
-    func_L05_003008C0(D_L08_001B1B84, y, D_L08_001B1B8C, D_L08_001B1B90,
+    DrawScaledObjectTwoAxes(label2, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    DrawScaledObjectTwoAxes(label3, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(label3, D_L08_001B1B88 + 4.0f, D_L08_001B3244, half, 1), 0.8f, -0.8f, 0.0f);
+    dotY = (f32)label_y(vehicle, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
+    texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
+    AppendSubpixelTexturedScreenQuad(D_L08_001B1B84, dotY, D_L08_001B1B8C, D_L08_001B1B90,
                      0, 0, D_L08_001B1B94, D_L08_001B1B98, 0x80808080UL, texture);
-    func_L08_003000C0();
-    anchor = *(u8 **)(state + 0x1B0);
-    if (!anchor) return;
-    cursor = D_L08_001FB660[anchor[0x21]];
-    if (!cursor) return;
-    p = cursor;
+    EndSavedFloatHold();
+    anchorObj = *(u8 **)(vars + 0x1B0);
+    if (!anchorObj) return;
+    listStart = D_L08_001FB660[anchorObj[0x21]];
+    if (!listStart) return;
+    idCursor = listStart;
     do {
-        entry = D_L08_001B29DC + ((*p & 0x7FFF) << 8);
-        if (!entry || entry[0x20] == 0xFE || entry[0x20] == 0xFD || *(s16 *)(entry + 0xAA) == 0x96A) continue;
-        distance = func_00282E48(object + 0x10, entry + 0x10);
+        blip = D_L08_001B29DC + ((*idCursor & 0x7FFF) << 8);
+        if (!blip || blip[0x20] == 0xFE || blip[0x20] == 0xFD || *(s16 *)(blip + 0xAA) == 0x96A /* Desert Crystal Shell */) continue;
+        distance = fast_vec_dist(vehicle + 0x10, blip + 0x10);
         if (distance <= D_L08_001B1BA4) {
-            y = distance / D_L08_001B1BA4;
-            y *= D_L08_001B1B9C;
+            dotY = distance / D_L08_001B1BA4;
+            dotY *= D_L08_001B1B9C;
             euler.q = 0;
             euler.f[2] = 1.5707964f;
-            func_002833F0(rotation, &euler);
-            func_00282CF0(&difference, entry + 0x10, object + 0x10);
-            func_00282F20(&difference, &difference, y);
-            func_002836E8(inverse, D_L08_001B9D30);
-            func_00283098(&difference, &difference, inverse);
-            func_00283098(&difference, &difference, rotation);
-            alpha = func_00283CF0((1.0f - distance / D_L08_001B1BA4) * 128.0f);
-            size = difference.f[2] * 0.125f + D_L08_001B1B8C * 0.5f;
-            if (size > D_L08_001B1B8C + D_L08_001B1B8C) size = D_L08_001B1B8C + D_L08_001B1B8C;
-            else if (size < 0.0f) size = 0.0f;
-            x = difference.f[0] + D_L08_001B1B84;
-            y = (f32)hud_coord(D_L08_001B1B88 - difference.f[1], D_L08_001B3244, 0.5f);
-            color = (s32)(D_L08_001B1BA8 | ((u32)alpha << 24));
-            texture = func_0027C878(D_L08_001B1BA0);
-            func_L05_003008C0(x, y, size, size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, color, texture);
+            euler_rotation_basis(rotation, &euler);
+            FastVecSub(&offset, blip + 0x10, vehicle + 0x10);
+            vec_scale_to_length(&offset, &offset, dotY);
+            FastMatrixHelperC(inverse, D_L08_001B9D30);
+            matrix_mul_vec3(&offset, &offset, inverse);
+            matrix_mul_vec3(&offset, &offset, rotation);
+            dotAlpha = FloatToInt((1.0f - distance / D_L08_001B1BA4) * 128.0f);
+            dotSize = offset.f[2] * 0.125f + D_L08_001B1B8C * 0.5f;
+            if (dotSize > D_L08_001B1B8C + D_L08_001B1B8C) dotSize = D_L08_001B1B8C + D_L08_001B1B8C;
+            else if (dotSize < 0.0f) dotSize = 0.0f;
+            dotX = offset.f[0] + D_L08_001B1B84;
+            dotY = (f32)hud_coord(D_L08_001B1B88 - offset.f[1], D_L08_001B3244, 0.5f);
+            dotColor = (s32)(D_L08_001B1BA8 | ((u32)dotAlpha << 24));
+            texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
+            AppendSubpixelTexturedScreenQuad(dotX, dotY, dotSize, dotSize, 0, 0, D_L08_001B1B94, D_L08_001B1B98, dotColor, texture);
         }
-    } while ((s16)*p++ >= 0);
+    } while ((s16)*idCursor++ >= 0);
 }

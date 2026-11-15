@@ -15,58 +15,59 @@ typedef struct {
     f32 f[4];
 } __attribute__((aligned(16))) L13_Quad;
 
-void func_L13_0041A398(u8 *self)
+/* Runs the beam machine: while on screen it makes a new lightning beam, ticks it, and plays its sound. */
+void func_L13_0041A398(u8 *moby)
 {
-    u8 *state;
+    u8 *vars;
     s32 one;
-    L13_Quad v;
+    L13_Quad checkPos;
 
-    state = *(u8 **)(self + 0x68);
-    if (self[0x20] != 0) {
-        qcopy(&v, self + 0x10);
-        v.f[3] = *(f32 *)(state + 0x624);
-        if (func_00283DB8(&v, 52.0f) < 0)
+    vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] != 0) {
+        qcopy(&checkPos, moby + 0x10);
+        checkPos.f[3] = *(f32 *)(vars + 0x624);
+        if (FastMathHelperA(&checkPos, 52.0f) < 0)
             return;
     }
-    if (*(s32 *)(state + 0x628) == 0)
+    if (*(s32 *)(vars + 0x628) == 0)
         return;
     one = 1;
-    switch (self[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        func_L13_0041A550(self);
-        *(u16 *)(state + 0x10) = *(u16 *)(state + 0xC);
-        self[0x20] = 2;
-        *(f32 *)(state + 0x624) = 2.5f;
-        *(s16 *)(state + 8) = one;
-        *(s16 *)(state + 0xA) = one;
+        BuildLightningBeam(moby);
+        *(u16 *)(vars + 0x10) = *(u16 *)(vars + 0xC);
+        moby[0x20] = 2;
+        *(f32 *)(vars + 0x624) = 2.5f;
+        *(s16 *)(vars + 8) = one;
+        *(s16 *)(vars + 0xA) = one;
         break;
     case 1:
-        if (D_L13_001B1618 != 0 && *(s16 *)(state + 0x12) == 0) {
+        if (D_L13_001B1618 != 0 && *(s16 *)(vars + 0x12) == 0) {
             D_L13_001B1618 = D_L13_001B1618 - 1;
-            func_L13_0041A550(self);
+            BuildLightningBeam(moby);
         }
         break;
     case 2:
-        if (func_00282978(state + 0x10) != 0) {
-            self[0x20] = 3;
-            *(u16 *)(state + 0x10) = *(u16 *)(state + 4);
-            func_L13_0041A550(self);
+        if (FastDecTimer(vars + 0x10) != 0) {
+            moby[0x20] = 3;
+            *(u16 *)(vars + 0x10) = *(u16 *)(vars + 4);
+            BuildLightningBeam(moby);
         }
         break;
     case 3:
-        if (func_00282978(state + 0x10) != 0) {
-            if (*(s16 *)(state + 6) != 0)
-                self[0x20] = 2;
-            *(s16 *)(state + 0x10) = 5;
-        } else if (*(s16 *)(state + 0x12) == 0) {
-            func_L13_0041A550(self);
+        if (FastDecTimer(vars + 0x10) != 0) {
+            if (*(s16 *)(vars + 6) != 0)
+                moby[0x20] = 2;
+            *(s16 *)(vars + 0x10) = 5;
+        } else if (*(s16 *)(vars + 0x12) == 0) {
+            BuildLightningBeam(moby);
         }
         break;
     }
-    if (*(s16 *)(state + 0x12) != 0) {
+    if (*(s16 *)(vars + 0x12) != 0) {
         if (D_L13_001B1630 == 0)
-            func_L13_0041AB30(self);
-        if (D_L13_001B1628 < *(s16 *)(state + 0x12) && D_L13_001B1634 == 0)
-            func_L00_002E6EF8(func_L13_0041AD00, self);
+            UpdateStreakEffect_L13(moby);
+        if (D_L13_001B1628 < *(s16 *)(vars + 0x12) && D_L13_001B1634 == 0)
+            AddDrawCallbackToList3(DrawElectricBeam, moby);
     }
 }

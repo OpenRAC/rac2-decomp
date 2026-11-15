@@ -1,3 +1,4 @@
+/* Turns a challenge number into the index of its saved "done" flag, or -1 when it has none. */
 int func_L11_0043E108(unsigned int index)
 {
     switch (index) {

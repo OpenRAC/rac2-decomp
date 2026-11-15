@@ -56,7 +56,7 @@ void func_L15_00435E80(u8 *self) {
     GornSlot *slots;
     int i;
     u16 *list;
-    u16 *p;
+    u16 *entry;
     int id;
     char *state;
     u8 *owner;
@@ -70,16 +70,16 @@ void func_L15_00435E80(u8 *self) {
     list = D_L15_001FB320[self[0x21]];
     if (list == 0)
         return;
-    p = list;
+    entry = list;
     do {
-        id = *p & 0x7FFF;
+        id = *entry & 0x7FFF;
         state = D_L15_001B261C[0][id].vars;
-        owner = func_002ED688(&D_L15_001B261C[0][id]);
+        owner = GetMobyMotionData(&D_L15_001B261C[0][id]);
         D_L15_001B261C[0][id].x7C = 0x3F;
         GornCopyQuad((char *)&D_L15_001B261C[0][id] + 0x10, state + 0x430);
-        func_00283360(D_L15_001B261C[0][id].rotation);
+        set_identity_rotation_rows(D_L15_001B261C[0][id].rotation);
         *(int *)(state + 0x27C) = 0;
-        func_00282C88(state + 0x400);
+        ClearVector128(state + 0x400);
         self[0x23] = 0x7F;
         *(u16 *)(self + 0x34) &= 0xFFF7;
         D_L15_001B261C[0][id].state = 1;
@@ -87,13 +87,13 @@ void func_L15_00435E80(u8 *self) {
         *(int *)(state + 0x44C) = 1;
         GornCopyQuad((char *)&D_L15_001B261C[0][id] + 0x10, &path->points[0]);
         *(int *)&D_L15_001B261C[0][id].position[3] = 0;
-        func_002EE678(&D_L15_001B261C[0][id], 2);
+        SetFollowerState(&D_L15_001B261C[0][id], 2);
         velocity = owner + 0x90;
-        func_002EE920(&D_L15_001B261C[0][id], &path->points[(*(int *)(state + 0x44C))++]);
-        func_00282CF0(velocity, owner + 0x60, (char *)&D_L15_001B261C[0][id] + 0x10);
-        func_00282F20(velocity, velocity, 0.016666668f);
+        SetFollowerPushVector(&D_L15_001B261C[0][id], &path->points[(*(int *)(state + 0x44C))++]);
+        FastVecSub(velocity, owner + 0x60, (char *)&D_L15_001B261C[0][id] + 0x10);
+        vec_scale_to_length(velocity, velocity, 0.016666668f);
         *(int *)(owner + 0x130) = 2000000;
         *(int *)(state + 0x450) = 0;
-        *(int *)(state + 0x454) = func_002A77E0(2);
-    } while (*(short *)p++ >= 0);
+        *(int *)(state + 0x454) = RandomIntBelow(2);
+    } while (*(short *)entry++ >= 0);
 }

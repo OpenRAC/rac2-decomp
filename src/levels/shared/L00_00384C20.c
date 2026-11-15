@@ -1,29 +1,31 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void *D_L00_00232A60[24];
 
 extern void func_0029F338(void *arg);
 
-void func_L00_00384C20(char *obj)
+/* Removes the two Synthenoids and the 24 sheep that the board created. */
+void func_L00_00384C20(char *owner)
 {
-    void **p = (void **)(*(char **)(obj + 0x68) + 0x48);
-    int i = 1;
+    void **slot = (void **)(*(char **)(owner + 0x68) + 0x48);
+    int remaining = 1;
     do {
-        int v = (int)*p;
-        p++;
-        i--;
-        if (v) {
-            func_0029F338((void *)v);
+        int object = (int)*slot;
+        slot++;
+        remaining--;
+        if (object) {
+            MarkMobySpawned((void *)object);
         }
-    } while (i >= 0);
-    p = D_L00_00232A60;
-    i = 23;
+    } while (remaining >= 0);
+    slot = D_L00_00232A60;
+    remaining = 23;
     do {
-        int v = (int)*p;
-        p++;
-        i--;
-        if (v) {
-            func_0029F338((void *)v);
+        int object = (int)*slot;
+        slot++;
+        remaining--;
+        if (object) {
+            MarkMobySpawned((void *)object);
         }
-    } while (i >= 0);
+    } while (remaining >= 0);
 }

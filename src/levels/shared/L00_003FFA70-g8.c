@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned char *D_L00_001B0CA0 __attribute__((sda));
 
@@ -6,6 +7,7 @@ extern int D_L00_001B2C14 __attribute__((sda));
 
 extern int *D_L00_001B0DB0 __attribute__((sda));
 
+/* Tells whether the global object exists and is in one of its three busy states. */
 int func_L00_00400F38(char *arg)
 {
     unsigned char *p = D_L00_001B0CA0;
@@ -15,6 +17,7 @@ int func_L00_00400F38(char *arg)
     return (unsigned int)(p[32] - 5) < 3;
 }
 
+/* Returns the stored flag value if the global object exists, otherwise zero. */
 int func_L00_00401E28(void)
 {
     if (!D_L00_001B0CA0) {
@@ -23,6 +26,7 @@ int func_L00_00401E28(void)
     return D_L00_001B2C14;
 }
 
+/* Marks the linked object's private data as active. */
 void func_L00_00402DB8(char *arg)
 {
     int *p = D_L00_001B0DB0;
@@ -34,6 +38,7 @@ void func_L00_00402DB8(char *arg)
 
 extern void func_L00_00402DB8(char *arg);
 
+/* Puts the global object into its start state and stores a countdown value (10 by default). */
 void func_L00_004028C0(char *arg, int value)
 {
     unsigned char *p = D_L00_001B0CA0;
@@ -44,7 +49,7 @@ void func_L00_004028C0(char *arg, int value)
     }
     o = *(int **)(p + 104);
     p[32] = (arg != 0) ? 5 : 7;
-    func_L00_00402DB8(arg);
+    ActivateLinkedObjectData(arg);
     if (value != -1) {
         o[24] = value;
     } else {
@@ -117,17 +122,17 @@ void func_L00_004029E8(char *obj)
     char *ctx = *(char **)(obj + 104);
 
     {
-        char *player = D_00189E20;
+        char *player = gHeroState;
 
         if (*(int *)(player + 0x1244) == 3)
             D_L00_001B0DB0 = 0;
-        func_0029FCC0(obj, 0, pos);
+        TransformMobyJointToWorld(obj, 0, pos);
         *(int *)(ctx + 44) = 0;
-        func_002FDF40(offset, pos, 0, 0, 1.6f, *(int *)(player + 0x2294) == 29 ? 11.0f : 4.5f,
+        CalculateAimedLaunchVelocity(offset, pos, 0, 0, 1.6f, *(int *)(player + 0x2294) == 29 ? 11.0f : 4.5f,
                       0.13333334f, 0.0030555557f);
     }
-    *(int *)(ctx + 36) = func_002FE5A0(pos, offset, ctx, ctx + 16, obj, &hit, &surface, 0.0030555557f);
-    blocked = func_00300540(surface);
+    *(int *)(ctx + 36) = TraceProjectileToImpact(pos, offset, ctx, ctx + 16, obj, &hit, &surface, 0.0030555557f);
+    blocked = GetWeaponGroup(surface);
     if (D_L00_001A8F00 != 0 || D_L00_001A8F08 != -2)
         *(int *)(ctx + 44) = 1;
     if (D_L00_001A8FF4 != 0 && *(float *)(ctx + 8) < 462.43f)
@@ -135,7 +140,7 @@ void func_L00_004029E8(char *obj)
     if (blocked || *(int *)(ctx + 36) == 0 || *(int *)(ctx + 40) == 0) {
         *(int *)(ctx + 44) = 1;
     } else {
-        char *player = D_00189E20;
+        char *player = gHeroState;
         int state = *(int *)(player + 0x2294);
         char *attached;
 
@@ -143,21 +148,21 @@ void func_L00_004029E8(char *obj)
             || state == 116 || state == 129) {
             *(int *)(ctx + 44) = 1;
         } else if (((attached = *(char **)(player + 0x33C)) != 0
-                    && (*(short *)(attached + 170) == 0x330 || *(short *)(attached + 170) == 0xB21))
-                   || (hit != 0 && (*(short *)(hit + 170) == 0xB21 || *(short *)(hit + 170) == 0xB5B))) {
+                    && (*(short *)(attached + 170) == 0x330 /* Taxi */ || *(short *)(attached + 170) == 0xB21 /* moby class 2849 */))
+                   || (hit != 0 && (*(short *)(hit + 170) == 0xB21 /* moby class 2849 */ || *(short *)(hit + 170) == 0xB5B /* moby class 2907 */))) {
             *(int *)(ctx + 44) = 1;
         } else {
-            func_002FE8D8(ctx, normal);
-            if (func_00282DB0(ctx + 16, normal) < 0.75f)
+            GetObjectFacingDirection(ctx, normal);
+            if (FastVecDot(ctx + 16, normal) < 0.75f)
                 *(int *)(ctx + 44) = 1;
         }
     }
     {
-        char *player = D_00189E20;
+        char *player = gHeroState;
 
         ready = 1;
         if (*(int *)(player + 0x2294) == 29) {
-            if (!func_00282948(player + 0x2534))
+            if (!FastFloatHelperD(player + 0x2534))
                 ready = 0;
         } else {
             *(int *)(player + 0x2534) = 40;
@@ -170,37 +175,37 @@ void func_L00_004029E8(char *obj)
         *(int *)(ctx + 40) = 1;
         *(int *)(ctx + 36) = 0;
     case 1: {
-        char *player = D_00189E20;
+        char *player = gHeroState;
 
         if ((D_00138324 & *(int *)(player + 0x1230)) && ready && !*(unsigned char *)(player + 0x22BC)
             && !*(int *)(ctx + 44)) {
-            if (func_L00_002D3F30(-1, 1)) {
+            if (SpendWeaponAmmo(-1, 1)) {
                 *(short *)(player + 0x1E0) = 120;
-                func_002B0CE0(6, 0, 1);
-                func_L00_002AF568();
+                ForceClaimNotice(6, 0, 1);
+                start_equipped_item_animation();
                 obj[32] = 2;
                 *(int *)(ctx + 32) = 12;
                 *(int *)(ctx + 40) = 0;
             } else {
-                func_002E5CF8(0, 0, obj);
+                PlayMobySound(0, 0, obj);
             }
         }
         break;
     }
     case 2:
-        if (func_00282948(ctx + 32)) {
-            char *spawn = func_L00_004005B0(pos, offset);
+        if (FastFloatHelperD(ctx + 32)) {
+            char *spawn = CreateTurretSpiderBot(pos, offset);
 
             *(char **)(spawn + 184) = obj;
-            func_L00_002AF7D0();
+            cancel_hero_item_animation();
             obj[32] = 3;
             *(int *)(ctx + 32) = 5;
         }
         break;
     case 3:
-        if (func_00282948(ctx + 32))
+        if (FastFloatHelperD(ctx + 32))
             obj[32] = 1;
         break;
     }
-    ref_L00_004029E8_00(func_L00_00402DD8, obj);
+    ref_L00_004029E8_00(RunObjectEffectIfActive, obj);
 }

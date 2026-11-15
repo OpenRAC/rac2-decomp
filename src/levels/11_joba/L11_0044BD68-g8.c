@@ -28,12 +28,12 @@ void func_L11_0044BD68(char *object)
     float speed, angle;
     if (*(u8 *)(object + 0x20) == 0) {
         *(char **)(state + 0x18) = state + 0x100;
-        speed = func_002A7878(15.0f, 40.0f) * 0.01745329424738884f;
-        if (func_002A77E0(2)) speed = -speed;
+        speed = RandomFloatRange(15.0f, 40.0f) * 0.01745329424738884f;
+        if (RandomIntBelow(2)) speed = -speed;
         *(float *)(state + 0x494) = speed;
-        if (func_002A77E0(2) == 1) *(u16 *)(object + 0x34) |= 0x8000;
-        *(u8 *)(state + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(state + 0x4A) = func_00283CF0(12.0f);
+        if (RandomIntBelow(2) == 1) *(u16 *)(object + 0x34) |= 0x8000;
+        *(u8 *)(state + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(state + 0x4A) = FloatToInt(12.0f);
         *(float *)(state + 0x80) = 0.8f;
         *(float *)(state + 0x8C) = 0.4f;
         *(s8 *)(state + 0xBC) = -1;
@@ -55,41 +55,41 @@ void func_L11_0044BD68(char *object)
         *(float *)(state + 0x12C) = 0.0055555556900799274f;
         *(u8 *)(state + 0x28) = 3;
         *(int *)(state + 0x49C) = 0;
-        func_00325B70(object, state + 0x4A0, 0, 1);
+        SpawnEnemyChildParts(object, state + 0x4A0, 0, 1);
         *(short *)(state + 0x4CA) = 0;
-        func_L11_0044C4F0(object);
+        DeactivateSmasherRobot(object);
     }
     if (*(short *)(state + 0x4D2) == 0 && *(u8 *)(object + 0x20) != 11 && !D_001A8FF4) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
-            func_002A93B0(object);
+        if (*(u8 *)(object + 0x31) && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+            UpdateMobyGroundCheck(object);
             *(u8 *)(object + 0x6F) = 22;
         }
     } else *(u16 *)(object + 0x34) &= 0xFBFF;
-    angle = func_00283B98(*(float *)(state + 0x49C), *(float *)(state + 0x4AC) * 0.01745329424738884f);
+    angle = FastAddRotations(*(float *)(state + 0x49C), *(float *)(state + 0x4AC) * 0.01745329424738884f);
     *(float *)(state + 0x49C) = angle;
-    func_00325C50(object, state + 0x4A0, 1, D_L11_001A8F20, angle);
-    func_00325DA0(object, state + 0x4BC);
+    AttachAndTurnChildParts(object, state + 0x4A0, 1, D_L11_001A8F20, angle);
+    SyncGroupCounter(object, state + 0x4BC);
     if (*(u8 *)(object + 0x20) >= 3) {
-        hit = func_002A9640(object, 0x10000, 1);
+        hit = FindOwnedEffectSlot(object, 0x10000, 1);
         if (hit && (other = *(char **)(hit + 0x20)) && !*(u8 *)(object + 0x31)) {
-            if (*(short *)(other + 0xAA) == 0xA03 || *(short *)(other + 0xAA) == 0xB89)
+            if (*(short *)(other + 0xAA) == 0xA03 /* moby class 2563 */ || *(short *)(other + 0xAA) == 0xB89 /* moby class 2953 */)
                 *(int *)(hit + 0x2C) = 0;
         }
-        if (func_002B0ED8(object, state + 0x50, 0) == 5) {
+        if (ApplyDamageToObject(object, state + 0x50, 0) == 5) {
             *(int *)(state + 0xE0) = 0;
             *(float *)(state + 0xE4) = 0.8377581834793091f;
         }
-        func_L11_0044C268(object);
+        UpdateSmasherRobotPairing(object);
         if (*(short *)(state + 0x4D2)) {
-            func_00283698(state + 0x230, object + 0xC0);
-            func_002AFFD8(object + 0x10, state + 0x260, 0);
-            if (!func_L11_004461C0(*(int *)(object + 0xB8), object + 0x10)) {
+            matrix_from_basis_rows(state + 0x230, object + 0xC0);
+            ComputeViewDirection(object + 0x10, state + 0x260, 0);
+            if (!IsPointInArenaInnerZone(*(int *)(object + 0xB8), object + 0x10)) {
                 *(int *)(state + 0x20) = 0;
-                func_002A7750(object, 11, 5);
+                SetMobyState(object, 11, 5);
             }
         }
     }
     if (*(u8 *)(object + 0x20) >= 2 && *(u8 *)(state + 0x2E) == 2)
-        func_L11_0044C4F0(object);
+        DeactivateSmasherRobot(object);
 }

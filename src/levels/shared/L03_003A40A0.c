@@ -4,6 +4,7 @@
  * one register): sda incomplete arrays read as [0]. The case 0 stores are written 0x30, 0x34,
  * 0x20, and the table index is the field plus the row. */
 #include "include_asm.h"
+#include "names.h"
 typedef struct { float x, y, z, w; } SwitchVector;
 typedef struct { char pad0[0x80]; float x,y; char pad1[0x2294-0x88]; int mode; } SwitchPlayer;
 extern unsigned char D_L03_00189E20[] __attribute__((nosda));
@@ -27,6 +28,7 @@ extern void func_002C3150(void *, void *, int, int, int, int, float);
 extern void func_L03_0043AD30(void *);
 extern int func_L02_002EF388(void *, void *, void *, int, int);
 
+/* Updates a Swingshot node moby: sets it up, aims it at the hero, shoots sparks, and re-arms it when its trigger turns on. */
 void func_L03_003A40A0(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *related;
@@ -37,7 +39,7 @@ void func_L03_003A40A0(unsigned char *object) {
     unsigned short flags;
     float *anglePointer;
     int row;
-    int m;
+    int inputBits;
     switch (object[0x20]) {
     case 0:
         flags = *(unsigned short *)(object + 0x34) | 0x1000;
@@ -50,35 +52,35 @@ void func_L03_003A40A0(unsigned char *object) {
             *(unsigned short *)(object + 0x34) = flags | 0x41;
             object[0x20] = 2;
         } else {
-            func_002A0488(object, 0xC0, 0xC0, 0xC0);
-            func_L03_0043AC40(object);
+            set_moby_color(object, 0xC0, 0xC0, 0xC0);
+            ResetGlobalRecord(object);
             object[0x20] = 1;
         }
         break;
     case 1:
-        if (*(short *)(object + 0xAA) == 0x323) {
+        if (*(short *)(object + 0xAA) == 0x323 /* Swingshot Node */) {
             anglePointer = (float *)(object + 0xF8);
-            angle = func_00283248(((SwitchPlayer *)D_L03_00189E20)->x - *(float *)(object + 0x10),
+            angle = FastMatrixHelperA(((SwitchPlayer *)D_L03_00189E20)->x - *(float *)(object + 0x10),
                                   ((SwitchPlayer *)D_L03_00189E20)->y - *(float *)(object + 0x14));
-            func_002AAA00(anglePointer, angle, 0.0017453294713050127f, 0.0017453294713050127f, 0.20943955f, state + 0x38, 0);
-            m = D_L03_001B2548[0];
-            if ((m & 1) && object[0x31]) {
+            ApproachTargetWithDirectionMode(anglePointer, angle, 0.0017453294713050127f, 0.0017453294713050127f, 0.20943955f, state + 0x38, 0);
+            inputBits = gFrameCounter_L03[0];
+            if ((inputBits & 1) && object[0x31]) {
                 direction = 1.0f;
-                if (m & 4)
+                if (inputBits & 4)
                     direction = -1.0f;
-                func_00282F20(&position, object + 0xD0, direction * D_L03_001AF51C);
-                func_00282F20(&velocity, &position, -2.0f / D_L03_001AF510);
-                func_00282CC0(&position, &position, object + 0x10);
-                color = func_00283CF0(D_L03_001AF510) & 0xFF;
-                random = func_002A77E0(0xFF) & 0xFF;
-                func_002C3150(&position, &velocity, D_L03_001AF514, color, random, 0, D_L03_001AF518);
+                vec_scale_to_length(&position, object + 0xD0, direction * D_L03_001AF51C);
+                vec_scale_to_length(&velocity, &position, -2.0f / D_L03_001AF510);
+                FastVecAdd(&position, &position, object + 0x10);
+                color = FloatToInt(D_L03_001AF510) & 0xFF;
+                random = RandomIntBelow(0xFF) & 0xFF;
+                SpawnHeroRelativeParticle(&position, &velocity, D_L03_001AF514, color, random, 0, D_L03_001AF518);
             }
         }
         if (((SwitchPlayer *)D_L03_00189E20)->mode != 0x2B)
-            func_L03_0043AD30(object);
+            UpdateCameraAimTargetCandidate(object);
         break;
     case 2:
-        if (D_0019B2E8[*(int *)(state + 0x30) + D_001A79F0[0] * 16] == 0) {
+        if (D_0019B2E8[*(int *)(state + 0x30) + gCurrentMapIndex[0] * 16] == 0) {
             if (*(int *)(state + 0x3C) == -1)
                 return;
             related = D_L03_001B2A1C + (*(int *)(state + 0x3C) << 8);
@@ -86,7 +88,7 @@ void func_L03_003A40A0(unsigned char *object) {
                 return;
         }
         *(unsigned short *)(object + 0x34) &= 0xFFBE;
-        func_L02_002EF388(object, object + 0x10, object + 0xF0, 0, 0);
+        FuseObjectWithLinkedObjects(object, object + 0x10, object + 0xF0, 0, 0);
         *(int *)(state + 0x30) = -1;
         object[0x20] = 0;
         break;

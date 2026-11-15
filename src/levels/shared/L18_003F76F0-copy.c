@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef short s16;
@@ -20,8 +21,8 @@ void func_L18_003F76F0(u8 *self, void *position, void *impulse) {
     *(s32 *)(self + 0x98) = *(s32 *)(*(u8 **)(self + 0x24) + 0x10);
     self[0x31] = 0;
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & ~2) | 1;
-    func_L18_0032B768(self, 0, 3);
-    func_002A7750(self, 3, 0);
+    SetTableEntryByte(self, 0, 3);
+    SetMobyState(self, 3, 0);
     *(s32 *)(self + 0x98) = *(s32 *)(*(u8 **)(self + 0x24) + 0x10);
     *(u16 *)(self + 0x34) |= 0x1000;
     *(Quad *)(self + 0x10) = *(Quad *)position;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -134,66 +135,76 @@ extern void func_00282CC0_32(void *a0, void *a0b, float *local);
 
 extern float func_00282C48_9(float t);
 
-void func_002A7750(u8 *a0,s32 a1,s32 a2) {
- u8 old=a0[0x20];a0[0x20]=(u8)a1;a0[0x94]=old;*(short *)(a0+0x96)=0;
- a0[0xbe]&=~1;
- if(a2!=-1){a0[0x95]=(u8)a2;a0[0xbe]&=~2;}
+/* Switches a moby to a new state, remembers the previous state and resets its state timer. */
+void func_002A7750(u8 *moby,s32 newState,s32 subState) {
+ u8 prevState=moby[0x20];moby[0x20]=(u8)newState;moby[0x94]=prevState;*(short *)(moby+0x96)=0;
+ moby[0xbe]&=~1;
+ if(subState!=-1){moby[0x95]=(u8)subState;moby[0xbe]&=~2;}
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-f32 func_002A7790(f32 a0) { return a0 * a0; }
+/* Squares a number. */
+f32 func_002A7790(f32 value) { return value * value; }
 
-f32 func_002A7798(f32 a0) {
- return 1.0f-(1.0f-a0)*(1.0f-a0);
+/* Eases a 0 to 1 value so it starts fast and slows down near 1. */
+f32 func_002A7798(f32 t) {
+ return 1.0f-(1.0f-t)*(1.0f-t);
 }
 
 
-s32 func_002A77E0(s32 a0) {
-    return (func_001163B0() >> 16 & 0x7fff) % a0;
+/* Returns a random whole number from 0 up to but not including the limit. */
+s32 func_002A77E0(s32 limit) {
+    return (Rand() >> 16 & 0x7fff) % limit;
 }
 
-s32 func_002A7820(s32 a0, s32 a1) {
-    return (func_001163B0() >> 16 & 0x7fff) % ((a1 - a0) + 1) + a0;
+/* Returns a random whole number between low and high, both included. */
+s32 func_002A7820(s32 low, s32 high) {
+    return (Rand() >> 16 & 0x7fff) % ((high - low) + 1) + low;
 }
 
-f32 func_002A7878(f32 a0, f32 a1) {
-    s32 r = func_001163B0();
-    return a0 + (f32)(r >> 16 & 0x7FFF) * (a1 - a0) * 3.0517578125e-05f;
+/* Returns a random decimal number between low and high. */
+f32 func_002A7878(f32 low, f32 high) {
+    s32 rand = Rand();
+    return low + (f32)(rand >> 16 & 0x7FFF) * (high - low) * 3.0517578125e-05f;
 }
 
-f32 func_002A78D8(f32 a0, f32 a1) {
-    s32 r = func_001163B0();
-    f32 result = a0 + (f32)(r >> 16 & 0xFFF) * (a1 - a0) * 0.000244140625f;
-    if ((r >> 16 & 1) != 0) result = -result;
+/* Returns a random decimal number between low and high, randomly made negative half of the time. */
+f32 func_002A78D8(f32 low, f32 high) {
+    s32 rand = Rand();
+    f32 result = low + (f32)(rand >> 16 & 0xFFF) * (high - low) * 0.000244140625f;
+    if ((rand >> 16 & 1) != 0) result = -result;
     return result;
 }
 
+/* Returns a random angle in radians, roughly between minus pi/2 and plus pi/2. */
 f32 func_002A7940(void) {
-    return (f32)((func_001163B0() >> 16 & 0xfff) - 0x800) * 0.0015339808f;
+    return (f32)((Rand() >> 16 & 0xfff) - 0x800) * 0.0015339808f;
 }
 
 /* draws two bounded random angles and an interval random value from the two float arguments, then forwards the pointer, the interval draw and both angles to a fourth callee */
-void func_002A7988(s32 a0, f32 a1, f32 a2) {
+/* Picks two random angles and a random distance, then passes them to another function along with the target. */
+void func_002A7988(s32 target, f32 low, f32 high) {
     f32 x = func_002A7940_5();
     f32 y = func_002A7940_5();
-    f32 z = func_002A7878_10(a1, a2);
-    func_002AF000_2(a0, z, x, y);
+    f32 z = func_002A7878_10(low, high);
+    func_002AF000_2(target, z, x, y);
 }
 
+/* Writes a random direction vector with a random length between low and high. */
 void func_002A7A00(float *out, float low, float high)
 {
-    float back = func_002A7878(low, high);
-    float a = Fc3394786_FUN_002A7940();
-    float b = Fc3394786_FUN_002A7940();
+    float length = RandomFloatRange(low, high);
+    float yaw = Fc3394786_FUN_002A7940();
+    float pitch = Fc3394786_FUN_002A7940();
     float value;
 
-    value = Fc3394786_FUN_00283180(a) * Fc3394786_FUN_00283198(b);
-    value = value * back;
+    value = Fc3394786_FUN_00283180(yaw) * Fc3394786_FUN_00283198(pitch);
+    value = value * length;
     out[0] = value;
-    value = Fc3394786_FUN_00283198(a) * Fc3394786_FUN_00283198(b);
-    value = value * back;
+    value = Fc3394786_FUN_00283198(yaw) * Fc3394786_FUN_00283198(pitch);
+    value = value * length;
     out[1] = value;
-    out[2] = Fc3394786_FUN_00283180(b) * back;
+    out[2] = Fc3394786_FUN_00283180(pitch) * length;
 }
 
 float func_002A7AA8(float a, float b, float c, float d, float t) {
@@ -209,6 +220,7 @@ static __inline__ void qcopy(void *dst, const void *src) {
                          : : "r"(dst), "r"(src) : "$2", "memory");
 }
 
+/* Computes a point on a smooth curve through four points, using t from 0 to 1. */
 void func_002A7AE0(f32 *out, f32 *a, f32 *b, f32 *c, f32 *d, float t)
 {
     f32 t2;
@@ -241,6 +253,7 @@ void func_002A7AE0(f32 *out, f32 *a, f32 *b, f32 *c, f32 *d, float t)
 }
 
 /* Eased scalar interpolation between a and b: returns a for t==0.0, b for t==1.0, otherwise a + (b-a)*((1-cos(t*pi))*0.5). */
+/* Smoothly blends between two numbers, starting and ending gently. */
 f32 func_002A7C00 (f32 a, f32 b, f32 t)
 {
   f32 u;
@@ -253,16 +266,17 @@ f32 func_002A7C00 (f32 a, f32 b, f32 t)
 }
 
 
-float func_002A7CA0(struct family_27f9_object *a0,
-                                         float *a1,
+/* Turns a heading toward a target angle with spring-like motion and a speed limit. */
+float func_002A7CA0(struct family_27f9_object *object,
+                                         float *velocity,
                                          float p1, float p2, float p3, float p4)
 {
     float t;
     float v;
-    float f3;
+    float oldVelocity;
     float out;
 
-    t = F27f9be8e_FUN_00283BE0(p1, a0->heading);
+    t = F27f9be8e_FUN_00283BE0(p1, object->heading);
     v = t * 6.3661971092224121093750e+00f;
     if (v > 1.0f) {
         v = 1.0f;
@@ -271,36 +285,37 @@ float func_002A7CA0(struct family_27f9_object *a0,
             v = -1.0f;
         }
     }
-    f3 = a1[0];
-    a1[0] = f3 + (p2 * v - p3 * f3);
+    oldVelocity = velocity[0];
+    velocity[0] = oldVelocity + (p2 * v - p3 * oldVelocity);
     if (p4 != 0.0f) {
-        if (a1[0] > p4) {
-            a1[0] = p4;
+        if (velocity[0] > p4) {
+            velocity[0] = p4;
         } else {
-            if (a1[0] < -p4) {
-                a1[0] = -p4;
+            if (velocity[0] < -p4) {
+                velocity[0] = -p4;
             }
         }
     }
-    if (F27f9be8e_FUN_00282C48(t) < a1[0]) {
-        a1[0] = F27f9be8e_FUN_00282C48(t);
+    if (F27f9be8e_FUN_00282C48(t) < velocity[0]) {
+        velocity[0] = F27f9be8e_FUN_00282C48(t);
     } else {
-        if (a1[0] < -F27f9be8e_FUN_00282C48(t)) {
-            a1[0] = -F27f9be8e_FUN_00282C48(t);
+        if (velocity[0] < -F27f9be8e_FUN_00282C48(t)) {
+            velocity[0] = -F27f9be8e_FUN_00282C48(t);
         }
     }
-    out = F27f9be8e_FUN_00283B98(a0->heading, a1[0]);
-    a0->heading = out;
+    out = F27f9be8e_FUN_00283B98(object->heading, velocity[0]);
+    object->heading = out;
     return out;
 }
 
 extern float func_00283248(float, float);
+/* Turns an object toward a target position using the spring turning function. */
 float func_002A7E08(struct family_27f9_object *object, float *target, float *value,
                    float speed, float damping, float limit)
 {
-    float angle = func_00283248(target[4] - ((float *)object)[4],
+    float angle = FastMatrixHelperA(target[4] - ((float *)object)[4],
                                target[5] - ((float *)object)[5]);
-    return func_002A7CA0(object, value, angle, speed, damping, limit);
+    return MobySpringTurn(object, value, angle, speed, damping, limit);
 }
 
 
@@ -316,6 +331,7 @@ extern char *D_001B1B5C __attribute__((sda));
 /* Counts the entries of the 0x7FFF-masked id list at table[index] whose class
    byte (0x20) is not value; an entry with the high bit of the id set ends the
    list, and value -1 counts every entry with a class byte below 0x80. */
+/* Counts the moby entries in a group list whose state differs from a given value. */
 int func_002A8508(int index, int value) {
     unsigned short *list;
     unsigned short *entry;
@@ -348,13 +364,14 @@ extern char *r1_D_L01_00160058 MACRO_ADDR;
 
 /* rac1-decomp src/overlays/shared/mobyutil_0026E8E0.c: func_L01_0026F040 */
 // Set byte 0xBC of each entry in a negative-terminated index list.
-void func_002A8598(int i, int v) {
-    unsigned short *t = r1_D_L01_001ABFC0[i];
+/* Sets one byte on every moby in a group list. */
+void func_002A8598(int group, int value) {
+    unsigned short *list = r1_D_L01_001ABFC0[group];
     unsigned short *p;
-    if (t != 0) {
-        p = t;
+    if (list != 0) {
+        p = list;
         do {
-            r1_D_L01_00160058[(*p & 0x7FFF) * 256 + 0xBC] = v;
+            r1_D_L01_00160058[(*p & 0x7FFF) * 256 + 0xBC] = value;
         } while (*(short *)p++ >= 0);
     }
 }
@@ -369,6 +386,7 @@ extern int func_002A86E8(int *out, unsigned char *m, int includeInactive, int on
 /* rac1-decomp src/overlays/shared/moby_ground_collision.c: get_first_moby_in_group */
 // Starts the group cursor at the first moby of a group; when the state filter
 // rejects it, advances to the next accepted moby.
+/* Starts looping over the mobys of a group and returns the first one that passes the filter. */
 int func_002A8600(int *out, int group, int includeInactive, int onlyInactive) {
     unsigned short *entry;
     unsigned char *m;
@@ -397,7 +415,7 @@ int func_002A8600(int *out, int group, int includeInactive, int onlyInactive) {
     } else if (!onlyInactive || inactive) {
         goto found;
     }
-    return func_002A86E8(out, D_001B1D40, includeInactive, onlyInactive);
+    return GetNextMobyInGroup(out, D_001B1D40, includeInactive, onlyInactive);
 found:
     return 0;
 }
@@ -405,12 +423,13 @@ found:
 
 
 
-int func_002A8860(int *p, int b) {
-    int w = *p;
-    int v = (w >> 24) - b;
-    if (v < 0) v = 0;
-    *p = (w & 0xFFFFFF) | (v << 24);
-    return v == 0;
+/* Subtracts from the top byte of a packed number, stopping at 0, and says whether it reached 0. */
+int func_002A8860(int *packed, int amount) {
+    int word = *packed;
+    int count = (word >> 24) - amount;
+    if (count < 0) count = 0;
+    *packed = (word & 0xFFFFFF) | (count << 24);
+    return count == 0;
 }
 
 
@@ -418,57 +437,63 @@ int func_002A8860(int *p, int b) {
 
 extern float func_002A89A8(void *, int, float);
 
+/* Looks up the ground height under an object. */
 void func_002A8A20(void *object) {
-    func_002A89A8(object, 32, 0.5f);
+    ProbeGroundHeightBelow(object, 32, 0.5f);
 }
 
 
-s32 func_002A8A50(const f32 *a0,const MmiPoint *a1,s32 a2) {
+/* Checks a point against a convex shape and returns the number of the first edge it lies outside, or 0 if inside. */
+s32 func_002A8A50(const f32 *point,const MmiPoint *poly,s32 count) {
     s32 i;
-    for(i=0;i<a2;i++) {
-        f32 x=a1[i].x,y=a1[i].y;
-        if((a1[(i+1)%a2].x-x)*(a0[1]-y)-(a1[(i+1)%a2].y-y)*(a0[0]-x)>0.0f) return i+1;
+    for(i=0;i<count;i++) {
+        f32 x=poly[i].x,y=poly[i].y;
+        if((poly[(i+1)%count].x-x)*(point[1]-y)-(poly[(i+1)%count].y-y)*(point[0]-x)>0.0f) return i+1;
     }
     return 0;
 }
 
-int func_002A8AF0(float *p, float *v, int n) {
-    int r = 0;
-    int i = 0;
+/* Tells whether a point lies inside a flat polygon. */
+int func_002A8AF0(float *point, float *verts, int count) {
+    int inside = 0;
+    int next = 0;
     int k;
-    for (k = 0; k < n; k++) {
-        float y1 = v[k * 4 + 1];
-        i++;
-        if (i == n) i = 0;
-        if ((y1 < p[1] && p[1] <= v[i * 4 + 1]) || (v[i * 4 + 1] < p[1] && p[1] <= y1)) {
-            if (v[k * 4] + (p[1] - v[k * 4 + 1]) / (v[i * 4 + 1] - v[k * 4 + 1]) * (v[i * 4] - v[k * 4]) < p[0]) {
-                r = !r;
+    for (k = 0; k < count; k++) {
+        float y1 = verts[k * 4 + 1];
+        next++;
+        if (next == count) next = 0;
+        if ((y1 < point[1] && point[1] <= verts[next * 4 + 1]) || (verts[next * 4 + 1] < point[1] && point[1] <= y1)) {
+            if (verts[k * 4] + (point[1] - verts[k * 4 + 1]) / (verts[next * 4 + 1] - verts[k * 4 + 1]) * (verts[next * 4] - verts[k * 4]) < point[0]) {
+                inside = !inside;
             }
         }
     }
-    return r;
+    return inside;
 }
 
 
-void func_002A8BD0(char *a0, int a1, int a2, float a3) { extern void func_00282C88(void *); *(int *)(a0 + 0x10) = a1; *(int *)(a0 + 0x14) = a2; *(float *)(a0 + 0x1C) = a3; *(int *)(a0 + 0x20) = 0; func_00282C88(a0); }
+/* Fills in an effect record with two numbers and a scale, then resets it. */
+void func_002A8BD0(char *record, int valueA, int valueB, float scale) { extern void ClearVector128(void *); *(int *)(record + 0x10) = valueA; *(int *)(record + 0x14) = valueB; *(float *)(record + 0x1C) = scale; *(int *)(record + 0x20) = 0; ClearVector128(record); }
 
-void func_002A8C00(char *a, int b, int c, float d, Quad16 *q) {
-    *(int *)(a + 0x10) = b;
-    *(int *)(a + 0x14) = c;
-    *(float *)(a + 0x1C) = d;
-    *(int *)(a + 0x20) = 1;
-    *(volatile TI128 *)a = *(TI128 *)q;
+/* Fills in an effect record with two numbers, a scale and a position copied from a source. */
+void func_002A8C00(char *record, int valueA, int valueB, float scale, Quad16 *source) {
+    *(int *)(record + 0x10) = valueA;
+    *(int *)(record + 0x14) = valueB;
+    *(float *)(record + 0x1C) = scale;
+    *(int *)(record + 0x20) = 1;
+    *(volatile TI128 *)record = *(TI128 *)source;
 }
 
 
 extern void func_0029FCC0(void *, int, float *);
 extern int func_002A8C28(void *, float, float *, int, float, float, int, int, int);
 
+/* Reads the position of a bone on an object and uses it to run a hit test. */
 int func_002A8D70(float x, float y, float z, void *object, int bone, int mode, int first, int second, int third)
 {
     float vector[4];
-    func_0029FCC0(object, bone, vector);
-    return func_002A8C28(object, x, vector, mode, y, z, first, second, third);
+    TransformMobyJointToWorld(object, bone, vector);
+    return SweepCollisionFromObject(object, x, vector, mode, y, z, first, second, third);
 }
 
 
@@ -503,38 +528,39 @@ extern void func_00282C88(void *);
 extern s32 D_001BAF80[];
 extern L_A8E20Entry D_001BF200[];
 
-void func_002A8E20(u8 *m, L_A8E20Req *r)
+/* Adds a hit effect to the queue for a moby, merging with its existing one if it is stronger. */
+void func_002A8E20(u8 *moby, L_A8E20Req *request)
 {
-    s32 idx = D_001BAF80[5];
+    s32 idx = gCollisionHit[5];
     s32 flags = 0;
-    L_A8E20Entry *e;
+    L_A8E20Entry *entry;
 
-    if (m[0xA8] != 0xFF) {
-        L_A8E20Entry *p = &D_001BF200[m[0xA8]];
+    if (moby[0xA8] != 0xFF) {
+        L_A8E20Entry *oldEntry = &D_001BF200[moby[0xA8]];
 
-        if (p->owner == m) {
-            if (p->f2C > r->f1C) {
-                p->flags = p->flags | r->flags;
+        if (oldEntry->owner == moby) {
+            if (oldEntry->f2C > request->f1C) {
+                oldEntry->flags = oldEntry->flags | request->flags;
                 return;
             }
-            flags = p->flags;
+            flags = oldEntry->flags;
         }
     }
-    e = &D_001BF200[idx];
-    func_00282C88(e);
-    qcopy(D_001BF200[idx].pos, r->pos);
-    e->flags = r->flags | flags;
-    e->i20 = r->i10;
-    e->b28 = r->b18;
-    e->b29 = r->b19;
-    e->h2A = r->h1A;
-    e->f2C = r->f1C;
-    e->f34 = r->f24;
-    e->i30 = r->i20;
-    e->owner = m;
-    e->i3C = 0;
-    m[0xA8] = idx;
-    D_001BAF80[5] = (idx + 1) & 0x3F;
+    entry = &D_001BF200[idx];
+    ClearVector128(entry);
+    qcopy(D_001BF200[idx].pos, request->pos);
+    entry->flags = request->flags | flags;
+    entry->i20 = request->i10;
+    entry->b28 = request->b18;
+    entry->b29 = request->b19;
+    entry->h2A = request->h1A;
+    entry->f2C = request->f1C;
+    entry->f34 = request->f24;
+    entry->i30 = request->i20;
+    entry->owner = moby;
+    entry->i3C = 0;
+    moby[0xA8] = idx;
+    gCollisionHit[5] = (idx + 1) & 0x3F;
 }
 
 /* func_002A8F70 is in 002A7750-records.c. */
@@ -550,37 +576,39 @@ extern float func_00282C48(float);
 extern float func_00282E80(void *, void *);
 extern void func_00282C98(void *);
 
+/* Finds the ground height at a position, using the level floor or a special flat area. */
 float func_002A90F8(float *position, void *direction)
 {
     float result;
     if (D_001B22D8 != 0) {
         result = position[2];
-        if (func_002FD828(&result, position[0], position[1], position[2]) != 0)
+        if (SampleSurfaceHeightMap(&result, position[0], position[1], position[2]) != 0)
             return result;
     }
-    if (D_001B22DC != 0 && func_00282C48(position[2] - D_001B22E0.height) < 0.5f &&
-        func_00282E80(position, &D_001B22E0) < D_001B22E0.radius) {
+    if (D_001B22DC != 0 && FloatAbs(position[2] - D_001B22E0.height) < 0.5f &&
+        vec_distance_xy(position, &D_001B22E0) < D_001B22E0.radius) {
         if (direction != 0)
-            func_00282C98(direction);
+            VectorCopyHelperA(direction);
         return D_001B22E0.height;
     }
     if (direction != 0)
-        func_00282C98(direction);
+        VectorCopyHelperA(direction);
     return position[2];
 }
 
 extern void func_002837D0(void *, void *, void *);
 extern void func_00283898(void *, int, float);
 
-void func_002A91F0(void *a0, float *a1) {
-    float v2[4];
-    float v1[4];
-    float v0[4];
-    func_00283898(v0, 0, a1[0]);
-    func_00283898(v1, 1, a1[1]);
-    func_00283898(v2, 2, a1[2]);
-    func_002837D0(a0, v0, v1);
-    func_002837D0(a0, a0, v2);
+/* Builds a rotation from three axis angles and combines them into one. */
+void func_002A91F0(void *out, float *angles) {
+    float rotZ[4];
+    float rotY[4];
+    float rotX[4];
+    build_axis_rotation_quaternion(rotX, 0, angles[0]);
+    build_axis_rotation_quaternion(rotY, 1, angles[1]);
+    build_axis_rotation_quaternion(rotZ, 2, angles[2]);
+    multiply_quaternions(out, rotX, rotY);
+    multiply_quaternions(out, out, rotZ);
 }
 
 /* func_002A9288 uses the quadword-copy profile in 002A9288-qcopy.c. */
@@ -595,55 +623,58 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00282DB0(void *, void *);
 extern int func_002761F8(void *, void *, int, void *, void *);
 
-void func_002A93B0(char *o)
+/* Checks the ground below a moby and sets its ground height and slide values. */
+void func_002A93B0(char *moby)
 {
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
+    float start[4] __attribute__((aligned(16)));
+    float end[4] __attribute__((aligned(16)));
+    float normal[4] __attribute__((aligned(16)));
 
     if (D_001A8CA0[0] == 0) {
-        if (*(float *)(o + 0xE8) < 0.9f) {
-            *(float *)(o + 0x70) = 0.0f;
-            *(float *)(o + 0x74) = 0.0f;
+        if (*(float *)(moby + 0xE8) < 0.9f) {
+            *(float *)(moby + 0x70) = 0.0f;
+            *(float *)(moby + 0x74) = 0.0f;
             return;
         }
-        qcopy(a, o + 0x10);
-        a[2] = a[2] - 16.0f;
-        if (a[2] < 0.5f)
-            a[2] = 0.5f;
-        qcopy(b, o + 0x10);
-        b[2] = b[2] + 0.5f;
-        if (func_002761F8(b, a, 0x22, 0, 0) != 0) {
-            *(float *)(o + 0x70) = D_001BAFA8 - *(float *)(o + 0x18);
-            *(float *)(o + 0x74) = *(float *)(o + 0xC) * 0.000244140625f;
+        qcopy(start, moby + 0x10);
+        start[2] = start[2] - 16.0f;
+        if (start[2] < 0.5f)
+            start[2] = 0.5f;
+        qcopy(end, moby + 0x10);
+        end[2] = end[2] + 0.5f;
+        if (CollLine(end, start, 0x22, 0, 0) != 0) {
+            *(float *)(moby + 0x70) = D_001BAFA8 - *(float *)(moby + 0x18);
+            *(float *)(moby + 0x74) = *(float *)(moby + 0xC) * 0.000244140625f;
         } else {
-            *(float *)(o + 0x70) = 0.0f;
-            *(float *)(o + 0x74) = 0.0f;
+            *(float *)(moby + 0x70) = 0.0f;
+            *(float *)(moby + 0x74) = 0.0f;
         }
     } else {
-        func_00282D60(a, o, 0.0009765625f);
-        func_00282D30(b, o + 0xE0, -8.0f);
-        func_00282CC0(b, a, b);
-        if (func_002761F8(a, b, 0x22, 0, 0) != 0) {
-            func_00282CF0(c, D_001BAFA0, o + 0x10);
-            *(float *)(o + 0x70) = func_00282DB0(c, o + 0xE0);
-            *(float *)(o + 0x74) = 0.2f;
-            *(unsigned char *)(o + 0xBD) = 0xFF;
+        scale_vector(start, moby, 0.0009765625f);
+        FastVecScale(end, moby + 0xE0, -8.0f);
+        FastVecAdd(end, start, end);
+        if (CollLine(start, end, 0x22, 0, 0) != 0) {
+            FastVecSub(normal, D_001BAFA0, moby + 0x10);
+            *(float *)(moby + 0x70) = FastVecDot(normal, moby + 0xE0);
+            *(float *)(moby + 0x74) = 0.2f;
+            *(unsigned char *)(moby + 0xBD) = 0xFF;
         } else {
-            *(float *)(o + 0x70) = 0.0f;
-            *(float *)(o + 0x74) = 0.0f;
+            *(float *)(moby + 0x70) = 0.0f;
+            *(float *)(moby + 0x74) = 0.0f;
         }
     }
 }
 
+/* Runs the ground check for an object. */
 void func_002A9548(void *object) {
-    func_002A93B0(object);
+    UpdateMobyGroundCheck(object);
 }
 
 extern int func_00283D38(int, int, float);
 
+/* Calls another function with two values and an amount and returns its result. */
 int func_002A9568(int first, int second, float amount) {
-    return func_00283D38(first, second, amount);
+    return FastTweenColor(first, second, amount);
 }
 
 
@@ -671,65 +702,67 @@ extern Rec_002A96A0 *func_002AB1F0(s32);
 extern u8 *func_002AB220(s32);
 extern u8 func_002AD980(u8 *);
 
-f32 func_002A96A0(s32 a0, Src_002A96A0 *a1) {
-    Rec_002A96A0 *p = func_002AB1F0(a0);
-    f32 f = 0.0f;
-    if (p != 0) {
-        u8 *q = p->p18;
-        if (q != 0) {
-            u8 c = q[0x20];
-            if (c != 0xFE) {
-                if (c == 0xFD) {
-                    p->s1C = 0;
-                    p->p18 = 0;
+/* Tracks which target the player is aiming at and returns an updated strength value, with a short delay before switching. */
+f32 func_002A96A0(s32 id, Src_002A96A0 *src) {
+    Rec_002A96A0 *rec = GetMobyPrivateValue0(id);
+    f32 result = 0.0f;
+    if (rec != 0) {
+        u8 *target = rec->p18;
+        if (target != 0) {
+            u8 targetState = target[0x20];
+            if (targetState != 0xFE) {
+                if (targetState == 0xFD) {
+                    rec->s1C = 0;
+                    rec->p18 = 0;
                 }
             } else {
-                p->s1C = 0;
-                p->p18 = 0;
+                rec->s1C = 0;
+                rec->p18 = 0;
             }
         }
         {
-            short t = p->s1C;
-            if (t != 0) {
-                p->s1C = (unsigned short)p->s1C + 1;
-                if (t >= 0x79) {
-                    p->p18 = 0;
-                    p->s1C = 0;
+            short timer = rec->s1C;
+            if (timer != 0) {
+                rec->s1C = (unsigned short)rec->s1C + 1;
+                if (timer >= 0x79) {
+                    rec->p18 = 0;
+                    rec->s1C = 0;
                 }
             }
         }
-        if (a1 != 0) {
-            u8 *x = a1->p20;
-            f = a1->f2C;
-            if (x != 0) {
-                if (p->p18 != x) {
-                    p->p18 = x;
-                    p->b17 = func_002AD980(a1->p20);
-                    p->s1C = 1;
+        if (src != 0) {
+            u8 *newTarget = src->p20;
+            result = src->f2C;
+            if (newTarget != 0) {
+                if (rec->p18 != newTarget) {
+                    rec->p18 = newTarget;
+                    rec->b17 = GetMobyKindSlot(src->p20);
+                    rec->s1C = 1;
                 } else {
-                    if (a1->b28 == 9) {
-                        if (p->s1C < 0x3C) f = 0.0f;
-                        else p->s1C = 1;
+                    if (src->b28 == 9) {
+                        if (rec->s1C < 0x3C) result = 0.0f;
+                        else rec->s1C = 1;
                     } else {
-                        if (p->s1C < 10) f = 0.0f;
-                        p->s1C = 1;
+                        if (rec->s1C < 10) result = 0.0f;
+                        rec->s1C = 1;
                     }
                 }
             }
-            if ((f32)p->s4 <= 1.0f && f > 0.0f && f < 1.0f) f = 1.0f;
-            if (a1->f24 & 0x100000) {
-                u8 *o = func_002AB220(a0);
-                if (o != 0) o[0x18] = 1;
+            if ((f32)rec->s4 <= 1.0f && result > 0.0f && result < 1.0f) result = 1.0f;
+            if (src->f24 & 0x100000) {
+                u8 *slot = GetMobyPrivateValue4(id);
+                if (slot != 0) slot[0x18] = 1;
             } else {
-                u8 *o = func_002AB220(a0);
-                if (o != 0) o[0x18] = 0;
+                u8 *slot = GetMobyPrivateValue4(id);
+                if (slot != 0) slot[0x18] = 0;
             }
         }
     }
-    return f;
+    return result;
 }
 
-void func_002A9850(void *a0, Vec16_F5621621c *src, int *p, int n,
+/* Queues a hit effect for each object in a list, pushing each one away from a point. */
+void func_002A9850(void *owner, Vec16_F5621621c *src, int *nodes, int count,
                                         int t0, int t1, int t2, int t3,
                                         float f1, float f2, float f3)
 {
@@ -737,62 +770,66 @@ void func_002A9850(void *a0, Vec16_F5621621c *src, int *p, int n,
     Vec16_F5621621c *vp = &vec;
     Rec_F5621621c rec;
     int i;
-    int *q;
+    int *nodePtr;
 
     *(V4_F5621621c *)&vec = *(V4_F5621621c *)src;
-    if (n <= 0) return;
-    for (q = p, i = n; i != 0; i--, q++) {
-        Node_F5621621c *v = (Node_F5621621c *)*q;
-        float t;
-        if ((int)*q == t0) continue;
-        rec.i16 = (int)a0;
-        rec.h26 = *(unsigned short *)((char *)a0 + 170);
+    if (count <= 0) return;
+    for (nodePtr = nodes, i = count; i != 0; i--, nodePtr++) {
+        Node_F5621621c *node = (Node_F5621621c *)*nodePtr;
+        float angle;
+        if ((int)*nodePtr == t0) continue;
+        rec.i16 = (int)owner;
+        rec.h26 = *(unsigned short *)((char *)owner + 170);
         rec.i20 = t1;
         rec.f28 = f1;
         rec.i32 = t1;
         rec.b24 = t2;
         rec.b25 = t3;
-        t = F5621621c_FUN_00283248(v->f16 - vp->x, v->f20 - vp->y);
-        rec.f0 = F5621621c_FUN_00283180(t) * f2;
-        rec.f4 = F5621621c_FUN_00283198(t) * f2;
+        angle = F5621621c_FUN_00283248(node->f16 - vp->x, node->f20 - vp->y);
+        rec.f0 = F5621621c_FUN_00283180(angle) * f2;
+        rec.f4 = F5621621c_FUN_00283198(angle) * f2;
         rec.f8 = f3;
         rec.f12 = 5.6279248046875000000000e3f;
-        F5621621c_FUN_002A8E20(*q, &rec);
+        F5621621c_FUN_002A8E20(*nodePtr, &rec);
     }
 }
 
 /* func_002A99A0 is in 002A99A0.c. */
 
 
+/* Blends linearly between two numbers. */
 f32 func_002AA140(f32 a, f32 b, f32 t) { return a + (b - a) * t; }
 
-float func_002AA150(float a0, float a1, float a2)
+/* Moves an angle part of the way toward a target angle. */
+float func_002AA150(float angle, float target, float factor)
 {
-    return F27f9be8e_FUN_00283B98(a0,
-            F27f9be8e_FUN_00283BE0(a1, a0) * a2);
+    return F27f9be8e_FUN_00283B98(angle,
+            F27f9be8e_FUN_00283BE0(target, angle) * factor);
 }
 
-void func_002AA198(Obj_Ff454dd77 *o, float a, float b, float c, float d)
+/* Updates a spring speed value, clamping it to limits. */
+void func_002AA198(Obj_Ff454dd77 *spring, float a, float b, float c, float d)
 {
-    if (Ff454dd77_FUN_00282C48(a) < o->f0)
-        o->f0 = Ff454dd77_FUN_00282C48(a);
-    else if (o->f0 < -Ff454dd77_FUN_00282C48(a))
-        o->f0 = -Ff454dd77_FUN_00282C48(a);
+    if (Ff454dd77_FUN_00282C48(a) < spring->f0)
+        spring->f0 = Ff454dd77_FUN_00282C48(a);
+    else if (spring->f0 < -Ff454dd77_FUN_00282C48(a))
+        spring->f0 = -Ff454dd77_FUN_00282C48(a);
 
-    o->f0 = o->f0 + (b * a - c * o->f0);
+    spring->f0 = spring->f0 + (b * a - c * spring->f0);
     if (0.0f < d) {
-        if (d < o->f0)
-            o->f0 = d;
-        else if (o->f0 < -d)
-            o->f0 = -d;
+        if (d < spring->f0)
+            spring->f0 = d;
+        else if (spring->f0 < -d)
+            spring->f0 = -d;
     }
 
-    if (Ff454dd77_FUN_00282C48(a) < o->f0)
-        o->f0 = Ff454dd77_FUN_00282C48(a);
-    else if (o->f0 < -Ff454dd77_FUN_00282C48(a))
-        o->f0 = -Ff454dd77_FUN_00282C48(a);
+    if (Ff454dd77_FUN_00282C48(a) < spring->f0)
+        spring->f0 = Ff454dd77_FUN_00282C48(a);
+    else if (spring->f0 < -Ff454dd77_FUN_00282C48(a))
+        spring->f0 = -Ff454dd77_FUN_00282C48(a);
 }
 
+/* Moves a number toward a target by at most one step and returns the remaining distance. */
 f32 func_002AA2E8(f32 *value, f32 target, f32 step) {
     f32 diff = target - *value;
     if (step < diff) diff = step;
@@ -801,60 +838,63 @@ f32 func_002AA2E8(f32 *value, f32 target, f32 step) {
     return Ff454dd77_FUN_00282C48(target - *value);
 }
 
-f32 func_002AA340(s32 *a0, s32 a1, s32 a2)
+/* Moves a whole number toward a target by at most one step and returns the remaining distance. */
+f32 func_002AA340(s32 *number, s32 target, s32 maxStep)
 {
     s32 value;
-    s32 step = a1 - *a0;
-    if (a2 < step)
-        step = a2;
-    else if (step < -a2)
-        step = -a2;
-    value = *(volatile s32 *)a0 + step;
-    *a0 = value;
-    return (f32)func_00282C30(a1 - value);
+    s32 step = target - *number;
+    if (maxStep < step)
+        step = maxStep;
+    else if (step < -maxStep)
+        step = -maxStep;
+    value = *(volatile s32 *)number + step;
+    *number = value;
+    return (f32)subtract_integer_with_clamp(target - value);
 }
 
 
-float func_002AA3A8(float *a0, float *a1, float f1, float f2,
+/* Moves a value toward a goal with spring motion and snaps to it when close. */
+float func_002AA3A8(float *value, float *velocity, float f1, float f2,
                                          float f3, float f4)
 {
-    float s = f1;
-    float u = f4;
-    float t;
-    float r;
+    float goal = f1;
+    float threshold = f4;
+    float error;
+    float absError;
 
-    F8cb0f4c0_FUN_002AA198(a1, s - a0[0]);
-    t = s - (a0[0] + a1[0]);
-    a0[0] = a0[0] + a1[0];
-    r = F8cb0f4c0_FUN_00282C48(t);
-    u = u * 0.01f;
-    if (r < u) {
-        a0[0] = s;
-        a1[0] = 0.0f;
-        return a1[0];
+    F8cb0f4c0_FUN_002AA198(velocity, goal - value[0]);
+    error = goal - (value[0] + velocity[0]);
+    value[0] = value[0] + velocity[0];
+    absError = F8cb0f4c0_FUN_00282C48(error);
+    threshold = threshold * 0.01f;
+    if (absError < threshold) {
+        value[0] = goal;
+        velocity[0] = 0.0f;
+        return velocity[0];
     }
-    return t;
+    return error;
 }
 
 /* shared native family */
-float func_002AA458(void *a0, void *a1, void *a2, float f1, float f2, float f3)
+/* Moves a position toward a target with spring motion and snaps to it when close. */
+float func_002AA458(void *pos, void *target, void *speed, float f1, float f2, float f3)
 {
-    float local[4];
-    float r;
-    float u;
+    float delta[4];
+    float dist;
+    float absDist;
 
-    func_00282CF0_16(local, a1, a0);
-    r = func_00282DF0_4(local);
-    func_002AA198_2(a2, r, f1, f2, f3);
-    func_00282F20_12(local, local, *(float *)a2);
-    func_00282CC0_32(a0, a0, local);
-    r = r - *(float *)a2;
-    u = func_00282C48_9(r);
-    if (!(u < f3 * 0.01f))
-        return r;
-    *(V4_Fc6bd459e *)a0 = *(V4_Fc6bd459e *)a1;
-    *(float *)a2 = 0.0f;
-    return *(float *)a2;
+    func_00282CF0_16(delta, target, pos);
+    dist = func_00282DF0_4(delta);
+    func_002AA198_2(speed, dist, f1, f2, f3);
+    func_00282F20_12(delta, delta, *(float *)speed);
+    func_00282CC0_32(pos, pos, delta);
+    dist = dist - *(float *)speed;
+    absDist = func_00282C48_9(dist);
+    if (!(absDist < f3 * 0.01f))
+        return dist;
+    *(V4_Fc6bd459e *)pos = *(V4_Fc6bd459e *)target;
+    *(float *)speed = 0.0f;
+    return *(float *)speed;
 }
 
 /* func_002AA548 is implemented in 002AA548.c. */
@@ -862,16 +902,17 @@ float func_002AA458(void *a0, void *a1, void *a2, float f1, float f2, float f3)
 extern float func_00283BE0(float, float);
 extern float func_00282C48(float);
 
-f32 func_002AA738(float from, s32 a0, float to)
+/* Gives the shortest turn between two angles, going a chosen direction when asked. */
+f32 func_002AA738(float from, s32 direction, float to)
 {
-    f32 base = func_00283BE0(from, to);
+    f32 base = fast_subtract_rotations(from, to);
 
-    if (a0 == 0 || base * (f32)a0 > 0.0f)
+    if (direction == 0 || base * (f32)direction > 0.0f)
         return base;
     {
         f32 zero = 0.0f;
 
-        if (func_00282C48(base) <= 0.001745329471305012702941895f)
+        if (FloatAbs(base) <= 0.001745329471305012702941895f)
             return zero;
         if (base > zero)
             return base - 6.2831859588623046875f;

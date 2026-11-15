@@ -46,19 +46,19 @@ void func_L02_003CD758(Moby_L02_003CD758 *m)
     Vars_L02_003CD758 *v = m->vars;
 
     if (v->timer == 0) {
-        if (v->link != 0 && (v->link->type == 0xA20 || v->link->type == 0xA21)) func_0029F338(v->link);
-        func_0029F338(m);
+        if (v->link != 0 && (v->link->type == 0xA20 /* moby class 2592 */ || v->link->type == 0xA21 /* moby class 2593 */)) MarkMobySpawned(v->link);
+        MarkMobySpawned(m);
         return;
     }
-    func_00282948(&v->timer);
-    if (v->link != 0 && !(v->link->type == 0xA20 || v->link->type == 0xA21)) {
-        if (v->h310 == 0) v->link = func_0029EFD0(0xA20);
-        else v->link = func_0029EFD0(0xA21);
+    FastFloatHelperD(&v->timer);
+    if (v->link != 0 && !(v->link->type == 0xA20 /* moby class 2592 */ || v->link->type == 0xA21 /* moby class 2593 */)) {
+        if (v->h310 == 0) v->link = CreateMoby(0xA20 /* moby class 2592 */);
+        else v->link = CreateMoby(0xA21 /* moby class 2593 */);
         if (v->link == 0) {
-            func_0029F338(m);
+            MarkMobySpawned(m);
             return;
         }
-        func_002B37E8(v->link, m);
+        InitChildObjectFromParent(v->link, m);
         v->link->flags |= 0x100;
     }
     v->link->flags |= 0x41;
@@ -71,5 +71,5 @@ void func_L02_003CD758(Moby_L02_003CD758 *m)
     m->flags = (m->flags | 0x41) & 0xEFFF;
     v->h88 = 0;
     v->b2E = 1;
-    func_002A7750(m, 0x17, 4);
+    SetMobyState(m, 0x17, 4);
 }

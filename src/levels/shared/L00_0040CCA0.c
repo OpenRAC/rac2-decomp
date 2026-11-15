@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_L00_0040DC08(float *p, float a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 
@@ -32,62 +33,63 @@ extern char D_0018A0E0[];
 
 extern char D_001FE940[];
 
-void func_L00_0040CCA0(float *p, int unused, int flag)
+/* Throws out a puff of grey smoke and bright sparks at a point. The sparks are red when the flag is set and green otherwise. */
+void func_L00_0040CCA0(float *position, int unused, int flag)
 {
-    float v[4];
-    float dir[4];
-    float out[4];
-    float ang;
-    float scale;
-    float mag;
-    float angle;
-    float f;
-    int id;
+    float toCamera[4];
+    float velocity[4];
+    float spawnPos[4];
+    float facingAngle;
+    float speed;
+    float pitchSpread;
+    float yaw;
+    float randomValue;
+    int spin;
     int i;
     unsigned int color;
-    char *r;
-    char *q;
+    char *part;
+    char *extra;
 
     if (flag != 0) {
         color = 0x7F2020FF;
-        func_L00_0040DC08(p, 0.25f, 0, 15, 10, 0, 20, 0, 0, 1, 0);
+        SpawnFlareMoby(position, 0.25f, 0, 15, 10, 0, 20, 0, 0, 1, 0);
     } else {
         color = 0x7F20FF20;
     }
-    func_00282CF0((char *)v, D_L00_001B8DC0, (char *)p);
-    ang = func_00283248(v[0], v[1]);
+    FastVecSub((char *)toCamera, gCameraPosition_L00, (char *)position);
+    facingAngle = FastMatrixHelperA(toCamera[0], toCamera[1]);
 
     for (i = 19; i >= 0; i--) {
-        f = func_002A7878(0.2f, 3.0f);
-        func_00282D30((char *)dir, D_0018A0E0, -(f * 0.01666666753590107f));
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        f = func_002A7878(0.3f, 0.75f) * 210000.0f;
-        out[0] = p[0] + func_002A78D8(0.0f, 0.2f);
-        out[1] = p[1] + func_002A78D8(0.0f, 0.2f);
-        out[2] = p[2] + func_002A78D8(0.0f, 0.2f);
-        r = func_002BDCE8((char *)out, 0.0f, 1.0f, 1.01f, f, id, (char *)dir, 0x7F202020, 0);
-        if (r != 0) {
-            q = r + 32;
-            *(unsigned char *)(r + 3) = 0x44;
-            *(short *)(r + 10) = 0x5A;
-            *(unsigned char *)(r + 9) = func_00283CF0(4.0f) + 0x40;
-            *(float *)(q + 0x1C) = func_00283CE0(5);
-            *(int *)(q + 4) = 3;
-            *(unsigned char *)(q + 0xA) = 0x30;
-            *(unsigned char *)(q + 0xB) = *(unsigned char *)(r + 10);
+        randomValue = RandomFloatRange(0.2f, 3.0f);
+        FastVecScale((char *)velocity, D_0018A0E0, -(randomValue * 0.01666666753590107f));
+        spin = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        randomValue = RandomFloatRange(0.3f, 0.75f) * 210000.0f;
+        spawnPos[0] = position[0] + RandomSignedFloatRange(0.0f, 0.2f);
+        spawnPos[1] = position[1] + RandomSignedFloatRange(0.0f, 0.2f);
+        spawnPos[2] = position[2] + RandomSignedFloatRange(0.0f, 0.2f);
+        part = SpawnSpinningSparkParticle((char *)spawnPos, 0.0f, 1.0f, 1.01f, randomValue, spin, (char *)velocity, 0x7F202020, 0);
+        if (part != 0) {
+            extra = part + 32;
+            *(unsigned char *)(part + 3) = 0x44;
+            *(short *)(part + 10) = 0x5A;
+            *(unsigned char *)(part + 9) = FloatToInt(4.0f) + 0x40;
+            *(float *)(extra + 0x1C) = IntToFloat(5);
+            *(int *)(extra + 4) = 3;
+            *(unsigned char *)(extra + 0xA) = 0x30;
+            *(unsigned char *)(extra + 0xB) = *(unsigned char *)(part + 10);
         }
-        scale = func_002A7878(1.0f, 2.0f);
-        mag = func_002A7878(0.0f, 1.396263599395752f);
-        angle = func_00283B98(ang, func_002A78D8(0.0f, 1.396263599395752f));
-        func_002AF000(dir, scale * 0.01666666753590107f, angle, mag);
-        out[0] = p[0] + func_002A78D8(0.0f, 0.1f);
-        out[1] = p[1] + func_002A78D8(0.0f, 0.1f);
-        out[2] = p[2] + func_002A78D8(0.0f, 0.1f);
-        r = func_002C16C0(out, dir, 30, 127, color, id,
-                          func_002A7878(0.25f, 0.7f) * 210000.0f, 500.0f, 1.0f, 0.0f, 0.0f);
-        if (r != 0) {
-            char *tbl = D_001FE940;
-            *(unsigned char *)(r + 2) = *(unsigned char *)(*(char **)(tbl + 0x184) + 6);
+        speed = RandomFloatRange(1.0f, 2.0f);
+        pitchSpread = RandomFloatRange(0.0f, 1.396263599395752f);
+        yaw = FastAddRotations(facingAngle, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        BuildSphericalOffset(velocity, speed * 0.01666666753590107f, yaw, pitchSpread);
+        spawnPos[0] = position[0] + RandomSignedFloatRange(0.0f, 0.1f);
+        spawnPos[1] = position[1] + RandomSignedFloatRange(0.0f, 0.1f);
+        spawnPos[2] = position[2] + RandomSignedFloatRange(0.0f, 0.1f);
+        part = SpawnBurstParticle_002C16C0(spawnPos, velocity, 30, 127, color, spin,
+                          RandomFloatRange(0.25f, 0.7f) * 210000.0f, 500.0f, 1.0f, 0.0f, 0.0f);
+        if (part != 0) {
+            char *resident = D_001FE940;
+            *(unsigned char *)(part + 2) = *(unsigned char *)(*(char **)(resident + 0x184) + 6);
         }
     }
 }

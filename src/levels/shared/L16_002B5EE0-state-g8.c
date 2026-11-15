@@ -59,6 +59,7 @@ extern int func_L01_0031BC68(int,int,float);
  * func_L16_003960E8 rises, bursts once that value reaches 1 (effects, shake, a
  * formatted message with a count), then deletes itself when its timer runs out.
  * The idle colour pulses while the object is visible. */
+/* This is the update of the moby of class 2681. */
 void func_L16_003C2C08(u8 *object)
 {
     float point[4],step[4],normal[4];
@@ -71,7 +72,7 @@ void func_L16_003C2C08(u8 *object)
     switch (object[0x20]) {
     case 0: {
         float speed;
-        if (D_0019B2E8[object[0xB0]+D_001A79F0*16]&0x80) goto remove;
+        if (D_0019B2E8[object[0xB0]+gCurrentMapIndex*16]&0x80) goto remove;
         object[0x30]=255;
         *(u16 *)(object+0x32)=0x113;
         *(u16 *)(object+0x34)|=0x4000;
@@ -80,40 +81,40 @@ void func_L16_003C2C08(u8 *object)
         state->amount=0.0f;
         state->sound=-1;
         state->angularSpeed=speed;
-        func_002A7750(object,1,-1);
+        SetMobyState(object,1,-1);
         break;
     }
     case 1:
         if (!D_L16_001A8FF0) break;
-        amount=func_L16_003960E8(D_L16_001B2B1C+(state->tableIndex<<8));
+        amount=GetLinkedFloatValue(D_L16_001B2B1C+(state->tableIndex<<8));
         if (amount!=0.0f || state->amount!=0.0f) {
-            func_L14_004272D8(object);
-            func_00282F20(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
-            func_00282CC0(object+0x10,state->origin,point);
-            if (amount<state->amount) func_002A8C28(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
+            SpawnSparkParticle_L14(object);
+            vec_scale_to_length(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
+            FastVecAdd(object+0x10,state->origin,point);
+            if (amount<state->amount) SweepCollisionFromObject(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
         }
         if (amount!=state->amount && amount!=1.0f && amount!=0.0f) {
-            u8 *playingSound=D_00188660+state->sound*0x70;
-            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=func_002E5CF8(2,4,(char *)object);
+            u8 *playingSound=gSoundState+state->sound*0x70;
+            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=PlayMobySound(2,4,(char *)object);
         } else {
             int sound=state->sound;
             if (sound!=-1) {
-                u8 *stoppingSound=D_00188660+sound*0x70;
-                if (*(u8 **)(stoppingSound+0x88)==object && stoppingSound[0x74]) func_002E59F8(sound);
+                u8 *stoppingSound=gSoundState+sound*0x70;
+                if (*(u8 **)(stoppingSound+0x88)==object && stoppingSound[0x74]) StopSoundVoice(sound);
             }
             state->sound=-1;
         }
-        if (amount==1.0f && state->amount!=1.0f) func_00288E18(0x9EC,67);
+        if (amount==1.0f && state->amount!=1.0f) RequestSubtitleVoiceLine(0x9EC,67);
         state->amount=amount;
         if (D_L16_001B3814!=D_L16_001B2648) {
             D_L16_001B3814=D_L16_001B2648;
-            func_L00_002E6CF0(func_L16_003C32F8,object);
+            AddDrawCallbackToList1(DrawRotatingGroupInstances,object);
         }
         if (amount>=1.0f) {
-            if (func_002A9640(object,0x10000,0)) {
-                func_002E5CF8(0,0,(char *)object);
+            if (FindOwnedEffectSlot(object,0x10000,0)) {
+                PlayMobySound(0,0,(char *)object);
                 object[0xA8]=255;
-                func_002A7750(object,2,-1);
+                SetMobyState(object,2,-1);
                 D_0018CC7C=65535;
             }
         } else object[0xA8]=255;
@@ -123,71 +124,71 @@ void func_L16_003C2C08(u8 *object)
         oldTimer=timer++;
         *(u16 *)(object+0x96)=timer;
         if (oldTimer>=60) {
-            func_00282F20(point,object+0xE0,-2.0f);
-            func_00282F20(step,object+0xE0,5.0f);
-            func_00282CC0(point,point,object+0x10);
-            func_002A8C28(object,point,0x10000,0,1,0,6.0f,3.0f,1.0f);
-            func_002E5CF8(1,0,(char *)object);
+            vec_scale_to_length(point,object+0xE0,-2.0f);
+            vec_scale_to_length(step,object+0xE0,5.0f);
+            FastVecAdd(point,point,object+0x10);
+            SweepCollisionFromObject(object,point,0x10000,0,1,0,6.0f,3.0f,1.0f);
+            PlayMobySound(1,0,(char *)object);
             for (i=0;i<2;i++) {
-                func_00282CF0(normal,D_L16_001B9B00,point);
-                func_00282F20(normal,normal,1.0f);
-                func_0032DA58(object,point,normal,0.0f);
-                func_00282CC0(point,point,step);
+                FastVecSub(normal,D_L16_001B9B00,point);
+                vec_scale_to_length(normal,normal,1.0f);
+                SpawnBlastEffectMoby(object,point,normal,0.0f);
+                FastVecAdd(point,point,step);
             }
             D_L16_001B99C0.damping=0.1f;
             D_L16_001B99C0.lifetime=90;
             D_L16_001B99C0.strength=0.2f;
             D_L16_001B99C0.duration=60;
             D_L16_001B99C0.timer=0;
-            func_002AB6D8((float *)(object+0xC0),(float *)(object+0xF0));
-            func_002B0A68((char *)object,0xFFF,(float *)D_L16_001A8F20,255,2.0f,4.0f,10.0f,20.0f);
+            GetEulerAnglesFromMatrix((float *)(object+0xC0),(float *)(object+0xF0));
+            SpawnDebrisForMaskedParts((char *)object,0xFFF,(float *)D_L16_001A8F20,255,2.0f,4.0f,10.0f,20.0f);
             state->counter=0;
             state->timer=180;
             state->flags=0;
             I(object,0x98)=0;
             *(u16 *)(object+0x34)=(*(u16 *)(object+0x34)|0x41)&0xEFFF;
-            count=func_002A8508(object[0x21],-1)-1;
+            count=CountMobysInGroupNotInState(object[0x21],-1)-1;
             if (count!=0) {
                 char *format=D_L16_001B02D0;
                 char *text=message;
-                string=func_00288FB8(0x2F3A);
-                func_00115DA8(text,format,string,count);
+                string=GetLocalizedString(0x2F3A);
+                Sprintf(text,format,string,count);
                 string=text;
-                func_002A7750(object,4,-1);
-                func_L00_0030DD70(string,180);
+                SetMobyState(object,4,-1);
+                CallLoadedModuleHandlerWithArg_003387A0_1(string,180);
             } else {
-                string=func_00288FB8(0x2F3B);
-                func_L00_0030DD70(string,180);
-                func_002A7750(object,5,-1);
+                string=GetLocalizedString(0x2F3B);
+                CallLoadedModuleHandlerWithArg_003387A0_1(string,180);
+                SetMobyState(object,5,-1);
             }
         } else {
-            if (*(u16 *)(object+0x96)%20==10) func_002E5CF8(3,0,(char *)object);
+            if (*(u16 *)(object+0x96)%20==10) PlayMobySound(3,0,(char *)object);
         }
         break;
     case 4:
-        if (func_00282948(&state->timer)) {
+        if (FastFloatHelperD(&state->timer)) {
 remove:
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
         break;
     case 5:
-        if (func_00282948(&state->timer)) {
-            if (object[0xB0]!=255) func_002A0430(object[0xB0]);
-            func_0029F338(object);
+        if (FastFloatHelperD(&state->timer)) {
+            if (object[0xB0]!=255) MarkTableEntryFlagged(object[0xB0]);
+            MarkMobySpawned(object);
             return;
         }
         break;
     }
     if (object[0x31]) {
         if (object[0x20]==2) {
-            rate=func_00283B98(state->angle,D_L16_001B02BC*0.00029088825f);
+            rate=FastAddRotations(state->angle,D_L16_001B02BC*0.00029088825f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=func_L01_0031BC68(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
+            *(u32 *)(object+0x78)=PulseColor(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
         } else {
-            rate=func_00283B98(state->angle,D_L16_001B02B8*0.00029088825f);
+            rate=FastAddRotations(state->angle,D_L16_001B02B8*0.00029088825f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=func_L01_0031BC68(colorFirst[0],D_L16_001B02C0[1],rate);
+            *(u32 *)(object+0x78)=PulseColor(colorFirst[0],D_L16_001B02C0[1],rate);
         }
     }
 }

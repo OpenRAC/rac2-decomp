@@ -26,6 +26,7 @@
 
 extern s32 func_00132DF0();
 
+/* Sends sound command 8, which has no data. */
 s32 func_00132818(void) {
-    return func_00132DF0(8, 0, 0, 0, 0);
+    return QueueSoundCommand(8, 0, 0, 0, 0);
 }

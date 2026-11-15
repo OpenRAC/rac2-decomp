@@ -20,61 +20,63 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 #define E_F(p,o) (*(float *)((u8 *)(p)+(o)))
 typedef struct { u8 pad[0x60]; TI128 pos; TI128 rot; int index; float duration; float progress; u8 pad2[2]; u8 trigger; u8 side; int sound; } EPlatform;
 typedef struct { u8 pad[0xf0]; float rx, ry, rz; } EMob;
-void func_L08_003E5BB8(u8 *m)
+/* Moves a platform back and forth between two spots when the hero stands on it,
+   playing a sound while it moves. */
+void func_L08_003E5BB8(u8 *moby)
 {
-    TI128 oldpos, oldrot, delta;
-    EPlatform *p = *(EPlatform **)(m+0x68);
-    float d1,d2,t;
-    qcopy(&oldpos,m+0x10);
-    qcopy(&oldrot,m+0xf0);
-    switch(m[0x20]) {
+    TI128 oldPos, oldRot, delta;
+    EPlatform *platform = *(EPlatform **)(moby+0x68);
+    float distToStart,distToEnd,blend;
+    qcopy(&oldPos,moby+0x10);
+    qcopy(&oldRot,moby+0xf0);
+    switch(moby[0x20]) {
     case 0:
-        p->sound=-1;
-        qcopy(&p->pos,m+0x10);
-        qcopy(&p->rot,m+0xf0);
-        if(E_F((u8 *)p,0x68)<E_F(D_L08_001B2ACC+p->index*128,0x38)) p->side=0; else p->side=1;
-        p->progress=0;
-        m[0xbc]=0;
-        func_002A7750(m,1,-1);
+        platform->sound=-1;
+        qcopy(&platform->pos,moby+0x10);
+        qcopy(&platform->rot,moby+0xf0);
+        if(E_F((u8 *)platform,0x68)<E_F(D_L08_001B2ACC+platform->index*128,0x38)) platform->side=0; else platform->side=1;
+        platform->progress=0;
+        moby[0xbc]=0;
+        SetMobyState(moby,1,-1);
         break;
     case 1:
-        d1=func_00282C48(E_F((u8 *)p,0x68)-D_00189E20.z);
-        d2=func_00282C48(E_F(D_L08_001B2ACC+p->index*128,0x38)-D_00189E20.z);
-        if (((!p->trigger || func_00283CF0(p->progress)==p->side) && D_00189E20.object==(int)m && D_00189E20.state!=0) ||
-            (p->progress<0.1f && d2<d1) || (p->progress>0.9f && d1<d2)) {
-            m[0xbc]^=1;
-            func_002A7750(m,2,-1);
+        distToStart=FloatAbs(E_F((u8 *)platform,0x68)-gHeroState.z);
+        distToEnd=FloatAbs(E_F(D_L08_001B2ACC+platform->index*128,0x38)-gHeroState.z);
+        if (((!platform->trigger || FloatToInt(platform->progress)==platform->side) && gHeroState.object==(int)moby && gHeroState.state!=0) ||
+            (platform->progress<0.1f && distToEnd<distToStart) || (platform->progress>0.9f && distToStart<distToEnd)) {
+            moby[0xbc]^=1;
+            SetMobyState(moby,2,-1);
         }
         break;
     case 2:
-        if(((ESound *)(D_00188660+p->sound*0x70))->object!=(int)m || !((ESound *)(D_00188660+p->sound*0x70))->active)
-            p->sound=func_002E5CF8(0,4,m);
-        if(m[0xbc]) p->progress+=1.0f/p->duration;
-        else p->progress-=1.0f/p->duration;
-        if(p->progress>1.0f) p->progress=1.0f;
-        else if(p->progress<0.0f) p->progress=0.0f;
-        t=(1.0f-func_00283180(p->progress*3.141592741f))*0.5f;
-        func_00282CF0(&delta,D_L08_001B2ACC+p->index*128+0x30,&p->pos);
-        func_00282D30(&delta,&delta,t);
-        func_00282CC0(m+0x10,&p->pos,&delta);
-        ((EMob*)m)->rz=func_002AA150(E_F((u8 *)p,0x78),E_F(D_L08_001B2ACC+p->index*128,0x78),t);
-        ((EMob*)m)->ry=func_002AA150(E_F((u8 *)p,0x74),E_F(D_L08_001B2ACC+p->index*128,0x74),t);
-        ((EMob*)m)->rx=func_002AA150(E_F(p,0x70),E_F(D_L08_001B2ACC+p->index*128,0x70),t);
-        if(m[0xbc] ? p->progress>=1.0f : p->progress<=0.0f) {
-            int i=p->sound;
-            if(i!=-1 && ((ESound *)(D_00188660+i*0x70))->object==(int)m && ((ESound *)(D_00188660+i*0x70))->active) func_002E59F8(i);
-            p->sound=-1;
-            if(*(short *)(m+0xaa)!=0xd49) func_002E5CF8(1,0,m);
-            func_002A7750(m,3,-1);
+        if(((ESound *)(gSoundState+platform->sound*0x70))->object!=(int)moby || !((ESound *)(gSoundState+platform->sound*0x70))->active)
+            platform->sound=PlayMobySound(0,4,moby);
+        if(moby[0xbc]) platform->progress+=1.0f/platform->duration;
+        else platform->progress-=1.0f/platform->duration;
+        if(platform->progress>1.0f) platform->progress=1.0f;
+        else if(platform->progress<0.0f) platform->progress=0.0f;
+        blend=(1.0f-FastSinOrCosA(platform->progress*3.141592741f))*0.5f;
+        FastVecSub(&delta,D_L08_001B2ACC+platform->index*128+0x30,&platform->pos);
+        FastVecScale(&delta,&delta,blend);
+        FastVecAdd(moby+0x10,&platform->pos,&delta);
+        ((EMob*)moby)->rz=MoveAngleTowardTarget(E_F((u8 *)platform,0x78),E_F(D_L08_001B2ACC+platform->index*128,0x78),blend);
+        ((EMob*)moby)->ry=MoveAngleTowardTarget(E_F((u8 *)platform,0x74),E_F(D_L08_001B2ACC+platform->index*128,0x74),blend);
+        ((EMob*)moby)->rx=MoveAngleTowardTarget(E_F(platform,0x70),E_F(D_L08_001B2ACC+platform->index*128,0x70),blend);
+        if(moby[0xbc] ? platform->progress>=1.0f : platform->progress<=0.0f) {
+            int i=platform->sound;
+            if(i!=-1 && ((ESound *)(gSoundState+i*0x70))->object==(int)moby && ((ESound *)(gSoundState+i*0x70))->active) StopSoundVoice(i);
+            platform->sound=-1;
+            if(*(short *)(moby+0xaa)!=0xd49 /* moby class 3401 */) PlayMobySound(1,0,moby);
+            SetMobyState(moby,3,-1);
         }
         break;
     case 3:
-        if(D_00189E20.object!=(int)m) func_002A7750(m,1,-1);
+        if(gHeroState.object!=(int)moby) SetMobyState(moby,1,-1);
         break;
     }
-    if(m[0x20]<4) {
-        func_00282CF0(&delta,m+0x10,&oldpos);
-        func_002AD6F0((u8 *)p+0x20,&delta,&oldrot,m+0xf0);
+    if(moby[0x20]<4) {
+        FastVecSub(&delta,moby+0x10,&oldPos);
+        CombineTransformsAndStore((u8 *)platform+0x20,&delta,&oldRot,moby+0xf0);
     }
 }
 

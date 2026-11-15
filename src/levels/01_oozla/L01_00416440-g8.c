@@ -113,7 +113,7 @@ extern s32 func_0029B3E0(s32, s32);
  * Adapted from RAC1's gold_bolt_update (GPL-3.0). */
 void func_L01_00416440(GoldBoltMoby *moby) {
     GoldBoltVars *vars = moby->pvars;
-    GoldBoltHero *h;
+    GoldBoltHero *hero;
     Vec4f at, look, at2, look2;
     s32 i;
 
@@ -124,10 +124,10 @@ void func_L01_00416440(GoldBoltMoby *moby) {
         }
         qcopy(&vars->home, &moby->pos);
         vars->home.w = moby->rot.z;
-        moby->rot.x = func_002A7940();
-        moby->rot.y = func_002A7940();
-        moby->rot.z = func_002A7940();
-        moby->rot.w = func_002A7940();
+        moby->rot.x = RandomAngle();
+        moby->rot.y = RandomAngle();
+        moby->rot.z = RandomAngle();
+        moby->rot.w = RandomAngle();
         vars->unk68 = D_L01_001B1A68 * SPIN;
         vars->unk64 = D_L01_001B1A6C * SPIN;
         vars->unk60 = D_L01_001B1A70 * SPIN;
@@ -135,113 +135,113 @@ void func_L01_00416440(GoldBoltMoby *moby) {
             moby->unk32 = 0x40;
         }
         moby->state = 1;
-        func_L01_00416B30(moby);
+        InitGoldBoltGlow(moby);
         break;
     case 1:
         moby->scale = moby->pclass->scale * D_L01_001B1A58;
-        moby->rot.x = func_00283B98(moby->rot.x, D_L01_001B1A68 * SPIN);
-        moby->rot.y = func_00283B98(moby->rot.y, D_L01_001B1A6C * SPIN);
-        moby->rot.z = func_00283B98(moby->rot.z, D_L01_001B1A70 * SPIN);
-        moby->rot.w = func_00283B98(moby->rot.w, D_L01_001B1A74 * SPIN);
-        func_L01_00416C08(moby);
-        if (!func_002A77E0(D_L01_001B1A98)) {
-            func_L01_00417090(moby);
+        moby->rot.x = FastAddRotations(moby->rot.x, D_L01_001B1A68 * SPIN);
+        moby->rot.y = FastAddRotations(moby->rot.y, D_L01_001B1A6C * SPIN);
+        moby->rot.z = FastAddRotations(moby->rot.z, D_L01_001B1A70 * SPIN);
+        moby->rot.w = FastAddRotations(moby->rot.w, D_L01_001B1A74 * SPIN);
+        DrawGlowRings(moby);
+        if (!RandomIntBelow(D_L01_001B1A98)) {
+            SpawnSparkleTrail(moby);
         }
-        if (!(func_00282E80(&moby->pos, &D_00189E20.pos) < 3.0f)) {
+        if (!(vec_distance_xy(&moby->pos, &gHeroState.pos) < 3.0f)) {
             break;
         }
-        if (!(func_00282C48(moby->pos.z - D_00189E20.pos.z) < 2.0f)) {
+        if (!(FloatAbs(moby->pos.z - gHeroState.pos.z) < 2.0f)) {
             break;
         }
-        if (D_00189E20.hp == 0) {
+        if (gHeroState.hp == 0) {
             break;
         }
-        if (D_00189E20.vehicle_mode != 3 && D_00189E20.vehicle_mode != 0) {
+        if (gHeroState.vehicle_mode != 3 && gHeroState.vehicle_mode != 0) {
             break;
         }
         if (vars->unkC != 0) {
             D_L01_001B21B0 = 180;
-            func_002B0A18(0xAAA, -1);
-            func_00288308(50);
-            func_002E5CF8(1, 0, moby);
+            SetEntryValueByIndex(0xAAA, -1);
+            UnlockHelpEntry(50);
+            PlayMobySound(1, 0, moby);
         remove:
-            func_0029F338(moby);
+            MarkMobySpawned(moby);
             break;
         }
-        at.x = func_00283180(vars->home.w) * 2.5f;
-        at.y = func_00283198(vars->home.w) * 2.5f;
+        at.x = FastSinOrCosA(vars->home.w) * 2.5f;
+        at.y = FastSinOrCosB(vars->home.w) * 2.5f;
         at.z = 0.0f;
-        func_00282CC0(&at, &at, &vars->home);
-        func_00282C88(&look);
-        look.z = func_00283B98(vars->home.w, 3.141593f);
-        func_0027D330(10);
-        if (D_00189E20.vehicle_mode == 3) {
-            func_L01_002B35E8(0);
+        FastVecAdd(&at, &at, &vars->home);
+        ClearVector128(&look);
+        look.z = FastAddRotations(vars->home.w, 3.141593f);
+        FadeToBlack(10);
+        if (gHeroState.vehicle_mode == 3) {
+            ResetHeroForAreaStart(0);
         }
-        func_L00_002B9D60(&at, &look, 0x6F, 0);
-        func_002E5CF8(0, 0, moby);
-        at2.x = func_00283180(vars->home.w) * 1.25f;
-        at2.y = func_00283198(vars->home.w) * 1.25f;
+        ResetHeroPositionAndDirection(&at, &look, 0x6F, 0);
+        PlayMobySound(0, 0, moby);
+        at2.x = FastSinOrCosA(vars->home.w) * 1.25f;
+        at2.y = FastSinOrCosB(vars->home.w) * 1.25f;
         at2.z = 0.0f;
-        at2.x += func_00283180(func_00283B98(vars->home.w, 1.5707965f)) * 4.0f;
-        at2.y += func_00283198(func_00283B98(vars->home.w, 1.5707965f)) * 4.0f;
-        func_00282CC0(&at2, &at2, &vars->home);
+        at2.x += FastSinOrCosA(FastAddRotations(vars->home.w, 1.5707965f)) * 4.0f;
+        at2.y += FastSinOrCosB(FastAddRotations(vars->home.w, 1.5707965f)) * 4.0f;
+        FastVecAdd(&at2, &at2, &vars->home);
         at2.z += 1.0f;
-        func_00282C88(&look2);
-        look2.z = func_00283BE0(vars->home.w, 1.5707965f);
-        func_00335438(&at2, &look2, 1, 0, 0);
-        func_00335370(&at2);
-        func_003353C8(&look2);
-        qcopy(&moby->pos, &D_00189E20.pos);
-        qcopy(&moby->rot, &D_00189E20.rot);
+        ClearVector128(&look2);
+        look2.z = fast_subtract_rotations(vars->home.w, 1.5707965f);
+        SetCamera5Pose(&at2, &look2, 1, 0, 0);
+        CopyVectorToSelectedObject(&at2);
+        SetCameraStateRotation(&look2);
+        qcopy(&moby->pos, &gHeroState.pos);
+        qcopy(&moby->rot, &gHeroState.rot);
         if (moby->prev_seq != 1) {
-            func_002A7470(moby, 1, 0, 0);
+            StartAnimationBlended(moby, 1, 0, 0);
         }
-        func_L00_002D2168(0x7B, 0, 0.0f);
+        set_hero_animation(0x7B, 0, 0.0f);
         if (D_001A7A45) {
             moby->flags |= 0x8000;
         }
-        D_00189E20.unk22BF = 1;
+        gHeroState.unk22BF = 1;
         D_L01_001B1FA8 = 1;
         moby->state = 2;
         vars->timer = 60;
         break;
     case 2:
         D_L01_001B22A0.busy = 1;
-        func_L01_00416E78(moby);
-        qcopy(&moby->pos, &D_00189E20.pos);
-        qcopy(&moby->rot, &D_00189E20.rot);
+        UpdateGoldBoltCamera(moby);
+        qcopy(&moby->pos, &gHeroState.pos);
+        qcopy(&moby->rot, &gHeroState.rot);
         if (moby->seq == 1) {
-            func_L01_00416A50(moby);
-            if (!func_002A77E0(10)) {
-                func_L01_00417090(moby);
+            UpdateBobbingMoby_L01_2(moby);
+            if (!RandomIntBelow(10)) {
+                SpawnSparkleTrail(moby);
             }
             if (moby->anim_flags & 2) {
                 if (moby->prev_seq != 0) {
-                    func_002A7470(moby, 0, 0, 0);
+                    StartAnimationBlended(moby, 0, 0, 0);
                 }
                 moby->visible = 0;
                 moby->flags |= 1;
                 for (i = 0; i < 4; i++) {
-                    func_L01_00417090(moby);
+                    SpawnSparkleTrail(moby);
                 }
             }
         }
-        h = &D_00189E20;
-        if (h->anim_flags & 2) {
-            func_L00_002D2168(0, 0, 30.0f);
+        hero = &gHeroState;
+        if (hero->anim_flags & 2) {
+            set_hero_animation(0, 0, 30.0f);
         }
-        if (moby->seq != 0 || !func_00282948(&vars->timer)) {
+        if (moby->seq != 0 || !FastFloatHelperD(&vars->timer)) {
             break;
         }
         D_L01_001B21B0 = 180;
-        func_002B0A18(0x129A, -1);
-        func_00288308(50);
+        SetEntryValueByIndex(0x129A, -1);
+        UnlockHelpEntry(50);
         D_L01_001B1FA8_gp = 0;
-        func_L00_002B9D60(&h->pos, &h->rot, 0, 0);
-        func_003355A8(0);
-        func_0029B3E0(0, -1);
-        func_0029F338(moby);
+        ResetHeroPositionAndDirection(&hero->pos, &hero->rot, 0, 0);
+        SetCameraModeState(0);
+        MemcardSave(0, -1);
+        MarkMobySpawned(moby);
         break;
     }
 }

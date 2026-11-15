@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Scratch-array layout and pointer updates follow RAC1 actuator_CalcPower,
  * src/game/actuator.c (OpenRAC/Lombyte, GPL-3.0). */
@@ -11,6 +12,7 @@ typedef struct {
 } WaveChannel;
 extern WaveChannel D_001B5180[8];
 
+/* Adds up all active wave channels into two output values and returns how many channels are active. */
 int func_0026F810(int *out)
 {
     int scratch[3][4];
@@ -73,13 +75,13 @@ int func_0026F810(int *out)
             float angle;
 
             if (phase < s->fall)
-                angle = func_00283CE0(phase) * 3.1415927f / func_00283CE0(s->fall);
+                angle = IntToFloat(phase) * 3.1415927f / IntToFloat(s->fall);
             else
-                angle = 3.1415927f - func_00283CE0(phase - s->fall) * 3.1415927f / func_00283CE0(s->rise);
-            angle = func_00283180(angle);
+                angle = 3.1415927f - IntToFloat(phase - s->fall) * 3.1415927f / IntToFloat(s->rise);
+            angle = FastSinOrCosA(angle);
             {
-                float a = func_00283CE0(s->amplitude);
-                value = func_00283CF0((angle * a + a) * 0.5f) + s->bias;
+                float a = IntToFloat(s->amplitude);
+                value = FloatToInt((angle * a + a) * 0.5f) + s->bias;
             }
             if (value > 255)
                 value = 255;

@@ -53,176 +53,177 @@ extern void func_L08_003F7A48(void *);
 static __inline__ int TaboraStageComplete(void)
 {
     int threshold;
-    if (func_00288D58()) threshold = 4;
+    if (IsFlagByteSet()) threshold = 4;
     else threshold = 1;
-    if (((StageStatus *)D_L08_0026CCF0)[D_00139568[0xA]].count >= threshold) return 1;
+    if (((StageStatus *)D_L08_0026CCF0)[gItemSlotToRecord[0xA]].count >= threshold) return 1;
     return 0;
 }
 
-void func_L08_003F6E18(u8 *o)
+/* Per-frame update of the level's progress controller moby (class 3114): checks which goals are done, plays the talk lines, moves between states and retires its helper mobys. */
+void func_L08_003F6E18(u8 *moby)
 {
-    u8 *s = *(u8 **)(o+0x68);
-    TaboraMoby *p;
+    u8 *vars = *(u8 **)(moby+0x68);
+    TaboraMoby *other;
     int mode;
     int bits;
     unsigned int seen;
-    switch ((u8)o[0x20]) {
+    switch ((u8)moby[0x20]) {
     case 0:
-        o[0x30]=255;
-        *(u16 *)(o+0x96)=0;
-        if (!D_001395B8[0x1C]) func_L00_003672F8();
-        if (*(int *)(s+4)!=-1 && D_00189EA8 < D_L08_001CA080.value) {
-            p=(D_L08_001B29DC+*(int *)(s+4));
-            if (p->state || (D_0019B2E8[p->id+(D_001A79F0<<4)]&128) ||
-                D_L08_0021EAF0.flags[p->index])
+        moby[0x30]=255;
+        *(u16 *)(moby+0x96)=0;
+        if (!D_001395B8[0x1C]) SetFlagToOne();
+        if (*(int *)(vars+4)!=-1 && D_00189EA8 < D_L08_001CA080.value) {
+            other=(D_L08_001B29DC+*(int *)(vars+4));
+            if (other->state || (D_0019B2E8[other->id+(gCurrentMapIndex<<4)]&128) ||
+                D_L08_0021EAF0.flags[other->index])
                 goto relocate_child;
-            bits = D_0019B4A8[(p->index>>1)+(D_001A79F0<<10)];
-            if (((u16)p->index & 1) ? ((bits >> 4) & 7) : (bits & 7)) {
+            bits = D_0019B4A8[(other->index>>1)+(gCurrentMapIndex<<10)];
+            if (((u16)other->index & 1) ? ((bits >> 4) & 7) : (bits & 7)) {
 relocate_child:
-                func_0026FEB8(D_L08_002B53E0);
-                func_L00_002B9D60((u8 *)p+0x10,(u8 *)p+0xF0,0,1);
-                func_002A7750(o,5,-1);
+                STUB_printf(D_L08_002B53E0);
+                ResetHeroPositionAndDirection((u8 *)other+0x10,(u8 *)other+0xF0,0,1);
+                SetMobyState(moby,5,-1);
             }
         }
         if (TaboraStageComplete()) {
-            if (*(int *)(s+0x30)!=-1) {
-                func_0029F338((D_L08_001B29DC+*(int *)(s+0x30)));
-                *(int *)(s+0x30)=-1;
+            if (*(int *)(vars+0x30)!=-1) {
+                MarkMobySpawned((D_L08_001B29DC+*(int *)(vars+0x30)));
+                *(int *)(vars+0x30)=-1;
             }
             if (D_00189EA8 < D_L08_001CA080.value) {
                 mode=0;
-                func_0026FEB8(D_L08_001B0BE8);
+                STUB_printf(D_L08_001B0BE8);
                 D_L08_0021F758=0;
-                func_L00_003672F8();
-                func_002A7750(o,5,-1);
+                SetFlagToOne();
+                SetMobyState(moby,5,-1);
             } else {
                 mode=1;
-                func_0026FEB8(D_L08_001B0C00);
+                STUB_printf(D_L08_001B0C00);
                 D_L08_0021F758=mode;
-                func_002A7750(o,5,-1);
+                SetMobyState(moby,5,-1);
             }
-            func_L08_003F6D30(o);
+            ReplaceTrackedMoby(moby);
         } else if (!(D_00139768.flags[0]&0x80000) || !(D_00139768.flags[1]&0x100000)) {
             mode=1;
-            func_0026FEB8(D_L08_001B0C28);
-            if (func_00288AA0(D_L08_001BFD00,0x53)) {
-                func_00288AA0(D_L08_001BFD00,0x54);
-                func_00288BE8(D_L08_001BFD00);
-                func_002F5CC8();
-                func_L00_003672F8();
-                func_002A7750(o,1,-1);
+            STUB_printf(D_L08_001B0C28);
+            if (PushRequestQueue(D_L08_001BFD00,0x53)) {
+                PushRequestQueue(D_L08_001BFD00,0x54);
+                LaunchQueuedRequest(D_L08_001BFD00);
+                SetSlowdownFactorAndLowFpsFade();
+                SetFlagToOne();
+                SetMobyState(moby,1,-1);
             }
         } else if (D_00139768.flags[1]&0x200000) {
             mode=0;
-            func_0026FEB8(D_L08_001B0C50);
+            STUB_printf(D_L08_001B0C50);
             D_L08_0021F758=0;
-            func_L00_003672F8();
-            func_002A7750(o,3,-1);
+            SetFlagToOne();
+            SetMobyState(moby,3,-1);
         } else {
             mode=0;
-            func_0026FEB8(D_L08_001B0C70);
-            func_L00_003672F8();
-            func_002A7750(o,1,-1);
-            *(u16 *)(o+0x96)=6;
+            STUB_printf(D_L08_001B0C70);
+            SetFlagToOne();
+            SetMobyState(moby,1,-1);
+            *(u16 *)(moby+0x96)=6;
         }
-        if (D_001A7AF8[0x15] && *(int *)(s+0x20)!=-1 &&
-            (D_L08_001B29DC+*(int *)(s+0x20))->state!=0xFE &&
-            (D_L08_001B29DC+*(int *)(s+0x20))->state!=0xFD &&
-            *(int *)(s+0x24)!=-1 &&
-            (D_L08_001B29DC+*(int *)(s+0x24))->state!=0xFE &&
-            (D_L08_001B29DC+*(int *)(s+0x24))->state!=0xFD) {
-            func_0026FEB8(D_L08_001B0C90);
-            if (!D_0019B278[*(int *)D_L08_001B29DC[*(int *)(s+0x24)].data+(D_001A79F0<<2)]) {
+        if (gItemOwnedFlags[0x15] && *(int *)(vars+0x20)!=-1 &&
+            (D_L08_001B29DC+*(int *)(vars+0x20))->state!=0xFE &&
+            (D_L08_001B29DC+*(int *)(vars+0x20))->state!=0xFD &&
+            *(int *)(vars+0x24)!=-1 &&
+            (D_L08_001B29DC+*(int *)(vars+0x24))->state!=0xFE &&
+            (D_L08_001B29DC+*(int *)(vars+0x24))->state!=0xFD) {
+            STUB_printf(D_L08_001B0C90);
+            if (!D_0019B278[*(int *)D_L08_001B29DC[*(int *)(vars+0x24)].data+(gCurrentMapIndex<<2)]) {
                 mode=1;
                 D_L08_0021F758=mode;
-                func_0026FEB8(D_L08_001B0CC0);
+                STUB_printf(D_L08_001B0CC0);
                 {
-                    TaboraMoby *replacement = D_L08_001B29DC + *(int *)(s+0x20);
-                    func_L00_002B9D60((u8 *)replacement+0x10,(u8 *)replacement+0xF0,0,1);
+                    TaboraMoby *replacement = D_L08_001B29DC + *(int *)(vars+0x20);
+                    ResetHeroPositionAndDirection((u8 *)replacement+0x10,(u8 *)replacement+0xF0,0,1);
                 }
-                func_L00_003672F8();
+                SetFlagToOne();
             }
             if (TaboraStageComplete()) {
-                if (func_00288D58()) func_00287FF8(10,4);
-                else func_00287FF8(10,1);
-                func_L08_0030A8F8(1);
+                if (IsFlagByteSet()) SeekChainEntry(10,4);
+                else SeekChainEntry(10,1);
+                RunScreenUpdateSteps(1);
             }
-            func_002A7750(o,5,-1);
+            SetMobyState(moby,5,-1);
         }
-        func_0026FEB8(D_L08_001B0CF0,mode);
-        func_L00_00303530(mode,0);
-        func_L08_003F79E0(o);
-        func_L08_003F77C0(o);
+        STUB_printf(D_L08_001B0CF0,mode);
+        LoadSceneChunk(mode,0);
+        SetFarTargetPoint(moby);
+        StartSparkleBurst(moby);
         break;
     case 1:
-        if (!func_002F5D10() && *(u16 *)(o+0x96)>=6) {
+        if (!IsEitherModeTwo() && *(u16 *)(moby+0x96)>=6) {
             D_001395B8[0x19]=1;
-            if (func_00288AA0(D_L08_001BFD00,0x55)) {
-                func_00288BE8(D_L08_001BFD00);
+            if (PushRequestQueue(D_L08_001BFD00,0x55)) {
+                LaunchQueuedRequest(D_L08_001BFD00);
                 D_L08_0021F758=0;
-                func_0026FEB8(D_L08_001B0D08);
-                func_002F5CC8();
+                STUB_printf(D_L08_001B0D08);
+                SetSlowdownFactorAndLowFpsFade();
                 D_L08_001B2514=1;
                 D_L08_001B2420=1.2f;
-                func_L08_0036EFC8();
-                func_L00_00303530(0,0);
-                func_002A7750(o,2,-1);
+                DisableObjectListFlags();
+                LoadSceneChunk(0,0);
+                SetMobyState(moby,2,-1);
             }
         }
         break;
     case 2:
-        if (!func_002F5D10() && *(u16 *)(o+0x96)>=6) {
+        if (!IsEitherModeTwo() && *(u16 *)(moby+0x96)>=6) {
             D_001395B8[0x1A]=1;
-            func_0026FEB8(D_L08_001B0D30);
-            func_0029B3E0(0,-1);
-            func_002A7750(o,3,-1);
+            STUB_printf(D_L08_001B0D30);
+            MemcardSave(0,-1);
+            SetMobyState(moby,3,-1);
         }
         break;
     case 3:
-        if (func_L00_00329520(D_00189EA0,*(int *)s)) {
-            if (func_00288AA0(D_L08_001BFD00,0x56)) {
-                func_00288BE8(D_L08_001BFD00);
-                func_0026FEB8(D_L08_001B0D48);
-                func_002A7750(o,4,-1);
+        if (IsPointInsideRegion(gHeroPosition,*(int *)vars)) {
+            if (PushRequestQueue(D_L08_001BFD00,0x56)) {
+                LaunchQueuedRequest(D_L08_001BFD00);
+                STUB_printf(D_L08_001B0D48);
+                SetMobyState(moby,4,-1);
             }
         }
         break;
     case 4:
-        if (D_L08_001A8F00==2 && *(int *)(s+0x30)!=-1) {
-            func_0029F338((D_L08_001B29DC+*(int *)(s+0x30)));
-            *(int *)(s+0x30)=-1;
+        if (D_L08_001A8F00==2 && *(int *)(vars+0x30)!=-1) {
+            MarkMobySpawned((D_L08_001B29DC+*(int *)(vars+0x30)));
+            *(int *)(vars+0x30)=-1;
         }
-        if (!func_002F5D10() && *(u16 *)(o+0x96)>=6) {
-            if (func_00288D58()) func_00287FF8(10,4);
-            else func_00287FF8(10,1);
-            func_L08_0030A8F8(1);
-            func_00288508(10);
-            func_L08_003F6D30(o);
-            if (*(int *)(s+8)!=-1) {
-                p=D_L08_001B29DC + *(int *)(s+8);
-                func_0026FEB8(D_L08_001B0D70);
-                D_L08_0021DE80.flags[p->index]=p->id+2;
+        if (!IsEitherModeTwo() && *(u16 *)(moby+0x96)>=6) {
+            if (IsFlagByteSet()) SeekChainEntry(10,4);
+            else SeekChainEntry(10,1);
+            RunScreenUpdateSteps(1);
+            ShowHelpMessageForId(10);
+            ReplaceTrackedMoby(moby);
+            if (*(int *)(vars+8)!=-1) {
+                other=D_L08_001B29DC + *(int *)(vars+8);
+                STUB_printf(D_L08_001B0D70);
+                D_L08_0021DE80.flags[other->index]=other->id+2;
                 {
-                    int id = p->id;
+                    int id = other->id;
                     if (id == 255 || (!(D_L08_001B2840[(u8)id] & 128) &&
-                        (D_0019B2E8[(u8)id + (D_001A79F0 << 4)] & 128)))
-                        D_L08_0021EAF0.flags[p->index]=id+2;
+                        (D_0019B2E8[(u8)id + (gCurrentMapIndex << 4)] & 128)))
+                        D_L08_0021EAF0.flags[other->index]=id+2;
                 }
             }
-            func_0026FEB8(D_L08_001B0DA8);
-            func_0029B3E0(0,-1);
-            func_002A7750(o,5,-1);
+            STUB_printf(D_L08_001B0DA8);
+            MemcardSave(0,-1);
+            SetMobyState(moby,5,-1);
         }
         break;
     }
-    ++*(u16 *)(o+0x96);
+    ++*(u16 *)(moby+0x96);
     if (D_001395B8[0x1C]) {
-        seen = (unsigned)D_0018CD20 & (1 << D_001A79F0);
-        if (!seen) func_00288E18(0x9F9,0x50);
+        seen = (unsigned)D_0018CD20 & (1 << gCurrentMapIndex);
+        if (!seen) RequestSubtitleVoiceLine(0x9F9,0x50);
     }
-    func_L01_002EABA8(0xA3A,0x91,0,*(int *)(s+0xC),-1);
+    TriggerSubtitleInCuboid(0xA3A,0x91,0,*(int *)(vars+0xC),-1);
     if (D_L08_001CA080.state==1) {
-        D_L08_001B9E08=func_L08_003F76C0(o);
-        func_L00_002E6CF0(func_L08_003F7A48,o);
+        D_L08_001B9E08=GetHeightMapGroundHeight(moby);
+        AddDrawCallbackToList1(DrawLensFlare_L08,moby);
     }
 }

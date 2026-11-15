@@ -9,23 +9,23 @@ extern char D_00189EA0[];
 
 /* Installs two aligned control vectors, raises the first Z component and
  * copies it into the saved state before clearing and refreshing the blend. */
-void func_L00_004284B0(char *a0)
+void func_L00_004284B0(char *camera)
 {
-    char *s1;
-    char *s0;
-    char *s2 = a0;
+    char *state;
+    char *blendVec;
+    char *cameraAlias = camera;
     {
-        char *initial = *(char **)(a0 + 0x70);
+        char *initial = *(char **)(camera + 0x70);
         char *block = initial + 0xB0;
-        qcopy(block, D_00189EA0);
+        qcopy(block, gHeroPosition);
         *(f32 *)(block + 8) += 2.0f;
-        qcopy(initial + 0xC0, D_00189EA0 + 0x10);
-        s1 = *(char **)(a0 + 0x70);
-        qcopy(s1 + 0x80, block);
+        qcopy(initial + 0xC0, gHeroPosition + 0x10);
+        state = *(char **)(camera + 0x70);
+        qcopy(state + 0x80, block);
     }
-    s0 = s1 + 0x14;
-    func_L00_002D7940(s0);
-    *(f32 *)(s1 + 0x1C) = 4.64f;
-    func_L00_002D7958(s2 + 0x50, s0, 0.0f);
-    func_L00_00427C78(s2);
+    blendVec = state + 0x14;
+    ZeroFiveWords(blendVec);
+    *(f32 *)(state + 0x1C) = 4.64f;
+    CopyVec5WithFirstBlended(cameraAlias + 0x50, blendVec, 0.0f);
+    InitCameraBlendValues_L00_2(cameraAlias);
 }

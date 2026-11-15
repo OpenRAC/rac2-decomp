@@ -24,6 +24,7 @@
  */
 #include "common.h"
 
+/* Camera hook that does nothing and returns 0. */
 s32 func_L00_004263A8(void) {
     return 0;
 }

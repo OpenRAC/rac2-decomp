@@ -64,7 +64,7 @@ void func_00270598(char *camera)
     CameraVector *pos;
     float *prevpos;
     info = D_001B1504[next->index].info;
-    prev = D_001B5200.current;
+    prev = gActiveCamera.current;
     state = prev->state;
     if (info)
         kind = info->kind;
@@ -73,26 +73,26 @@ void func_00270598(char *camera)
     } else if (state == 2 || kind == 1 || kind == 5) {
         if (kind == 1) {
             float duration = next->duration;
-            D_001B5200.nextkind = 0;
+            gActiveCamera.nextkind = 0;
             if (duration > 0.0f) {
-                D_001B5200.rotrate = duration;
-                D_001B5200.posrate = duration;
+                gActiveCamera.rotrate = duration;
+                gActiveCamera.posrate = duration;
             } else {
-                D_001B5200.rotrate = 0.018f;
-                D_001B5200.posrate = 0.018f;
+                gActiveCamera.rotrate = 0.018f;
+                gActiveCamera.posrate = 0.018f;
             }
         } else if (kind == 5) {
             float duration = next->duration;
-            D_001B5200.nextkind = 2;
+            gActiveCamera.nextkind = 2;
             if (duration > 0.0f)
-                D_001B5200.frames = func_00283CF0(duration);
+                gActiveCamera.frames = FloatToInt(duration);
             else
-                D_001B5200.frames = 40;
+                gActiveCamera.frames = 40;
         }
-        if (D_001B5200.phase == 0)
-            D_001B5200.phase = 1;
+        if (gActiveCamera.phase == 0)
+            gActiveCamera.phase = 1;
         else
-            D_001B5200.phase = 2;
+            gActiveCamera.phase = 2;
     } else if (state == 3 || state == 5 || kind == 3 || kind == 6) {
         qcopy(&next->pos, &prev->pos);
         qcopy(&next->rows[0], &prev->rows[0]);
@@ -101,13 +101,13 @@ void func_00270598(char *camera)
         next->handoff = 2;
         if (prev->state == 5 || kind == 6) {
             float duration = next->duration;
-            D_001B5200.nextkind = 0;
+            gActiveCamera.nextkind = 0;
             if (duration > 0.0f) {
-                D_001B5200.rotrate = duration;
-                D_001B5200.posrate = duration;
+                gActiveCamera.rotrate = duration;
+                gActiveCamera.posrate = duration;
             } else {
-                D_001B5200.rotrate = 0.018f;
-                D_001B5200.posrate = 0.018f;
+                gActiveCamera.rotrate = 0.018f;
+                gActiveCamera.posrate = 0.018f;
             }
         }
     } else {
@@ -116,17 +116,17 @@ void func_00270598(char *camera)
     prev->state = 0;
     prev->handoff = 0;
     prev->cut = 0;
-    D_001B5200.previous = prev;
-    func_00282B50(D_001B79B0, D_001B79B0 - 0x280, 0x280);
-    D_001B5200.previous->buffer = D_001B79B0;
-    D_001B5200.current = next;
+    gActiveCamera.previous = prev;
+    FastMemoryHelperC(D_001B79B0, D_001B79B0 - 0x280, 0x280);
+    gActiveCamera.previous->buffer = D_001B79B0;
+    gActiveCamera.current = next;
     next->buffer = D_001B79B0 - 0x280;
     prev = next;
-    D_001B5200.timer = 0;
-    func_00270550((char *)prev);
-    func_002701B0();
+    gActiveCamera.timer = 0;
+    CallObjectHandler2((char *)prev);
+    CopyCameraWorkingData();
     pos = &prev->pos;
-    qcopy(&D_001B5200.pos, pos);
+    qcopy(&gActiveCamera.pos, pos);
     prevpos = prev->prevpos;
     prevpos[0] = prev->pos.f[0];
     prevpos[1] = pos->f[1];

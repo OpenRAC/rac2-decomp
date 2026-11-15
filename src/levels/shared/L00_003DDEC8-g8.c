@@ -37,23 +37,23 @@ int func_L00_003DDEC8(void)
     float half;
     float ox, sc, z, w;
 
-    if (D_L00_001B043C == 0)
+    if (gSpiderBotMoby == 0)
         return 1;
     w = 380.0f;
     half = 0.5f;
     one = 1;
     entry = 0x8710;
-    id = func_00336D50(D_001A904C[0] + entry, 0xC1);
+    id = FindTableEntryById(D_001A904C[0] + entry, 0xC1);
     y = hud_coord(w, D_L00_001B2704[0], half, one);
     ox = -0.5f;
     sc = 1.0f;
-    func_00300A00(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
-    id = func_00336D50(D_001A904C[0] + entry, 0xC2);
+    DrawScaledObjectTwoAxes(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
+    id = FindTableEntryById(D_001A904C[0] + entry, 0xC2);
     y = hud_coord(w, D_L00_001B2704[0], half, one);
-    func_00300A00(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
-    func_002ED578(D_L00_001B2B40[0], &a, &b, &c);
-    func_00115DA8(text, D_L00_001B0450, a, b, c);
-    func_0027F5B8(func_00283CF0(405.0f), hud_coord(372.0f, D_L00_001B2704[0], half, one),
+    DrawScaledObjectTwoAxes(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
+    SplitTimeIntoParts(D_L00_001B2B40[0], &a, &b, &c);
+    Sprintf(text, D_L00_001B0450, a, b, c);
+    DrawTextMediumFont(FloatToInt(405.0f), hud_coord(372.0f, D_L00_001B2704[0], half, one),
                   0x80808080UL, text, 128);
     return 1;
 }

@@ -88,17 +88,18 @@ extern void func_L01_003CC210(u8 *);
 extern void func_L01_003CC280(u8 *);
 extern void func_L01_003CC898(u8 *, void *, void *, u8, void *);
 
-void func_L01_003CC930(u8 *self)
+/* Updates the swamp monster arm. It reaches for the hero, swings and sparks on a hit, then goes back to rest. */
+void func_L01_003CC930(u8 *moby)
 {
-    f32 v10[4];
-    f32 v20[4];
-    f32 v30[4];
-    f32 v40[4];
-    f32 v50[4];
-    f32 v60[4];
-    f32 v70[4];
-    f32 v80[4];
-    u8 *pv = 0;
+    f32 vecA[4];
+    f32 vecB[4];
+    f32 vecC[4];
+    f32 vecD[4];
+    f32 vecE[4];
+    f32 vecF[4];
+    f32 vecG[4];
+    f32 vecH[4];
+    u8 *vars = 0;
     u8 *e1 = 0;
     u8 *e2 = 0;
     u8 *e9 = 0;
@@ -109,7 +110,7 @@ void func_L01_003CC930(u8 *self)
     u8 *pos5 = 0;
     u8 *pos6 = 0;
     u8 *pos7 = 0;
-    u8 *p = 0;
+    u8 *particle = 0;
     s32 flag = 0;
     s32 i1 = 0;
     s32 i2 = 0;
@@ -117,7 +118,7 @@ void func_L01_003CC930(u8 *self)
     s32 a = 0;
     s32 b = 0;
     s32 c = 0;
-    f32 d = 0.0f;
+    f32 animFrame = 0.0f;
     f32 f5 = 0.0f;
     f32 f6a = 0.0f;
     f32 f6 = 0.0f;
@@ -128,9 +129,9 @@ void func_L01_003CC930(u8 *self)
     f32 dir6b = 0.0f;
     u8 *e0 = 0;
     u8 *e3 = 0;
-    u8 *hero5 = 0;
-    u8 *hero6 = 0;
-    s32 lv = 0;
+    u8 *heroTarget = 0;
+    u8 *heroTarget6 = 0;
+    s32 level = 0;
     f32 rnd = 0.0f;
     f32 ra = 0.0f;
     f32 rb = 0.0f;
@@ -152,346 +153,346 @@ void func_L01_003CC930(u8 *self)
     f32 scale7 = 0.0f;
     s32 busy8 = 0;
 
-    pv = *(u8 **)(self + 0x68);
-    func_L01_003CC280(self);
-    switch (self[0x95]) {
+    vars = *(u8 **)(moby + 0x68);
+    UpdateOozlaLinkedGroupDamage(moby);
+    switch (moby[0x95]) {
     case 0:
         if (D_L01_001B2088 < 2)
             return;
-        func_L01_003CBFF0(self);
+        InitSwampMonsterArm(moby);
         break;
     case 1:
-        e1 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
-        if (*(s32 *)(pv + 0xC8) != 0)
-            func_00307390(self, 7, e1 + 0x10);
+        e1 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
+        if (*(s32 *)(vars + 0xC8) != 0)
+            func_00307390(moby, 7, e1 + 0x10);
         else
-            func_00307390(self, 8, e1 + 0x10);
-        qcopy(e1 + 0xF0, self + 0xF0);
-        switch (self[0x20]) {
+            func_00307390(moby, 8, e1 + 0x10);
+        qcopy(e1 + 0xF0, moby + 0xF0);
+        switch (moby[0x20]) {
         case 0:
             flag = 0;
-            *(s32 *)(pv + 0xF0) = *(s32 *)(pv + 0xE0);
-            if (*(s32 *)(pv + 0x74) == 1) {
-                if (*(s32 *)(pv + 0x7C) == 1)
+            *(s32 *)(vars + 0xF0) = *(s32 *)(vars + 0xE0);
+            if (*(s32 *)(vars + 0x74) == 1) {
+                if (*(s32 *)(vars + 0x7C) == 1)
                     flag = 1;
             }
-            if (*(s32 *)(pv + 0xC0) > 0)
+            if (*(s32 *)(vars + 0xC0) > 0)
                 flag = 1;
-            e0 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
+            e0 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
             if (func_00312B68(e0, 0x10001, 0) != 0)
                 flag = 1;
             if (flag) {
-                *(u16 *)(self + 0x34) &= 0xEFFF;
-                *(s32 *)(pv + 0xBC) = 0;
-                func_00310418(self, 1, -1);
+                *(u16 *)(moby + 0x34) &= 0xEFFF;
+                *(s32 *)(vars + 0xBC) = 0;
+                func_00310418(moby, 1, -1);
             }
             break;
         case 1:
-            if (*(s32 *)(pv + 0xBC) != 0)
+            if (*(s32 *)(vars + 0xBC) != 0)
                 break;
-            e2 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
-            if (*(s32 *)(pv + 0xC8) != 0) {
-                if (self[0x43] != 10)
-                    func_00310138(self, 10, 0, 7);
+            e2 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
+            if (*(s32 *)(vars + 0xC8) != 0) {
+                if (moby[0x43] != 10)
+                    func_00310138(moby, 10, 0, 7);
                 func_00310138(e2, 8, 0, 7);
             } else {
-                if (self[0x43] != 6)
-                    func_00310138(self, 6, 0, 7);
+                if (moby[0x43] != 6)
+                    func_00310138(moby, 6, 0, 7);
             }
             func_00355828(0, 0, e2, 0xB1A);
-            *(u16 *)(self + 0x34) &= 0xEFFF;
-            func_00310418(self, 2, 1);
+            *(u16 *)(moby + 0x34) &= 0xEFFF;
+            func_00310418(moby, 2, 1);
             break;
         case 2:
             busy1 = func_003104E8(4);
             if (busy1 == 0)
-                func_L01_003CBCD8(self, 3, 10, 1);
-            if (!(self[0x60] & 2))
+                SpawnSwampMonsterSplash(moby, 3, 10, 1);
+            if (!(moby[0x60] & 2))
                 break;
-            e3 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
+            e3 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
             e3[0x95] = 1;
-            if (*(s32 *)(pv + 0xEC) == -1)
+            if (*(s32 *)(vars + 0xEC) == -1)
                 goto done;
-            if (*(f32 *)(pv + 0xD4) > 0.0f)
-                *(f32 *)(self + 0x18) = *(f32 *)(pv + 0xD4);
-            *(u16 *)(self + 0x34) &= 0xEFFF;
-            *(s32 *)(pv + 0xBC) = 0x28;
-            if (self[0x43] != 0)
-                func_00310138(self, 0, 0, 1);
-            *(f32 *)(self + 0x48) = 0.0f;
-            *(s32 *)(pv + 0xF0) = *(s32 *)(pv + 0xE8);
-            func_00310418(self, 0, 4);
+            if (*(f32 *)(vars + 0xD4) > 0.0f)
+                *(f32 *)(moby + 0x18) = *(f32 *)(vars + 0xD4);
+            *(u16 *)(moby + 0x34) &= 0xEFFF;
+            *(s32 *)(vars + 0xBC) = 0x28;
+            if (moby[0x43] != 0)
+                func_00310138(moby, 0, 0, 1);
+            *(f32 *)(moby + 0x48) = 0.0f;
+            *(s32 *)(vars + 0xF0) = *(s32 *)(vars + 0xE8);
+            func_00310418(moby, 0, 4);
             break;
         }
         break;
     case 2:
         busy2 = func_003104E8(5);
         if (busy2 == 0)
-            func_L01_003CBCD8(self, 3, 10, 1);
-        if ((self[0x42] == 6 || self[0x42] == 10) && (self[0x60] & 2)) {
-            if (*(f32 *)(pv + 0xD4) > 0.0f)
-                *(f32 *)(self + 0x18) = *(f32 *)(pv + 0xD4);
-            if (self[0x43] != 0)
-                func_00310138(self, 0, 0, 0);
-            *(f32 *)(self + 0x48) = 0.0f;
-            *(u16 *)(self + 0x34) &= 0xEFFF;
-            func_00310418(self, 0, 4);
+            SpawnSwampMonsterSplash(moby, 3, 10, 1);
+        if ((moby[0x42] == 6 || moby[0x42] == 10) && (moby[0x60] & 2)) {
+            if (*(f32 *)(vars + 0xD4) > 0.0f)
+                *(f32 *)(moby + 0x18) = *(f32 *)(vars + 0xD4);
+            if (moby[0x43] != 0)
+                func_00310138(moby, 0, 0, 0);
+            *(f32 *)(moby + 0x48) = 0.0f;
+            *(u16 *)(moby + 0x34) &= 0xEFFF;
+            func_00310418(moby, 0, 4);
         }
         break;
     case 3:
         busy3 = func_003104E8(5);
         if (busy3 == 0)
-            func_L01_003CBCD8(self, 3, 10, 1);
-        if (self[0x60] & 2) {
-            *(u16 *)(self + 0x34) |= 0x1000;
-            *(s32 *)(pv + 0xC0) = 0xF0;
-            if (self[0x43] != 1)
-                func_00310138(self, 1, 0, func_00310528(10, 15));
+            SpawnSwampMonsterSplash(moby, 3, 10, 1);
+        if (moby[0x60] & 2) {
+            *(u16 *)(moby + 0x34) |= 0x1000;
+            *(s32 *)(vars + 0xC0) = 0xF0;
+            if (moby[0x43] != 1)
+                func_00310138(moby, 1, 0, func_00310528(10, 15));
             scale3 = func_00310580(0.8f, 1.2f);
-            *(f32 *)(self + 0x48) = scale3;
-            *(s32 *)(pv + 0xF0) = *(s32 *)(pv + 0xEC);
-            func_00310418(self, 0, 5);
+            *(f32 *)(moby + 0x48) = scale3;
+            *(s32 *)(vars + 0xF0) = *(s32 *)(vars + 0xEC);
+            func_00310418(moby, 0, 5);
         }
         break;
     case 4:
-        *(s32 *)(pv + 0xF0) = *(s32 *)(pv + 0xE8);
-        if (*(s32 *)(pv + 0x74) == 1 && *(s32 *)(pv + 0x7C) == 1) {
-            if (*(s32 *)(pv + 0xBC) == 0)
-                *(s32 *)(pv + 0xBC) = 0x78;
-            if (*(s32 *)(pv + 0xBC) == 1) {
-                if (*(f32 *)(pv + 0xD4) > 0.0f)
-                    *(f32 *)(self + 0x18) = *(f32 *)(pv + 0xD4);
-                *(f32 *)(self + 0x48) = 1.0f;
-                if (self[0x43] != 0)
-                    func_00310138(self, 0, 0, func_00310528(10, 15));
-                func_00310418(self, 0, 3);
+        *(s32 *)(vars + 0xF0) = *(s32 *)(vars + 0xE8);
+        if (*(s32 *)(vars + 0x74) == 1 && *(s32 *)(vars + 0x7C) == 1) {
+            if (*(s32 *)(vars + 0xBC) == 0)
+                *(s32 *)(vars + 0xBC) = 0x78;
+            if (*(s32 *)(vars + 0xBC) == 1) {
+                if (*(f32 *)(vars + 0xD4) > 0.0f)
+                    *(f32 *)(moby + 0x18) = *(f32 *)(vars + 0xD4);
+                *(f32 *)(moby + 0x48) = 1.0f;
+                if (moby[0x43] != 0)
+                    func_00310138(moby, 0, 0, func_00310528(10, 15));
+                func_00310418(moby, 0, 3);
             }
         }
         break;
     case 5:
-        if (*(s32 *)(pv + 0x74) == 1) {
-            func_00337A60(pv + 0x90, pv + 0x60, D_L01_001FE180[*(s32 *)(pv + 0xB8)] + 0x10, *(s32 *)D_L01_001FE180[*(s32 *)(pv + 0xB8)]);
-            *(s32 *)(pv + 0xC0) = 0xF0;
-            tgt5 = pv + 0x90;
+        if (*(s32 *)(vars + 0x74) == 1) {
+            func_00337A60(vars + 0x90, vars + 0x60, D_L01_001FE180[*(s32 *)(vars + 0xB8)] + 0x10, *(s32 *)D_L01_001FE180[*(s32 *)(vars + 0xB8)]);
+            *(s32 *)(vars + 0xC0) = 0xF0;
+            tgt5 = vars + 0x90;
         } else {
-            qcopy(pv + 0x90, pv + 0x80);
-            tgt5 = pv + 0x90;
+            qcopy(vars + 0x90, vars + 0x80);
+            tgt5 = vars + 0x90;
         }
-        hero5 = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-        if (*(u8 **)(pv + 0x70) == hero5) {
-            func_002E34E0(v10, &((Hero *)D_00189E20)->b[0x110], D_L01_001B0390);
-            func_002E3470(v10, v10, *(u8 **)(pv + 0x70) + 0x10);
+        heroTarget = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+        if (*(u8 **)(vars + 0x70) == heroTarget) {
+            func_002E34E0(vecA, &((Hero *)gHeroState)->b[0x110], D_L01_001B0390);
+            func_002E3470(vecA, vecA, *(u8 **)(vars + 0x70) + 0x10);
         } else {
-            qcopy(v10, *(u8 **)(pv + 0x70) + 0x10);
+            qcopy(vecA, *(u8 **)(vars + 0x70) + 0x10);
         }
-        pos5 = self + 0x10;
-        func_002E34A0(v20, tgt5, pos5);
-        func_002E34E0(v20, v20, 0.05f);
-        func_002E37D0(v20, v20, 0.050000004f);
-        v20[2] = 0.0f;
-        func_002E3470(pos5, pos5, v20);
+        pos5 = moby + 0x10;
+        func_002E34A0(vecB, tgt5, pos5);
+        func_002E34E0(vecB, vecB, 0.05f);
+        func_002E37D0(vecB, vecB, 0.050000004f);
+        vecB[2] = 0.0f;
+        func_002E3470(pos5, pos5, vecB);
         dir5a = 0.09599312f;
-        if (pv[0xDD] != 0)
+        if (vars[0xDD] != 0)
             dir5a = -0.09599312f;
-        yaw5a = func_002E4460(*(f32 *)(self + 0xF8), dir5a);
-        *(f32 *)(self + 0xF8) = yaw5a;
-        f5 = func_002E3B10(v10[0] - *(f32 *)(self + 0x10), v10[1] - *(f32 *)(self + 0x14));
-        func_00310D28(self, pv + 0xCC, f5, 0.002327106f, 0.1f, 0.13962637f);
-        if (self[0x60] & 2)
-            *(f32 *)(self + 0x48) = func_00310580(0.8f, 1.2f);
-        if (D_L01_001A8F40 != 2 && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6F && *(s32 *)(pv + 0xC4) == 0 &&
-            (self[0x21] == 0xFF || **(s32 **)(pv + 0xD8) <= 0) && func_002E3650(pos5, pv + 0x60) < 35.0f &&
-            (f5 = func_002E3B10(v10[0] - *(f32 *)(self + 0x10), v10[1] - *(f32 *)(self + 0x14)),
-             func_002E4548(*(f32 *)(self + 0xF8), f5) < 0.034906588f)) {
-            pv[0xDC] = 1;
-            if (self[0x21] != 0xFF)
-                **(s32 **)(pv + 0xD8) += 1;
-            if (self[0x43] != 2)
-                func_00310138(self, 2, 0, func_00310528(7, 12));
-            func_00310418(self, 0, 6);
-            pv[0xDE] = 0;
-        } else if (*(s32 *)(pv + 0xC0) == 0) {
-            if (self[0x43] != 6)
-                func_00310138(self, 6, 0, 0x14);
-            *(u16 *)(self + 0x34) &= 0xEFFF;
-            func_00310418(self, 0, 2);
+        yaw5a = func_002E4460(*(f32 *)(moby + 0xF8), dir5a);
+        *(f32 *)(moby + 0xF8) = yaw5a;
+        f5 = func_002E3B10(vecA[0] - *(f32 *)(moby + 0x10), vecA[1] - *(f32 *)(moby + 0x14));
+        func_00310D28(moby, vars + 0xCC, f5, 0.002327106f, 0.1f, 0.13962637f);
+        if (moby[0x60] & 2)
+            *(f32 *)(moby + 0x48) = func_00310580(0.8f, 1.2f);
+        if (D_L01_001A8F40 != 2 && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x6F && *(s32 *)(vars + 0xC4) == 0 &&
+            (moby[0x21] == 0xFF || **(s32 **)(vars + 0xD8) <= 0) && func_002E3650(pos5, vars + 0x60) < 35.0f &&
+            (f5 = func_002E3B10(vecA[0] - *(f32 *)(moby + 0x10), vecA[1] - *(f32 *)(moby + 0x14)),
+             func_002E4548(*(f32 *)(moby + 0xF8), f5) < 0.034906588f)) {
+            vars[0xDC] = 1;
+            if (moby[0x21] != 0xFF)
+                **(s32 **)(vars + 0xD8) += 1;
+            if (moby[0x43] != 2)
+                func_00310138(moby, 2, 0, func_00310528(7, 12));
+            func_00310418(moby, 0, 6);
+            vars[0xDE] = 0;
+        } else if (*(s32 *)(vars + 0xC0) == 0) {
+            if (moby[0x43] != 6)
+                func_00310138(moby, 6, 0, 0x14);
+            *(u16 *)(moby + 0x34) &= 0xEFFF;
+            func_00310418(moby, 0, 2);
         }
         dir5b = 0.09599312f;
-        if (pv[0xDD] != 0)
+        if (vars[0xDD] != 0)
             dir5b = -0.09599312f;
-        yaw5b = func_002E44A8(*(f32 *)(self + 0xF8), dir5b);
-        *(f32 *)(self + 0xF8) = yaw5b;
+        yaw5b = func_002E44A8(*(f32 *)(moby + 0xF8), dir5b);
+        *(f32 *)(moby + 0xF8) = yaw5b;
         break;
     case 6:
-        pos6 = self + 0x10;
-        d = func_00306448(self);
-        func_002E34A0(v10, pv + 0x90, pos6);
-        func_002E34E0(v10, v10, 0.05f);
-        func_002E37D0(v10, v10, 0.050000004f);
-        v10[2] = 0.0f;
-        func_002E3470(pos6, pos6, v10);
-        if (d > 46.0f && d < 56.0f) {
+        pos6 = moby + 0x10;
+        animFrame = func_00306448(moby);
+        func_002E34A0(vecA, vars + 0x90, pos6);
+        func_002E34E0(vecA, vecA, 0.05f);
+        func_002E37D0(vecA, vecA, 0.050000004f);
+        vecA[2] = 0.0f;
+        func_002E3470(pos6, pos6, vecA);
+        if (animFrame > 46.0f && animFrame < 56.0f) {
             for (i1 = 1; i1 < 8; i1++) {
-                func_00307390(self, i1, v20);
-                func_00307390(self, i1 + 1, v40);
-                func_002E3738(v60, self + 0xD0, 0.3f);
-                func_002E3738(v70, self + 0xD0, 0.3f);
-                func_002E3470(v30, v20, v60);
-                func_002E3470(v50, v40, v70);
-                func_002E34A0(v20, v20, v60);
-                func_002E34A0(v40, v40, v70);
-                func_L01_003CC898(self, v20, v40, pv[0x34], pv + 0xDE);
-                func_L01_003CC898(self, v30, v50, pv[0x34], pv + 0xDE);
+                func_00307390(moby, i1, vecB);
+                func_00307390(moby, i1 + 1, vecD);
+                func_002E3738(vecF, moby + 0xD0, 0.3f);
+                func_002E3738(vecG, moby + 0xD0, 0.3f);
+                func_002E3470(vecC, vecB, vecF);
+                func_002E3470(vecE, vecD, vecG);
+                func_002E34A0(vecB, vecB, vecF);
+                func_002E34A0(vecD, vecD, vecG);
+                TestAttackSegmentHitsHero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
+                TestAttackSegmentHitsHero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
             }
-            func_00307390(self, 6, v20);
-            qcopy(v30, v20);
-            v20[2] += 0.5f;
-            v40[2] += 2.0f;
-            v30[2] += 2.0f;
-            v50[2] += 0.5f;
-            func_L01_003CC898(self, v20, v40, pv[0x34], pv + 0xDE);
-            func_L01_003CC898(self, v30, v50, pv[0x34], pv + 0xDE);
+            func_00307390(moby, 6, vecB);
+            qcopy(vecC, vecB);
+            vecB[2] += 0.5f;
+            vecD[2] += 2.0f;
+            vecC[2] += 2.0f;
+            vecE[2] += 0.5f;
+            TestAttackSegmentHitsHero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
+            TestAttackSegmentHitsHero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
         }
-        if (d >= 56.0f && pv[0xDE] == 0) {
-            func_00355780(2, 0, self);
-            pv[0xDE] = 1;
+        if (animFrame >= 56.0f && vars[0xDE] == 0) {
+            func_00355780(2, 0, moby);
+            vars[0xDE] = 1;
         }
-        lv = func_002D9308(self[0xB0]);
-        D_L01_001B03D0 = D_L01_001B03D8[lv - 1];
-        if (d < (f32)D_L01_001B03D0 &&
-            (d < 20.0f || (((Hero *)D_00189E20)->i[0x340 / 4] != 0 && ((Hero *)D_00189E20)->h[0x34E / 2] == 0 &&
-                           ((Hero *)D_00189E20)->i[0x229C / 4] != 4))) {
+        level = func_002D9308(moby[0xB0]);
+        D_L01_001B03D0 = D_L01_001B03D8[level - 1];
+        if (animFrame < (f32)D_L01_001B03D0 &&
+            (animFrame < 20.0f || (((Hero *)gHeroState)->i[0x340 / 4] != 0 && ((Hero *)gHeroState)->h[0x34E / 2] == 0 &&
+                           ((Hero *)gHeroState)->i[0x229C / 4] != 4))) {
             dir6a = 0.09599312f;
-            if (pv[0xDD] != 0)
+            if (vars[0xDD] != 0)
                 dir6a = -0.09599312f;
-            yaw6a = func_002E4460(*(f32 *)(self + 0xF8), dir6a);
-            *(f32 *)(self + 0xF8) = yaw6a;
-            hero6 = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-            if (*(u8 **)(pv + 0x70) == hero6) {
-                func_002E34E0(v20, &((Hero *)D_00189E20)->b[0x110], 55.0f - d);
-                func_002E3470(v20, v20, *(u8 **)(pv + 0x70) + 0x10);
+            yaw6a = func_002E4460(*(f32 *)(moby + 0xF8), dir6a);
+            *(f32 *)(moby + 0xF8) = yaw6a;
+            heroTarget6 = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+            if (*(u8 **)(vars + 0x70) == heroTarget6) {
+                func_002E34E0(vecB, &((Hero *)gHeroState)->b[0x110], 55.0f - animFrame);
+                func_002E3470(vecB, vecB, *(u8 **)(vars + 0x70) + 0x10);
             } else {
-                qcopy(v20, *(u8 **)(pv + 0x70) + 0x10);
+                qcopy(vecB, *(u8 **)(vars + 0x70) + 0x10);
             }
-            f6a = func_002E3B10(v20[0] - *(f32 *)(self + 0x10), v20[1] - *(f32 *)(self + 0x14));
-            func_00310D28(self, pv + 0xCC, f6a, 0.002327106f, 0.1f, 0.13962637f);
+            f6a = func_002E3B10(vecB[0] - *(f32 *)(moby + 0x10), vecB[1] - *(f32 *)(moby + 0x14));
+            func_00310D28(moby, vars + 0xCC, f6a, 0.002327106f, 0.1f, 0.13962637f);
             dir6b = 0.09599312f;
-            if (pv[0xDD] != 0)
+            if (vars[0xDD] != 0)
                 dir6b = -0.09599312f;
-            yaw6b = func_002E44A8(*(f32 *)(self + 0xF8), dir6b);
-            *(f32 *)(self + 0xF8) = yaw6b;
+            yaw6b = func_002E44A8(*(f32 *)(moby + 0xF8), dir6b);
+            *(f32 *)(moby + 0xF8) = yaw6b;
         }
-        if (d > 55.0f && d < 58.0f) {
-            if (d <= 56.0f) {
+        if (animFrame > 55.0f && animFrame < 58.0f) {
+            if (animFrame <= 56.0f) {
                 D_L01_001B9380.f160 = 0.2f;
                 D_L01_001B9380.i168 = 0x14;
                 D_L01_001B9380.i16C = 0;
             }
-            f6 = *(f32 *)(self + 0x18);
+            f6 = *(f32 *)(moby + 0x18);
             for (i2 = 1; i2 < 8; i2++) {
-                func_00307390(self, i2, v20);
-                f6 = func_00311A00(v20, 2, 0.5f);
+                func_00307390(moby, i2, vecB);
+                f6 = func_00311A00(vecB, 2, 0.5f);
                 mode6 = func_002D77E8();
                 if (mode6 != 3)
                     break;
             }
-            v20[2] = f6;
-            func_00307390(self, 8, v30);
-            v30[2] = f6;
-            func_002E34A0(v30, v30, v20);
-            qzero(v80);
-            v80[3] = D_L01_001B03BC;
+            vecB[2] = f6;
+            func_00307390(moby, 8, vecC);
+            vecC[2] = f6;
+            func_002E34A0(vecC, vecC, vecB);
+            qzero(vecH);
+            vecH[3] = D_L01_001B03BC;
             for (j = 0; j < D_L01_001B03CC; j++) {
                 rnd = func_00310580(0.0f, 1.0f);
-                func_002E34E0(v40, v30, rnd);
-                func_00316348(v40, 0.1f);
-                func_002E3470(v40, v40, v20);
+                func_002E34E0(vecD, vecC, rnd);
+                func_00316348(vecD, 0.1f);
+                func_002E3470(vecD, vecD, vecB);
                 spinx = func_00310580(-(D_L01_001B03C4 * 0.016666668f), D_L01_001B03C4 * 0.016666668f);
-                func_002E3738(v60, self + 0xD0, spinx);
+                func_002E3738(vecF, moby + 0xD0, spinx);
                 spiny = func_00310580(-(D_L01_001B03C8 * 0.016666668f), D_L01_001B03C8 * 0.016666668f);
-                func_002E3738(v70, self + 0xC0, spiny);
-                func_002E3470(v50, v60, v70);
+                func_002E3738(vecG, moby + 0xC0, spiny);
+                func_002E3470(vecE, vecF, vecG);
                 rise = func_00310580(0.0f, D_L01_001B03C0 * 0.016666668f);
-                v50[2] = rise;
-                v50[3] = D_L01_001B03B8;
+                vecE[2] = rise;
+                vecE[3] = D_L01_001B03B8;
                 ra = func_00310580(D_L01_001B03A0, D_L01_001B03A4);
                 a = func_002E45B8(ra);
                 rb = func_00310580(D_L01_001B03A8, D_L01_001B03AC);
                 b = func_002E45B8(rb);
                 rc = func_00310580(D_L01_001B03B0, D_L01_001B03B4);
                 c = func_002E45B8(rc);
-                p = func_00327360(v40, v50, v80, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
-                if (p != 0 && (func_001163B0() & 1))
-                    p[3] = 0x48;
+                particle = func_00327360(vecD, vecE, vecH, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
+                if (particle != 0 && (Rand() & 1))
+                    particle[3] = 0x48;
             }
         }
-        if (self[0x60] & 2) {
-            func_L01_003CBFA8(self);
-            *(s32 *)(pv + 0xC4) = 0xB4;
-            if (self[0x43] != 1)
-                func_00310138(self, 1, 0, func_00310528(10, 15));
+        if (moby[0x60] & 2) {
+            ReleaseAttackSlot_L01_2(moby);
+            *(s32 *)(vars + 0xC4) = 0xB4;
+            if (moby[0x43] != 1)
+                func_00310138(moby, 1, 0, func_00310528(10, 15));
             scale6 = func_00310580(0.8f, 1.2f);
-            *(f32 *)(self + 0x48) = scale6;
-            func_00310418(self, 0, 5);
+            *(f32 *)(moby + 0x48) = scale6;
+            func_00310418(moby, 0, 5);
         }
         break;
     case 7:
-        self[0xA8] = 0xFF;
-        pos7 = self + 0x10;
-        func_002E3470(v10, pos7, pv + 0xA0);
-        tbl7a = D_L01_001FE180[*(s32 *)(pv + 0xB8)];
-        hit7 = func_00311B48(v10, tbl7a + 0x10, *(s32 *)tbl7a);
+        moby[0xA8] = 0xFF;
+        pos7 = moby + 0x10;
+        func_002E3470(vecA, pos7, vars + 0xA0);
+        tbl7a = D_L01_001FE180[*(s32 *)(vars + 0xB8)];
+        hit7 = func_00311B48(vecA, tbl7a + 0x10, *(s32 *)tbl7a);
         if (hit7 != 0) {
-            qcopy(pos7, v10);
+            qcopy(pos7, vecA);
         } else {
-            tbl7b = D_L01_001FE180[*(s32 *)(pv + 0xB8)];
-            func_00337A60(pos7, v10, tbl7b + 0x10, *(s32 *)tbl7b);
-            func_002E34A0(v20, pv + 0x80, pos7);
-            func_002E3738(v20, v20, 0.033333335f);
-            func_002E3470(pos7, pos7, v20);
+            tbl7b = D_L01_001FE180[*(s32 *)(vars + 0xB8)];
+            func_00337A60(pos7, vecA, tbl7b + 0x10, *(s32 *)tbl7b);
+            func_002E34A0(vecB, vars + 0x80, pos7);
+            func_002E3738(vecB, vecB, 0.033333335f);
+            func_002E3470(pos7, pos7, vecB);
         }
-        f7 = func_002E35A0((pv + 0xA0)) - 0.0030555557f;
+        f7 = func_002E35A0((vars + 0xA0)) - 0.0030555557f;
         if (f7 < 0.0f) {
             f7 = 0.0f;
         }
-        func_002E3738((pv + 0xA0), (pv + 0xA0), f7);
-        if (!(self[0x60] & 2))
+        func_002E3738((vars + 0xA0), (vars + 0xA0), f7);
+        if (!(moby[0x60] & 2))
             break;
-        qzero_nc((pv + 0xA0));
-        if (*(f32 *)(pv + 0x20) <= 0.0f) {
-            if (self[0x42] == 3) {
-                if (self[0x43] != 4)
-                    func_00310138(self, 4, 0, 10);
+        qzero_nc((vars + 0xA0));
+        if (*(f32 *)(vars + 0x20) <= 0.0f) {
+            if (moby[0x42] == 3) {
+                if (moby[0x43] != 4)
+                    func_00310138(moby, 4, 0, 10);
             } else {
-                func_00310418(self, 0, 9);
+                func_00310418(moby, 0, 9);
             }
         } else {
-            *(u16 *)(self + 0x34) |= 0x1000;
-            *(s32 *)(pv + 0xC0) = 0xF0;
-            *(s32 *)(pv + 0xC4) = 0;
-            if (self[0x43] != 1)
-                func_00310138(self, 1, 0, func_00310528(10, 15));
+            *(u16 *)(moby + 0x34) |= 0x1000;
+            *(s32 *)(vars + 0xC0) = 0xF0;
+            *(s32 *)(vars + 0xC4) = 0;
+            if (moby[0x43] != 1)
+                func_00310138(moby, 1, 0, func_00310528(10, 15));
             scale7 = func_00310580(0.8f, 1.2f);
-            *(f32 *)(self + 0x48) = scale7;
-            func_00310418(self, 0, 5);
+            *(f32 *)(moby + 0x48) = scale7;
+            func_00310418(moby, 0, 5);
         }
         break;
     case 8:
         busy8 = func_003104E8(4);
         if (busy8 == 0)
-            func_L01_003CBCD8(self, 3, 10, 1);
-        if (!(self[0x60] & 2))
+            SpawnSwampMonsterSplash(moby, 3, 10, 1);
+        if (!(moby[0x60] & 2))
             break;
     case 9:
-        func_0030F920(self, 0x200, 3);
-        if (*(s32 *)(pv + 0xE4) != -1 && !(D_0019B2E8[self[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
-            func_00307E70(self[0xB0]);
-            e9 = D_L01_001B264C + (*(s32 *)(pv + 0xE4) << 7);
+        func_0030F920(moby, 0x200, 3);
+        if (*(s32 *)(vars + 0xE4) != -1 && !(D_0019B2E8[moby[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+            func_00307E70(moby[0xB0]);
+            e9 = D_L01_001B264C + (*(s32 *)(vars + 0xE4) << 7);
             func_0034ECD0(e9 + 0x30, e9 + 0x70);
         }
     done:
-        func_00306250(self);
+        func_00306250(moby);
         return;
     }
-    func_L01_003CC210(self);
+    ReleaseSwampMonsterArmTimers(moby);
 }

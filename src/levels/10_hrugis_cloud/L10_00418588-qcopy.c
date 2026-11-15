@@ -18,27 +18,27 @@ extern void func_L00_0033C0D0(char *, void *, void *, void *, s32);
 void func_L10_00418588(char *obj)
 {
     V4_F418588 dir, drift, tail, mark1, mark2, mark3;
-    float k;
+    float driftScale;
 
     dir.q = 0;
     dir.f[0] = -2.1f;
     dir.f[3] = 1.0f;
     drift.q = 0;
-    func_00283098(&tail, &dir, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
-    k = 0.8f;
+    matrix_mul_vec3(&tail, &dir, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
+    driftScale = 0.8f;
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
     qcopy(&mark3, &tail);
-    func_002ACB48(&tail, 0.1f);
-    func_002ACB48(&mark1, 0.1f);
-    func_002ACB48(&mark2, 0.1f);
-    func_002ACB48(&mark3, 0.1f);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.016666668f) * k;
-    func_L00_0033C0D0(obj, &mark1, &drift, &D_L10_001B0F50, 1);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.016666668f) * k;
-    func_L00_0033C0D0(obj, &mark2, &drift, &D_L10_001B0F60, 1);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.016666668f) * k;
-    func_L00_0033C0D0(obj, &mark3, &drift, &D_L10_001B0F70, 1);
+    AddRandomOffsetToVector(&tail, 0.1f);
+    AddRandomOffsetToVector(&mark1, 0.1f);
+    AddRandomOffsetToVector(&mark2, 0.1f);
+    AddRandomOffsetToVector(&mark3, 0.1f);
+    drift.f[0] = -(RandomFloatRange(30.0f, 40.0f) * 0.016666668f) * driftScale;
+    SpawnObjectRelativeParticle(obj, &mark1, &drift, &D_L10_001B0F50, 1);
+    drift.f[0] = -(RandomFloatRange(30.0f, 40.0f) * 0.016666668f) * driftScale;
+    SpawnObjectRelativeParticle(obj, &mark2, &drift, &D_L10_001B0F60, 1);
+    drift.f[0] = -(RandomFloatRange(30.0f, 40.0f) * 0.016666668f) * driftScale;
+    SpawnObjectRelativeParticle(obj, &mark3, &drift, &D_L10_001B0F70, 1);
 }

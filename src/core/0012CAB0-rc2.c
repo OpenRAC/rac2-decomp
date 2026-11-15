@@ -30,34 +30,35 @@ extern void func_0012CBC0(s8 *);
 extern void func_0012D060(s8 *);
 extern void func_0012FA98(s32, void *);
 
-s32 func_0012CAB0(s8 *arg0) {
+/* Reads headers from the video stream until a picture begins, then returns its type. Returns 0 at the end of the stream. */
+s32 func_0012CAB0(s8 *decoderPtr) {
     struct {
         s32 a;
         s32 pad;
         s64 b;
         s64 c;
     } blk;
-    u32 v;
+    u32 startCode;
 
     for (;;) {
-        func_0012C9C8(arg0);
-        v = func_0012C878(arg0, 0x20);
-        switch (v) {
+        SkipToMpegStartCode(decoderPtr);
+        startCode = ReadMpegBits(decoderPtr, 0x20);
+        switch (startCode) {
         case 0x1B3:
-            func_00130300(arg0);
+            ReadMpegSequenceHeader(decoderPtr);
             break;
         case 0x1B8:
-            func_0012D060(arg0);
+            ReadMpegGroupOfPicturesHeader(decoderPtr);
             break;
         case 0x100:
-            func_0012CBC0(arg0);
+            ReadMpegPictureHeader(decoderPtr);
             blk.a = 5;
             blk.b = -1;
             blk.c = -1;
-            func_0012FA98(*(s32 *)(arg0 + 0x858), &blk);
-            *(s64 *)(arg0 + 0x830) = blk.c;
-            *(s64 *)(arg0 + 0x828) = blk.b;
-            return *(s32 *)(arg0 + 0x150);
+            DispatchMpegCallback(*(s32 *)(decoderPtr + 0x858), &blk);
+            *(s64 *)(decoderPtr + 0x830) = blk.c;
+            *(s64 *)(decoderPtr + 0x828) = blk.b;
+            return *(s32 *)(decoderPtr + 0x150);
         case 0x1B7:
             return 0;
         }

@@ -18,24 +18,26 @@ extern short r1_D_0015EDC4;
    above. Exact under 2.9-ee, which saves $16 before $31 as retail does;
    2.95.3 saved them the other way round (4/104), the prologue-order
    residual that pointed at the SDK compiler in the first place. */
+/* Turns every field of a clock record from BCD into normal numbers. */
 void func_00131780(unsigned char *p) {
-    p[7] = func_00131760(p[7]);
-    p[6] = func_00131760(p[6]);
-    p[5] = func_00131760(p[5]);
-    p[3] = func_00131760(p[3]);
-    p[2] = func_00131760(p[2]);
-    p[1] = func_00131760(p[1]);
+    p[7] = BcdToDecimal(p[7]);
+    p[6] = BcdToDecimal(p[6]);
+    p[5] = BcdToDecimal(p[5]);
+    p[3] = BcdToDecimal(p[3]);
+    p[2] = BcdToDecimal(p[2]);
+    p[1] = BcdToDecimal(p[1]);
 }
 extern void func_001317E8(unsigned char *p);
 extern int func_00131730(int);
 
+/* Turns every field of a clock record from normal numbers back into BCD. */
 void func_001317E8(unsigned char *clock) {
-    clock[7] = func_00131730(clock[7]);
-    clock[6] = func_00131730(clock[6]);
-    clock[5] = func_00131730(clock[5]);
-    clock[3] = func_00131730(clock[3]);
-    clock[2] = func_00131730(clock[2]);
-    clock[1] = func_00131730(clock[1]);
+    clock[7] = DecimalToBcd(clock[7]);
+    clock[6] = DecimalToBcd(clock[6]);
+    clock[5] = DecimalToBcd(clock[5]);
+    clock[3] = DecimalToBcd(clock[3]);
+    clock[2] = DecimalToBcd(clock[2]);
+    clock[1] = DecimalToBcd(clock[1]);
 }
 
 
@@ -53,6 +55,7 @@ void func_001317E8(unsigned char *clock) {
  * load is a zero-extending load, a different expression to GCSE, so
  * the later byte load stays. (This C is exact under 2.95.3 as well.)
  */
+/* Moves a clock date forward by one day, handling month length, leap years and year wrap. */
 void func_00131850(unsigned char *s) {
     Cfg12 days;
     unsigned char m;
@@ -92,6 +95,7 @@ void func_00131850(unsigned char *s) {
  * year as an if/else with one store per arm, which cross-jumping merges
  * into retail's single `sb`. Exact under both compilers.
  */
+/* Moves a clock date back by one day, handling month length, leap years and year wrap. */
 void func_00131908(unsigned char *s) {
     Cfg12 days;
     int y = s[7];
@@ -122,17 +126,19 @@ void func_00131908(unsigned char *s) {
  * 2.9-ee emits from this plain C. (Under 2.95.3, which has no sibling
  * calls, it was 8 bytes over.)
  */
+/* Moves a clock forward by one hour, and by one day when it passes midnight. */
 void func_001319B0(unsigned char *s) {
     s[3] = s[3] + 1;
     if (s[3] == 0x18) {
         s[3] = 0;
-        func_00131850(s);
+        ClockAdvanceDay(s);
     }
 }
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D760 */
 /* The backward analog: the hour counts down, and at 0 it becomes 23 and
    the day ticks back, again through a conditional tail call. */
+/* Moves a clock back by one hour, and by one day when it passes midnight. */
 void func_001319E0(unsigned char *s) {
     unsigned char v = s[3];
     if (v != 0) {
@@ -140,42 +146,44 @@ void func_001319E0(unsigned char *s) {
         return;
     }
     s[3] = 0x17;
-    func_00131908(s);
+    ClockRewindDay(s);
 }
 
 extern void func_001319B0(unsigned char *);
 extern void func_001319E0(unsigned char *);
 
+/* Moves a clock forward or back by a number of minutes. */
 void func_00131A08(unsigned char *clock, int offset) {
     int minutes;
-    func_00131780(clock);
+    ClockBcdToDecimal(clock);
     minutes = clock[2] + offset;
     if (minutes >= 0) {
         while (minutes > 60) {
-            func_001319B0(clock);
+            ClockAdvanceHour(clock);
             minutes -= 60;
         }
     } else {
         do {
             minutes += 60;
-            func_001319E0(clock);
+            ClockRewindHour(clock);
         } while (minutes < 0);
     }
     clock[2] = minutes;
-    func_001317E8(clock);
+    ClockDecimalToBcd(clock);
 }
 
 extern int func_00131670(void);
 extern int func_001316C8(void);
 extern void func_00131A08(unsigned char *, int);
 
+/* Converts a clock to local time by adding the console time zone and summer time offset. */
 void func_00131A98(unsigned char *clock) {
     int offset;
-    int zone = func_00131670();
-    offset = func_001316C8();
+    int zone = GetConsoleModelId();
+    offset = GetConsoleInfoFlag();
     offset *= 60;
     offset -= 540;
-    func_00131A08(clock, zone + offset);
+    ClockAddMinutes(clock, zone + offset);
 }
 
 ASM_FUNC("asm/core", func_00131AE8);
@@ -186,8 +194,9 @@ ASM_FUNC("asm/core", func_00131AE8);
    compiler puts the argument in the jump's delay slot. */
 extern void func_0011FA20(int);
 
+/* Exits the program and always reports status 0. */
 void func_00131CA8(int ignored_status) {
-    func_0011FA20(0);
+    ExitProgram(0);
 }
 
 /* Original assembly: `addiu $v1,$zero,0x23; syscall`, a thread-exit stub whose address crt0 passes to the thread syscall; the compiler cannot emit syscall. */
@@ -204,21 +213,24 @@ ASM_FUNC("asm/core", func_00131CB0);
 /* func_001325E0 is defined in 00131780-g8.c. */
 
 
+/* Sends a sound command (id 6) with one value. */
 void func_00132858(int value) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(6, 4, (int)payload, 0, 0);
+    QueueSoundCommand(6, 4, (int)payload, 0, 0);
 }
 
+/* Sends a sound command (id 9) with two values. */
 void func_00132888(int first, int second) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
-    func_00132DF0(9, 8, (int)payload, 0, 0);
+    QueueSoundCommand(9, 8, (int)payload, 0, 0);
 }
 
 typedef struct { char bytes[24]; } CommandParameters24;
 
+/* Sends a sound command (id 96) with a value and an optional block of settings. */
 void func_001328C0(int value, const CommandParameters24 *parameters) {
     struct {
         int value;
@@ -229,45 +241,50 @@ void func_001328C0(int value, const CommandParameters24 *parameters) {
         payload.parameters = *parameters;
     else
         *(int *)&payload.parameters = -1;
-    func_00132DF0(96, 28, (int)&payload, 0, 0);
+    QueueSoundCommand(96, 28, (int)&payload, 0, 0);
 }
 
+/* Sends a sound command (id 11) with one value. */
 void func_00132938(int value) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(11, 4, (int)payload, 0, 0);
+    QueueSoundCommand(11, 4, (int)payload, 0, 0);
 }
 
 
+/* Sends a sound command (id 78) with three values. */
 void func_001329B0(int first, int second, int third) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
     payload[2] = third;
-    func_00132DF0(78, 12, (int)payload, 0, 0);
+    QueueSoundCommand(78, 12, (int)payload, 0, 0);
 }
 
 
 
 
+/* Sends a sound command (id 22) with one value. */
 void func_00132AF8(int value) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(22, 4, (int)payload, 0, 0);
+    QueueSoundCommand(22, 4, (int)payload, 0, 0);
 }
 
+/* Sends a sound command (id 23) with one value. */
 void func_00132B28(int param_1) {
   int auStack_20[4];
 
   auStack_20[0] = param_1;
-  func_00132DF0(0x17, 4, (int)auStack_20, 0, 0);
+  QueueSoundCommand(0x17, 4, (int)auStack_20, 0, 0);
   return;
 }
 
+/* Sends a sound command (id 25) with one value and two extra settings. */
 void func_00132B58(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(25, 4, (int)payload, fourth, fifth);
+    QueueSoundCommand(25, 4, (int)payload, fourth, fifth);
 }
 
 
@@ -279,6 +296,7 @@ void func_00132B58(int value, long fourth, int fifth) {
 
 /* rac1-decomp src/core/989snd.c: func_0012EC30 */
 /* snd_UnkFunction_0012eaf0 */
+/* Sets the sound current buffer flag to 1. */
 void func_00133220(void) {
     *(int *)&r1_D_0015EDC4 = 1;
 }
@@ -286,20 +304,23 @@ void func_00133220(void) {
 
 
 
+/* Sends a sound command (id 46) with one value. */
 void func_00133400(int value) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(46, 4, (int)payload, 0, 0);
+    QueueSoundCommand(46, 4, (int)payload, 0, 0);
 }
 
+/* Sends a sound command (id 50) with one value and two extra settings. */
 void func_00133430(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(50, 4, (int)payload, fourth, fifth);
+    QueueSoundCommand(50, 4, (int)payload, fourth, fifth);
 }
 
+/* Sends a sound command (id 79) with one value and two extra settings. */
 void func_00133460(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
-    func_00132DF0(79, 4, (int)payload, fourth, fifth);
+    QueueSoundCommand(79, 4, (int)payload, fourth, fifth);
 }

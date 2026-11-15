@@ -19,6 +19,7 @@ extern void func_00282D08(void *, void *, void *, float);
 extern void func_L01_0031A278(void *, void *, float, float, float);
 extern void func_00280B90(void *, void *, int);
 
+/* Draws the three scrolling bands of pictures on the face of the slot machine. */
 void func_L02_003E7B58(char *actor) {
     StripGeometry geometry;
     StripPacket packet;
@@ -47,17 +48,17 @@ void func_L02_003E7B58(char *actor) {
         float *phase = (float *)(state + 0x60);
         float scroll = *(float *)((char *)phase + off) + 0.15f;
         for (piece = 0; piece < 3; piece++) {
-            float first = ((float)func_00283CF0(scroll) - scroll) * 0.43094158f;
+            float first = ((float)FloatToInt(scroll) - scroll) * 0.43094158f;
             int tile;
             float last;
             float texFirst;
             float texLast;
             first += (float)piece * 0.43094158f;
-            tile = func_00283CF0((scroll + (float)piece - 1.0f) + 9.0f) % 9;
+            tile = FloatToInt((scroll + (float)piece - 1.0f) + 9.0f) % 9;
             last = first + 0.43094158f;
             {
                 int idx = D_L02_002A53B0[band][tile];
-                packet.texture = func_0027C878(D_L02_001B0A00[idx]);
+                packet.texture = GetEffectTextureDescriptor(D_L02_001B0A00[idx]);
             }
             texFirst = 0.0f;
             texLast = 1.0f;
@@ -71,15 +72,15 @@ void func_L02_003E7B58(char *actor) {
             }
             packet.tex0[1] = packet.tex0[3] = texFirst;
             packet.tex1[1] = packet.tex1[3] = texLast;
-            func_00282D08(sample, geometry.point[band][0], geometry.point[band][2], first);
-            func_L01_0031A278(actor, packet.corner[0], sample[0], sample[1], sample[2]);
-            func_00282D08(sample, geometry.point[band][1], geometry.point[band][3], first);
-            func_L01_0031A278(actor, packet.corner[1], sample[0], sample[1], sample[2]);
-            func_00282D08(sample, geometry.point[band][0], geometry.point[band][2], last);
-            func_L01_0031A278(actor, packet.corner[2], sample[0], sample[1], sample[2]);
-            func_00282D08(sample, geometry.point[band][1], geometry.point[band][3], last);
-            func_L01_0031A278(actor, packet.corner[3], sample[0], sample[1], sample[2]);
-            func_00280B90(&packet, 0, 0);
+            lerp_vector(sample, geometry.point[band][0], geometry.point[band][2], first);
+            ComputeMobyLocalPoint(actor, packet.corner[0], sample[0], sample[1], sample[2]);
+            lerp_vector(sample, geometry.point[band][1], geometry.point[band][3], first);
+            ComputeMobyLocalPoint(actor, packet.corner[1], sample[0], sample[1], sample[2]);
+            lerp_vector(sample, geometry.point[band][0], geometry.point[band][2], last);
+            ComputeMobyLocalPoint(actor, packet.corner[2], sample[0], sample[1], sample[2]);
+            lerp_vector(sample, geometry.point[band][1], geometry.point[band][3], last);
+            ComputeMobyLocalPoint(actor, packet.corner[3], sample[0], sample[1], sample[2]);
+            draw_world_quad(&packet, 0, 0);
         }
     }
 }

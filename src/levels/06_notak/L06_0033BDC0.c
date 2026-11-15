@@ -116,6 +116,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 
 /* func_L06_003D0AC8 is defined in L06_003D0AC8.c. */
 
+/* Updates a falling object: it moves, checks what it touches, and bounces or breaks when it hits something. */
 void func_L06_003D0EE0(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
@@ -139,10 +140,10 @@ void func_L06_003D0EE0(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
+    FastVecAdd(position, position, ctx);
+    ComputeViewDirection(position, &frame.surface, 0);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
+    SpawnSparkPuff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
@@ -150,24 +151,24 @@ void func_L06_003D0EE0(char *obj) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L06_0026C7F0)->material;
     qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L06_001BFC80;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L06_001BFC80;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L06_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L06_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -175,30 +176,30 @@ void func_L06_003D0EE0(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L06_001BFC80;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
+    } else if (FastFloatHelperD(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
+        ClearEntryFlag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+            SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            SpawnImpactBurst(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -254,7 +255,7 @@ Moby *func_L06_003F3448(Moby *parent, Quad *position)
     state = parent->state;
     result = 0;
     child = 0;
-    if (func_002A8600(&child, state->group, 1, 1) == 0) {
+    if (GetFirstMobyInGroup(&child, state->group, 1, 1) == 0) {
         state->count++;
         {
             Moby *spawned = child;
@@ -280,7 +281,7 @@ Moby *func_L06_003F3448(Moby *parent, Quad *position)
         if (state->small)
             child->scale = child->class->scale * 0.1f;
 
-        part = func_L00_00345AF0(child);
+        part = ReturnZeroUnsigned(child);
         if (part) {
             part->f94 = 0;
             part->f68 = 0;
@@ -294,18 +295,18 @@ Moby *func_L06_003F3448(Moby *parent, Quad *position)
             parent->health = 0;
         child->parent = parent;
         child->f98 = child->class->f10;
-        func_002AB650(child);
+        CopyHeroField38ToMoby(child);
         func_002A0F48(child);
         result = child;
 
-        record = func_002AB1F0(result);
+        record = GetMobyPrivateValue0(result);
         if (record) {
             record->f24 = 0;
             record->f20 = 0;
             record->value = (float)record->limit;
         }
     } else {
-        func_0026FEB8(D_L06_001AF990, parent->fB2, D_L06_001B2348[0]);
+        STUB_printf(D_L06_001AF990, parent->fB2, D_L06_001B2348[0]);
     }
     return result;
 }
@@ -321,48 +322,48 @@ extern void func_002A6C58(char *a0, int a1, int a2);
 extern void func_002AB8C0(char *a0, char *a1);
 
 /* runs a moby's timer down and picks the dying or the revived path from what is left */
-void func_L06_003F3690(char *a0, char *a1)
+void func_L06_003F3690(char *moby, char *vars)
 {
-    float t = func_002A96A0(a0, func_002A9640(a0, 0xC30000, 0));
+    float damageStep = UpdateAimTargetStrength(moby, FindOwnedEffectSlot(moby, 0xC30000, 0));
 
-    if (t > 0.0f) {
-        float left = *(float *)(a1 + 0x20) - t;
+    if (damageStep > 0.0f) {
+        float timeLeft = *(float *)(vars + 0x20) - damageStep;
 
-        *(float *)(a1 + 0x20) = left;
-        if (left > 0.0f) {
-            *(unsigned char *)(a1 + 0x57) = 0x5A;
-            func_002AB800(a0, a1 + 0x50);
+        *(float *)(vars + 0x20) = timeLeft;
+        if (timeLeft > 0.0f) {
+            *(unsigned char *)(vars + 0x57) = 0x5A;
+            StartColorFade(moby, vars + 0x50);
         } else {
-            func_002A6C58(a0, 0, 3);
-            *(unsigned char *)(a0 + 0x20) = 2;
-            *(unsigned char *)(a1 + 0x57) = 0x78;
-            func_002AB800(a0, a1 + 0x50);
+            SetDeathBits(moby, 0, 3);
+            *(unsigned char *)(moby + 0x20) = 2;
+            *(unsigned char *)(vars + 0x57) = 0x78;
+            StartColorFade(moby, vars + 0x50);
         }
     }
-    *(unsigned char *)(a0 + 0xA8) = 0xFF;
-    func_002AB8C0(a0, a1 + 0x50);
+    *(unsigned char *)(moby + 0xA8) = 0xFF;
+    UpdateColorFade(moby, vars + 0x50);
 }
 
 extern int func_002A8508(int a0, int a1);
 
 /* counts the 0x75E-slot entries that are live and returns the last free one */
-int func_L06_003F3760(int a0, char *a1)
+int func_L06_003F3760(int spawnerMoby, char *varsIn)
 {
-    char *s0 = a1;
-    int free_slot = -1;
+    char *vars = varsIn;
+    int freeSlot = -1;
     int i;
 
-    *(unsigned char *)(s0 + 0x81) = func_002A8508(*(int *)(s0 + 0x84), -1);
+    *(unsigned char *)(vars + 0x81) = CountMobysInGroupNotInState(*(int *)(vars + 0x84), -1);
     for (i = 0; i < 20; i++) {
-        char *m = ((char **)(s0 + 0xA0))[i];
+        char *member = ((char **)(vars + 0xA0))[i];
 
-        if (m != 0 && *(short *)(m + 0xAA) == 0x75E
-            && *(unsigned char *)(m + 0x20) != 0xFE && *(unsigned char *)(m + 0x20) != 0xFD)
-            (*(unsigned char *)(s0 + 0x81))++;
+        if (member != 0 && *(short *)(member + 0xAA) == 0x75E /* moby class 1886 */
+            && *(unsigned char *)(member + 0x20) != 0xFE && *(unsigned char *)(member + 0x20) != 0xFD)
+            (*(unsigned char *)(vars + 0x81))++;
         else
-            free_slot = i;
+            freeSlot = i;
     }
-    return free_slot;
+    return freeSlot;
 }
 
 /* func_L06_003F3800 is matched in L06_003F3800-g8.c. */
@@ -372,32 +373,32 @@ int func_L06_003F3760(int a0, char *a1)
 extern void func_0029F338(char *a0);
 
 /* clears one word of a 0x75D moby's state block when it is neither dying nor gone */
-void func_L06_003F4020(char *a0, char *a1)
+void func_L06_003F4020(char *moby, char *vars)
 {
-    char *m = *(char **)(a1 + 0x10);
+    char *spawnerMoby = *(char **)(vars + 0x10);
 
-    if (m != 0 && *(short *)(m + 0xAA) == 0x75D
-        && *(unsigned char *)(m + 0x20) != 0xFE && *(unsigned char *)(m + 0x20) != 0xFD) {
-        int *p = *(int **)(m + 0x68);
+    if (spawnerMoby != 0 && *(short *)(spawnerMoby + 0xAA) == 0x75D /* moby class 1885 */
+        && *(unsigned char *)(spawnerMoby + 0x20) != 0xFE && *(unsigned char *)(spawnerMoby + 0x20) != 0xFD) {
+        int *spawnerVars = *(int **)(spawnerMoby + 0x68);
 
-        p += *(unsigned char *)(a1 + 0x1C);
-        p[40] = 0;
+        spawnerVars += *(unsigned char *)(vars + 0x1C);
+        spawnerVars[40] = 0;
     }
-    func_0029F338(a0);
+    MarkMobySpawned(moby);
 }
 
 
 extern int D_L06_001B3760[];
 
 /* zeroes the six words a finished moby left behind */
-void func_L06_003F4908(char *a0)
+void func_L06_003F4908(char *moby)
 {
-    if (*(unsigned char *)(a0 + 0x20) == 0) {
+    if (*(unsigned char *)(moby + 0x20) == 0) {
         int i;
 
         for (i = 5; i >= 0; i--)
             D_L06_001B3760[i] = 0;
-        func_0029F338(a0);
+        MarkMobySpawned(moby);
     }
 }
 
@@ -432,47 +433,47 @@ void func_L06_00401820(Moby *moby)
         state->step = 0;
         break;
     case 1:
-        if (func_L00_00324120(moby)) {
+        if (IsCurrentSelectedId(moby)) {
             if (state->level == 0) {
-                func_002A7750(moby, 3, -1);
-                if (!func_002E59B0(moby, state->sound))
-                    state->sound = func_002E5CF8(0, 4, moby);
+                SetMobyState(moby, 3, -1);
+                if (!IsVoicePlayingForOwner(moby, state->sound))
+                    state->sound = PlayMobySound(0, 4, moby);
             } else {
-                func_002A7750(moby, 2, -1);
-                if (!func_002E59B0(moby, state->sound))
-                    state->sound = func_002E5CF8(1, 4, moby);
+                SetMobyState(moby, 2, -1);
+                if (!IsVoicePlayingForOwner(moby, state->sound))
+                    state->sound = PlayMobySound(1, 4, moby);
             }
         }
-        if (D_00189E20.position[2] < 55.0f && state->level == 0) {
-            if (!func_002E59B0(moby, state->sound))
-                state->sound = func_002E5CF8(0, 4, moby);
-            func_002A7750(moby, 3, -1);
-        } else if (D_00189E20.position[2] > 57.0f && state->level == 1 &&
-                   func_002ACBC8(D_00189E20.position, state->zone)) {
-            if (!func_002E59B0(moby, state->sound))
-                state->sound = func_002E5CF8(1, 4, moby);
-            func_002A7750(moby, 2, -1);
+        if (gHeroState.position[2] < 55.0f && state->level == 0) {
+            if (!IsVoicePlayingForOwner(moby, state->sound))
+                state->sound = PlayMobySound(0, 4, moby);
+            SetMobyState(moby, 3, -1);
+        } else if (gHeroState.position[2] > 57.0f && state->level == 1 &&
+                   IsPointInCuboid(gHeroState.position, state->zone)) {
+            if (!IsVoicePlayingForOwner(moby, state->sound))
+                state->sound = PlayMobySound(1, 4, moby);
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_00282E48(moby->position, state->home) > 0.04f) {
-            movement[0] = func_00283180(moby->rotation[2] + 1.57079649f) * 0.05f;
-            movement[1] = func_00283198(moby->rotation[2] + 1.57079649f) * 0.05f;
+        if (fast_vec_dist(moby->position, state->home) > 0.04f) {
+            movement[0] = FastSinOrCosA(moby->rotation[2] + 1.57079649f) * 0.05f;
+            movement[1] = FastSinOrCosB(moby->rotation[2] + 1.57079649f) * 0.05f;
             movement[2] = 0.0f;
-            func_00282CC0(moby->position, moby->position, movement);
+            FastVecAdd(moby->position, moby->position, movement);
             if (state->step < 104)
                 moby->position[2] += 0.07f;
             state->step++;
-        } else if (!func_L00_00324120(moby)) {
+        } else if (!IsCurrentSelectedId(moby)) {
             state->level = 0;
             handle = state->sound;
             if (handle != -1) {
-                sound = (SoundSlot *)(D_00188660 + handle * 0x70);
+                sound = (SoundSlot *)(gSoundState + handle * 0x70);
                 if (sound->owner == moby && sound->active)
-                    func_002E59F8(handle);
+                    StopSoundVoice(handle);
             }
             state->sound = -1;
-            func_002A7750(moby, 1, -1);
+            SetMobyState(moby, 1, -1);
             qcopy(moby->position, state->home);
             state->step = 0;
         } else {
@@ -482,26 +483,26 @@ void func_L06_00401820(Moby *moby)
     case 3:
         if (moby->position[2] >= 50.75f) {
             if (moby->position[2] < 53.0f &&
-                func_002ACBC8(D_00189E20.position, state->zone) &&
-                D_00189E20.position[2] < moby->position[2])
+                IsPointInCuboid(gHeroState.position, state->zone) &&
+                gHeroState.position[2] < moby->position[2])
                 break;
-            movement[0] = func_00283180(moby->rotation[2] - 1.57079649f) * 0.05f;
-            movement[1] = func_00283198(moby->rotation[2] - 1.57079649f) * 0.05f;
+            movement[0] = FastSinOrCosA(moby->rotation[2] - 1.57079649f) * 0.05f;
+            movement[1] = FastSinOrCosB(moby->rotation[2] - 1.57079649f) * 0.05f;
             movement[2] = 0.0f;
-            func_00282CC0(moby->position, moby->position, movement);
+            FastVecAdd(moby->position, moby->position, movement);
             if (state->step >= 61)
                 moby->position[2] -= 0.07f;
             state->step++;
-        } else if (!func_L00_00324120(moby) && moby->position[2] < 50.75f) {
+        } else if (!IsCurrentSelectedId(moby) && moby->position[2] < 50.75f) {
             state->level = 1;
             handle = state->sound;
             if (handle != -1) {
-                sound = (SoundSlot *)(D_00188660 + handle * 0x70);
+                sound = (SoundSlot *)(gSoundState + handle * 0x70);
                 if (sound->owner == moby && sound->active)
-                    func_002E59F8(handle);
+                    StopSoundVoice(handle);
             }
             state->sound = -1;
-            func_002A7750(moby, 1, -1);
+            SetMobyState(moby, 1, -1);
             state->step = 0;
         } else {
             goto stop;
@@ -512,14 +513,14 @@ void func_L06_00401820(Moby *moby)
 stop:
     handle = state->sound;
     if (handle != -1) {
-        sound = (SoundSlot *)(D_00188660 + handle * 0x70);
+        sound = (SoundSlot *)(gSoundState + handle * 0x70);
         if (sound->owner == moby && sound->active)
-            func_002E59F8(handle);
+            StopSoundVoice(handle);
     }
     state->sound = -1;
 done:
-    func_00282CF0(movement, moby->position, oldPosition);
-    func_002AD6F0(state->tracker, movement, oldRotation, moby->rotation);
+    FastVecSub(movement, moby->position, oldPosition);
+    CombineTransformsAndStore(state->tracker, movement, oldRotation, moby->rotation);
 }
 
 /* func_L06_00402230 is matched in L06_00402230.c (built with -g). */
@@ -530,17 +531,17 @@ done:
 /* func_L06_00419CA8 is defined in L06_00419CA8-g8.c. */
 
 /* clears one word of a 0xA58 moby's state block when it is neither dying nor gone */
-void func_L06_0041CAB0(char *a0, char *a1)
+void func_L06_0041CAB0(char *moby, char *vars)
 {
-    char *m = *(char **)(a1 + 0x10);
+    char *spawnerMoby = *(char **)(vars + 0x10);
 
-    if (m != 0 && *(short *)(m + 0xAA) == 0xA58
-        && *(unsigned char *)(m + 0x20) != 0xFE && *(unsigned char *)(m + 0x20) != 0xFD) {
-        int *p = *(int **)(m + 0x68);
+    if (spawnerMoby != 0 && *(short *)(spawnerMoby + 0xAA) == 0xA58 /* moby class 2648 */
+        && *(unsigned char *)(spawnerMoby + 0x20) != 0xFE && *(unsigned char *)(spawnerMoby + 0x20) != 0xFD) {
+        int *spawnerVars = *(int **)(spawnerMoby + 0x68);
 
-        p += *(unsigned char *)(a1 + 0x1C);
-        p[40] = 0;
+        spawnerVars += *(unsigned char *)(vars + 0x1C);
+        spawnerVars[40] = 0;
     }
-    func_0029F338(a0);
+    MarkMobySpawned(moby);
 }
 

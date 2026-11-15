@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct {
     float x, y, z, w;
 } Vec9E60;
@@ -20,7 +21,8 @@ extern float func_002EAB28(float, float);
 extern float func_002EB478(float, float);
 extern void func_00282F20(char *, char *, float);
 extern void func_00282CC0(char *, char *,char *);
-int func_L09_003E9E60(Object9E60 *obj, void *buf, float f)
+/* Moves the object toward a target point at a speed that depends on how far it must turn. Returns 0 when its path point changed, otherwise 1. */
+int func_L09_003E9E60(Object9E60 *obj, void *buf, float distance)
 {
     char *object = (char *)obj;
     struct State {
@@ -36,7 +38,7 @@ int func_L09_003E9E60(Object9E60 *obj, void *buf, float f)
         short current, previous;
     };
     struct State *state = *(struct State **)(object + 0x68);
-    float v[4];
+    float toTarget[4];
     float speed;
     float scale;
     int result = 1;
@@ -44,27 +46,27 @@ int func_L09_003E9E60(Object9E60 *obj, void *buf, float f)
     char *pos;
     if (state->current != -1) {
         scale = 1.0f;
-        func_00282CF0((char *)v, buf, (char *)&obj->position);
+        FastVecSub((char *)toTarget, buf, (char *)&obj->position);
         pos = (char *)&obj->position;
-        func_00282FB8((char *)v, (char *)v, state->field78);
-        angle = func_002EAB28(v[0], v[1]);
+        FastVectorDivideHelper((char *)toTarget, (char *)toTarget, state->field78);
+        angle = func_002EAB28(toTarget[0], toTarget[1]);
         if (*(unsigned char *)(object + 0x20) < 4) {
-            func_002AAA00(object + 0xF8, angle, state->field64, state->field68, state->field6C, (char *)&state->field104, 0);
-            scale = func_00283C80(angle, *(float *)(object + 0xF8)) / state->field80;
+            ApproachTargetWithDirectionMode(object + 0xF8, angle, state->field64, state->field68, state->field6C, (char *)&state->field104, 0);
+            scale = FastDiffRots(angle, *(float *)(object + 0xF8)) / state->field80;
             if (scale > 1.0f) scale = 1.0f;
             else if (scale < 0.0f) scale = 0.0f;
-            scale = func_002A7798(1.0f - scale);
+            scale = EaseOutQuad(1.0f - scale);
         } else {
             float y = obj->position.y;
             float x = obj->position.x;
-            angle = func_002EAB28(D_00189E20.position.x - x, D_00189E20.position.y - y);
-            func_002AAA00(object + 0xF8, func_002EB478(angle, 1.5707964897155762f), state->field64, state->field68, state->field6C, (char *)&state->field104, 0);
+            angle = func_002EAB28(gHeroState.position.x - x, gHeroState.position.y - y);
+            ApproachTargetWithDirectionMode(object + 0xF8, func_002EB478(angle, 1.5707964897155762f), state->field64, state->field68, state->field6C, (char *)&state->field104, 0);
         }
-        speed = func_00282DF0((char *)state->velocity);
-        func_002AAC80(&speed, f, state->field70, state->field74, state->field78);
+        speed = FastVecLength((char *)state->velocity);
+        ApproachTargetWithBraking(&speed, distance, state->field70, state->field74, state->field78);
         speed *= scale;
-        func_00282F20((char *)state->velocity, (char *)v, speed);
-        func_00282CC0(pos, pos, (char *)state->velocity);
+        vec_scale_to_length((char *)state->velocity, (char *)toTarget, speed);
+        FastVecAdd(pos, pos, (char *)state->velocity);
         if (state->current != state->previous) result = 0;
     }
     return result;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* libgcc _eh.o: __throw, adapted from the public GNU EE libgcc2.c
  * (gnu-ee-binutils-gcc-1.1, GPL-2.0-or-later with the libgcc linking exception).
  * The paired throw/rethrow routines use the same two frame_state objects;
@@ -45,6 +46,7 @@ extern void *func_00120BD0(struct eh_context *, void *, frame_state *,
    then we unwind the frames down to the one that has the handler and transfer
    control into the handler.  */
 
+/* Throws an exception: finds the handler up the call stack and jumps to it. */
 void func_00120F00(void)
 {
   struct eh_context *eh = (struct eh_context *)(*D_00135D38) ();
@@ -57,13 +59,13 @@ void func_00120F00(void)
      try and rethrow an exception, when there is no exception currently
      active.  */
   if (! eh->info)
-    func_00120368 ();
+    CallTerminateHandler ();
 
   /* Start at our stack frame.  */
 label:
-  udata = func_001240C8 (&&label, udata);
+  udata = GetFrameStateForPc (&&label, udata);
   if (! udata)
-    func_00120368 ();
+    CallTerminateHandler ();
 
   /* We need to get the value from the CFA register. */
   udata->cfa = __builtin_dwarf_cfa ();
@@ -77,7 +79,7 @@ label:
   /* Now reset pc to the right throw point.  */
   pc = __builtin_extract_return_addr (__builtin_return_address (0)) - 1;
 
-  handler = func_00120BD0 (eh, pc, my_udata, &udata);
+  handler = ThrowHelper (eh, pc, my_udata, &udata);
 
   /* Now go!  */
 

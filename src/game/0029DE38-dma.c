@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int ref_002A0048_00[] __attribute__((sda));
 extern int ref_002A0048_01[] __attribute__((sda));
@@ -28,8 +29,8 @@ void func_002A0048(void)
         ((unsigned int *)ref_002A0048_01[0])[1] = (unsigned int)ref_002A0048_02[0];
         ((unsigned int *)ref_002A0048_01[0])[2] = 0;
         ((unsigned int *)ref_002A0048_01[0])[3] = 0;
-        func_002DFD88();
-        func_002DFBB0(ref_002A0048_03);
+        PrepareShadowDrawing();
+        DrawShadowList(ref_002A0048_03);
         ((unsigned int *)ref_002A0048_02[0])[0] = 0x20000000;
         ((unsigned int *)ref_002A0048_02[0])[1] = (unsigned int)(ref_002A0048_01[0] + 16);
         ((unsigned int *)ref_002A0048_02[0])[2] = 0;

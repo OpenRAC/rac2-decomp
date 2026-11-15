@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -21,31 +22,31 @@ extern void func_003140C0(char *, f32, f32);
 extern char D_001B9B00[];
 
 /* lays the object's ten measurement points out along a ring and asks the engine to arm them */
-void func_L16_00416D08(char *arg0) {
+void func_L16_00416D08(char *moby) {
     char buf0[0x10];
     char buf1[0x10];
-    f32 f20;
-    f32 f30;
-    s16 h;
+    f32 speed;
+    f32 size;
+    s16 classId;
     s32 i;
 
-    func_002E74B8(buf0, D_001B9B00, arg0 + 0x10);
+    func_002E74B8(buf0, D_001B9B00, moby + 0x10);
     func_002E7788(buf0, buf0, 1.0f);
-    func_003E9FF0(arg0, arg0 + 0x10, buf0, 0.0f);
-    func_00357288(0, 0, arg0);
+    func_003E9FF0(moby, moby + 0x10, buf0, 0.0f);
+    func_00357288(0, 0, moby);
     for (i = 0; i < 5; i++) {
         func_003140C0(buf1, 0.0833333358168602f, 0.25f);
         *(f32 *)(buf1 + 8) = func_002E73F8(*(f32 *)(buf1 + 8));
-        h = *(s16 *)(arg0 + 0xAA);
-        f20 = func_00313F98(90.0f, 180.0f);
-        f30 = func_00313F38(10.0f, 20.0f);
-        func_002D4CC8(arg0, 2, h, i, arg0 + 0x10, arg0 + 0xF0, buf1, 0xFF, f20, f30);
+        classId = *(s16 *)(moby + 0xAA);
+        speed = func_00313F98(90.0f, 180.0f);
+        size = func_00313F38(10.0f, 20.0f);
+        func_002D4CC8(moby, 2, classId, i, moby + 0x10, moby + 0xF0, buf1, 0xFF, speed, size);
     }
 }
 
 /* the horizontal speed the object carries in its data block */
-f32 func_L16_00416EB8(char *arg0) {
-    return *(f32 *)(*(char **)(arg0 + 0x68) + 0x78);
+f32 func_L16_00416EB8(char *moby) {
+    return *(f32 *)(*(char **)(moby + 0x68) + 0x78);
 }
 
 /* func_L16_00416EC8 uses its dedicated quadword-copy and G16 profile. */
@@ -55,9 +56,9 @@ f32 func_L16_00416EB8(char *arg0) {
 /* func_L16_00417210 is defined in L16_00417210-g8.c. */
 
 /* the model index the object's data block points at */
-s32 func_L16_00417788(char *arg0) {
-    char *p = *(char **)(arg0 + 0x68);
-    return *(s32 *)(p + 0x60);
+s32 func_L16_00417788(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    return *(s32 *)(vars + 0x60);
 }
 
 /* func_L16_00417798 is defined in L16_00417798-g8.c. */
@@ -87,52 +88,52 @@ extern void func_002A7750(char *, s32, s32);
 
 /* Controls the timed rotation cycle and restores the original settings. */
 void func_L16_0041C7A0(char *self) {
-    char *st = *(char **)(self + 0x68);
-    f32 a, b, angle;
+    char *vars = *(char **)(self + 0x68);
+    f32 firstTime, secondTime, savedAngle;
     switch (*(u8 *)(self + 0x20)) {
     case 0:
-        *(s32 *)(st + 0) = 0;
-        *(s32 *)(st + 4) = 0;
-        *(s32 *)(st + 8) = 0;
-        *(s32 *)(st + 12) = 0;
-        *(s32 *)(st + 16) = 0;
-        a = *(f32 *)(st + 20);
-        angle = *(f32 *)(self + 0xF0);
-        b = *(f32 *)(st + 24);
-        *(f32 *)(st + 40) = angle;
-        *(s32 *)(st + 36) = *(u8 *)(self + 0xBC);
-        *(f32 *)(st + 32) = b;
-        *(f32 *)(st + 28) = a;
-        func_002A7750(self, 1, -1);
+        *(s32 *)(vars + 0) = 0;
+        *(s32 *)(vars + 4) = 0;
+        *(s32 *)(vars + 8) = 0;
+        *(s32 *)(vars + 12) = 0;
+        *(s32 *)(vars + 16) = 0;
+        firstTime = *(f32 *)(vars + 20);
+        savedAngle = *(f32 *)(self + 0xF0);
+        secondTime = *(f32 *)(vars + 24);
+        *(f32 *)(vars + 40) = savedAngle;
+        *(s32 *)(vars + 36) = *(u8 *)(self + 0xBC);
+        *(f32 *)(vars + 32) = secondTime;
+        *(f32 *)(vars + 28) = firstTime;
+        SetMobyState(self, 1, -1);
         break;
     case 1:
         if (*(u8 *)(self + 0xBC))
-            func_002A7750(self, 4, -1);
+            SetMobyState(self, 4, -1);
         break;
     case 4:
-        if (*(s32 *)(st + 16) < 180) {
-            *(f32 *)(self + 0xF0) = func_00283B98(*(f32 *)(self + 0xF0), 0.0872664749622345f);
-            *(s32 *)(st + 16) += 5;
-        } else func_002A7750(self, 2, -1);
+        if (*(s32 *)(vars + 16) < 180) {
+            *(f32 *)(self + 0xF0) = FastAddRotations(*(f32 *)(self + 0xF0), 0.0872664749622345f);
+            *(s32 *)(vars + 16) += 5;
+        } else SetMobyState(self, 2, -1);
         break;
     case 2:
-        if (func_002829D8(st + 20)) func_002A7750(self, 3, -1);
+        if (FastVectorHelperB(vars + 20)) SetMobyState(self, 3, -1);
         break;
     case 3:
-        if (func_002829D8(st + 24)) func_002A7750(self, 5, -1);
-        func_L16_0041C948(self);
+        if (FastVectorHelperB(vars + 24)) SetMobyState(self, 5, -1);
+        SubmitSubobjectWithAngleScale(self);
         break;
     case 5:
-        if (*(s32 *)(st + 16) > 0) {
-            *(f32 *)(self + 0xF0) = func_00283BE0(*(f32 *)(self + 0xF0), 0.0872664749622345f);
-            *(s32 *)(st + 16) -= 5;
+        if (*(s32 *)(vars + 16) > 0) {
+            *(f32 *)(self + 0xF0) = fast_subtract_rotations(*(f32 *)(self + 0xF0), 0.0872664749622345f);
+            *(s32 *)(vars + 16) -= 5;
         } else {
-            *(u8 *)(self + 0xBC) = *(u8 *)(st + 36);
-            *(f32 *)(st + 20) = *(f32 *)(st + 28);
-            *(f32 *)(st + 24) = *(f32 *)(st + 32);
-            a = *(f32 *)(st + 40);
-            *(f32 *)(self + 0xF0) = a;
-            func_002A7750(self, 1, -1);
+            *(u8 *)(self + 0xBC) = *(u8 *)(vars + 36);
+            *(f32 *)(vars + 20) = *(f32 *)(vars + 28);
+            *(f32 *)(vars + 24) = *(f32 *)(vars + 32);
+            firstTime = *(f32 *)(vars + 40);
+            *(f32 *)(self + 0xF0) = firstTime;
+            SetMobyState(self, 1, -1);
         }
         break;
     }
@@ -158,20 +159,20 @@ extern s32 func_003320E0(char *, char *, u32, u32, f32, u32, u32);
 extern s32 func_002E8648(f32);
 
 /* spawns the level's score pickup effect for this object */
-void func_L16_0041F150(char *arg0) {
+void func_L16_0041F150(char *moby) {
     char buf[0x10];
-    char *st = *(char **)(arg0 + 0x68);
-    char *obj;
-    s32 handle;
-    s32 a;
+    char *vars = *(char **)(moby + 0x68);
+    char *particle;
+    s32 color;
+    s32 alpha;
 
-    func_002E74B8(buf, arg0 + 0x10, st);
-    handle = func_00313EE0(3, 7) & 0xFF;
-    a = func_00313EA0(0xFF) & 0xFF;
-    obj = (char *)func_003320E0(buf, st, 0x60006080, handle, 2.5f, a, 0);
-    if (obj == 0)
+    func_002E74B8(buf, moby + 0x10, vars);
+    color = func_00313EE0(3, 7) & 0xFF;
+    alpha = func_00313EA0(0xFF) & 0xFF;
+    particle = (char *)func_003320E0(buf, vars, 0x60006080, color, 2.5f, alpha, 0);
+    if (particle == 0)
         return;
-    obj[9] = (u8)(func_002E8648(4.0f) - 16);
+    particle[9] = (u8)(func_002E8648(4.0f) - 16);
 }
 
 /* func_L16_0041F1F0 lives in L16_0041F1F0.c. */

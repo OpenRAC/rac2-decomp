@@ -31,6 +31,7 @@ extern void func_L00_002AF7D0(void);
 extern void ref_L00_003C8828_00(void (*)(void *), void *);
 extern void func_L00_003C8A58(void *);
 
+/* Per-frame update of the Megaturret Glove weapon (moby class 2661). It aims, waits for the fire button, then after a short delay launches the turret and cools down. */
 void func_L00_003C8828(char *owner)
 {
     InputVector origin, target;
@@ -39,19 +40,19 @@ void func_L00_003C8828(char *owner)
     int allowed;
     float radius;
 
-    func_0029FCC0(owner, 0, &origin);
+    TransformMobyJointToWorld(owner, 0, &origin);
     targetVector = &target;
-    radius = D_00189E20.state == 29 ? 11.0f : 4.5f;
-    func_002FDF40(targetVector, &origin, 0, 0, 1.5f, radius, 0.25f, 0.0030555557f);
+    radius = gHeroState.state == 29 ? 11.0f : 4.5f;
+    CalculateAimedLaunchVelocity(targetVector, &origin, 0, 0, 1.5f, radius, 0.25f, 0.0030555557f);
     allowed = 1;
-    FIELD(context, int, 0x24) = func_002FE5A0(&origin, targetVector, context,
+    FIELD(context, int, 0x24) = TraceProjectileToImpact(&origin, targetVector, context,
         context + 0x10, owner, 0, 0, 0.0030555557f);
 
-    if (D_00189E20.state == 29) {
-        if (!func_00282948(&D_00189E20.timer))
+    if (gHeroState.state == 29) {
+        if (!FastFloatHelperD(&gHeroState.timer))
             allowed = 0;
     } else {
-        D_00189E20.timer = 40;
+        gHeroState.timer = 40;
     }
 
     switch (FIELD(owner, unsigned char, 0x20)) {
@@ -60,29 +61,29 @@ void func_L00_003C8828(char *owner)
         FIELD(context, int, 0x24) = 0;
         /* Fall through. */
     case 1:
-        if ((D_00138324 & D_00189E20.input) && !D_00189E20.flag && allowed) {
-            if (func_L00_002D3F30(-1, 1)) {
-                func_L00_002AF568();
+        if ((D_00138324 & gHeroState.input) && !gHeroState.flag && allowed) {
+            if (SpendWeaponAmmo(-1, 1)) {
+                start_equipped_item_animation();
                 FIELD(owner, unsigned char, 0x20) = 2;
                 FIELD(context, int, 0x20) = 20;
             } else {
-                func_002E5CF8(2, 0, owner);
+                PlayMobySound(2, 0, owner);
             }
         }
         break;
     case 2:
-        if (func_00282948(context + 0x20)) {
-            func_002E5CF8(0, 0, owner);
-            func_L00_0038A748(owner, &origin, targetVector);
-            func_L00_002AF7D0();
+        if (FastFloatHelperD(context + 0x20)) {
+            PlayMobySound(0, 0, owner);
+            SpawnMegaturretShot(owner, &origin, targetVector);
+            cancel_hero_item_animation();
             FIELD(owner, unsigned char, 0x20) = 3;
             FIELD(context, int, 0x20) = 10;
         }
         break;
     case 3:
-        if (func_00282948(context + 0x20))
+        if (FastFloatHelperD(context + 0x20))
             FIELD(owner, unsigned char, 0x20) = 1;
         break;
     }
-    ref_L00_003C8828_00(func_L00_003C8A58, owner);
+    ref_L00_003C8828_00(DrawActiveOwnerEffect, owner);
 }

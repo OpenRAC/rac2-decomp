@@ -12,33 +12,33 @@ extern StatusGlobals D_00189E20;
 extern float ref_L00_0034AA30_00 MACRO_ADDR,ref_L00_0034AA30_02 MACRO_ADDR;
 extern const float ref_L00_0034AA30_01 MACRO_ADDR;
 extern int ref_L00_0034AA30_03 MACRO_ADDR;
-void func_0034AA30(char *o)
+void func_0034AA30(char *hud)
 {
- UiCoordinates *out=func_00335E10(o+0xf4);
+ UiCoordinates *out=GetFirstField(hud+0xf4);
  if(D_001A7A00<80) {
   struct { int a,b,c; } range;
   float y, scale, offsetY;
   int iy;
   int mode;
-  func_00335E68(o+0xf4,1);
-  range.c=0;range.a=D_00189E20.start;range.b=D_00189E20.end;
-  if(!range.a)func_0026F808(&range.a,&range.b,&range.c);
-  func_00336B90(o+0xf4,range.b-range.a);
-  func_00336B98(o+0xf4,(D_001A7A0C>>5)-range.a);
-  out->x=ref_L00_0034AA30_00+(*(UiCoordinates **)(o+8))->x;
+  SetFlagValue(hud+0xf4,1);
+  range.c=0;range.a=gHeroState.start;range.b=gHeroState.end;
+  if(!range.a)EmptyStubF808(&range.a,&range.b,&range.c);
+  SetMeterMaximum(hud+0xf4,range.b-range.a);
+  SetMeterValue(hud+0xf4,(D_001A7A0C>>5)-range.a);
+  out->x=ref_L00_0034AA30_00+(*(UiCoordinates **)(hud+8))->x;
   scale=ref_L00_0034AA30_02;
   mode=ref_L00_0034AA30_03;
   offsetY=ref_L00_0034AA30_01;
-  y=(offsetY+(*(UiCoordinates **)(o+8))->y)*scale+0.5f;
+  y=(offsetY+(*(UiCoordinates **)(hud+8))->y)*scale+0.5f;
   if(mode==1)iy=(int)(y+-5.0f);
   else iy=(int)y;
   out->y=iy;
-  if(D_00189E20.mode==1) {
-   func_00336498(o+0xf4,0x60808080,0x60808080);
-   func_003364B0(o+0xf4,0x40808080,0x40808080);
+  if(gHeroState.mode==1) {
+   SetFirstPair(hud+0xf4,0x60808080,0x60808080);
+   SetSecondPair(hud+0xf4,0x40808080,0x40808080);
   } else {
-   func_00336498(o+0xf4,0x8049c1ff,0x80001eff);
-   func_003364B0(o+0xf4,0x50f0c070,0x50f0c070);
+   SetFirstPair(hud+0xf4,0x8049c1ff,0x80001eff);
+   SetSecondPair(hud+0xf4,0x50f0c070,0x50f0c070);
   }
- } else func_00335E68(o+0xf4,0);
+ } else SetFlagValue(hud+0xf4,0);
 }

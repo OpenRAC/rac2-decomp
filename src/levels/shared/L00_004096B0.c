@@ -142,31 +142,32 @@ typedef struct {
 
 /* func_L00_0040D058 is defined in L00_0040D058-ribbon.c. */
 
+/* Creates a glowing flare effect facing the camera at a position, with the given size and colour. It also gives the camera a small shake when the flare is close. */
 char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0xf6d);
+    char *object = CreateMoby(0xf6d /* moby class 3949 */);
     SpawnState *state;
-    SpawnObject *m;
+    SpawnObject *mobyView;
     char *camera;
     float angle;
     if (object != 0) {
-        m = (SpawnObject *)object;
-        state = m->state;
+        mobyView = (SpawnObject *)object;
+        state = mobyView->state;
         *(unsigned char *)(object + 0x30) = 0xff;
         *(short *)(object + 0x32) = 0xff;
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         camera = D_L00_001B8C80 + 0x140;
-        func_00282CF0(direction, camera, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
-        func_002AFFD8(object + 0x10, (char *)up, 1);
+        FastVecSub(direction, camera, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
+        ComputeViewDirection(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
-        m->forward[3] = m->right[3] = m->up[3] = 0.0f;
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
+        mobyView->forward[3] = mobyView->right[3] = mobyView->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
         state->outer = size + size;
@@ -182,19 +183,19 @@ char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int r
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (func_00283DB8(sphere, 128.0f) == 1) {
+        if (FastMathHelperA(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_00282E48(position, camera) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
                 char *manager = camera - 0x140;
                 *(int *)(manager + 0x16c) = 0;
                 *(volatile float *)(manager + 0x160) = 0.075f;
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L00_001B8C80 + 0x140);
-                func_00282F20(difference, difference, 1.0f);
-                angle = func_002831B0(func_00282DB0(difference, D_L00_001B8C80 + 0x370));
+                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                angle = FastAngleHelper(FastVecDot(difference, D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -204,13 +205,14 @@ char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int r
             state->delay = 0;
             state->flags = 0;
         }
-        func_L00_0040DF58(object, (char *)up);
+        SpawnBurstEffects(object, (char *)up);
     }
     return object;
 }
 
 
 /* Tests the handle cached in the object and, while the handle reports itself already released, drops the next sub-handle, otherwise runs the object's destroy helper. */
+/* Per-frame update for the flare effect (moby class 3949): waits for its handle to be released, then removes the object. */
 void func_L00_0040DF00(char *object)
 {
     char *handle = *(char **)(object + 104);
@@ -234,6 +236,7 @@ void func_L00_0040DF00(char *object)
 /* Reads the halfword at +0x1A of the object's node and grades it: 4 at or above 90, 3 above 60,
    2 above 30, else 1. The two lower bounds stay in variables, which is what keeps them in
    registers instead of an immediate compare. */
+/* Turns the object's charge level into a grade from 1 (low) to 4 (full). */
 int func_L00_00410840(char *object)
 {
     int value = *(short *)(*(int *)(object + 0x68) + 0x1A);
@@ -252,6 +255,7 @@ int func_L00_00410840(char *object)
 
 /* func_L00_00410888 is defined in L00_00410888-g8.c. */
 
+/* Does nothing. Several object classes use it as an empty update. */
 void func_L00_00410D18(void)
 {
 }
@@ -259,25 +263,26 @@ void func_L00_00410D18(void)
 /* func_L00_00410D20 is defined in L00_00410D20.c. */
 
 /* Calls a helper with a referenced node and three identity bytes of the object, then copies those bytes into a linked record when a node flag bit is set and the record exists with a non-zero leading short. */
-void func_L00_004110D8(Obj_F23626ad8 *p)
+/* Applies the slot's colour to its target, and copies it into the target's linked record when that record allows it. */
+void func_L00_004110D8(Obj_F23626ad8 *slot)
 {
-    Node24_F23626ad8 *s;
-    Node16_F23626ad8 *d;
-    int v;
+    Node24_F23626ad8 *target;
+    Node16_F23626ad8 *record;
+    int value;
 
-    func_002A0488(p->f24, p->u.b.b4, p->u.b.b5, p->u.b.h6);
-    s = p->f24;
-    if ((s->h52 & 0x20) == 0)
+    set_moby_color(slot->f24, slot->u.b.b4, slot->u.b.b5, slot->u.b.h6);
+    target = slot->f24;
+    if ((target->h52 & 0x20) == 0)
         return;
-    d = ((Node104_F23626ad8 *)s->p104)->p16;
-    if (d == 0)
+    record = ((Node104_F23626ad8 *)target->p104)->p16;
+    if (record == 0)
         return;
-    if (d->h0 == 0)
+    if (record->h0 == 0)
         return;
-    d->b4 = p->u.b.b4;
-    d->b5 = p->u.f4 >> 8;
-    v = p->u.b.h6;
-    d->b6 = v;
+    record->b4 = slot->u.b.b4;
+    record->b5 = slot->u.f4 >> 8;
+    value = slot->u.b.h6;
+    record->b6 = value;
 }
 
 
@@ -288,28 +293,29 @@ void func_L00_004110D8(Obj_F23626ad8 *p)
    set, folds it into a sixteen-byte buffer: the record's own transform, then the scale of its
    +0x0C word, then its first three words added to the buffer. The block's address differs
    from level to level, so it takes a per-level name. */
-void func_L00_004117B8(char *a0)
+/* Updates the positions of the 30 tracked targets, then redraws the lightning arcs of this object. */
+void func_L00_004117B8(char *moby)
 {
-    char *s0 = ref_L00_004117B8_00;
-    char *s2 = a0;
-    char *p;
-    float buf[4];
+    char *slot = ref_L00_004117B8_00;
+    char *owner = moby;
+    char *target;
+    float offset[4];
     int i;
 
     for (i = 0x1D; i >= 0; i--) {
-        if (*(char **)(s0 + 0x18) != 0) {
-            p = *(char **)(s0 + 0x18);
-            func_002AFFD8(p + 0x10, buf, 1);
-            p = *(char **)(s0 + 0x18);
-            func_00282D30(buf, buf, *(float *)(p + 0xC) * 0.0008300250046886504f);
-            p = *(char **)(s0 + 0x18);
-            buf[0] += *(float *)(p + 0) * 0.0009764999849721789f;
-            buf[1] += *(float *)(p + 4) * 0.0009764999849721789f;
-            buf[2] += *(float *)(p + 8) * 0.0009764999849721789f;
+        if (*(char **)(slot + 0x18) != 0) {
+            target = *(char **)(slot + 0x18);
+            ComputeViewDirection(target + 0x10, offset, 1);
+            target = *(char **)(slot + 0x18);
+            FastVecScale(offset, offset, *(float *)(target + 0xC) * 0.0008300250046886504f);
+            target = *(char **)(slot + 0x18);
+            offset[0] += *(float *)(target + 0) * 0.0009764999849721789f;
+            offset[1] += *(float *)(target + 4) * 0.0009764999849721789f;
+            offset[2] += *(float *)(target + 8) * 0.0009764999849721789f;
         }
-        s0 = s0 + 0x30;
+        slot = slot + 0x30;
     }
-    func_L00_00411F48(s2);
+    UpdateOwnedLightningArcs(owner);
 }
 
 
@@ -323,112 +329,113 @@ extern int func_00282948(void *);
 extern void func_002A8C00(void *, void *, int, void *, float);
 extern void func_002A8E20(void *, void *);
 extern void func_L00_00412928(void *, int, int);
-void func_L00_00411B30(char *object)
+/* Moves each of this object's 48 flying pieces toward its target. When a piece arrives it hits the target with damage and sparks, and the piece is freed. */
+void func_L00_00411B30(char *moby)
 {
-    Vector128 temp[1];
-    char event[48];
-    char *p, *q, *node, *first, *second;
+    Vector128 offsetVec[1];
+    char hitEvent[48];
+    char *record, *activeRecord, *linkData, *currentPos, *startPos;
     int i;
     float fraction, amount;
     for (i = 0; i < 48; i++) {
-        p = D_L00_00256BC0 + i * 0xd0;
-        if (*(char **)(p + 0xac) != object) continue;
-        first = p + 0x20;
-        qcopy(first, p + 0x40);
-        if (*(char **)(p + 0xb4)) {
-            node = func_002AB1F0(*(char **)(p + 0xb4));
-            if (node) {
-                func_002AFFD8(*(char **)(p + 0xb4) + 0x10, temp, 1);
-                func_00282D30(temp, temp, *(float *)(node + 0x10));
-                func_00282CC0(temp, temp, *(char **)(p + 0xb4) + 0x10);
-                func_00282CC0(first, temp, first);
-            } else qcopy(first, *(char **)(p + 0xb4) + 0x10);
+        record = D_L00_00256BC0 + i * 0xd0;
+        if (*(char **)(record + 0xac) != moby) continue;
+        currentPos = record + 0x20;
+        qcopy(currentPos, record + 0x40);
+        if (*(char **)(record + 0xb4)) {
+            linkData = GetMobyPrivateValue0(*(char **)(record + 0xb4));
+            if (linkData) {
+                ComputeViewDirection(*(char **)(record + 0xb4) + 0x10, offsetVec, 1);
+                FastVecScale(offsetVec, offsetVec, *(float *)(linkData + 0x10));
+                FastVecAdd(offsetVec, offsetVec, *(char **)(record + 0xb4) + 0x10);
+                FastVecAdd(currentPos, offsetVec, currentPos);
+            } else qcopy(currentPos, *(char **)(record + 0xb4) + 0x10);
         }
-        if (*(int *)(p + 0xb8)) {
-            *(float *)(p + 96) = func_00283B98(*(float *)(p + 96), *(float *)(p + 108) * 100.0f);
-            *(float *)(p + 100) = func_00283B98(*(float *)(p + 100), *(float *)(p + 112) * 100.0f);
-            *(float *)(p + 104) = func_00283B98(*(float *)(p + 104), *(float *)(p + 116) * 100.0f);
-            *(float *)(p + 132) = func_00283B98(*(float *)(p + 132), *(float *)(p + 144) * 100.0f);
-            *(float *)(p + 136) = func_00283B98(*(float *)(p + 136), *(float *)(p + 148) * 100.0f);
-            *(float *)(p + 140) = func_00283B98(*(float *)(p + 140), *(float *)(p + 152) * 100.0f);
+        if (*(int *)(record + 0xb8)) {
+            *(float *)(record + 96) = FastAddRotations(*(float *)(record + 96), *(float *)(record + 108) * 100.0f);
+            *(float *)(record + 100) = FastAddRotations(*(float *)(record + 100), *(float *)(record + 112) * 100.0f);
+            *(float *)(record + 104) = FastAddRotations(*(float *)(record + 104), *(float *)(record + 116) * 100.0f);
+            *(float *)(record + 132) = FastAddRotations(*(float *)(record + 132), *(float *)(record + 144) * 100.0f);
+            *(float *)(record + 136) = FastAddRotations(*(float *)(record + 136), *(float *)(record + 148) * 100.0f);
+            *(float *)(record + 140) = FastAddRotations(*(float *)(record + 140), *(float *)(record + 152) * 100.0f);
         } else {
-            *(float *)(p + 96) = func_00283B98(*(float *)(p + 96), *(float *)(p + 108));
-            *(float *)(p + 100) = func_00283B98(*(float *)(p + 100), *(float *)(p + 112));
-            *(float *)(p + 104) = func_00283B98(*(float *)(p + 104), *(float *)(p + 116));
-            *(float *)(p + 132) = func_00283B98(*(float *)(p + 132), *(float *)(p + 144));
-            *(float *)(p + 136) = func_00283B98(*(float *)(p + 136), *(float *)(p + 148));
-            *(float *)(p + 140) = func_00283B98(*(float *)(p + 140), *(float *)(p + 152));
+            *(float *)(record + 96) = FastAddRotations(*(float *)(record + 96), *(float *)(record + 108));
+            *(float *)(record + 100) = FastAddRotations(*(float *)(record + 100), *(float *)(record + 112));
+            *(float *)(record + 104) = FastAddRotations(*(float *)(record + 104), *(float *)(record + 116));
+            *(float *)(record + 132) = FastAddRotations(*(float *)(record + 132), *(float *)(record + 144));
+            *(float *)(record + 136) = FastAddRotations(*(float *)(record + 136), *(float *)(record + 148));
+            *(float *)(record + 140) = FastAddRotations(*(float *)(record + 140), *(float *)(record + 152));
         }
-        *(float *)(p + 0) = func_00283180(*(float *)(p + 96)) * *(float *)(p + 120);
-        *(float *)(p + 4) = func_00283198(*(float *)(p + 100)) * *(float *)(p + 124);
-        *(float *)(p + 8) = -func_00283198(*(float *)(p + 104)) * *(float *)(p + 128);
-        *(float *)(p + 16) = func_00283180(*(float *)(p + 132)) * *(float *)(p + 156);
-        *(float *)(p + 20) = func_00283198(*(float *)(p + 136)) * *(float *)(p + 160);
-        *(float *)(p + 24) = -func_00283198(*(float *)(p + 140)) * *(float *)(p + 164);
-        qcopy(p + 0x30, p + 0x50);
-        if (*(char **)(p + 0xb0)) {
-            node = func_002AB1F0(*(char **)(p + 0xb0));
-            if (node) {
-                func_002AFFD8(*(char **)(p + 0xb0) + 0x10, temp, 1);
-                func_00282D30(temp, temp, *(float *)(node + 0x10));
-                func_00282CC0(temp, temp, *(char **)(p + 0xb0) + 0x10);
-                func_00282CC0(p + 0x30, temp, p + 0x30);
-            } else qcopy(p + 0x30, *(char **)(p + 0xb0) + 0x10);
+        *(float *)(record + 0) = FastSinOrCosA(*(float *)(record + 96)) * *(float *)(record + 120);
+        *(float *)(record + 4) = FastSinOrCosB(*(float *)(record + 100)) * *(float *)(record + 124);
+        *(float *)(record + 8) = -FastSinOrCosB(*(float *)(record + 104)) * *(float *)(record + 128);
+        *(float *)(record + 16) = FastSinOrCosA(*(float *)(record + 132)) * *(float *)(record + 156);
+        *(float *)(record + 20) = FastSinOrCosB(*(float *)(record + 136)) * *(float *)(record + 160);
+        *(float *)(record + 24) = -FastSinOrCosB(*(float *)(record + 140)) * *(float *)(record + 164);
+        qcopy(record + 0x30, record + 0x50);
+        if (*(char **)(record + 0xb0)) {
+            linkData = GetMobyPrivateValue0(*(char **)(record + 0xb0));
+            if (linkData) {
+                ComputeViewDirection(*(char **)(record + 0xb0) + 0x10, offsetVec, 1);
+                FastVecScale(offsetVec, offsetVec, *(float *)(linkData + 0x10));
+                FastVecAdd(offsetVec, offsetVec, *(char **)(record + 0xb0) + 0x10);
+                FastVecAdd(record + 0x30, offsetVec, record + 0x30);
+            } else qcopy(record + 0x30, *(char **)(record + 0xb0) + 0x10);
         }
-        first = p + 0x30;
-        q = p;
-        fraction = func_00283CE0(*(int *)(q + 0xb8));
-        fraction /= func_00283CE0(*(int *)(q + 0xbc));
-        second = q + 0x20;
-        func_00282D08(first, second, first, 1.0f - fraction);
-        if (!func_00282948(q + 0xb8)) continue;
-        if (*(int *)(*(char **)(q + 0xb0) + 0x98) && !*(int *)(q + 0xc0) && *(int *)(q + 0xc4)) {
-            func_00282CF0(temp, first, second);
-            func_00282F20(temp, temp, 0.033333335f);
-            amount = *(float *)(q + 0xc8);
-            *(int *)(object + 0xb8) = *(int *)(*(char **)(q + 0xcc) + 0x20);
-            func_002A8C00(event, object, 0x210000, temp, amount);
-            event[0x18] = 5;
-            event[0x19] = 3;
-            *(short *)(event + 0x1a) = *(short *)(object + 0xaa);
-            func_002A8E20(*(char **)(q + 0xb0), event);
-            *(int *)(q + 0xc0) = 1;
-            func_L00_00412928(first, 10, 1);
+        currentPos = record + 0x30;
+        activeRecord = record;
+        fraction = IntToFloat(*(int *)(activeRecord + 0xb8));
+        fraction /= IntToFloat(*(int *)(activeRecord + 0xbc));
+        startPos = activeRecord + 0x20;
+        lerp_vector(currentPos, startPos, currentPos, 1.0f - fraction);
+        if (!FastFloatHelperD(activeRecord + 0xb8)) continue;
+        if (*(int *)(*(char **)(activeRecord + 0xb0) + 0x98) && !*(int *)(activeRecord + 0xc0) && *(int *)(activeRecord + 0xc4)) {
+            FastVecSub(offsetVec, currentPos, startPos);
+            vec_scale_to_length(offsetVec, offsetVec, 0.033333335f);
+            amount = *(float *)(activeRecord + 0xc8);
+            *(int *)(moby + 0xb8) = *(int *)(*(char **)(activeRecord + 0xcc) + 0x20);
+            make_hit_descriptor(hitEvent, moby, 0x210000, offsetVec, amount);
+            hitEvent[0x18] = 5;
+            hitEvent[0x19] = 3;
+            *(short *)(hitEvent + 0x1a) = *(short *)(moby + 0xaa);
+            QueueMobyImpact(*(char **)(activeRecord + 0xb0), hitEvent);
+            *(int *)(activeRecord + 0xc0) = 1;
+            EmitSparkParticlePairs(currentPos, 10, 1);
         }
-        if (func_00282948(q + 0xa8)) *(int *)(q + 0xac) = 0;
+        if (FastFloatHelperD(activeRecord + 0xa8)) *(int *)(activeRecord + 0xac) = 0;
     }
 }
 
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_00412088(char *p)
+void func_L00_00412088(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* func_L00_00412110 is defined in L00_00412110.c. */
@@ -436,12 +443,13 @@ void func_L00_00412088(char *p)
 /* func_L00_00412230 is defined in x-qcopy.c. */
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
-void func_L00_00412408(Vec16_Fc936841d *object, int index)
+/* Works out the next point of a curve from the two points before it. */
+void func_L00_00412408(Vec16_Fc936841d *points, int index)
 {
-    char local[16];
+    char delta[16];
 
-    func_00282CF0_9(local, (char *)&object[index - 2], (char *)&object[index - 3]);
-    func_00282CC0_15((char *)&object[index - 1], (char *)&object[index - 2], local);
+    func_00282CF0_9(delta, (char *)&points[index - 2], (char *)&points[index - 3]);
+    func_00282CC0_15((char *)&points[index - 1], (char *)&points[index - 2], delta);
 }
 
 /* func_L00_00412470 is defined in L00_00412470.c. */

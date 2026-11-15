@@ -13,33 +13,34 @@ extern void func_002A0F48(char *a);
 extern char *func_L09_003364E0(char *object, int a1, u32 a2, int a3, float f12, float f13);
 
 
-char *func_L09_003A06B0(char *object, char *a1, char *a2, float f12)
+/* Creates a small moving effect object at a position, aims it along a direction and returns it. */
+char *func_L09_003A06B0(char *object, char *direction, char *position, float speed)
 {
-    char *s1 = func_0029EFD0(0x3A6);
-    char *s0;
-    float d;
+    char *spawned = CreateMoby(0x3A6 /* moby class 934 */);
+    char *vars;
+    float length;
 
-    if (s1 != 0) {
-        *(u8 *)(s1 + 0x30) = 0xFF;
-        *(u16 *)(s1 + 0x32) = 0xFF;
-        *(u8 *)(s1 + 0x31) = 1;
-        *(u8 *)(s1 + 0x20) = 0;
-        *(u64 *)(s1 + 0x38) = *(u64 *)(object + 0x38);
-        qcopy(s1 + 0x10, a2);
-        s0 = *(char **)(s1 + 0x68);
-        qcopy(s0, a1);
-        *(char **)(s0 + 0x3C) = object;
-        *(u32 *)(s0 + 0x38) = 0xF0;
-        *(float *)(s0 + 0x40) = f12;
-        *(float *)(s1 + 0xF8) = func_00283248(*(float *)a1, *(float *)(a1 + 4));
-        d = func_00282E20(a1);
-        *(float *)(s1 + 0xF4) =
-            -func_00283248(d, *(float *)(a1 + 8));
-        *(char **)(s0 + 0x48) =
-            func_L09_003364E0(s1, -1, 0xF0208080, 0x60, 0.1f, 0.01f);
-        func_002A0F48(s1);
-        *(u8 *)(s1 + 0x31) = 0;
-        *(u16 *)(s1 + 0x34) |= 1;
+    if (spawned != 0) {
+        *(u8 *)(spawned + 0x30) = 0xFF;
+        *(u16 *)(spawned + 0x32) = 0xFF;
+        *(u8 *)(spawned + 0x31) = 1;
+        *(u8 *)(spawned + 0x20) = 0;
+        *(u64 *)(spawned + 0x38) = *(u64 *)(object + 0x38);
+        qcopy(spawned + 0x10, position);
+        vars = *(char **)(spawned + 0x68);
+        qcopy(vars, direction);
+        *(char **)(vars + 0x3C) = object;
+        *(u32 *)(vars + 0x38) = 0xF0;
+        *(float *)(vars + 0x40) = speed;
+        *(float *)(spawned + 0xF8) = FastMatrixHelperA(*(float *)direction, *(float *)(direction + 4));
+        length = vec_length_xy(direction);
+        *(float *)(spawned + 0xF4) =
+            -FastMatrixHelperA(length, *(float *)(direction + 8));
+        *(char **)(vars + 0x48) =
+            SpawnSizedParticle(spawned, -1, 0xF0208080, 0x60, 0.1f, 0.01f);
+        func_002A0F48(spawned);
+        *(u8 *)(spawned + 0x31) = 0;
+        *(u16 *)(spawned + 0x34) |= 1;
     }
-    return s1;
+    return spawned;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char D_00189E20[];
 
@@ -28,7 +29,7 @@ int func_L23_0041D1F0(char *obj, int unused, int mode, int flag) {
     switch (mode) {
     case 0:
         if (flag) {
-            char *g = D_00189E20;
+            char *g = gHeroState;
 
             if (*(int *)(g + 0x1874) < *(short *)(state + 0x2F4)) {
                 *(int *)(g + 0x1874) = *(int *)(g + 0x1874) + *(short *)(state + 0x2F0);

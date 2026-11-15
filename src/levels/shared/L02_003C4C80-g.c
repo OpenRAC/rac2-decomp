@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int a;
@@ -44,25 +45,25 @@ void func_L02_003C4C80(L02Owner *self)
     float t;
 
     for (i = 1; i >= 0; i--) {
-        *angle = func_00283B98(*angle, *step * 0.00029088824f);
+        *angle = FastAddRotations(*angle, *step * 0.00029088824f);
         angle++;
         step++;
     }
     if (self->kind == 5) {
-        t = func_00283198(*(float *)(state + 0x128));
-        t = t + func_00283198(*(float *)(state + 0x12C));
+        t = FastSinOrCosB(*(float *)(state + 0x128));
+        t = t + FastSinOrCosB(*(float *)(state + 0x12C));
         t = t * 0.25f;
-        self->tint = func_00283D38(high.a, high.b, t + 0.5f);
+        self->tint = FastTweenColor(high.a, high.b, t + 0.5f);
     } else {
-        a = func_00283198(*(float *)(state + 0x128)) * 0.5f + 0.5f;
-        b = func_00283198(*(float *)(state + 0x12C)) * 0.5f + 0.5f;
+        a = FastSinOrCosB(*(float *)(state + 0x128)) * 0.5f + 0.5f;
+        b = FastSinOrCosB(*(float *)(state + 0x12C)) * 0.5f + 0.5f;
         if (a < b)
             a = b;
         {
             float u = a;
             for (j = 2; j >= 0; j--)
                 u = u * a;
-            self->tint = func_00283D38(low.a, low.b, u);
+            self->tint = FastTweenColor(low.a, low.b, u);
         }
     }
 }

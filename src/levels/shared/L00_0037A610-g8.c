@@ -124,12 +124,12 @@ void func_L00_0037A610(void)
     int ids[4];
     Pair pair;
     unsigned char matrices[128] __attribute__((aligned(16)));
-    int r, g, b, color;
+    int red, green, blue, color;
     float scale;
-    int c;
-    func_00284F40(0);
+    int handle;
+    AppendDrawListBufferTag(0);
     D_L00_001BD370[0] = 0.62f;
-    func_0027AB40();
+    UpdateViewContext();
 
     switch (menu->state) {
     case 0:
@@ -138,20 +138,20 @@ void func_L00_0037A610(void)
         D_L00_001B18D4 = 0x100ff;
         if (menu->initialize)
             D_L00_001B18D4 = 127;
-        func_0027BD70();
+        RenderFrame();
         *(unsigned short *)(menu->moby + 0x34) &= 0xfffe;
         if (!menu->initialize)
             break;
         {
             menu->state = 1;
             menu->initialize = 0;
-            func_002FC3C0(1);
-            func_001261F0(0);
+            WaitForDmaStatusBits(1);
+            GetGsCurrentField(0);
             D_L00_001B18D8 = D_L00_001B18D8 + 1;
-            func_002FC280();
-            func_002FC220();
+            SubmitBufferedDmaChain();
+            SwapPacketBuffer();
             D_L00_001B2610 = 0x60000;
-            func_L00_002E73E0(menu->capture);
+            DrawItemWithPass(menu->capture);
             if (menu->use_camera) {
                 qcopy(&menu->saved, D_L00_001B8DD0);
                 /* Save the three camera basis vectors before resetting the view. */
@@ -169,7 +169,7 @@ void func_L00_0037A610(void)
                 D_L00_001B8C80.y = 1;
                 D_L00_001B8C80.z = 1;
                 D_L00_001B8C80.w = 1;
-                func_00279D18();
+                BuildViewMatrices();
             }
             {
                 char * base = menu->buffer;
@@ -177,25 +177,25 @@ void func_L00_0037A610(void)
                 menu->preview0 = base;
                 menu->models = base + 0x1000;
                 menu->text = base + 0x2400;
-                func_00282A88(base + 0x2400, 0x400);
+                FastMemoryHelperB(base + 0x2400, 0x400);
             }
             menu->field94 = 0;
             menu->field90 = 0;
             menu->end = menu->text + 0x400;
-            func_002FB1A0();
+            PrepareVendorSelectionPreview();
         }
         /* Initialization falls through into the first rendered frame. */
     case 1:
-        func_002FC990(menu->capture, D_001A72DC[0], D_001A7344[0] << 11);
-        func_0027C540(0);
-        func_00279D18();
-        func_0027B858();
+        UploadImageToGsPackets(menu->capture, D_001A72DC[0], gScreenHeight[0] << 11);
+        SetupGifPaging(0);
+        BuildViewMatrices();
+        WriteClearColorPackets();
         if (D_L00_001AD570 >= 1.0f && menu->draw) {
-            func_002A0250();
-            func_002A01C8();
-            func_002A01F0();
+            DrawMobysSetup();
+            FillScratchArea();
+            SaveScratchArea();
         }
-        func_002FC560(0x42, 0x8000000044ULL);
+        VU1_addGSregister(0x42, 0x8000000044ULL);
         {
             float dr = (float)(D_L00_001B25F0[0] - D_L00_001B25E4[0]);
             float dg = (float)(D_L00_001B25F4[0] - D_L00_001B25E8[0]);
@@ -203,9 +203,9 @@ void func_L00_0037A610(void)
             float fr = (float)D_L00_001B25E4[0] + dr * D_L00_001AD570;
             float fb = (float)D_L00_001B25EC[0] + db * D_L00_001AD570;
             float fg = (float)D_L00_001B25E8[0] + dg * D_L00_001AD570;
-            r = (int)fr;
-            g = (int)fg;
-            b = (int)fb;
+            red = (int)fr;
+            green = (int)fg;
+            blue = (int)fb;
         }
         scale = D_L00_001AD574 + (D_L00_001AD578 - D_L00_001AD574) * D_L00_001AD570;
         if (menu->mode == 0) {
@@ -228,96 +228,96 @@ void func_L00_0037A610(void)
             ids[1] = 0x7a;
             ids[2] = 0x7b;
         }
-        c = func_00336D50(D_L00_001A904C + 0x8710, ids[0]);
-        func_00300A00(c, (r << 24) | 0x442d00, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
-        c = func_00336D50(D_L00_001A904C + 0x8710, ids[1]);
-        func_00300A00(c, (g << 24) | 0x241700, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
-        c = func_00336D50(D_L00_001A904C + 0x8710, ids[2]);
-        color = (b << 24) | 0xf0c070;
-        func_00300A00(c, color, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
+        handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[0]);
+        DrawScaledObjectTwoAxes(handle, (red << 24) | 0x442d00, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
+        handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[1]);
+        DrawScaledObjectTwoAxes(handle, (green << 24) | 0x241700, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
+        handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[2]);
+        color = (blue << 24) | 0xf0c070;
+        DrawScaledObjectTwoAxes(handle, color, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
         if (menu->mode != 1) {
-            c = func_00336D50(D_L00_001A904C + 0x8710, ids[3]);
-            func_00300A00(c, color, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
+            handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[3]);
+            DrawScaledObjectTwoAxes(handle, color, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
         }
-        func_0028E458();
-        func_0029BF08();
+        UpdateHudRecordHandlers();
+        RunLevelCallbacksAndDraw();
         if (D_L00_001AD570 >= 1.0f) {
             ref_L00_0037A610_00();
             if (menu->mode == 0) {
-                func_002FA880();
-                func_L00_00377C50();
-                func_L00_00378818();
-                func_002F9C80();
-                func_L00_00375718();
+                DrawVendorPurchasePrompt();
+                DrawPurchaseActionPrompts();
+                DrawVendorPurchasePanel();
+                DrawVendorItemSelectList();
+                DrawScrollingHelpText();
                 if (menu->auxiliary)
-                    func_002FAE68();
+                    StepShopMessageStates();
                 if (menu->draw) {
-                    func_002FC620(158, 360, 115, 206);
-                    func_002A0300(menu->models, 1);
-                    func_002A0220();
-                    func_002A0380();
+                    SetGsScissorClamped(158, 360, 115, 206);
+                    UploadObjectTextures(menu->models, 1);
+                    RestoreScratchArea();
+                    RunTextureUploadAndSetup();
                 }
             } else if (menu->mode == 3) {
-                func_L00_00377330();
-                func_L00_003781B0();
-                func_L00_00378C18();
-                func_L00_00376600();
-                func_L00_00375718();
+                DrawSelectedItemPriceAndDescription();
+                DrawItemPurchaseButtonLabels();
+                DrawPurchaseAffordabilityPrompt();
+                DrawItemIconStrip();
+                DrawScrollingHelpText();
                 if (menu->draw) {
-                    func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
-                    func_L00_002D5000(menu->models, menu->models + 0x100);
+                    SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
+                    InitRecordFromObject(menu->models, menu->models + 0x100);
                     pair = D_L00_001AD858[0];
-                    func_L00_003116A8(menu->models, 2, &pair, matrices);
+                    TransformMatrixArray(menu->models, 2, &pair, matrices);
                     {
                         char * models = menu->models;
                         qcopy(models + 0x210, matrices + 0x30);
                         qcopy(models + 0x310, matrices + 0x70);
                         func_002A0F48(models + 0x200);
                     }
-                    func_00283678(menu->models + 0x2c0, matrices);
-                    func_00283678(menu->models + 0x3c0, matrices + 0x40);
+                    copy_matrix3x4(menu->models + 0x2c0, matrices);
+                    copy_matrix3x4(menu->models + 0x3c0, matrices + 0x40);
                     func_002A10E8(menu->models + 0x200);
                     func_002A10E8(menu->models + 0x300);
-                    func_002A0300(menu->models, menu->count + 2);
-                    func_002A0220();
-                    func_002A0380();
+                    UploadObjectTextures(menu->models, menu->count + 2);
+                    RestoreScratchArea();
+                    RunTextureUploadAndSetup();
                 }
             } else if (menu->mode == 2) {
-                func_L00_00378578();
-                func_L00_00378E90();
-                func_L00_003769C0();
-                func_L00_00375718();
+                DrawSelectedItemPurchasePanel();
+                DrawItemLimitTextBox();
+                DrawVendorItemList();
+                DrawScrollingHelpText();
                 if (menu->draw) {
-                    func_002FC620(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
-                    c = func_002A9588(0xffffff, 0x606060, 30, 1, 0);
+                    SetGsScissorClamped(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
+                    handle = PingPongBlendValues(0xffffff, 0x606060, 30, 1, 0);
                     if (menu->selected0 != -1)
-                        func_002A0468(menu->models + (menu->selected0 << 8), c, 14, 14, 0);
+                        PackRenderCommandFields(menu->models + (menu->selected0 << 8), handle, 14, 14, 0);
                     if (menu->selected1 != -1)
-                        func_002A0468(menu->models + (menu->selected1 << 8), c, 14, 14, 0);
-                    func_002A0300(menu->models, menu->count);
-                    func_002A0220();
-                    func_002A0380();
-                    func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
-                    func_L00_003778F0();
+                        PackRenderCommandFields(menu->models + (menu->selected1 << 8), handle, 14, 14, 0);
+                    UploadObjectTextures(menu->models, menu->count);
+                    RestoreScratchArea();
+                    RunTextureUploadAndSetup();
+                    SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
+                    DrawSelectedItemInfoPanel();
                 }
             } else if (menu->mode == 1) {
-                func_L00_00377580();
-                func_L00_00378388();
-                func_L00_00378DE0();
-                func_002FA270();
-                func_L00_00375718();
+                DrawUpgradePriceLines();
+                DrawBuyBackLabelsByBolts();
+                DrawSelectedItemLimitStatus();
+                DrawAmmoSelectList();
+                DrawScrollingHelpText();
                 if (menu->draw) {
-                    func_002FC620(158, 360, 115, 206);
-                    func_002A0300(menu->models, 1);
-                    func_002A0220();
-                    func_002A0380();
+                    SetGsScissorClamped(158, 360, 115, 206);
+                    UploadObjectTextures(menu->models, 1);
+                    RestoreScratchArea();
+                    RunTextureUploadAndSetup();
                 }
             }
-            func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
+            SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
         }
-        func_0027C660();
-        func_002FC3C0(16);
-        func_0029FEE0();
+        DoGifPaging();
+        WaitForDmaStatusBits(16);
+        PatchMobyGifs();
         break;
     }
 }

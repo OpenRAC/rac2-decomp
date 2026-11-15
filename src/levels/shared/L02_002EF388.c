@@ -31,7 +31,7 @@ int func_L02_002EF388(u8 *object, TI128 *position, TI128 *rotation, u8 **links, 
         float full[16];
         struct { float rows[12]; float angles[4]; } view;
     } rotationWork __attribute__((aligned(16)));
-    u8 *fused = func_0029EFD0(0x9BB);
+    u8 *fused = CreateMoby(0x9BB /* moby class 2491 */);
     FuseData *data;
     u8 *originalMatrix;
     int i;
@@ -42,19 +42,19 @@ int func_L02_002EF388(u8 *object, TI128 *position, TI128 *rotation, u8 **links, 
     data = *(FuseData **)(fused + 0x68);
     data->owner[0] = object;
     data->flags[0] = *(u16 *)(object + 0x34);
-    data->handle[0] = func_L02_003272D8((char *)object);
-    func_00283698(inverse, object + 0xC0);
+    data->handle[0] = PackObjectHandle((char *)object);
+    matrix_from_basis_rows(inverse, object + 0xC0);
     for (i = 0; i < count && i < 3; i++) {
         if (links[i]) {
             data->owner[i + 1] = links[i];
             data->flags[i + 1] = *(u16 *)(links[i] + 0x34);
-            data->handle[i + 1] = func_L02_003272D8((char *)links[i]);
-            func_00282CF0(relative, links[i] + 0x10, (TI128 *)(object + 0x10));
-            func_00283098(relative, relative, inverse);
-            func_002AE730(relative, &data->offset[i]);
-            func_00283738(rotationWork.full, inverse, links[i] + 0xC0);
-            func_002AB6D8(rotationWork.full, rotationWork.view.angles);
-            func_002AE730(rotationWork.view.angles, &data->angle[i]);
+            data->handle[i + 1] = PackObjectHandle((char *)links[i]);
+            FastVecSub(relative, links[i] + 0x10, (TI128 *)(object + 0x10));
+            matrix_mul_vec3(relative, relative, inverse);
+            PackDirectionVector(relative, &data->offset[i]);
+            multiply_matrix3x3(rotationWork.full, inverse, links[i] + 0xC0);
+            GetEulerAnglesFromMatrix(rotationWork.full, rotationWork.view.angles);
+            PackDirectionVector(rotationWork.view.angles, &data->angle[i]);
             *(u16 *)(links[i] + 0x34) |= 0x102;
             *(u16 *)(links[i] + 0x34) |= 1;
             links[i][0x31] = 0;
@@ -63,7 +63,7 @@ int func_L02_002EF388(u8 *object, TI128 *position, TI128 *rotation, u8 **links, 
     }
     qcopy((TI128 *)(object + 0x10), position);
     qcopy((TI128 *)(object + 0xF0), rotation);
-    func_002833F0(object + 0xC0, (TI128 *)(object + 0xF0));
+    euler_rotation_basis(object + 0xC0, (TI128 *)(object + 0xF0));
     *(int *)(object + 0x98) = 0;
     object[0x31] = 0;
     *(u16 *)(object + 0x34) |= 0x103;

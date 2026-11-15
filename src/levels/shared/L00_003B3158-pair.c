@@ -86,66 +86,66 @@ void func_L00_003B6B70(Moby *object)
     Moby *actor;
     int i;
 
-    axes[0] = -D_00138180.analog[2];
-    if (D_00138180.held & PAD_LEFT)
+    axes[0] = -gPadState.analog[2];
+    if (gPadState.held & PAD_LEFT)
         axes[0] = 1.0f;
-    else if (D_00138180.held & PAD_RIGHT)
+    else if (gPadState.held & PAD_RIGHT)
         axes[0] = -1.0f;
     axes[1] = -D_00138500.analog[2];
     if (D_00138500.held & PAD_LEFT)
         axes[1] = 1.0f;
     else if (D_00138500.held & PAD_RIGHT)
         axes[1] = -1.0f;
-    held[0] = D_00138180.held;
+    held[0] = gPadState.held;
     held[1] = D_00138500.held;
-    pressed[0] = D_00138180.pressed;
+    pressed[0] = gPadState.pressed;
     pressed[1] = D_00138500.pressed;
 
-    func_00283698(inverse, D_L00_001B8FF0);
+    matrix_from_basis_rows(inverse, D_L00_001B8FF0);
     for (i = 0; i < 2; ++i) {
         actor = context->actors[i];
         if (actor->modeBits & 1)
             continue;
 
         /* Turn by the stick (degrees per second to radians per frame). */
-        func_002AA2E8(&context->steering[i], D_L00_001AFAA8 * (axes[i] * 0.00029088825f),
+        ApproachValue(&context->steering[i], D_L00_001AFAA8 * (axes[i] * 0.00029088825f),
                       D_L00_001AFAAC * 0.0000048481375f);
-        actor->rotation[2] = func_00283B98(actor->rotation[2], context->steering[i]);
+        actor->rotation[2] = FastAddRotations(actor->rotation[2], context->steering[i]);
 
         /* Thrust along the actor's forward axis while cross is held. */
         if (held[i] & PAD_CROSS) {
-            func_00283098(&impulse, actor->matrix[0], inverse);
-            func_00282F20(&impulse, &impulse, D_L00_001AFAB0 * 0.00027777778f);
+            matrix_mul_vec3(&impulse, actor->matrix[0], inverse);
+            vec_scale_to_length(&impulse, &impulse, D_L00_001AFAB0 * 0.00027777778f);
             impulse.v[0] = 0.0f;
-            func_00282CC0(&context->velocities[i], &context->velocities[i], &impulse);
+            FastVecAdd(&context->velocities[i], &context->velocities[i], &impulse);
             local.q = 0;
             local.v[0] = -0.4f;
-            func_00283098(&local, &local, actor->matrix);
-            func_00282CC0(&local, &local, actor->position);
-            func_L00_003B74A8(actor, &local);
+            matrix_mul_vec3(&local, &local, actor->matrix);
+            FastVecAdd(&local, &local, actor->position);
+            SpawnTwoColoredSparkles(actor, &local);
         }
 
         /* Fire on circle or square once the reload timer has run out. */
-        if (!context->phase && func_00282948(&context->timers[i])
+        if (!context->phase && FastFloatHelperD(&context->timers[i])
             && (pressed[i] & (PAD_CIRCLE | PAD_SQUARE))) {
             muzzle.q = 0;
             muzzle.v[1] = context->velocities[i].v[1];
             muzzle.v[2] = context->velocities[i].v[2];
             local.q = muzzle.q;
-            func_00283098(&muzzle, &D_L00_001AFAC0, actor->matrix);
-            func_00282CC0(&muzzle, &muzzle, actor->position);
-            func_00282F20(&impulse, actor->matrix[0], D_L00_001AFAB8 * 0.016666668f);
-            func_00283098(&local, &local, D_L00_001B8FF0);
-            func_00282CC0(&impulse, &impulse, &local);
-            func_L00_003B7410(actor, &muzzle, &impulse, (void *)i);
+            matrix_mul_vec3(&muzzle, &D_L00_001AFAC0, actor->matrix);
+            FastVecAdd(&muzzle, &muzzle, actor->position);
+            vec_scale_to_length(&impulse, actor->matrix[0], D_L00_001AFAB8 * 0.016666668f);
+            matrix_mul_vec3(&local, &local, D_L00_001B8FF0);
+            FastVecAdd(&impulse, &impulse, &local);
+            SpawnPairGameShot(actor, &muzzle, &impulse, (void *)i);
             context->timers[i] = D_L00_001AFA48;
         }
 
         /* Pull toward the centre, cap the speed and move. */
-        func_L00_003B7260(context->positions[i].v[1], context->positions[i].v[2],
+        ApplyCentrePullToVelocity(context->positions[i].v[1], context->positions[i].v[2],
                           D_L00_001AFA40 * 0.00027777778f,
                           &context->velocities[i].v[1], &context->velocities[i].v[2]);
-        func_002AC9F8(context->velocities[i].v, D_L00_001AFAB4 * 0.016666668f);
-        func_00282CC0(&context->positions[i], &context->positions[i], &context->velocities[i]);
+        ClampVectorLength(context->velocities[i].v, D_L00_001AFAB4 * 0.016666668f);
+        FastVecAdd(&context->positions[i], &context->positions[i], &context->velocities[i]);
     }
 }

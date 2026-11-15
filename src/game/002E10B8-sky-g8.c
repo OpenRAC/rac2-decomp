@@ -39,6 +39,7 @@ extern void func_0029CF58(int, int, int);
 extern void func_0029CF78(void);
 extern void func_002FC560(int, long);
 
+/* Draws the textured pieces of the sky, loading each piece into fast memory while the previous one is drawn. */
 void func_002E3998(Sky *sky)
 {
     int count = sky->count;
@@ -47,21 +48,21 @@ void func_002E3998(Sky *sky)
 
     if (count == 0)
         return;
-    func_002E4388((char *)sky + 0x10, count, visible);
-    *(int *)(D_001B22A8 + 0) = 0x30000007;
-    *(int *)(D_001B22A8 + 4) = (int)D_00139370;
-    *(int *)(D_001B22A8 + 8) = 0;
-    *(int *)(D_001B22A8 + 0xC) = 0x50000007;
-    D_001B22A8 = D_001B22A8 + 16;
+    TransformVectorsVu0Alt((char *)sky + 0x10, count, visible);
+    *(int *)(gDmaPacketCursor + 0) = 0x30000007;
+    *(int *)(gDmaPacketCursor + 4) = (int)D_00139370;
+    *(int *)(gDmaPacketCursor + 8) = 0;
+    *(int *)(gDmaPacketCursor + 0xC) = 0x50000007;
+    gDmaPacketCursor = gDmaPacketCursor + 16;
     D_001ABDE0 = 1 - D_001ABDE0;
     if (visible[0] == 1)
-        func_0029CF58(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
+        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
     for (i = 0; i < sky->count; i++) {
         if (visible[i] == 1)
-            func_0029CF78();
+            DmaToSprSync();
         D_001ABDE0 = 1 - D_001ABDE0;
         if (i + 1 < sky->count && visible[i + 1] == 1)
-            func_0029CF58(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
+            DmaToSpr(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
                           D_001ABDD8[D_001ABDE0]);
         if (visible[i] == 1) {
             int base = D_001ABDD8[1 - D_001ABDE0];
@@ -72,12 +73,13 @@ void func_002E3998(Sky *sky)
             st = PIECE(sky, i)->face_data;
             face_list = base + faces;
             st_list = base + st;
-            if (func_002E3E54(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
-                func_002E40C8(PIECE(sky, i)->face_count, face_list, st_list, SKY_VERTEX_RECORDS);
+            if (ProcessRenderEntryA(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
+                ProcessRenderEntryC(PIECE(sky, i)->face_count, face_list, st_list, SKY_VERTEX_RECORDS);
         }
     }
 }
 
+/* Draws the colour-shaded pieces of the sky, loading each piece into fast memory while the previous one is drawn. */
 void func_002E3BD8(Sky *sky)
 {
     int count = sky->count;
@@ -86,21 +88,21 @@ void func_002E3BD8(Sky *sky)
 
     if (count == 0)
         return;
-    func_002E4388((char *)sky + 0x10, count, visible);
-    *(int *)(D_001B22A8 + 0) = 0x30000007;
-    *(int *)(D_001B22A8 + 4) = (int)D_00139300;
-    *(int *)(D_001B22A8 + 8) = 0;
-    *(int *)(D_001B22A8 + 0xC) = 0x50000007;
-    D_001B22A8 = D_001B22A8 + 16;
+    TransformVectorsVu0Alt((char *)sky + 0x10, count, visible);
+    *(int *)(gDmaPacketCursor + 0) = 0x30000007;
+    *(int *)(gDmaPacketCursor + 4) = (int)D_00139300;
+    *(int *)(gDmaPacketCursor + 8) = 0;
+    *(int *)(gDmaPacketCursor + 0xC) = 0x50000007;
+    gDmaPacketCursor = gDmaPacketCursor + 16;
     D_001ABDE0 = 1 - D_001ABDE0;
     if (visible[0] == 1)
-        func_0029CF58(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
+        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
     for (i = 0; i < sky->count; i++) {
         if (visible[i] == 1)
-            func_0029CF78();
+            DmaToSprSync();
         D_001ABDE0 = 1 - D_001ABDE0;
         if (i + 1 < sky->count && visible[i + 1] == 1)
-            func_0029CF58(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
+            DmaToSpr(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
                           D_001ABDD8[D_001ABDE0]);
         if (visible[i] == 1) {
             int base = D_001ABDD8[1 - D_001ABDE0];
@@ -111,10 +113,10 @@ void func_002E3BD8(Sky *sky)
             colours = PIECE(sky, i)->face_data;
             face_list = base + faces;
             colour_list = base + colours;
-            if (func_002E3E54(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
-                func_002E3FA0(PIECE(sky, i)->face_count, face_list, colour_list, SKY_VERTEX_RECORDS);
+            if (ProcessRenderEntryA(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
+                ProcessRenderEntryB(PIECE(sky, i)->face_count, face_list, colour_list, SKY_VERTEX_RECORDS);
         }
     }
-    func_002FC560(0x47, 0x3180B);
-    func_002FC560(0x4E, (long)(D_001A72E0 >> 13) | 0x1000000 | 0x100000000L);
+    VU1_addGSregister(0x47, 0x3180B);
+    VU1_addGSregister(0x4E, (long)(D_001A72E0 >> 13) | 0x1000000 | 0x100000000L);
 }

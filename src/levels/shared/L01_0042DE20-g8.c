@@ -24,10 +24,11 @@ extern char D_00188660[];
 extern float D_L01_001B1D7C __attribute__((sda));
 extern float D_001A7928 __attribute__((sda));
 
-void func_L01_0042DE20(char *m)
+/* Fades an ambient sound by how open to the sky the player's surroundings are. */
+void func_L01_0042DE20(char *moby)
 {
     float sample[4], radius[4], axis[4];
-    char *state = *(char **)(m + 8);
+    char *state = *(char **)(moby + 8);
     float exposedFraction = 0, angle = 0;
 
     radius[0] = 4;
@@ -38,9 +39,9 @@ void func_L01_0042DE20(char *m)
     axis[1] = 0;
     axis[2] = 1;
     do {
-        func_002ACEC0(sample, radius, axis, angle);
-        func_00282CC0(sample, D_L01_001B9380.pos, sample);
-        if (func_002B0520(sample) < D_L01_001B9380.pos[2])
+        ApplyAxisRotationToQuaternion(sample, radius, axis, angle);
+        FastVecAdd(sample, D_L01_001B9380.pos, sample);
+        if (GetHeightmapHeightAtPosition(sample) < D_L01_001B9380.pos[2])
             exposedFraction += 0.05f;
         angle += 0.3141592741012573f;
     } while (angle < 6.2831854820251465f);
@@ -54,14 +55,14 @@ void func_L01_0042DE20(char *m)
     else if (D_L01_001B1D7C < 0)
         D_L01_001B1D7C = 0;
 
-    if (((TransitionSoundSlot *)(D_00188660 + *(int *)(state + 8) * 0x70))->owner == m &&
-        ((TransitionSoundSlot *)(D_00188660 + *(int *)(state + 8) * 0x70))->active)
-        func_L01_00355BA0(*(int *)(state + 8),
+    if (((TransitionSoundSlot *)(gSoundState + *(int *)(state + 8) * 0x70))->owner == moby &&
+        ((TransitionSoundSlot *)(gSoundState + *(int *)(state + 8) * 0x70))->active)
+        SetSoundSlotField(*(int *)(state + 8),
                          (int)((*(float *)(state + 4) + D_L01_001B1D7C) /
                                (*(float *)(state + 4) + 1) * 1024));
-    qcopy_nc(((TransitionSoundSlot *)(D_00188660 + *(int *)(state + 8) * 0x70))->pos,
+    qcopy_nc(((TransitionSoundSlot *)(gSoundState + *(int *)(state + 8) * 0x70))->pos,
              D_L01_001B9380.pos);
-    if (((TransitionSoundSlot *)(D_00188660 + *(int *)(state + 8) * 0x70))->owner != m ||
-        !((TransitionSoundSlot *)(D_00188660 + *(int *)(state + 8) * 0x70))->active)
-        *(int *)(state + 8) = func_L00_0035F640(*(int *)state, 0x15, m, 0x400);
+    if (((TransitionSoundSlot *)(gSoundState + *(int *)(state + 8) * 0x70))->owner != moby ||
+        !((TransitionSoundSlot *)(gSoundState + *(int *)(state + 8) * 0x70))->active)
+        *(int *)(state + 8) = StartEffectFromTableEntry(*(int *)state, 0x15, moby, 0x400);
 }

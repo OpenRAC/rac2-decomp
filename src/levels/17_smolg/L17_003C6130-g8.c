@@ -96,9 +96,9 @@ static __inline__ void stopSound(u8 *object, PlatformVars *data)
     char *sound;
 
     if (data->sound != -1) {
-        sound = D_00188660 + data->sound * 0x70;
+        sound = gSoundState + data->sound * 0x70;
         if (*(u8 **)(sound + 0x88) == object && *(u8 *)(sound + 0x74))
-            func_002E59F8(data->sound);
+            StopSoundVoice(data->sound);
     }
     data->sound = -1;
 }
@@ -114,19 +114,19 @@ void func_L17_003C6130(u8 *object)
 
     u16 id;
     PlatformPathRow *exitRow;
-    func_L06_0036F728(object, func_L17_003C5DF0(object));
+    SetTableEntryField(object, IsRidePlatformCarrying(object));
     data->flags8C |= 1;
     data->flags3E |= 8;
     if (D_L17_001B0340) {
         int i;
-        for (i = 0; i < D_L17_001FE880[data->entryPaths[0]]->count; i++)
-            func_L03_00339128(&D_L17_001FE880[data->entryPaths[0]]->points[i],
+        for (i = 0; i < gPathTable_L17[data->entryPaths[0]]->count; i++)
+            CreateTimedEffectEntry(&gPathTable_L17[data->entryPaths[0]]->points[i],
                               object, 4, 0x800000FF, 0x7F, 2, 0xFF, 0.333f);
-        for (i = 0; i < D_L17_001FE880[data->middlePaths[0]]->count; i++)
-            func_L03_00339128(&D_L17_001FE880[data->middlePaths[0]]->points[i],
+        for (i = 0; i < gPathTable_L17[data->middlePaths[0]]->count; i++)
+            CreateTimedEffectEntry(&gPathTable_L17[data->middlePaths[0]]->points[i],
                               object, 4, 0x8000FF00, 0x7F, 2, 0xFF, 0.333f);
-        for (i = 0; i < D_L17_001FE880[data->exitPaths[0]]->count; i++)
-            func_L03_00339128(&D_L17_001FE880[data->exitPaths[0]]->points[i],
+        for (i = 0; i < gPathTable_L17[data->exitPaths[0]]->count; i++)
+            CreateTimedEffectEntry(&gPathTable_L17[data->exitPaths[0]]->points[i],
                               object, 4, 0x80FF0000, 0x7F, 2, 0xFF, 0.333f);
     }
     qcopy(&oldPosition, &moby->position);
@@ -134,14 +134,14 @@ void func_L17_003C6130(u8 *object)
     switch (moby->state) {
     case 0:
         if (data->entryPaths[0] != -1) {
-            PlatformPath *path = D_L17_001FE880[data->entryPaths[0]];
+            PlatformPath *path = gPathTable_L17[data->entryPaths[0]];
             qcopy(&moby->position, &path->points[0]);
-            moby->rotation.f[2] = func_00283248(path->points[1].f[0] - moby->position.f[0],
+            moby->rotation.f[2] = FastMatrixHelperA(path->points[1].f[0] - moby->position.f[0],
                                            path->points[1].f[1] - moby->position.f[1]);
         } else if (data->middlePaths[0] != -1) {
-            PlatformPath *path = D_L17_001FE880[data->middlePaths[0]];
+            PlatformPath *path = gPathTable_L17[data->middlePaths[0]];
             qcopy(&moby->position, &path->points[0]);
-            moby->rotation.f[2] = func_00283248(path->points[1].f[0] - moby->position.f[0],
+            moby->rotation.f[2] = FastMatrixHelperA(path->points[1].f[0] - moby->position.f[0],
                                            path->points[1].f[1] - moby->position.f[1]);
         }
         moby->timer = 0;
@@ -154,116 +154,116 @@ void func_L17_003C6130(u8 *object)
         id = moby->uid;
         if (D_L17_0021EBB0.collected[(s16)id]) goto destroy;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)];
+            int packed = D_0019B4A8[((s16)id >> 1) + (gCurrentMapIndex << 10)];
             if ((id & 1) ? ((packed >> 4) & 7) : (packed & 7)) {
         destroy:
-                func_0029F338(object);
+                MarkMobySpawned(object);
                 return;
             }
         }
         break;
     case 1: {
         int i;
-        if (data->enabled && (D_0019B2E8[moby->group + (D_001A79F0 << 4)] & 0x80)) {
+        if (data->enabled && (D_0019B2E8[moby->group + (gCurrentMapIndex << 4)] & 0x80)) {
             for (i = 0; i < 5; i++) {
                 if (data->triggers[i] != -1 || data->selection == i)
-                    func_L17_003C5F58(object);
+                    SelectRidePlatformEntry(object);
             }
         }
         break;
     }
     case 2:
         if (data->entryPaths[moby->choice] == -1 ||
-            func_L17_003C69A8(object, data->entryPaths[moby->choice], &data->sound)) {
+            MoveRidePlatformAlongPath(object, data->entryPaths[moby->choice], &data->sound)) {
             moby->state = 3;
             data->field114 = -1;
             data->startHeight = moby->position.f[2];
         }
         break;
     case 3:
-        func_002AAA00(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
+        ApproachTargetWithDirectionMode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
                      D_L17_001B034C * 4.848137450608192e-06f,
                      D_L17_001B034C * 4.848137450608192e-06f, 0.20943954586982727f, 0);
-        func_002AAA00(&moby->rotation, 0.0f, &data->yawSpeed,
+        ApproachTargetWithDirectionMode(&moby->rotation, 0.0f, &data->yawSpeed,
                      D_L17_001B0354 * 4.848137450608192e-06f,
                      D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
-        if (D_00189E20.groundObject == object && D_00189E20.mode34E == 0) {
-            func_002B0C28(10, 0x27ED, 1);
+        if (gHeroState.groundObject == object && gHeroState.mode34E == 0) {
+            TryClaimNotice(10, 0x27ED, 1);
             if (D_00138324 & 0x10) {
                 data->progress = 0;
                 moby->state = 4;
                 data->point = 1;
             }
-        } else func_L17_003C5F58(object);
+        } else SelectRidePlatformEntry(object);
         goto updateSound;
     case 4:
         moby->state = 5;
         stopSound(object, data);
         break;
     case 5:
-        if (func_L17_003C5E20(object)) {
-            D_00189E20.mode212 = 4;
-            D_00189E20.mode214 = 4;
+        if (IsObjectUnderPlayer(object)) {
+            gHeroState.mode212 = 4;
+            gHeroState.mode214 = 4;
         }
-        if (func_L17_003C69A8(object, data->middlePaths[moby->choice], &data->sound))
+        if (MoveRidePlatformAlongPath(object, data->middlePaths[moby->choice], &data->sound))
             moby->state = 6;
-        else func_L17_003C5E78(object);
+        else AttachPathToPlatformTransform(object);
         break;
     case 6:
-        func_002AAA00(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
+        ApproachTargetWithDirectionMode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
                      D_L17_001B034C * 4.848137450608192e-06f,
                      D_L17_001B034C * 4.848137450608192e-06f, 0.20943954586982727f, 0);
-        func_002AAA00(&moby->rotation, 0.0f, &data->yawSpeed,
+        ApproachTargetWithDirectionMode(&moby->rotation, 0.0f, &data->yawSpeed,
                      D_L17_001B0354 * 4.848137450608192e-06f,
                      D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         exitRow = (PlatformPathRow *)data->exitPaths;
         if (exitRow->paths[moby->choice] != -1 &&
-            func_00282E48(&moby->position, D_00189EA0) > 15.0f) {
+            fast_vec_dist(&moby->position, gHeroPosition) > 15.0f) {
             moby->state = 7;
             data->point = 1;
         } else if (exitRow->paths[moby->choice] == -1 && D_0018A15C != (char *)object)
             moby->state = 1;
         goto updateSound;
     case 8:
-        func_002AAA00(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
+        ApproachTargetWithDirectionMode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
                      D_L17_001B034C * 4.848137450608192e-06f,
                      D_L17_001B034C * 4.848137450608192e-06f, 0.20943954586982727f, 0);
-        func_002AAA00(&moby->rotation, 0.0f, &data->yawSpeed,
+        ApproachTargetWithDirectionMode(&moby->rotation, 0.0f, &data->yawSpeed,
                      D_L17_001B0354 * 4.848137450608192e-06f,
                      D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
-        if (D_00189E20.groundObject == object && D_00189E20.mode34E == 0) {
-            func_002B0C28(10, 0x27ED, 1);
+        if (gHeroState.groundObject == object && gHeroState.mode34E == 0) {
+            TryClaimNotice(10, 0x27ED, 1);
             if (D_00138324 & 0x10) {
                 data->progress = 0;
                 moby->state = 9;
-                data->point = D_L17_001FE880[data->middlePaths[moby->choice]]->count - 2;
+                data->point = gPathTable_L17[data->middlePaths[moby->choice]]->count - 2;
             }
         }
 updateSound:
-        if (!func_002E59B0(object, data->sound) && D_L17_001DBF82[0] != 0xFF)
-            data->sound = func_002E5DA0(1, 4, object, 0x922);
+        if (!IsVoicePlayingForOwner(object, data->sound) && D_L17_001DBF82[0] != 0xFF)
+            data->sound = PlaySoundFromClassBank(1, 4, object, 0x922);
         break;
     case 9:
         moby->state = 10;
         stopSound(object, data);
         break;
     case 10:
-        if (func_L17_003C5E20(object)) {
-            D_00189E20.mode212 = 4;
-            D_00189E20.mode214 = 4;
+        if (IsObjectUnderPlayer(object)) {
+            gHeroState.mode212 = 4;
+            gHeroState.mode214 = 4;
         }
-        if (func_L17_003C6CE8(object, data->middlePaths[moby->choice], &data->sound))
+        if (MoveAlongPathWithSound(object, data->middlePaths[moby->choice], &data->sound))
             moby->state = 6;
         break;
     case 7:
-        if (func_L17_003C69A8(object, data->exitPaths[moby->choice], &data->sound)) {
+        if (MoveRidePlatformAlongPath(object, data->exitPaths[moby->choice], &data->sound)) {
             moby->timer = 0;
             moby->state = 1;
             moby->animation = 0;
         }
         break;
     }
-    func_L17_003C7018(object);
-    func_00282CF0(&delta, &moby->position, &oldPosition);
-    func_002AD6F0(data->motion, &delta, &oldRotation, &moby->rotation);
+    UpdatePlatformBobAndSway(object);
+    FastVecSub(&delta, &moby->position, &oldPosition);
+    CombineTransformsAndStore(data->motion, &delta, &oldRotation, &moby->rotation);
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int V4_F876460d6 __attribute__((mode(TI)));
 extern int func_002AB1F0(void *);
 extern float func_002AF2E8(char *,char *,float,float,float,float,int *);
@@ -18,12 +19,12 @@ int func_002AF460(V4_F876460d6 *pos, float p1, float p2, float p3, float p4)
     void *v;
 
     while (node) {
-        v = (void *)func_002AB1F0((void *)node);
+        v = (void *)GetMobyPrivateValue0((void *)node);
         if (v == 0)
             goto next;
         if (*(float *)v == 0.0f)
             goto next;
-        d = func_002AF2E8(cbuf, (char *)node, p1, p2, p3, p4, &flag);
+        d = MeasureTargetReach(cbuf, (char *)node, p1, p2, p3, p4, &flag);
         if (flag)
             goto next;
         if (d < best) {

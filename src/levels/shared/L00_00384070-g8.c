@@ -26,11 +26,11 @@ int func_L00_00384070(char *owner)
     int j;
     Vector4 *basis;
 
-    FIELD(int, work, 0x68) = func_002A77E0(255);
+    FIELD(int, work, 0x68) = RandomIntBelow(255);
     do {
-        *slot = func_0029EFD0(0xCB2);
-        func_002B37E8(*slot, 0);
-        func_002A7398((signed char *)*slot, 1, 0);
+        *slot = CreateMoby(0xCB2 /* Synthenoid */);
+        InitChildObjectFromParent(*slot, 0);
+        StartAnimationImmediate((signed char *)*slot, 1, 0);
         FIELD(unsigned short, *slot, 0x34) |= 0x4002;
         FIELD(unsigned char, *slot, 0xBC) = i;
         qcopy(*slot + 0xF0, &D_L00_001AED90);
@@ -38,7 +38,7 @@ int func_L00_00384070(char *owner)
         qzero(work + 0x20 + i * 16);
         FIELD(float, *slot, 0x2C) =
             FIELD(float, FIELD(char *, *slot, 0x24), 0x24) * D_L00_001AEDA0[i];
-        func_002AEC18(*slot, D_L00_001AEDA8[i]);
+        SetMobyLightColor(*slot, D_L00_001AEDA8[i]);
         ++i;
         ++slot;
     } while (i < 2);
@@ -47,12 +47,12 @@ int func_L00_00384070(char *owner)
     basis = &D_L00_001AED50;
     j = 23;
     do {
-        *slot = func_0029EFD0(0xE7D);
+        *slot = CreateMoby(0xE7D /* Sheep */);
         if (*slot) {
-            func_002B37E8(*slot, 0);
-            result = func_002A77E0(FIELD(unsigned char,
+            InitChildObjectFromParent(*slot, 0);
+            result = RandomIntBelow(FIELD(unsigned char,
                 FIELD(char *, FIELD(char *, *slot, 0x24), 0x50), 0x10));
-            func_002A7398((signed char *)*slot, 2, result);
+            StartAnimationImmediate((signed char *)*slot, 2, result);
             FIELD(unsigned short, *slot, 0x34) |= 0x4002;
             qcopy(*slot + 0xF0, basis);
         }

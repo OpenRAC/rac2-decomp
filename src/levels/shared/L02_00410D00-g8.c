@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef int Quad __attribute__((mode(TI)));
 extern float D_L02_001B1A48 __attribute__((sda));
@@ -24,11 +25,11 @@ void func_L02_00410D00(u8 *object)
         *(float *)(child+0x18)=height;
         *(float *)(*slot+0xF4)=yaw;
         distance=*(float *)(state+0x20)*2.4f-1.2f;
-        func_002833F0(*slot+0xC0,*slot+0xF0);
-        func_00282F20(&displacement,*slot+0xC0,distance);
-        func_00282CC0(*slot+0x10,*slot+0x10,&displacement);
+        euler_rotation_basis(*slot+0xC0,*slot+0xF0);
+        vec_scale_to_length(&displacement,*slot+0xC0,distance);
+        FastVecAdd(*slot+0x10,*slot+0x10,&displacement);
         *(float *)(*slot+0xF4)=*(float *)(state+0x24)*-1.0471977f-0.3490659f;
-        func_002833F0(*slot+0xC0,*slot+0xF0);
+        euler_rotation_basis(*slot+0xC0,*slot+0xF0);
         slot++;
     } while (--left>=0);
 }

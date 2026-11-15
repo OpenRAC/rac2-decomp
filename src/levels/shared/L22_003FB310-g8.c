@@ -29,10 +29,11 @@ extern u8 * ref_L22_003FB310_09;
 extern void func_L22_003FB9B8(void *, void *, int, int);
 extern void func_L22_003FC048(void *);
 
+/* Per-frame update for moby class 3642: spins and shrinks the effect, keeps it near the player or its owner, sprays particles, and removes it when its timer runs out. */
 void func_L22_003FB310(u8 *obj) {
     f32 axis[4] __attribute__((aligned(16)));
     u8 *ctl = *(u8 **)(obj + 0x68);
-    f32 f;
+    f32 value;
     int i;
     f32 rot[4] __attribute__((aligned(16)));
     /* Transform construction and collision recovery use this scratch space
@@ -52,95 +53,95 @@ void func_L22_003FB310(u8 *obj) {
         } collision;
     } scratch __attribute__((aligned(16)));
     if (obj[0x20] == 0x62) return;
-    f = func_00282E48(D_00189E20 + 0x80, obj + 0x10);
-    *(f32 *)(ctl + 0x2C) = f;
-    if (ref_L22_003FB310_07 <= f) obj[0x23] = 255;
-    func_002AFFD8(obj + 0x10, axis, 0);
-    if (func_002B3868(obj) && obj[0x20] == 0x10) func_L00_0035F5A0(0x12, 0, 0);
+    value = fast_vec_dist(gHeroState + 0x80, obj + 0x10);
+    *(f32 *)(ctl + 0x2C) = value;
+    if (ref_L22_003FB310_07 <= value) obj[0x23] = 255;
+    ComputeViewDirection(obj + 0x10, axis, 0);
+    if (SetFirstPendingFlag(obj) && obj[0x20] == 0x10) StartEffectInSlot(0x12, 0, 0);
     if (obj[0x20] == 0) {
         qzero_nc(rot);
         rot[2] = 0.018907737f;
-        func_002833F0(scratch.transform.mat, rot);
-        func_00283738(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
-        func_L00_00325600(obj + 0xC0, axis, 0);
-        func_L22_003FC048(obj);
+        euler_rotation_basis(scratch.transform.mat, rot);
+        multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
+        NegateAndForwardVector(obj + 0xC0, axis, 0);
+        UpdateEffectParticles(obj);
     } else {
         qzero_nc(rot);
         rot[2] = ((45.0f - (f32)*(u16 *)(obj + 0x96)) * 22.0f + 155.0f) * 0.00029088825f;
-        func_002833F0(scratch.transform.mat, rot);
+        euler_rotation_basis(scratch.transform.mat, rot);
 
         if (obj[0x23] >= 3) obj[0x23]--;
         if (obj[0x23] >= 11 && obj[0x20] == 0x10) {
             switch (*(u16 *)(obj + 0x96) & 3) {
             case 0:
-                func_00282D30(scratch.transform.start, obj + 0xC0, -ref_L22_003FB310_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xD0, -ref_L22_003FB310_01);
+                FastVecScale(scratch.transform.start, obj + 0xC0, -ref_L22_003FB310_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xD0, -ref_L22_003FB310_01);
                 break;
             case 1:
-                func_00282D30(scratch.transform.start, obj + 0xC0, ref_L22_003FB310_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xD0, ref_L22_003FB310_01);
+                FastVecScale(scratch.transform.start, obj + 0xC0, ref_L22_003FB310_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xD0, ref_L22_003FB310_01);
                 break;
             case 2:
-                func_00282D30(scratch.transform.start, obj + 0xD0, ref_L22_003FB310_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xC0, ref_L22_003FB310_01);
+                FastVecScale(scratch.transform.start, obj + 0xD0, ref_L22_003FB310_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xC0, ref_L22_003FB310_01);
                 break;
             case 3:
-                func_00282D30(scratch.transform.start, obj + 0xD0, -ref_L22_003FB310_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xC0, -ref_L22_003FB310_01);
+                FastVecScale(scratch.transform.start, obj + 0xD0, -ref_L22_003FB310_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xC0, -ref_L22_003FB310_01);
                 break;
             }
-            func_L22_003FB9B8(scratch.transform.start, scratch.transform.end, ref_L22_003FB310_02, 0);
+            EmitSparkBurst_L22(scratch.transform.start, scratch.transform.end, ref_L22_003FB310_02, 0);
         }
-        func_00283360(scratch.transform.scale);
-        f = (45.0f - (f32)*(u16 *)(obj + 0x96) * 0.022222223f) * (ref_L22_003FB310_03 * 0.022222223f);
-        scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = f;
-        func_00283738(scratch.transform.mat, scratch.transform.scale, scratch.transform.mat);
-        func_00283738(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
+        set_identity_rotation_rows(scratch.transform.scale);
+        value = (45.0f - (f32)*(u16 *)(obj + 0x96) * 0.022222223f) * (ref_L22_003FB310_03 * 0.022222223f);
+        scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = value;
+        multiply_matrix3x3(scratch.transform.mat, scratch.transform.scale, scratch.transform.mat);
+        multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
         for (i = 0; i < 8; i++) {
             void **slot = (void **)(ctl + 0x60 + i * 4);
-            if (*slot) { func_002B9180(*slot); *slot = 0; }
+            if (*slot) { KillParticle(*slot); *slot = 0; }
         }
         if (*(u16 *)(obj + 0x96) >= 46) {
-            if (ref_L22_003FB310_09 == obj) obj[0x20] = 0x62; else func_0029F338(obj);
+            if (ref_L22_003FB310_09 == obj) obj[0x20] = 0x62; else MarkMobySpawned(obj);
             return;
         }
         if (obj[0x20] == 0x10) {
-            qcopy(obj + 0x10, D_00189E20 + 0x80);
-            func_002AFFD8(obj + 0x10, axis, 0);
-            func_L00_00325600(obj + 0xC0, axis, 0);
-            func_00282F20(scratch.transform.start, axis, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
-            func_00282CC0(obj + 0x10, obj + 0x10, scratch.transform.start);
+            qcopy(obj + 0x10, gHeroState + 0x80);
+            ComputeViewDirection(obj + 0x10, axis, 0);
+            NegateAndForwardVector(obj + 0xC0, axis, 0);
+            vec_scale_to_length(scratch.transform.start, axis, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
+            FastVecAdd(obj + 0x10, obj + 0x10, scratch.transform.start);
         } else {
             qcopy(obj + 0x10, ref_L22_003FB310_04 + 0x10);
-            func_002AFFD8(obj + 0x10, axis, 0);
-            func_L00_00325600(obj + 0xC0, axis, 0);
-            func_00282F20(scratch.transform.start, axis, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
-            func_00282CC0(obj + 0x10, obj + 0x10, scratch.transform.start);
+            ComputeViewDirection(obj + 0x10, axis, 0);
+            NegateAndForwardVector(obj + 0xC0, axis, 0);
+            vec_scale_to_length(scratch.transform.start, axis, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
+            FastVecAdd(obj + 0x10, obj + 0x10, scratch.transform.start);
         }
     }
     if (*(u16 *)(obj + 0x96) < 65535) (*(u16 *)(obj + 0x96))++;
     else *(u16 *)(obj + 0x96) = 0;
     if (*(s16 *)(ctl + 0x2A) != 0 && (*(u16 *)(obj + 0x96) & 31) == 0) {
-        func_00282D30(rot, axis, 6.0f);
-        func_00282D30(scratch.collision.mat, axis, -3.0f);
-        func_00282CC0(rot, rot, obj + 0x10);
-        func_00282CC0(scratch.collision.mat, scratch.collision.mat, obj + 0x10);
-        if (func_002761F8(scratch.collision.mat, rot, 0x12, 0, 0) == 0) {
-            func_L22_003A2988(obj + 0x10, 0.0f);
-            func_00282D30(scratch.collision.move,
-                obj + 0xC0 + func_002A77E0(2) * 16,
-                func_002A77E0(2) ? ref_L22_003FB310_05 : -ref_L22_003FB310_06);
-            func_00282CC0(obj + 0x10, obj + 0x10, scratch.collision.move);
-            func_L22_003A2988(obj + 0x10, 0.0f);
-            func_00282D30(scratch.collision.start, axis, 3.0f);
-            func_00282D30(scratch.collision.end, axis, -3.0f);
-            func_00282CC0(scratch.collision.start, scratch.collision.start, obj + 0x10);
-            func_00282CC0(scratch.collision.end, scratch.collision.end, obj + 0x10);
-            if (func_002761F8(scratch.collision.end, scratch.collision.start, 0x12, 0, 0)) qcopy(obj + 0x10, ref_L22_003FB310_08);
+        FastVecScale(rot, axis, 6.0f);
+        FastVecScale(scratch.collision.mat, axis, -3.0f);
+        FastVecAdd(rot, rot, obj + 0x10);
+        FastVecAdd(scratch.collision.mat, scratch.collision.mat, obj + 0x10);
+        if (CollLine(scratch.collision.mat, rot, 0x12, 0, 0) == 0) {
+            PushPointOutOfArena(obj + 0x10, 0.0f);
+            FastVecScale(scratch.collision.move,
+                obj + 0xC0 + RandomIntBelow(2) * 16,
+                RandomIntBelow(2) ? ref_L22_003FB310_05 : -ref_L22_003FB310_06);
+            FastVecAdd(obj + 0x10, obj + 0x10, scratch.collision.move);
+            PushPointOutOfArena(obj + 0x10, 0.0f);
+            FastVecScale(scratch.collision.start, axis, 3.0f);
+            FastVecScale(scratch.collision.end, axis, -3.0f);
+            FastVecAdd(scratch.collision.start, scratch.collision.start, obj + 0x10);
+            FastVecAdd(scratch.collision.end, scratch.collision.end, obj + 0x10);
+            if (CollLine(scratch.collision.end, scratch.collision.start, 0x12, 0, 0)) qcopy(obj + 0x10, ref_L22_003FB310_08);
             *(s16 *)(ctl + 0x2A) = 0;
         }
     }

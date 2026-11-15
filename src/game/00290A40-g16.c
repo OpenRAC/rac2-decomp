@@ -47,23 +47,23 @@ void func_002914B8(void)
     DynamicLightState *state;
 
     qcopy(D_001C2740.ambient, D_001A9190);
-    angle = func_00283B98(D_001B5358, -0.8f);
-    D_001C2740.direction[0] = func_00283180(angle) * 0.866f;
-    D_001C2740.direction[1] = func_00283198(angle) * 0.866f;
+    angle = FastAddRotations(D_001B5358, -0.8f);
+    D_001C2740.direction[0] = FastSinOrCosA(angle) * 0.866f;
+    D_001C2740.direction[1] = FastSinOrCosB(angle) * 0.866f;
     D_001C2740.direction[2] = -0.5f;
     D_001C2740.flags = 0;
     for (i = 0; i < 8; i++) {
         light = &D_001C2B40[i];
         state = &D_001C2C40[i];
         if (state->state != 0) {
-            if (func_00282E48(light->position, state->position) > 1.0f
-                || func_00282C48(light->radius - state->position[3]) > 1.0f) {
+            if (fast_vec_dist(light->position, state->position) > 1.0f
+                || FloatAbs(light->radius - state->position[3]) > 1.0f) {
                 qcopy(state->position, light->position);
                 if (state->state == 1) {
-                    func_00291640(i);
+                    CreatePointLight(i);
                     state->state = 2;
                 } else if (state->state == 2) {
-                    func_00291758(i);
+                    RefreshLightParts(i);
                 }
             }
         }

@@ -24,16 +24,17 @@
 #include "common.h"
 
 extern s8 D_00265290[];
-s32 func_00341558(s32 arg0) {
-    s32 temp_a1;
-    s32 var_a2;
-    s32 tmp0;
+/* Returns the value of the selected entry of the current tab, or 0 when it is locked. */
+s32 func_00341558(s32 self) {
+    s32 tab;
+    s32 result;
+    s32 base;
 
-    temp_a1 = (*(s32 *)((s8 *)(arg0) + (0x2FC)));
-    tmp0 = arg0 + (temp_a1 * 4);
-    var_a2 = *(s32 *)(((s32)D_00265290) + (s32) (((*(s32 *)((s8 *)(tmp0) + (0x1B8))) * 4) + (temp_a1 << 5)));
-    if ((temp_a1 == 2) && (*(u8 *)0x1A7A0A == 0)) {
-        var_a2 = ((*(s32 *)((s8 *)(arg0) + (0x1C0))) >= 3) ? 0 : var_a2;
+    tab = (*(s32 *)((s8 *)(self) + (0x2FC)));
+    base = self + (tab * 4);
+    result = *(s32 *)(((s32)D_00265290) + (s32) (((*(s32 *)((s8 *)(base) + (0x1B8))) * 4) + (tab << 5)));
+    if ((tab == 2) && (*(u8 *)0x1A7A0A == 0)) {
+        result = ((*(s32 *)((s8 *)(self) + (0x1C0))) >= 3) ? 0 : result;
     }
-    return var_a2;
+    return result;
 }

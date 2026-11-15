@@ -2,6 +2,7 @@
    file is compiled at -G32 (config/cflags.txt). D_001A7478 is read absolute (lui/lw)
    and written through $gp, so it has a plain name and an sda name. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; int fallback; } SelectionCallback;
 
@@ -30,96 +31,97 @@ extern FlagTarget *D_0025C210[];
 typedef struct { char p00[8]; int f08; char p0c[8]; int f14; int f18; char pad[0xE4]; int f100; int f104; char pad2[0x38]; int f140; } GameObj;
 
 
+/* Handles input on the five-entry Extras page and starts the chosen entry or plays an error sound if it is locked. */
 int func_002D01D0(void)
 {
-    int a = -1;
-    int b = -1;
-    int c = -1;
+    int sound = -1;
+    int firstId = -1;
+    int secondId = -1;
     int result = 0;
-    int flags = ((CallbackMenuState *)&D_00138180)->flags;
-    int old = D_001ABA04;
+    int flags = ((CallbackMenuState *)&gPadState)->flags;
+    int oldCursor = D_001ABA04;
 
     if (flags & 0x10) {
         int value;
-        int status;
+        int returnCode;
         D_001ABA04 = 0;
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
+            returnCode = -1;
             goto finish;
         }
-        status = 0;
+        returnCode = 0;
 finish:
-        return status;
+        return returnCode;
     }
     if (flags & 0x900) {
         D_001ABA04 = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             if (--D_001ABA04 < 0)
                 D_001ABA04 = 4;
         } else if (flags & 0x4000) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             if (++D_001ABA04 >= 5)
                 D_001ABA04 = 0;
         }
-        if (((CallbackMenuState *)&D_00138180)->flags & 0x40) {
+        if (((CallbackMenuState *)&gPadState)->flags & 0x40) {
             switch (D_001ABA04) {
             case 2:
-                if (D_001ABA08[D_001ABA04] != 0) { a = 4; b = 0xBF; } else a = 5;
+                if (D_001ABA08[D_001ABA04] != 0) { sound = 4; firstId = 0xBF; } else sound = 5;
                 break;
             case 3:
-                if (D_001ABA08[D_001ABA04] != 0) { a = 4; b = 0xBD; c = 0xBE; } else a = 5;
+                if (D_001ABA08[D_001ABA04] != 0) { sound = 4; firstId = 0xBD; secondId = 0xBE; } else sound = 5;
                 break;
             case 4:
-                if (D_001ABA08[D_001ABA04] != 0) { a = 4; b = 0xC1; } else a = 5;
+                if (D_001ABA08[D_001ABA04] != 0) { sound = 4; firstId = 0xC1; } else sound = 5;
                 break;
             case 1:
                 if (D_001ABA08[D_001ABA04] != 0) {
-                    func_002C9E60(1);
-                    a = 4;
+                    RestoreSavedScreenImage(1);
+                    sound = 4;
                     D_001B1580 = 2;
-                    ((GameObj *)&D_001F2840)->f100 = ((GameObj *)&D_001F2840)->f14;
-                    ((GameObj *)&D_001F2840)->f104 = ((GameObj *)&D_001F2840)->f08;
-                    func_002B49E0(9, 1, 0, 0, 0);
-                } else a = 5;
+                    ((GameObj *)&gPauseMenuState)->f100 = ((GameObj *)&gPauseMenuState)->f14;
+                    ((GameObj *)&gPauseMenuState)->f104 = ((GameObj *)&gPauseMenuState)->f08;
+                    BeginSlotRequest(9, 1, 0, 0, 0);
+                } else sound = 5;
                 break;
             case 0:
-                D_001F2840.value = (int)D_0025C2B8;
-                a = 4;
+                gPauseMenuState.value = (int)D_0025C2B8;
+                sound = 4;
                 break;
             default:
                 break;
             }
-            if (b != -1) {
+            if (firstId != -1) {
                 char *obj;
-                func_002C9E60(0);
-                ((GameObj *)&D_001F2840)->f100 = ((GameObj *)&D_001F2840)->f14;
-                ((GameObj *)&D_001F2840)->f104 = ((GameObj *)&D_001F2840)->f08;
-                ((GameObj *)&D_001F2840)->f140 = D_001A7478;
+                RestoreSavedScreenImage(0);
+                ((GameObj *)&gPauseMenuState)->f100 = ((GameObj *)&gPauseMenuState)->f14;
+                ((GameObj *)&gPauseMenuState)->f104 = ((GameObj *)&gPauseMenuState)->f08;
+                ((GameObj *)&gPauseMenuState)->f140 = D_001A7478;
                 D_001A7478_sda = 2;
                 obj = D_001BAD40;
-                func_00288AA0(obj, b);
-                if (c != -1)
-                    func_00288AA0(obj, c);
-                func_00288BE8(obj);
+                PushRequestQueue(obj, firstId);
+                if (secondId != -1)
+                    PushRequestQueue(obj, secondId);
+                LaunchQueuedRequest(obj);
             }
-            if (a != -1)
-                func_002E5E58(a, 0, 0);
+            if (sound != -1)
+                PlaySoundFromGlobalBank(sound, 0, 0);
         }
         {
             MenuFields *menu = &D_0025C250;
             menu->f58 = D_001ABA04;
             if (D_001ABA08[D_001ABA04] != 0) {
-                if (old == D_001ABA04) {
+                if (oldCursor == D_001ABA04) {
                     if (D_001A63AC[0] == 0) {
-                        if (menu->f50 == old && menu->f44 == 2) {
+                        if (menu->f50 == oldCursor && menu->f44 == 2) {
                             D_0025C210[0]->flags &= -5;
-                        } else if (menu->f54 == old && menu->f44 == 4) {
+                        } else if (menu->f54 == oldCursor && menu->f44 == 4) {
                             D_0025C210[0]->flags &= -5;
                         }
                     }

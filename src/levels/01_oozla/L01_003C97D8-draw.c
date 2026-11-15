@@ -17,87 +17,88 @@ typedef struct {
     unsigned long reserved, texture, state, primitive;
 } L01_003C97D8_QUAD;
 
-void func_L01_003C97D8(char *obj)
+/* Draws the glowing scrolling ribbon strips of the moby in five layers. */
+void func_L01_003C97D8(char *moby)
 {
-    L01_003C97D8_QUAD q;
+    L01_003C97D8_QUAD quad;
     float origin[4], step[4], center[4], width[4], offset[4];
     float scratch;
-    char *s = *(char **)(obj + 0x68);
-    float phase, v, t, doubleScale, scale;
+    char *vars = *(char **)(moby + 0x68);
+    float phase, scrollV, t, doubleScale, scale;
     float stepScale = 2.0f;
     float increment;
-    q.texture = func_0027C878(*(int *)(s + 0x78) + 63);
-    q.state = 0xFF9000000260UL;
-    q.primitive = 0x8000000044UL;
-    q.reserved = 0;
-    scale = *(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24);
-    *(float *)(s + 0x74) -= (*(float *)(s + 0x68) * 0.016666668f) / stepScale;
+    quad.texture = GetEffectTextureDescriptor(*(int *)(vars + 0x78) + 63);
+    quad.state = 0xFF9000000260UL;
+    quad.primitive = 0x8000000044UL;
+    quad.reserved = 0;
+    scale = *(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24);
+    *(float *)(vars + 0x74) -= (*(float *)(vars + 0x68) * 0.016666668f) / stepScale;
     qzero_nc(origin);
-    if (*(int *)(s + 0x7C) == 1) func_00282F20(origin, obj + 0xC0, scale * -10.0f);
-    func_00282CC0(origin, origin, obj + 0x10);
+    if (*(int *)(vars + 0x7C) == 1) vec_scale_to_length(origin, moby + 0xC0, scale * -10.0f);
+    FastVecAdd(origin, origin, moby + 0x10);
     t = scale + scale;
-    func_00282F20(step, obj + 0xC0, stepScale * (float)*(int *)(s + 0x7C));
-    func_00282F20(width, obj + 0xD0, scale * -2.0f);
-    func_00282F20(offset, obj + 0xD0, t * 0.8f);
+    vec_scale_to_length(step, moby + 0xC0, stepScale * (float)*(int *)(vars + 0x7C));
+    vec_scale_to_length(width, moby + 0xD0, scale * -2.0f);
+    vec_scale_to_length(offset, moby + 0xD0, t * 0.8f);
     doubleScale = t;
     increment = 0.2f;
     {
         int i;
         for (i = 0; i < 5; i++) {
-            v = 0.0f;
+            scrollV = 0.0f;
             switch (i) {
             case 0:
                 origin[2] += 0.02f;
                 qcopy(center, origin);
-                q.color[2] = q.color[3] = func_002AAE98(0.25f, 1.0f, 0.5f, 0.0f);
-                phase = func_00283CC8(&scratch, *(float *)(s + 0x74));
-                v = phase;
+                quad.color[2] = quad.color[3] = PackColorFloatsToWord(0.25f, 1.0f, 0.5f, 0.0f);
+                phase = SplitFloatFraction(&scratch, *(float *)(vars + 0x74));
+                scrollV = phase;
                 break;
             case 1:
                 qcopy(center, origin);
-                q.color[2] = q.color[3] = func_002AAE98(0.25f, 0.5f, 1.0f, 0.0f);
-                v = func_00283CC8(&scratch, *(float *)(s + 0x74) + 0.5f);
+                quad.color[2] = quad.color[3] = PackColorFloatsToWord(0.25f, 0.5f, 1.0f, 0.0f);
+                scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) + 0.5f);
                 break;
             case 2:
                 origin[2] += 0.02f;
                 qcopy(center, origin);
-                q.color[2] = q.color[3] = func_002AAE98(1.0f, 0.0f, 0.0f, 0.0f);
-                func_00282F20(width, width, doubleScale * 0.2f);
+                quad.color[2] = quad.color[3] = PackColorFloatsToWord(1.0f, 0.0f, 0.0f, 0.0f);
+                vec_scale_to_length(width, width, doubleScale * 0.2f);
                 stepScale *= 0.4f;
                 increment *= 0.4f;
-                func_00282F20(step, obj + 0xC0, stepScale * (float)*(int *)(s + 0x7C));
-                v = func_00283CC8(&scratch, *(float *)(s + 0x74) * 3.0f);
+                vec_scale_to_length(step, moby + 0xC0, stepScale * (float)*(int *)(vars + 0x7C));
+                scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.0f);
                 break;
             case 3:
-                v = func_00283CC8(&scratch, *(float *)(s + 0x74) * 3.5f);
-                q.color[2] = q.color[3] = func_002AAE98(1.0f, 1.0f, 1.0f, 0.0f);
-                func_00282CC0(center, origin, offset);
+                scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.5f);
+                quad.color[2] = quad.color[3] = PackColorFloatsToWord(1.0f, 1.0f, 1.0f, 0.0f);
+                FastVecAdd(center, origin, offset);
                 break;
             case 4:
-                func_00282CF0(center, origin, offset);
+                FastVecSub(center, origin, offset);
                 break;
             }
-            func_00282CF0(q.pos[2], center, width);
+            FastVecSub(quad.pos[2], center, width);
             t = increment;
-            func_00282CC0(q.pos[3], center, width);
-            func_00282CC0(center, center, step);
-            q.uv[2][0] = q.uv[0][0] = 0.0f;
-            q.uv[3][0] = q.uv[1][0] = 1.0f;
-            q.uv[1][1] = q.uv[0][1] = v;
-            q.uv[3][1] = q.uv[2][1] = v + 1.0f;
+            FastVecAdd(quad.pos[3], center, width);
+            FastVecAdd(center, center, step);
+            quad.uv[2][0] = quad.uv[0][0] = 0.0f;
+            quad.uv[3][0] = quad.uv[1][0] = 1.0f;
+            quad.uv[1][1] = quad.uv[0][1] = scrollV;
+            quad.uv[3][1] = quad.uv[2][1] = scrollV + 1.0f;
             while (t < 1.0f) {
-                phase = func_002A7798(func_00283198(t * 3.1415927f));
-                q.color[0] = q.color[1] = q.color[2];
+                phase = EaseOutQuad(FastSinOrCosB(t * 3.1415927f));
+                quad.color[0] = quad.color[1] = quad.color[2];
                 {
-                    int alpha = func_00283CF0(phase * (*(float *)(s + 0x70) * 102.4f));
-                    q.color[2] = q.color[3] = (q.color[0] & 0xFFFFFF) | (alpha << 24);
+                    int alpha = FloatToInt(phase * (*(float *)(vars + 0x70) * 102.4f));
+                    quad.color[2] = quad.color[3] = (quad.color[0] & 0xFFFFFF) | (alpha << 24);
                 }
-                qcopy(q.pos[0], q.pos[2]);
-                qcopy(q.pos[1], q.pos[3]);
-                func_00282CF0(q.pos[2], center, width);
-                func_00282CC0(q.pos[3], center, width);
-                func_00282CC0(center, center, step);
-                func_00280B90(&q, 0, 1);
+                qcopy(quad.pos[0], quad.pos[2]);
+                qcopy(quad.pos[1], quad.pos[3]);
+                FastVecSub(quad.pos[2], center, width);
+                FastVecAdd(quad.pos[3], center, width);
+                FastVecAdd(center, center, step);
+                draw_world_quad(&quad, 0, 1);
                 t += increment;
             }
         }

@@ -27,26 +27,26 @@ void func_L11_00412B20(u8 *object) {
         return;
     }
     if (D_001A7B00[0]) {
-        func_L01_002EABA8(0x9FF, 0x56, 3, *(s32 *)(state + 0x4), -1);
+        TriggerSubtitleInCuboid(0x9FF, 0x56, 3, *(s32 *)(state + 0x4), -1);
     }
     if (D_L11_001A9010[0] != 0 && D_L11_001B30C8 >= 3) {
         D_0018CD60 = 0xFFFF;
     }
-    if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x0)) != 0) {
-        if (func_00282948(state + 0x8) != 0) {
+    if (IsPointInCuboid(gHeroPosition, *(s32 *)(state + 0x0)) != 0) {
+        if (FastFloatHelperD(state + 0x8) != 0) {
             if (D_00194158 == 0) {
-                func_00288E18(0xA00, 0x57);
+                RequestSubtitleVoiceLine(0xA00, 0x57);
                 *(s32 *)(state + 0x8) = 0x1A4;
             }
         }
     }
     if (D_001A7B00[0x2E]) {
-        func_L01_002EABA8(0xA03, 0x5A, 0, *(s32 *)(state + 0xC), -1);
+        TriggerSubtitleInCuboid(0xA03, 0x5A, 0, *(s32 *)(state + 0xC), -1);
     }
     if (D_001A7B00[0xB]) {
         if (D_0018D048 == 0) {
-            if (func_00282948(state + 0x10) != 0) {
-                func_00288E18(0xA3D, 0x94);
+            if (FastFloatHelperD(state + 0x10) != 0) {
+                RequestSubtitleVoiceLine(0xA3D, 0x94);
             }
         }
     }

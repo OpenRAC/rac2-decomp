@@ -14,91 +14,92 @@ extern float func_00282E80(void *, void *);
 
 /* Walks the level's table of short rows, keeping the closest match of the handle's
    measured pair in the handle and the winning row in the handle's second half. */
-void func_L16_00410CC0(u8 *arg0, u8 *arg1)
+void func_L16_00410CC0(u8 *moby, u8 *point)
 {
-    TI128 state;
+    TI128 bestPoint;
     TI128 work;
-    u32 *s4;
-    u8 *fp;
+    u32 *vars;
+    u8 *path;
     s32 next;
-    u8 *dest;
+    u8 *bestOut;
     f32 best;
-    f32 f;
-    f32 g;
+    f32 along;
+    f32 dist;
     s32 row;
     s32 count;
-    s16 v;
-    s16 *r;
+    s16 neighbor;
+    s16 *rowPtr;
 
-    s4 = *(u32 **)(arg0 + 0x68);
+    vars = *(u32 **)(moby + 0x68);
     best = 2001.0f;
-    fp = *(u8 **)(D_L16_001FE7C0 + s4[92]);
-    qcopy(&state, arg1);
-    dest = (u8 *)s4 + 0x200;
+    path = *(u8 **)(D_L16_001FE7C0 + vars[92]);
+    qcopy(&bestPoint, point);
+    bestOut = (u8 *)vars + 0x200;
     for (row = 0; row < 8; row = next) {
         count = 0;
-        v = D_L16_001B1710.row[row][0];
+        neighbor = D_L16_001B1710.row[row][0];
         next = row + 1;
-        if (v == -1)
+        if (neighbor == -1)
             continue;
-        r = D_L16_001B1710.row[row];
+        rowPtr = D_L16_001B1710.row[row];
         do {
-            if (v >= row) {
-                f = func_L01_00311C18(&work, fp + (row * 16 + 0x10), fp + (v * 16 + 0x10), arg1);
-                g = func_00282E80(arg1, &work);
-                if (g < best) {
-                    best = g;
-                    s4[0x7E] = v;
-                    *(f32 *)((u8 *)s4 + 0x1FC) = f;
-                    s4[0x7D] = row;
-                    qcopy(&state, &work);
+            if (neighbor >= row) {
+                along = ClosestPointOnSegment(&work, path + (row * 16 + 0x10), path + (neighbor * 16 + 0x10), point);
+                dist = vec_distance_xy(point, &work);
+                if (dist < best) {
+                    best = dist;
+                    vars[0x7E] = neighbor;
+                    *(f32 *)((u8 *)vars + 0x1FC) = along;
+                    vars[0x7D] = row;
+                    qcopy(&bestPoint, &work);
                 }
             }
             count++;
-            r++;
+            rowPtr++;
             if (count >= 4)
                 break;
-            v = *r;
-        } while (v != -1);
+            neighbor = *rowPtr;
+        } while (neighbor != -1);
     }
-    qcopy(dest, &state);
+    qcopy(bestOut, &bestPoint);
 }
 
-void func_L16_00410FA8(u8 *arg0)
+/* Picks which two path points the boss should walk between next when it has moved onto a different part of the path. */
+void func_L16_00410FA8(u8 *moby)
 {
-    s32 *p;
+    s32 *vars;
     s32 mask;
     s32 acc;
     s32 i;
     s32 j;
-    s32 v;
+    s32 neighbor;
 
-    p = *(s32 **)(arg0 + 0x68);
-    if (p[0x7D] == p[0x88] || p[0x7D] == p[0x89]) {
-        p[0x8A] = p[0x7D];
-        p[0x8B] = p[0x7E];
+    vars = *(s32 **)(moby + 0x68);
+    if (vars[0x7D] == vars[0x88] || vars[0x7D] == vars[0x89]) {
+        vars[0x8A] = vars[0x7D];
+        vars[0x8B] = vars[0x7E];
         return;
     }
-    if (p[0x7E] == p[0x88] || p[0x7E] == p[0x89]) {
-        p[0x8A] = p[0x7E];
-        p[0x8B] = p[0x7D];
+    if (vars[0x7E] == vars[0x88] || vars[0x7E] == vars[0x89]) {
+        vars[0x8A] = vars[0x7E];
+        vars[0x8B] = vars[0x7D];
         return;
     }
-    mask = (1 << p[0x7D]) | (1 << p[0x7E]);
+    mask = (1 << vars[0x7D]) | (1 << vars[0x7E]);
     acc = 0;
     for (;;) {
         for (i = 0; i < 8; i++) {
             if ((mask >> i) & 1) {
-                for (j = 0; j < 4 && (v = D_L16_001B1710.row[i][j]) != -1; j++) {
-                    acc |= 1 << v;
-                    if (v == p[0x88]) {
-                        p[0x8A] = v;
-                        p[0x8B] = i;
+                for (j = 0; j < 4 && (neighbor = D_L16_001B1710.row[i][j]) != -1; j++) {
+                    acc |= 1 << neighbor;
+                    if (neighbor == vars[0x88]) {
+                        vars[0x8A] = neighbor;
+                        vars[0x8B] = i;
                         return;
                     }
-                    if (v == p[0x89]) {
-                        p[0x8A] = v;
-                        p[0x8B] = i;
+                    if (neighbor == vars[0x89]) {
+                        vars[0x8A] = neighbor;
+                        vars[0x8B] = i;
                         return;
                     }
                 }

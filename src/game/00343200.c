@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -24,16 +25,16 @@ typedef int s32;
 typedef unsigned int u32;
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
-u8 *func_00343200(u8 *a0) {
-    func_L00_0042BAD0_3(a0);
-    func_L00_0042BAD0_3(a0 + 76);
-    func_L00_0042BAD0_3(a0 + 152);
-    func_L00_0042BFF8_2(a0 + 228);
-    func_L00_0042C290_3(a0 + 432);
-    func_L00_0042C290_3(a0 + 504);
-    func_L00_0042C290_3(a0 + 576);
-    func_L00_004380E0_1(a0 + 664);
-    return a0;
+u8 *func_00343200(u8 *menu) {
+    func_L00_0042BAD0_3(menu);
+    func_L00_0042BAD0_3(menu + 76);
+    func_L00_0042BAD0_3(menu + 152);
+    func_L00_0042BFF8_2(menu + 228);
+    func_L00_0042C290_3(menu + 432);
+    func_L00_0042C290_3(menu + 504);
+    func_L00_0042C290_3(menu + 576);
+    func_L00_004380E0_1(menu + 664);
+    return menu;
 }
 
 extern int func_00336E40(void *);
@@ -62,7 +63,7 @@ void func_00343260(char *self, void *argument)
 {
     *(void **)(self + 0x28C) = argument;
     if (argument) {
-        int *allocation = func_00336DA8(16, func_00336E40(argument));
+        int *allocation = ReturnSecondArgument(16, AllocPoolCell(argument));
         *(int **)(self + 0x288) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -72,60 +73,66 @@ void func_00343260(char *self, void *argument)
     *(int *)(self + 0x290) = 1;
     **(float **)(self + 0x288) = 251.0f;
     (*(float **)(self + 0x288))[1] = 210.0f;
-    func_003361E0(self, D_001ADC10, argument);
-    func_003361E0(self + 0x4C, D_001ADC18, argument);
-    func_003361E0(self + 0x98, D_001ADC20, argument);
-    func_003369A8(self + 0x1B0, D_001ADC30, argument);
-    func_003369A8(self + 0x1F8, D_001ADC88, argument);
-    func_003369A8(self + 0x240, D_001ADC88, argument);
-    func_00336710(self + 0xE4, D_001AE0C0, argument);
-    *func_00335E20(self) = 0x60442D00;
-    *func_00335E20(self + 0x4C) = 0x60241700;
-    *func_00335E20(self + 0x98) = 0x55F0C070;
-    *func_00335E20(self + 0x1B0) = 0x80F0F0F0;
-    *func_00335E20(self + 0x240) = 0x80F0F0F0;
-    *func_00335E20(self + 0x1F8) = 0x80F0F0F0;
-    *func_00335E20(self + 0xE4) = 0x80F0F0F0;
-    func_00336390(self, D_001A8CFC[0] + 0x8710, 0x99);
-    func_00336390(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9A);
-    func_00336390(self + 0x98, D_001A8CFC[0] + 0x8710, 0x9B);
-    func_00336A38(self + 0x1B0, self + 0x120);
-    func_00336A38(self + 0x1F8, self + 0x160);
-    func_00336A38(self + 0x240, (void *)func_00288FB8(0x2D4F));
-    func_003435B0((u8 *)self, 0);
-    func_00335F88(self + 0xE4, 32.0f, 32.0f, 0.0f, 0.0f);
-    func_003428E0(self + 0x298, argument);
-    func_00343028(self + 0x298, 0.0f, 40.0f);
-    func_00343038(self + 0x298, 32.0f);
+    InitDerivedArrays(self, D_001ADC10, argument);
+    InitDerivedArrays(self + 0x4C, D_001ADC18, argument);
+    InitDerivedArrays(self + 0x98, D_001ADC20, argument);
+    InitWidgetDefaults(self + 0x1B0, D_001ADC30, argument);
+    InitWidgetDefaults(self + 0x1F8, D_001ADC88, argument);
+    InitWidgetDefaults(self + 0x240, D_001ADC88, argument);
+    InitDerivedObjectC(self + 0xE4, D_001AE0C0, argument);
+    *GetFieldC(self) = 0x60442D00;
+    *GetFieldC(self + 0x4C) = 0x60241700;
+    *GetFieldC(self + 0x98) = 0x55F0C070;
+    *GetFieldC(self + 0x1B0) = 0x80F0F0F0;
+    *GetFieldC(self + 0x240) = 0x80F0F0F0;
+    *GetFieldC(self + 0x1F8) = 0x80F0F0F0;
+    *GetFieldC(self + 0xE4) = 0x80F0F0F0;
+    SetFieldAt40(self, D_001A8CFC[0] + 0x8710, 0x99);
+    SetFieldAt40(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9A);
+    SetFieldAt40(self + 0x98, D_001A8CFC[0] + 0x8710, 0x9B);
+    SetWidgetField40(self + 0x1B0, self + 0x120);
+    SetWidgetField40(self + 0x1F8, self + 0x160);
+    SetWidgetField40(self + 0x240, (void *)GetLocalizedString(0x2D4F));
+    SetMenuTitleMode((u8 *)self, 0);
+    SetSecondFloat4(self + 0xE4, 32.0f, 32.0f, 0.0f, 0.0f);
+    InitMenuList(self + 0x298, argument);
+    SetMenuListSpacing(self + 0x298, 0.0f, 40.0f);
+    SetMenuListIconSize(self + 0x298, 32.0f);
     *(int *)(self + 0x330) = 0;
-    func_00343798(self, 0);
+    UpdateItemSelectMenu(self, 0);
 }
 
-void func_00343538(QwenRecovery_a2544d80ec96_AbiByte22 *p1, const QwenRecovery_a2544d80ec96_AbiByte22 *table)
+/* Fills the menu's item list from a table of entries. */
+void func_00343538(QwenRecovery_a2544d80ec96_AbiByte22 *menu, const QwenRecovery_a2544d80ec96_AbiByte22 *table)
 {
-    func_00342F70(p1 + 0x298, table);
+    BuildMenuListIds(menu + 0x298, table);
 }
 
 
+/* Returns the id of the entry selected in the menu's list. */
 int func_00343560(unsigned char *owner)
 {
-    return func_00342BC0(owner + 0x298);
+    return GetSelectedMenuListId(owner + 0x298);
 }
 
+/* Clears the state of the menu's list. */
 void func_00343580(unsigned char *owner)
 {
-    func_00343058(owner + 0x298);
+    ClearMenuListState(owner + 0x298);
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_003435A0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x330) = a1; }
+/* Stores an extra value in the menu. */
+void func_003435A0(u8 *menu, s32 value) { *(s32 *)(menu + 0x330) = value; }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_003435A8(u8 *a0) { return *(s32 *)(a0 + 0x330); }
+/* Returns the extra value stored in the menu. */
+s32 func_003435A8(u8 *menu) { return *(s32 *)(menu + 0x330); }
 
-void func_003435B0(u8 *a0, u32 a1) {
-    if (a1 < 4) *(u32 *)(a0 + 0x294) = a1;
-    *(s32 *)(a0 + 0x1a0) = 0;
+/* Sets which of the four title modes the menu uses and clears a field. */
+void func_003435B0(u8 *menu, u32 mode) {
+    if (mode < 4) *(u32 *)(menu + 0x294) = mode;
+    *(s32 *)(menu + 0x1a0) = 0;
 }
 
 

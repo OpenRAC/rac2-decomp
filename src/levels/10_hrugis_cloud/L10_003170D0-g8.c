@@ -4,16 +4,18 @@
 extern s32 D_L10_001B0F44 __attribute__((sda));
 extern s32 D_L10_001B0F48 __attribute__((sda));
 
+/* Returns the first boss flag and clears it, so each event is seen only once. */
 s32 func_L10_004176A0(void) {
-    s32 v = D_L10_001B0F44;
+    s32 value = D_L10_001B0F44;
     D_L10_001B0F44 = 0;
-    return v;
+    return value;
 }
 
+/* Returns the second boss flag and clears it, so each event is seen only once. */
 s32 func_L10_004176B0(void) {
-    s32 v = D_L10_001B0F48;
+    s32 value = D_L10_001B0F48;
     D_L10_001B0F48 = 0;
-    return v;
+    return value;
 }
 
 extern s32 D_L10_001B0F44 __attribute__((sda));
@@ -24,31 +26,31 @@ extern u8 *D_001B251C;
 
 /* Clears the arena's 128 records of 0x60 bytes and then walks the entry's two-byte
    id list, flagging every live object of one class. */
-void func_L10_00417440(u8 *arg0) {
-    s32 *p;
+void func_L10_00417440(u8 *group) {
+    s32 *clearPtr;
     s32 i;
-    u8 *q;
-    u16 *r;
-    u8 *e;
+    u8 *idList;
+    u16 *idPtr;
+    u8 *moby;
 
     D_L10_001B0F44 = 0;
-    p = (s32 *)D_L10_00265BA0;
+    clearPtr = (s32 *)D_L10_00265BA0;
     D_L10_001B0F48 = 0;
-    p = (s32 *)((u8 *)p + 0x2FE0);
+    clearPtr = (s32 *)((u8 *)clearPtr + 0x2FE0);
     for (i = 0x7F; i >= 0; i--) {
-        *p = 0;
-        p -= 0x18;
+        *clearPtr = 0;
+        clearPtr -= 0x18;
     }
-    q = D_L10_001FB1E0[arg0[0x21]];
-    if (q == 0)
+    idList = D_L10_001FB1E0[group[0x21]];
+    if (idList == 0)
         return;
-    r = (u16 *)q;
+    idPtr = (u16 *)idList;
     do {
-        e = D_001B251C + ((*r & 0x7FFF) << 8);
-        e[0x20] = 1;
-        if ((s16)*r < 0)
+        moby = D_001B251C + ((*idPtr & 0x7FFF) << 8);
+        moby[0x20] = 1;
+        if ((s16)*idPtr < 0)
             break;
-        r++;
+        idPtr++;
     } while (1);
 }
 
@@ -58,39 +60,39 @@ extern void func_0032AF78(s32 a0);
 /* Releases both timed effects the entry's live objects still hold: the id list walks the
    same arena records as func_L10_00417440, one record per id, and tears down the two
    effect slots at +0x2C4 and +0x2C0 of each record. */
-void func_L10_004174C8(u8 *arg0) {
-    u16 *r;
-    u8 *e;
-    u8 *s0;
-    u8 *q;
-    u32 v;
+void func_L10_004174C8(u8 *group) {
+    u16 *idPtr;
+    u8 *moby;
+    u8 *vars;
+    u8 *idList;
+    u32 childVars;
 
-    q = D_L10_001FB1E0[arg0[0x21]];
-    if (q == 0)
+    idList = D_L10_001FB1E0[group[0x21]];
+    if (idList == 0)
         return;
-    r = (u16 *)q;
+    idPtr = (u16 *)idList;
     do {
-        e = D_001B251C + ((*r & 0x7FFF) << 8);
-        s0 = *(u8 **)(e + 0x68);
-        if (*(u8 **)(s0 + 0x2C4) != 0) {
-            func_0032BD98((s32)*(u8 **)(s0 + 0x2C4), s0 + 0x370);
-            func_0032BD98((s32)*(u8 **)(s0 + 0x2C4), s0 + 0x3B0);
-            v = *(u32 *)(*(u8 **)(*(u8 **)(s0 + 0x2C4) + 0x68) + 0x18);
-            if (v != 0)
-                func_0032AF78(v);
-            func_0032AF78((s32)*(u8 **)(s0 + 0x2C4));
-            *(u32 *)(s0 + 0x2C4) = 0;
+        moby = D_001B251C + ((*idPtr & 0x7FFF) << 8);
+        vars = *(u8 **)(moby + 0x68);
+        if (*(u8 **)(vars + 0x2C4) != 0) {
+            func_0032BD98((s32)*(u8 **)(vars + 0x2C4), vars + 0x370);
+            func_0032BD98((s32)*(u8 **)(vars + 0x2C4), vars + 0x3B0);
+            childVars = *(u32 *)(*(u8 **)(*(u8 **)(vars + 0x2C4) + 0x68) + 0x18);
+            if (childVars != 0)
+                func_0032AF78(childVars);
+            func_0032AF78((s32)*(u8 **)(vars + 0x2C4));
+            *(u32 *)(vars + 0x2C4) = 0;
         }
-        if (*(u8 **)(s0 + 0x2C0) != 0) {
-            func_0032BD98((s32)*(u8 **)(s0 + 0x2C0), s0 + 0x2F0);
-            func_0032BD98((s32)*(u8 **)(s0 + 0x2C0), s0 + 0x330);
-            v = *(u32 *)(*(u8 **)(*(u8 **)(s0 + 0x2C0) + 0x68) + 0x18);
-            if (v != 0)
-                func_0032AF78(v);
-            func_0032AF78((s32)*(u8 **)(s0 + 0x2C0));
-            *(u32 *)(s0 + 0x2C0) = 0;
+        if (*(u8 **)(vars + 0x2C0) != 0) {
+            func_0032BD98((s32)*(u8 **)(vars + 0x2C0), vars + 0x2F0);
+            func_0032BD98((s32)*(u8 **)(vars + 0x2C0), vars + 0x330);
+            childVars = *(u32 *)(*(u8 **)(*(u8 **)(vars + 0x2C0) + 0x68) + 0x18);
+            if (childVars != 0)
+                func_0032AF78(childVars);
+            func_0032AF78((s32)*(u8 **)(vars + 0x2C0));
+            *(u32 *)(vars + 0x2C0) = 0;
         }
-    } while ((s16)*r++ >= 0);
+    } while ((s16)*idPtr++ >= 0);
 }
 
 /* The mission state (D_L10_00221CD0), as far as func_L10_00423500 resets it. */
@@ -132,14 +134,14 @@ void func_L10_00423500(void *object) {
     D_L10_001B1438 = 1;
     D_L10_00221CD0.waiting = 1;
     D_L10_00221CD0.f28 = 100;
-    D_L10_001B13A4 = 0;
+    gMissionInitialized = 0;
     D_L10_00221CD0.rounds = 0;
-    slot = func_002ED8A0(6);
+    slot = FindLastUsedChainEntry(6);
     D_L10_002A3C70[slot].value = D_L10_002A3C70[slot].limit;
-    func_L05_0037B210();
+    InitAllRegisteredEntries();
     D_L10_00221CD0.f30 = 8.0f;
     D_L10_00221CD0.f10 = 0;
-    func_L05_00379F28(0);
-    func_L05_0037D6E8();
-    func_L05_00379F68();
+    SetPlayerStateField15(0);
+    ResetTableWorkingValues();
+    ClearLevelObjectRecords();
 }

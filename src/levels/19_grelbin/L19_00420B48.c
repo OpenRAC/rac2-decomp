@@ -14,58 +14,58 @@ extern float D_L19_001B1DE8[] __attribute__((sda));
 extern float D_L19_001B1DEC[] __attribute__((sda));
 
 /* Draws the object's 25-unit beam along its heading: a wide tinted quad, then a narrow white core. */
-void func_L19_00420B48(char *object)
+void func_L19_00420B48(char *moby)
 {
-    BeamWorkspace local;
+    BeamWorkspace beam;
     int i, j;
-    func_00282F20(&local.direction,object+0xe0,*(float *)(*(char **)(object+0x68)+0xc));
-    func_00282CC0(&local.end,object+0x10,&local.direction);
-    func_00282CF0(&local.firstSide,object+0x10,D_L19_001B9A40);
-    func_00282CF0(&local.secondSide,&local.end,D_L19_001B9A40);
-    func_00282DD8(&local.firstSide,&local.firstSide,&local.direction);
-    func_00282F20(&local.firstSide,&local.firstSide,0.15f);
-    func_00282DD8(&local.secondSide,&local.secondSide,&local.direction);
-    func_00282F20(&local.secondSide,&local.secondSide,0.15f);
-    local.packet.header[1]=func_0027C878(14);
-    local.packet.header[2]=0xff9000000260ULL;
-    local.packet.header[3]=0x8000000048ULL;
-    local.packet.header[0]=0;
-    local.packet.colors[0] = local.packet.colors[1] = local.packet.colors[2] = local.packet.colors[3] = 0x80243278u;
+    vec_scale_to_length(&beam.direction,moby+0xe0,*(float *)(*(char **)(moby+0x68)+0xc));
+    FastVecAdd(&beam.end,moby+0x10,&beam.direction);
+    FastVecSub(&beam.firstSide,moby+0x10,D_L19_001B9A40);
+    FastVecSub(&beam.secondSide,&beam.end,D_L19_001B9A40);
+    FastVecCross(&beam.firstSide,&beam.firstSide,&beam.direction);
+    vec_scale_to_length(&beam.firstSide,&beam.firstSide,0.15f);
+    FastVecCross(&beam.secondSide,&beam.secondSide,&beam.direction);
+    vec_scale_to_length(&beam.secondSide,&beam.secondSide,0.15f);
+    beam.packet.header[1]=GetEffectTextureDescriptor(14);
+    beam.packet.header[2]=0xff9000000260ULL;
+    beam.packet.header[3]=0x8000000048ULL;
+    beam.packet.header[0]=0;
+    beam.packet.colors[0] = beam.packet.colors[1] = beam.packet.colors[2] = beam.packet.colors[3] = 0x80243278u;
     for (i = 0; i < 4; i++) {
-        local.packet.uv[i][0] = D_L19_001B1DE8[i * 2];
-        local.packet.uv[i][1] = D_L19_001B1DEC[i * 2];
+        beam.packet.uv[i][0] = D_L19_001B1DE8[i * 2];
+        beam.packet.uv[i][1] = D_L19_001B1DEC[i * 2];
     }
-    func_00282CF0(&local.scratch,object+0x10,&local.firstSide);
-    local.packet.vertices[0]=local.scratch;
-    func_00282CC0(&local.scratch,object+0x10,&local.firstSide);
-    local.packet.vertices[1]=local.scratch;
-    func_00282CF0(&local.scratch,&local.end,&local.secondSide);
-    local.packet.vertices[2]=local.scratch;
-    func_00282CC0(&local.scratch,&local.end,&local.secondSide);
-    local.packet.vertices[3]=local.scratch;
-    func_00280B90(&local.packet,0,0);
-    func_00282CF0(&local.firstSide,object+0x10,D_L19_001B9A40);
-    func_00282CF0(&local.secondSide,&local.end,D_L19_001B9A40);
-    func_00282DD8(&local.firstSide,&local.firstSide,&local.direction);
-    func_00282F20(&local.firstSide,&local.firstSide,0.05f);
-    func_00282DD8(&local.secondSide,&local.secondSide,&local.direction);
-    func_00282F20(&local.secondSide,&local.secondSide,0.05f);
-    local.packet.header[1]=func_0027C878(14);
-    local.packet.header[2]=0xff9000000260ULL;
-    local.packet.header[3]=0x8000000048ULL;
-    local.packet.header[0]=0;
-    local.packet.colors[0] = local.packet.colors[1] = local.packet.colors[2] = local.packet.colors[3] = 0x80808080u;
+    FastVecSub(&beam.scratch,moby+0x10,&beam.firstSide);
+    beam.packet.vertices[0]=beam.scratch;
+    FastVecAdd(&beam.scratch,moby+0x10,&beam.firstSide);
+    beam.packet.vertices[1]=beam.scratch;
+    FastVecSub(&beam.scratch,&beam.end,&beam.secondSide);
+    beam.packet.vertices[2]=beam.scratch;
+    FastVecAdd(&beam.scratch,&beam.end,&beam.secondSide);
+    beam.packet.vertices[3]=beam.scratch;
+    draw_world_quad(&beam.packet,0,0);
+    FastVecSub(&beam.firstSide,moby+0x10,D_L19_001B9A40);
+    FastVecSub(&beam.secondSide,&beam.end,D_L19_001B9A40);
+    FastVecCross(&beam.firstSide,&beam.firstSide,&beam.direction);
+    vec_scale_to_length(&beam.firstSide,&beam.firstSide,0.05f);
+    FastVecCross(&beam.secondSide,&beam.secondSide,&beam.direction);
+    vec_scale_to_length(&beam.secondSide,&beam.secondSide,0.05f);
+    beam.packet.header[1]=GetEffectTextureDescriptor(14);
+    beam.packet.header[2]=0xff9000000260ULL;
+    beam.packet.header[3]=0x8000000048ULL;
+    beam.packet.header[0]=0;
+    beam.packet.colors[0] = beam.packet.colors[1] = beam.packet.colors[2] = beam.packet.colors[3] = 0x80808080u;
     for (j = 0; j < 4; j++) {
-        local.packet.uv[j][0] = D_L19_001B1DE8[j * 2];
-        local.packet.uv[j][1] = D_L19_001B1DEC[j * 2];
+        beam.packet.uv[j][0] = D_L19_001B1DE8[j * 2];
+        beam.packet.uv[j][1] = D_L19_001B1DEC[j * 2];
     }
-    func_00282CF0(&local.scratch,object+0x10,&local.firstSide);
-    local.packet.vertices[0]=local.scratch;
-    func_00282CC0(&local.scratch,object+0x10,&local.firstSide);
-    local.packet.vertices[1]=local.scratch;
-    func_00282CF0(&local.scratch,&local.end,&local.secondSide);
-    local.packet.vertices[2]=local.scratch;
-    func_00282CC0(&local.scratch,&local.end,&local.secondSide);
-    local.packet.vertices[3]=local.scratch;
-    func_00280B90(&local.packet,0,0);
+    FastVecSub(&beam.scratch,moby+0x10,&beam.firstSide);
+    beam.packet.vertices[0]=beam.scratch;
+    FastVecAdd(&beam.scratch,moby+0x10,&beam.firstSide);
+    beam.packet.vertices[1]=beam.scratch;
+    FastVecSub(&beam.scratch,&beam.end,&beam.secondSide);
+    beam.packet.vertices[2]=beam.scratch;
+    FastVecAdd(&beam.scratch,&beam.end,&beam.secondSide);
+    beam.packet.vertices[3]=beam.scratch;
+    draw_world_quad(&beam.packet,0,0);
 }

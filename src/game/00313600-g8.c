@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00313600: -G8 unit, so the two float scales are $gp reads. func_002ACEC0 has its
  * real prototype (the draft called it undeclared), and the loop indexes the two tables,
  * which strength reduction turns into retail's pointer pair and %hi registers. */
@@ -28,7 +29,7 @@ void func_00313600(void)
 
     for (i = 0; i < 8; i++) {
         char *entry = D_00229B70 + i * 16;
-        func_002ACEC0(entry, entry, D_00229BF0 + i * 16, D_001AF108);
-        func_00282F20(entry, entry, D_001AF130);
+        ApplyAxisRotationToQuaternion(entry, entry, D_00229BF0 + i * 16, D_001AF108);
+        vec_scale_to_length(entry, entry, D_001AF130);
     }
 }

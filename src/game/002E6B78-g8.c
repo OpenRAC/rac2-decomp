@@ -29,6 +29,7 @@ extern void func_00283098(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00280B90(void *, void *, int);
 
+/* Draws a soft shadow square on the ground under an object, fading it with distance and during the end-of-level fade. */
 void func_002E6B78(char *object)
 {
     float projected[4];
@@ -40,32 +41,32 @@ void func_002E6B78(char *object)
     char *point;
 
     alpha = 0;
-    func_00282D60(projected, object, 0.0009765625f);
-    if (func_00283EB0(projected, &alpha, 32.0f) < 0)
+    scale_vector(projected, object, 0.0009765625f);
+    if (FastMathHelperB(projected, &alpha, 32.0f) < 0)
         return;
-    if (D_001A8BB0_gp == 6 && D_00152C00[16] == 1 && D_00152C00[17] >= 151) {
-        alpha -= (D_00152C00[17] - 150) * 4;
+    if (D_001A8BB0_gp == 6 && gHeroMoby_00152C00[16] == 1 && gHeroMoby_00152C00[17] >= 151) {
+        alpha -= (gHeroMoby_00152C00[17] - 150) * 4;
         if (alpha <= 0)
             return;
     }
-    packet.tags[1] = func_0027C878(0);
+    packet.tags[1] = GetEffectTextureDescriptor(0);
     packet.tags[2] = 0xFF9000000260ULL;
     packet.tags[3] = 0x8000000044ULL;
     packet.tags[0] = 0;
-    func_00282B50(packet.block, D_001ABF90, 32);
-    func_00282D30(pos, object, 0.0009765625f);
+    FastMemoryHelperC(packet.block, D_001ABF90, 32);
+    FastVecScale(pos, object, 0.0009765625f);
     height = *(float *)(object + 24) + 0.1f;
-    if (D_001A8BB0 == 6 || D_001A8BB0 == 0)
-        height = func_002A89A8(object + 16, 0, 0.5f) + 0.1f;
+    if (gCurrentGameMode == 6 || gCurrentGameMode == 0)
+        height = ProbeGroundHeightBelow(object + 16, 0, 0.5f) + 0.1f;
     point = object + 16;
     for (i = 0; i < 4; i++) {
         Vector *row;
 
         packet.colors[i] = ((alpha >> 1) << 24) | 0x808080;
         row = &packet.rows[i];
-        func_00283098(row, D_001ABFB0 + 16 * i, object + 192);
-        func_00282CC0(row, row, point);
+        matrix_mul_vec3(row, D_001ABFB0 + 16 * i, object + 192);
+        FastVecAdd(row, row, point);
         row->v[2] = height;
     }
-    func_00280B90(packet.rows, 0, 0);
+    draw_world_quad(packet.rows, 0, 0);
 }

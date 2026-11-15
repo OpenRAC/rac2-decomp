@@ -50,24 +50,24 @@ Moby *func_00315C78(Moby *self)
 
     nearest = D_001AF54C;
     while (moby != 0) {
-        if ((moby->oClass == 0xCB5 || moby->oClass == 0x12EA) && moby->state != 2) {
+        if ((moby->oClass == 0xCB5 /* moby class 3253 */ || moby->oClass == 0x12EA /* moby class 4842 */) && moby->state != 2) {
             int accept;
 
             qcopy(sphere, moby->position);
             sphere[3] = 0.5f;
-            if (func_00283DB8(sphere, *(float *)(moby->vars + 8)) != -1) {
+            if (FastMathHelperA(sphere, *(float *)(moby->vars + 8)) != -1) {
                 accept = 1;
-                if (func_002761F8(D_001B5340, moby->position, 6, moby, 0)) {
-                    Moby *hit = D_001BAF80.moby;
+                if (CollLine(gCameraState_001B5340, moby->position, 6, moby, 0)) {
+                    Moby *hit = gCollisionHit.moby;
 
-                    if (hit == 0 || (hit->oClass != 0xCB5 && D_00189E20.moby != hit))
+                    if (hit == 0 || (hit->oClass != 0xCB5 && gHeroState.moby != hit))
                         accept = 0;
                     if (moby->oClass == 0x12EA &&
-                        func_00282E80(D_001BAF80.point, moby->position) < 1.0f)
+                        vec_distance_xy(gCollisionHit.point, moby->position) < 1.0f)
                         accept = 1;
                 }
                 if (accept) {
-                    float distance = func_00282E48(moby->position, D_00189E20.moby->position);
+                    float distance = fast_vec_dist(moby->position, gHeroState.moby->position);
 
                     if (distance < nearest) {
                         nearest = distance;

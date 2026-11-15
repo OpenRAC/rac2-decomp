@@ -27,8 +27,8 @@ void func_00292B88(long *out, Texture_292B88 *texture,
     int base, first, second, storage;
     if (width <= 0) width = 1;
     if (half_width <= 0) half_width = 1;
-    log_width = func_00282A18(texture->width);
-    log_height = func_00282A18(texture->height);
+    log_width = log2dim(texture->width);
+    log_height = log2dim(texture->height);
     base = texture->base + (D_001A72F4 >> 8);
     first = texture->first + (D_001A72F4 >> 8);
     second = texture->second + (D_001A72F4 >> 8);

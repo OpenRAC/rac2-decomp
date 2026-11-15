@@ -10,12 +10,12 @@ extern void r1_func_0012BCC8(int);
 
 typedef struct {
     unsigned char pad0[0x11C];
-    int unk11C;
+    int errorFlag;
     unsigned char pad120[0x6F8];
-    int unk818;
+    int cmdInfo;
     unsigned char pad81C[0x1C];
-    int unk838;
-    int unk83C;
+    int bitWindow;
+    int bitsLeft;
     unsigned char pad840[0x18];
     void *cbData;
 } MpegVdec;
@@ -28,8 +28,9 @@ extern int func_0012C878(void *, int);
 
 /* rac1-decomp src/core/00125630.c: func_001286E8 */
 /* _ipuVdec (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
-short func_0012C508(int arg0, int tbl) {
-    MpegVdec *d = (MpegVdec *)arg0;
+/* Reads one code from the video stream using one of the chip lookup tables, and sets the error flag if nothing matched. */
+short func_0012C508(int decoderAddr, int tbl) {
+    MpegVdec *d = (MpegVdec *)decoderAddr;
     int i;
     int j;
     unsigned int cmd;
@@ -47,7 +48,7 @@ short func_0012C508(int arg0, int tbl) {
     }
     cmd = (tbl << 26) | 0x30000000;
     IPU_CMD = cmd;
-    d->unk818 = r1_D_00132F70[(int)cmd >> 28];
+    d->cmdInfo = r1_D_00132F70[(int)cmd >> 28];
     r = IPU_CMD64;
     while (r < 0) {
         if (i++ > 5000) {
@@ -58,13 +59,13 @@ short func_0012C508(int arg0, int tbl) {
     }
     bp = IPU_BP;
     top = IPU_TOP;
-    d->unk838 = top;
+    d->bitWindow = top;
     if (top < 0) {
-        d->unk83C = -(bp & 0x1F) & 0x1F;
+        d->bitsLeft = -(bp & 0x1F) & 0x1F;
     } else {
-        d->unk83C = 32;
+        d->bitsLeft = 32;
     }
-    d->unk11C = (int)r == 0;
+    d->errorFlag = (int)r == 0;
     return (short)r;
 }
 extern int func_0012C680(void *arg, int count);
@@ -78,8 +79,8 @@ extern long r1_func_00128638(void *arg0);
    consuming them, refilling the 32-bit window from the IPU (FDEC) when
    it runs short and nudging the callback while the IPU stays busy.
    Adapted from Lombyte's project (GPL-3.0) for PAL. */
-int func_0012C680(void *arg, int count) {
-    char *ctx = arg;
+int func_0012C680(void *decoderPtr, int count) {
+    char *ctx = decoderPtr;
     int counter;
 
     if (*(int *)(ctx + 0x818) == 0 && *(int *)(ctx + 0x83C) >= count) {
@@ -121,21 +122,22 @@ extern long r1_func_00128638();
  * like retail; 2.95.3 hoists them into saved registers (SIZE 252/240).
  * The stores go in source order 0x838 then 0x83C.
  */
-void func_0012C788(void *arg0, int arg1) {
+/* Skips a given number of bits in the video stream. */
+void func_0012C788(void *decoderPtr, int bitCount) {
     int counter = 0;
     unsigned int cmd;
 
     while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
-            r1_func_0012BCC8(*(int *)((char *)arg0 + 0x858));
+            r1_func_0012BCC8(*(int *)((char *)decoderPtr + 0x858));
             counter = 0;
         }
     }
-    cmd = arg1 | 0x40000000;
+    cmd = bitCount | 0x40000000;
     IPU_CMD = cmd;
-    *(int *)((char *)arg0 + 0x818) = r1_D_00132F70[cmd >> 28];
-    *(int *)((char *)arg0 + 0x838) = r1_func_00128638(arg0);
-    *(int *)((char *)arg0 + 0x83C) = 0x20;
+    *(int *)((char *)decoderPtr + 0x818) = r1_D_00132F70[cmd >> 28];
+    *(int *)((char *)decoderPtr + 0x838) = r1_func_00128638(decoderPtr);
+    *(int *)((char *)decoderPtr + 0x83C) = 0x20;
 }
 
 extern int func_0012C878(void *arg0, int n);
@@ -149,8 +151,9 @@ extern int func_0012C878(void *arg0, int n);
  * the IPU to consume them. The r1_D_00132F70 index needs its own local,
  * computed before the command store, or the allocator swaps $v1 and $a0.
  */
-int func_0012C878(void *arg0, int n) {
-    char *s = (char *)arg0;
+/* Reads the given number of bits from the video stream and moves past them. */
+int func_0012C878(void *decoderPtr, int n) {
+    char *s = (char *)decoderPtr;
     int counter = 0;
     unsigned int cmd;
     unsigned int idx;

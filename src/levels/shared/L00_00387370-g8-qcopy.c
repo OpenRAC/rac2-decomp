@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_00387370 is a unit of its own: the 16-byte block the level copies out of
    the object needs the opt-in grouped quadword-copy profile (-frac2-qcopy
@@ -23,8 +24,8 @@ void func_L00_00387370(void *owner)
     char local[16];
 
     *(L00_00387370_TI128 *)local = *(L00_00387370_TI128 *)target;
-    func_00282CC0(target, target, source);
-    func_002FE880(target, source, D_L00_001AEF30 * 2.7777778086601757e-05f);
-    if (func_002761F8(local, target, 0x10, owner, 0) != 0)
+    FastVecAdd(target, target, source);
+    AddObjectDirectionScaled(target, source, D_L00_001AEF30 * 2.7777778086601757e-05f);
+    if (CollLine(local, target, 0x10, owner, 0) != 0)
         *((unsigned char *)owner + 0x20) = 8;
 }

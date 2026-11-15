@@ -28,37 +28,38 @@ extern f32 ref_L04_003A0C40_01;
 extern f32 ref_L04_003A0C40_02;
 extern f32 ref_L04_003A0C40_03;
 
-void func_L04_003A0C40(void *arg0) {
-    s32 var_a1;
-    s32 var_a2;
-    f32 *var_a1_2;
-    f32 *var_v1;
-    f32 temp_f0;
-    f32 var_f2;
-    f32 var_f3;
-    s32 temp_v0;
+/* Fills a 17 by 17 grid of points starting at the given position. */
+void func_L04_003A0C40(void *origin) {
+    s32 row;
+    s32 col;
+    f32 *srcPtr;
+    f32 *outPtr;
+    f32 srcVal;
+    f32 xPos;
+    f32 yPos;
+    s32 nextRow;
 
-    var_v1 = (f32 *)0x70002000;
-    var_a1 = 0;
-    var_f3 = (*(f32 *)((s8 *)(arg0) + (4))) + ref_L04_003A0C40_01;
+    outPtr = (f32 *)0x70002000;
+    row = 0;
+    yPos = (*(f32 *)((s8 *)(origin) + (4))) + ref_L04_003A0C40_01;
     do {
-        temp_v0 = var_a1 + 1;
-        var_f2 = (*(f32 *)((s8 *)(arg0) + (0))) + ref_L04_003A0C40_00;
-        var_a1_2 = (f32 *)((s8 *)0x70000010 + temp_v0 * 0x60);
-        var_a2 = 0x10;
+        nextRow = row + 1;
+        xPos = (*(f32 *)((s8 *)(origin) + (0))) + ref_L04_003A0C40_00;
+        srcPtr = (f32 *)((s8 *)0x70000010 + nextRow * 0x60);
+        col = 0x10;
         do {
-            *var_v1 = var_f2;
-            var_a2 -= 1;
-            var_v1 += 1;
-            *var_v1 = var_f3;
-            var_v1 += 1;
-            temp_f0 = *var_a1_2;
-            var_a1_2 += 1;
-            *var_v1 = temp_f0 + (*(f32 *)((s8 *)(arg0) + (8)));
-            var_v1 += 1;
-            var_f2 += ref_L04_003A0C40_02;
-        } while (var_a2 >= 0);
-        var_a1 = temp_v0;
-        var_f3 += ref_L04_003A0C40_03;
-    } while (var_a1 < 0x11);
+            *outPtr = xPos;
+            col -= 1;
+            outPtr += 1;
+            *outPtr = yPos;
+            outPtr += 1;
+            srcVal = *srcPtr;
+            srcPtr += 1;
+            *outPtr = srcVal + (*(f32 *)((s8 *)(origin) + (8)));
+            outPtr += 1;
+            xPos += ref_L04_003A0C40_02;
+        } while (col >= 0);
+        row = nextRow;
+        yPos += ref_L04_003A0C40_03;
+    } while (row < 0x11);
 }

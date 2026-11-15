@@ -103,16 +103,16 @@ void func_L00_003B79A0(Moby *moby)
     switch (moby->state) {
     case 0:
         /* Settle into the floor; start pressed if it was pressed before or its mission is done. */
-        vars->phase = func_002A7940();
+        vars->phase = RandomAngle();
         id = moby->uid;
         moby->position[2] -= 0.35f;
         if (!D_L00_0021DDB0.byUid[id]) {
-            count = D_0019B4A8[(id >> 1) + D_001A79F0 * 0x400];
+            count = D_0019B4A8[(id >> 1) + gCurrentMapIndex * 0x400];
             if (moby->uid & 1)
                 count = (count >> 4) & 7;
             else
                 count &= 7;
-            if (!count && !(vars->byMission && (D_0019B2E8[D_001A79F0][moby->mission] & 0x80)))
+            if (!count && !(vars->byMission && (D_0019B2E8[gCurrentMapIndex][moby->mission] & 0x80)))
                 goto waiting;
         }
         moby->fBC = 2;
@@ -126,8 +126,8 @@ waiting:
 
     case 1:
         /* Pulse the glow between 32 and 128. */
-        vars->phase = func_00283B98(vars->phase, 0.10471977f);    /* 6 degrees a frame */
-        intensity = func_00283CF0((func_00283198(vars->phase) * 4.0f - 3.0f) * 128.0f);
+        vars->phase = FastAddRotations(vars->phase, 0.10471977f);    /* 6 degrees a frame */
+        intensity = FloatToInt((FastSinOrCosB(vars->phase) * 4.0f - 3.0f) * 128.0f);
         if (intensity > 128)
             intensity = 128;
         else if (intensity < 32)
@@ -138,22 +138,22 @@ waiting:
         moby->color = blue | alphaGreen | grey;
 
         /* Wait for the hero to stand on the button, or for its mission. */
-        if (D_00189E20.groundMoby != moby || D_00189E20.f34E) {
+        if (gHeroState.groundMoby != moby || gHeroState.f34E) {
             if (!vars->byMission)
                 return;
-            if (!(D_0019B2E8[D_001A79F0][moby->mission] & 0x80))
+            if (!(D_0019B2E8[gCurrentMapIndex][moby->mission] & 0x80))
                 return;
         }
 
         /* Count the press (up to 7), then unblock the path. */
         uid = moby->uid;
         if (uid & 1) {
-            counter = &D_0019B4A8[((short)uid >> 1) + D_001A79F0 * 0x400];
+            counter = &D_0019B4A8[((short)uid >> 1) + gCurrentMapIndex * 0x400];
             value = *counter;
             if (((value >> 4) & 7) != 7)
                 *counter = value + 0x10;
         } else {
-            counter = &D_0019B4A8[((short)uid >> 1) + D_001A79F0 * 0x400];
+            counter = &D_0019B4A8[((short)uid >> 1) + gCurrentMapIndex * 0x400];
             value = *counter;
             if ((value & 7) != 7)
                 *counter = value + 1;
@@ -161,7 +161,7 @@ waiting:
         moby->state = 2;
         moby->fBC = 1;
         moby->color = 0x80208020;
-        func_002E5CF8(0, 0, moby);
+        PlayMobySound(0, 0, moby);
         ClearPathTags(vars);
     }
 }

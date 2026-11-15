@@ -30,63 +30,65 @@ extern unsigned short **D_L00_001A9014 __attribute__((sda));
 extern unsigned char *D_L00_001B2514 __attribute__((sda));
 extern unsigned char *D_L00_001B251C __attribute__((sda));
 
+/* Goes through a list of lit points near the object, keeps the ones in view, and works out
+   each colour from how much the point faces the camera. Then it sends them all to be drawn. */
 void func_L00_003F3518(char *obj)
 {
-    unsigned char *st = *(unsigned char **)(obj + 0x68);
+    unsigned char *vars = *(unsigned char **)(obj + 0x68);
     char buf0[0x460] __attribute__((aligned(16)));
     char buf1[0x120] __attribute__((aligned(16)));
     char pos[16] __attribute__((aligned(16)));
-    char b[16] __attribute__((aligned(16)));
-    char d[16] __attribute__((aligned(16)));
-    char c[16] __attribute__((aligned(16)));
-    char f[16] __attribute__((aligned(16)));
-    char e4[16] __attribute__((aligned(16)));
+    char groupPoint[16] __attribute__((aligned(16)));
+    char offset[16] __attribute__((aligned(16)));
+    char scratch[16] __attribute__((aligned(16)));
+    char facing[16] __attribute__((aligned(16)));
+    char facingBase[16] __attribute__((aligned(16)));
     int idx;
     int count;
     int color;
-    unsigned short *q;
-    unsigned char *e;
+    unsigned short *indexList;
+    unsigned char *entry;
     float dot;
 
-    idx = *(int *)st;
+    idx = *(int *)vars;
     count = 0;
-    q = D_L00_001A9014[idx];
-    for (; q != 0 && ((short)q[-1] >= 0 || q == D_L00_001A9014[*(int *)st]) &&
-           (e = D_L00_001B251C + ((*q & 0x7FFF) << 6)) != 0;
-         q++) {
-        qcopy(pos, D_L00_001B2514 + ((*q & 0x7FFF) << 5));
-        *(float *)(pos + 12) += *(float *)(st + 0x4C);
-        if (func_00283DB8(pos, *(float *)(st + 0x60)) < 0)
+    indexList = D_L00_001A9014[idx];
+    for (; indexList != 0 && ((short)indexList[-1] >= 0 || indexList == D_L00_001A9014[*(int *)vars]) &&
+           (entry = D_L00_001B251C + ((*indexList & 0x7FFF) << 6)) != 0;
+         indexList++) {
+        qcopy(pos, D_L00_001B2514 + ((*indexList & 0x7FFF) << 5));
+        *(float *)(pos + 12) += *(float *)(vars + 0x4C);
+        if (FastMathHelperA(pos, *(float *)(vars + 0x60)) < 0)
             continue;
-        qcopy(b, e + 0x30);
-        *(TI128 *)c = 0;
-        *(float *)(c + 0) = *(float *)(st + 0x50);
-        *(float *)(c + 4) = *(float *)(st + 0x54);
-        *(float *)(c + 8) = *(float *)(st + 0x58);
-        *(TI128 *)d = *(TI128 *)c;
-        func_00283098(d, d, (char *)e);
-        func_00282CC0(b, b, d);
-        if (*(int *)(st + 0x6C) != 0) {
-            func_L00_003F34D8(b, (int *)(st + 0x30), buf0, (int *)buf1, &count);
+        qcopy(groupPoint, entry + 0x30);
+        *(TI128 *)scratch = 0;
+        *(float *)(scratch + 0) = *(float *)(vars + 0x50);
+        *(float *)(scratch + 4) = *(float *)(vars + 0x54);
+        *(float *)(scratch + 8) = *(float *)(vars + 0x58);
+        *(TI128 *)offset = *(TI128 *)scratch;
+        matrix_mul_vec3(offset, offset, (char *)entry);
+        FastVecAdd(groupPoint, groupPoint, offset);
+        if (*(int *)(vars + 0x6C) != 0) {
+            AppendPointAndColorToList(groupPoint, (int *)(vars + 0x30), buf0, (int *)buf1, &count);
             continue;
         }
-        func_00282CF0(c, (char *)&D_L00_001B8C80.x_140, b);
-        func_00282F20(c, c, 1.0f);
-        *(TI128 *)e4 = 0;
-        *(float *)(e4 + 0) = *(float *)(st + 0x40);
-        *(float *)(e4 + 4) = *(float *)(st + 0x44);
-        *(float *)(e4 + 8) = *(float *)(st + 0x48);
-        *(TI128 *)f = *(TI128 *)e4;
-        func_00283098(f, f, (char *)e);
-        func_00282F20(f, f, 1.0f);
-        dot = func_00282DB0(c, f);
-        if (*(float *)(st + 0x3C) < dot) {
+        FastVecSub(scratch, (char *)&D_L00_001B8C80.x_140, groupPoint);
+        vec_scale_to_length(scratch, scratch, 1.0f);
+        *(TI128 *)facingBase = 0;
+        *(float *)(facingBase + 0) = *(float *)(vars + 0x40);
+        *(float *)(facingBase + 4) = *(float *)(vars + 0x44);
+        *(float *)(facingBase + 8) = *(float *)(vars + 0x48);
+        *(TI128 *)facing = *(TI128 *)facingBase;
+        matrix_mul_vec3(facing, facing, (char *)entry);
+        vec_scale_to_length(facing, facing, 1.0f);
+        dot = FastVecDot(scratch, facing);
+        if (*(float *)(vars + 0x3C) < dot) {
             dot = dot * 0.5f + 0.5f;
-            if (*(int *)(st + 0x38) != 0)
+            if (*(int *)(vars + 0x38) != 0)
                 dot = dot * dot;
-            color = func_L00_0031C998(*(int *)(st + 0x34), *(int *)(st + 0x30), dot);
-            func_L00_003F34D8(b, &color, buf0, (int *)buf1, &count);
+            color = LerpIntegerFraction(*(int *)(vars + 0x34), *(int *)(vars + 0x30), dot);
+            AppendPointAndColorToList(groupPoint, &color, buf0, (int *)buf1, &count);
         }
     }
-    func_L00_00325CC0(count, buf0, buf1, *(float *)(st + 0x4C), *(float *)(st + 0x5C));
+    DrawOffsetBillboardBatch(count, buf0, buf1, *(float *)(vars + 0x4C), *(float *)(vars + 0x5C));
 }

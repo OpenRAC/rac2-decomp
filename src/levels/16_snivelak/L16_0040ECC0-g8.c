@@ -148,6 +148,7 @@ extern void func_L16_00411480(u8 *);
 extern void func_L16_00411600(u8 *);
 
 /* Advances the boss's arena, animation, aiming and projectile phases. */
+/* This is the per-frame update of the Snivelak boss (moby class 3961). */
 void func_L16_0040ECC0(u8 *moby)
 {
     u8 *slot1, *slot2, *slot3, *slot4, *slot5, *slot6;
@@ -158,25 +159,25 @@ void func_L16_0040ECC0(u8 *moby)
     u8 *flags;
     float *heading0, *heading1, *heading2, *heading3, *heading6, *heading7, *heading8;
     int next, sound1, sound2, sound3, sound4;
-    func_L16_00410618(moby);
+    UpdateSnivelakBossDamage(moby);
     if (!moby || moby[0x20] == 254 || moby[0x20] == 253) return;
 
     switch (moby[0x95]) {
     case 0:
-        if (func_002ACBC8(&((Hero *)D_00189E20)->f[0x20], state->entryArea) ||
-            (func_002ACBC8(&((Hero *)D_00189E20)->f[0x20], state->exitArea) && D_001395B8[0x83] == 1)) {
+        if (IsPointInCuboid(&((Hero *)gHeroState)->f[0x20], state->entryArea) ||
+            (IsPointInCuboid(&((Hero *)gHeroState)->f[0x20], state->exitArea) && D_001395B8[0x83] == 1)) {
             flags = D_001395B8;
             if (!flags[0x83]) {
-                if (func_00288AA0((u8 *)&D_L16_001BFD00, 132)) {
-                    func_00288BE8(&D_L16_001BFD00);
-                    func_002F5CB8((int)func_L16_00412D48, (int)moby);
+                if (PushRequestQueue((u8 *)&D_L16_001BFD00, 132)) {
+                    LaunchQueuedRequest(&D_L16_001BFD00);
+                    SetStoredValuePair((int)FinishBossIntroState, (int)moby);
                     flags[0x83] = 1;
                     state->introStarted = 1;
                 }
-            } else if (!func_002F5D10()) {
-                func_L16_00412D48(moby);
+            } else if (!IsEitherModeTwo()) {
+                FinishBossIntroState(moby);
             }
-        } else if ((*(unsigned short *)(moby + 0x34) & 1) && ((Hero *)D_00189E20)->f[0x20] >= 610.0f) {
+        } else if ((*(unsigned short *)(moby + 0x34) & 1) && ((Hero *)gHeroState)->f[0x20] >= 610.0f) {
             *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xffbe) | 0x1000;
             *(int *)(moby + 0x98) = *(int *)(*(u8 **)(moby + 0x24) + 0x10);
             if (state->body) {
@@ -199,11 +200,11 @@ void func_L16_0040ECC0(u8 *moby)
     case 1:
         if (D_L16_001B16C0) {
             state->target = D_L16_001B16C0;
-            func_002A7750(moby, 7, 2);
+            SetMobyState(moby, 7, 2);
         }
         break;
     case 2:
-        if (!D_L16_001B16C0) func_002A7750(moby, 2, 1);
+        if (!D_L16_001B16C0) SetMobyState(moby, 2, 1);
         break;
     }
     if (D_L16_001A8F00 == 2) return;
@@ -212,299 +213,299 @@ void func_L16_0040ECC0(u8 *moby)
     case 1:
         break;
     case 2:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, 10, 15, 3.0f);
-            if (!func_002A77E0(1)) {
-                if (func_L02_002F21C0(moby + 0x10, &((Hero *)D_00189E20)->f[0x20]) > 1600.0f)
-                    func_L16_00412C58(moby, 3, 6);
-                else func_L16_00412C58(moby, 7, 11);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, 10, 15, 3.0f);
+            if (!RandomIntBelow(1)) {
+                if (DistanceSquaredXY(moby + 0x10, &((Hero *)gHeroState)->f[0x20]) > 1600.0f)
+                    PlayUnplayedVoiceLine(moby, 3, 6);
+                else PlayUnplayedVoiceLine(moby, 7, 11);
             }
         }
-        func_L16_00410CC0(moby, &((Hero *)D_00189E20)->f[0x20]);
-        func_L16_004110D0(moby, D_L16_001B16E4 * 0.016666668f);
-        if (func_00282E80(moby + 0x10, state->destination) < 32.0f) {
-            frame = func_0029F530((char *)moby);
-            if (func_00282C48(frame - 5.0f) < 1.0f || func_00282C48(frame - 21.0f) < 1.0f) {
-                func_002E5CF8(8, 0, (char *)moby);
-                func_002A7750(moby, 3, -1);
+        FindClosestPathSegmentPoint(moby, &((Hero *)gHeroState)->f[0x20]);
+        MoveBossAlongPath(moby, D_L16_001B16E4 * 0.016666668f);
+        if (vec_distance_xy(moby + 0x10, state->destination) < 32.0f) {
+            frame = GetMobyAnimationValue((char *)moby);
+            if (FloatAbs(frame - 5.0f) < 1.0f || FloatAbs(frame - 21.0f) < 1.0f) {
+                PlayMobySound(8, 0, (char *)moby);
+                SetMobyState(moby, 3, -1);
             }
         }
-        func_L16_00410B88(moby);
+        SwitchBossFlyHoverState(moby);
         break;
     case 16:
-        if (func_002B3868(moby)) state->verticalSpeed = 0.0f;
+        if (SetFirstPendingFlag(moby)) state->verticalSpeed = 0.0f;
         state->verticalSpeed -= 0.008333334f;
         *(float *)(moby + 0x18) += state->verticalSpeed;
         if (*(float *)(moby + 0x18) <= state->floorHeight) {
             *(float *)(moby + 0x18) = state->floorHeight;
-            func_002E5CF8(9, 0, (char *)moby);
-            func_002A7750(moby, state->resumeState, state->resumeArgument);
+            PlayMobySound(9, 0, (char *)moby);
+            SetMobyState(moby, state->resumeState, state->resumeArgument);
         }
         break;
     case 3:
-        if (func_002B3868(moby)) {
-            func_002E5CF8(9, 0, (char *)moby);
-            func_L16_004116C8(moby, 3, 15, 6.0f);
-            if (!func_002A77E0(1)) func_L16_00412C58(moby, 12, 15);
+        if (SetFirstPendingFlag(moby)) {
+            PlayMobySound(9, 0, (char *)moby);
+            PlayAnimationOnSelfOrChild(moby, 3, 15, 6.0f);
+            if (!RandomIntBelow(1)) PlayUnplayedVoiceLine(moby, 12, 15);
         }
-        if (!state->taunted && !state->suppressSpeech && !func_002A77E0(2) &&
-            ((Hero *)D_00189E20)->i[0x8A5] == 22 && ((Hero *)D_00189E20)->i[0x6E] == 1 && ((u8 *)((Hero *)D_00189E20)->ptr[0x927]) &&
-            *(short *)(((u8 *)((Hero *)D_00189E20)->ptr[0x927]) + 0xaa) == 0xea7) {
+        if (!state->taunted && !state->suppressSpeech && !RandomIntBelow(2) &&
+            ((Hero *)gHeroState)->i[0x8A5] == 22 && ((Hero *)gHeroState)->i[0x6E] == 1 && ((u8 *)((Hero *)gHeroState)->ptr[0x927]) &&
+            *(short *)(((u8 *)((Hero *)gHeroState)->ptr[0x927]) + 0xaa) == 0xea7) {
             state->taunted = 1;
-            func_L16_00412BA8(moby, 16);
+            RequestVoiceLine(moby, 16);
         }
-        if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) func_L16_00411B40(moby);
-        func_L16_00410CC0(moby, &((Hero *)D_00189E20)->f[0x20]);
-        if (((Hero *)D_00189E20)->i[0x8A5] == 129) func_002A7750(moby, 6, -1);
-        else if (func_00282E80(moby + 0x10, state->destination) > 48.0f) func_002A7750(moby, 2, -1);
-        else if (func_00282E80(moby + 0x10, &((Hero *)D_00189E20)->f[0x20]) < 12.0f &&
-                 func_00282C48(((Hero *)D_00189E20)->f[0x22] - state->floorHeight) < 10.0f) func_002A7750(moby, 5, -1);
+        if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) FireBossBodyShots(moby);
+        FindClosestPathSegmentPoint(moby, &((Hero *)gHeroState)->f[0x20]);
+        if (((Hero *)gHeroState)->i[0x8A5] == 129) SetMobyState(moby, 6, -1);
+        else if (vec_distance_xy(moby + 0x10, state->destination) > 48.0f) SetMobyState(moby, 2, -1);
+        else if (vec_distance_xy(moby + 0x10, &((Hero *)gHeroState)->f[0x20]) < 12.0f &&
+                 FloatAbs(((Hero *)gHeroState)->f[0x22] - state->floorHeight) < 10.0f) SetMobyState(moby, 5, -1);
         else {
-            angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-            if (func_00283C80(*(float *)(moby + 0xf8), angle) > 0.26179942f) func_002A7750(moby, 4, -1);
+            angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+            if (FastDiffRots(*(float *)(moby + 0xf8), angle) > 0.26179942f) SetMobyState(moby, 4, -1);
             else if (*(unsigned short *)(moby + 0x96) > 900) {
-                func_002A7750(moby, 11, -1);
+                SetMobyState(moby, 11, -1);
                 state->target = 0;
-                qcopy(state->lastPlayer, &((Hero *)D_00189E20)->f[0x34]);
+                qcopy(state->lastPlayer, &((Hero *)gHeroState)->f[0x34]);
             }
         }
-        func_L16_00410B88(moby);
+        SwitchBossFlyHoverState(moby);
         break;
     case 4:
-        if (func_002B3868(moby)) {
-            angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-            if (func_00283BE0(*(float *)(moby + 0xf8), angle) > 0.0f)
-                func_L16_004116C8(moby, 10, 30, 1.0f);
+        if (SetFirstPendingFlag(moby)) {
+            angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+            if (fast_subtract_rotations(*(float *)(moby + 0xf8), angle) > 0.0f)
+                PlayAnimationOnSelfOrChild(moby, 10, 30, 1.0f);
             else
-                func_L16_004116C8(moby, 10, 30, 10.0f);
+                PlayAnimationOnSelfOrChild(moby, 10, 30, 10.0f);
         }
         heading0 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading0, angle, 0.00174532947f, 0.00174532947f, 0.104719773f, &state->turnVelocity, 0);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        if (func_00283C80(*(float *)(moby + 0xf8), angle) < 0.087266475f && moby[0x42] == moby[0x43]) func_002A7750(moby, 3, -1);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading0, angle, 0.00174532947f, 0.00174532947f, 0.104719773f, &state->turnVelocity, 0);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        if (FastDiffRots(*(float *)(moby + 0xf8), angle) < 0.087266475f && moby[0x42] == moby[0x43]) SetMobyState(moby, 3, -1);
         break;
     case 5:
-        if (func_002B3868(moby)) {
+        if (SetFirstPendingFlag(moby)) {
             state->verticalSpeed = 0.0f;
             state->bodyMode = 1;
             state->fireTimer = 30;
-            func_L16_004116C8(moby, 0, 30, state->verticalSpeed);
+            PlayAnimationOnSelfOrChild(moby, 0, 30, state->verticalSpeed);
         }
         heading1 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading1, angle, 0.000872664736f, 0.000872664736f, 0.104719773f, &state->turnVelocity, 0);
-        if (func_00282948(&state->fireTimer)) {
-            func_L16_00411ED0(moby);
-            func_L00_0035F5A0(17, 0, (int)moby);
-            state->fireTimer = func_002A7820(45, 75);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading1, angle, 0.000872664736f, 0.000872664736f, 0.104719773f, &state->turnVelocity, 0);
+        if (FastFloatHelperD(&state->fireTimer)) {
+            DropBossFallingShot(moby);
+            StartEffectInSlot(17, 0, (int)moby);
+            state->fireTimer = RandomIntRange(45, 75);
         }
-        if (func_00282E80(moby + 0x10, &((Hero *)D_00189E20)->f[0x20]) > 16.0f || func_00282C48(((Hero *)D_00189E20)->f[0x22] - state->floorHeight) > 10.0f) func_002A7750(moby, 2, -1);
+        if (vec_distance_xy(moby + 0x10, &((Hero *)gHeroState)->f[0x20]) > 16.0f || FloatAbs(((Hero *)gHeroState)->f[0x22] - state->floorHeight) > 10.0f) SetMobyState(moby, 2, -1);
         break;
     case 6:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, 16, 30, 0.0f);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, 16, 30, 0.0f);
             *(float *)(moby + 0x48) = 0.666f;
         }
-        if (state->body[0x60] & 2) func_002A7750(moby, 2, -1);
+        if (state->body[0x60] & 2) SetMobyState(moby, 2, -1);
         break;
     case 8:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, state->activeArm + 11, 20, 0.0f);
-            if (!state->suppressSpeech) func_L16_00412C58(moby, 17, 23);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, state->activeArm + 11, 20, 0.0f);
+            if (!state->suppressSpeech) PlayUnplayedVoiceLine(moby, 17, 23);
             state->fired = 0;
             *(float *)(moby + 0x48) = 1.0f;
         }
         heading2 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading2, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
-        if (!state->fired && state->body[0x42] == state->body[0x43] && func_0029F530((char *)state->body) >= 13.0f) {
-            if (state->body[0x42] == 11) func_002E5CF8(7, 0, (char *)moby);
-            func_L16_00411900(moby);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading2, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
+        if (!state->fired && state->body[0x42] == state->body[0x43] && GetMobyAnimationValue((char *)state->body) >= 13.0f) {
+            if (state->body[0x42] == 11) PlayMobySound(7, 0, (char *)moby);
+            FireBossArmShot(moby);
             state->fired = 1;
-        } else if (func_0029F530((char *)state->body) > 20.0f) {
-            func_L16_004116C8(moby, state->activeArm + 11, 20, 0.0f);
+        } else if (GetMobyAnimationValue((char *)state->body) > 20.0f) {
+            PlayAnimationOnSelfOrChild(moby, state->activeArm + 11, 20, 0.0f);
             state->fired = 0;
         }
-        if (*(unsigned short *)(moby + 0x96) > 300) func_002A7750(moby, 7, -1);
+        if (*(unsigned short *)(moby + 0x96) > 300) SetMobyState(moby, 7, -1);
         break;
     case 7:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, 10, 30, 6.0f);
-            func_L16_00410E40(moby, D_L16_001B16EC, D_L16_001B16F0);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, 10, 30, 6.0f);
+            PickNewPathSlot(moby, D_L16_001B16EC, D_L16_001B16F0);
         }
-        func_L16_004110D0(moby, D_L16_001B16E8 * 0.016666668f);
-        if (func_00282E80(moby + 0x10, state->destination) < 1.0f) func_002A7750(moby, 8, -1);
-        func_L16_00410B88(moby);
+        MoveBossAlongPath(moby, D_L16_001B16E8 * 0.016666668f);
+        if (vec_distance_xy(moby + 0x10, state->destination) < 1.0f) SetMobyState(moby, 8, -1);
+        SwitchBossFlyHoverState(moby);
         break;
     case 9:
-        if (func_002B3868(moby)) func_L16_004116C8(moby, 16, 30, 6.0f);
+        if (SetFirstPendingFlag(moby)) PlayAnimationOnSelfOrChild(moby, 16, 30, 6.0f);
         heading3 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading3, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading3, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
         if (state->body[0x60] & 2) {
-            if ((float)state->maximumHealth * 0.55f <= state->health) func_002A7750(moby, 10, -1);
-            else if (func_002A77E0(2) || !state->leftUsed || !state->rightUsed) func_002A7750(moby, 13, -1);
-            else func_002A7750(moby, 10, -1);
+            if ((float)state->maximumHealth * 0.55f <= state->health) SetMobyState(moby, 10, -1);
+            else if (RandomIntBelow(2) || !state->leftUsed || !state->rightUsed) SetMobyState(moby, 13, -1);
+            else SetMobyState(moby, 10, -1);
         }
         break;
     case 10:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, 10, 30, 6.0f);
-            func_L16_00410CC0(moby, state->target + 0x10);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, 10, 30, 6.0f);
+            FindClosestPathSegmentPoint(moby, state->target + 0x10);
         }
-        func_L16_004110D0(moby, D_L16_001B16E8 * 0.016666668f);
-        if (func_00282E80(moby + 0x10, state->destination) < 1.0f) {
-            if (func_00282C48(*(float *)(state->target + 0x18) - 120.0f) < 1.0f) func_002A7750(moby, 12, -1);
-            else func_002A7750(moby, 11, -1);
+        MoveBossAlongPath(moby, D_L16_001B16E8 * 0.016666668f);
+        if (vec_distance_xy(moby + 0x10, state->destination) < 1.0f) {
+            if (FloatAbs(*(float *)(state->target + 0x18) - 120.0f) < 1.0f) SetMobyState(moby, 12, -1);
+            else SetMobyState(moby, 11, -1);
         }
         break;
     case 11:
-        if (func_002B3868(moby)) {
-            if (moby[0x43] != 22) func_002A7470(moby, 22, 0, 20);
-            func_002A7470(state->body, 3, 0, 30);
+        if (SetFirstPendingFlag(moby)) {
+            if (moby[0x43] != 22) StartAnimationBlended(moby, 22, 0, 20);
+            StartAnimationBlended(state->body, 3, 0, 30);
             state->aimTimeout = 120;
             state->aimTime = D_L16_001B16F4;
             state->aimBlend = 0.0f;
             state->verticalSpeed = 0.0f;
         }
         if (state->target) {
-            angle = func_00283248(*(float *)(state->target + 0x10) - *(float *)(moby + 0x10), *(float *)(state->target + 0x14) - *(float *)(moby + 0x14));
+            angle = FastMatrixHelperA(*(float *)(state->target + 0x10) - *(float *)(moby + 0x10), *(float *)(state->target + 0x14) - *(float *)(moby + 0x14));
         } else {
-            angle = func_00283248(state->lastPlayer[0] - *(float *)(moby + 0x10), state->lastPlayer[1] - *(float *)(moby + 0x14));
+            angle = FastMatrixHelperA(state->lastPlayer[0] - *(float *)(moby + 0x10), state->lastPlayer[1] - *(float *)(moby + 0x14));
         }
-        func_002AAA00((float *)(moby + 0xf8), angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
-        if (func_00283C80(angle, *(float *)(moby + 0xf8)) < 0.087266475f) {
-            func_002AA2E8(&state->aimTime, 0.0f, D_L16_001B16F8 * 0.016666668f);
-            func_002AA2E8(&state->aimBlend, 1.0f, 0.06666667f);
-            slot1 = D_00188660 + state->attackSound * 112;
+        ApproachTargetWithDirectionMode((float *)(moby + 0xf8), angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
+        if (FastDiffRots(angle, *(float *)(moby + 0xf8)) < 0.087266475f) {
+            ApproachValue(&state->aimTime, 0.0f, D_L16_001B16F8 * 0.016666668f);
+            ApproachValue(&state->aimBlend, 1.0f, 0.06666667f);
+            slot1 = gSoundState + state->attackSound * 112;
             if (*(u8 **)(slot1 + 0x88) != state->body || !slot1[0x74])
-                state->attackSound = func_002E5CF8(2, 4, (char *)state->body);
-            func_L00_002E6CF0(func_L16_00412560, moby);
+                state->attackSound = PlayMobySound(2, 4, (char *)state->body);
+            AddDrawCallbackToList1(DrawBossLaserBeam, moby);
         }
-        if ((state->target && (*(unsigned short *)(state->target + 0x34) & 1) && func_00282948(&state->aimTimeout)) || (!state->target && state->aimTime <= 0.0f)) {
-            func_002A7750(moby, 3, 1);
+        if ((state->target && (*(unsigned short *)(state->target + 0x34) & 1) && FastFloatHelperD(&state->aimTimeout)) || (!state->target && state->aimTime <= 0.0f)) {
+            SetMobyState(moby, 3, 1);
             sound1 = state->attackSound;
             if (sound1 != -1) {
-                slot2 = D_00188660 + sound1 * 112;
-                if (*(u8 **)(slot2 + 0x88) == state->body && slot2[0x74]) func_002E59F8(sound1);
+                slot2 = gSoundState + sound1 * 112;
+                if (*(u8 **)(slot2 + 0x88) == state->body && slot2[0x74]) StopSoundVoice(sound1);
             }
             state->attackSound = -1;
         }
         break;
     case 12:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, 1, 30, 0.0f);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, 1, 30, 0.0f);
             *(float *)(moby + 0x48) = 0.5f;
         }
-        angle = func_00283248(*(float *)(state->target + 0x10) - *(float *)(moby + 0x10), *(float *)(state->target + 0x14) - *(float *)(moby + 0x14));
-        func_002AAA00((float *)(moby + 0xf8), angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
-        frame2 = func_0029F530((char *)moby);
-        if (frame2 > 30.0f) func_002AA2E8((float *)(moby + 0x48), 1.0f, 0.13333334f);
-        if (frame2 > 40.0f && frame2 < 42.0f) func_002A8C28(moby, state->target + 0x10, 0x10001, 0, 1, 0, 4.0f, (float)state->power, 1.0f);
-        if (moby[0x60] & 2) func_002A7750(moby, 2, 1);
-        else if (((Hero *)D_00189E20)->i[0x8A5] == 22 && ((Hero *)D_00189E20)->i[0x6E] == 1 && ((u8 *)((Hero *)D_00189E20)->ptr[0x927]) == moby) func_L16_00412C58(moby, 24, 27);
+        angle = FastMatrixHelperA(*(float *)(state->target + 0x10) - *(float *)(moby + 0x10), *(float *)(state->target + 0x14) - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode((float *)(moby + 0xf8), angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
+        frame2 = GetMobyAnimationValue((char *)moby);
+        if (frame2 > 30.0f) ApproachValue((float *)(moby + 0x48), 1.0f, 0.13333334f);
+        if (frame2 > 40.0f && frame2 < 42.0f) SweepCollisionFromObject(moby, state->target + 0x10, 0x10001, 0, 1, 0, 4.0f, (float)state->power, 1.0f);
+        if (moby[0x60] & 2) SetMobyState(moby, 2, 1);
+        else if (((Hero *)gHeroState)->i[0x8A5] == 22 && ((Hero *)gHeroState)->i[0x6E] == 1 && ((u8 *)((Hero *)gHeroState)->ptr[0x927]) == moby) PlayUnplayedVoiceLine(moby, 24, 27);
         break;
     case 13:
-        if (func_002B3868(moby)) {
+        if (SetFirstPendingFlag(moby)) {
             state->verticalSpeed = 0.0f;
             state->bodyMode = 1;
-            func_L16_004116C8(moby, 0, 30, state->verticalSpeed);
+            PlayAnimationOnSelfOrChild(moby, 0, 30, state->verticalSpeed);
             if (state->leftUsed == state->rightUsed) {
-                state->projectile = !func_002A77E0(2) ? 0 : func_L16_004130B0(moby, 1);
-            } else if (!state->leftUsed) state->projectile = func_L16_004130B0(moby, 1);
+                state->projectile = !RandomIntBelow(2) ? 0 : SpawnBossRockProjectile(moby, 1);
+            } else if (!state->leftUsed) state->projectile = SpawnBossRockProjectile(moby, 1);
             else state->projectile = 0;
         }
         heading6 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading6, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading6, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
         if (*(float *)(moby + 0x18) > state->floorHeight + 20.0f) {
-            if (state->projectile) { func_002A7750(moby, 14, -1);
+            if (state->projectile) { SetMobyState(moby, 14, -1);
             state->leftUsed = 1; }
-            else { func_002A7750(moby, 15, -1);
+            else { SetMobyState(moby, 15, -1);
             state->rightUsed = 1; }
         }
         break;
     case 15:
-        if (func_002B3868(moby)) func_L16_004116C8(moby, 14, 30, 0.0f);
+        if (SetFirstPendingFlag(moby)) PlayAnimationOnSelfOrChild(moby, 14, 30, 0.0f);
         heading7 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading7, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
-        if (state->body[0x42] == state->body[0x43] && (D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) func_L16_00411D00(moby);
-        if (*(unsigned short *)(moby + 0x96) > 180) func_002A7750(moby, 2, 1);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading7, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
+        if (state->body[0x42] == state->body[0x43] && (D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) FireBossLobbedShot(moby);
+        if (*(unsigned short *)(moby + 0x96) > 180) SetMobyState(moby, 2, 1);
         break;
     case 14:
-        if (func_002B3868(moby)) func_L16_004116C8(moby, 6, 30, 0.0f);
-        func_0029FC20((char *)state->body, 3, (char *)work.bone);
+        if (SetFirstPendingFlag(moby)) PlayAnimationOnSelfOrChild(moby, 6, 30, 0.0f);
+        TransformMobyJointPoint((char *)state->body, 3, (char *)work.bone);
         switch (state->body[0x43]) {
         case 6:
-            if (func_L16_00413638(state->projectile)) {
-                func_L16_00413690(state->projectile, (u8 *)work.bone);
-                func_L16_004116C8(moby, 7, 5, 0.0f);
+            if (IsBehindSurface(state->projectile)) {
+                AttachChildToParentPose(state->projectile, (u8 *)work.bone);
+                PlayAnimationOnSelfOrChild(moby, 7, 5, 0.0f);
             }
             break;
         case 7:
-            func_L16_00413690(state->projectile, (u8 *)work.bone);
-            if (state->body[0x60] & 2) func_L16_004116C8(moby, 9, 5, 0.0f);
+            AttachChildToParentPose(state->projectile, (u8 *)work.bone);
+            if (state->body[0x60] & 2) PlayAnimationOnSelfOrChild(moby, 9, 5, 0.0f);
             break;
         case 9:
             if (state->projectile) {
-                func_L16_00413690(state->projectile, (u8 *)work.bone);
-                if (state->body[0x42] == 9 && func_0029F530((char *)state->body) > 16.0f) {
+                AttachChildToParentPose(state->projectile, (u8 *)work.bone);
+                if (state->body[0x42] == 9 && GetMobyAnimationValue((char *)state->body) > 16.0f) {
                     gravity = 0.0013888889f;
-                    distance = func_00282E80(state->projectile + 0x10, state->target + 0x10) * 0.008333334f;
-                    func_00282CF0(velocity, state->target + 0x10, state->projectile + 0x10);
+                    distance = vec_distance_xy(state->projectile + 0x10, state->target + 0x10) * 0.008333334f;
+                    FastVecSub(velocity, state->target + 0x10, state->projectile + 0x10);
                     velocity[2] = 0.0f;
-                    func_00282F20(velocity, velocity, distance);
-                    velocity[2] = func_L00_0031CDD0(state->projectile + 0x10, state->target + 0x10, 0, distance, -gravity);
-                    func_L16_00413700(state->projectile, velocity, gravity);
+                    vec_scale_to_length(velocity, velocity, distance);
+                    velocity[2] = ComputeShotLaunchSpeed(state->projectile + 0x10, state->target + 0x10, 0, distance, -gravity);
+                    LaunchBossProjectile(state->projectile, velocity, gravity);
                     state->projectile = 0;
                 }
             }
-            if (state->body[0x60] & 2) func_002A7750(moby, 2, 1);
+            if (state->body[0x60] & 2) SetMobyState(moby, 2, 1);
             break;
         }
         break;
     case 17:
-        if (func_002B3868(moby)) {
-            func_L16_004116C8(moby, 16, 30, 0.0f);
+        if (SetFirstPendingFlag(moby)) {
+            PlayAnimationOnSelfOrChild(moby, 16, 30, 0.0f);
             *(float *)(moby + 0x48) = 0.5f;
             state->bodyMode = 1;
             if (state->verticalSpeed < 0.0f) state->verticalSpeed = 0.0f;
             sound2 = state->attackSound;
             if (sound2 != -1) {
-                slot3 = D_00188660 + sound2 * 112;
-                if (*(u8 **)(slot3 + 0x88) == state->body && slot3[0x74]) func_002E59F8(sound2);
+                slot3 = gSoundState + sound2 * 112;
+                if (*(u8 **)(slot3 + 0x88) == state->body && slot3[0x74]) StopSoundVoice(sound2);
             }
             state->attackSound = -1;
             sound3 = state->bodySound;
             if (sound3 != -1) {
-                slot4 = D_00188660 + sound3 * 112;
-                if (*(u8 **)(slot4 + 0x88) == moby && slot4[0x74]) func_002E59F8(sound3);
+                slot4 = gSoundState + sound3 * 112;
+                if (*(u8 **)(slot4 + 0x88) == moby && slot4[0x74]) StopSoundVoice(sound3);
             }
             state->bodySound = -1;
         }
         heading8 = (float *)(moby + 0xf8);
-        angle = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(moby + 0x14));
-        func_002AAA00(heading8, angle, 0.00174532947f, 0.00174532947f, 0.104719773f, &state->turnVelocity, 0);
+        angle = FastMatrixHelperA(((Hero *)gHeroState)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)gHeroState)->f[0x21] - *(float *)(moby + 0x14));
+        ApproachTargetWithDirectionMode(heading8, angle, 0.00174532947f, 0.00174532947f, 0.104719773f, &state->turnVelocity, 0);
         if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) {
             *(BossQuadword *)work.vectors.offset = 0;
-            work.vectors.offset[0] = func_002A78D8(0.0f, 6.0f);
-            work.vectors.offset[1] = func_002A78D8(0.0f, 6.0f);
-            work.vectors.offset[2] = func_002A7878(5.0f, 20.0f);
+            work.vectors.offset[0] = RandomSignedFloatRange(0.0f, 6.0f);
+            work.vectors.offset[1] = RandomSignedFloatRange(0.0f, 6.0f);
+            work.vectors.offset[2] = RandomFloatRange(5.0f, 20.0f);
             {
                 BossQuadword q = *(BossQuadword *)work.vectors.offset;
                 *(BossQuadword *)work.vectors.position = q;
             }
-            func_00282CC0(work.vectors.position, work.vectors.position, moby + 0x10);
-            func_00282CF0(work.vectors.offset, D_L16_001B9B00, work.vectors.position);
-            func_00282F20(work.vectors.offset, work.vectors.offset, 1.0f);
-            func_0032DA58(moby, work.vectors.position, work.vectors.offset, 0.0f);
-            func_002E5DA0(6, 0, (char *)moby, 0xf78);
+            FastVecAdd(work.vectors.position, work.vectors.position, moby + 0x10);
+            FastVecSub(work.vectors.offset, D_L16_001B9B00, work.vectors.position);
+            vec_scale_to_length(work.vectors.offset, work.vectors.offset, 1.0f);
+            SpawnBlastEffectMoby(moby, work.vectors.position, work.vectors.offset, 0.0f);
+            PlaySoundFromClassBank(6, 0, (char *)moby, 0xf78);
         }
-        if (state->body[0x42] == state->body[0x43] && state->body[0x41] > 29) func_L16_002D2D10(5, 5.0f, 15.0f);
+        if (state->body[0x42] == state->body[0x43] && state->body[0x41] > 29) ArmSharedTransition(5, 5.0f, 15.0f);
         if (D_L16_001B2564 >= 1.0f) {
-            func_002A7750(moby, 18, -1);
+            SetMobyState(moby, 18, -1);
             moby[0x31] = 0;
             *(unsigned short *)(moby + 0x34) |= 1;
             state->bodyMode = 0;
@@ -516,16 +517,16 @@ void func_L16_0040ECC0(u8 *moby)
         state->bodyMode = 0;
         state->verticalSpeed -= 0.0055555557f;
         *(float *)(moby + 0x18) += state->verticalSpeed;
-        if (*(unsigned short *)(moby + 0x96) > 90 && D_001395B8[0x83] != 2 && func_00288AA0((u8 *)&D_L16_001BFD00, 133)) {
-            func_002A7750(moby, 19, -1);
-            func_00288AA0((u8 *)&D_L16_001BFD00, 17);
-            func_00288AA0((u8 *)&D_L16_001BFD00, 134);
-            func_00288BE8(&D_L16_001BFD00);
-            func_002F5CB8((int)func_L16_00412E70, (int)moby);
+        if (*(unsigned short *)(moby + 0x96) > 90 && D_001395B8[0x83] != 2 && PushRequestQueue((u8 *)&D_L16_001BFD00, 133)) {
+            SetMobyState(moby, 19, -1);
+            PushRequestQueue((u8 *)&D_L16_001BFD00, 17);
+            PushRequestQueue((u8 *)&D_L16_001BFD00, 134);
+            LaunchQueuedRequest(&D_L16_001BFD00);
+            SetStoredValuePair((int)CleanUpBossAndFree, (int)moby);
         }
         break;
     case 19:
-        if (func_002B3868(moby)) {
+        if (SetFirstPendingFlag(moby)) {
             *(int *)(moby + 0x98) = 0;
             *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xefff;
             *(unsigned short *)(state->body + 0x34) |= 0x41;
@@ -538,21 +539,21 @@ void func_L16_0040ECC0(u8 *moby)
             *(unsigned short *)(state->arms[1] + 0x34) &= 0xefff;
             *(int *)(state->arms[1] + 0x98) = 0;
         }
-        if (D_L16_001A8F00 == 2) func_L16_00411F80(moby, 0);
+        if (D_L16_001A8F00 == 2) SetMobyAndGroupsEnabled(moby, 0);
         break;
     }
-    func_L16_00411480(moby);
-    func_L16_00411600(moby);
+    UpdateBossPartMoby_L16(moby);
+    CopyBossBonesToChildren(moby);
     if (state->bodyMode) {
-        slot5 = D_00188660 + state->bodySound * 112;
+        slot5 = gSoundState + state->bodySound * 112;
         if (*(u8 **)(slot5 + 0x88) != moby || !slot5[0x74])
-            state->bodySound = func_002E5CF8(10, 4, (char *)moby);
+            state->bodySound = PlayMobySound(10, 4, (char *)moby);
     } else {
         sound4 = state->bodySound;
         if (sound4 != -1) {
-            slot6 = D_00188660 + sound4 * 112;
+            slot6 = gSoundState + sound4 * 112;
             if (*(u8 **)(slot6 + 0x88) == moby && slot6[0x74])
-                func_002E59F8(sound4);
+                StopSoundVoice(sound4);
         }
         state->bodySound = -1;
     }

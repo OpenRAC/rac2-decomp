@@ -26,6 +26,8 @@ extern char *D_L05_001B251C MACRO_ADDR;
 extern u8 D_00188660[];
 
 typedef struct { u8 pad[0x11C]; int mode; } Movement;
+/* Moves the object along a route of points each frame and restarts it from the route start
+   when it is new. */
 void func_L05_004170C8(u8 *actor)
 {
     Vector direction, facing;
@@ -35,42 +37,42 @@ void func_L05_004170C8(u8 *actor)
     int one, mode;
     if (actor[0x20] == 0) {
         actor[0x30] = 0xFF;
-        if (func_L00_00367720() == 0)
+        if (GetStoredPointerValue() == 0)
             return;
-        func_L05_00417448(actor);
+        InitEffectMobyFromTable(actor);
         if (*(int *)(state + 0x1B4) != 0)
-            func_L05_00379E60((int)actor, (int)func_L05_00417730, 0, 0);
+            AppendLevelObject((int)actor, (int)func_L05_00417730, 0, 0);
         D_L05_001B0F50 = 0;
         return;
     }
-    movement = (u8 *)func_002ED688(actor);
+    movement = (u8 *)GetMobyMotionData(actor);
     if (*(int *)(movement + 0x110) == 0)
         return;
     path = D_L05_001FE380[D_L05_00221D48];
     one = 1;
-    func_002EE678(actor, 11);
+    SetFollowerState(actor, 11);
     if (*(int *)(state + 0x1B8) == 0) {
         *(int *)(state + 0x1B8) = one;
         *(int *)(state + 0x1BC) = one;
         qcopy(actor + 0x10, path + 0x10);
         *(int *)(state + 0x1BC) = 2;
-        func_002EE920(actor, path + 0x20);
-        func_00282CF0(movement + 0x90, movement + 0x60, actor + 0x10);
-        func_00282F20(movement + 0x90, movement + 0x90, 1.0f);
+        SetFollowerPushVector(actor, path + 0x20);
+        FastVecSub(movement + 0x90, movement + 0x60, actor + 0x10);
+        vec_scale_to_length(movement + 0x90, movement + 0x90, 1.0f);
         *(int *)(movement + 0x130) = 2000000;
-    } else if (func_002EEB00(actor) != 0) {
+    } else if (HasFollowerReachedTarget(actor) != 0) {
         int next = *(int *)(state + 0x1BC);
         if (next >= *(int *)path)
             D_L05_001B0F50 = one;
         else {
             *(int *)(state + 0x1BC) = next + 1;
-            func_002EE920(actor, path + (next * 16 + 16));
+            SetFollowerPushVector(actor, path + (next * 16 + 16));
             *(int *)(movement + 0x130) = 2000000;
         }
     }
     if (D_L05_001B0F50 == 0) {
-        func_L05_0037C160(actor);
-        func_L05_0037B948(actor, 1, 32.0f);
+        UpdateObjectMovementState(actor);
+        CheckPlayerInViewAndRange(actor, 1, 32.0f);
     }
     mode = *(int *)(movement + 0x110);
     if (mode == 1) {
@@ -79,28 +81,28 @@ void func_L05_004170C8(u8 *actor)
             ((Movement *)movement)->mode = mode;
             other = (u8 *)D_L05_001B251C + (*(int *)(state + 0x1B0) << 8);
             *(u8 **)(movement + 0x120) = other;
-            if (func_00282E48(other + 0x10, actor + 0x10) < 15.0f) {
+            if (fast_vec_dist(other + 0x10, actor + 0x10) < 15.0f) {
                 float alignment;
-                func_00282CF0(&direction, actor + 0x10, *(u8 **)(movement + 0x120) + 0x10);
-                func_00282F20(&direction, &direction, 1.0f);
-                func_00282F20(&facing, *(u8 **)(movement + 0x120) + 0xC0, 1.0f);
-                alignment = func_00282DB0(&facing, &direction);
+                FastVecSub(&direction, actor + 0x10, *(u8 **)(movement + 0x120) + 0x10);
+                vec_scale_to_length(&direction, &direction, 1.0f);
+                vec_scale_to_length(&facing, *(u8 **)(movement + 0x120) + 0xC0, 1.0f);
+                alignment = FastVecDot(&facing, &direction);
                 if (alignment > 0.4f) {
-                    if (func_00282948(state + 0x1C8) != 0) {
-                        *(int *)(state + 0x1C4) = func_002E5DA0(14, 0, actor, 0xFBF);
-                        *(int *)(state + 0x1C8) = func_00283CF0(func_002A7878(180.0f, 240.0f));
+                    if (FastFloatHelperD(state + 0x1C8) != 0) {
+                        *(int *)(state + 0x1C4) = PlaySoundFromClassBank(14, 0, actor, 0xFBF);
+                        *(int *)(state + 0x1C8) = FloatToInt(RandomFloatRange(180.0f, 240.0f));
                     }
-                } else if (alignment < -0.4f && func_00282948(state + 0x1C8) != 0) {
-                    func_002E5DA0(11, 0, actor, 0xFBF);
-                    *(int *)(state + 0x1C8) = func_00283CF0(func_002A7878(180.0f, 240.0f));
+                } else if (alignment < -0.4f && FastFloatHelperD(state + 0x1C8) != 0) {
+                    PlaySoundFromClassBank(11, 0, actor, 0xFBF);
+                    *(int *)(state + 0x1C8) = FloatToInt(RandomFloatRange(180.0f, 240.0f));
                 }
             }
         }
-        func_L05_00417550(actor);
+        SpawnTailTrailMarks_L05(actor);
     }
     {
-        u8 *sound = D_00188660 + *(int *)(state + 0x1C0) * 0x70;
+        u8 *sound = gSoundState + *(int *)(state + 0x1C0) * 0x70;
         if (*(u8 **)(sound + 0x88) != actor || sound[0x74] == 0)
-            *(int *)(state + 0x1C0) = func_002E5DA0(0, 6, actor, 0xF82);
+            *(int *)(state + 0x1C0) = PlaySoundFromClassBank(0, 6, actor, 0xF82);
     }
 }

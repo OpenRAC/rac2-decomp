@@ -3,6 +3,7 @@
    (config/cflags.txt gives this file -frac2-qcopy). */
 
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -17,11 +18,11 @@ void func_002ACEC0(void *dst, void *src, float *axis, float amount)
 {
     float v[4];
 
-    if (func_00282C48(amount) < 1e-5f) {
+    if (FloatAbs(amount) < 1e-5f) {
         *(TI128 *)dst = *(TI128 *)src;
     } else {
-        func_00282F20(v, axis, 1.0f);
-        func_002AB668(v, v, amount);
-        func_002ACDE8(dst, src, v);
+        vec_scale_to_length(v, axis, 1.0f);
+        BuildAxisAngleQuaternion(v, v, amount);
+        RotateVectorByQuaternion(dst, src, v);
     }
 }

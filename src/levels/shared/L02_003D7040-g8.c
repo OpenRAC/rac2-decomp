@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 
@@ -13,23 +14,24 @@ extern int func_002A77E0(int);
 extern void func_00282C88(Quad *),func_00282CC0(void *,void *,void *),func_00282CF0(void *,void *,void *),func_00282F20(void *,void *,float),func_002ACB48(float *,float);
 extern float func_002A7878(float,float);
 extern void *func_L02_003449D8(void *,void *,void *,void *,int);
+/* Sometimes spawns a small puff effect near the object, drifting upward. */
 void func_L02_003D7040(char *object) {
     Vector velocity,origin,direction;
     float speed;
     int variant;
-    if (func_002A77E0(D_L02_001B03DC)) return;
+    if (RandomIntBelow(D_L02_001B03DC)) return;
     velocity.q=0;
-    func_00282C88(&origin.q);
-    func_00282CC0(&origin,&origin,object+0x10);
+    ClearVector128(&origin.q);
+    FastVecAdd(&origin,&origin,object+0x10);
     origin.f[3]=0.0f;
     origin.f[2]+=D_L02_001B03D4;
-    func_00282CF0(&direction,D_L02_001BA500,&origin);
+    FastVecSub(&direction,gCameraPosition_L02,&origin);
     direction.f[2]=0.0f;
-    func_00282F20(&direction,&direction,D_L02_001B03D8);
-    func_00282CC0(&origin,&origin,&direction);
-    func_002ACB48(origin.f,D_L02_001B03C8);
-    speed=func_002A7878(D_L02_001B03CC,D_L02_001B03D0);
+    vec_scale_to_length(&direction,&direction,D_L02_001B03D8);
+    FastVecAdd(&origin,&origin,&direction);
+    AddRandomOffsetToVector(origin.f,D_L02_001B03C8);
+    speed=RandomFloatRange(D_L02_001B03CC,D_L02_001B03D0);
     velocity.f[2]=speed*0.0166666675f;
-    variant=func_002A77E0(2);
-    func_L02_003449D8(&origin,&velocity,&D_L02_001B03B0,(void *)variant,1);
+    variant=RandomIntBelow(2);
+    SpawnEnemyRecord(&origin,&velocity,&D_L02_001B03B0,(void *)variant,1);
 }

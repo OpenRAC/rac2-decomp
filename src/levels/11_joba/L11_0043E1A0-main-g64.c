@@ -257,551 +257,552 @@ extern void func_L11_00447360(char *);
 #define TABLE D_L11_001B14F8
 #define OBJ ((JobaObj *)obj)
 
+/* Runs the arena challenge from start to finish: waiting for the player, spawning each wave of fighters, the boss fights, and the win or fail screens. */
 void func_L11_0043E1A0(u8 *obj) {
     JobaState *st;
-    JobaRecord *rec1;
-    JobaRecord *rec3;
-    JobaRecord *rec2;
-    JobaRecord *rec6;
-    JobaRecord *rec8;
-    JobaRecord *rec9;
-    s32 ok1;
-    s32 ok2;
-    s32 sum1;
-    s32 sum2;
-    s32 sum3;
-    s32 r1;
-    s32 r2;
-    s32 r3;
-    s32 r4;
-    s32 r5;
-    s32 cls1;
-    s32 cls2;
-    u32 cls3;
-    JobaLight *lt1;
-    JobaLight *lt2;
-    JobaLight *lt3;
-    JobaLight *lt4;
-    JobaMoby *m1;
-    JobaMoby *m2;
-    JobaMoby *m3;
-    u8 *e1;
-    u8 *e2;
-    f32 f1;
-    f32 f2;
-    u8 *p1;
-    u8 *q1;
-    s32 slot1;
-    s32 k1;
+    JobaRecord *firstRecord;
+    JobaRecord *nextWaveRecord;
+    JobaRecord *currentRecord;
+    JobaRecord *bossSpawnRecord;
+    JobaRecord *followRecord;
+    JobaRecord *newWaveRecord;
+    s32 spawnedAny;
+    s32 spawnedAnyBoss;
+    s32 killSum5;
+    s32 killSum8;
+    s32 killSum12;
+    s32 savedWord1;
+    s32 savedWord2;
+    s32 bossA;
+    s32 bossB;
+    s32 bossC;
+    s32 challengeA;
+    s32 challengeB;
+    u32 challengeU;
+    JobaLight *lightRise;
+    JobaLight *lightLower;
+    JobaLight *lightReset;
+    JobaLight *lightEnd;
+    JobaMoby *lampReset;
+    JobaMoby *lampEnd;
+    JobaMoby *lampLower;
+    u8 *slotEntity;
+    u8 *slotEntityBoss;
+    f32 raisedHeight;
+    f32 loweredHeight;
+    u8 *cameraEntry;
+    u8 *lampBytes;
+    s32 mobySlot;
+    s32 clearIdx;
     s32 k2;
-    s32 k3;
-    s32 k4;
-    s32 k5;
-    s32 k6;
-    s32 k7;
-    s32 k8;
-    s32 k9;
-    s32 k10;
-    s32 c10;
-    s32 c11;
-    s32 k11;
-    s32 k12;
-    s32 k13;
-    s32 sel;
+    s32 markIdx;
+    s32 resetIdx;
+    s32 sumIdx5;
+    s32 sumIdx8;
+    s32 spawnIdx;
+    s32 orbIdx;
+    s32 spawnIdxBoss;
+    s32 hoverIdx;
+    s32 resetIdx2;
+    s32 clearIdx2;
+    s32 followIdx;
+    s32 sumIdx12;
+    s32 resetIdx3;
+    s32 selection;
     s32 code;
-    JobaClass *cl1;
-    s32 w1;
-    JobaRecord *next1;
-    s32 snd1;
-    u8 *buf2;
-    u8 *buf3;
-    s32 snd2;
-    s32 snd3;
+    JobaClass *classInfo;
+    s32 waveIndex;
+    JobaRecord *nextRecord;
+    s32 soundHandleA;
+    u8 *soundBufB;
+    u8 *soundBufC;
+    s32 soundHandleB;
+    s32 soundHandleC;
 
     st = OBJ->st;
-    func_L00_003E4948();
+    CallBlastHelperNoArgs();
     D_L11_001A9010 = 1;
     switch (OBJ->state) {
     case 0:
-        func_L11_004401C0(obj);
-        func_L11_00442C80(obj);
+        ResetArenaControllerState_L11(obj);
+        RunHelperOnSpawnGroups(obj);
         D_L11_001A8FF0 = 0;
         D_L11_001A8FF4 = 0;
-        D_L11_001B359C[st->door].flags |= 1;
-        D_L11_001B359C[st->door].hidden = 0;
+        gMobyTable_L11[st->door].flags |= 1;
+        gMobyTable_L11[st->door].hidden = 0;
         if (D_001A7904 == 2) {
             D_001A7904 = 0;
-            func_002A7750(obj, 2, -1);
-            func_L00_003672F8();
+            SetMobyState(obj, 2, -1);
+            SetFlagToOne();
             st->fade = D_001A65D2[0];
-            func_L00_002E6CF0(func_L11_00445B30, obj);
+            AddDrawCallbackToList1(DrawScreenFadeBar, obj);
             OBJ->timer = 0x1F;
         }
         break;
     case 1:
-        if (func_L00_003206B8(&HERO->f[0x80 / 4], st->zone) != 0) {
-            func_002A7750(obj, 4, -1);
-        } else if (func_002ACBC8(&HERO->f[0x80 / 4], st->trigger1) != 0) {
-            func_002B0C28(4, 0x2F3C, 1);
-            func_L02_003FF698(obj);
-        } else if (D_001395B8[func_L11_0043E108(1)] != 0) {
-            if (func_002ACBC8(&HERO->f[0x80 / 4], st->trigger2) != 0) {
-                func_002B0C28(4, 0x2F3C, 1);
-                func_L02_003FF698(obj);
+        if (IsPointInsideRecordVolume(&HERO->f[0x80 / 4], st->zone) != 0) {
+            SetMobyState(obj, 4, -1);
+        } else if (IsPointInCuboid(&HERO->f[0x80 / 4], st->trigger1) != 0) {
+            TryClaimNotice(4, 0x2F3C, 1);
+            TryAllocateAndEnterState2(obj);
+        } else if (D_001395B8[GetChallengeFlagIndex(1)] != 0) {
+            if (IsPointInCuboid(&HERO->f[0x80 / 4], st->trigger2) != 0) {
+                TryClaimNotice(4, 0x2F3C, 1);
+                TryAllocateAndEnterState2(obj);
             }
         }
         if (D_001A7904 == 2) {
             D_001A7904 = 0;
-            func_002A7750(obj, 2, -1);
-            func_L00_003672F8();
+            SetMobyState(obj, 2, -1);
+            SetFlagToOne();
             st->fade = D_001A65D2[0];
-            func_L00_002E6CF0(func_L11_00445B30, obj);
+            AddDrawCallbackToList1(DrawScreenFadeBar, obj);
             OBJ->timer = 0x1F;
         }
         D_L11_001A9010 = 0;
         break;
     case 2:
-        if (func_002B3868(obj) != 0) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+        if (SetFirstPendingFlag(obj) != 0) {
+            SetGroupAActiveCount(obj, 0);
+            SetGroupBActiveCount(obj, 0);
             OBJ->phase = 0;
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
-            lt3 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            m1 = &D_L11_001B359C[st->lamp];
-            lt3->height = 419.766f;
-            m1->y = 419.766f;
+            gMobyTable_L11[st->door].flags |= 1;
+            gMobyTable_L11[st->door].hidden = 0;
+            lightReset = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lampReset = &gMobyTable_L11[st->lamp];
+            lightReset->height = 419.766f;
+            lampReset->y = 419.766f;
         } else if (OBJ->phase == 0) {
             if (OBJ->timer < 0x1F) {
-                D_L11_001B2FE0 = func_00283CE0(OBJ->timer) * 0.05f < 1.0f
-                                     ? func_00283CE0(OBJ->timer) * 0.05f
+                D_L11_001B2FE0 = IntToFloat(OBJ->timer) * 0.05f < 1.0f
+                                     ? IntToFloat(OBJ->timer) * 0.05f
                                      : 1.0f;
             } else {
-                f32 v[4] __attribute__((aligned(16)));
+                f32 cameraPos[4] __attribute__((aligned(16)));
 
                 st->fade = D_001A65D2[0];
-                func_L00_002E6CF0(func_L11_00445B30, obj);
+                AddDrawCallbackToList1(DrawScreenFadeBar, obj);
                 if (D_L11_001CAE40[0] != 1) {
-                    func_L00_00303530(1, st->music);
+                    LoadSceneChunk(1, st->music);
                 }
-                p1 = D_L11_001B368C + (st->camera << 7);
-                func_L00_002B9D60(p1 + 0x30, p1 + 0x70, 0x6F, 1);
-                func_002DF3F8(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
-                func_L01_00323310(st->music, st->volume);
-                *(TI128 *)v = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
-                v[2] += 2.0f;
-                func_00335438((char *)v, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
+                cameraEntry = D_L11_001B368C + (st->camera << 7);
+                ResetHeroPositionAndDirection(cameraEntry + 0x30, cameraEntry + 0x70, 0x6F, 1);
+                CaptureCheckpointState(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
+                QueueKeyedRequest(st->music, st->volume);
+                *(TI128 *)cameraPos = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
+                cameraPos[2] += 2.0f;
+                SetCamera5Pose((char *)cameraPos, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
                 OBJ->phase = 2;
             }
         } else if (OBJ->phase == 2) {
-            func_L00_002E6EF8(func_L11_00445B30, obj);
+            AddDrawCallbackToList3(DrawScreenFadeBar, obj);
             D_L11_001B2FE0 = 0.0f;
             if (st->fade <= 0) {
                 OBJ->phase = 3;
-                func_L00_002C8BA8(0);
-                func_L00_002D40A0(func_L11_004417E8(obj), 0, 0.0f);
+                StartHeroLoaderState(0);
+                StartHeroTargetState(GetArenaCenterPoint(obj), 0, 0.0f);
             }
         } else if (OBJ->phase == 3) {
-            if (func_00282E80(&HERO->f[0x80 / 4], func_L11_004417E8(obj)) < 10.0f) {
+            if (vec_distance_xy(&HERO->f[0x80 / 4], GetArenaCenterPoint(obj)) < 10.0f) {
                 if (D_001395B8[0x4A] == 0) {
                     D_001395B8[0x4A] = 1;
                     OBJ->phase = 1;
-                    func_L00_003294F0((u8 *)&D_L11_001B359C[st->gate1], 1);
+                    SetObjectFlagBit((u8 *)&gMobyTable_L11[st->gate1], 1);
                     OBJ->timer = 0;
-                } else if (D_001395B8[func_L11_0043E108(0)] != 0) {
-                    func_002A7750(obj, 4, -1);
+                } else if (D_001395B8[GetChallengeFlagIndex(0)] != 0) {
+                    SetMobyState(obj, 4, -1);
                 } else {
-                    func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0, 1);
+                    ResetHeroPositionAndDirection(GetArenaCenterPoint(obj), D_L11_001B1570, 0, 1);
                     st->cls = 0;
                     st->wave = 0;
-                    func_002A7750(obj, 8, -1);
-                    func_003355A8(2);
+                    SetMobyState(obj, 8, -1);
+                    SetCameraModeState(2);
                 }
             }
         } else if (OBJ->phase == 1) {
             if (OBJ->timer >= 0x3D && D_L11_001A8F00 != 2) {
-                if (D_001395B8[func_L11_0043E108(0)] == 0) {
-                    func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0, 1);
+                if (D_001395B8[GetChallengeFlagIndex(0)] == 0) {
+                    ResetHeroPositionAndDirection(GetArenaCenterPoint(obj), D_L11_001B1570, 0, 1);
                     st->cls = 0;
                     st->wave = 0;
-                    func_002A7750(obj, 8, -1);
-                    func_003355A8(2);
+                    SetMobyState(obj, 8, -1);
+                    SetCameraModeState(2);
                 } else {
-                    func_002A7750(obj, 4, -1);
+                    SetMobyState(obj, 4, -1);
                 }
             }
         }
         break;
     case 5:
         if (OBJ->timer < 0xB4) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+            SetGroupAActiveCount(obj, 0);
+            SetGroupBActiveCount(obj, 0);
             HERO->f[0x24A4 / 4] = 300.0f;
-            func_L11_00442170(obj);
+            UpdateFightersInsideArena(obj);
             break;
         }
     case 4:
-        if (func_002B3868(obj) != 0) {
+        if (SetFirstPendingFlag(obj) != 0) {
             if (OBJ->state == 5) {
-                func_L11_004427B8((char *)obj, st->cls);
+                StartChallengeResultScene((char *)obj, st->cls);
             }
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
-            func_L11_00442C80(obj);
-            func_L11_004411C8(obj);
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
-            func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0x6F, 1);
-            func_002DF3F8(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
-            func_L11_00443380(obj);
+            gMobyTable_L11[st->door].flags |= 1;
+            gMobyTable_L11[st->door].hidden = 0;
+            RunHelperOnSpawnGroups(obj);
+            RunAllArenaMemberHandlers(obj);
+            SetGroupAActiveCount(obj, 0);
+            SetGroupBActiveCount(obj, 0);
+            ResetHeroPositionAndDirection(GetArenaCenterPoint(obj), D_L11_001B1570, 0x6F, 1);
+            CaptureCheckpointState(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
+            StartArenaIntroScript(obj);
             st->mode = 5;
-            func_L11_004461E8(obj);
+            UpdateJobaRibbonScale(obj);
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
         }
-        func_L11_004433D8(obj);
+        UpdateArenaIntroScript(obj);
         break;
     case 11:
         if (OBJ->timer < 0x168) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+            SetGroupAActiveCount(obj, 0);
+            SetGroupBActiveCount(obj, 0);
             if (OBJ->timer >= 0xB5) {
                 HERO->f[0x24A4 / 4] = 200.0f;
             }
-            func_L11_00442170(obj);
+            UpdateFightersInsideArena(obj);
         } else {
-            func_002A7750(obj, 4, -1);
+            SetMobyState(obj, 4, -1);
         }
         break;
     case 12:
     case 13:
-        if (func_002B3868(obj) != 0) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+        if (SetFirstPendingFlag(obj) != 0) {
+            SetGroupAActiveCount(obj, 0);
+            SetGroupBActiveCount(obj, 0);
             OBJ->phase = 0;
         }
         if (OBJ->phase == 0) {
             if (OBJ->timer < 0xB4) {
                 HERO->f[0x24A4 / 4] = 200.0f;
-                func_L11_00442170(obj);
+                UpdateFightersInsideArena(obj);
                 break;
             }
             if (OBJ->state == 12) {
-                func_L00_003294F0((u8 *)&D_L11_001B359C[st->gate2], 1);
+                SetObjectFlagBit((u8 *)&gMobyTable_L11[st->gate2], 1);
             } else if (OBJ->state == 13) {
-                func_L00_003294F0((u8 *)&D_L11_001B359C[st->gate3], 1);
+                SetObjectFlagBit((u8 *)&gMobyTable_L11[st->gate3], 1);
             }
             OBJ->timer = 0;
             OBJ->phase = 1;
         } else if (HERO->i[0x24CC / 4] > 0 && D_L11_001A8F00 != 2 && OBJ->timer >= 0xF1) {
-            func_L11_004427B8((char *)obj, st->cls);
+            StartChallengeResultScene((char *)obj, st->cls);
             OBJ->state = 5;
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
-            func_L11_00442C80(obj);
-            func_L11_004411C8(obj);
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
-            func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0x6F, 1);
-            func_002DF3F8(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
-            func_L11_00443380(obj);
+            gMobyTable_L11[st->door].flags |= 1;
+            gMobyTable_L11[st->door].hidden = 0;
+            RunHelperOnSpawnGroups(obj);
+            RunAllArenaMemberHandlers(obj);
+            SetGroupAActiveCount(obj, 0);
+            SetGroupBActiveCount(obj, 0);
+            ResetHeroPositionAndDirection(GetArenaCenterPoint(obj), D_L11_001B1570, 0x6F, 1);
+            CaptureCheckpointState(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
+            StartArenaIntroScript(obj);
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
         }
         break;
     case 6:
-        func_L11_00445990((char *)obj);
+        MoveJobaMenuSelectionToNext((char *)obj);
         break;
     case 7:
-        if (func_002B3868(obj) != 0) {
-            sel = D_001395B8[0x49];
-            if (sel != 0 && (D_001395B8[func_L11_0043E108(TABLE[sel]->id)] == 0 ||
-                             (sel >= 11 && func_00288D58() == 0) ||
-                             (sel == 8 && D_00139586[0][D_L11_00279BA0].enabled == 0))) {
-                sel = 0;
+        if (SetFirstPendingFlag(obj) != 0) {
+            selection = D_001395B8[0x49];
+            if (selection != 0 && (D_001395B8[GetChallengeFlagIndex(TABLE[selection]->id)] == 0 ||
+                             (selection >= 11 && IsFlagByteSet() == 0) ||
+                             (selection == 8 && D_00139586[0][D_L11_00279BA0].enabled == 0))) {
+                selection = 0;
             }
-            st->result = sel;
+            st->result = selection;
         }
-        func_L11_00443498(obj);
+        UpdateJobaClassSelectionMenu(obj);
         break;
     case 8:
-        func_L11_0043E108(1);
-        if (func_002B3868(obj) != 0) {
+        GetChallengeFlagIndex(1);
+        if (SetFirstPendingFlag(obj) != 0) {
             st->wave = 0;
-            for (k1 = 0; k1 < 8; k1++) {
-                st->counts[k1] = 0;
+            for (clearIdx = 0; clearIdx < 8; clearIdx++) {
+                st->counts[clearIdx] = 0;
             }
             st->frames = 0;
             st->lost = 0;
-            func_L11_00442C80(obj);
-            func_L11_00440238(obj);
-            func_L11_00442E38(obj);
-            rec1 = &TABLE[st->cls]->records[st->wave];
-            func_L11_00441A58(obj, rec1->h[7]);
-            func_L11_00441D08(obj, rec1->h[6]);
-            for (k3 = 0; k3 < 40; k3++) {
-                st->marks[k3] = 0;
+            RunHelperOnSpawnGroups(obj);
+            CountArenaFighters(obj);
+            AssignFightersToSpawnPoints(obj);
+            firstRecord = &TABLE[st->cls]->records[st->wave];
+            SetGroupAActiveCount(obj, firstRecord->h[7]);
+            SetGroupBActiveCount(obj, firstRecord->h[6]);
+            for (markIdx = 0; markIdx < 40; markIdx++) {
+                st->marks[markIdx] = 0;
             }
-            for (k3 = 0; k3 < 6; k3++) {
-                st->limits[k3] = D_L11_001B14B0[k3];
+            for (markIdx = 0; markIdx < 6; markIdx++) {
+                st->limits[markIdx] = D_L11_001B14B0[markIdx];
             }
             HERO->i[0x24CC / 4] = D_001A7A00;
-            func_L11_00447360((char *)obj);
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
+            UpdateMobyClassSpecials((char *)obj);
+            gMobyTable_L11[st->door].flags |= 1;
+            gMobyTable_L11[st->door].hidden = 0;
             if (st->cls == 7) {
-                r1 = HERO->i[0x18D4 / 4];
+                savedWord1 = HERO->i[0x18D4 / 4];
                 HERO->i[0x18D4 / 4] = 0;
-                D_L11_001B1588 = r1;
+                D_L11_001B1588 = savedWord1;
             } else if (st->cls == 8) {
-                r2 = HERO->i[0x18D4 / 4];
+                savedWord2 = HERO->i[0x18D4 / 4];
                 HERO->i[0x18D4 / 4] = 0;
                 D_00139700[0] = 300;
-                D_L11_001B1588 = r2;
+                D_L11_001B1588 = savedWord2;
             }
         }
-        rec2 = &TABLE[st->cls]->records[st->wave];
-        if (rec2->b[3] != 0) {
-            func_002A7750(obj, 9, -1);
+        currentRecord = &TABLE[st->cls]->records[st->wave];
+        if (currentRecord->b[3] != 0) {
+            SetMobyState(obj, 9, -1);
             return;
         }
-        func_L11_00440360(obj);
-        if (func_L11_00442710(obj) != 0) {
+        UpdateArenaLossHistory(obj);
+        if (IsWaveComplete_L11(obj) != 0) {
             st->wave++;
-            for (k4 = 0; k4 < 7; k4++) {
-                st->counts[k4] = 0;
+            for (resetIdx = 0; resetIdx < 7; resetIdx++) {
+                st->counts[resetIdx] = 0;
             }
             st->lost = 0;
             if (D_L11_001BA780.owner == st->owner) {
                 D_L11_001BA780.owner = 0;
             }
-            cls1 = st->cls;
-            cls3 = (u16)st->cls;
+            challengeA = st->cls;
+            challengeU = (u16)st->cls;
             st->sound = 0;
             st->owner = 0;
-            if (st->wave >= TABLE[cls1]->count) {
-                if (cls3 - 7U < 2) {
+            if (st->wave >= TABLE[challengeA]->count) {
+                if (challengeU - 7U < 2) {
                     HERO->i[0x18D4 / 4] = D_L11_001B1588;
                 }
                 st->result = st->cls;
-                if (st->result == 0 && D_001395B8[func_L11_0043E108(0)] == 0) {
-                    func_002A7750(obj, 12, -1);
+                if (st->result == 0 && D_001395B8[GetChallengeFlagIndex(0)] == 0) {
+                    SetMobyState(obj, 12, -1);
                     return;
                 }
-                func_002A7750(obj, 5, -1);
-                func_L00_003DF6B0(1, -1);
-                func_L00_004028C0((char *)1, -1);
+                SetMobyState(obj, 5, -1);
+                SetTrackedObjectState(1, -1);
+                StartGlobalObject((char *)1, -1);
                 return;
             }
-            if (cls1 >= 13) {
+            if (challengeA >= 13) {
                 st->cls = 0;
             }
-            func_L11_00442E38(obj);
-            rec3 = &TABLE[st->cls]->records[st->wave];
-            func_L11_00441A58(obj, rec3->h[7]);
-            func_L11_00441D08(obj, rec3->h[6]);
+            AssignFightersToSpawnPoints(obj);
+            nextWaveRecord = &TABLE[st->cls]->records[st->wave];
+            SetGroupAActiveCount(obj, nextWaveRecord->h[7]);
+            SetGroupBActiveCount(obj, nextWaveRecord->h[6]);
         }
         st->frames++;
         if (st->cls == 5) {
             if (st->frames >= 0x1519) {
-                char buf[0x70];
+                char message[0x70];
 
-                sum1 = 0;
-                for (k5 = 0; k5 < 6; k5++) {
-                    sum1 += st->counts[k5];
+                killSum5 = 0;
+                for (sumIdx5 = 0; sumIdx5 < 6; sumIdx5++) {
+                    killSum5 += st->counts[sumIdx5];
                 }
-                func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x3269), D_L11_001B14B8[st->wave] + sum1 - st->lost,
-                              func_00288FB8(0x2F61));
-                func_L00_0030DD70((int)buf, -1);
-                func_002A7750(obj, 11, -1);
-                func_L00_003DF6B0(1, -1);
-                func_L00_004028C0((char *)1, -1);
+                Sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14B8[st->wave] + killSum5 - st->lost,
+                              GetLocalizedString(0x2F61));
+                CallLoadedModuleHandlerWithArg_003387A0_1((int)message, -1);
+                SetMobyState(obj, 11, -1);
+                SetTrackedObjectState(1, -1);
+                StartGlobalObject((char *)1, -1);
                 return;
             }
         }
         if (st->cls == 9 && st->frames >= 0x2A31) {
-            func_L00_0030DD70(func_00288FB8(0x3269), -1);
-            func_002A7750(obj, 11, -1);
-            func_L00_003DF6B0(1, -1);
-            func_L00_004028C0((char *)1, -1);
+            CallLoadedModuleHandlerWithArg_003387A0_1(GetLocalizedString(0x3269), -1);
+            SetMobyState(obj, 11, -1);
+            SetTrackedObjectState(1, -1);
+            StartGlobalObject((char *)1, -1);
             return;
         }
         if (st->cls == 8) {
             if (st->frames >= 0xE11) {
-                char buf[0x70];
+                char message[0x70];
 
-                sum2 = 0;
-                for (k6 = 0; k6 < 6; k6++) {
-                    sum2 += st->counts[k6];
+                killSum8 = 0;
+                for (sumIdx8 = 0; sumIdx8 < 6; sumIdx8++) {
+                    killSum8 += st->counts[sumIdx8];
                 }
-                func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x3269), D_L11_001B14D0[st->wave] + sum2 - st->lost,
-                              func_00288FB8(0x2F61));
-                func_L00_0030DD70((int)buf, -1);
-                func_002A7750(obj, 11, -1);
-                func_L00_003DF6B0(1, -1);
-                func_L00_004028C0((char *)1, -1);
+                Sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D0[st->wave] + killSum8 - st->lost,
+                              GetLocalizedString(0x2F61));
+                CallLoadedModuleHandlerWithArg_003387A0_1((int)message, -1);
+                SetMobyState(obj, 11, -1);
+                SetTrackedObjectState(1, -1);
+                StartGlobalObject((char *)1, -1);
                 return;
             }
         }
         if ((st->cls == 3 || st->cls == 11) && HERO->i[0x24CC / 4] < D_001A7A00) {
-            func_L00_0030DD70(func_00288FB8(0x326A), -1);
-            func_002A7750(obj, 11, -1);
-            func_L00_003DF6B0(1, -1);
-            func_L00_004028C0((char *)1, -1);
+            CallLoadedModuleHandlerWithArg_003387A0_1(GetLocalizedString(0x326A), -1);
+            SetMobyState(obj, 11, -1);
+            SetTrackedObjectState(1, -1);
+            StartGlobalObject((char *)1, -1);
             return;
         }
-        rec2 = &TABLE[st->cls]->records[st->wave];
-        if (OBJ->timer >= 0x3D || rec2->b[0] != 0) {
-            ok1 = 0;
-            func_L11_00441108(obj);
-            func_L11_00440E18(obj);
-            e1 = st->slots[st->slot];
-            if (e1 != 0 && func_L02_003D77B8(e1) != 0) {
-                for (k7 = st->counts[3]; k7 < rec2->h[3]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDF7, 0);
+        currentRecord = &TABLE[st->cls]->records[st->wave];
+        if (OBJ->timer >= 0x3D || currentRecord->b[0] != 0) {
+            spawnedAny = 0;
+            ClearSquadSlotsWhenDone(obj);
+            ChooseNextSquadMember(obj);
+            slotEntity = st->slots[st->slot];
+            if (slotEntity != 0 && HasFreeChildSlotInState2(slotEntity) != 0) {
+                for (spawnIdx = st->counts[3]; spawnIdx < currentRecord->h[3]; spawnIdx++) {
+                    spawnedAny |= ActivateArenaFighterOfClass(obj, 0xDF7 /* moby class 3575 */, 0);
                 }
-                for (k7 = st->counts[1]; k7 < rec2->h[1]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDCF, 0);
+                for (spawnIdx = st->counts[1]; spawnIdx < currentRecord->h[1]; spawnIdx++) {
+                    spawnedAny |= ActivateArenaFighterOfClass(obj, 0xDCF /* Joba smasher robot */, 0);
                 }
-                for (k7 = st->counts[2]; k7 < rec2->h[2]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDF4, 0);
+                for (spawnIdx = st->counts[2]; spawnIdx < currentRecord->h[2]; spawnIdx++) {
+                    spawnedAny |= ActivateArenaFighterOfClass(obj, 0xDF4 /* moby class 3572 */, 0);
                 }
-                for (k7 = st->counts[0]; k7 < rec2->h[0]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xD98, 0);
+                for (spawnIdx = st->counts[0]; spawnIdx < currentRecord->h[0]; spawnIdx++) {
+                    spawnedAny |= ActivateArenaFighterOfClass(obj, 0xD98 /* Joba security robot */, 0);
                 }
-                for (k7 = st->counts[4]; k7 < rec2->h[4]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDF9, 0);
+                for (spawnIdx = st->counts[4]; spawnIdx < currentRecord->h[4]; spawnIdx++) {
+                    spawnedAny |= ActivateArenaFighterOfClass(obj, 0xDF9 /* Joba fighter */, 0);
                 }
-                for (k7 = st->counts[5]; k7 < rec2->h[5]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xD37, 0);
+                for (spawnIdx = st->counts[5]; spawnIdx < currentRecord->h[5]; spawnIdx++) {
+                    spawnedAny |= ActivateArenaFighterOfClass(obj, 0xD37 /* moby class 3383 */, 0);
                 }
             }
-            if (st->counts[6] == 0 && rec2->b[0] != 0) {
-                r3 = func_L11_00440868(obj, 0xD4A, 0);
-                st->sound = r3;
-                st->owner = r3;
+            if (st->counts[6] == 0 && currentRecord->b[0] != 0) {
+                bossA = ActivateArenaBossOfClass(obj, 0xD4A /* moby class 3402 */, 0);
+                st->sound = bossA;
+                st->owner = bossA;
                 if (D_L11_001BA780.owner == 0) {
-                    D_L11_001BA780.owner = r3;
+                    D_L11_001BA780.owner = bossA;
                     D_L11_001BA780.timer = 0;
                 }
-                snd1 = st->sound;
+                soundHandleA = st->sound;
                 if (D_L11_001B3770[0] == 0) {
-                    D_L11_001B3770[0] = snd1;
-                    func_00282A60(D_L11_001FFA78, 0, 0xE0);
+                    D_L11_001B3770[0] = soundHandleA;
+                    ClearMemory(D_L11_001FFA78, 0, 0xE0);
                 }
-                func_L11_00445D28(obj, 10);
-                func_L01_00323310(st->track, st->trackVolume);
+                QueueArenaVoiceLine(obj, 10);
+                QueueKeyedRequest(st->track, st->trackVolume);
             }
-            if (rec2->b[0] == 0) {
-                if (D_001A63A8[0x48] != st->music && D_001A63A8[0x3C] != st->music) {
-                    func_L01_00323310(st->music, st->volume);
+            if (currentRecord->b[0] == 0) {
+                if (gMusicState[0x48] != st->music && gMusicState[0x3C] != st->music) {
+                    QueueKeyedRequest(st->music, st->volume);
                 }
             }
-            if (ok1 != 0) {
-                func_L11_00441090(obj);
+            if (spawnedAny != 0) {
+                RefreshSquadSlots(obj);
             }
         }
         if (st->cls == 7) {
-            func_002AD860(10);
+            HandleRequestSlotState(10);
             HERO->b[0x22B7] = 1;
         }
         if (st->cls == 8) {
-            func_002AD860(30);
+            HandleRequestSlotState(30);
         }
-        func_L00_002E6CF0(func_L11_00444400, obj);
-        func_L11_004423F8(obj);
-        func_L11_00446020(obj);
+        AddDrawCallbackToList1(DrawJobaChallengeHud, obj);
+        UpdateArenaCameraGuide(obj);
+        PickJobaBossActionByTarget(obj);
         if ((D_001A7BC0 & 3) == 0) {
-            func_L11_00441350(obj);
+            MarkNearestFightersToAttack(obj);
         }
-        func_L11_00442170(obj);
-        if (func_L11_0043E090(st->cls) != -1) {
-            D_L11_001AA170 = func_L11_0043E090(st->cls);
+        UpdateFightersInsideArena(obj);
+        if (GetChallengeDisplayId(st->cls) != -1) {
+            D_L11_001AA170 = GetChallengeDisplayId(st->cls);
             D_L11_001B3680 = D_001A7390;
         }
         break;
     case 9:
-        func_L11_0043E108(1);
-        if (func_002B3868(obj) != 0) {
+        GetChallengeFlagIndex(1);
+        if (SetFirstPendingFlag(obj) != 0) {
             if (st->counts[7] == 0) {
                 if (TABLE[st->cls]->records[st->wave].b[1] != 0) {
-                    r4 = func_L11_00440868(obj, 0xB3A, 0);
-                    st->sound = r4;
-                    st->owner = r4;
+                    bossB = ActivateArenaBossOfClass(obj, 0xB3A /* Arachnoid */, 0);
+                    st->sound = bossB;
+                    st->owner = bossB;
                     if (D_L11_001BA780.owner == 0) {
-                        D_L11_001BA780.owner = r4;
+                        D_L11_001BA780.owner = bossB;
                         D_L11_001BA780.timer = 0;
                     }
-                    snd2 = st->sound;
+                    soundHandleB = st->sound;
                     if (D_L11_001B3770[1] == 0) {
-                        D_L11_001B3770[1] = snd2;
-                        buf2 = D_L11_001FFA78;
-                        func_00282A60(buf2 + 0xE0, 0, 0xE0);
+                        D_L11_001B3770[1] = soundHandleB;
+                        soundBufB = D_L11_001FFA78;
+                        ClearMemory(soundBufB + 0xE0, 0, 0xE0);
                     }
-                    func_L11_00445D28(obj, 4);
-                    func_L01_00323310(st->track, st->trackVolume);
+                    QueueArenaVoiceLine(obj, 4);
+                    QueueKeyedRequest(st->track, st->trackVolume);
                 }
             }
             st->mode = 1;
             OBJ->phase = 0;
-            func_L11_00445D28(obj, func_002A77E0(2) + 0x1B);
-            for (k8 = 0; k8 < 4; k8++) {
-                st->phase[k8] = (f32)k8 * 0.25f;
-                st->speed[k8] = func_002A7878(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.016666668f;
-                st->delay[k8] = func_002A7878(D_L11_001B1598[0], D_L11_001B1598[1]);
+            QueueArenaVoiceLine(obj, RandomIntBelow(2) + 0x1B);
+            for (orbIdx = 0; orbIdx < 4; orbIdx++) {
+                st->phase[orbIdx] = (f32)orbIdx * 0.25f;
+                st->speed[orbIdx] = RandomFloatRange(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.016666668f;
+                st->delay[orbIdx] = RandomFloatRange(D_L11_001B1598[0], D_L11_001B1598[1]);
             }
         } else if (OBJ->phase == 0) {
-            func_L11_004461E8(obj);
-            func_L11_00440360(obj);
-            lt1 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            q1 = (u8 *)&D_L11_001B359C[st->lamp];
-            if (lt1->height < 421.266f) {
-                f1 = lt1->height + 0.008333334f;
-                lt1->height = f1;
-                *(f32 *)(q1 + 0x18) = f1;
+            UpdateJobaRibbonScale(obj);
+            UpdateArenaLossHistory(obj);
+            lightRise = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lampBytes = (u8 *)&gMobyTable_L11[st->lamp];
+            if (lightRise->height < 421.266f) {
+                raisedHeight = lightRise->height + 0.008333334f;
+                lightRise->height = raisedHeight;
+                *(f32 *)(lampBytes + 0x18) = raisedHeight;
             }
-            if (HERO->ptr[0x33C / 4] == (void *)q1 && HERO->i[0x340 / 4] != 0 &&
+            if (HERO->ptr[0x33C / 4] == (void *)lampBytes && HERO->i[0x340 / 4] != 0 &&
                 (HERO->i[0x2294 / 4] == 7 || OBJ->timer >= 0x12D)) {
                 HERO->i[0xF0 / 4] = 0;
                 D_L11_001A7CD8 = 80.0f;
                 HERO->i[0xF4 / 4] = 0;
                 if (HERO->i[0x2294 / 4] != 7) {
                     if (HERO->i[0x2294 / 4] != 0x81) {
-                        func_L11_002D8EF8(7, 1);
+                        EnterHeroState_L11(7, 1);
                     }
                 } else {
-                    func_L11_002D8EF8(0x81, 1);
+                    EnterHeroState_L11(0x81, 1);
                 }
-                if (func_00282E80(&HERO->f[0x80 / 4], lt1->pos) < 0.01f) {
+                if (vec_distance_xy(&HERO->f[0x80 / 4], lightRise->pos) < 0.01f) {
                     HERO->f[0x84 / 4] += 0.01f;
                 }
             }
-            ok2 = 0;
-            func_L11_00441108(obj);
-            func_L11_00440E18(obj);
-            e2 = st->slots[st->slot];
-            if (e2 != 0 && func_L02_003D77B8(e2) != 0) {
-                for (k9 = st->counts[1]; k9 < 4; k9++) {
-                    ok2 |= func_L11_00440790(obj, 0xDCF, 0);
+            spawnedAnyBoss = 0;
+            ClearSquadSlotsWhenDone(obj);
+            ChooseNextSquadMember(obj);
+            slotEntityBoss = st->slots[st->slot];
+            if (slotEntityBoss != 0 && HasFreeChildSlotInState2(slotEntityBoss) != 0) {
+                for (spawnIdxBoss = st->counts[1]; spawnIdxBoss < 4; spawnIdxBoss++) {
+                    spawnedAnyBoss |= ActivateArenaFighterOfClass(obj, 0xDCF /* Joba smasher robot */, 0);
                 }
-                for (k9 = st->counts[2]; k9 < 4; k9++) {
-                    ok2 |= func_L11_00440790(obj, 0xDF4, 0);
+                for (spawnIdxBoss = st->counts[2]; spawnIdxBoss < 4; spawnIdxBoss++) {
+                    spawnedAnyBoss |= ActivateArenaFighterOfClass(obj, 0xDF4 /* moby class 3572 */, 0);
                 }
-                for (k9 = st->counts[0]; k9 < 4; k9++) {
-                    ok2 |= func_L11_00440790(obj, 0xD98, 0);
+                for (spawnIdxBoss = st->counts[0]; spawnIdxBoss < 4; spawnIdxBoss++) {
+                    spawnedAnyBoss |= ActivateArenaFighterOfClass(obj, 0xD98 /* Joba security robot */, 0);
                 }
             }
-            func_L11_00446C78(obj);
-            func_L00_002E6CF0(func_L11_00446EB8, obj);
-            if (ok2 != 0) {
-                func_L11_00441090(obj);
+            EmitRobotLaserParticles(obj);
+            AddDrawCallbackToList1(SpawnChannelBeamEffects, obj);
+            if (spawnedAnyBoss != 0) {
+                RefreshSquadSlots(obj);
             }
             if (D_L11_001A8FF4 == 0) {
                 if (HERO->f[0x88 / 4] > 480.0f && HERO->f[0x180 / 4] < 0.033333335f) {
                     D_L11_001A8FF4 = 1;
                     D_L11_001A8FF0 = 1;
-                    func_L11_00447360((char *)obj);
-                    func_L11_00447018(obj, 5);
+                    UpdateMobyClassSpecials((char *)obj);
+                    EmitObjectSparks(obj, 5);
                 }
                 if (D_L11_001A8FF4 == 0) {
                     if (HERO->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < HERO->f[0x88 / 4]) {
@@ -812,122 +813,122 @@ void func_L11_0043E1A0(u8 *obj) {
                     }
                 }
             }
-            func_L11_00447018(obj, 0);
+            EmitObjectSparks(obj, 0);
             if (D_L11_001A8FF4 != 0 && st->mode == 3) {
                 OBJ->timer = 0;
                 OBJ->phase = 1;
-                rec6 = &TABLE[st->cls]->records[st->wave];
-                for (c10 = 0; c10 < 6; c10++) {
-                    st->counts[c10] = 0;
+                bossSpawnRecord = &TABLE[st->cls]->records[st->wave];
+                for (resetIdx2 = 0; resetIdx2 < 6; resetIdx2++) {
+                    st->counts[resetIdx2] = 0;
                 }
-                st->heading = func_00283248(HERO->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
-                                           HERO->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
-                st->heading = func_00283B98(st->heading, -1.5707965f);
-                for (k10 = st->counts[3]; k10 < rec6->h[3]; k10++) {
-                    func_L11_00440790(obj, 0xDF7, 1);
+                st->heading = FastMatrixHelperA(HERO->f[0x80 / 4] - ((f32 *)GetArenaCenterPoint(obj))[0],
+                                           HERO->f[0x84 / 4] - ((f32 *)GetArenaCenterPoint(obj))[1]);
+                st->heading = FastAddRotations(st->heading, -1.5707965f);
+                for (hoverIdx = st->counts[3]; hoverIdx < bossSpawnRecord->h[3]; hoverIdx++) {
+                    ActivateArenaFighterOfClass(obj, 0xDF7 /* moby class 3575 */, 1);
                 }
-                for (k10 = st->counts[5]; k10 < rec6->h[5]; k10++) {
-                    func_L11_00440790(obj, 0xD37, 1);
+                for (hoverIdx = st->counts[5]; hoverIdx < bossSpawnRecord->h[5]; hoverIdx++) {
+                    ActivateArenaFighterOfClass(obj, 0xD37 /* moby class 3383 */, 1);
                 }
-                for (k10 = st->counts[1]; k10 < rec6->h[1]; k10++) {
-                    func_L11_00440790(obj, 0xDCF, 1);
+                for (hoverIdx = st->counts[1]; hoverIdx < bossSpawnRecord->h[1]; hoverIdx++) {
+                    ActivateArenaFighterOfClass(obj, 0xDCF /* Joba smasher robot */, 1);
                 }
-                for (k10 = st->counts[2]; k10 < rec6->h[2]; k10++) {
-                    func_L11_00440790(obj, 0xDF4, 1);
+                for (hoverIdx = st->counts[2]; hoverIdx < bossSpawnRecord->h[2]; hoverIdx++) {
+                    ActivateArenaFighterOfClass(obj, 0xDF4 /* moby class 3572 */, 1);
                 }
-                for (k10 = st->counts[0]; k10 < rec6->h[0]; k10++) {
-                    func_L11_00440790(obj, 0xD98, 1);
+                for (hoverIdx = st->counts[0]; hoverIdx < bossSpawnRecord->h[0]; hoverIdx++) {
+                    ActivateArenaFighterOfClass(obj, 0xD98 /* Joba security robot */, 1);
                 }
             }
         } else if (OBJ->phase == 1) {
-            func_L11_00440360(obj);
-            func_L11_004461E8(obj);
+            UpdateArenaLossHistory(obj);
+            UpdateJobaRibbonScale(obj);
             if (TABLE[st->cls]->records[st->wave].b[4] != 0) {
-                func_L11_004471A8(obj, &TABLE[st->cls]->records[st->wave]);
+                SpawnTimedEffectNearAnchor(obj, &TABLE[st->cls]->records[st->wave]);
             }
-            func_L11_00447018(obj, 0);
-            if (func_L11_00442710(obj) != 0) {
-                for (c11 = 0; c11 < 8; c11++) {
-                    st->counts[c11] = 0;
+            EmitObjectSparks(obj, 0);
+            if (IsWaveComplete_L11(obj) != 0) {
+                for (clearIdx2 = 0; clearIdx2 < 8; clearIdx2++) {
+                    st->counts[clearIdx2] = 0;
                 }
                 st->lost = 0;
-                cl1 = TABLE[st->cls];
-                w1 = st->wave;
-                next1 = &cl1->records[w1 + 1];
-                if (w1 + 1 < cl1->count && next1->b[3] != 0) {
-                    st->heading = func_00283248(HERO->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
-                                               HERO->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
-                    st->heading = func_00283B98(st->heading, -1.5707965f);
+                classInfo = TABLE[st->cls];
+                waveIndex = st->wave;
+                nextRecord = &classInfo->records[waveIndex + 1];
+                if (waveIndex + 1 < classInfo->count && nextRecord->b[3] != 0) {
+                    st->heading = FastMatrixHelperA(HERO->f[0x80 / 4] - ((f32 *)GetArenaCenterPoint(obj))[0],
+                                               HERO->f[0x84 / 4] - ((f32 *)GetArenaCenterPoint(obj))[1]);
+                    st->heading = FastAddRotations(st->heading, -1.5707965f);
                     st->wave++;
-                    rec8 = &TABLE[st->cls]->records[st->wave];
-                    for (k11 = st->counts[3]; k11 < rec8->h[3]; k11++) {
-                        func_L11_00440790(obj, 0xDF7, 1);
+                    followRecord = &TABLE[st->cls]->records[st->wave];
+                    for (followIdx = st->counts[3]; followIdx < followRecord->h[3]; followIdx++) {
+                        ActivateArenaFighterOfClass(obj, 0xDF7 /* moby class 3575 */, 1);
                     }
-                    for (k11 = st->counts[5]; k11 < rec8->h[5]; k11++) {
-                        func_L11_00440790(obj, 0xD37, 1);
+                    for (followIdx = st->counts[5]; followIdx < followRecord->h[5]; followIdx++) {
+                        ActivateArenaFighterOfClass(obj, 0xD37 /* moby class 3383 */, 1);
                     }
-                    for (k11 = st->counts[1]; k11 < rec8->h[1]; k11++) {
-                        func_L11_00440790(obj, 0xDCF, 1);
+                    for (followIdx = st->counts[1]; followIdx < followRecord->h[1]; followIdx++) {
+                        ActivateArenaFighterOfClass(obj, 0xDCF /* Joba smasher robot */, 1);
                     }
-                    for (k11 = st->counts[2]; k11 < rec8->h[2]; k11++) {
-                        func_L11_00440790(obj, 0xDF4, 1);
+                    for (followIdx = st->counts[2]; followIdx < followRecord->h[2]; followIdx++) {
+                        ActivateArenaFighterOfClass(obj, 0xDF4 /* moby class 3572 */, 1);
                     }
-                    for (k11 = st->counts[0]; k11 < rec8->h[0]; k11++) {
-                        func_L11_00440790(obj, 0xD98, 1);
+                    for (followIdx = st->counts[0]; followIdx < followRecord->h[0]; followIdx++) {
+                        ActivateArenaFighterOfClass(obj, 0xD98 /* Joba security robot */, 1);
                     }
-                    if (st->counts[7] == 0 && rec8->b[1] != 0) {
-                        r5 = func_L11_00440868(obj, 0xB3A, 0);
-                        st->sound = r5;
-                        st->owner = r5;
+                    if (st->counts[7] == 0 && followRecord->b[1] != 0) {
+                        bossC = ActivateArenaBossOfClass(obj, 0xB3A /* Arachnoid */, 0);
+                        st->sound = bossC;
+                        st->owner = bossC;
                         if (D_L11_001BA780.owner == 0) {
-                            D_L11_001BA780.owner = r5;
+                            D_L11_001BA780.owner = bossC;
                             D_L11_001BA780.timer = 0;
                         }
-                        snd3 = st->sound;
+                        soundHandleC = st->sound;
                         if (D_L11_001B3770[1] == 0) {
-                            D_L11_001B3770[1] = snd3;
-                            buf3 = D_L11_001FFA78;
-                            func_00282A60(buf3 + 0xE0, 0, 0xE0);
+                            D_L11_001B3770[1] = soundHandleC;
+                            soundBufC = D_L11_001FFA78;
+                            ClearMemory(soundBufC + 0xE0, 0, 0xE0);
                         }
-                        func_L11_00445D28(obj, 4);
+                        QueueArenaVoiceLine(obj, 4);
                     }
                 } else {
-                    func_L11_002D8EF8(0x6F, 1);
+                    EnterHeroState_L11(0x6F, 1);
                     OBJ->phase = 2;
                     st->mode = 4;
                     OBJ->timer = 0;
-                    func_L00_003DF6B0(1, -1);
-                    func_L00_004028C0((char *)1, -1);
+                    SetTrackedObjectState(1, -1);
+                    StartGlobalObject((char *)1, -1);
                 }
             }
             st->frames++;
             if (st->cls == 12) {
                 if (st->frames >= 0x1771) {
-                    char buf[0x70];
+                    char message[0x70];
 
-                    sum3 = 0;
-                    for (k12 = 0; k12 < 6; k12++) {
-                        sum3 += st->counts[k12];
+                    killSum12 = 0;
+                    for (sumIdx12 = 0; sumIdx12 < 6; sumIdx12++) {
+                        killSum12 += st->counts[sumIdx12];
                     }
-                    func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x3269), D_L11_001B14D8[st->wave] + sum3 - st->lost,
-                                  func_00288FB8(0x2F61));
-                    func_L00_0030DD70((int)buf, -1);
-                    lt4 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-                    m2 = &D_L11_001B359C[st->lamp];
-                    lt4->height = 419.766f;
-                    m2->y = 419.766f;
-                    func_002A7750(obj, 11, -1);
-                    func_L00_003DF6B0(1, -1);
-                    func_L00_004028C0((char *)1, -1);
+                    Sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D8[st->wave] + killSum12 - st->lost,
+                                  GetLocalizedString(0x2F61));
+                    CallLoadedModuleHandlerWithArg_003387A0_1((int)message, -1);
+                    lightEnd = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+                    lampEnd = &gMobyTable_L11[st->lamp];
+                    lightEnd->height = 419.766f;
+                    lampEnd->y = 419.766f;
+                    SetMobyState(obj, 11, -1);
+                    SetTrackedObjectState(1, -1);
+                    StartGlobalObject((char *)1, -1);
                     return;
                 }
             }
         } else if (OBJ->phase == 2) {
-            func_L11_004461E8(obj);
+            UpdateJobaRibbonScale(obj);
             if (OBJ->timer >= 0xB5) {
                 HERO->h[0x348 / 2] = 0;
                 D_L11_001A7CD8 = 5.0f;
-                func_L11_002D8EF8(0x81, 1);
+                EnterHeroState_L11(0x81, 1);
                 OBJ->phase = 3;
             }
         } else if (OBJ->phase == 3) {
@@ -936,66 +937,66 @@ void func_L11_0043E1A0(u8 *obj) {
             if (HERO->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < HERO->f[0x88 / 4]) {
                 HERO->h[0x1F0 / 2] = 1;
             }
-            func_L11_004461E8(obj);
-            lt2 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            m3 = &D_L11_001B359C[st->lamp];
-            if (lt2->height > 419.766f) {
-                f2 = lt2->height - 0.008333334f;
-                lt2->height = f2;
-                m3->y = f2;
+            UpdateJobaRibbonScale(obj);
+            lightLower = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lampLower = &gMobyTable_L11[st->lamp];
+            if (lightLower->height > 419.766f) {
+                loweredHeight = lightLower->height - 0.008333334f;
+                lightLower->height = loweredHeight;
+                lampLower->y = loweredHeight;
             }
             if (st->mode == 0) {
                 st->wave++;
-                for (k13 = 0; k13 < 7; k13++) {
-                    st->counts[k13] = 0;
+                for (resetIdx3 = 0; resetIdx3 < 7; resetIdx3++) {
+                    st->counts[resetIdx3] = 0;
                 }
                 st->lost = 0;
                 if (D_L11_001BA780.owner == st->owner) {
                     D_L11_001BA780.owner = 0;
                 }
-                cls2 = st->cls;
+                challengeB = st->cls;
                 st->sound = 0;
                 st->owner = 0;
-                if (st->wave >= TABLE[cls2]->count) {
-                    if (cls2 == 1 && D_001395B8[func_L11_0043E108(1)] == 0) {
-                        func_002A7750(obj, 13, -1);
+                if (st->wave >= TABLE[challengeB]->count) {
+                    if (challengeB == 1 && D_001395B8[GetChallengeFlagIndex(1)] == 0) {
+                        SetMobyState(obj, 13, -1);
                         OBJ->timer = 0xB4;
                     } else {
-                        func_002A7750(obj, 5, -1);
+                        SetMobyState(obj, 5, -1);
                         OBJ->timer = 0xB4;
                     }
-                    func_L00_003DF6B0(1, -1);
-                    func_L00_004028C0((char *)1, -1);
+                    SetTrackedObjectState(1, -1);
+                    StartGlobalObject((char *)1, -1);
                     st->result = st->cls;
                     return;
                 }
-                if (cls2 >= 13) {
+                if (challengeB >= 13) {
                     st->cls = 0;
                 }
-                func_L11_00442E38(obj);
-                rec9 = &TABLE[st->cls]->records[st->wave];
-                func_L11_00441A58(obj, rec9->h[7]);
-                func_L11_00441D08(obj, rec9->h[6]);
+                AssignFightersToSpawnPoints(obj);
+                newWaveRecord = &TABLE[st->cls]->records[st->wave];
+                SetGroupAActiveCount(obj, newWaveRecord->h[7]);
+                SetGroupBActiveCount(obj, newWaveRecord->h[6]);
                 OBJ->state = 8;
             }
         }
     tail9:
-        slot1 = (s32)obj >> 8;
-        func_L00_002E6CF0(func_L11_00444400, obj);
-        func_L11_004423F8(obj);
-        func_L11_00446020(obj);
-        if ((D_L11_001B30C8 & 7) == (slot1 & 7)) {
-            func_L11_00442170(obj);
+        mobySlot = (s32)obj >> 8;
+        AddDrawCallbackToList1(DrawJobaChallengeHud, obj);
+        UpdateArenaCameraGuide(obj);
+        PickJobaBossActionByTarget(obj);
+        if ((D_L11_001B30C8 & 7) == (mobySlot & 7)) {
+            UpdateFightersInsideArena(obj);
         }
-        if ((D_L11_001B30C8 & 0x3F) == (slot1 & 0x3F)) {
-            func_L11_00441350(obj);
+        if ((D_L11_001B30C8 & 0x3F) == (mobySlot & 0x3F)) {
+            MarkNearestFightersToAttack(obj);
         }
-        if (func_L11_0043E090(st->cls) != -1) {
-            D_L11_001AA170 = func_L11_0043E090(st->cls);
+        if (GetChallengeDisplayId(st->cls) != -1) {
+            D_L11_001AA170 = GetChallengeDisplayId(st->cls);
             D_L11_001B3680 = D_001A7390;
         }
         break;
     }
-    func_L11_00440160(obj);
+    EndArenaControllerFrame(obj);
 }
 

@@ -27,42 +27,43 @@ extern s32 ref_L30_003848B8_00 __attribute__((sda));
 extern s32 ref_L30_003848B8_01[];
 extern s8 D_001A63A8[];
 
-s32 func_L30_003848B8(void *arg0) {
-    s8 *temp_a3;
-    s8 *t0;
-    s8 *t1;
-    s32 temp_a1;
-    s32 temp_a2;
-    s32 temp_v1;
-    s32 var_v1;
-    s32 o1;
-    s32 o2;
+/* Picks the next time value for the chosen entry and stores it in the game state; returns 1 if it did, 0 if not. */
+s32 func_L30_003848B8(void *moby) {
+    s8 *vars;
+    s8 *gameState;
+    s8 *state;
+    s32 kind;
+    s32 slot;
+    s32 pending;
+    s32 value;
+    s32 firstOffset;
+    s32 secondOffset;
 
-    t0 = D_001A63A8;
-    temp_a3 = *(s8 **)((s8 *)arg0 + 0x68);
-    temp_a2 = *(s32 *)(temp_a3 + 0x144);
-    temp_a1 = ref_L30_003848B8_01[temp_a2];
-    if (*(s32 *)(t0 + 0x68) == 0) {
-        temp_v1 = *(s32 *)(t0 + 0x24);
-        if ((temp_v1 == -1) && (temp_a2 != temp_v1)) {
-            if (temp_a1 != 6) {
-                if ((((s32) ref_L30_003848B8_00 >> temp_a1) ^ 1) & 1) {
-                    o1 = temp_a1 * 4;
-                    var_v1 = *(s32 *)(temp_a3 + o1 + 0xE0);
-                    ref_L30_003848B8_00 |= 1 << temp_a1;
+    gameState = gMusicState;
+    vars = *(s8 **)((s8 *)moby + 0x68);
+    slot = *(s32 *)(vars + 0x144);
+    kind = ref_L30_003848B8_01[slot];
+    if (*(s32 *)(gameState + 0x68) == 0) {
+        pending = *(s32 *)(gameState + 0x24);
+        if ((pending == -1) && (slot != pending)) {
+            if (kind != 6) {
+                if ((((s32) ref_L30_003848B8_00 >> kind) ^ 1) & 1) {
+                    firstOffset = kind * 4;
+                    value = *(s32 *)(vars + firstOffset + 0xE0);
+                    ref_L30_003848B8_00 |= 1 << kind;
                 } else {
-                    o1 = temp_a1 * 4;
-                    o2 = temp_a1 * 4;
-                    var_v1 = *(s32 *)(temp_a3 + o2 + 0x10C);
+                    firstOffset = kind * 4;
+                    secondOffset = kind * 4;
+                    value = *(s32 *)(vars + secondOffset + 0x10C);
                 }
-            } else if (temp_a2 == 1) {
-                var_v1 = *(s32 *)(temp_a3 + 0xF8);
+            } else if (slot == 1) {
+                value = *(s32 *)(vars + 0xF8);
             } else {
-                var_v1 = *(s32 *)(temp_a3 + 0x124);
+                value = *(s32 *)(vars + 0x124);
             }
-            t1 = D_001A63A8;
-            *(s32 *)(t1 + 0x24) = (var_v1 & 0x3FFF) + 0xBB8;
-            *(s32 *)(t1 + 0x28) = 0;
+            state = gMusicState;
+            *(s32 *)(state + 0x24) = (value & 0x3FFF) + 0xBB8;
+            *(s32 *)(state + 0x28) = 0;
             return 1;
         }
     }

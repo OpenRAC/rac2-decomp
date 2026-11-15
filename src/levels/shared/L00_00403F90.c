@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -35,6 +36,7 @@ extern void func_0032D758(void *, int, int);
 extern void func_L00_00404368(void *, int, int);
 extern int func_002E5DA0(int, int, void *, int);
 
+/* Checks if a sheep shot hit something on its way. If it did, it hurts the target, makes sparks and starts to blow up. */
 void func_L00_00403F90(char *arg, void *p) {
     char *st = *(char **)(arg + 0x68);
     float vec[4];
@@ -45,14 +47,14 @@ void func_L00_00403F90(char *arg, void *p) {
     int is3;
     char *pos = arg + 0x10;
 
-    if (func_002761F8(p, pos, 0, arg, 0) == 0) {
+    if (CollLine(p, pos, 0, arg, 0) == 0) {
         return;
     }
-    if (D_L00_001BF200.hero != 0 && D_L00_001BF200.hero != D_L00_0018C0B0 &&
-        (*(short *)(*(char **)(D_L00_001BF200.hero + 0x24) + 0x46) == 5 ||
-         (*(u16 *)(D_L00_001BF200.hero + 0x34) & 0x4000) != 0)) {
-        func_00282F20(vec, st, 1.0f);
-        e = &D_L00_00262570[D_L00_00139588];
+    if (gCollisionResult.hero != 0 && gCollisionResult.hero != D_L00_0018C0B0 &&
+        (*(short *)(*(char **)(gCollisionResult.hero + 0x24) + 0x46) == 5 ||
+         (*(u16 *)(gCollisionResult.hero + 0x34) & 0x4000) != 0)) {
+        vec_scale_to_length(vec, st, 1.0f);
+        e = &gWeaponTable_L00[D_L00_00139588];
         scale = 1.0f;
         is2 = e->used != 0 && e->mode == 2;
         if (is2) {
@@ -62,17 +64,17 @@ void func_L00_00403F90(char *arg, void *p) {
         if (is3) {
             scale = 15.0f;
         }
-        func_002A8C00(&fx, arg, scale, 0x210000, vec);
+        make_hit_descriptor(&fx, arg, scale, 0x210000, vec);
         fx.sub = 3;
         fx.kind = 5;
         fx.id = *(u16 *)(arg + 0xAA);
-        func_002A8E20(D_L00_001BF200.hero, &fx);
-        func_0032D758(D_L00_001BF200.hero, 0x4E, *(int *)(*(char **)(st + 0x20) + 0xB8));
-        func_L00_00404368(pos, 0xA, 1);
+        QueueMobyImpact(gCollisionResult.hero, &fx);
+        StartAttachedEffect(gCollisionResult.hero, 0x4E, *(int *)(*(char **)(st + 0x20) + 0xB8));
+        SpawnSheepShotHitSparks(pos, 0xA, 1);
     }
-    if (D_L00_001BF200.hero == 0) {
-        func_L00_00404368(arg + 0x10, 0xF, 0);
+    if (gCollisionResult.hero == 0) {
+        SpawnSheepShotHitSparks(arg + 0x10, 0xF, 0);
     }
-    func_002E5DA0(7, 0, arg, 0xE79);
+    PlaySoundFromClassBank(7, 0, arg, 0xE79);
     arg[0x20] = 2;
 }

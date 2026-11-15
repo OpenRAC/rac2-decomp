@@ -45,48 +45,48 @@ extern void func_L05_0037AE40(char *a0);
    fires the object's effect and takes the moby down, which it reports. */
 int func_L15_0042FFB8(char *obj, int flag)
 {
-    char *s0;
-    float *s2;
-    char *s3;
-    char *v;
-    short v1;
+    char *attachedPart;
+    float *healthPtr;
+    char *hitInfo;
+    char *vars;
+    short classId;
     int ret = 0;
 
-    s3 = func_002A9640(obj, 0x230000, 0);
+    hitInfo = FindOwnedEffectSlot(obj, 0x230000, 0);
     *(unsigned char *)(obj + 0xA8) = 0xFF;
-    v = *(char **)(obj + 0x68);
-    s0 = *(char **)(v + 0x10);
-    s2 = *(float **)(v + 0x0);
-    if (s0 != 0) {
-        func_002AB8C0(obj, s0);
+    vars = *(char **)(obj + 0x68);
+    attachedPart = *(char **)(vars + 0x10);
+    healthPtr = *(float **)(vars + 0x0);
+    if (attachedPart != 0) {
+        UpdateColorFade(obj, attachedPart);
     }
-    if (s3 != 0) {
-        if (s0 != 0) {
-            *(unsigned char *)(s0 + 7) = 0xFF;
-            func_002AB800(obj, s0);
+    if (hitInfo != 0) {
+        if (attachedPart != 0) {
+            *(unsigned char *)(attachedPart + 7) = 0xFF;
+            StartColorFade(obj, attachedPart);
         }
-        *s2 = *s2 - *(float *)(s3 + 0x2C);
-        v1 = *(short *)(obj + 0xAA);
-        if (v1 != 0xB73) {
-            if (v1 == 0x1211) {
-                func_002E5DA0(5, 0, obj, 0x1211);
+        *healthPtr = *healthPtr - *(float *)(hitInfo + 0x2C);
+        classId = *(short *)(obj + 0xAA);
+        if (classId != 0xB73 /* moby class 2931 */) {
+            if (classId == 0x1211 /* moby class 4625 */) {
+                PlaySoundFromClassBank(5, 0, obj, 0x1211);
             } else {
-                func_002E5DA0(0xD, 0, obj, 0xFBF);
+                PlaySoundFromClassBank(0xD, 0, obj, 0xFBF);
             }
         }
-        if (*s2 <= 0.0f) {
-            *s2 = 0.0f;
-            func_L05_00424990(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
+        if (*healthPtr <= 0.0f) {
+            *healthPtr = 0.0f;
+            SpawnShockwaveBurst(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
             if (D_L15_001B1520 == 0) {
                 func_L05_00421908(obj, 1, 0xF);
             } else {
                 func_L05_00421908(obj, 0, 0xF);
             }
-            if (func_L05_0037BBB8(obj)) {
-                func_L05_0037BE98(obj);
+            if (IsObjectInUse(obj)) {
+                ReleaseObjectFromGroup(obj);
             }
             if (flag == 0) {
-                func_L05_0037AE40(obj);
+                ResetObjectActionState(obj);
             }
             ret = 1;
         }

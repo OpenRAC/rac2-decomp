@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern short D_00264630[64][12];
 
@@ -21,10 +22,10 @@ extern void func_0029B698(int);
 
 /* Finds the row of D_00264630 whose first four ids hold the object's id at +0xAA,
    then counts it in column `type` of D_00188510 (capped at 9999). */
-void func_002A6AE0(char *p, int type)
+void func_002A6AE0(char *moby, int type)
 {
     int found = -1, i, j;
-    int id = *(short *)(p + 0xAA);
+    int id = *(short *)(moby + 0xAA);
 
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 4; j++) {
@@ -40,7 +41,7 @@ found_it:
     if (D_001A7A00.enabled && D_001A9E70 == -1 && D_001A7A00.limit < 20) {
         D_001A7A00.count++;
         if (D_001A7A00.count * 2 >= D_001A7A00.limit) {
-            func_0029B698(180);
+            ForwardValueToLevelObject(180);
             D_001A7A00.count = 0;
             D_001A7A00.limit++;
         }

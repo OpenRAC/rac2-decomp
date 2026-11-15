@@ -17,66 +17,67 @@ extern void func_L08_002F2D10(void *, void *);
 extern void func_L30_00416FB0(void);
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-void func_L30_00416A88(char *obj) {
+/* Moves the museum projectile each frame, explodes it on a hit or after 4 seconds, and spins its model. */
+void func_L30_00416A88(char *moby) {
     float pos[4];
     struct Packet { Vec v; void *owner; int mode; unsigned char kind, active; unsigned short id; float distance; int enabled; } packet;
     Vec velocity;
     struct Packet query;
-    char *st = *(char **)(obj + 0x68);
-    if (!*(unsigned char *)(obj + 0xBC)) {
-        if (++*(int *)(st + 0x24) > 240) {
-            if (!*(unsigned char *)(obj + 0xBC)) {
-                func_002A8C28(obj, 0.6f, obj + 0x10, *(float *)(st + 0x14), 0x10003, 0.0f, 0, 1, 0);
-                func_002A7750(obj, 1, -1);
+    char *vars = *(char **)(moby + 0x68);
+    if (!*(unsigned char *)(moby + 0xBC)) {
+        if (++*(int *)(vars + 0x24) > 240) {
+            if (!*(unsigned char *)(moby + 0xBC)) {
+                SweepCollisionFromObject(moby, 0.6f, moby + 0x10, *(float *)(vars + 0x14), 0x10003, 0.0f, 0, 1, 0);
+                SetMobyState(moby, 1, -1);
             }
         }
-        switch (*(unsigned char *)(obj + 0x20)) {
+        switch (*(unsigned char *)(moby + 0x20)) {
         case 0: {
-            func_00282CC0(pos, obj + 0x10, st);
-            func_002A8C00(&packet, obj, 3, *(float *)(st + 0x14), st);
-            packet.id = *(unsigned short *)(obj + 0xAA);
-            if (func_002761F8(obj + 0x10, pos, 0, obj, &packet) || func_00277258(obj + 0x10, 0, obj, 0.3f)) {
+            FastVecAdd(pos, moby + 0x10, vars);
+            make_hit_descriptor(&packet, moby, 3, *(float *)(vars + 0x14), vars);
+            packet.id = *(unsigned short *)(moby + 0xAA);
+            if (CollLine(moby + 0x10, pos, 0, moby, &packet) || TestPointAgainstCollision(moby + 0x10, 0, moby, 0.3f)) {
                 /* Two full copies of the response: cross-jumping merges their tails after reload,
                    and each copy's velocity pointer stays local to its block, in $s0. */
                 if (D_L30_001C0218) {
-                    if (D_L30_001C0218 == *(char **)(st + 0x10)) goto move; /* An owner hit continues normal movement. */
-                    qcopy(&velocity, st);
-                    func_00282D30(&velocity, &velocity, 1.5f);
+                    if (D_L30_001C0218 == *(char **)(vars + 0x10)) goto move; /* An owner hit continues normal movement. */
+                    qcopy(&velocity, vars);
+                    FastVecScale(&velocity, &velocity, 1.5f);
                     velocity.f[2] = 1.0f;
                     velocity.f[3] = 5627.9248046875f;
-                    func_002A8C00(&query, obj, 0x10003, *(float *)(st + 0x14), &velocity);
+                    make_hit_descriptor(&query, moby, 0x10003, *(float *)(vars + 0x14), &velocity);
                     query.active = 1;
-                    query.id = *(unsigned short *)(obj + 0xAA);
+                    query.id = *(unsigned short *)(moby + 0xAA);
                     query.kind = 0;
-                    func_00277F48(obj + 0x10, 0.6f, 0, obj, &query);
-                    if (!*(unsigned char *)(obj + 0xBC)) func_002A7750(obj, 1, -1);
+                    ProcessCollisionHit(moby + 0x10, 0.6f, 0, moby, &query);
+                    if (!*(unsigned char *)(moby + 0xBC)) SetMobyState(moby, 1, -1);
                     return;
                 }
-                qcopy(&velocity, st);
-                func_00282D30(&velocity, &velocity, 3.0f);
+                qcopy(&velocity, vars);
+                FastVecScale(&velocity, &velocity, 3.0f);
                 velocity.f[2] = 1.0f;
                 velocity.f[3] = 5627.9248046875f;
-                func_002A8C00(&query, obj, 0x10003, *(float *)(st + 0x14), &velocity);
+                make_hit_descriptor(&query, moby, 0x10003, *(float *)(vars + 0x14), &velocity);
                 query.active = 1;
-                query.id = *(unsigned short *)(obj + 0xAA);
+                query.id = *(unsigned short *)(moby + 0xAA);
                 query.kind = 0;
-                func_00277F48(obj + 0x10, 0.6f, 0, obj, &query);
-                if (!*(unsigned char *)(obj + 0xBC)) func_002A7750(obj, 1, -1);
+                ProcessCollisionHit(moby + 0x10, 0.6f, 0, moby, &query);
+                if (!*(unsigned char *)(moby + 0xBC)) SetMobyState(moby, 1, -1);
                 return;
             }
 move:
-            if (!*(unsigned char *)(obj + 0xBC)) qcopy(obj + 0x10, pos);
-            func_00282D30(&velocity, st, -0.5f);
-            func_00282C88(&query);
+            if (!*(unsigned char *)(moby + 0xBC)) qcopy(moby + 0x10, pos);
+            FastVecScale(&velocity, vars, -0.5f);
+            ClearVector128(&query);
             break;
         }
         case 1:
-            func_L16_00406080(obj + 0x10, 0, 25, 20, 20, 20, 0, 0, 1, 0.25f, 0);
-            func_0029F338(obj);
+            CreateFlashEffectMoby(moby + 0x10, 0, 25, 20, 20, 20, 0, 0, 1, 0.25f, 0);
+            MarkMobySpawned(moby);
             return;
         }
     }
-    func_002ACEC0(obj + 0xE0, obj + 0xE0, obj + 0xD0, D_L30_001B1F04 * 0.01745329424738884f);
-    func_002ACEC0(obj + 0xC0, obj + 0xC0, obj + 0xD0, D_L30_001B1F04 * 0.01745329424738884f);
-    func_L08_002F2D10(func_L30_00416FB0, obj);
+    ApplyAxisRotationToQuaternion(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L30_001B1F04 * 0.01745329424738884f);
+    ApplyAxisRotationToQuaternion(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L30_001B1F04 * 0.01745329424738884f);
+    QueueDrawCallback(func_L30_00416FB0, moby);
 }

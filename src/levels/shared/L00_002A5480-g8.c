@@ -1,3 +1,4 @@
+#include "names.h"
 /* Tick reads use the real SDA word and its absolute-address alias.
    USA timing: initial delay 30 frames, subsequent bias 20 frames. */
 typedef unsigned char u8;
@@ -16,7 +17,7 @@ extern s32 func_002A77E0(s32);
    the helper twice and stores the sum of the two answers. */
 void func_L00_002A5480(void)
 {
-    u8 *b = D_00189E20;
+    u8 *b = gHeroState;
     s32 first_delay;
     s32 second_delay;
     s32 biased_delay;
@@ -28,10 +29,10 @@ void func_L00_002A5480(void)
         *(s32 *)(b + 0x1184) = ref_L00_002A5480_00 + 30;
         return;
     }
-    if (D_L00_001B19C8 > *(s32 *)(b + 0x1184)) {
+    if (gFrameCounter_L00 > *(s32 *)(b + 0x1184)) {
         *(s32 *)(b + 0x1180) = 1;
-        first_delay = func_002A77E0(*(s32 *)(b + 0x1188));
-        second_delay = func_002A77E0(*(s32 *)(b + 0x1188));
+        first_delay = RandomIntBelow(*(s32 *)(b + 0x1188));
+        second_delay = RandomIntBelow(*(s32 *)(b + 0x1188));
         biased_delay = first_delay + 20;
         tick = ref_L00_002A5480_00;
         tick = tick + biased_delay;

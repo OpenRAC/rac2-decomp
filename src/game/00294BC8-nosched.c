@@ -18,12 +18,12 @@ typedef struct {
 } TableBlock;
 
 /* Whether the 28-entry slot table selected by flag 0x100 has a positive value at the low byte's index. */
-int func_00295870(int arg)
+int func_00295870(int mapId)
 {
-    if ((arg & 0x100) == 0) {
-        arg = ((TableBlock *)D_0014B540_1)->clear[arg & 0xFF].unk4;
-        return arg > 0;
+    if ((mapId & 0x100) == 0) {
+        mapId = ((TableBlock *)D_0014B540_1)->clear[mapId & 0xFF].unk4;
+        return mapId > 0;
     }
-    arg = ((TableBlock *)D_0014B540_1)->set[arg & 0xFF].unk4;
-    return arg > 0;
+    mapId = ((TableBlock *)D_0014B540_1)->set[mapId & 0xFF].unk4;
+    return mapId > 0;
 }

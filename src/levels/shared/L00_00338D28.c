@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned int u32;
@@ -34,20 +35,21 @@ extern unsigned char *ref_L00_00338D28_00;
 
 /* Allocates the 0x2F record, copies the two sixteen-byte blocks into it, and fills
    its flag bytes, its tag word and its two level-derived fields. */
+/* Creates a short-lived visual effect between two points, with a random start color and a random shade. */
 Obj_L00_00338D28 *func_L00_00338D28(char *src1, char *src2, f32 value)
 {
-    Obj_L00_00338D28 *o = (Obj_L00_00338D28 *)func_002B9030(0x2F);
+    Obj_L00_00338D28 *o = (Obj_L00_00338D28 *)AllocParticle(0x2F);
 
     if (o != 0) {
         o->v10 = *(V4_L00_00338D28 *)src1;
-        o->w4 = ((func_002A77E0(8) + 0x28) << 24) | 0x00808080;
-        o->b9 = func_00283CF0(2.0f) + 0x20;
+        o->w4 = ((RandomIntBelow(8) + 0x28) << 24) | 0x00808080;
+        o->b9 = FloatToInt(2.0f) + 0x20;
         o->b3 = 0x48;
         o->b1 = 0;
         o->b2 = *ref_L00_00338D28_00;
         o->f_c = value;
         o->v20 = *(V4_L00_00338D28 *)src2;
-        o->b8 = func_002A77E0(0x100);
+        o->b8 = RandomIntBelow(0x100);
     }
     return o;
 }

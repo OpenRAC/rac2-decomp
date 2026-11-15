@@ -46,7 +46,8 @@ extern void func_00282CC0(char *, char *, char *);
 
 
 
-void func_L24_00383818(unsigned char *obj) {
+/* Moves a bouncing projectile one step, bursts it into sparks on a first floor hit, and bounces it off walls. */
+void func_L24_00383818(unsigned char *moby) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -60,7 +61,7 @@ void func_L24_00383818(unsigned char *obj) {
         } packet;
         Vec position, spread;
     } frame;
-    char *ctx = *(char **)(obj + 0x68), *position = (char *)obj + 0x10;
+    char *vars = *(char **)(moby + 0x68), *position = (char *)moby + 0x10;
     int i, lifetime;
     float angle, speed;
 
@@ -69,52 +70,52 @@ void func_L24_00383818(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
-    func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
-    func_00300190(position, position);
-    func_00300248(ctx, ctx);
-    func_002FE880(position, ctx, 0.0030555557f);
-    func_L00_0038F178(obj);
-    frame.packet.moby = obj;
+    FastVecAdd(position, vars, position);
+    SteerEffectDirection(*(int *)(vars + 0x1C), vars, 0);
+    TransformVectorOrCopy(position, position);
+    TriggerCurrentStateEffect(vars, vars);
+    AddObjectDirectionScaled(position, vars, 0.0030555557f);
+    EmitSparkleParticles(moby);
+    frame.packet.moby = moby;
     frame.packet.flags = 0x830000;
-    if (*(int *)(ctx + 0x18) < 0x122)
+    if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L24_00261E70 + D_00139568[12] * sizeof(Material)))->material;
-    qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+        ((Material *)((u32)D_L24_00261E70 + gItemSlotToRecord[12] * sizeof(Material)))->material;
+    qcopy(&frame.packet.vector, vars);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.kind = 2;
-    frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
+    frame.packet.class_id = *(unsigned short *)(moby + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, moby, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L24_001B1F30, D_L24_001B1F38, 1,
-                *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
-            *(int *)(ctx + 0x14) = 1;
-            func_00282C88(ctx);
-            *(float *)(ctx + 8) = -0.025000002f;
-            frame.position.f[0] = *(float *)(obj + 0x10);
-            frame.position.f[1] = *(float *)(obj + 0x14);
+            RippleDisturb(D_L24_001B1F30, D_L24_001B1F38, 1,
+                *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
+            *(int *)(vars + 0x14) = 1;
+            ClearVector128(vars);
+            *(float *)(vars + 8) = -0.025000002f;
+            frame.position.f[0] = *(float *)(moby + 0x10);
+            frame.position.f[1] = *(float *)(moby + 0x14);
             frame.position.f[2] = D_L24_001BEB00.point.f[2];
-            effect = func_00312D58(&frame.position, 2.0f);
+            effect = SpawnScaledEffectMoby(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
             i = 15;
             do {
                 --i;
-                angle = func_002A7940();
-                speed = func_002A7878(0.0f, 0.050000004f);
-                frame.spread.f[0] = func_00283180(angle) * speed;
-                frame.spread.f[1] = func_00283198(angle) * speed;
-                frame.spread.f[2] = func_002A7878(0.050000004f, 0.10833334f);
-                lifetime = func_002A7820(90, 120);
-                func_002BFB38(&frame.position, spread, func_002A77E0(2), lifetime);
+                angle = RandomAngle();
+                speed = RandomFloatRange(0.0f, 0.050000004f);
+                frame.spread.f[0] = FastSinOrCosA(angle) * speed;
+                frame.spread.f[1] = FastSinOrCosB(angle) * speed;
+                frame.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
+                lifetime = RandomIntRange(90, 120);
+                SpawnSparkParticle_002BFB38(&frame.position, spread, RandomIntBelow(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -125,40 +126,41 @@ void func_L24_00383818(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L24_001BEB00;
                 model = reread->hit;
                 if (*(int *)(model + 0x64) == D_L24_001AC790 && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
-                obj[0xBC] = 1;
-                qcopy(obj + 0x10, &reread->point);
-                func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                moby[0xBC] = 1;
+                qcopy(moby + 0x10, &reread->point);
+                FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
-                obj[0xBC] = 1;
-                qcopy(obj + 0x10, &collision->point);
-                func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                moby[0xBC] = 1;
+                qcopy(moby + 0x10, &collision->point);
+                FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (func_00282948(ctx + 0x18)) {
-        obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+    } else if (FastFloatHelperD(vars + 0x18)) {
+        moby[0xBC] = 1;
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
-    if (obj[0xBC]) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+    if (moby[0xBC]) {
+        ClearEntryFlag(*(int *)(vars + 0x1C));
+        SpawnBigExplosionEffect(moby, &frame.velocity, &frame.normal);
     }
 }
 
 
-void func_L24_00383C30(char *obj) {
+/* Moves a projectile one step and bounces it off what it hits, using a stronger blast once it has bounced enough. */
+void func_L24_00383C30(char *moby) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -171,8 +173,8 @@ void func_L24_00383C30(char *obj) {
             int enabled;
         } packet;
     } frame;
-    char *ctx = *(char **)(obj + 0x68);
-    char *position = obj + 0x10;
+    char *vars = *(char **)(moby + 0x68);
+    char *position = moby + 0x10;
     char *hit;
     Collision *collision;
 
@@ -181,66 +183,66 @@ void func_L24_00383C30(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
-    frame.packet.moby = obj;
+    FastVecAdd(position, position, vars);
+    ComputeViewDirection(position, &frame.surface, 0);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
+    SpawnSparkPuff(moby);
+    frame.packet.moby = moby;
     frame.packet.flags = 0x830000;
-    if (*(int *)(ctx + 0x18) < 0x122)
+    if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L24_00261E70)->material;
-    qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    qcopy(&frame.packet.vector, vars);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
-    frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
+    frame.packet.class_id = *(unsigned short *)(moby + 0xAA);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
-    (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    (*(int *)(vars + 0x14))++;
+    if (CollLine(&frame.old, position, 0x10, moby, &frame.packet)) {
         collision = &D_L24_001BEB00;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L24_001BEB00;
             model = reread->hit;
             if (*(int *)(model + 0x64) == D_L24_001AC790 && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
-            obj[0xBC] = 1;
+            moby[0xBC] = 1;
             {
                 void *source = &reread->point;
-                void *dest = obj + 0x10;
+                void *dest = moby + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L24_001BEB00;
             if (collision->count <= 0)
                 goto finish;
-            obj[0xBC] = 1;
+            moby[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
-        obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+    } else if (FastFloatHelperD(vars + 0x18)) {
+        moby[0xBC] = 1;
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
-    if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+    if (*(unsigned char *)(moby + 0xBC)) {
+        ClearEntryFlag(*(int *)(vars + 0x1C));
+        if (*(int *)(vars + 0x14) < 20)
+            SpawnBigExplosionEffect(moby, &frame.velocity, &frame.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            SpawnImpactBurst(moby, &frame.velocity, &frame.normal);
     }
 }
 

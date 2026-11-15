@@ -22,48 +22,50 @@ extern void func_0029F338(void *);
 extern void func_L11_00450508(u8 *);
 extern void func_L00_002E6EF8(void (*)(void *), void *);
 
+/* Per-frame update of a moving shot (moby class 3545): flies it forward, explodes it on a hit or after
+   240 frames, adds glow effects, and draws it. */
 void func_L11_0044FFA0(u8 *object) {
     EffectVector destination;
     struct CollisionFilter filter;
     EffectVector backward, light;
-    char *data = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     float size, growth, size2, growth2;
-    *(int *)(data + 0x24) += 1;
-    if (*(int *)(data + 0x24) > 240) {
-        func_002A8C28(object, 0.6f, (float *)(object + 0x10), 0x10001, *(float *)(data + 0x14), 0.0f, 0, 1, 0);
-        func_002A7750(object, 1, -1);
+    *(int *)(vars + 0x24) += 1;
+    if (*(int *)(vars + 0x24) > 240) {
+        SweepCollisionFromObject(object, 0.6f, (float *)(object + 0x10), 0x10001, *(float *)(vars + 0x14), 0.0f, 0, 1, 0);
+        SetMobyState(object, 1, -1);
     }
     switch (object[0x20]) {
     case 0:
-        func_00282CC0(&destination, object + 0x10, data);
-        func_002A8C00((char *)&filter, (int)object, 1, *(float *)(data + 0x14), (Quad16 *)data);
+        FastVecAdd(&destination, object + 0x10, vars);
+        make_hit_descriptor((char *)&filter, (int)object, 1, *(float *)(vars + 0x14), (Quad16 *)vars);
         filter.objectType = *(u16 *)(object + 0xAA);
-        if (func_002761F8(object + 0x10, &destination, 0, object, &filter) || func_00277258(object + 0x10, 0, object, 0.3f)) {
-            if (!D_L11_001C0D18 || D_L11_001C0D18 != *(char **)(data + 0x10)) {
-                func_002A8C28(object, 0.6f, (float *)(object + 0x10), 0x10001, *(float *)(data + 0x14), 0.0f, 0, 1, 0);
-                func_002A7750(object, 1, -1);
+        if (CollLine(object + 0x10, &destination, 0, object, &filter) || TestPointAgainstCollision(object + 0x10, 0, object, 0.3f)) {
+            if (!D_L11_001C0D18 || D_L11_001C0D18 != *(char **)(vars + 0x10)) {
+                SweepCollisionFromObject(object, 0.6f, (float *)(object + 0x10), 0x10001, *(float *)(vars + 0x14), 0.0f, 0, 1, 0);
+                SetMobyState(object, 1, -1);
                 return;
             }
         }
         qcopy(object + 0x10, &destination);
-        func_00282D30(&backward, data, -0.5f);
+        FastVecScale(&backward, vars, -0.5f);
         if (D_L11_001B1CE4) {
-            func_00282F20(&light, data, 0.5f);
-            func_00282CC0(&light, object + 0x10, &light);
-            size = func_002A7878(1.2f, 1.45f) * 210000.0f;
-            growth = func_002A7878(0.1f, 0.2f);
-            func_002C65A0(&light, &backward, 2, D_L11_001B1CE0, 3, 127, 47, size, growth * 210000.0f, 0.0f, 0);
-            func_00282F20(&light, data, -0.03f);
-            func_00282CC0(&light, object + 0x10, &light);
-            size2 = func_002A7878(0.7f, 0.9f) * 210000.0f;
-            growth2 = func_002A7878(0.1f, 0.3f);
-            func_002C65A0(&light, &backward, 2, D_L11_001B1CE0, 7, 127, 47, size2, growth2 * 210000.0f, 0.0f, 0);
+            vec_scale_to_length(&light, vars, 0.5f);
+            FastVecAdd(&light, object + 0x10, &light);
+            size = RandomFloatRange(1.2f, 1.45f) * 210000.0f;
+            growth = RandomFloatRange(0.1f, 0.2f);
+            SpawnGravityFadeParticle(&light, &backward, 2, D_L11_001B1CE0, 3, 127, 47, size, growth * 210000.0f, 0.0f, 0);
+            vec_scale_to_length(&light, vars, -0.03f);
+            FastVecAdd(&light, object + 0x10, &light);
+            size2 = RandomFloatRange(0.7f, 0.9f) * 210000.0f;
+            growth2 = RandomFloatRange(0.1f, 0.3f);
+            SpawnGravityFadeParticle(&light, &backward, 2, D_L11_001B1CE0, 7, 127, 47, size2, growth2 * 210000.0f, 0.0f, 0);
         }
         break;
     case 1:
-        func_0032C700(object + 0x10, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0.25f, 20.0f);
-        func_0029F338(object);
+        SpawnExplosion(object + 0x10, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0.25f, 20.0f);
+        MarkMobySpawned(object);
         return;
     }
-    func_L00_002E6EF8((void (*)(void *))func_L11_00450508, object);
+    AddDrawCallbackToList3((void (*)(void *))DrawShotGlowSprites, object);
 }

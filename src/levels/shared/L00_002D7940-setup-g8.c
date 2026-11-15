@@ -59,47 +59,48 @@ extern void func_L00_002EE0D0(void *);
    with RAC2 offsets measured from the retail body. As in RAC1 the second block takes a
    fresh state pointer (g1). The descriptor address is summed as an integer, offset
    first, which is the operand order retail's addu has without RAC1's -fno-force-mem. */
+/* Resets all level cameras when a level starts. */
 void func_L00_002D9E80(void) {
-    CameraState9E *g = &D_L00_001B8C80;
-    CameraState9E *g1;
-    CameraFollow9E *q;
+    CameraState9E *camState = &D_L00_001B8C80;
+    CameraState9E *camState2;
+    CameraFollow9E *follow;
     CameraVec9E *up;
     CameraHero9E *hero;
-    int i,k;
-    g->frames=0;
-    g->underwater=0;
+    int i,slotIndex;
+    camState->frames=0;
+    camState->underwater=0;
     D_001A8900=0.85f;
     D_L00_001B1840=0;
-    for(k=0;k<48;k++) {
-        D_L00_001B91D0[k].hard_cut=0;
-        D_L00_001BB930[k]=0;
+    for(slotIndex=0;slotIndex<48;slotIndex++) {
+        D_L00_001B91D0[slotIndex].hard_cut=0;
+        D_L00_001BB930[slotIndex]=0;
     }
-    func_L00_002D7068();
-    func_L00_002D75F0();
-    g1=&D_L00_001B8C80;
-    g1->previous=0;
-    g1->blend.phase=0;
-    qzero_nc(&g1->clear);
-    q=&D_L00_001B8C80.follow;
-    hero=&D_00189E20;
-    up=&q->up;
+    ClearCameraOverrideSlots();
+    InitCameraBlendValues_L00();
+    camState2=&D_L00_001B8C80;
+    camState2->previous=0;
+    camState2->blend.phase=0;
+    qzero_nc(&camState2->clear);
+    follow=&D_L00_001B8C80.follow;
+    hero=&gHeroState;
+    up=&follow->up;
     func_L00_002EE3D0(up,hero->object+0xe0,1.0f);
-    qcopy(&q->target,up);
-    qcopy(&q->previous,up);
-    func_L00_002EE0D0(&q->velocity);
-    qcopy(&q->hero,&hero->pos);
+    qcopy(&follow->target,up);
+    qcopy(&follow->previous,up);
+    func_L00_002EE0D0(&follow->velocity);
+    qcopy(&follow->hero,&hero->pos);
     {
         float yaw=hero->yaw;
-        q->c4=0;
-        q->e4=0;
-        q->c0=0;
-        q->cc=0;
-        q->e8=0;
-        q->yaw4=yaw;
-        q->yaw3=yaw;
-        q->yaw2=yaw;
-        q->yaw1=yaw;
-        q->yaw0=yaw;
+        follow->c4=0;
+        follow->e4=0;
+        follow->c0=0;
+        follow->cc=0;
+        follow->e8=0;
+        follow->yaw4=yaw;
+        follow->yaw3=yaw;
+        follow->yaw2=yaw;
+        follow->yaw1=yaw;
+        follow->yaw0=yaw;
     }
     i=0;
     if(D_L00_001B1848>0) do {
@@ -123,10 +124,10 @@ void func_L00_002D9E80(void) {
         id=source->id;
         D_L00_001BB930[i]=1;
         entry->id=id;
-        entry->type=func_L00_002D9D48((short)id);
+        entry->type=FindCameraEntryIndex((short)id);
         i++;
     } while(i<D_L00_001B1848);
-    func_L00_002D9D98();
+    ResetDefaultCamera();
     {
         CameraBlend9E *b=&D_L00_001B8C80.blend;
         int *u=b->unknown;

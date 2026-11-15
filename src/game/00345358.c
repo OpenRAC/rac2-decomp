@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float *func_00335E10(char *);
 extern void func_0034AA30(char *);
@@ -151,45 +152,47 @@ extern void func_00335E38(char *, float, float, float, float);
 extern void func_00335F88(char *, float, float, float, float);
 extern char *D_001A8CFC __attribute__((section(".sdata")));
 
-void func_00345358(char *obj)
+/* Draws every part of a menu screen (labels, icons and buttons) when the screen is switched on. */
+void func_00345358(char *menu)
 {
-    if (*(int *)(obj + 1080) != 0) {
-        char *s0 = obj + 456;
+    if (*(int *)(menu + 1080) != 0) {
+        char *titleLabel = menu + 456;
 
-        F6402b823_FUN_00336320(obj);
-        F6402b823_FUN_00336320(obj + 76);
-        F6402b823_FUN_00336320(obj + 152);
-        F6402b823_FUN_00336320(obj + 228);
-        F6402b823_FUN_00336A78(s0);
-        F6402b823_FUN_00336A78(obj + 664);
-        F6402b823_FUN_00336A78(s0);
-        F6402b823_FUN_00335E68(obj + 528, 0);
-        F6402b823_FUN_00345268(obj);
-        F6402b823_FUN_00345088(obj);
-        F6402b823_FUN_00344F98(obj);
-        F6402b823_FUN_00345178(obj);
-        F6402b823_FUN_00344938(obj);
-        F6402b823_FUN_00336320(obj + 380);
+        F6402b823_FUN_00336320(menu);
+        F6402b823_FUN_00336320(menu + 76);
+        F6402b823_FUN_00336320(menu + 152);
+        F6402b823_FUN_00336320(menu + 228);
+        F6402b823_FUN_00336A78(titleLabel);
+        F6402b823_FUN_00336A78(menu + 664);
+        F6402b823_FUN_00336A78(titleLabel);
+        F6402b823_FUN_00335E68(menu + 528, 0);
+        F6402b823_FUN_00345268(menu);
+        F6402b823_FUN_00345088(menu);
+        F6402b823_FUN_00344F98(menu);
+        F6402b823_FUN_00345178(menu);
+        F6402b823_FUN_00344938(menu);
+        F6402b823_FUN_00336320(menu + 380);
     }
 }
 
-char *func_00345400(char *p)
+/* Sets up all the sprites and labels of a menu screen. */
+char *func_00345400(char *menu)
 {
-    F449e2f67_FUN_003361A8(p);
-    F449e2f67_FUN_003361A8(p + 76);
-    F449e2f67_FUN_003361A8(p + 152);
-    F449e2f67_FUN_003361A8(p + 228);
-    F449e2f67_FUN_003361A8(p + 304);
-    F449e2f67_FUN_003361A8(p + 380);
-    F449e2f67_FUN_00336968(p + 456);
-    F449e2f67_FUN_00336968(p + 528);
-    F449e2f67_FUN_003366D0(p + 600);
-    F449e2f67_FUN_00336968(p + 664);
-    F449e2f67_FUN_00336968(p + 736);
-    F449e2f67_FUN_00336968(p + 808);
-    F449e2f67_FUN_00336968(p + 880);
-    F449e2f67_FUN_00336968(p + 952);
-    return p;
+    F449e2f67_FUN_003361A8(menu);
+    F449e2f67_FUN_003361A8(menu + 76);
+    F449e2f67_FUN_003361A8(menu + 152);
+    F449e2f67_FUN_003361A8(menu + 228);
+    F449e2f67_FUN_003361A8(menu + 304);
+    F449e2f67_FUN_003361A8(menu + 380);
+    F449e2f67_FUN_00336968(menu + 456);
+    F449e2f67_FUN_00336968(menu + 528);
+    F449e2f67_FUN_003366D0(menu + 600);
+    F449e2f67_FUN_00336968(menu + 664);
+    F449e2f67_FUN_00336968(menu + 736);
+    F449e2f67_FUN_00336968(menu + 808);
+    F449e2f67_FUN_00336968(menu + 880);
+    F449e2f67_FUN_00336968(menu + 952);
+    return menu;
 }
 
 /* func_00345490 is built from 00345358-init.c. */
@@ -203,46 +206,48 @@ char *func_00345400(char *p)
 /* func_003463C8 and func_003464D0 are built from 00345358-g8.c for small-data access. */
 
 
-void func_003465D0(char *a0)
+/* Draws every part of a bigger menu screen when it is switched on. */
+void func_003465D0(char *menu)
 {
-    if (*(int *)(a0 + 1160) == 0)
+    if (*(int *)(menu + 1160) == 0)
         return;
-    Fd1c2476b_FUN_00336320(a0);
-    Fd1c2476b_FUN_00336320(a0 + 76);
-    Fd1c2476b_FUN_00336320(a0 + 152);
-    Fd1c2476b_FUN_00336320(a0 + 228);
-    Fd1c2476b_FUN_00336A78(a0 + 456);
-    Fd1c2476b_FUN_003462A8(a0);
-    Fd1c2476b_FUN_003463C8(a0);
-    Fd1c2476b_FUN_003464D0(a0);
-    Fd1c2476b_FUN_00336320(a0 + 380);
-    Fd1c2476b_FUN_00336A78(a0 + 736);
-    Fd1c2476b_FUN_00336A78(a0 + 664);
-    Fd1c2476b_FUN_00336A78(a0 + 808);
-    Fd1c2476b_FUN_00336A78(a0 + 880);
-    Fd1c2476b_FUN_00336A78(a0 + 952);
+    Fd1c2476b_FUN_00336320(menu);
+    Fd1c2476b_FUN_00336320(menu + 76);
+    Fd1c2476b_FUN_00336320(menu + 152);
+    Fd1c2476b_FUN_00336320(menu + 228);
+    Fd1c2476b_FUN_00336A78(menu + 456);
+    Fd1c2476b_FUN_003462A8(menu);
+    Fd1c2476b_FUN_003463C8(menu);
+    Fd1c2476b_FUN_003464D0(menu);
+    Fd1c2476b_FUN_00336320(menu + 380);
+    Fd1c2476b_FUN_00336A78(menu + 736);
+    Fd1c2476b_FUN_00336A78(menu + 664);
+    Fd1c2476b_FUN_00336A78(menu + 808);
+    Fd1c2476b_FUN_00336A78(menu + 880);
+    Fd1c2476b_FUN_00336A78(menu + 952);
 }
 
-void *func_00346670(char *p)
+/* Sets up all the sprites and labels of a menu screen with many parts. */
+void *func_00346670(char *menu)
 {
-    F5a9e4f98_FUN_003361A8(p);
-    F5a9e4f98_FUN_003361A8(p + 0x4c);
-    F5a9e4f98_FUN_003361A8(p + 0x98);
-    F5a9e4f98_FUN_003361A8(p + 0xe4);
-    F5a9e4f98_FUN_003361A8(p + 0x130);
-    F5a9e4f98_FUN_003361A8(p + 0x17c);
-    F5a9e4f98_FUN_003363D0(p + 0x1c8);
-    F5a9e4f98_FUN_00336968(p + 0x210);
-    F5a9e4f98_FUN_00336968(p + 0x258);
-    F5a9e4f98_FUN_00336968(p + 0x2a0);
-    F5a9e4f98_FUN_00336968(p + 0x2e8);
-    F5a9e4f98_FUN_00336968(p + 0x330);
-    F5a9e4f98_FUN_003366D0(p + 0x378);
-    F5a9e4f98_FUN_003361A8(p + 0x3b4);
-    F5a9e4f98_FUN_003361A8(p + 0x400);
-    F5a9e4f98_FUN_003361A8(p + 0x44c);
+    F5a9e4f98_FUN_003361A8(menu);
+    F5a9e4f98_FUN_003361A8(menu + 0x4c);
+    F5a9e4f98_FUN_003361A8(menu + 0x98);
+    F5a9e4f98_FUN_003361A8(menu + 0xe4);
+    F5a9e4f98_FUN_003361A8(menu + 0x130);
+    F5a9e4f98_FUN_003361A8(menu + 0x17c);
+    F5a9e4f98_FUN_003363D0(menu + 0x1c8);
+    F5a9e4f98_FUN_00336968(menu + 0x210);
+    F5a9e4f98_FUN_00336968(menu + 0x258);
+    F5a9e4f98_FUN_00336968(menu + 0x2a0);
+    F5a9e4f98_FUN_00336968(menu + 0x2e8);
+    F5a9e4f98_FUN_00336968(menu + 0x330);
+    F5a9e4f98_FUN_003366D0(menu + 0x378);
+    F5a9e4f98_FUN_003361A8(menu + 0x3b4);
+    F5a9e4f98_FUN_003361A8(menu + 0x400);
+    F5a9e4f98_FUN_003361A8(menu + 0x44c);
 
-    return p;
+    return menu;
 }
 
 /* The two menu labels at +0x2E8 and +0x330: shown according to the flags of the highlighted
@@ -265,34 +270,35 @@ void func_003472B8(char *obj)
     int bits;
     int index = D_00259F58[*(int *)(obj + 0x4FC) + *(int *)(obj + 0x500) * 4].id;
 
-    if (D_001A7AF8[index] == 0)
+    if (gItemOwnedFlags[index] == 0)
         return;
     a = obj + 0x2E8;
     pad = ref_003472B8_00;
     flags = &D_001A7A80[index];
     b = obj + 0x330;
     bits = flags[0] & 4;
-    func_00335E68(a, (flags[0] & 1) | (bits != 0));
+    SetFlagValue(a, (flags[0] & 1) | (bits != 0));
     {
         int b2 = flags[0] & 0x10;
-        func_00335E68(b, b2 != 0);
+        SetFlagValue(b, b2 != 0);
     }
-    x = (*(float **)(obj + 0x498))[0] + func_00335E10(a)[0] + (float)pad.x;
-    y = (*(float **)(obj + 0x498))[1] + func_00335E10(a)[1] + (float)pad.y;
-    func_00335E38(a, x, y, 0.0f, 0.0f);
-    x2 = (*(float **)(obj + 0x498))[0] + func_00335E10(b)[0] + (float)pad.x;
-    y2 = (*(float **)(obj + 0x498))[1] + func_00335E10(b)[1] + (float)pad.y;
-    func_00335E38(b, x2, y2, 0.0f, 0.0f);
+    x = (*(float **)(obj + 0x498))[0] + GetFirstField(a)[0] + (float)pad.x;
+    y = (*(float **)(obj + 0x498))[1] + GetFirstField(a)[1] + (float)pad.y;
+    SetFirstFloat4(a, x, y, 0.0f, 0.0f);
+    x2 = (*(float **)(obj + 0x498))[0] + GetFirstField(b)[0] + (float)pad.x;
+    y2 = (*(float **)(obj + 0x498))[1] + GetFirstField(b)[1] + (float)pad.y;
+    SetFirstFloat4(b, x2, y2, 0.0f, 0.0f);
 }
 
 /* func_00347468 is built from 00345358-selection-g8.c. */
 
 /* func_003478F0 is defined in 003478F0-grid-g8.c. */
 
-unsigned long long func_00347EA0(unsigned long long value)
+/* Passes a value to a helper and gives the same value back. */
+unsigned long long func_00347EA0(unsigned long long handle)
 {
-    func_00336968(value);
-    return value;
+    ConstructWidgetBase(handle);
+    return handle;
 }
 
 extern int func_00336E40(void *);
@@ -300,121 +306,136 @@ extern void *func_00336DA8(int, int);
 extern void *func_003369A8(void *, void *, void *);
 extern char D_001AE5A8[];
 
-void func_00347EC8(char *object, void *data)
+/* Resets a list menu to its start state and attaches its item data. */
+void func_00347EC8(char *menu, void *items)
 {
-    int *position;
-    *(int *)(object + 0x50) = 0;
-    *(int *)(object + 0xB0) = 0;
-    *(void **)(object + 0x48) = data;
-    if (data) {
-        position = func_00336DA8(16, func_00336E40(data));
-        *(int **)(object + 0x4C) = position;
-        position[1] = 0; position[2] = 0; position[3] = 0; position[0] = 0;
+    int *cursorPos;
+    *(int *)(menu + 0x50) = 0;
+    *(int *)(menu + 0xB0) = 0;
+    *(void **)(menu + 0x48) = items;
+    if (items) {
+        cursorPos = ReturnSecondArgument(16, AllocPoolCell(items));
+        *(int **)(menu + 0x4C) = cursorPos;
+        cursorPos[1] = 0; cursorPos[2] = 0; cursorPos[3] = 0; cursorPos[0] = 0;
     }
-    func_003369A8(object, D_001AE5A8, data);
-    *(int *)(object + 0x9C) = 0x70FFFEED;
-    *(int *)(object + 0xA0) = 0x80F0F0F0;
-    *(int *)(object + 0xA4) = 0x80808080;
-    *(int *)(object + 0xAC) = 32;
-    *(int *)(object + 0xA8) = 0;
-    *(int *)(object + 0xB4) = 0;
-    *(int *)(object + 0xB8) = 0;
-    *(int *)(object + 0xBC) = -1;
+    InitWidgetDefaults(menu, D_001AE5A8, items);
+    *(int *)(menu + 0x9C) = 0x70FFFEED;
+    *(int *)(menu + 0xA0) = 0x80F0F0F0;
+    *(int *)(menu + 0xA4) = 0x80808080;
+    *(int *)(menu + 0xAC) = 32;
+    *(int *)(menu + 0xA8) = 0;
+    *(int *)(menu + 0xB4) = 0;
+    *(int *)(menu + 0xB8) = 0;
+    *(int *)(menu + 0xBC) = -1;
 }
 
 /* func_00347F80 is built from 00345358-wrap.c. */
 
 
-void func_00348068(u8 *a0,f32 *a1) {
+/* Points the menu at a table of entries and counts how many are in use. */
+void func_00348068(u8 *menu,f32 *entries) {
  f32 *end;
- *(f32 **)(a0+0x58)=a1;
- *(s32 *)(a0+0xb0)=0;
- end=a1+0x50;
- if(a1[0]>0.0f) {
+ *(f32 **)(menu+0x58)=entries;
+ *(s32 *)(menu+0xb0)=0;
+ end=entries+0x50;
+ if(entries[0]>0.0f) {
   do {
-   a1+=5;
-   (*(s32 *)(a0+0xb0))++;
-  } while(*a1>0.0f && (s32)a1<(s32)end);
+   entries+=5;
+   (*(s32 *)(menu+0xb0))++;
+  } while(*entries>0.0f && (s32)entries<(s32)end);
  }
- if(*(s32 *)(a0+0x50)>=*(s32 *)(a0+0xb0)) *(s32 *)(a0+0x50)=0;
+ if(*(s32 *)(menu+0x50)>=*(s32 *)(menu+0xb0)) *(s32 *)(menu+0x50)=0;
 }
 
-void func_003480D8(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0xa8) = a1; *(s32 *)(a0 + 0xac) = a2; }
+/* Stores two settings on a menu object. */
+void func_003480D8(u8 *menu, s32 first, s32 second) { *(s32 *)(menu + 0xa8) = first; *(s32 *)(menu + 0xac) = second; }
 
-void func_003480E8(int param_1, unsigned int param_2)
+/* Stores a value in a menu field. */
+void func_003480E8(int menu, unsigned int value)
 {
-  *(unsigned int *)(param_1 + 0xb8) = param_2;
+  *(unsigned int *)(menu + 0xb8) = value;
   return;
 }
 
-void func_003480F0(u8 *a0,f32 f0,f32 f1) {
- (*(f32 **)(a0+0x4c))[0]=f0;
- (*(f32 **)(a0+0x4c))[1]=f1;
- (*(s32 **)(a0+0x4c))[2]=0;
- (*(s32 **)(a0+0x4c))[3]=0;
+/* Sets the first two numbers of the menu's position and clears the other two. */
+void func_003480F0(u8 *menu,f32 posX,f32 posY) {
+ (*(f32 **)(menu+0x4c))[0]=posX;
+ (*(f32 **)(menu+0x4c))[1]=posY;
+ (*(s32 **)(menu+0x4c))[2]=0;
+ (*(s32 **)(menu+0x4c))[3]=0;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00348118(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x50) = a1; }
+/* Sets the selected entry number of a menu. */
+void func_00348118(u8 *menu, s32 index) { *(s32 *)(menu + 0x50) = index; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00348120(u8 *a0, s32 a1) { *(s32 *)(a0 + 0xbc) = a1; }
+/* Stores a value in a menu field. */
+void func_00348120(u8 *menu, s32 value) { *(s32 *)(menu + 0xbc) = value; }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00348128(u8 *a0) { return *(s32 *)(a0 + 0x50); }
+/* Gives back the selected entry number of a menu. */
+s32 func_00348128(u8 *menu) { return *(s32 *)(menu + 0x50); }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00348130(u8 *a0) { return *(s32 *)(a0 + 0xb0); }
+/* Gives back how many entries a menu has. */
+s32 func_00348130(u8 *menu) { return *(s32 *)(menu + 0xb0); }
 
 /* func_00348138 is built from 00345358-menu.c. */
 
-char *func_003484C8(char *a0)
+/* Sets up the seven sprites and seven labels of a menu screen. */
+char *func_003484C8(char *menu)
 {
-    char *p = a0 + 536;
+    char *label = menu + 536;
     int i;
 
-    Faac80289_FUN_003361A8(a0);
-    Faac80289_FUN_003361A8(a0 + 76);
-    Faac80289_FUN_003361A8(a0 + 152);
-    Faac80289_FUN_003361A8(a0 + 228);
-    Faac80289_FUN_003361A8(a0 + 304);
-    Faac80289_FUN_003361A8(a0 + 380);
-    Faac80289_FUN_003361A8(a0 + 456);
+    Faac80289_FUN_003361A8(menu);
+    Faac80289_FUN_003361A8(menu + 76);
+    Faac80289_FUN_003361A8(menu + 152);
+    Faac80289_FUN_003361A8(menu + 228);
+    Faac80289_FUN_003361A8(menu + 304);
+    Faac80289_FUN_003361A8(menu + 380);
+    Faac80289_FUN_003361A8(menu + 456);
 
     for (i = 6; i != -1; i--) {
-        Faac80289_FUN_00336968(p);
-        p += 72;
+        Faac80289_FUN_00336968(label);
+        label += 72;
     }
-    return a0;
+    return menu;
 }
 
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00348570(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x448) = a1; }
+/* Stores a value in a menu field. */
+void func_00348570(u8 *menu, s32 value) { *(s32 *)(menu + 0x448) = value; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00348578(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x44c) = a1; }
+/* Stores a value in another menu field. */
+void func_00348578(u8 *menu, s32 value) { *(s32 *)(menu + 0x44c) = value; }
 
 /* Forwards one shared global pointer plus a fixed byte offset, together with five distinct fixed offsets of the first object, into the same callee five times, reading one distinct word of the second object each call. */
-void func_00348580(char *object, int *values)
+/* Loads five menu sprites from the shared sprite data, one for each given value. */
+void func_00348580(char *menu, int *spriteIds)
 {
-    func_00336390(object,       D_L00_001A904C_3 + 0x8710, values[0]);
-    func_00336390(object + 304, D_L00_001A904C_3 + 0x8710, values[2]);
-    func_00336390(object + 76,  D_L00_001A904C_3 + 0x8710, values[4]);
-    func_00336390(object + 152, D_L00_001A904C_3 + 0x8710, values[8]);
-    func_00336390(object + 228, D_L00_001A904C_3 + 0x8710, values[6]);
+    SetFieldAt40(menu,       D_L00_001A904C_3 + 0x8710, spriteIds[0]);
+    SetFieldAt40(menu + 304, D_L00_001A904C_3 + 0x8710, spriteIds[2]);
+    SetFieldAt40(menu + 76,  D_L00_001A904C_3 + 0x8710, spriteIds[4]);
+    SetFieldAt40(menu + 152, D_L00_001A904C_3 + 0x8710, spriteIds[8]);
+    SetFieldAt40(menu + 228, D_L00_001A904C_3 + 0x8710, spriteIds[6]);
 }
 
-void func_00348630(u8 *a0, s32 a1, s32 a2) { a0 += a1 * 4; *(s32 *)(a0 + 0x418) = a2; }
+/* Stores a value in a slot of a small table in the menu. */
+void func_00348630(u8 *menu, s32 slot, s32 value) { menu += slot * 4; *(s32 *)(menu + 0x418) = value; }
 
 /* stores the count in a field, then loops count times calling one helper on each successive 72-byte slot and passing the result to a second helper. */
-void func_00348640(char *a0, int a1, int *a2)
+/* Sets how many icons the menu shows and prepares each icon from a list. */
+void func_00348640(char *menu, int count, int *iconIds)
 {
     int i;
 
-    *(int *)(a0 + 1092) = a1;
-    for (i = 0; i < a1; i++)
-        func_L00_0042C360_1(a0 + 536 + i * 72, func_00288FB8_2(a2[i]));
+    *(int *)(menu + 1092) = count;
+    for (i = 0; i < count; i++)
+        func_L00_0042C360_1(menu + 536 + i * 72, func_00288FB8_2(iconIds[i]));
 }
 
 /* func_003486A8 is built from 00345358-children.c. */
@@ -422,61 +443,68 @@ void func_00348640(char *a0, int a1, int *a2)
 /* func_003489E8 is built from 00345358-list-g8.c. */
 
 
+/* Gives back the object it was given. */
 void *func_00349148(void *object) {
     return object;
 }
 
-void func_00349150(s32 *a0) {
- u8 *p=(u8 *)a0+0x50; s32 value=-1; s32 i=15;
- a0[0]=0;a0[0x52]=0;
+/* Clears a menu and sets all its sixteen entries to empty. */
+void func_00349150(s32 *menu) {
+ u8 *entry=(u8 *)menu+0x50; s32 empty=-1; s32 i=15;
+ menu[0]=0;menu[0x52]=0;
  do {
-  *(s32 *)(p-12)=value;*(s32 *)(p-8)=value;*(s32 *)(p-4)=value;*(s32 *)p=value;
-  i--;p+=16;
+  *(s32 *)(entry-12)=empty;*(s32 *)(entry-8)=empty;*(s32 *)(entry-4)=empty;*(s32 *)entry=empty;
+  i--;entry+=16;
  }while(i>=0);
- a0[0x54]=0;a0[0x55]=0;
+ menu[0x54]=0;menu[0x55]=0;
 }
 
 /* func_00349190 is built from 00345358-input-g8.c. */
 
-void func_00349488(int *param_1)
+/* Clears a menu field. */
+void func_00349488(int *menu)
 {
-    param_1[0x150 / sizeof(int)] = 0;
+    menu[0x150 / sizeof(int)] = 0;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00349490(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x144) = a1; }
+/* Stores a value in a menu field. */
+void func_00349490(u8 *menu, s32 value) { *(s32 *)(menu + 0x144) = value; }
 
-u8 *func_00349498(u8 *a0) {
- s32 *p=(s32 *)(a0+0x30);s32 i=3;
+/* Clears sixteen words of a block to zero and gives the block back. */
+u8 *func_00349498(u8 *block) {
+ s32 *word=(s32 *)(block+0x30);s32 i=3;
  do {
-  p[0]=0;p[1]=0;p[2]=0;p[3]=0;
-  i--;p+=4;
+  word[0]=0;word[1]=0;word[2]=0;word[3]=0;
+  i--;word+=4;
  }while(i!=-1);
- return a0;
+ return block;
 }
 
 /* Zeroes six word fields of an object, reads back the first one as a float, calls a helper twice with that float (then with 1.0f) over five float arguments, sets two more int fields, and calls a second helper with two float arguments. */
-void func_003494D0(char *o)
+/* Sets up a fade effect with its starting values. */
+void func_003494D0(char *fade)
 {
-    float v;
+    float start;
 
-    *(int *)(o + 24) = 0;
-    *(float *)(o + 40) = 0.0f;
-    v = *(float *)(o + 24);
-    *(float *)(o + 44) = 0.0f;
-    *(float *)(o + 128) = 0.0f;
-    *(float *)(o + 36) = 0.005f;
-    func_003495D8_1(o, 0, v, v, v, v, v);
-    func_003495D8_1(o, 1, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
-    *(int *)(o + 132) = 2;
-    func_00349610(o, 0, v, v);
-    *(int *)(o + 32) = 0;
-    *(int *)(o + 28) = 1;
+    *(int *)(fade + 24) = 0;
+    *(float *)(fade + 40) = 0.0f;
+    start = *(float *)(fade + 24);
+    *(float *)(fade + 44) = 0.0f;
+    *(float *)(fade + 128) = 0.0f;
+    *(float *)(fade + 36) = 0.005f;
+    func_003495D8_1(fade, 0, start, start, start, start, start);
+    func_003495D8_1(fade, 1, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+    *(int *)(fade + 132) = 2;
+    SetAnimationKeyRange(fade, 0, start, start);
+    *(int *)(fade + 32) = 0;
+    *(int *)(fade + 28) = 1;
 }
 
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00349590(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2c) = a1; }
+/* Stores a value in a fade field. */
+void func_00349590(u8 *fade, s32 value) { *(s32 *)(fade + 0x2c) = value; }
 
 
 typedef struct {
@@ -486,17 +514,20 @@ typedef struct {
     int mode;
 } Value_3495A0;
 
-float func_003495A0(Value_3495A0 *object) {
-    float previous = object->value;
-    object->value = 0.0f;
-    object->mode = 1;
+/* Resets the fade amount to zero and returns the old amount. */
+float func_003495A0(Value_3495A0 *fade) {
+    float previous = fade->value;
+    fade->value = 0.0f;
+    fade->mode = 1;
     return previous;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_003495C0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x80) = a1; }
+/* Stores a value in a fade field. */
+void func_003495C0(u8 *fade, s32 value) { *(s32 *)(fade + 0x80) = value; }
 
-s32 func_003495C8(u8 *a0, s32 a1) { s32 vieux = *(s32 *)(a0 + 0x28); *(s32 *)(a0 + 0x28) = a1; return vieux; }
+/* Swaps in a new value and returns the old one. */
+s32 func_003495C8(u8 *fade, s32 newValue) { s32 oldValue = *(s32 *)(fade + 0x28); *(s32 *)(fade + 0x28) = newValue; return oldValue; }
 
 /* Store an indexed four-component parameter row and its float weight */
 void func_003495D8(f32 weight, f32 x, f32 y, f32 z, f32 w, JammingParameterRows *object, s32 index) {
@@ -507,70 +538,77 @@ void func_003495D8(f32 weight, f32 x, f32 y, f32 z, f32 w, JammingParameterRows 
     object->weights[index] = weight;
 }
 
-void func_00349628(int param_1, int param_2) {
-    *(int *)(param_1 + 0x84) = param_2;
+/* Stores a value in a field of an effect. */
+void func_00349628(int effect, int value) {
+    *(int *)(effect + 0x84) = value;
 }
 
-void func_00349630(u8 *a0,s32 a1) {
- *(s32 *)(a0+0x1c)=a1;
- if(*(s32 *)(a0+0x28)==0) {
-  if(a1==1) *(f32 *)(a0+0x18)=0.0f;
-  else *(f32 *)(a0+0x18)=1.0f;
-  *(s32 *)(a0+0x28)=1;
+/* Starts a fade in one direction, unless one is already running. */
+void func_00349630(u8 *fade,s32 direction) {
+ *(s32 *)(fade+0x1c)=direction;
+ if(*(s32 *)(fade+0x28)==0) {
+  if(direction==1) *(f32 *)(fade+0x18)=0.0f;
+  else *(f32 *)(fade+0x18)=1.0f;
+  *(s32 *)(fade+0x28)=1;
  }
 }
 
-void func_00349670(int param_1, unsigned int param_2)
+/* Stores a value in a field of an effect. */
+void func_00349670(int effect, unsigned int value)
 {
-  *(unsigned int *)(param_1 + 32) = param_2;
+  *(unsigned int *)(effect + 32) = value;
   return;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00349678(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x24) = a1; }
+/* Sets the speed of a fade. */
+void func_00349678(u8 *fade, f32 speed) { *(f32 *)(fade + 0x24) = speed; }
 
 /* func_00349680 is built with float min/max in 00345358-interpolation.c. */
 
-u8 *func_00349918(u8 *a0) {
- s32 *p=(s32 *)(a0+0x2c); s32 i=1;
+/* Clears two groups of three rows to zero and gives the block back. */
+u8 *func_00349918(u8 *block) {
+ s32 *word=(s32 *)(block+0x2c); s32 i=1;
  do {
-  s32 *end=p+12;
-  s32 next=i-1;
+  s32 *groupEnd=word+12;
+  s32 remaining=i-1;
   s32 j=2;
   do {
-   p[0]=0;p[1]=0;p[2]=0;p[3]=0;
-   j--;p+=4;
+   word[0]=0;word[1]=0;word[2]=0;word[3]=0;
+   j--;word+=4;
   } while(j!=-1);
-  i=next;p=end;
+  i=remaining;word=groupEnd;
  } while(i!=-1);
- return a0;
+ return block;
 }
 
 
 /* Initialises a record of four 1.0 floats, one zero, one small constant and four zero words, then runs the same four-argument setup four times with two selector flags swept over 0 and 1. */
-void func_00349970(S_F49afcbfe *x)
+/* Sets up a color effect with default values for all four combinations of its two switches. */
+void func_00349970(S_F49afcbfe *effect)
 {
-    float z;
+    float zero;
 
-    x->f0 = 1.0f;
-    x->f4 = 1.0f;
-    x->f8 = 1.0f;
-    x->f12 = 1.0f;
-    x->f16 = 0.0f;
-    x->f24 = 6.6665999591350555419922e-02f;
-    x->i28 = 0;
-    x->i32 = 0;
-    x->i36 = 0;
-    x->i40 = 0;
-    z = x->f16;
-    func_00349A70_1(x, 0, 0, z, z, z, z);
-    func_00349A70_1(x, 0, 1, z, z, z, z);
-    func_00349A70_1(x, 1, 0, z, z, z, z);
-    func_00349A70_1(x, 1, 1, z, z, z, z);
+    effect->f0 = 1.0f;
+    effect->f4 = 1.0f;
+    effect->f8 = 1.0f;
+    effect->f12 = 1.0f;
+    effect->f16 = 0.0f;
+    effect->f24 = 6.6665999591350555419922e-02f;
+    effect->i28 = 0;
+    effect->i32 = 0;
+    effect->i36 = 0;
+    effect->i40 = 0;
+    zero = effect->f16;
+    func_00349A70_1(effect, 0, 0, zero, zero, zero, zero);
+    func_00349A70_1(effect, 0, 1, zero, zero, zero, zero);
+    func_00349A70_1(effect, 1, 0, zero, zero, zero, zero);
+    func_00349A70_1(effect, 1, 1, zero, zero, zero, zero);
 }
 
 
-void func_00349A60(u8 *a0, s32 a1, s32 a2) { a0 += a1 * 4; *(s32 *)(a0 + 0x20) = a2; }
+/* Stores a value in a slot of a small table. */
+void func_00349A60(u8 *effect, s32 slot, s32 value) { effect += slot * 4; *(s32 *)(effect + 0x20) = value; }
 
 /* Store four float components in a selected row of a parameter group */
 void func_00349A70(f32 x, f32 y, f32 z, f32 w, JammingGridObject *object, s32 row, s32 group) {
@@ -580,24 +618,28 @@ void func_00349A70(f32 x, f32 y, f32 z, f32 w, JammingGridObject *object, s32 ro
     object->groups[group].rows[row].w = w;
 }
 
-void func_00349AA8(u8 *a0, s32 a1, s32 a2) { a0 += a1 * 4; *(s32 *)(a0 + 0x8C) = a2; }
+/* Stores a value in a slot of a small table. */
+void func_00349AA8(u8 *effect, s32 slot, s32 value) { effect += slot * 4; *(s32 *)(effect + 0x8C) = value; }
 
-void func_00349AB8(u8 *a0,s32 a1) {
- if(a1!=0) *(f32 *)(a0+0x10)=1.0f;
- else *(f32 *)(a0+0x10)=0.0f;
- *(s32 *)(a0+0x14)=1;
- *(s32 *)(a0+0x1c)=1;
+/* Starts a fade-in or fade-out going forward, from fully off or fully on. */
+void func_00349AB8(u8 *fade,s32 startFull) {
+ if(startFull!=0) *(f32 *)(fade+0x10)=1.0f;
+ else *(f32 *)(fade+0x10)=0.0f;
+ *(s32 *)(fade+0x14)=1;
+ *(s32 *)(fade+0x1c)=1;
 }
 
-void func_00349AE0(u8 *a0,s32 a1) {
- if(a1!=0) *(f32 *)(a0+0x10)=0.0f;
- else *(f32 *)(a0+0x10)=1.0f;
- *(s32 *)(a0+0x14)=-1;
- *(s32 *)(a0+0x1c)=1;
+/* Starts a fade going backward, from fully on or fully off. */
+void func_00349AE0(u8 *fade,s32 startEmpty) {
+ if(startEmpty!=0) *(f32 *)(fade+0x10)=0.0f;
+ else *(f32 *)(fade+0x10)=1.0f;
+ *(s32 *)(fade+0x14)=-1;
+ *(s32 *)(fade+0x1c)=1;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00349B18(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x18) = a1; }
+/* Sets the current amount of a fade. */
+void func_00349B18(u8 *fade, f32 amount) { *(f32 *)(fade + 0x18) = amount; }
 
 extern void func_003361A8(char *);
 extern void func_003363D0(char *);
@@ -605,27 +647,29 @@ extern char *func_00335AC8(char *);
 extern char D_001AD908[] __attribute__((sda));
 extern char D_001AD928[] __attribute__((sda));
 
-char *func_00349CB8(char *object)
+/* Sets up the sprites, labels and fade effects of a meter screen. */
+char *func_00349CB8(char *meter)
 {
-    func_003361A8(object + 0x10);
-    func_003361A8(object + 0x5C);
-    func_003361A8(object + 0xA8);
-    func_003363D0(object + 0xF4);
-    func_00349498(object + 0x140);
-    func_00335AC8(object + 0x1CC);
-    *(char **)(object + 0x1CC) = D_001AD908;
-    func_00335AC8(object + 0x1D0);
-    *(char **)(object + 0x1D0) = D_001AD928;
-    func_00349498(object + 0x1D4);
-    func_00349498(object + 0x25C);
-    func_00349498(object + 0x2E4);
-    func_00349498(object + 0x36C);
-    return object;
+    ConstructDerivedObjectA(meter + 0x10);
+    ConstructDerivedObjectA(meter + 0x5C);
+    ConstructDerivedObjectA(meter + 0xA8);
+    ConstructDerivedObjectB(meter + 0xF4);
+    ClearSixteenWords(meter + 0x140);
+    InitObjectTypePointer(meter + 0x1CC);
+    *(char **)(meter + 0x1CC) = D_001AD908;
+    InitObjectTypePointer(meter + 0x1D0);
+    *(char **)(meter + 0x1D0) = D_001AD928;
+    ClearSixteenWords(meter + 0x1D4);
+    ClearSixteenWords(meter + 0x25C);
+    ClearSixteenWords(meter + 0x2E4);
+    ClearSixteenWords(meter + 0x36C);
+    return meter;
 }
 
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_0034A4A8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x0) = a1; }
+/* Stores a value in the first field of an object. */
+void func_0034A4A8(u8 *object, s32 value) { *(s32 *)(object + 0x0) = value; }
 
 /* Replace the value at offset 0x04 and, when it changes while the bound debug byte is zero, retain the previous value and set the two counters to 180 and 300; original game role is unknown. */
 void func_0034A4B0(Rac2Native_79744baad5ad7f65_ScalarChange48Owner *owner, int value)
@@ -647,11 +691,12 @@ extern const StageFloatTable D_001AE628, D_001AE638;
 extern const StageIntTable D_001AE648, D_001AE658;
 extern void func_003363C0(char *widget, float position);
 
-float func_0034A4E0(char *object, int type, int *columns, int *rows,
+/* Works out the layout of the item grid for the given item number and sets up its two arrow sprites. */
+float func_0034A4E0(char *screen, int type, int *columns, int *rows,
                     float *spacing, int *xOffset, int *yOffset, int *flag,
                     float *extra)
 {
-    StageOwner *owner = (StageOwner *)object;
+    StageOwner *owner = (StageOwner *)screen;
     StageFloatTable spacings, results;
     StageIntTable xOffsets, yOffsets;
     int index, tier;
@@ -675,10 +720,10 @@ float func_0034A4E0(char *object, int type, int *columns, int *rows,
         *yOffset = yOffsets.values[0];
         result = results.values[0];
         *extra = 0.0f;
-        func_003363C0((char *)&owner->left, position);
-        func_003363C0((char *)&owner->right, position);
-        func_00336390((char *)&owner->left, D_001A8CFC + 0x8710, 17);
-        func_00336390((char *)&owner->right, D_001A8CFC + 0x8710, 18);
+        SetFloatAt38((char *)&owner->left, position);
+        SetFloatAt38((char *)&owner->right, position);
+        SetFieldAt40((char *)&owner->left, D_001A8CFC + 0x8710, 17);
+        SetFieldAt40((char *)&owner->right, D_001A8CFC + 0x8710, 18);
     } else if (type >= 21 && type <= 40) {
         int row = index / 4 - 5;
         if (row < 0) row = 0;
@@ -689,10 +734,10 @@ float func_0034A4E0(char *object, int type, int *columns, int *rows,
         *yOffset = yOffsets.values[1];
         *extra = -0.5f;
         result = results.values[1];
-        func_003363C0((char *)&owner->left, position);
-        func_003363C0((char *)&owner->right, position);
-        func_00336390((char *)&owner->left, D_001A8CFC + 0x8710, 19);
-        func_00336390((char *)&owner->right, D_001A8CFC + 0x8710, 20);
+        SetFloatAt38((char *)&owner->left, position);
+        SetFloatAt38((char *)&owner->right, position);
+        SetFieldAt40((char *)&owner->left, D_001A8CFC + 0x8710, 19);
+        SetFieldAt40((char *)&owner->right, D_001A8CFC + 0x8710, 20);
     } else if (type >= 41 && type <= 80) {
         int row = index / 4 - 10;
         if (row < 0) row = 0;
@@ -704,10 +749,10 @@ float func_0034A4E0(char *object, int type, int *columns, int *rows,
         *extra = -0.5f;
         *flag = 1;
         result = results.values[2];
-        func_003363C0((char *)&owner->left, position);
-        func_003363C0((char *)&owner->right, position);
-        func_00336390((char *)&owner->left, D_001A8CFC + 0x8710, 21);
-        func_00336390((char *)&owner->right, D_001A8CFC + 0x8710, 22);
+        SetFloatAt38((char *)&owner->left, position);
+        SetFloatAt38((char *)&owner->right, position);
+        SetFieldAt40((char *)&owner->left, D_001A8CFC + 0x8710, 21);
+        SetFieldAt40((char *)&owner->right, D_001A8CFC + 0x8710, 22);
     }
     return result;
 }
@@ -716,41 +761,42 @@ float func_0034A4E0(char *object, int type, int *columns, int *rows,
 
 /* func_0034AA30 is built from 0034AA30.c. */
 
-void func_0034AC10(char *self)
+/* Moves the labels to follow the screen position, updates the meter and counts down the show timer. */
+void func_0034AC10(char *meter)
 {
-    float *out = func_00335E10(self + 0x5C);
+    float *labelPos = GetFirstField(meter + 0x5C);
 
     {
         float x = ref_L00_001AEAC8_00;
-        float px = (*(float **)(self + 8))[0];
+        float px = (*(float **)(meter + 8))[0];
         float y = ref_L00_001AEACC_00;
-        out[0] = x + px;
-        out[1] = y + (*(float **)(self + 8))[1];
+        labelPos[0] = x + px;
+        labelPos[1] = y + (*(float **)(meter + 8))[1];
     }
 
-    out = func_00335E10(self + 0xA8);
+    labelPos = GetFirstField(meter + 0xA8);
     {
         float x = ref_L00_001AEAD0_00;
-        float px = (*(float **)(self + 8))[0];
+        float px = (*(float **)(meter + 8))[0];
         float y = ref_L00_001AEAD4_00;
-        out[0] = x + px;
-        out[1] = y + (*(float **)(self + 8))[1];
+        labelPos[0] = x + px;
+        labelPos[1] = y + (*(float **)(meter + 8))[1];
     }
 
-    func_0034AA30(self);
-    func_00349680(self + 0x140, 1);
+    UpdateHudMeterBar(meter);
+    UpdateKeyframeAnimation(meter + 0x140, 1);
 
-    if (*(int *)(self + 0x3F4) != 0) {
-        int remaining = *(int *)(self + 0x3F4) - 1;
-        *(int *)(self + 0x3F4) = remaining;
-        if (remaining == 0) {
-            *(int *)(self + 0x0C) = 0;
-            *(int *)(self + 0x3F8) = 0;
-            *(int *)(self + 0x400) = 1;
-            func_00349630_2(self + 0x1D4, -1);
-            func_00349630_2(self + 0x25C, -1);
-            func_00349630_2(self + 0x2E4, -1);
-            func_00349630_2(self + 0x36C, -1);
+    if (*(int *)(meter + 0x3F4) != 0) {
+        int timeLeft = *(int *)(meter + 0x3F4) - 1;
+        *(int *)(meter + 0x3F4) = timeLeft;
+        if (timeLeft == 0) {
+            *(int *)(meter + 0x0C) = 0;
+            *(int *)(meter + 0x3F8) = 0;
+            *(int *)(meter + 0x400) = 1;
+            func_00349630_2(meter + 0x1D4, -1);
+            func_00349630_2(meter + 0x25C, -1);
+            func_00349630_2(meter + 0x2E4, -1);
+            func_00349630_2(meter + 0x36C, -1);
         }
     }
 }
@@ -761,15 +807,15 @@ void func_0034AD10(char *o)
         float x, y, size;
         int mode, color = 0, i;
 
-        func_00336320(o + 0x5C);
-        func_00336320(o + 0xA8);
-        func_00336548(o + 0xF4);
+        DrawScreenElementAtStoredPosition(o + 0x5C);
+        DrawScreenElementAtStoredPosition(o + 0xA8);
+        DrawProgressBar(o + 0xF4);
         x = 0;
         y = 0;
         size = 0;
         mode = 0;
         if (*(int *)(o + 0x3F8)) {
-            color = func_002A9588(-1, 0x22222222, 10, 0, 0);
+            color = PingPongBlendValues(-1, 0x22222222, 10, 0, 0);
             --*(int *)(o + 0x3F8);
         }
         for (i = 0; i < *(int *)(o + 4); i++) {
@@ -778,8 +824,8 @@ void func_0034AD10(char *o)
 
             if (*(int *)(o + 0x3F8) && i >= *(int *)(o + 0x3FC))
                 flash = 1;
-            func_0034A808(o, *(int *)(o + 4), i, &x, &y, &size, &mode);
-            func_00335E38(o + 0x10, x, y, 0, 0);
+            ComputeGridTilePlacement(o, *(int *)(o + 4), i, &x, &y, &size, &mode);
+            SetFirstFloat4(o + 0x10, x, y, 0, 0);
             sx = size;
             sy = size;
             switch (mode) {
@@ -796,122 +842,128 @@ void func_0034AD10(char *o)
                 sx = -sx;
                 break;
             }
-            func_00335F88(o + 0x10, sx, sy, 0, 0);
+            SetSecondFloat4(o + 0x10, sx, sy, 0, 0);
             if (*(int *)(o + 4) < 21) {
                 if (*(int *)o >= i + 1) {
-                    func_00336390(o + 0x10, D_001A8CFC + 0x8710, 26);
+                    SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 26);
                     if (flash)
-                        *(int *)func_00335E20((unsigned char *)o + 0x10) = color;
+                        *(int *)GetFieldC((unsigned char *)o + 0x10) = color;
                     else
-                        *(float *)func_00335E20((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
-                    func_00336320(o + 0x10);
+                        *(float *)GetFieldC((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
+                    DrawScreenElementAtStoredPosition(o + 0x10);
                 }
-                func_00336390(o + 0x10, D_001A8CFC + 0x8710, 25);
-                *(int *)func_00335E20((unsigned char *)o + 0x10) = 0x55F0C070;
-                func_00336320(o + 0x10);
+                SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 25);
+                *(int *)GetFieldC((unsigned char *)o + 0x10) = 0x55F0C070;
+                DrawScreenElementAtStoredPosition(o + 0x10);
             } else {
                 if (*(int *)o >= i + 1) {
-                    func_00336390(o + 0x10, D_001A8CFC + 0x8710, 27);
+                    SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 27);
                     if (flash)
-                        *(int *)func_00335E20((unsigned char *)o + 0x10) = color;
+                        *(int *)GetFieldC((unsigned char *)o + 0x10) = color;
                     else
-                        *(float *)func_00335E20((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
-                    func_00336320(o + 0x10);
+                        *(float *)GetFieldC((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
+                    DrawScreenElementAtStoredPosition(o + 0x10);
                 }
-                func_00336390(o + 0x10, D_001A8CFC + 0x8710, 24);
-                *(int *)func_00335E20((unsigned char *)o + 0x10) = 0x55F0C070;
-                func_00336320(o + 0x10);
+                SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 24);
+                *(int *)GetFieldC((unsigned char *)o + 0x10) = 0x55F0C070;
+                DrawScreenElementAtStoredPosition(o + 0x10);
             }
         }
     }
 }
 
-void func_0034AFE8(u8 *a0, f32 a1, f32 a2) {
-    *(f32 *)*(u8 **)(a0 + 0x8) = a1;
-    *(f32 *)(*(u8 **)(a0 + 0x8) + 0x4) = a2;
+/* Sets the position of the object to the two given numbers. */
+void func_0034AFE8(u8 *object, f32 posX, f32 posY) {
+    *(f32 *)*(u8 **)(object + 0x8) = posX;
+    *(f32 *)(*(u8 **)(object + 0x8) + 0x4) = posY;
 }
 
 /* Stores an argument at +1012; if the word at +1024 is zero it returns, else it clears +1024, sets +12 to 1 and calls one callee four times on this+468/604/740/876 with argument 1. */
-void func_0034B000(char *p, int a1)
+/* Stores a value, and if a pending flag is set, clears it and restarts four fades. */
+void func_0034B000(char *menu, int value)
 {
-    *(int *)(p + 1012) = a1;
-    if (*(int *)(p + 1024) == 0)
+    *(int *)(menu + 1012) = value;
+    if (*(int *)(menu + 1024) == 0)
         return;
-    *(int *)(p + 1024) = 0;
-    *(int *)(p + 12) = 1;
-    func_00349630_2(p + 468, 1);
-    func_00349630_2(p + 604, 1);
-    func_00349630_2(p + 740, 1);
-    func_00349630_2(p + 876, 1);
+    *(int *)(menu + 1024) = 0;
+    *(int *)(menu + 12) = 1;
+    func_00349630_2(menu + 468, 1);
+    func_00349630_2(menu + 604, 1);
+    func_00349630_2(menu + 740, 1);
+    func_00349630_2(menu + 876, 1);
 }
 
 
 
 /* func_0034B2C8 is defined in 0034B2C8-hud.c. */
 
-unsigned int func_0034CA68(unsigned char *owner)
+/* Reads the top byte of the color of the label at the end of the screen. */
+unsigned int func_0034CA68(unsigned char *screen)
 {
-    unsigned int address = (unsigned int)func_00335E20(owner + 0x358);
+    unsigned int address = (unsigned int)GetFieldC(screen + 0x358);
     return *(unsigned int *)address & 0xff000000u;
 }
 
 extern void func_00336920(char *, int, int);
-void func_0034CA90(char *self, int mode)
+/* Switches the screen mode and starts the matching sound. */
+void func_0034CA90(char *screen, int mode)
 {
-    *(int *)(self + 0x1584) = mode;
+    *(int *)(screen + 0x1584) = mode;
     switch (mode) {
     case 0:
-        func_00336920(self + 0x280, 0x7567, 0);
+        SetWidgetValuePair(screen + 0x280, 0x7567, 0);
         break;
     case 1:
-        func_00336920(self + 0x280, 0xEAA2, 0);
+        SetWidgetValuePair(screen + 0x280, 0xEAA2, 0);
         break;
     }
 }
 
-void func_0034CAE8(char *p, void *a1, int a2)
+/* Stores a value and, when a pending flag is set, restarts the screen fades and sound. */
+void func_0034CAE8(char *screen, void *sound, int value)
 {
-    *(int *)(p + 0x1564) = a2;
-    if (*(int *)(p + 0x1568) != 0) {
-        *(int *)(p + 0x1568) = 0;
-        F72a1dff5_FUN_00349AB8(p + 0xf1c, 0);
-        F72a1dff5_FUN_00349AB8(p + 0xfb0, 0);
-        F72a1dff5_FUN_00349AB8(p + 0x1044, 0);
-        F72a1dff5_FUN_00349630(p + 0x10d8, 1);
-        F72a1dff5_FUN_00349AB8(p + 0x1160, 0);
-        F72a1dff5_FUN_00336920(p + 0x148, a1, 0);
+    *(int *)(screen + 0x1564) = value;
+    if (*(int *)(screen + 0x1568) != 0) {
+        *(int *)(screen + 0x1568) = 0;
+        F72a1dff5_FUN_00349AB8(screen + 0xf1c, 0);
+        F72a1dff5_FUN_00349AB8(screen + 0xfb0, 0);
+        F72a1dff5_FUN_00349AB8(screen + 0x1044, 0);
+        F72a1dff5_FUN_00349630(screen + 0x10d8, 1);
+        F72a1dff5_FUN_00349AB8(screen + 0x1160, 0);
+        F72a1dff5_FUN_00336920(screen + 0x148, sound, 0);
     }
-    if (*(int *)(p + 0x157c) != 0) {
-        F72a1dff5_FUN_00336920(p + 0x148, a1, 0);
+    if (*(int *)(screen + 0x157c) != 0) {
+        F72a1dff5_FUN_00336920(screen + 0x148, sound, 0);
     }
 }
 
-void func_0034CB88(char *self, int x)
+/* Stores a value and, when a pending flag is set, restarts six fades with a speed that depends on a setting. */
+void func_0034CB88(char *screen, int value)
 {
-    char *p1, *p2, *p3, *p4, *p5, *p6;
+    char *fade1, *fade2, *fade3, *fade4, *fade5, *fade6;
 
-    *(s32 *)(self + 5492) = x;
-    if (*(s32 *)(self + 5496) != 0) {
-        *(s32 *)(self + 5496) = 0;
-        F01bd4546_FUN_00335E68(self + 1464, 0);
-        p1 = self + 3052;
-        p2 = self + 3188;
-        p3 = self + 3324;
-        p4 = self + 3460;
-        p5 = self + 3596;
-        p6 = self + 3732;
-        F01bd4546_FUN_00349630(p1, 1);
-        F01bd4546_FUN_00349630(p2, 1);
-        F01bd4546_FUN_00349630(p3, 1);
-        F01bd4546_FUN_00349630(p4, 1);
-        F01bd4546_FUN_00349630(p5, 1);
-        F01bd4546_FUN_00349630(p6, 1);
-        F01bd4546_FUN_00349678(p1, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
-        F01bd4546_FUN_00349678(p2, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
-        F01bd4546_FUN_00349678(p3, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
-        F01bd4546_FUN_00349678(p4, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
-        F01bd4546_FUN_00349678(p5, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
-        F01bd4546_FUN_00349678(p6, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
+    *(s32 *)(screen + 5492) = value;
+    if (*(s32 *)(screen + 5496) != 0) {
+        *(s32 *)(screen + 5496) = 0;
+        F01bd4546_FUN_00335E68(screen + 1464, 0);
+        fade1 = screen + 3052;
+        fade2 = screen + 3188;
+        fade3 = screen + 3324;
+        fade4 = screen + 3460;
+        fade5 = screen + 3596;
+        fade6 = screen + 3732;
+        F01bd4546_FUN_00349630(fade1, 1);
+        F01bd4546_FUN_00349630(fade2, 1);
+        F01bd4546_FUN_00349630(fade3, 1);
+        F01bd4546_FUN_00349630(fade4, 1);
+        F01bd4546_FUN_00349630(fade5, 1);
+        F01bd4546_FUN_00349630(fade6, 1);
+        F01bd4546_FUN_00349678(fade1, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
+        F01bd4546_FUN_00349678(fade2, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
+        F01bd4546_FUN_00349678(fade3, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
+        F01bd4546_FUN_00349678(fade4, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
+        F01bd4546_FUN_00349678(fade5, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
+        F01bd4546_FUN_00349678(fade6, *(s32 *)0x1A7B90 ? 0.14f : 0.116666675f);
     }
 }
 
@@ -920,30 +972,33 @@ extern int func_002A9588(int, int, int, int, int);
 
 extern float *func_00336318(void *);
 extern void func_00335E68(void *, int);
-void func_0034CD70(char *object, int arg, float value)
+/* Shows a label with a new color and value, and makes a sound if a button is held. */
+void func_0034CD70(char *screen, int text, float value)
 {
-    int *result;
-    char *child;
+    int *color;
+    char *label;
     if (D_00138344 & 0xF000)
-        func_002A9588(0, 0, 1, 0, 1);
-    child = object + 0x5B8;
-    result = (int *)func_00335E20((unsigned char *)child);
-    *result = func_002A9588(0x60442D00, 0x70FFFEED, 20, 0, 0);
-    *func_00336318(child) = value;
-    func_00335E68(child, arg);
+        PingPongBlendValues(0, 0, 1, 0, 1);
+    label = screen + 0x5B8;
+    color = (int *)GetFieldC((unsigned char *)label);
+    *color = PingPongBlendValues(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    *GetFieldAt38(label) = value;
+    SetFlagValue(label, text);
 }
 
-void func_0034CE28(int *self, int value)
+/* Stores a value and, when a pending flag is set, restarts four fades. */
+void func_0034CE28(int *screen, int value)
 {
-    self[1371] = value;
-    if (self[1372] != 0) {
-        self[1372] = 0;
-        F076896f4_FUN_00349AB8((char *)self + 4596, 0);
-        F076896f4_FUN_00349AB8((char *)self + 4744, 0);
-        F076896f4_FUN_00349AB8((char *)self + 4892, 0);
-        F076896f4_FUN_00349AB8((char *)self + 5040, 0);
+    screen[1371] = value;
+    if (screen[1372] != 0) {
+        screen[1372] = 0;
+        F076896f4_FUN_00349AB8((char *)screen + 4596, 0);
+        F076896f4_FUN_00349AB8((char *)screen + 4744, 0);
+        F076896f4_FUN_00349AB8((char *)screen + 4892, 0);
+        F076896f4_FUN_00349AB8((char *)screen + 5040, 0);
     }
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_0034CE98(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2bc) = a1; }
+/* Stores a value in a screen field. */
+void func_0034CE98(u8 *screen, s32 value) { *(s32 *)(screen + 0x2bc) = value; }

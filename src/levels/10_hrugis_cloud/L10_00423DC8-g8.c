@@ -42,28 +42,28 @@ extern void func_002B49E0(s32, s32, s32, s32, s32);
    test: retail allocates it that way (the test in $v1, the pad word kept in $v0). */
 void func_L10_00423DC8(u8 *obj, s32 kind) {
     u8 *s = *(u8 **)(obj + 0x68);
-    u8 *other = D_001B251C + *(s32 *)(s + 0x24) * 256;
-    RewardOwnerState *os = *(RewardOwnerState **)(other + 0x68);
+    u8 *ownerMoby = D_001B251C + *(s32 *)(s + 0x24) * 256;
+    RewardOwnerState *os = *(RewardOwnerState **)(ownerMoby + 0x68);
     s32 id = os->effect;
-    s32 n, reward, tmp, capped;
+    s32 completedCount, reward, tmp, capped;
     u8 multiplier;
 
     if (id != -1) {
-        u8 *p = D_L10_00188660 + id * 0x70;
-        if (*(u8 **)(p + 0x88) == other && p[0x74])
+        u8 *record = D_L10_00188660 + id * 0x70;
+        if (*(u8 **)(record + 0x88) == ownerMoby && record[0x74])
             func_00373410(id);
     }
     os->effect = -1;
     tmp = D_L10_001A8F00;
     if (tmp == 2)
         return;
-    if (!func_00282948(s + 0x58))
+    if (!FastFloatHelperD(s + 0x58))
         return;
     if (D_L10_001A904C && !D_L10_001B1440) {
-        func_0027D330(30);
-        func_0029B758(0, func_L10_004239A0);
-        n = D_L10_001B1390_gp[kind];
-        capped = n < 3 ? n : 2;
+        FadeToBlack(30);
+        StoreLevelObjectValuePair(0, DrawMissionRewardPanel);
+        completedCount = D_L10_001B1390_gp[kind];
+        capped = completedCount < 3 ? completedCount : 2;
         multiplier = D_001A7A0A;
         D_L10_001B1440 = 1;
         D_L10_001B355C = kind;
@@ -72,30 +72,30 @@ void func_L10_00423DC8(u8 *obj, s32 kind) {
         reward = D_L10_001B1448_gp[kind][capped];
         if (multiplier)
             reward *= 10;
-        D_L10_001B1390_gp[kind] = n + 1;
-        D_001A79F8 = D_001A79F8 + reward;
-        func_L10_00425888();
-        func_0029B3E0(0, -1);
+        D_L10_001B1390_gp[kind] = completedCount + 1;
+        gPlayerBolts = gPlayerBolts + reward;
+        ClampAndStoreCompletionCounts();
+        MemcardSave(0, -1);
     }
-    func_L05_00379F48(1);
-    if (!func_00282948(s + 0x40)) {
+    SetPlayerStateField18(1);
+    if (!FastFloatHelperD(s + 0x40)) {
         tmp = D_00138324 & 0x40;
         if (tmp) {
             D_L10_001B1440 = 0;
             *(s32 *)(s + 0x40) = 0x278D0;
-            func_0027D330(30);
-            func_L05_00379F48(0);
+            FadeToBlack(30);
+            SetPlayerStateField18(0);
             *(s32 *)(s + 0x58) = 120;
             *(s32 *)(s + 0x48) = 0x2A30;
-            if (D_L10_001B1390_gp[0] && D_L10_001B1390[1] && D_L10_001B1390[2])
-                D_L10_001B143C = 3;
-            else if (D_L10_001B1390_gp[0] && D_L10_001B1390[1])
-                D_L10_001B143C = 2;
+            if (D_L10_001B1390_gp[0] && gMissionCompletionCounts[1] && gMissionCompletionCounts[2])
+                gSelectedMissionIndex = 3;
+            else if (D_L10_001B1390_gp[0] && gMissionCompletionCounts[1])
+                gSelectedMissionIndex = 2;
             else if (D_L10_001B1390_gp[0])
-                D_L10_001B143C = 1;
-            func_L10_00423500(obj);
+                gSelectedMissionIndex = 1;
+            ResetHrugisMissionState(obj);
         } else if (D_00138324 & 0x10)
-            func_002B49E0(3, 1, 4, 0, 0);
+            BeginSlotRequest(3, 1, 4, 0, 0);
     } else
         *(s32 *)(s + 0x40) = 0x278D0;
 }

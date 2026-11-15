@@ -10,6 +10,7 @@ extern int func_L02_00349BD8(int, int, int *, int *);
 extern void func_00282D30(void *, void *, float);
 extern float func_00282E80(void *, void *);
 
+/* Takes a list of region ids, keeps the ones that connect to each other, links neighbours together and gives each region a bounding sphere. Returns how many regions were kept. */
 int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacity) {
     unsigned char depth[256];
     RegionPoint center;
@@ -20,7 +21,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     int sourceEdge, targetEdge;
     RegionGeometry *geometry;
     float distance;
-    func_00282A88(depth, 0x100);
+    FastMemoryHelperB(depth, 0x100);
     depth[0] = pass;
     visited = (unsigned int)depth;
     { int i, j;
@@ -34,7 +35,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
                         continue;
                     if (ids[j] == -1)
                         break;
-                    if (func_L02_00349BD8(ids[i], ids[j], &sourceEdge, &targetEdge)) {
+                    if (FindTouchingPolygonCorners(ids[i], ids[j], &sourceEdge, &targetEdge)) {
                         changed = 1;
                         *(unsigned char *)(visited + j) = pass + 1;
                     }
@@ -59,7 +60,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     { int i, j, k;
     for (i = 0; i < count; i++) {
         for (j = i + 1; j < count; j++) {
-            if (func_L02_00349BD8(records[i].id, records[j].id, &edgeA, &edgeB)) {
+            if (FindTouchingPolygonCorners(records[i].id, records[j].id, &edgeA, &edgeB)) {
                 ((RegionGeometry *)D_L03_001FE700[records[i].id])->points[edgeA].w = 0;
                 ((RegionGeometry *)D_L03_001FE700[records[j].id])->points[edgeB].w = 0;
                 /* Entered at its test: loop.c leaves a loop entered from outside alone. */
@@ -93,13 +94,13 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     { int i, j, k;
     for (i = 0; i < count; i++) {
         geometry = (RegionGeometry *)D_L03_001FE700[records[i].id];
-        func_00282C88(&center);
+        ClearVector128(&center);
         for (j = 0; j < geometry->count; j++)
-            func_00282CC0(&center, &center, &geometry->points[j]);
-        func_00282D30(&center, &center, 1.0f / (float)geometry->count);
+            FastVecAdd(&center, &center, &geometry->points[j]);
+        FastVecScale(&center, &center, 1.0f / (float)geometry->count);
         center.w = 0;
         for (k = 0; k < geometry->count; k++) {
-            distance = func_00282E80(&center, &geometry->points[k]);
+            distance = vec_distance_xy(&center, &geometry->points[k]);
             if (distance > center.w)
                 center.w = distance;
         }

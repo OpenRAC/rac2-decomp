@@ -33,7 +33,7 @@ extern void ref_L00_003E2180_23(char *);
 char *func_L00_003E2180(char *pos, char *parent, char *target, float scale)
 {
     float point[4], offset[4];
-    char *object = ref_L00_003E2180_00(0xbfe);
+    char *object = ref_L00_003E2180_00(0xbfe /* moby class 3070 */);
     char *state, *data;
     float speed, lifetime;
     int valid, count;

@@ -11,41 +11,42 @@ extern void func_00282CC0(void *, void *, void *);
 extern int func_00282978(void *);
 extern void func_002B9180(void *);
 
-void func_002C8880(char *self) {
-    float a[4];
-    float b[4];
-    char *p = self + 0x20;
-    float t, f20, f21, f22;
+/* Updates a flying particle: it changes colour and speed over its life, then fades out over 20 more frames and is removed. */
+void func_002C8880(char *particle) {
+    float change[4];
+    float direction[4];
+    char *params = particle + 0x20;
+    float lifeLeft, fade, startAlpha, progress;
     int color;
 
-    b[0] = *(float *)(self + 0x20);
-    b[1] = *(float *)(p + 4);
-    b[2] = *(float *)(p + 8);
-    b[3] = 0;
-    func_00300190(self + 0x10, self + 0x10);
-    t = func_00283CE0(*(short *)(self + 0xA)) / func_00283CE0(*(unsigned char *)(p + 0x11));
-    f22 = 1.0f - t;
-    if (*(unsigned char *)(p + 0x13) == 0) {
-        color = func_00283D38(f22, 0x103080, *(int *)(p + 0xC));
-        *(int *)(self + 4) = color | (*(unsigned char *)(p + 0x12) << 24);
-        *(float *)(self + 0xC) = *(float *)(p + 0x14) + (*(float *)(p + 0x18) - *(float *)(p + 0x14)) * f22;
-        func_00282D30(a, b, *(float *)(p + 0x1C) * func_002A7798(f22));
+    direction[0] = *(float *)(particle + 0x20);
+    direction[1] = *(float *)(params + 4);
+    direction[2] = *(float *)(params + 8);
+    direction[3] = 0;
+    TransformVectorOrCopy(particle + 0x10, particle + 0x10);
+    lifeLeft = IntToFloat(*(short *)(particle + 0xA)) / IntToFloat(*(unsigned char *)(params + 0x11));
+    progress = 1.0f - lifeLeft;
+    if (*(unsigned char *)(params + 0x13) == 0) {
+        color = FastTweenColor(progress, 0x103080, *(int *)(params + 0xC));
+        *(int *)(particle + 4) = color | (*(unsigned char *)(params + 0x12) << 24);
+        *(float *)(particle + 0xC) = *(float *)(params + 0x14) + (*(float *)(params + 0x18) - *(float *)(params + 0x14)) * progress;
+        FastVecScale(change, direction, *(float *)(params + 0x1C) * EaseOutQuad(progress));
     } else {
-        f21 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = f20 * func_002A7790(f22);
-        *(int *)(self + 4) = *(int *)(p + 0xC) | (func_00283CF0(f21 - f20) << 24);
-        func_00282D30(a, b, *(float *)(p + 0x1C));
+        startAlpha = IntToFloat(*(unsigned char *)(params + 0x12));
+        fade = IntToFloat(*(unsigned char *)(params + 0x12));
+        fade = fade * Square(progress);
+        *(int *)(particle + 4) = *(int *)(params + 0xC) | (FloatToInt(startAlpha - fade) << 24);
+        FastVecScale(change, direction, *(float *)(params + 0x1C));
     }
-    func_00282CC0(self + 0x10, a, self + 0x10);
-    *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(p + 0x10);
-    if (func_00282978(self + 0xA) != 0) {
-        if (*(unsigned char *)(p + 0x13) == 0) {
-            *(unsigned char *)(p + 0x13) = 1;
-            *(unsigned char *)(p + 0x11) = 0x14;
-            *(short *)(self + 0xA) = 0x14;
+    FastVecAdd(particle + 0x10, change, particle + 0x10);
+    *(unsigned char *)(particle + 8) = *(unsigned char *)(particle + 8) + *(unsigned char *)(params + 0x10);
+    if (FastDecTimer(particle + 0xA) != 0) {
+        if (*(unsigned char *)(params + 0x13) == 0) {
+            *(unsigned char *)(params + 0x13) = 1;
+            *(unsigned char *)(params + 0x11) = 0x14;
+            *(short *)(particle + 0xA) = 0x14;
         } else {
-            func_002B9180(self);
+            KillParticle(particle);
         }
     }
 }

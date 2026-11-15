@@ -3,6 +3,7 @@
  * ping-pong reflection and the re-arm time keep their sums in separate statements, so
  * fold does not reassociate them: retail adds the 2 and the 10 first. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -39,10 +40,10 @@ s32 func_0028DF80(Anim28DF80_State *a0) {
             r = t->f4;
             break;
         case 1:
-            r = t->f4 + (D_001B1688 - a0->fC) / t->f7 % t->f2;
+            r = t->f4 + (gGameTime - a0->fC) / t->f7 % t->f2;
             break;
         case 2:
-            r = (D_001B1688 - a0->fC) / t->f7 % (t->f2 * 2 - 2);
+            r = (gGameTime - a0->fC) / t->f7 % (t->f2 * 2 - 2);
             if (r >= t->f2) {
                 s32 k = r + 2;
                 r = t->f2 * 2 - k;
@@ -50,8 +51,8 @@ s32 func_0028DF80(Anim28DF80_State *a0) {
             r += t->f4;
             break;
         case 3:
-            if (a0->fC < D_001B1688) {
-                r = (D_001B1688 - a0->fC) / t->f7;
+            if (a0->fC < gGameTime) {
+                r = (gGameTime - a0->fC) / t->f7;
                 if (r < t->f2 * 2 - 2) {
                     if (r >= t->f2) {
                         s32 k = r + 2;
@@ -61,7 +62,7 @@ s32 func_0028DF80(Anim28DF80_State *a0) {
                 } else {
                     r = t->f4;
                     {
-                        s32 k = func_002A77E0(30) + 10;
+                        s32 k = RandomIntBelow(30) + 10;
                         a0->fC = t->f2 * 2 + k;
                     }
                 }

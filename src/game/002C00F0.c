@@ -16,22 +16,23 @@ extern void func_002B9180(void *);
 extern int func_00283CF0(float);
 
 /* Particle tick: age, fade the alpha by 0.01 a frame and drift; dead at zero. */
+/* Updates a particle that drifts, slows down and fades out until it is invisible. */
 void func_002C00F0(Particle *p)
 {
-    float *pl = p->payload;
-    float a;
-    if (func_00282978(&p->size) != 0) goto kill;
-    p->life += pl[4];
+    float *payload = p->payload;
+    float alpha;
+    if (FastDecTimer(&p->size) != 0) goto kill;
+    p->life += payload[4];
     p->seed++;
-    a = pl[5] - 0.01f;
-    pl[5] = a > 0.0f ? a : 0.0f;
+    alpha = payload[5] - 0.01f;
+    payload[5] = alpha > 0.0f ? alpha : 0.0f;
     p->color &= 0xFFFFFF;
-    p->color |= func_00283CF0(pl[5] * 255.0f) << 24;
-    if (pl[5] <= 0.0f) {
+    p->color |= FloatToInt(payload[5] * 255.0f) << 24;
+    if (payload[5] <= 0.0f) {
 kill:
-        func_002B9180(p);
+        KillParticle(p);
     } else {
-        func_00282CC0(p->position, p->position, pl);
-        func_00282D30(pl, pl, 0.98f);
+        FastVecAdd(p->position, p->position, payload);
+        FastVecScale(payload, payload, 0.98f);
     }
 }

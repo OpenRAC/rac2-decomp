@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -52,7 +53,7 @@ void func_L18_0043E938(u8 *obj) {
     if (D_L18_001B1C4C < *(f32 *)(state + 0x15C)) {
         s32 probe = func_00337AD8(*(s32 *)(obj + 0x78) & 0xFFFFFF, *(s32 *)(obj + 0x78),
                                   *(f32 *)(state + 0x15C));
-        func_L00_00325AE8(obj + 0x10, probe,
+        DrawBillboardQuad_L00(obj + 0x10, probe,
                           D_L18_001B1C44 + D_L18_001B1C48 * *(f32 *)(state + 0x158),
                           D_L18_001B1C40);
     }
@@ -79,20 +80,21 @@ extern s32 func_00283CF0(f32);
 
 extern void func_L18_00307C60(void *, void *, s32, s32, f32, f32, f32);
 
+/* Emits a burst of effect particles whose number and size depend on the fade level at +0x158. */
 void func_L18_0043E9B0(u8 *obj) {
     u8 *state;
-    f32 t;
-    s32 n;
+    f32 intensity;
+    s32 particleCount;
 
-    func_002820A0();
+    SetGsRegisterConstant();
     state = *(u8 **)(obj + 0x68);
-    t = func_002AA140(D_L18_001B1C50, D_L18_001B1C54[0], *(f32 *)(state + 0x158));
+    intensity = LerpFloat_002AA140(D_L18_001B1C50, D_L18_001B1C54[0], *(f32 *)(state + 0x158));
     if (*(f32 *)(state + 0x158) < 0.1f) {
-        n = func_00283CF0((f32)D_L18_001B1C58 * *(f32 *)(state + 0x158) * 10.0f);
+        particleCount = FloatToInt((f32)D_L18_001B1C58 * *(f32 *)(state + 0x158) * 10.0f);
     } else {
-        n = func_00283CF0((f32)D_L18_001B1C58 * (1.0f - *(f32 *)(state + 0x158)));
+        particleCount = FloatToInt((f32)D_L18_001B1C58 * (1.0f - *(f32 *)(state + 0x158)));
     }
-    func_L18_00307C60(obj + 0x10, obj + 0xC0, n, 0, t, D_L18_001B1C5C, 0.08f);
+    DrawLensFlareQuad(obj + 0x10, obj + 0xC0, particleCount, 0, intensity, D_L18_001B1C5C, 0.08f);
 }
 
 extern int D_L18_001B1C60 __attribute__((sda));
@@ -125,27 +127,27 @@ void func_L18_0043EA90(char *object)
     int life;
     float first, second, large, small;
 
-    life = func_002A7820(48, 128);
-    first = (1.0f - *(float *)(state + 0x158)) * func_002A7878(D_L18_001B1C78, D_L18_001B1C7C);
-    second = (1.0f - *(float *)(state + 0x158)) * func_002A7878(D_L18_001B1C80, D_L18_001B1C84);
-    func_L18_0043F130(points, count, state, step);
-    func_L18_0043F428(points, count, life, D_L18_001B1C88, D_L18_001B1C8C, first, second);
-    life = func_002A7820(48, 128);
-    first = (1.0f - *(float *)(state + 0x158)) * func_002A7878(D_L18_001B1C78, D_L18_001B1C7C);
-    second = (1.0f - *(float *)(state + 0x158)) * func_002A7878(D_L18_001B1C80, D_L18_001B1C84);
-    func_L18_0043F130(points, count, state + 0xA0, step);
-    func_L18_0043F428(points, count, life, D_L18_001B1C88, D_L18_001B1C8C, first, second);
+    life = RandomIntRange(48, 128);
+    first = (1.0f - *(float *)(state + 0x158)) * RandomFloatRange(D_L18_001B1C78, D_L18_001B1C7C);
+    second = (1.0f - *(float *)(state + 0x158)) * RandomFloatRange(D_L18_001B1C80, D_L18_001B1C84);
+    BuildJitteredCurvePoints_L18(points, count, state, step);
+    DrawRibbonAlongPoints_L18(points, count, life, D_L18_001B1C88, D_L18_001B1C8C, first, second);
+    life = RandomIntRange(48, 128);
+    first = (1.0f - *(float *)(state + 0x158)) * RandomFloatRange(D_L18_001B1C78, D_L18_001B1C7C);
+    second = (1.0f - *(float *)(state + 0x158)) * RandomFloatRange(D_L18_001B1C80, D_L18_001B1C84);
+    BuildJitteredCurvePoints_L18(points, count, state + 0xA0, step);
+    DrawRibbonAlongPoints_L18(points, count, life, D_L18_001B1C88, D_L18_001B1C8C, first, second);
     small = D_L18_001B1C90 * (1.0f - *(float *)(state + 0x158));
     large = small * 0.5f;
-    func_L11_00458DF0(state, D_L18_001B1C98, large, func_002A7820(80, 96), func_002A7940(), 49, 2);
+    DrawBillboardSpriteAtPosition(state, D_L18_001B1C98, large, RandomIntRange(80, 96), RandomAngle(), 49, 2);
     small *= 0.7f;
-    func_L11_00458DF0(state, D_L18_001B1C9C, small, func_002A7820(8, 22), func_002A7940(), 11, 2);
-    func_L11_00458DF0(state + 0x10, D_L18_001B1C98, large, func_002A7820(80, 96), func_002A7940(), 49, 2);
-    func_L11_00458DF0(state + 0x10, D_L18_001B1C9C, small, func_002A7820(8, 22), func_002A7940(), 11, 2);
-    func_L11_00458DF0(state + 0xA0, D_L18_001B1C98, large, func_002A7820(80, 96), func_002A7940(), 49, 2);
-    func_L11_00458DF0(state + 0xA0, D_L18_001B1C9C, small, func_002A7820(8, 22), func_002A7940(), 11, 2);
-    func_L11_00458DF0(state + 0xB0, D_L18_001B1C98, large, func_002A7820(80, 96), func_002A7940(), 49, 2);
-    func_L11_00458DF0(state + 0xB0, D_L18_001B1C9C, small, func_002A7820(8, 22), func_002A7940(), 11, 2);
+    DrawBillboardSpriteAtPosition(state, D_L18_001B1C9C, small, RandomIntRange(8, 22), RandomAngle(), 11, 2);
+    DrawBillboardSpriteAtPosition(state + 0x10, D_L18_001B1C98, large, RandomIntRange(80, 96), RandomAngle(), 49, 2);
+    DrawBillboardSpriteAtPosition(state + 0x10, D_L18_001B1C9C, small, RandomIntRange(8, 22), RandomAngle(), 11, 2);
+    DrawBillboardSpriteAtPosition(state + 0xA0, D_L18_001B1C98, large, RandomIntRange(80, 96), RandomAngle(), 49, 2);
+    DrawBillboardSpriteAtPosition(state + 0xA0, D_L18_001B1C9C, small, RandomIntRange(8, 22), RandomAngle(), 11, 2);
+    DrawBillboardSpriteAtPosition(state + 0xB0, D_L18_001B1C98, large, RandomIntRange(80, 96), RandomAngle(), 49, 2);
+    DrawBillboardSpriteAtPosition(state + 0xB0, D_L18_001B1C9C, small, RandomIntRange(8, 22), RandomAngle(), 11, 2);
 }
 
 typedef float L18_EDE8f32;
@@ -165,23 +167,24 @@ extern L18_EDE8f32 D_L18_001B1C6C __attribute__((sda));
 extern L18_EDE8f32 D_L18_001B1C70 __attribute__((sda));
 extern L18_EDE8f32 D_L18_001B1C74 __attribute__((sda));
 
+/* Sets up the two ribbon emitters with random settings and a random starting point near the object. */
 void func_L18_0043EDE8(u8 *obj)
 {
     u8 *state = *(u8 **)(obj + 0x68);
-    L18_EDE8f32 v[4] __attribute__((aligned(16)));
+    L18_EDE8f32 point[4] __attribute__((aligned(16)));
     s32 i;
 
     for (i = 0; i < 2; i++) {
-        u8 *s = state + i * 0xA0;
+        u8 *emitter = state + i * 0xA0;
 
-        func_002A7A00(s + 0x60, D_L18_001B1C68 * 0.00029088824f, D_L18_001B1C6C * 0.00029088824f);
-        func_002A7A00(s + 0x70, D_L18_001B1C68 * 0.00029088824f, D_L18_001B1C6C * 0.00029088824f);
-        func_002A7A00(s + 0x80, D_L18_001B1C70, D_L18_001B1C74);
-        func_002A7A00(s + 0x90, D_L18_001B1C70, D_L18_001B1C74);
+        RandomDirectionVector(emitter + 0x60, D_L18_001B1C68 * 0.00029088824f, D_L18_001B1C6C * 0.00029088824f);
+        RandomDirectionVector(emitter + 0x70, D_L18_001B1C68 * 0.00029088824f, D_L18_001B1C6C * 0.00029088824f);
+        RandomDirectionVector(emitter + 0x80, D_L18_001B1C70, D_L18_001B1C74);
+        RandomDirectionVector(emitter + 0x90, D_L18_001B1C70, D_L18_001B1C74);
         qcopy(state, state + 0x140);
         qcopy(state + 0xA0, state + 0x140);
-        func_00283098(v, D_L18_002BD9B0 + func_002A77E0(6) * 16, obj + 0xC0);
-        func_00282CC0(v, obj + 0x10, v);
-        qcopy(state + 0x10, v);
+        matrix_mul_vec3(point, D_L18_002BD9B0 + RandomIntBelow(6) * 16, obj + 0xC0);
+        FastVecAdd(point, obj + 0x10, point);
+        qcopy(state + 0x10, point);
     }
 }

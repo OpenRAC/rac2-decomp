@@ -74,37 +74,39 @@ typedef struct Rac2Native_acdcf1600d770d3b_ScalarConfigure116State {
 extern Rac2Native_acdcf1600d770d3b_ScalarConfigure116State D_00188660_2[];
 
 /* Walks up to 25 records of 10 bytes; for each record whose 16-bit key is non-negative and whose table byte is set, resolves an object through a helper and copies/relocates it with the record's 16-bit length, capping the destination table at 25 entries. */
-void func_L00_00358D98(char *a0)
+/* Copies each listed block of data into the object it belongs to when the level is set up. */
+void func_L00_00358D98(char *table)
 {
     int i = 0;
 
-    if (i < *(int *)a0) {
-        int one = 1;
-        char *d = a0 + 8;
-        char *e = a0 + 4;
+    if (i < *(int *)table) {
+        int absoluteFlag = 1;
+        char *dataCursor = table + 8;
+        char *recordCursor = table + 4;
 
         do {
-            char *obj = func_L00_00358D50(*(short *)(e + 14), *(short *)(e + 12));
-            if (obj != 0) {
-                char *t;
-                if (*(short *)(e + 10) == one)
-                    t = (char *)(*(int *)e + (int)obj);
+            char *owner = FindRecordByKey(*(short *)(recordCursor + 14), *(short *)(recordCursor + 12));
+            if (owner != 0) {
+                char *dest;
+                if (*(short *)(recordCursor + 10) == absoluteFlag)
+                    dest = (char *)(*(int *)recordCursor + (int)owner);
                 else
-                    t = (char *)(*(int *)e + *(int *)(obj + 104));
-                func_00282AB0_1(t, d, *(unsigned short *)(e + 8));
+                    dest = (char *)(*(int *)recordCursor + *(int *)(owner + 104));
+                func_00282AB0_1(dest, dataCursor, *(unsigned short *)(recordCursor + 8));
             }
             i++;
-            d += 16;
-            e += 16;
-        } while (i < *(int *)a0);
+            dataCursor += 16;
+            recordCursor += 16;
+        } while (i < *(int *)table);
     }
 }
 
 extern char D_L00_0021DE10[];
 
+/* Applies the level data blocks from the standard table. */
 void func_L00_00358E50(void)
 {
-    func_L00_00358D98(D_L00_0021DE10);
+    CopyDataBlocksToObjects(D_L00_0021DE10);
 }
 
 
@@ -121,56 +123,59 @@ extern int func_002E5AD0(char *a0, int a1, int a2, int a3, int a4);
 
 /* Shared slot table: the first free record of a 112-byte table is filled with the index and the
  * caller's value; returns the record number, or -1 when the index is out of range. */
+/* Starts a sound or effect in a free slot and remembers its index, returning the slot or -1. */
 int func_L00_0035F5A0(int index, int a1, int a2)
 {
-    int r;
-    char *p;
+    int slot;
+    char *record;
 
     if (D_001B19EC == 0)
         return -1;
     index = index + D_001B8F0C;
     if (index >= D_001B19E8)
         return -1;
-    r = func_002E5AD0((char *)(D_001B19EC + index * 32), a1, a2, 0, 1024);
-    if (r >= 0) {
-        p = D_00188660_3 + r * 112;
-        *(int *)(p + 136) = a2;
-        *(short *)(p + 126) = index;
+    slot = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a1, a2, 0, 1024);
+    if (slot >= 0) {
+        record = D_00188660_3 + slot * 112;
+        *(int *)(record + 136) = a2;
+        *(short *)(record + 126) = index;
     }
-    return r;
+    return slot;
 }
 
 /* Same slot table as func_L00_0035F5A0, but with the caller's own record: the helper gets the
  * slot's record, the value goes in at 0x40 and the helper's second value becomes the fifth
  * argument; the record's index word is written at 126 and the value word at 140. */
+/* Starts a sound or effect from a given table entry, filling a free slot and returning it or -1. */
 int func_L00_0035F640(int index, int a1, int a2, int a3)
 {
-    int r;
-    char *p;
+    int slot;
+    char *record;
 
     if (index >= D_001B19E8)
         return -1;
     if (index == 0xFFFFFFFFU) {
         return -1;
     } else {
-        r = func_002E5AD0((char *)(D_001B19EC + index * 32), a1, 0, a2 + 0x40, a3);
-        if (r >= 0) {
-            p = D_00188660_3 + r * 112;
-            *(int *)(p + 140) = a2;
-            *(short *)(p + 126) = index;
+        slot = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a1, 0, a2 + 0x40, a3);
+        if (slot >= 0) {
+            record = D_00188660_3 + slot * 112;
+            *(int *)(record + 140) = a2;
+            *(short *)(record + 126) = index;
         }
-        return r;
+        return slot;
     }
 }
 
 /* Builds a slot index out of three weight/kind arguments and fills the same 112-byte record as
  * above; the record's value word comes from the fifth argument, the helper's from the sixth. */
+/* Works out a table entry from three small values, then starts it in a free slot, returning the slot or -1. */
 int func_L00_0035F6D8(int a0, int a1, int a2, int a3, int a4, int a5)
 {
     int index;
     int sum;
-    int r;
-    char *p;
+    int slot;
+    char *record;
 
     if (a0 == 0xFFFFFFFFU)
         return -1;
@@ -179,13 +184,13 @@ int func_L00_0035F6D8(int a0, int a1, int a2, int a3, int a4, int a5)
     index = sum + D_001B8F0C;
     if (index >= D_001B19E8)
         return -1;
-    r = func_002E5AD0((char *)(D_001B19EC + index * 32), a3, a4, 0, a5);
-    if (r >= 0) {
-        p = D_00188660_3 + r * 112;
-        *(int *)(p + 136) = a4;
-        *(short *)(p + 126) = index;
+    slot = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a3, a4, 0, a5);
+    if (slot >= 0) {
+        record = D_00188660_3 + slot * 112;
+        *(int *)(record + 136) = a4;
+        *(short *)(record + 126) = index;
     }
-    return r;
+    return slot;
 }
 
 extern Entry32fd6f60 D_L00_002A3B00[];
@@ -205,6 +210,7 @@ void func_L00_0035F7E8(Query *q)
     q->value = D_L00_002A3B00[i].value;
 }
 
+/* Sets the screen effect values and marks which parts changed so they get updated. */
 void func_L00_0035F8D0(int value60, int selector68, int value64, int axis69, int mode6A)
 {
     Rac2Native_acdcf1600d770d3b_ScalarConfigure116State *state = D_00188660_2;
@@ -224,6 +230,7 @@ void func_L00_0035F8D0(int value60, int selector68, int value64, int axis69, int
     }
 }
 
+/* Stores a number at an address unless the address is empty. */
 void func_L00_0035F9F0(int value, long address) {
     int *target = (int *)(int)address;
     if (target != 0)
@@ -269,6 +276,7 @@ extern int func_L00_003268E8(int);
     (HERO_VEHICLE && *(short *)(HERO_VEHICLE + 0xAA) == 0xD54 && \
      (unsigned char)HERO_VEHICLE[0x20] != 254 && (unsigned char)HERO_VEHICLE[0x20] != 253)
 
+/* Updates a pickup that glows and can be used when Ratchet stands close, or is riding the vehicle. */
 void func_L00_003603C0(unsigned char *object) {
     Vector position;
     Vector offset;
@@ -280,35 +288,35 @@ void func_L00_003603C0(unsigned char *object) {
     char *spawn;
     unsigned int shade;
     int available;
-    if (!D_L00_001A8F00) func_002E64A0(object);
+    if (!D_L00_001A8F00) UpdateEquipmentPieces(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
-        key = D_L00_001A8F80[(D_001A7AF0 >> 4) & 1];
+        key = D_L00_001A8F80[(gEquipmentBits >> 4) & 1];
         for (index = 0; D_L00_00220DA0[index]; index++) {
             slot = D_L00_00220DA0 + index;
             if (*(short *)(D_L00_00220DA0[index] + 0xAA) == key) {
-                shade = (int)(func_00283180(func_00283CE0((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
+                shade = (int)(FastSinOrCosA(IntToFloat((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
                 *(unsigned int *)(*slot + 0x78) = shade | (shade << 8) | (shade << 16);
                 *(unsigned short *)(*slot + 0x34) |= 0x10;
                 break;
             }
         }
-        ref_L00_003603C0_00(func_002ECB70, object);
-        if (func_00282E80(object + 0x10, &D_L00_001B8DC0) < 32.0f)
-            func_L00_002E6CF0(func_002E6B78, object);
+        ref_L00_003603C0_00(render_environment_mapped_object, object);
+        if (vec_distance_xy(object + 0x10, &gCameraPosition_L00) < 32.0f)
+            AddDrawCallbackToList1(DrawGroundShadowQuad, object);
     }
     if (*(short *)(private + 0xC) != 0) {
-        if (func_00282E48(object + 0x10, &D_00189EA0) > 6.1f && !HERO_RIDING_D54())
+        if (fast_vec_dist(object + 0x10, &gHeroPosition) > 6.1f && !HERO_RIDING_D54())
             *(short *)(private + 0xC) = 0;
     } else {
-        if (func_00282E80(object + 0x10, &D_00189EA0) < 8.0f || HERO_RIDING_D54()) {
-            if (func_00282E48(object + 0x10, &D_00189EA0) < 6.0f || HERO_RIDING_D54())
+        if (vec_distance_xy(object + 0x10, &gHeroPosition) < 8.0f || HERO_RIDING_D54()) {
+            if (fast_vec_dist(object + 0x10, &gHeroPosition) < 6.0f || HERO_RIDING_D54())
                 *(short *)(private + 0xC) = 1;
         }
     }
     if (*(unsigned short *)(object + 0x34) & 1) *(short *)(private + 0xC) = 0;
     if (*(short *)(private + 0xC)) {
-        available = func_002B0C28(2, 0x2798, 1) != 0;
+        available = TryClaimNotice(2, 0x2798, 1) != 0;
         if ((D_00138324 & 0x10) && available) {
             offset.q = 0;
             angles.q = 0;
@@ -317,14 +325,14 @@ void func_L00_003603C0(unsigned char *object) {
             angles.f[0] = -0.021118486f;
             angles.f[1] = 0.0588176f;
             angles.f[2] = 1.2252212f;
-            func_00283098(&position, &offset, object + 0xC0);
-            func_00282CC0(&position, &position, object + 0x10);
-            position.f[2] = func_002A89A8(&position, 0, 0.5f);
-            angles.f[2] = func_00283B98(angles.f[2], *(float *)(object + 0xF8));
-            spawn = D_00152C00 + 0x70;
+            matrix_mul_vec3(&position, &offset, object + 0xC0);
+            FastVecAdd(&position, &position, object + 0x10);
+            position.f[2] = ProbeGroundHeightBelow(&position, 0, 0.5f);
+            angles.f[2] = FastAddRotations(angles.f[2], *(float *)(object + 0xF8));
+            spawn = gHeroMoby_00152C00 + 0x70;
             qcopy(spawn, &position);
             qcopy(spawn + 0x10, &angles);
-            func_L00_003268E8(2);
+            ReleaseMatchingResource(2);
             *(short *)(spawn - 0x4A) = 0;
             D_L00_001B1AE0 = 1;
         }
@@ -342,28 +350,30 @@ extern int D_0014B540[];
 
 /* Same body as func_L00_003046D0: compares two words of a 332-byte-stride table and calls the
  * two helpers when the entry ahead is greater; returns 1. */
+/* Moves to the next cutscene chunk if it holds data, and starts it playing. */
 int func_L00_00364EE8(int index)
 {
-    int j = index + 1;
-    int *d = D_L00_001BCAC0;
-    int *b = D_0014B540;
-    int *t = (int *)((char *)b + 16040);
-    int n = d[12] * 332;
-    int hold = d[28];
-    int j4 = j * 4;
-    int cur = *(int *)((char *)t + (n + index * 4));
-    int next = *(int *)((char *)t + (j4 + n));
+    int nextIndex = index + 1;
+    int *sequence = D_L00_001BCAC0;
+    int *base = gCopySetupData;
+    int *table = (int *)((char *)base + 16040);
+    int rowOffset = sequence[12] * 332;
+    int hold = sequence[28];
+    int nextOffset = nextIndex * 4;
+    int current = *(int *)((char *)table + (rowOffset + index * 4));
+    int following = *(int *)((char *)table + (nextOffset + rowOffset));
 
-    n = next - cur;
-    if (n > 0) {
-        func_002B7B18(hold, (char *)(cur + b[3977]));
-        func_002B7CE0(0);
+    rowOffset = following - current;
+    if (rowOffset > 0) {
+        StartDiscRead(hold, (char *)(current + base[3977]));
+        PumpMusicAndDiscRead(0);
     }
     return 1;
 }
 
 extern unsigned short D_00152C26;
 
+/* Sets a flag to 1. */
 void func_L00_003672F8(void) {
     D_00152C26 = 1;
 }
@@ -375,6 +385,7 @@ void func_L00_003672F8(void) {
 extern void *r1_D_0012F86C_00367720 NOT_SDA;
 
 /* rac1-decomp src/core/001138A8.c: func_001138A8 */
+/* Returns a stored pointer value as a number. */
 int func_L00_00367720(void) {
     return (int)r1_D_0012F86C_00367720;
 }
@@ -404,6 +415,7 @@ ASM_FUNC("asm/levels", func_L00_0036EF40);
 /* Original assembly: $at as a working register and trapping add/addi; the compiler cannot emit them. */
 ASM_FUNC("asm/levels", func_L00_0036EF68);
 
+/* Does nothing and returns 0. */
 unsigned int func_L00_0036F480(void)
 {
     return 0;
@@ -445,30 +457,32 @@ extern void func_00289178(void);
 
 /* Runs the level's tick chain once: the three-argument engine reset, a gate on the resident
  * word and the boot flag, then the subsystem updates and the resident object's callback. */
+/* Runs one frame of the main update steps, then calls the update function of the level object. */
 void func_L00_0036FA68(void)
 {
     L00_0036FA68_Object *object;
 
-    func_00284E18(0, 0, 0);
-    if (ref_L00_001A8F00_00 == 0 && (D_001A7424 & 1)) {
-        if (func_002B49E0(4, 1, 1, 0, 0) == 0)
+    SetBackgroundColor(0, 0, 0);
+    if (ref_L00_001A8F00_00 == 0 && (gSaveMenuFlags & 1)) {
+        if (BeginSlotRequest(4, 1, 1, 0, 0) == 0)
             return;
     }
     if (ref_L00_0036FA68_00() != 0)
         return;
-    func_002F5220();
-    func_002E4AC8();
-    func_002B9390();
-    func_L00_00310048();
+    ResetFrameCounters();
+    UpdateSoundVoices();
+    UpdateParticles();
+    CountActiveRecords();
     object = ref_L00_001AC0C0_00;
     object->field64(object);
-    func_002F52B8();
-    func_00289178();
+    UpdateIdleFrameCounters();
+    UpdateSubtitleStateMachine();
 }
 
 
 /* func_L00_00373D40 is defined in L00_00373D40-g8.c. */
 
+/* Empty function that does nothing. */
 void func_L00_00373F40(void)
 {
 }
@@ -480,26 +494,28 @@ void func_L00_00373F40(void)
 extern int D_0022F810;
 
 /* Dispatch on a mode word: mode 1 goes through the recording wrapper, the other modes replay. */
+/* Picks what to do for the current mode of the menu. */
 void func_L00_00374B98(void)
 {
     switch (D_0022F810) {
     case 0:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     case 1:
-        func_L00_00374B78();
+        CallMenuUpdate();
         break;
     case 2:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     case 3:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     }
 }
 
 extern void func_3747B0(void);
 
+/* Calls the menu update function. */
 void func_L00_00374B78(void) {
     func_3747B0();
 }
@@ -516,31 +532,31 @@ void func_L00_00374B78(void) {
 void func_L00_003778F0(void) {
     PanelColors colors;
     char text[256];
-    char *model = (char *)&D_L00_0022F7C0;
+    char *model = (char *)&gPurchaseMenuModel;
     int index = *(int *)(model + 0x80);
     colors = D_L00_001AD768;
     D_L00_001B1BB8[1] = 0;
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
+    DrawHudSpriteGradient(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
                   192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
+    DrawHudSpriteGradient(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
                   -192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
+    DrawHudSpriteGradient(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
                   192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
+    DrawHudSpriteGradient(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
                   -192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0027FA10(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL,
-                  (unsigned char *)func_00288FB8(0x318C), -1);
-    func_002F9BC0(text, D_L00_0022F7C0.items[index].price);
-    func_0027F5B8(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
-    func_0027FB40(D_001A7340 >> 1, (int)(D_L00_001B25E0 * 277.0f + 0.5f), 0x80F0F0F0ULL,
-                  D_L00_0022F7C0.items[index].name, -1);
+    DrawTextRightAlignedMediumFont(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL,
+                  (unsigned char *)GetLocalizedString(0x318C), -1);
+    FormatNumberWithSeparators_002F9BC0(text, gPurchaseMenuModel.items[index].price);
+    DrawTextMediumFont(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
+    DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_L00_001B25E0 * 277.0f + 0.5f), 0x80F0F0F0ULL,
+                  gPurchaseMenuModel.items[index].name, -1);
     colors.word[3] = 0x60F0F0B0;
     colors.word[2] = 0x60F0F0B0;
     colors.word[1] = 0x60F0F0B0;
     colors.word[0] = 0x60F0F0B0;
-    func_002F9BC0(text, D_001A79FC);
-    func_0027F980(444, 17, 0x80FFFFFFULL, (unsigned char *)text, -1);
-    func_0028EA58(func_0028E588(0xEAA2, 3), 458, (int)(D_L00_001B25E0 * 15.0f + 0.5f),
+    FormatNumberWithSeparators_002F9BC0(text, D_001A79FC);
+    DrawTextRightAlignedSmallFont(444, 17, 0x80FFFFFFULL, (unsigned char *)text, -1);
+    DrawHudSpriteGradient(GetIconFrame(0xEAA2, 3), 458, (int)(D_L00_001B25E0 * 15.0f + 0.5f),
                   32, (int)(D_L00_001B25E0 * 32.0f + 0.5f), colors.word);
 }
 
@@ -558,12 +574,12 @@ void func_L00_00378818(void) {
     /* This 24-byte workspace becomes the four-color array after drawing text. */
     union { TextLayout layout; unsigned int colors[4]; } seed;
     char text[256];
-    PurchaseModel *model = (PurchaseModel *)&D_L00_0022F7C0;
+    PurchaseModel *model = (PurchaseModel *)&gPurchaseMenuModel;
     int index;
     int message;
     unsigned short unit_price;
     if (model->active == 0) return;
-    func_00115484(&seed.layout, 0, 24);
+    memset(&seed.layout, 0, 24);
     seed.layout.field[0] = 120;
     seed.layout.field[1] = (short)(D_L00_001B25E0 * 200.0f + 0.5f);
     seed.layout.field[2] = 160;
@@ -578,37 +594,37 @@ void func_L00_00378818(void) {
     index = model->index;
     if (model->entries[index].kind == 1) {
         int selected_id = model->entries[index].id;
-        unit_price = ((ShopClass *)D_L00_00262570)[D_00139568[selected_id]].price;
-        if ((int)unit_price <= D_001A79F8) {
+        unit_price = ((ShopClass *)gWeaponTable_L00)[gItemSlotToRecord[selected_id]].price;
+        if ((int)unit_price <= gPlayerBolts) {
             copy.field[9] = 1;
             copy.field[5] = (short)((float)(copy.field[0] + 12) * D_L00_001B25E0 + 0.5f);
-            func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1127), -1);
-            func_00115DA8(text, D_L00_001AD798, D_L00_001B25A8);
+            DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1127), -1);
+            Sprintf(text, D_L00_001AD798, D_L00_001B25A8);
             copy.field[5] = (short)((float)(copy.field[0] + 40) * D_L00_001B25E0 + 0.5f);
-            func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)text, -1);
-            func_00115DA8(text, D_L00_001AD6C8, (unsigned int)D_L00_001B25A8 *
-                ((ShopClass *)D_L00_00262570)[D_00139568[model->entries[model->index].id]].price);
-            func_0027FA10(256, (int)(D_L00_001B25E0 * 180.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
+            DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, (unsigned char *)text, -1);
+            Sprintf(text, D_L00_001AD6C8, (unsigned int)D_L00_001B25A8 *
+                ((ShopClass *)gWeaponTable_L00)[gItemSlotToRecord[model->entries[model->index].id]].price);
+            DrawTextRightAlignedMediumFont(256, (int)(D_L00_001B25E0 * 180.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
             seed.colors[0] = 0x60F0F0B0;
             seed.colors[1] = 0x60F0F0B0;
             seed.colors[2] = 0x60F0F0B0;
             seed.colors[3] = 0x60F0F0B0;
-            func_0028EA58(func_0028E588(0x7567, 0), 260, (int)(D_L00_001B25E0 * 180.0f + 0.5f),
+            DrawHudSpriteGradient(GetIconFrame(0x7567, 0), 260, (int)(D_L00_001B25E0 * 180.0f + 0.5f),
                           16, (int)(D_L00_001B25E0 * 16.0f + 0.5f), seed.colors);
             return;
         }
         message = 0x1128;
     } else {
-        if (D_001A79F8 >= func_002F6510()) {
+        if (gPlayerBolts >= GetSelectedShopItemPrice()) {
             copy.field[9] = 1;
             copy.field[5] = (short)((float)(copy.field[0] + 6) * D_L00_001B25E0 + 0.5f);
             message = 0x1129;
         } else goto no_money;
     }
-    func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(message), -1);
+    DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(message), -1);
     return;
 no_money:
-    func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1128), -1);
+    DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1128), -1);
 }
 
 /* Measured rows of the confirmation prompt: the price is their first word. */
@@ -627,7 +643,7 @@ extern void *memset(void *, int, unsigned int);
 void func_L00_00378C18(void) {
     TextLayout copy;
     TextLayout layout;
-    ConfirmModel *model = (ConfirmModel *)&D_L00_0022F7C0;
+    ConfirmModel *model = (ConfirmModel *)&gPurchaseMenuModel;
     int top;
     float scale;
     if (model->active == 0) return;
@@ -645,12 +661,12 @@ void func_L00_00378C18(void) {
     layout.field[8] = 16;
     layout.field[9] = 3;
     copy = layout;
-    if (D_001A79F8 >= model->rows[model->index].price) {
+    if (gPlayerBolts >= model->rows[model->index].price) {
         copy.field[9] = 1;
         copy.field[5] = (short)((float)(copy.field[0] + 40) * scale + 0.5f);
-        func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1129), -1);
+        DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1129), -1);
     } else {
-        func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1128), -1);
+        DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1128), -1);
     }
 }
 
@@ -662,6 +678,7 @@ void func_L00_00378C18(void) {
 
 /* func_L00_0037A610 is defined in L00_0037A610-g8.c. */
 
+/* Empty function that does nothing. */
 void func_L00_0037AF58(void)
 {
 }

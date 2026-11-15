@@ -15,28 +15,29 @@ struct SpawnState {
 };
 
 /* Creates the 0xB24 object, seeds its state block and copies the two vectors in. */
-u8 *func_L01_003DA300(u8 *a0, u8 *a1, u8 *a2, f32 f12)
+/* Creates a thrown object, sets up its state and copies the start position and target into it. */
+u8 *func_L01_003DA300(u8 *spawnPosition, u8 *targetPosition, u8 *ownerHandle, f32 weight)
 {
-    u8 *s1;
+    u8 *newMoby;
     struct SpawnState *state;
 
-    s1 = func_0029EFD0(0xB24);
-    if (s1 != 0) {
-        *(u8 *)(s1 + 0x30) = 0xFF;
-        *(u16 *)(s1 + 0x32) = 0xFF;
-        *(u8 *)(s1 + 0x31) = 1;
-        *(u8 *)(s1 + 0x20) = 0;
-        state = *(struct SpawnState **)(s1 + 0x68);
-        *(f32 *)(s1 + 0xF8) = func_002A7940();
-        *(f32 *)(s1 + 0xF4) = func_002A7940();
-        *(f32 *)(s1 + 0xF0) = func_002A7940();
-        *(f32 *)(s1 + 0x2C) = *(f32 *)(*(u8 **)(s1 + 0x24) + 0x24) * D_L01_001B0828;
-        state->handle = a2;
-        state->weight = f12;
-        qcopy(s1 + 0x10, a0);
-        qcopy(&state->position, a1);
-        if (*(u8 *)(s1 + 0x43) != 0)
-            func_002A7470(s1, 0, 0, 0xA);
+    newMoby = CreateMoby(0xB24 /* moby class 2852 */);
+    if (newMoby != 0) {
+        *(u8 *)(newMoby + 0x30) = 0xFF;
+        *(u16 *)(newMoby + 0x32) = 0xFF;
+        *(u8 *)(newMoby + 0x31) = 1;
+        *(u8 *)(newMoby + 0x20) = 0;
+        state = *(struct SpawnState **)(newMoby + 0x68);
+        *(f32 *)(newMoby + 0xF8) = RandomAngle();
+        *(f32 *)(newMoby + 0xF4) = RandomAngle();
+        *(f32 *)(newMoby + 0xF0) = RandomAngle();
+        *(f32 *)(newMoby + 0x2C) = *(f32 *)(*(u8 **)(newMoby + 0x24) + 0x24) * D_L01_001B0828;
+        state->handle = ownerHandle;
+        state->weight = weight;
+        qcopy(newMoby + 0x10, spawnPosition);
+        qcopy(&state->position, targetPosition);
+        if (*(u8 *)(newMoby + 0x43) != 0)
+            StartAnimationBlended(newMoby, 0, 0, 0xA);
     }
-    return s1;
+    return newMoby;
 }

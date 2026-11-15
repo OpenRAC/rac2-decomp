@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -41,25 +42,25 @@ extern u8 *func_0029EFD0(s32);
 
 /* Allocates the object, records it in the word its key selects and fills its fields and the
  * level block; the caller's record is copied in when the level word is set. */
-u8 *func_L22_003B8FE8(u8 *arg0, TI128 *arg1) {
+u8 *func_L22_003B8FE8(u8 *hero, TI128 *position) {
     u8 *obj;
     u8 *payload;
-    s32 *word;
+    s32 *slot;
 
-    obj = func_0029EFD0(0x5F3);
-    word = &ref_L22_003B8FE8_00;
-    if (arg0 == (u8 *)D_0018C0B0[0]) {
-        word = &ref_L22_003B8FE8_01;
+    obj = CreateMoby(0x5F3 /* moby class 1523 */);
+    slot = &ref_L22_003B8FE8_00;
+    if (hero == (u8 *)gHeroMoby_0018C0B0[0]) {
+        slot = &ref_L22_003B8FE8_01;
     }
-    if (obj != 0 && *word == 0) {
+    if (obj != 0 && *slot == 0) {
         *(u8 *)(obj + 0x30) = 0xFF;
         *(s16 *)(obj + 0x32) = 0xFF;
         *(u8 *)(obj + 0x31) = 1;
-        *(u8 **)(obj + 0xB8) = arg0;
+        *(u8 **)(obj + 0xB8) = hero;
         *(u8 *)(obj + 0x20) = 0;
         payload = *(u8 **)(obj + 0x68);
-        *(TI128 *)(obj + 0x10) = *arg1;
-        *word = (s32)obj;
+        *(TI128 *)(obj + 0x10) = *position;
+        *slot = (s32)obj;
         D_L22_001A8AB4[0] = 0xFF;
         D_L22_001A8AC4[0] = 0x00FFFFFF;
         D_L22_001A8AC8[0] = 0x1F00000042LL;
@@ -67,13 +68,13 @@ u8 *func_L22_003B8FE8(u8 *arg0, TI128 *arg1) {
         D_L22_001A8AB0 = 0;
         D_L22_001A8AC0 = 0;
         *(s32 *)(payload + 0x10) = 0;
-        *(s16 *)(payload + 0x2C) = func_00291308(arg1, 0, 0.0f, 0.0f);
+        *(s16 *)(payload + 0x2C) = AddPointLight(position, 0, 0.0f, 0.0f);
     }
     if (D_L22_001A8FF0 != 0) {
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x100;
-        *(TI128 *)(obj + 0xC0) = *(TI128 *)(arg0 + 0xC0);
-        *(TI128 *)(obj + 0xD0) = *(TI128 *)(arg0 + 0xD0);
-        *(TI128 *)(obj + 0xE0) = *(TI128 *)(arg0 + 0xE0);
+        *(TI128 *)(obj + 0xC0) = *(TI128 *)(hero + 0xC0);
+        *(TI128 *)(obj + 0xD0) = *(TI128 *)(hero + 0xD0);
+        *(TI128 *)(obj + 0xE0) = *(TI128 *)(hero + 0xE0);
     }
     return obj;
 }

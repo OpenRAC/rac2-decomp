@@ -16,28 +16,29 @@ extern float D_L02_001B0380 __attribute__((sda));
 /* Integer duration counter: readers use integer loads; this store is absolute. */
 extern int D_L02_001B3FD8 NOT_SDA;
 
-void func_L02_003D6DF8(char *a0) {
-    char *s0 = a0;
-    char *s1 = *(char **)(s0 + 0x68);
-    TI128 v[2];
-    float f;
+/* Sets up a moving platform when it first appears: sets its turn speed, its timer and its starting state. */
+void func_L02_003D6DF8(char *mobyArg) {
+    char *moby = mobyArg;
+    char *vars = *(char **)(moby + 0x68);
+    TI128 rotation[2];
+    float seconds;
 
-    if (*(unsigned char *)(s0 + 0x20) != 0)
+    if (*(unsigned char *)(moby + 0x20) != 0)
         return;
-    *(unsigned char *)(s1 + 0x9) = 0;
-    *(unsigned char *)(s1 + 0x8) = 3;
-    *(int *)(s1 + 0x10) = 0;
-    *(unsigned short *)(s0 + 0x34) &= 0xEFFF;
-    func_002A7750((u8 *)s0, 2, -1);
-    v[1] = 0;
-    *(float *)&v[1] = D_L02_001B0380 * 0.0002908882452175021f;
-    v[0] = v[1];
-    func_002833F0((char *)(s1 + 0x80), (char *)&v[0]);
-    f = 180.0f / D_L02_001B0380;
-    *(unsigned short *)(s0 + 0x34) |= 0x100;
-    D_L02_001B3FD8 = (int)(f * 60.0f);
-    func_L02_003D6EE0(s0);
-    func_L00_00323958(s0, s1 + 0x30);
-    *(int *)(s1 + 0xBC) = 0;
-    *(short *)(s1 + 0xC0) = -1;
+    *(unsigned char *)(vars + 0x9) = 0;
+    *(unsigned char *)(vars + 0x8) = 3;
+    *(int *)(vars + 0x10) = 0;
+    *(unsigned short *)(moby + 0x34) &= 0xEFFF;
+    SetMobyState((u8 *)moby, 2, -1);
+    rotation[1] = 0;
+    *(float *)&rotation[1] = D_L02_001B0380 * 0.0002908882452175021f;
+    rotation[0] = rotation[1];
+    euler_rotation_basis((char *)(vars + 0x80), (char *)&rotation[0]);
+    seconds = 180.0f / D_L02_001B0380;
+    *(unsigned short *)(moby + 0x34) |= 0x100;
+    D_L02_001B3FD8 = (int)(seconds * 60.0f);
+    FindNearbyRecordForMoby(moby);
+    UpdateAttachedObjectTransforms(moby, vars + 0x30);
+    *(int *)(vars + 0xBC) = 0;
+    *(short *)(vars + 0xC0) = -1;
 }

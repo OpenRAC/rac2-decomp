@@ -69,25 +69,25 @@ void func_L14_004221D8(char *self)
     v[0] = 0;
     v[1] = st->height;
     v[2] = 0;
-    func_00282CC0(&st->next, &st->pos, v);
+    FastVecAdd(&st->next, &st->pos, v);
     /* The new head is copied back into v as well; v is not used again. */
     qcopy(v, &st->next);
     D_L14_001B1618 = 20;
-    func_L11_0046BC08(self);
+    ResetBoltPointsToLine(self);
 
     if (st->dirty != 0) {
-        func_L14_00422498(self);
+        RebuildLightningBolt(self);
         count = D_L14_001B1618;
         src = D_L14_001FE1C0[st->shape];
         for (i = count - 4; i < count; i++) {
             qcopy_nc(&D_L14_002594F0[st->row][i * 16], src + i * 16 + 0x10);
         }
-        func_L00_002E6EF8(func_L14_004228C0, self);
+        AddDrawCallbackToList3(DrawRibbonPair, self);
     }
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         st->dirty = 0;
-        st->handle = func_00291308((float *)&st->pos, 0.0f, 0.0f, 0);
+        st->handle = AddPointLight((float *)&st->pos, 0.0f, 0.0f, 0);
         *(unsigned char *)(self + 0x20) = 1;
         st->count = D_L14_001B1618;
         st->coreColor = D_L14_001B1680;
@@ -111,7 +111,7 @@ void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAl
     /* Each pass declares its own zero constant; one shared constant changes the code. */
     const float zero = 0.0f;
     RibbonOwnerState *state = *(RibbonOwnerState **)(object + 0x68);
-    long texture = func_0027C878(D_L14_001B16A8);
+    long texture = GetEffectTextureDescriptor(D_L14_001B16A8);
 
     core.flags = 0x8000000048L;
     core.mode = 0xFF9000000260L;
@@ -122,7 +122,7 @@ void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAl
     core.color[2] = coreColor;
     core.color[1] = coreColor;
     core.color[0] = coreColor;
-    halo.texture = func_0027C878(D_L14_001B16AC);
+    halo.texture = GetEffectTextureDescriptor(D_L14_001B16AC);
     haloColor = state->haloColor | (outerAlpha << 24);
     halo.flags = core.flags;
     halo.mode = core.mode;
@@ -150,27 +150,27 @@ void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAl
     core.uv[7] = 1.0f;
 
     /* First core segment. */
-    func_00282CF0(eye, points, D_L14_001B9500);
-    func_00282CF0(tangent, &points[1], points);
-    func_00282DD8(normal, tangent, eye);
-    initialLength = func_00282DF0(normal);
+    FastVecSub(eye, points, D_L14_001B9500);
+    FastVecSub(tangent, &points[1], points);
+    FastVecCross(normal, tangent, eye);
+    initialLength = FastVecLength(normal);
     if (initialLength != zero)
         initialLength = 1.0f / initialLength;
-    func_00282D30(normal, normal, coreWidth * initialLength);
-    func_00282CC0(coreVertices[0], points, normal);
-    func_00282CF0(coreVertices[1], points, normal);
+    FastVecScale(normal, normal, coreWidth * initialLength);
+    FastVecAdd(coreVertices[0], points, normal);
+    FastVecSub(coreVertices[1], points, normal);
 
     for (i = 1; i < count - 1; i++) {
         float coreZero = 0.0f;
-        func_00282CF0(eye, &points[i], D_L14_001B9500);
-        func_00282CF0(tangent, &points[i + 1], &points[i]);
-        func_00282DD8(normal, tangent, eye);
-        length = func_00282DF0(normal);
+        FastVecSub(eye, &points[i], D_L14_001B9500);
+        FastVecSub(tangent, &points[i + 1], &points[i]);
+        FastVecCross(normal, tangent, eye);
+        length = FastVecLength(normal);
         if (length != coreZero)
             length = 1.0f / length;
-        func_00282D30(normal, normal, coreWidth * length);
-        func_00282CC0(coreVertices[2], &points[i], normal);
-        func_00282CF0(coreVertices[3], &points[i], normal);
+        FastVecScale(normal, normal, coreWidth * length);
+        FastVecAdd(coreVertices[2], &points[i], normal);
+        FastVecSub(coreVertices[3], &points[i], normal);
         if (i == 1) {
             core.color[1] = D_L14_001B1680;
             core.color[0] = D_L14_001B1680;
@@ -181,7 +181,7 @@ void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAl
             core.color[1] = coreColor;
             core.color[0] = coreColor;
         }
-        func_00280B90(coreVertices, 0, 0);
+        draw_world_quad(coreVertices, 0, 0);
         qcopy(coreVertices[0], coreVertices[2]);
         qcopy(coreVertices[1], coreVertices[3]);
     }
@@ -189,37 +189,37 @@ void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAl
     /* The halo omits the final core segment. */
     for (i = 0; i < count - 2; i++) {
         float haloZero = 0.0f;
-        func_00282CF0(firstRay, &points[i], D_L14_001B9500);
-        func_00282CF0(lastRay, &points[i + 1], D_L14_001B9500);
-        firstLength = func_00282DF0(firstRay);
-        lastLength = func_00282DF0(lastRay);
+        FastVecSub(firstRay, &points[i], D_L14_001B9500);
+        FastVecSub(lastRay, &points[i + 1], D_L14_001B9500);
+        firstLength = FastVecLength(firstRay);
+        lastLength = FastVecLength(lastRay);
         if (lastLength < firstLength) {
             if (lastLength == haloZero)
                 qcopy(lastRay, firstRay);
             else
-                func_00282D30(lastRay, lastRay, firstLength / lastLength);
+                FastVecScale(lastRay, lastRay, firstLength / lastLength);
         } else {
             if (firstLength == haloZero)
                 qcopy(firstRay, lastRay);
             else
-                func_00282D30(firstRay, firstRay, lastLength / firstLength);
+                FastVecScale(firstRay, firstRay, lastLength / firstLength);
         }
-        func_00282CC0(first, D_L14_001B9500, firstRay);
-        func_00282CC0(last, D_L14_001B9500, lastRay);
-        func_00282CF0(tangent, last, first);
-        func_00282D30(extension, tangent, extend);
-        func_00282CF0(first, first, extension);
-        func_00282CC0(last, last, extension);
-        func_00282CF0(toEye, D_L14_001B9500, first);
-        func_00282DD8(normal, toEye, tangent);
-        haloLength = func_00282DF0(normal);
+        FastVecAdd(first, D_L14_001B9500, firstRay);
+        FastVecAdd(last, D_L14_001B9500, lastRay);
+        FastVecSub(tangent, last, first);
+        FastVecScale(extension, tangent, extend);
+        FastVecSub(first, first, extension);
+        FastVecAdd(last, last, extension);
+        FastVecSub(toEye, D_L14_001B9500, first);
+        FastVecCross(normal, toEye, tangent);
+        haloLength = FastVecLength(normal);
         if (haloLength != haloZero)
             haloLength = 1.0f / haloLength;
-        func_00282D30(widthVector, normal, haloWidth * haloLength);
-        func_00282CC0(haloVertices[0], first, widthVector);
-        func_00282CF0(haloVertices[1], first, widthVector);
-        func_00282CC0(haloVertices[2], last, widthVector);
-        func_00282CF0(haloVertices[3], last, widthVector);
+        FastVecScale(widthVector, normal, haloWidth * haloLength);
+        FastVecAdd(haloVertices[0], first, widthVector);
+        FastVecSub(haloVertices[1], first, widthVector);
+        FastVecAdd(haloVertices[2], last, widthVector);
+        FastVecSub(haloVertices[3], last, widthVector);
         if (i == 0) {
             halo.color[1] = D_L14_001B1684;
             halo.color[0] = D_L14_001B1684;
@@ -230,8 +230,8 @@ void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAl
             halo.color[1] = haloColor;
             halo.color[0] = haloColor;
         }
-        func_00280B90(haloVertices, 0, 0);
+        draw_world_quad(haloVertices, 0, 0);
     }
 
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
 }

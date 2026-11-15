@@ -27,29 +27,29 @@ extern int func_L04_0040A1D0(int);
    0x840 takes the entry if its flag is set or func_L04_0040A1D0 of the previous entry
    is positive (sound 4, else 5), and 0x10 ends through func_L04_0040AC30. loop.c
    reverses the count-up slot loop, so its counter is set after the hoisted -1. */
-void func_L04_0040BA68(char *m, char *p)
+void func_L04_0040BA68(char *controller, char *vars)
 {
     int done = 0;
     int *slot, i;
     char *obj, *extra, *child, *base;
     if (!D_L04_001B0978) {
         D_L04_001A8ED0[5] = 1;
-        func_00132AF8(0x5d); func_002B72E8(0); func_00132028();
+        SendSoundCommand22(0x5d); music_Pause(0); snd_Pump();
         D_L04_001A8ED0[0] = 1;
-        func_L04_0040A3B8(m,0);
-        D_L04_001B0904 = D_L04_001B090C;
+        ResetRacerState(controller,0);
+        gSelectedRaceIndex = gCurrentRaceIndex;
         D_L04_001B0978 = 1;
     }
-    if (S32_AT(D_00189E20,0x2294) != 0x31) func_L04_002E7C08(0x31,1);
-    U16_AT(m,0x34) |= 0x41;
-    if (S32_AT(p,0x1dc) != -1) {
-        obj = D_L04_001B24DC + (S32_AT(p,0x1dc) << 8);
+    if (S32_AT(gHeroState,0x2294) != 0x31) EnterHeroState_L04(0x31,1);
+    U16_AT(controller,0x34) |= 0x41;
+    if (S32_AT(vars,0x1dc) != -1) {
+        obj = gMobyPool_L04 + (S32_AT(vars,0x1dc) << 8);
         extra = D_L04_001B08F4;
         U16_AT(obj,0x34) |= 0x41;
         if (extra) U16_AT(extra,0x34) |= 0x41;
     }
-    base=D_L04_001B24DC;
-    slot=(int *)(p+0x1e4);
+    base=gMobyPool_L04;
+    slot=(int *)(vars+0x1e4);
     for (i=0;i<21;i++) {
         if (slot[i] != -1) {
             obj=base+(slot[i]<<8);
@@ -58,32 +58,32 @@ void func_L04_0040BA68(char *m, char *p)
             if (child) U16_AT(child,0x34)|=0x41;
         }
     }
-    func_L04_0040E248(m,p);
-    S32_AT(D_00189E20,0x24a0)=26;
-    D_00189E20[0x22b5]=1;
-    S32_AT(PTR_AT(D_00189E20,0x2290),0x98)=0;
-    if (S32_AT(D_00138180,0x1c4)&0x8000) {
-        func_002E5E58(3,0,0);
-        D_L04_001B0904=D_L04_001B0904-1;
-        if (D_L04_001B0904 < 0) D_L04_001B0904=4;
-    } else if (S32_AT(D_00138180,0x1c4)&0x2000) {
-        func_002E5E58(3,0,0);
-        D_L04_001B0904=D_L04_001B0904+1;
-        if (D_L04_001B0904 >= 5) D_L04_001B0904=0;
+    ReleaseRacerSoundHandles(controller,vars);
+    S32_AT(gHeroState,0x24a0)=26;
+    gHeroState[0x22b5]=1;
+    S32_AT(PTR_AT(gHeroState,0x2290),0x98)=0;
+    if (S32_AT(gPadState,0x1c4)&0x8000) {
+        PlaySoundFromGlobalBank(3,0,0);
+        gSelectedRaceIndex=gSelectedRaceIndex-1;
+        if (gSelectedRaceIndex < 0) gSelectedRaceIndex=4;
+    } else if (S32_AT(gPadState,0x1c4)&0x2000) {
+        PlaySoundFromGlobalBank(3,0,0);
+        gSelectedRaceIndex=gSelectedRaceIndex+1;
+        if (gSelectedRaceIndex >= 5) gSelectedRaceIndex=0;
     }
-    if (S32_AT(D_00138180,0x1c4)&0x840) {
-        if ((D_L04_002C63C0.entry[D_L04_001B0904].flags&0x10000000) || (D_L04_001B0904>0 && func_L04_0040A1D0(D_L04_001B0904-1)>0)) {
-            func_002E5E58(4,0,0); done=1;
-            D_L04_001B090C=D_L04_001B0904;
-            m[0xbc]=2;
-        } else func_002E5E58(5,0,0);
-    } else if (S32_AT(D_00138180,0x1c4)&0x10) {
-        func_002E5E58(4,0,0);done=1;
-        func_L04_0040AC30(m,p);
-        S32_AT(p,0x320)=-1;m[0x20]=4;
+    if (S32_AT(gPadState,0x1c4)&0x840) {
+        if ((gRaceChallengeTable.entry[gSelectedRaceIndex].flags&0x10000000) || (gSelectedRaceIndex>0 && GetCourseWinCount(gSelectedRaceIndex-1)>0)) {
+            PlaySoundFromGlobalBank(4,0,0); done=1;
+            gCurrentRaceIndex=gSelectedRaceIndex;
+            controller[0xbc]=2;
+        } else PlaySoundFromGlobalBank(5,0,0);
+    } else if (S32_AT(gPadState,0x1c4)&0x10) {
+        PlaySoundFromGlobalBank(4,0,0);done=1;
+        ReleaseRacerLinkState(controller,vars);
+        S32_AT(vars,0x320)=-1;controller[0x20]=4;
     }
     if (done) {
-        func_00132B28(0x5d);func_002B7320();func_00132028();
+        SendSoundCommand23(0x5d);music_Unpause();snd_Pump();
         D_L04_001A8ED0[5]=0;D_L04_001A8ED0[0]=0;D_L04_001B0978=0;
     }
 }

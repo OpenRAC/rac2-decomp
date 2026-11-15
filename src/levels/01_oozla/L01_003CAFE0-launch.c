@@ -27,40 +27,41 @@ typedef struct { int delay, startId, endId, unused; int first[2], second[2]; int
 #define FIELD(o) (*(int *)(data + (o)))
 #define HALF(o) (*(short *)(data + (o)))
 #define POOL (*(PoolRecord64 **)(data + 0x34))
-void func_L01_003D2890(unsigned char *self)
+/* Launcher that waits for a trigger, then fires shots along its path points on a timer. It shows a glow while the hero is nearby. */
+void func_L01_003D2890(unsigned char *moby)
 {
-    LaunchState *state = *(LaunchState **)(self + 0x68);
+    LaunchState *state = *(LaunchState **)(moby + 0x68);
     unsigned char *data = (unsigned char *)state;
     LaunchVector point, target;
     int i, command;
     int *firstIDs, *secondIDs;
-    switch (self[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         POOL = 0;
         for (i = 0; i < 2; i++) {
             if (state->first[i] == -1) {
-                func_0026FEB8(D_L01_001B0548, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
-                func_002A7750(self, 4, -1);
+                STUB_printf(D_L01_001B0548, *(short *)(moby + 0xaa), *(short *)(moby + 0xb2), i);
+                SetMobyState(moby, 4, -1);
             }
             if (state->second[i] == -1) {
-                func_0026FEB8(D_L01_001B0580, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
-                func_002A7750(self, 4, -1);
+                STUB_printf(D_L01_001B0580, *(short *)(moby + 0xaa), *(short *)(moby + 0xb2), i);
+                SetMobyState(moby, 4, -1);
             }
         }
-        if (self[0x20] == 0) func_002A7750(self, 1, -1);
+        if (moby[0x20] == 0) SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (self[0xbc]) {
-            D_L01_001B255C[FIELD(4) * 256 + 0xbc] = 1;
+        if (moby[0xbc]) {
+            gMobyTable_L01[FIELD(4) * 256 + 0xbc] = 1;
             FIELD(0x28) = 0;
-            self[0xbc] = 0;
+            moby[0xbc] = 0;
             FIELD(0x3c) = 0;
             FIELD(0x2c) = FIELD(0x24);
-            func_002A7750(self, 2, -1);
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_00282948((int *)(data + 0x28))) {
+        if (FastFloatHelperD((int *)(data + 0x28))) {
             command = D_L01_00297BF0[FIELD(0x3c)];
             switch (command) {
             case 0: HALF(0x30) = 0; HALF(0x32) = 0; break;
@@ -75,27 +76,27 @@ void func_L01_003D2890(unsigned char *self)
                 index = state->second[selection];
                 qcopy_nc(&point, base + index * 128 + 0x30);
                 qcopy_nc(&target, base + index * 128 + 0x70);
-                func_L01_003D25B8(self, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30));
+                SpawnChildMoby_L01(moby, &point, &target, HALF(0x32) + 0xa9e /* moby class 2718 */, HALF(0x30));
             }
             {
                 int triggerIndex = FIELD(8);
                 state->timer = FIELD(0);
-                D_L01_001B255C[triggerIndex * 256 + 0xbc] = 1;
+                gMobyTable_L01[triggerIndex * 256 + 0xbc] = 1;
             }
         }
         if (FIELD(0x28) < FIELD(0) - 40)
-            D_L01_001B255C[FIELD(8) * 256 + 0xbc] = 0;
-        if (func_00282948((int *)(data + 0x2c))) func_002A7750(self, 3, -1);
+            gMobyTable_L01[FIELD(8) * 256 + 0xbc] = 0;
+        if (FastFloatHelperD((int *)(data + 0x2c))) SetMobyState(moby, 3, -1);
         break;
     case 3:
-        D_L01_001B255C[FIELD(4) * 256 + 0xbc] = 0;
-        func_002A8598(self[0x21], 0);
-        func_002A7750(self, 1, -1);
+        gMobyTable_L01[FIELD(4) * 256 + 0xbc] = 0;
+        SetByteOnGroupMobys(moby[0x21], 0);
+        SetMobyState(moby, 1, -1);
         break;
     }
-    if (self[0x20] == 2 && FIELD(0x38) != -1 && func_002ACBC8(D_00189EA0, FIELD(0x38))) {
+    if (moby[0x20] == 2 && FIELD(0x38) != -1 && IsPointInCuboid(gHeroPosition, FIELD(0x38))) {
         if (POOL == 0) {
-            POOL = func_L00_002D70A0(5);
+            POOL = AllocCameraOverrideSlot(5);
             qzero((unsigned char *)POOL + 0x20);
             *(float *)((unsigned char *)POOL + 0x20) = -1.0f;
             POOL->f24 = 1;
@@ -104,7 +105,7 @@ void func_L01_003D2890(unsigned char *self)
             POOL->f30 = 1;
         }
     } else if (POOL) {
-        func_L00_002D7140((unsigned char *)POOL);
+        EndCameraOverride((unsigned char *)POOL);
         POOL = 0;
     }
 }

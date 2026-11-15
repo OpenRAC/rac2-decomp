@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef unsigned int u32;
@@ -35,7 +36,7 @@ void func_0031A158(char *obj)
     char *p0;
     char *p1;
 
-    f.packet.texture = func_0027C878(14);
+    f.packet.texture = GetEffectTextureDescriptor(14);
     p1 = st + 0x300;
     p0 = st + 0x2F0;
     f.axis = 0;
@@ -49,21 +50,21 @@ void func_0031A158(char *obj)
     f.packet.color[2] = 0x1F7F7F7F;
     ((float *)&f.axis)[2] = 0.05000000074505806f;
     ref_0031A158_00(&f.packet);
-    func_00282CF0(f.a, p1, p0);
-    func_00282F20(f.a, f.a, 1.0f);
-    func_00282CF0(f.b, ref_0031A158_01, p0);
-    func_00282DD8(f.c, f.b, f.a);
-    func_00282F20(f.c, f.c, 1.0f);
-    func_00282DD8(f.b, f.a, f.c);
+    FastVecSub(f.a, p1, p0);
+    vec_scale_to_length(f.a, f.a, 1.0f);
+    FastVecSub(f.b, ref_0031A158_01, p0);
+    FastVecCross(f.c, f.b, f.a);
+    vec_scale_to_length(f.c, f.c, 1.0f);
+    FastVecCross(f.b, f.a, f.c);
     f.dead = *(TI128 *)p0;
     f.packet.position[0] = f.axis;
-    func_00282D30(&f.packet.position[1], &f.packet.position[0], -1.0f);
-    func_002830C0(&f.packet.position[0], &f.packet.position[0], f.a);
-    func_002830C0(&f.packet.position[1], &f.packet.position[1], f.a);
+    FastVecScale(&f.packet.position[1], &f.packet.position[0], -1.0f);
+    transform_vector(&f.packet.position[0], &f.packet.position[0], f.a);
+    transform_vector(&f.packet.position[1], &f.packet.position[1], f.a);
     f.dead = *(TI128 *)p1;
     f.packet.position[2] = f.axis;
-    func_00282D30(&f.packet.position[3], &f.packet.position[2], -1.0f);
-    func_002830C0(&f.packet.position[2], &f.packet.position[2], f.a);
-    func_002830C0(&f.packet.position[3], &f.packet.position[3], f.a);
-    func_00280B90(&f.packet, 0, 0);
+    FastVecScale(&f.packet.position[3], &f.packet.position[2], -1.0f);
+    transform_vector(&f.packet.position[2], &f.packet.position[2], f.a);
+    transform_vector(&f.packet.position[3], &f.packet.position[3], f.a);
+    draw_world_quad(&f.packet, 0, 0);
 }

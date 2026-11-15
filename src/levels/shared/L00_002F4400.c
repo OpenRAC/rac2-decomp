@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int f0;
@@ -18,13 +19,15 @@ extern void func_2F4490(int, int);
 
 extern int r1_func_0011CC38();
 
+/* Does nothing. */
 void func_L00_002F4400(void)
 {
 }
 
 
+/* Clears the top bit in the same field of each of 161 entries in a table. */
 void func_L00_002F45B8(void) {
-    char *base = D_0018C958;
+    char *base = gSubtitleHistory;
     int *field = (int *)(base + 8);
     unsigned int mask = 0x7FFFFFFF;
     int i = 0xA0;
@@ -36,17 +39,19 @@ void func_L00_002F45B8(void) {
 }
 
 
+/* Sets the first entry of a level table to zero. */
 void func_L00_002F4720(void) {
     D_L00_0027D880[0] = 0;
 }
 
+/* Does nothing. */
 void func_L00_002F51B0(void)
 {
 }
 
 /* Only the second mode triggers the spawn. */
-void func_L00_002F5890(int a0) {
-    if (a0 == 2)
+void func_L00_002F5890(int mode) {
+    if (mode == 2)
         func_2F4490(0xA01, 0x58);
 }
 
@@ -88,10 +93,12 @@ int func_L00_002F7568(void) {
     return r1_func_0011CC38();
 }
 
+/* Always answers zero. */
 int func_L00_002F7588(void) {
     return 0;
 }
 
+/* Always answers zero. */
 int func_L00_002F9858(void) {
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_00336E40(void *);
 extern int *func_00336DA8(int, int);
@@ -29,7 +30,7 @@ void func_0033B170(char *self, char *owner)
 
     *(char **)(self + 0x1CC) = owner;
     if (owner) {
-        int *allocation = func_00336DA8(16, func_00336E40(owner));
+        int *allocation = ReturnSecondArgument(16, AllocPoolCell(owner));
         *(int **)(self + 0x1C8) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -39,41 +40,41 @@ void func_0033B170(char *self, char *owner)
     *(int *)(self + 0x328) = 1;
     (*(float **)(self + 0x1C8))[0] = 255.0f;
     (*(float **)(self + 0x1C8))[1] = 207.0f;
-    func_003361E0(self, D_001ADC10, owner);
-    func_003361E0(self + 0x4C, D_001ADC18, owner);
-    func_003361E0(self + 0x98, D_001ADC20, owner);
+    InitDerivedArrays(self, D_001ADC10, owner);
+    InitDerivedArrays(self + 0x4C, D_001ADC18, owner);
+    InitDerivedArrays(self + 0x98, D_001ADC20, owner);
     for (i = 0; i < 3; i++)
-        func_003361E0(self + 0xE4 + i * 0x4C, D_001ADC28, owner);
-    func_003369A8(self + 0x1D8, D_001ADD58, owner);
-    func_003369A8(self + 0x268, D_001ADD60, owner);
-    func_003369A8(self + 0x220, D_001ADD68, owner);
-    func_00336A30(self + 0x268, 0);
-    func_00336A30(self + 0x220, 0);
-    func_00336710(self + 0x2B0, D_001ADD70, owner);
-    func_00336710(self + 0x2EC, D_001ADD78, owner);
-    *func_00335E20(self) = 0x60442D00;
-    *func_00335E20(self + 0x4C) = 0x60241700;
-    *func_00335E20(self + 0x98) = 0x55F0C070;
+        InitDerivedArrays(self + 0xE4 + i * 0x4C, D_001ADC28, owner);
+    InitWidgetDefaults(self + 0x1D8, D_001ADD58, owner);
+    InitWidgetDefaults(self + 0x268, D_001ADD60, owner);
+    InitWidgetDefaults(self + 0x220, D_001ADD68, owner);
+    SetWidgetField44(self + 0x268, 0);
+    SetWidgetField44(self + 0x220, 0);
+    InitDerivedObjectC(self + 0x2B0, D_001ADD70, owner);
+    InitDerivedObjectC(self + 0x2EC, D_001ADD78, owner);
+    *GetFieldC(self) = 0x60442D00;
+    *GetFieldC(self + 0x4C) = 0x60241700;
+    *GetFieldC(self + 0x98) = 0x55F0C070;
     for (j = 0; j < 3; j++)
-        *func_00335E20(self + 0xE4 + j * 0x4C) = 0x80FFDE8D;
-    *func_00335E20(self + 0x2B0) = 0x70A0C0C0;
-    *func_00335E20(self + 0x1D8) = 0x80F0F0F0;
-    *func_00335E20(self + 0x268) = 0x80F0F0F0;
-    *func_00335E20(self + 0x220) = 0x80F0F0F0;
-    func_00336390(self, D_001A8CFC + 0x8710, 0x87);
-    func_00336390(self + 0x4C, D_001A8CFC + 0x8710, 0x88);
-    func_00336390(self + 0x98, D_001A8CFC + 0x8710, 0x89);
+        *GetFieldC(self + 0xE4 + j * 0x4C) = 0x80FFDE8D;
+    *GetFieldC(self + 0x2B0) = 0x70A0C0C0;
+    *GetFieldC(self + 0x1D8) = 0x80F0F0F0;
+    *GetFieldC(self + 0x268) = 0x80F0F0F0;
+    *GetFieldC(self + 0x220) = 0x80F0F0F0;
+    SetFieldAt40(self, D_001A8CFC + 0x8710, 0x87);
+    SetFieldAt40(self + 0x4C, D_001A8CFC + 0x8710, 0x88);
+    SetFieldAt40(self + 0x98, D_001A8CFC + 0x8710, 0x89);
     for (k = 0; k < 3; k++)
-        func_00336390(self + 0xE4 + k * 0x4C, D_001A8CFC + 0x8710, 0x8A);
-    func_00335F88(self + 0x130, 1.0f, -1.0f, 0.0f, 0.0f);
-    func_00336920(self + 0x2B0, 0xE99A, 10);
-    func_00335F88(self + 0x2B0, 302.0f, 194.0f, 0.0f, 0.0f);
-    func_00335F88(self + 0x2EC, 32.0f, 32.0f, 0.0f, 0.0f);
+        SetFieldAt40(self + 0xE4 + k * 0x4C, D_001A8CFC + 0x8710, 0x8A);
+    SetSecondFloat4(self + 0x130, 1.0f, -1.0f, 0.0f, 0.0f);
+    SetWidgetValuePair(self + 0x2B0, 0xE99A, 10);
+    SetSecondFloat4(self + 0x2B0, 302.0f, 194.0f, 0.0f, 0.0f);
+    SetSecondFloat4(self + 0x2EC, 32.0f, 32.0f, 0.0f, 0.0f);
     *(int *)(self + 0x1D0) = 0;
-    func_00336A38(self + 0x1D8, func_00288FB8(0x2D60));
-    func_00336A38(self + 0x268, func_00288FB8(0x2D4F));
-    func_00336A38(self + 0x220, func_00288FB8(0x2D75));
-    func_0033B540(self, 0);
+    SetWidgetField40(self + 0x1D8, GetLocalizedString(0x2D60));
+    SetWidgetField40(self + 0x268, GetLocalizedString(0x2D4F));
+    SetWidgetField40(self + 0x220, GetLocalizedString(0x2D75));
+    UpdateMapScreenLayout(self, 0);
 }
 
 extern void func_00335E38(char *, float, float, float, float);
@@ -106,55 +107,55 @@ int func_0033B540(char *self, int unused)
 {
     float dx, dy;
     float *anchor;
-    char *g;
+    char *game;
 
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self, anchor[0], anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self, anchor[0], anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x4C, anchor[0], anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x4C, anchor[0], anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x98, anchor[0], anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x98, anchor[0], anchor[1], 0.0f, 0.0f);
     dx = dy = 0.0f;
-    g = D_001C4FA0;
-    if (*(int *)(g + 0x230) < 0x15) {
-        float t;
+    game = gMapOverlayState;
+    if (*(int *)(game + 0x230) < 0x15) {
+        float step;
 
-        dx = func_00335E10(self + 0xE4)[0] - (D_001ADD88 + (*(float **)(self + 0x1C8))[0]);
-        if (func_00335E10(self + 0xE4)[0] == 0.0f) {
+        dx = GetFirstField(self + 0xE4)[0] - (D_001ADD88 + (*(float **)(self + 0x1C8))[0]);
+        if (GetFirstField(self + 0xE4)[0] == 0.0f) {
             dx = 56.0f;
         } else {
-            t = (float)D_00265140[*(int *)(g + 0x230)].first + D_00265140[*(int *)(g + 0x230)].scale * 0.5f - dx;
-            if (t > 5.0f)
-                t = 5.0f;
-            else if (t < -5.0f)
-                t = -5.0f;
-            dx += t;
+            step = (float)gMapSpotTable[*(int *)(game + 0x230)].first + gMapSpotTable[*(int *)(game + 0x230)].scale * 0.5f - dx;
+            if (step > 5.0f)
+                step = 5.0f;
+            else if (step < -5.0f)
+                step = -5.0f;
+            dx += step;
         }
-        dy = func_00335E10(self + 0x17C)[1] - (D_001ADD9C + (*(float **)(self + 0x1C8))[1]);
-        if (func_00335E10(self + 0x17C)[1] == 0.0f) {
+        dy = GetFirstField(self + 0x17C)[1] - (D_001ADD9C + (*(float **)(self + 0x1C8))[1]);
+        if (GetFirstField(self + 0x17C)[1] == 0.0f) {
             dy = -50.0f;
         } else {
-            char *g2 = D_001C4FA0;
-            t = (float)D_00265140[*(int *)(g2 + 0x230)].second + D_00265140[*(int *)(g2 + 0x230)].scale * 0.5f - dy;
-            if (t > 3.0f)
-                t = 3.0f;
-            else if (t < -3.0f)
-                t = -3.0f;
-            dy += t;
+            char *game2 = gMapOverlayState;
+            step = (float)gMapSpotTable[*(int *)(game2 + 0x230)].second + gMapSpotTable[*(int *)(game2 + 0x230)].scale * 0.5f - dy;
+            if (step > 3.0f)
+                step = 3.0f;
+            else if (step < -3.0f)
+                step = -3.0f;
+            dy += step;
         }
     }
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0xE4, D_001ADD88 + anchor[0] + dx, D_001ADD8C + anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0xE4, D_001ADD88 + anchor[0] + dx, D_001ADD8C + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x130, D_001ADD90 + anchor[0] + dx, D_001ADD94 + anchor[1], 0.0f, 0.0f);
-    func_00335E38(self + 0x17C, D_001ADD98 + (*(float **)(self + 0x1C8))[0], D_001ADD9C + (*(float **)(self + 0x1C8))[1] + dy, 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x130, D_001ADD90 + anchor[0] + dx, D_001ADD94 + anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x17C, D_001ADD98 + (*(float **)(self + 0x1C8))[0], D_001ADD9C + (*(float **)(self + 0x1C8))[1] + dy, 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x1D8, D_001ADDA0 + anchor[0], D_001ADDA4 + anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x1D8, D_001ADDA0 + anchor[0], D_001ADDA4 + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x220, D_001ADDA8 + anchor[0], D_001ADDAC + anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x220, D_001ADDA8 + anchor[0], D_001ADDAC + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x268, D_001ADDB0 + anchor[0], D_001ADDB4 + anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x268, D_001ADDB0 + anchor[0], D_001ADDB4 + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    func_00335E38(self + 0x2B0, D_001ADDB8 + anchor[0], D_001ADDBC + anchor[1], 0.0f, 0.0f);
+    SetFirstFloat4(self + 0x2B0, D_001ADDB8 + anchor[0], D_001ADDBC + anchor[1], 0.0f, 0.0f);
     return 0;
 }

@@ -19,31 +19,32 @@ extern void ref_L05_004431A0_01(void *, void *, float);
 
 extern void ref_L05_004431A0_02(void *, void *, void *);
 
-void func_L05_004431A0(void *a0, float *a1, float *a2)
+/* Rotates the ship's three direction vectors by the turn amounts from the steering, then saves them. */
+void func_L05_004431A0(void *obj, float *yawRate, float *pitchRate)
 {
-    void *s0 = a0;
-    float *s1 = a1;
-    float *s2 = a2;
+    void *ship = obj;
+    float *yawPtr = yawRate;
+    float *pitchPtr = pitchRate;
     TI128 scratch;
-    float f20;
+    float epsilon;
 
-    if (D_001A79F0 == 20)
+    if (gCurrentMapIndex == 20)
         goto done;
-    f20 = 1e-5f;
-    if (f20 < ref_L05_004431A0_00(*s1)) {
-        ref_L05_004431A0_01(&scratch, (char *)s0 + 0x20, *s1);
-        ref_L05_004431A0_02(s0, s0, &scratch);
-        ref_L05_004431A0_02((char *)s0 + 0x10, (char *)s0 + 0x10, &scratch);
+    epsilon = 1e-5f;
+    if (epsilon < ref_L05_004431A0_00(*yawPtr)) {
+        ref_L05_004431A0_01(&scratch, (char *)ship + 0x20, *yawPtr);
+        ref_L05_004431A0_02(ship, ship, &scratch);
+        ref_L05_004431A0_02((char *)ship + 0x10, (char *)ship + 0x10, &scratch);
     }
     if (D_001A79F0_alt == 20 || D_001A79F0_alt == 15)
         goto done;
-    if (f20 < ref_L05_004431A0_00(*s2)) {
-        ref_L05_004431A0_01(&scratch, (char *)s0 + 0x10, *s2);
-        ref_L05_004431A0_02(s0, s0, &scratch);
-        ref_L05_004431A0_02((char *)s0 + 0x20, (char *)s0 + 0x20, &scratch);
+    if (epsilon < ref_L05_004431A0_00(*pitchPtr)) {
+        ref_L05_004431A0_01(&scratch, (char *)ship + 0x10, *pitchPtr);
+        ref_L05_004431A0_02(ship, ship, &scratch);
+        ref_L05_004431A0_02((char *)ship + 0x20, (char *)ship + 0x20, &scratch);
     }
 done:
-    qcopy(&D_L05_001B35D0, a0);
-    qcopy(&D_L05_001B35E0, (char *)s0 + 0x10);
-    qcopy(&D_L05_001B35F0, (char *)s0 + 0x20);
+    qcopy(&D_L05_001B35D0, obj);
+    qcopy(&D_L05_001B35E0, (char *)ship + 0x10);
+    qcopy(&D_L05_001B35F0, (char *)ship + 0x20);
 }

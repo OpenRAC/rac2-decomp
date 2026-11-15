@@ -20,32 +20,34 @@ extern void *func_002A9640(void *, int, int);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_002A7750(void *, int, int);
 
-void func_L11_003DCEB0(u8 *a0) {
+/* Updates the Hoverbike Race Bomb (moby class 2679). It flies along its path, lands on a
+   hit, and blows up when something touches it or after a short time. */
+void func_L11_003DCEB0(u8 *moby) {
     u8 vec[16] __attribute__((aligned(16)));
-    u8 *s0 = *(u8 **)(a0 + 0x68);
-    s32 flag = 0;
-    u8 state = a0[0x20];
+    u8 *vars = *(u8 **)(moby + 0x68);
+    s32 expired = 0;
+    u8 state = moby[0x20];
 
     switch (state) {
     case 0:
-        func_00282CC0(vec, a0 + 0x10, s0);
-        *(f32 *)(s0 + 8) = *(f32 *)(s0 + 8) - *(f32 *)(s0 + 0xC);
-        if (func_002761F8(a0 + 0x10, vec, 2, 0, 0) != 0) {
-            qcopy(a0 + 0x10, D_L11_001C0D20);
-            *(f32 *)(a0 + 0x18) = *(f32 *)(a0 + 0x18) + D_L11_001B0170 * D_L11_001B016C;
-            func_002A7750(a0, 1, -1);
+        FastVecAdd(vec, moby + 0x10, vars);
+        *(f32 *)(vars + 8) = *(f32 *)(vars + 8) - *(f32 *)(vars + 0xC);
+        if (CollLine(moby + 0x10, vec, 2, 0, 0) != 0) {
+            qcopy(moby + 0x10, D_L11_001C0D20);
+            *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + D_L11_001B0170 * D_L11_001B016C;
+            SetMobyState(moby, 1, -1);
         } else {
-            qcopy(a0 + 0x10, vec);
+            qcopy(moby + 0x10, vec);
         }
         break;
     case 1:
-        *(u16 *)(a0 + 0x96) += 1;
-        if (*(u16 *)(a0 + 0x96) >= 0x79) flag = state;
+        *(u16 *)(moby + 0x96) += 1;
+        if (*(u16 *)(moby + 0x96) >= 0x79) expired = state;
         break;
     }
-    if (func_002A9640(a0, -1, 0) != 0 || flag != 0) {
-        func_002ABBB8(a0, D_L11_001A8F20, a0 + 0x10, D_L11_001B0174, 1.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
-        func_002E5CF8(0, 0, a0);
-        func_0029F338(a0);
+    if (FindOwnedEffectSlot(moby, -1, 0) != 0 || expired != 0) {
+        SpawnExplosionEffects(moby, D_L11_001A8F20, moby + 0x10, D_L11_001B0174, 1.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
+        PlayMobySound(0, 0, moby);
+        MarkMobySpawned(moby);
     }
 }

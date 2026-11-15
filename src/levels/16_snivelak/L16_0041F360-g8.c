@@ -32,25 +32,25 @@ void func_L16_0041F360(char *self) {
     s32 i, j, k;
     for (i = 0, point = points; i < 32; i++, point++) {
         angle = (f32)(i << 1) * 0.09817477315664291f - 3.141592741012573f;
-        point->v.x = func_00283180(angle) * *(f32 *)(st + 0x2C);
-        point->v.y = func_00283198(angle) * *(f32 *)(st + 0x2C);
+        point->v.x = FastSinOrCosA(angle) * *(f32 *)(st + 0x2C);
+        point->v.y = FastSinOrCosB(angle) * *(f32 *)(st + 0x2C);
         point->v.z = 0;
-        func_00282CC0((char *)point, (char *)point, self + 0x10);
+        FastVecAdd((char *)point, (char *)point, self + 0x10);
         point->v.w = D_L16_001B2008;
     }
     qcopy(&points[32], &points[0]);
     for (j = 0; j < 32; j++) {
-        func_002A8C00(collision, self, 1, (char *)&D_L16_001A8F20, *(f32 *)(st + 0x28));
+        make_hit_descriptor(collision, self, 1, (char *)&D_L16_001A8F20, *(f32 *)(st + 0x28));
         collision[24] = 0;
         collision[25] = 1;
         *(u16 *)(collision + 26) = *(u16 *)(self + 0xAA);
-        func_002761F8((char *)&points[j], (char *)&points[j + 1], 9, self, collision);
+        CollLine((char *)&points[j], (char *)&points[j + 1], 9, self, collision);
     }
-    inner = func_00283D38(D_L16_001B2000 & 0xFFFFFF, D_L16_001B2000, *(f32 *)(st + 0x30));
-    outer = func_00283D38(D_L16_001B2004[0] & 0xFFFFFF, D_L16_001B2004[0], *(f32 *)(st + 0x30));
-    func_L00_002EBE88((char *)points, D_L16_001B1FF8, D_L16_001B1FFC[0], 33, inner, outer,
+    inner = FastTweenColor(D_L16_001B2000 & 0xFFFFFF, D_L16_001B2000, *(f32 *)(st + 0x30));
+    outer = FastTweenColor(D_L16_001B2004[0] & 0xFFFFFF, D_L16_001B2004[0], *(f32 *)(st + 0x30));
+    DrawTwoLayerPolylineRibbon((char *)points, D_L16_001B1FF8, D_L16_001B1FFC[0], 33, inner, outer,
                       D_L16_001B2008, D_L16_001B200C[0], *(f32 *)(st + 0x34));
     for (k = 31; k >= 0; k--) points[k].v.w = D_L16_001B2010[0];
-    func_L00_002EBE88((char *)points, D_L16_001B1FF8, D_L16_001B1FFC[0], 33, inner, outer,
+    DrawTwoLayerPolylineRibbon((char *)points, D_L16_001B1FF8, D_L16_001B1FFC[0], 33, inner, outer,
                       D_L16_001B2010[0], D_L16_001B2014[0], -*(f32 *)(st + 0x34));
 }

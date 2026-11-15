@@ -20,6 +20,7 @@ extern float D_L09_001AF9D0[] SDATA(D_L09_001AF9D0);
 
 /* Death of a three-state object: it picks its animation, waits for the hit, then spawns the
    closing effects and retires itself. */
+/* Per-frame update that plays a death sequence in three steps and then removes the object. */
 void func_L09_003B6550(u8 *self)
 {
     EffectVector v;
@@ -27,29 +28,29 @@ void func_L09_003B6550(u8 *self)
 
     switch (self[0x20]) {
     case 0:
-        func_002A7398(self, 0, func_002A77E0(*(u8 *)(*(u8 **)(*(u8 **)(self + 0x24) + 0x48) + 0x10)));
-        func_002A7750(self, 1, -1);
+        StartAnimationImmediate(self, 0, RandomIntBelow(*(u8 *)(*(u8 **)(*(u8 **)(self + 0x24) + 0x48) + 0x10)));
+        SetMobyState(self, 1, -1);
         break;
     case 1:
-        if (*(short *)(self + 0xAA) == 0x852) {
-            if (func_002A9640(self, 0x4010000, 0)) {
-                func_002E5CF8(0, 0, self);
-                func_002A7750(self, 2, -1);
+        if (*(short *)(self + 0xAA) == 0x852 /* moby class 2130 */) {
+            if (FindOwnedEffectSlot(self, 0x4010000, 0)) {
+                PlayMobySound(0, 0, self);
+                SetMobyState(self, 2, -1);
             }
             self[0xA8] = 0xFF;
         }
         break;
     case 2:
-        effect = func_L00_00326620(self, 0x12A1, 0);
+        effect = SpawnChildMoby_L00(self, 0x12A1, 0);
         if (effect)
-            func_L00_0032A258(effect, D_L09_001AF9E0, D_L09_001AF9D8, D_L09_001AF9D0, 0xFFFF, 0,
+            ExplodeObjectIntoPieces(effect, D_L09_001AF9E0, D_L09_001AF9D8, D_L09_001AF9D0, 0xFFFF, 0,
                               -1, 0x16, 0xFFFF, 0xFF, 0);
-        func_0032C700(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        SpawnExplosion(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         v.bits = 0;
         v.value[2] = 0.20000002f;
-        func_L00_003263D0(self, self + 0x10, 0x14, 0, &v, 0x80804040, 0, 6.0f, 3.0f, 1.5f, 7.0f);
-        func_0029F338(effect);
-        func_0029F338(self);
+        SpawnTintedEffects(self, self + 0x10, 0x14, 0, &v, 0x80804040, 0, 6.0f, 3.0f, 1.5f, 7.0f);
+        MarkMobySpawned(effect);
+        MarkMobySpawned(self);
         break;
     }
 }

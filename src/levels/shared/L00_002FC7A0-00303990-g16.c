@@ -124,6 +124,7 @@ extern void func_L00_003588A8(void);
 extern void func_L00_002E3BA0(int);
 extern void func_L00_0032CF60(void);
 
+/* Loads the level archive, uploads its textures, sets up the render tables and then runs the gameplay loader. */
 int func_L00_00303990(int load, int resume)
 {
     Hdr *h = (Hdr *)((Blk *)&D_L00_001BF140)->p[0xC / 4];
@@ -147,16 +148,16 @@ int func_L00_00303990(int load, int resume)
     int sq, a3, ci, k;
 
     if (load)
-        func_00292888();
+        LoadHudBanks();
     base = ((Blk *)&D_L00_001BF140)->p[0x18 / 4];
     if (load) {
-        func_L00_0036ADB0();
+        ResetTableEntries();
         ((Blk *)&D_L00_001C9340)->i[0] = 0;
-        func_00282B50(h, (char *)(f[2] + (int)f), f[3]);
-        func_00282AB0(D_L00_001B1CE0, D_0019B2E8 + D_001A79F0 * 16, 16);
-        func_00293000((char *)(f[4] + (int)f), h->i[0], h->i[0x84 / 4], (char *)h + h->i[1]);
-        func_0011AEA0(0);
-        used = func_0029D4D0((char *)(f[0x12] + (int)f), base);
+        FastMemoryHelperC(h, (char *)(f[2] + (int)f), f[3]);
+        CopyMemoryAligned(D_L00_001B1CE0, D_0019B2E8 + gCurrentMapIndex * 16, 16);
+        UploadTextureImages((char *)(f[4] + (int)f), h->i[0], h->i[0x84 / 4], (char *)h + h->i[1]);
+        FlushCache(0);
+        used = fast_decompress((char *)(f[0x12] + (int)f), base);
         ((Blk *)&D_L00_001BF140)->p[0x2C / 4] = base + h->i[0x60 / 4];
         fx = D_001A72F4;
         fy = D_001A7304;
@@ -172,11 +173,11 @@ int func_L00_00303990(int load, int resume)
         t1 = (TexRef *)((char *)h + h->i[0x34 / 4]);
         D_L00_001B24D8 = h->i[0x30 / 4];
         for (c1 = 0; c1 < D_L00_001B24D8; c1++)
-            D_L00_00225900[c1] = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t1[c1].offset + (func_00282A18(t1[c1].kind) << 28);
+            D_L00_00225900[c1] = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t1[c1].offset + (log2dim(t1[c1].kind) << 28);
         tex = (TexRef *)((char *)h + h->i[0x3C / 4]);
         D_L00_001B1E8C = h->i[0x38 / 4];
         for (c2 = 0; c2 < D_L00_001B1E8C; c2++) {
-            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + tex[c2].offset + (func_00282A18(tex[c2].kind) << 28);
+            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + tex[c2].offset + (log2dim(tex[c2].kind) << 28);
             D_L00_001DC980[c2] = value;
         }
         qcopy(&D_00152CD0, &tex[h->i[0x80 / 4]]);
@@ -184,17 +185,17 @@ int func_L00_00303990(int load, int resume)
         t3 = (TexRef *)((char *)h + h->i[0x44 / 4]);
         D_L00_001B2550 = h->i[0x40 / 4];
         for (c3 = 0; c3 < D_L00_001B2550; c3++) {
-            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t3[c3].offset + (func_00282A18(t3[c3].kind) << 28);
+            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t3[c3].offset + (log2dim(t3[c3].kind) << 28);
             D_L00_0022D200[c3] = value;
         }
         t4 = (TexRef *)((char *)h + h->i[0x4C / 4]);
         D_L00_001B2410 = h->i[0x48 / 4];
         for (c4 = 0; c4 < D_L00_001B2410; c4++) {
-            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t4[c4].offset + (func_00282A18(t4[c4].kind) << 28);
+            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t4[c4].offset + (log2dim(t4[c4].kind) << 28);
             D_L00_0021FBA0[c4] = value;
         }
         ((Blk *)&D_L00_001BF140)->p[0x1C / 4] = base + h->i[0x8 / 4];
-        func_L00_00300090(((Blk *)&D_L00_001BF140)->p[0x1C / 4], (char *)h + h->i[0x34 / 4]);
+        initialize_tfrag_render_data(((Blk *)&D_L00_001BF140)->p[0x1C / 4], (char *)h + h->i[0x34 / 4]);
         ((Blk *)&D_L00_001C9340)->p[0x8 / 4] = ((Blk *)&D_L00_001BF140)->p[0x1C / 4];
         if (h->i[0xC / 4] != 0) {
             char *p = base + h->i[0xC / 4];
@@ -207,7 +208,7 @@ int func_L00_00303990(int load, int resume)
         if (h->i[0x10 / 4] != 0) {
             char *p = base + h->i[0x10 / 4];
             ((Blk *)&D_L00_001BF140)->p[0x24 / 4] = p;
-            func_00291EC0(p);
+            RelocateSkyDefinition(p);
         } else {
             D_L00_001B2420 = 0;
             ((Blk *)&D_L00_001BF140)->p[0x24 / 4] = 0;
@@ -215,38 +216,38 @@ int func_L00_00303990(int load, int resume)
         {
             char *p = base + h->i[0x14 / 4];
             ((Blk *)&D_L00_001BF140)->p[0x28 / 4] = p;
-            func_L00_00300378(p);
+            RelocateLevelHeaderBlocks(p);
         }
         ((Blk *)&D_L00_001C9340)->p[0x4 / 4] = ((Blk *)&D_L00_001BF140)->p[0x28 / 4];
         for (i = 0, q2 = (char *)h + h->i[0x1C / 4]; i < h->i[0x18 / 4]; i++, q2 += 0x20) {
             char *p = *(int *)q2 != 0 ? base + *(int *)q2 : 0;
             if (*(int *)(q2 + 8) != 0) {
-                D_L00_001C91C0[0] = D_00152C00.d[0x38 / 8];
+                D_L00_001C91C0[0] = gHeroMoby_00152C00.d[0x38 / 8];
                 D_L00_001C91C0[1] = 0xFFA0000000E0ULL;
                 D_L00_001C91C0[2] = 0x40000400004000ULL;
-                func_00293890(p, 0, D_L00_001A9520, *(int *)(q2 + 4));
+                RegisterClassCacheObject(p, 0, D_L00_001A9520, *(int *)(q2 + 4));
                 D_L00_001DD180[D_L00_001B1E80 - 1] = 0xFFFC0000;
             } else {
-                func_00293890(p, (char *)h + h->i[0x3C / 4], q2 + 0x10, *(int *)(q2 + 4));
+                RegisterClassCacheObject(p, (char *)h + h->i[0x3C / 4], q2 + 0x10, *(int *)(q2 + 4));
             }
         }
         ((Blk *)&D_L00_001BF140)->p[0x38 / 4] = (char *)D_L00_001D9F00[0];
-        func_L00_00300438((char *)h + h->i[0x1C / 4], h->i[0x18 / 4], (char *)h + h->i[0x24 / 4]);
+        PrintMobyClassSizes((char *)h + h->i[0x1C / 4], h->i[0x18 / 4], (char *)h + h->i[0x24 / 4]);
         {
             int count = D_L00_001B1E80;
-            D_00152C00.i[0x1C / 4] = count++;
-            D_L00_001DD180[D_00152C00.i[0x1C / 4]] = 0xFFFC0000;
-            D_L00_001DA680[D_00152C00.i[0x1C / 4]] = 0xD54;
-            D_L00_001D9F00[D_00152C00.i[0x1C / 4]] = (Bank *)((Blk *)&D_L00_001BF140)->p[0x70 / 4];
-            D_L00_001DA860[0xD54] = D_00152C00.i[0x1C / 4];
+            gHeroMoby_00152C00.i[0x1C / 4] = count++;
+            D_L00_001DD180[gHeroMoby_00152C00.i[0x1C / 4]] = 0xFFFC0000;
+            D_L00_001DA680[gHeroMoby_00152C00.i[0x1C / 4]] = 0xD54;
+            D_L00_001D9F00[gHeroMoby_00152C00.i[0x1C / 4]] = (Bank *)((Blk *)&D_L00_001BF140)->p[0x70 / 4];
+            D_L00_001DA860[0xD54] = gHeroMoby_00152C00.i[0x1C / 4];
             D_00152CD0.h[0x12 / 2] = count;
             D_L00_001B1E80 = count + 1;
         }
         if (D_001A7290 != D_001A7A18) {
-            func_00292328(D_001A7A18);
+            BuildTextureDrawPackets(D_001A7A18);
             D_001A7290 = D_001A7A18;
         }
-        func_002934B8(D_L00_001D9F00[0], ((Blk *)&D_L00_001BF140)->i[0x78 / 4]);
+        CopyHeaderAndRelocatePointers(D_L00_001D9F00[0], ((Blk *)&D_L00_001BF140)->i[0x78 / 4]);
         D_L00_001DD180[0] = 0xFFFC0000;
         slot8 = D_L00_001DA860[0xD54];
         if (slot8 != 0xFF) {
@@ -259,14 +260,14 @@ int func_L00_00303990(int load, int resume)
             }
         }
         {
-            int want = (D_00139568[0xA] + D_L00_00262570)->b4;
+            int want = (gItemSlotToRecord[0xA] + gWeaponTable_L00)->b4;
             if (D_001A72C0 != want)
-                func_L00_002FE268(want);
+                SendGsRegisterPacket(want);
         }
         {
             int hero = D_L00_001DA860[0x47];
             D_001A72C4 = hero;
-            func_002934B8(D_L00_001D9F00[hero], ((Blk *)&D_L00_001BF140)->i[0x74 / 4]);
+            CopyHeaderAndRelocatePointers(D_L00_001D9F00[hero], ((Blk *)&D_L00_001BF140)->i[0x74 / 4]);
         }
         D_L00_001DD180[D_001A72C4] = 0xFFFC0000;
         us = (unsigned short *)((char *)h + h->i[0xAC / 4]);
@@ -279,17 +280,17 @@ int func_L00_00303990(int load, int resume)
         for (sq = 0, p = (char *)h + h->i[0x78 / 4]; sq < D_L00_001D9F00[0]->bC; sq++, p += 4) {
             if (*(int *)p != 0) {
                 D_L00_001D9F00[0]->f48[sq] = (int)(base + *(int *)p);
-                func_00293260(D_L00_001D9F00[0], sq);
+                relocate_asset_entry_pointers(D_L00_001D9F00[0], sq);
             }
         }
         ((Blk *)&D_L00_001BF140)->i[0x44 / 4] = D_L00_001D9F00[0]->f48[0];
         for (i = 0, q2 = (char *)h + h->i[0x24 / 4]; i < h->i[0x20 / 4]; i++, q2 += 0x20)
-            func_L00_002FF6A8(base + *(int *)q2, (char *)h + h->i[0x44 / 4], q2 + 0x10, *(int *)(q2 + 4));
+            RegisterObjectRenderClass(base + *(int *)q2, (char *)h + h->i[0x44 / 4], q2 + 0x10, *(int *)(q2 + 4));
         if (D_L00_00226700[0] != 0)
             ((Blk *)&D_L00_001BF140)->i[0x3C / 4] = D_L00_00226700[0];
         ref_L00_00303990_00((char *)h + h->i[0x24 / 4], h->i[0x20 / 4]);
         for (i = 0, q2 = (char *)h + h->i[0x2C / 4]; i < h->i[0x28 / 4]; i++, q2 += 0x30)
-            func_L00_002FFAB8(base + *(int *)q2, (char *)h + h->i[0x4C / 4], q2 + 0x10, q2 + 0x20, *(int *)(q2 + 4));
+            RegisterShrubRenderClass(base + *(int *)q2, (char *)h + h->i[0x4C / 4], q2 + 0x10, q2 + 0x20, *(int *)(q2 + 4));
         if (D_L00_0021EA20[0] != 0)
             ((Blk *)&D_L00_001BF140)->i[0x40 / 4] = D_L00_0021EA20[0];
         {
@@ -299,7 +300,7 @@ int func_L00_00303990(int load, int resume)
         }
         func_00291DE0((char *)h + h->i[0x5C / 4], h->i[0x58 / 4]);
         if (h->i[0xA4 / 4] != 0) {
-            func_L00_002FD480(base + h->i[0xA4 / 4]);
+            LoadQuadwordBlockToGlobals(base + h->i[0xA4 / 4]);
         } else {
             qzero(&D_L00_001B1D20);
             qzero(&D_L00_001B1D30);
@@ -320,7 +321,7 @@ int func_L00_00303990(int load, int resume)
             char *x2;
             ((Blk *)&D_L00_001BF140)->p[0x30 / 4] = x1;
             x2 = (char *)h + h->i[0x54 / 4];
-            func_00291CA8((char *)h + h->i[0x6C / 4], x1, x2, h->i[0x50 / 4]);
+            RebasePackAndFillTextureRanges((char *)h + h->i[0x6C / 4], x1, x2, h->i[0x50 / 4]);
         }
         base = (char *)((unsigned int)(base + used + 0x3F) & ~0x3F);
         if (D_L00_001B24D4 != ((Blk *)&D_L00_001C9340)->i[0x18 / 4]) {
@@ -333,7 +334,7 @@ int func_L00_00303990(int load, int resume)
             dst = base;
             size *= 16;
             base += size;
-            func_00282B50(dst, (char *)h + h->i[0x34 / 4], size);
+            FastMemoryHelperC(dst, (char *)h + h->i[0x34 / 4], size);
             ((Blk *)&D_L00_001C9340)->p[0x14 / 4] = base;
             base = (char *)(((unsigned int)(base + ((Blk *)&D_L00_001C9340)->i[0x18 / 4] * 2) + 0x7F) & ~0x3F);
         }
@@ -343,14 +344,14 @@ int func_L00_00303990(int load, int resume)
             int nslots = span->count;
             D_L00_001B19EC = (Slot32 *)base;
             D_L00_001B19E8 = nslots;
-            func_00282AB0(base, tab + span->off, nslots * 32);
+            CopyMemoryAligned(base, tab + span->off, nslots * 32);
             span++;
             base += nslots * 32;
         }
         e = tab + span->off;
         for (a3 = 0; a3 < D_L00_001B19E8; a3++) {
             if (D_L00_001B19EC[a3].h1A >= span->count) {
-                func_0026FEB8(D_L00_001A95B8);
+                STUB_printf(D_L00_001A95B8);
                 D_L00_001B19EC[a3].h1A = -1;
             } else {
                 D_L00_001B19EC[a3].h1A = *(unsigned short *)(e + D_L00_001B19EC[a3].h1A * 4);
@@ -363,7 +364,7 @@ int func_L00_00303990(int load, int resume)
             int cls = D_L00_001DA860[*(int *)(q + 4)];
             if (D_L00_001DA680[cls] == *(int *)(q + 4)) {
                 if ((span->count != 0 || D_L00_001D9F00[cls]->bD != 0) && span->count - 1 != D_L00_001D9F00[cls]->bD)
-                    func_0026FEB8(D_L00_001A95D8, D_L00_001DA680[cls], span->count - 1, D_L00_001D9F00[cls]->bD);
+                    STUB_printf(D_L00_001A95D8, D_L00_001DA680[cls], span->count - 1, D_L00_001D9F00[cls]->bD);
                 {
                     int first;
                     e = tab + span->off;
@@ -379,25 +380,25 @@ int func_L00_00303990(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         ((Blk *)&D_L00_001BF140)->p[0x48 / 4] = base;
     }
-    ((Blk *)&D_L00_001BF140)->i[0x68 / 4] = func_L00_00300618(load);
+    ((Blk *)&D_L00_001BF140)->i[0x68 / 4] = LoadLevelData(load);
     if (load)
         D_00152CE4[0] = -1;
     if (((Blk *)&D_L00_001C9340)->i[0xC / 4] != 0) {
         if (load)
-            func_L00_003032F0();
-        func_L00_00303418(((Blk *)&D_L00_001C9340)->i[0]);
+            ResetTutorialRecordValues();
+        UpdateObjectVisibilityForSelection(((Blk *)&D_L00_001C9340)->i[0]);
     }
     if (resume)
-        func_L00_00358B30();
+        RestoreSavedHeroState();
     else
-        func_L00_003588A8();
+        ClearWorkAreas();
     D_L00_001B1AD0.f8 = 0;
     if (D_001A7A00.enabled != 0) {
         int m;
         for (m = D_L00_001B1E9C; m != D_L00_001B1EA0[0]; m += 0x100)
-            func_L00_002E3BA0(m);
+            ScaleObjectByDifficulty(m);
     }
-    func_L00_0032CF60();
-    D_L00_001B19C8++;
+    UpdateLiveObjects();
+    gFrameCounter_L00++;
     return 0;
 }

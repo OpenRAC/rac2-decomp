@@ -14,13 +14,14 @@ extern void func_002DA4F8(void);
 extern void func_002D96D0(void);
 extern void func_00371A70(void);
 
+/* Finishes the water wave drawing by writing the draw settings into the graphics packet. */
 void func_L01_003CB540(void)
 {
     u8 *state;
-    u8 *p = D_L01_001B2CC8[0];
-    qcopy(p, D_L01_001B02A0);
-    p += 16;
-    D_L01_001B2CC8[0] = p;
+    u8 *cursor = D_L01_001B2CC8[0];
+    qcopy(cursor, D_L01_001B02A0);
+    cursor += 16;
+    D_L01_001B2CC8[0] = cursor;
     {
         float a = D_L01_001B31D4[0], b = D_L01_001B31D8[0];
         float c = D_L01_001B31DC[0], d = D_L01_001B31E0[0];
@@ -37,17 +38,17 @@ void func_L01_003CB540(void)
     *(u32 *)(D_L01_001B2CC8[0] + 8) = 0x11000000;
     *(u32 *)(D_L01_001B2CC8[0] + 12) = 0x50000002;
     {
-        u8 *packet = D_L01_001B2CC8[0];
-        D_L01_001B2CC8[0] = packet + 16;
+        u8 *basePacket = D_L01_001B2CC8[0];
+        D_L01_001B2CC8[0] = basePacket + 16;
         {
-            u8 *next = packet + 16;
-            *(u64 *)(packet + 16) = 0x1000000000008001ULL;
-            *(u64 *)(next + 8) = 14;
-            *(u64 *)(next + 16) = (u64)*(s32 *)(state + 0x230) |
+            u8 *nextPacket = basePacket + 16;
+            *(u64 *)(basePacket + 16) = 0x1000000000008001ULL;
+            *(u64 *)(nextPacket + 8) = 14;
+            *(u64 *)(nextPacket + 16) = (u64)*(s32 *)(state + 0x230) |
                 ((u64)*(s32 *)(state + 0x234) << 8) |
                 ((u64)*(s32 *)(state + 0x238) << 16);
-            *(u64 *)(next + 24) = 0x3D;
-            D_L01_001B2CC8_gp = packet + 48;
+            *(u64 *)(nextPacket + 24) = 0x3D;
+            D_L01_001B2CC8_gp = basePacket + 48;
         }
     }
     func_00371A70();

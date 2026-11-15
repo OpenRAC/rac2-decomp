@@ -7,8 +7,8 @@ extern void r1_func_0011D9A8(void);
 
 typedef struct {
     unsigned char pad0[0x838];
-    int unk838;
-    int unk83C;
+    int bitWindow;
+    int bitsLeft;
     unsigned char pad840[0x18];
     void *cbData;
 } MpegDec;
@@ -34,11 +34,11 @@ extern void r1_func_0012A0F8(void *);
 extern char r1_D_001537E8[];
 typedef struct {
     char pad0[0x128];
-    int unk128;
+    int outAddr;
     int unk12C;
-    int unk130;
+    int isIntra;
     int unk134;
-    int unk138;
+    int needsMotionComp;
     int unk13C;
 } Elem00125630;
 typedef struct {
@@ -48,27 +48,27 @@ typedef struct {
 } Ref00125630;
 typedef struct {
     char pad0[0x11C];
-    int unk11C;
+    int errorFlag;
     char pad120[0xC];
-    int unk12C;
+    int mbWidth;
     char pad130[0x44];
-    int unk174;
+    int pictureStructure;
     char pad178[0x48];
-    Ref00125630 *unk1C0;
+    Ref00125630 *refFrame0;
     char pad1C4[0xC];
-    Ref00125630 *unk1D0;
+    Ref00125630 *refFrame1;
     char pad1D4[0xC];
-    Ref00125630 *unk1E0;
+    Ref00125630 *refFrame2;
     char pad1E4[0x3AC];
     Elem00125630 e[2];
-    int unk810;
+    int curSlot;
 } Dec00125630;
 
 /* rac1-decomp src/core/00125630.c: func_00129450 */
 /* Motion-compensate one macroblock (or wait for the intra IDCT) and record its output slot. */
-int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
+int func_00129450(void *decoder, int mbAddr, int mbInc, int mbType, int motionType,
                   void *pmv, void *mvfs, void *dmv) {
-    Dec00125630 *d = (Dec00125630 *)arg0;
+    Dec00125630 *d = (Dec00125630 *)decoder;
     int intra;
     int x;
     int y;
@@ -77,18 +77,18 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
     Ref00125630 *ref;
 
     intra = mbType & 1;
-    y = mbAddr / d->unk12C;
-    x = mbAddr % d->unk12C;
+    y = mbAddr / d->mbWidth;
+    x = mbAddr % d->mbWidth;
     by = y * 16;
     bx = x * 16;
     if (intra) {
         while ((D9_CHCR >> 8) & 1)
             ;
-        d->e[d->unk810].unk138 = 0;
+        d->e[d->curSlot].needsMotionComp = 0;
     } else {
         if ((unsigned int)(motionType - 1) >= 3) {
             r1_func_0012C430(d, r1_D_001537E8, motionType);
-            d->unk11C = 1;
+            d->errorFlag = 1;
             return 0;
         }
         r1_func_00125880((struct MpegDecoder *)d, bx, by, mbType, motionType,
@@ -96,23 +96,23 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
         while ((D9_CHCR >> 8) & 1)
             ;
         r1_func_0012A0F8(d);
-        d->e[d->unk810].unk138 = 1;
+        d->e[d->curSlot].needsMotionComp = 1;
     }
-    if (arg2 == 1 && (mbType & 2)) {
-        d->e[d->unk810].unk134 = arg2;
+    if (mbInc == 1 && (mbType & 2)) {
+        d->e[d->curSlot].unk134 = mbInc;
     } else {
-        d->e[d->unk810].unk134 = 0;
+        d->e[d->curSlot].unk134 = 0;
     }
-    d->e[d->unk810].unk130 = intra;
-    if (d->unk174 == 3) {
-        d->e[d->unk810].unk128 = d->unk1C0->unk0 + (x * d->unk1C0->unk10 + y) * 0x180;
+    d->e[d->curSlot].isIntra = intra;
+    if (d->pictureStructure == 3) {
+        d->e[d->curSlot].outAddr = d->refFrame0->unk0 + (x * d->refFrame0->unk10 + y) * 0x180;
     } else {
-        if (d->unk174 == 2) {
-            ref = d->unk1E0;
+        if (d->pictureStructure == 2) {
+            ref = d->refFrame2;
         } else {
-            ref = d->unk1D0;
+            ref = d->refFrame1;
         }
-        d->e[d->unk810].unk128 = ref->unk0 + (x * ref->unk10 + y) * 0x180;
+        d->e[d->curSlot].outAddr = ref->unk0 + (x * ref->unk10 + y) * 0x180;
     }
     return 1;
 }
@@ -202,6 +202,7 @@ extern MpegMcFuncC D_00137ED0[];
 
 extern MpegMcFuncC D_00137EF0[];
 
+/* Works out which reference pictures to copy from for one macroblock, going forward and backward, and queues the copy jobs. */
 void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type,
                    int pmv[2][2][2], int mvfs[2][2], int *dmvector) {
     int dmv[2][2];
@@ -218,22 +219,22 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
     if ((mb_type & 8) || d->picture_coding_type == 2) {
         if (d->picture_structure == 3) {
             if (motion_type == 2 || !(mb_type & 8)) {
-                func_00129DA8(d, d->ref_images[0], 0, 0, 0, 16, bx, by, pmv[0][0][0],
+                _getRef0(d, d->ref_images[0], 0, 0, 0, 16, bx, by, pmv[0][0][0],
                               pmv[0][0][1], 0, 0);
             } else if (motion_type == same) {
-                func_00129DA8(d, d->ref_images[0], mvfs[0][0], 0, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[0], mvfs[0][0], 0, 0, 8, bx, by,
                               pmv[0][0][0], pmv[0][0][1] >> 1, same, 0);
-                func_00129DA8(d, d->ref_images[0], mvfs[1][0], 1, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[0], mvfs[1][0], 1, 0, 8, bx, by,
                               pmv[1][0][0], pmv[1][0][1] >> 1, same, 0);
             } else if (motion_type == 3) {
-                func_0012B3E0(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1] >> 1);
-                func_00129DA8(d, d->ref_images[0], 0, 0, 0, 8, bx, by, pmv[0][0][0],
+                ComputeMpegDualPrimeVectors(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1] >> 1);
+                _getRef0(d, d->ref_images[0], 0, 0, 0, 8, bx, by, pmv[0][0][0],
                               pmv[0][0][1] >> 1, same, 0);
-                func_00129DA8(d, d->ref_images[0], 1, 0, 0, 8, bx, by, dmv[0][0],
+                _getRef0(d, d->ref_images[0], 1, 0, 0, 8, bx, by, dmv[0][0],
                               dmv[0][1], same, one);
-                func_00129DA8(d, d->ref_images[0], 1, 1, 0, 8, bx, by, pmv[0][0][0],
+                _getRef0(d, d->ref_images[0], 1, 1, 0, 8, bx, by, pmv[0][0][0],
                               pmv[0][0][1] >> 1, same, 0);
-                func_00129DA8(d, d->ref_images[0], 0, 1, 0, 8, bx, by, dmv[1][0],
+                _getRef0(d, d->ref_images[0], 0, 1, 0, 8, bx, by, dmv[1][0],
                               dmv[1][1], same, one);
             } else {
                 func_00130250_msg(d, D_0013BA20, motion_type);
@@ -251,21 +252,21 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
                 same = currentfield != mvfs[0][0];
             }
             if (motion_type == 1 || !(mb_type & 8)) {
-                func_00129DA8(d, refs[same][mvfs[0][0]], 0, 0, 0, 16, bx, by,
+                _getRef0(d, refs[same][mvfs[0][0]], 0, 0, 0, 16, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
             } else if (motion_type == 2) {
-                func_00129DA8(d, refs[same][mvfs[0][0]], 0, 0, 0, 8, bx, by,
+                _getRef0(d, refs[same][mvfs[0][0]], 0, 0, 0, 8, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
                 same = d->picture_coding_type == motion_type && d->second_field &&
                        currentfield != mvfs[1][0];
-                func_00129DA8(d, refs[same][mvfs[1][0]], 0, 0, 8, 8, bx, by,
+                _getRef0(d, refs[same][mvfs[1][0]], 0, 0, 8, 8, bx, by,
                               pmv[1][0][0], pmv[1][0][1], 0, 0);
             } else if (motion_type == 3) {
                 same = d->second_field ? motion_type - 2 : 0;
-                func_0012B3E0(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1]);
-                func_00129DA8(d, refs[0][currentfield], 0, 0, 0, 16, bx, by,
+                ComputeMpegDualPrimeVectors(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1]);
+                _getRef0(d, refs[0][currentfield], 0, 0, 0, 16, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
-                func_00129DA8(d, refs[same][!currentfield], 0, 0, 0, 16, bx, by,
+                _getRef0(d, refs[same][!currentfield], 0, 0, 0, 16, bx, by,
                               dmv[0][0], dmv[0][1], 0, 1);
             } else {
                 func_00130250_msg(d, D_0013BA40, motion_type);
@@ -278,21 +279,21 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
         if (d->picture_structure == 3) {
             same = 1;
             if (motion_type == 2) {
-                func_00129DA8(d, d->ref_images[1], 0, 0, 0, 16, bx, by, pmv[0][1][0],
+                _getRef0(d, d->ref_images[1], 0, 0, 0, 16, bx, by, pmv[0][1][0],
                               pmv[0][1][1], 0, avg);
             } else {
-                func_00129DA8(d, d->ref_images[1], mvfs[0][1], 0, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[1], mvfs[0][1], 0, 0, 8, bx, by,
                               pmv[0][1][0], pmv[0][1][1] >> 1, same, avg);
-                func_00129DA8(d, d->ref_images[1], mvfs[1][1], 1, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[1], mvfs[1][1], 1, 0, 8, bx, by,
                               pmv[1][1][0], pmv[1][1][1] >> 1, same, avg);
             }
         } else if (motion_type == 1) {
-            func_00129DA8(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
+            _getRef0(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
                           16, bx, by, pmv[0][1][0], pmv[0][1][1], 0, avg);
         } else if (motion_type == 2) {
-            func_00129DA8(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
+            _getRef0(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
                           8, bx, by, pmv[0][1][0], pmv[0][1][1], 0, avg);
-            func_00129DA8(d, mvfs[1][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 8,
+            _getRef0(d, mvfs[1][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 8,
                           8, bx, by, pmv[1][1][0], pmv[1][1][1], 0, avg);
         } else {
             func_00130250_msg(d, D_0013BA60, motion_type);
@@ -300,6 +301,7 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
     }
 }
 
+/* Queues the copy of one block from a reference picture, working out where to read it and which copy or average routine to use. */
 void func_00129DA8(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
                    int yofs, int h, int bx, int by, int dx, int dy, int fieldpred,
                    int avg) {
@@ -426,42 +428,42 @@ typedef struct {
     void (*fb[4])(void *);
     char a[4][0x1C];
     char b[4][0x1C];
-    int unk128;
+    int outAddr;
     int count;
-    int unk130;
+    int isIntra;
     int pad134;
-    int unk138;
+    int needsMotionComp;
     int unk13C;
 } Elem001263A8;
 typedef struct {
     char pad0[0x590];
     Elem001263A8 e[2];
     char pad810[0xC];
-    int unk81C;
+    int workBuf;
 } Dec001263A8;
 
 
 /* rac1-decomp src/core/00125630.c: func_0012A1C8 */
 /* Run a channel's per-block callbacks, then hand its buffer to the output routine. */
-void func_0012A1C8(void *arg0, int idx) {
-    Dec001263A8 *p = (Dec001263A8 *)arg0;
+void func_0012A1C8(void *decoderPtr, int idx) {
+    Dec001263A8 *decoder = (Dec001263A8 *)decoderPtr;
     int i;
 
-    if (p->e[idx].unk138 != 0) {
-        for (i = 0; i < p->e[idx].count; i++) {
-            p->e[idx].fa[i](p->e[idx].a[i]);
-            p->e[idx].fb[i](p->e[idx].b[i]);
+    if (decoder->e[idx].needsMotionComp != 0) {
+        for (i = 0; i < decoder->e[idx].count; i++) {
+            decoder->e[idx].fa[i](decoder->e[idx].a[i]);
+            decoder->e[idx].fb[i](decoder->e[idx].b[i]);
         }
     }
-    if (p->e[idx].unk130 != 0 && p->e[idx].unk13C != 0) {
-        r1_func_0012C468(p, r1_D_00153870);
+    if (decoder->e[idx].isIntra != 0 && decoder->e[idx].unk13C != 0) {
+        r1_func_0012C468(decoder, r1_D_00153870);
     }
-    if (p->e[idx].unk130 != 0) {
-        r1_func_00127318(p->e[idx].unk128, p->e[idx].unk4);
-    } else if (p->e[idx].unk13C != 0) {
-        r1_func_00127318(p->e[idx].unk128, p->unk81C);
+    if (decoder->e[idx].isIntra != 0) {
+        r1_func_00127318(decoder->e[idx].outAddr, decoder->e[idx].unk4);
+    } else if (decoder->e[idx].unk13C != 0) {
+        r1_func_00127318(decoder->e[idx].outAddr, decoder->workBuf);
     } else {
-        r1_func_001272B8(p->e[idx].unk128, p->unk81C, p->e[idx].unk4);
+        r1_func_001272B8(decoder->e[idx].outAddr, decoder->workBuf, decoder->e[idx].unk4);
     }
 }
 
@@ -500,15 +502,17 @@ ASM_FUNC("asm/core", func_0012AFC0);
 ASM_FUNC("asm/core", func_0012B0D8);
 
 /* rac1-decomp src/core/00125630.c: func_00127378 */
-void func_0012B198(int arg0) {
-    unsigned int *p = (unsigned int *)0x10002010;
-    *p = (*p & 0xFF7FFFFF) | (arg0 << 23);
+/* Sets or clears one flag bit in the video decoder chip control register. */
+void func_0012B198(int bitValue) {
+    unsigned int *ctrlReg = (unsigned int *)0x10002010;
+    *ctrlReg = (*ctrlReg & 0xFF7FFFFF) | (bitValue << 23);
 }
 
 /* rac1-decomp src/core/00125630.c: func_001273A0 */
 /* _waitBdecOut (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
-int func_0012B1C0(void *arg0) {
-    MpegDec *d = arg0;
+/* Waits for the video decoder chip to finish its current block, and resets it if it hit an error. */
+int func_0012B1C0(void *decoderPtr) {
+    MpegDec *d = decoderPtr;
     int cb1[8];
     int cb2[8];
     int ret;
@@ -518,7 +522,7 @@ int func_0012B1C0(void *arg0) {
     unsigned int rest;
 
     ret = 1;
-    func_0012C3B0(d);
+    WaitIpuIdle(d);
     if (D3_QWC != 0 && !(IPU_CTRL & 0x4000)) {
         do {
             if (D4_QWC == 0 && !(D4_CHCR & 0x100)) {
@@ -529,12 +533,12 @@ int func_0012B1C0(void *arg0) {
     }
     bp = IPU_BP;
     top = IPU_TOP;
-    d->unk838 = top;
+    d->bitWindow = top;
     if (top < 0) {
         rest = bp & 0x1F;
-        d->unk83C = rest ? 32 - rest : 0;
+        d->bitsLeft = rest ? 32 - rest : 0;
     } else {
-        d->unk83C = 32;
+        d->bitsLeft = 32;
     }
     if (IPU_CTRL & 0x4000) {
         r1_func_0012C468(d, r1_D_00153888);
@@ -560,6 +564,7 @@ int func_0012B1C0(void *arg0) {
 /* Returns its callee's value: retail keeps the frame and calls, and
    2.9-ee turns a void one-call function into a bare tail jump (8 bytes
    against 28). */
-short func_0012B3C0(int arg0) {
-    return func_0012C508(arg0, 3);
+/* Reads the small dual-prime motion value from the video stream. */
+short func_0012B3C0(int decoder) {
+    return ReadIpuVlcCode(decoder, 3);
 }

@@ -16,19 +16,20 @@ extern void func_L00_002E3520(void);
 extern void func_0027C660(void);
 extern int func_00283CF0(float);
 extern void func_0027DDC0(int,int,int,int);
+/* Draws the whole text screen wipe for one frame. */
 void func_L00_002E2958(void) {
  int i; float alpha;
  if(D_L00_001BC200.active) {
-  func_0027C540(0);
-  func_002FCB00((int)((char *)D_L00_001BC200.buffers[(short)(D_L00_001BC200.buffer^1)]+16),D_001A72DC,512,416);
-  func_L00_002E3520();
+  SetupGifPaging(0);
+  UploadTextureBlocksReturnTex0((int)((char *)D_L00_001BC200.buffers[(short)(D_L00_001BC200.buffer^1)]+16),D_001A72DC,512,416);
+  DrawCaptionWithBars();
   switch(D_L00_001BC588[D_L00_001BC200.index].mode) {
   case 0:
    for(i=0;i<D_L00_001BC588[D_L00_001BC200.index].count;i++) {
     if(D_L00_001BC588[D_L00_001BC200.index].duration<D_L00_001BC200.timer*2)
      alpha=(1.0f-(float)D_L00_001BC200.timer/(float)D_L00_001BC588[D_L00_001BC200.index].duration)*2.0f;
     else alpha=1.0f;
-    func_L00_002E3340(i,alpha);
+    DrawCaptionLine(i,alpha);
    }
    break;
   case 1: case 2:
@@ -36,13 +37,13 @@ void func_L00_002E2958(void) {
    int j=0;
    if(j<D_L00_001BC588[D_L00_001BC200.index].count) do {
     int next=j+1;
-    func_L00_002E2C30(j,1.0f-((float)D_L00_001BC200.timer-(float)(D_L00_001BC588[D_L00_001BC200.index].count-next)*(float)D_L00_001BC200.delay)/(float)D_L00_001BC200.fade);
+    DrawFadingTextLine(j,1.0f-((float)D_L00_001BC200.timer-(float)(D_L00_001BC588[D_L00_001BC200.index].count-next)*(float)D_L00_001BC200.delay)/(float)D_L00_001BC200.fade);
     j=next;
    } while(j<D_L00_001BC588[D_L00_001BC200.index].count);
    }
    break;
   }
-  func_0027C660();
+  DoGifPaging();
  }
- func_0027DDC0(0,0,0,func_00283CF0(ref_L00_001B18E0_00*128.0f));
+ SetClearColorPacket(0,0,0,FloatToInt(ref_L00_001B18E0_00*128.0f));
 }

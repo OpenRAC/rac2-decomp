@@ -47,51 +47,52 @@ extern float func_002AA3A8(float *, float, float *, float, float, float);
  * difference below the step from +0xF0 plus 0.01) it snaps there instead when easing is
  * off (+0x287 clear) or the anchor at +0x240 is more than half of +0x264 away; with the
  * lock held or the goal passed, the easing rate at +0x344 is cleared. */
+/* Slides the hero smoothly to its wanted spot, or jumps straight there when it is very close. */
 void func_L00_002B5250(void)
 {
-    Hero5250 *hero = &D_00189E20;
+    Hero5250 *hero = &gHeroState;
     float d;
 
-    if (D_00189E20.vectorMode != 0) {
-        if (D_00189E20.lock == 0 && D_00189E20.x31C < 0.0f) {
-            d = func_00282C48(D_00189E20.x31C);
-            if (d < func_00282C48(func_L00_002D3B00(&hero->vF0)) + 0.01f) {
-                if (D_00189E20.easing == 0
-                    || func_00282E80(&hero->anchor, &hero->position) > D_00189E20.reach * 0.5f) {
+    if (gHeroState.vectorMode != 0) {
+        if (gHeroState.lock == 0 && gHeroState.x31C < 0.0f) {
+            d = FloatAbs(gHeroState.x31C);
+            if (d < FloatAbs(GetViewSpaceHeight(&hero->vF0)) + 0.01f) {
+                if (gHeroState.easing == 0
+                    || vec_distance_xy(&hero->anchor, &hero->position) > gHeroState.reach * 0.5f) {
                     qcopy(&hero->position, &hero->goal);
                     return;
                 }
-                func_002AA458(&hero->position, &hero->goal, &hero->rate,
+                SpringVectorToTarget(&hero->position, &hero->goal, &hero->rate,
                               0.05f, 0.21f, 0.0833333358f);
             } else {
-                func_002AA458(&D_00189E20.position, &D_00189E20.goal, &D_00189E20.rate,
+                SpringVectorToTarget(&gHeroState.position, &gHeroState.goal, &gHeroState.rate,
                               0.05f, 0.21f, 0.0833333358f);
             }
         } else {
-            D_00189E20.rate = 0.0f;
+            gHeroState.rate = 0.0f;
         }
     } else {
-        if (D_00189E20.lock == 0 && D_00189E20.position.z < D_00189E20.goalZ) {
-            d = func_00282C48(D_00189E20.position.z - D_00189E20.goalZ);
-            if (d < func_00282C48(D_00189E20.vF0.z) + 0.01f) {
-                if (D_00189E20.easing == 0
-                    || func_00282E80(&hero->anchor, &hero->position) > D_00189E20.reach * 0.5f) {
-                    D_00189E20.position.z = D_00189E20.goalZ;
+        if (gHeroState.lock == 0 && gHeroState.position.z < gHeroState.goalZ) {
+            d = FloatAbs(gHeroState.position.z - gHeroState.goalZ);
+            if (d < FloatAbs(gHeroState.vF0.z) + 0.01f) {
+                if (gHeroState.easing == 0
+                    || vec_distance_xy(&hero->anchor, &hero->position) > gHeroState.reach * 0.5f) {
+                    gHeroState.position.z = gHeroState.goalZ;
                     return;
                 }
-                func_002AA3A8(&hero->position.z, D_00189E20.goalZ, &hero->rate,
+                SpringFloatToGoal(&hero->position.z, gHeroState.goalZ, &hero->rate,
                               0.05f, 0.17f, 0.0833333358f);
             } else {
-                if (D_00189E20.v120.z < 0.0f) {
-                    D_00189E20.position.z -= D_00189E20.v120.z;
-                    if (D_00189E20.goalZ < D_00189E20.position.z)
-                        D_00189E20.position.z = D_00189E20.goalZ;
+                if (gHeroState.v120.z < 0.0f) {
+                    gHeroState.position.z -= gHeroState.v120.z;
+                    if (gHeroState.goalZ < gHeroState.position.z)
+                        gHeroState.position.z = gHeroState.goalZ;
                 }
-                func_002AA3A8(&D_00189E20.position.z, D_00189E20.goalZ, &D_00189E20.rate,
+                SpringFloatToGoal(&gHeroState.position.z, gHeroState.goalZ, &gHeroState.rate,
                               0.05f, 0.17f, 0.0833333358f);
             }
         } else {
-            D_00189E20.rate = 0.0f;
+            gHeroState.rate = 0.0f;
         }
     }
 }

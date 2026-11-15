@@ -23,24 +23,24 @@ void func_L04_004389C0(u8 *obj)
     if (obj[0x20] == 1) {
         s32 found = 0;
         for (i = 0; i < 4; i++) {
-            if (func_002A8508(*(u32 *)(links + 4 * i), -1))
+            if (CountMobysInGroupNotInState(*(u32 *)(links + 4 * i), -1))
                 found = 1;
         }
         if (*(u32 *)(links + 0x10) != 0) {
-            if (func_00288D58() != 0) {
-                if (func_002A8508(*(u32 *)links, -1) == 0)
+            if (IsFlagByteSet() != 0) {
+                if (CountMobysInGroupNotInState(*(u32 *)links, -1) == 0)
                     found = 0;
             }
         }
-        if (found == 0 || (D_0019B2E8[obj[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
-            func_002E5CF8(0, 0, (char *)obj);
+        if (found == 0 || (D_0019B2E8[obj[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+            PlayMobySound(0, 0, (char *)obj);
             obj[0x20] = 2;
         }
     }
     if (obj[0x20] == 2) {
-        f32 t = *(f32 *)(obj + 0x18);
-        if (t >= 30.0f)
-            *(f32 *)(obj + 0x18) = t - 0.28333336f;
+        f32 height = *(f32 *)(obj + 0x18);
+        if (height >= 30.0f)
+            *(f32 *)(obj + 0x18) = height - 0.28333336f;
         if (*(f32 *)(obj + 0x18) < 30.0f)
             obj[0x20] = 4;
     }

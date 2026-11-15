@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Update two linked parts from a valid parent and propagate object state and color. */
 typedef struct DobboPartsObject252 DobboPartsObject252;
@@ -59,16 +60,17 @@ extern f32 func_00282E20(const f32 *vector);
 extern void func_00282CF0(float *, const float *, const float *);
 
 /* validate descriptorparent classD0E/status then attach two optionalparts, propagate flag/disabled state and original packed-color helper */
+/* Attaches the two arm parts to the torso and copies the on or off state to them. */
 void func_L09_003F9468(DobboPartsObject252 *object)
 {
     DobboPartsDescriptor252 *descriptor = object->descriptor;
     DobboPartsObject252 *parent = descriptor->parent;
     int i;
-    if (!parent || parent->class_code != 0xd0e || parent->status == 0xfe || parent->status == 0xfd)
+    if (!parent || parent->class_code != 0xd0e /* Megacorp Trooper Torso */ || parent->status == 0xfe || parent->status == 0xfd)
         return;
     for (i = 0; i < 2; ++i) {
         if (descriptor->parts[i]) {
-            func_002AF1D0(descriptor->parent, descriptor->parts[i], i, i == 1 ? 6 : 0);
+            CopyJointTransformToObject(descriptor->parent, descriptor->parts[i], i, i == 1 ? 6 : 0);
             if (object->disabled) {
                 descriptor->parts[i]->flags &= ~1U;
                 descriptor->parts[i]->disabled = 1;
@@ -76,7 +78,7 @@ void func_L09_003F9468(DobboPartsObject252 *object)
                 descriptor->parts[i]->flags |= 1;
                 descriptor->parts[i]->disabled = 0;
             }
-            func_L09_003F7788(object, descriptor->parts[i]);
+            CopyMobyColor(object, descriptor->parts[i]);
         }
     }
 }
@@ -84,19 +86,20 @@ void func_L09_003F9468(DobboPartsObject252 *object)
 
 /* func_L09_003F9708 lives in L09_003F9708-g8.c. */
 
-extern s32 func_33E658(s32 a0);
+extern s32 func_33E658(s32 moby);
 
 /* Refreshes the cached 16-bit handle of the state's 0x2DC entry. */
-s32 func_L09_003F9928(char *a0)
+/* Toggles the enemy's cached path handle between empty and the current path. */
+s32 func_L09_003F9928(char *moby)
 {
-    char *s0 = *(char **)(a0 + 0x68);
-    short v0 = *(short *)(s0 + 0x1CA);
+    char *vars = *(char **)(moby + 0x68);
+    short cachedHandle = *(short *)(vars + 0x1CA);
 
-    if (v0 != 0) {
-        *(short *)(s0 + 0x1CA) = 0;
+    if (cachedHandle != 0) {
+        *(short *)(vars + 0x1CA) = 0;
         return 0;
     }
-    *(short *)(s0 + 0x1CA) = func_33E658(*(s32 *)(s0 + 0x2DC));
+    *(short *)(vars + 0x1CA) = func_33E658(*(s32 *)(vars + 0x2DC));
     return 1;
 }
 
@@ -108,18 +111,19 @@ s32 func_L09_003F9928(char *a0)
 
 
 /* computes a local target direction and stores bounded horizontal and vertical angles through the original math helpers */
+/* Turns the object to face its target, with limits on how far it can turn left, right, up and down. */
 void func_L09_004051F8(NativeAngleOwner *owner) {
     f32 direction[4] __attribute__((aligned(16)));
     NativeAngleState *state = owner->field68;
     f32 angle, xy_length;
-    func_00282CF0(direction, state->field1F0, owner->field10);
-    func_002AFDD8(owner, direction, direction, 0);
-    angle = func_00283248(direction[0], direction[1]);
+    FastVecSub(direction, state->field1F0, owner->field10);
+    TransformVectorByObjectOrGiven(owner, direction, direction, 0);
+    angle = FastMatrixHelperA(direction[0], direction[1]);
     state->field2E0 = angle;
     if (0.78539824f < angle) state->field2E0 = 0.78539824f;
     else if (angle < -0.78539824f) state->field2E0 = -0.78539824f;
-    xy_length = func_00282E20(direction);
-    angle = -func_00283248(xy_length, direction[2]);
+    xy_length = vec_length_xy(direction);
+    angle = -FastMatrixHelperA(xy_length, direction[2]);
     state->field2E8 = angle;
     if (0.52359885f < angle) state->field2E8 = 0.52359885f;
     else if (angle < -0.52359885f) state->field2E8 = -0.52359885f;

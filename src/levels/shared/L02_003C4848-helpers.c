@@ -48,6 +48,7 @@ struct L02SpinObj {
 };
 
 /* Measured pointer-list starts are accessed without guessing their capacities. */
+/* Resets a puzzle group: restarts its three kinds of linked parts (lists, turning parts and spinning parts) and sets the group timer to 60. */
 void func_L02_003C4848(char *arg)
 {
     char *parent = *(char **)(arg + 0x68);

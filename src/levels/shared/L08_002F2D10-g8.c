@@ -7,6 +7,7 @@ extern f32 D_L08_001BE0B0 __attribute__((nosda));
 
 extern void func_0027AB40();
 
+/* Starts a saved-state hold: remembers a global float and returns 1, or returns 0 if one is already active. */
 s32 func_L08_00300090(void) {
     if (D_L08_001A9050 != 0)
         return 0;
@@ -15,11 +16,12 @@ s32 func_L08_00300090(void) {
     return 1;
 }
 
+/* Ends the saved-state hold: puts the remembered float back and returns 1, or returns 0 if none is active. */
 s32 func_L08_003000C0(void) {
     if (D_L08_001A9050 == 0)
         return 0;
     D_L08_001BE0B0 = D_L08_001A9054;
-    func_0027AB40();
+    UpdateViewContext();
     D_L08_001A9050 = 0;
     return 1;
 }
@@ -53,37 +55,37 @@ extern f32 func_00283CE0(s32);
 
 /* Flags the level's object, feeds the camera its aim values and advances the
    counter the aim is scaled by. */
-void func_L08_003CD488(s32 *counter, u8 *arg) {
+void func_L08_003CD488(s32 *counter, u8 *moby) {
     u8 *owner;
-    f32 t, a, b, c;
+    f32 fade, scaleA, scaleB, scaleC;
 
-    owner = *(u8 **)((u8 *)arg + 0x68);
+    owner = *(u8 **)((u8 *)moby + 0x68);
     if (*(s16 *)((u8 *)D_L08_001B9B50 + 0x86) == 0) {
         *(s32 *)((u8 *)*(u8 **)((u8 *)D_L08_001B9B50 + 0x70) + 0x250) = 2;
     }
 
-    func_L00_00424A88(D_L08_001B00F0, D_L08_001B00F4, D_L08_001B00F8);
-    func_L00_00424A08(0, D_L08_001B00E4, D_L08_001B00E0);
+    SetCameraAimOffsetTarget(D_L08_001B00F0, D_L08_001B00F4, D_L08_001B00F8);
+    follow_camera_set_distance(0, D_L08_001B00E4, D_L08_001B00E0);
 
     if (*(s32 *)((u8 *)owner + 0xC8) >= 0 &&
-        func_002ACBC8(D_00189EA0, *(s32 *)((u8 *)owner + 0xC8)) != 0) {
-        func_L00_00424B20(0.52359885f);
+        IsPointInCuboid(gHeroPosition, *(s32 *)((u8 *)owner + 0xC8)) != 0) {
+        SetCameraTuningValue(0.52359885f);
     }
 
-    func_L00_00424A50(D_L08_001B00E8, 0.003f);
-    func_L00_00424C28();
+    follow_camera_set_height(D_L08_001B00E8, 0.003f);
+    SetCameraLockFlag();
 
-    t = func_00283CE0(*counter) / func_00283CE0(0x5A);
-    if (t > 1.0f)
-        t = 1.0f;
+    fade = IntToFloat(*counter) / IntToFloat(0x5A);
+    if (fade > 1.0f)
+        fade = 1.0f;
 
-    a = t * 0.985f + 0.015f;
-    b = t * 0.8f + 0.2f;
-    c = t * 0.044999998062849045f + 0.015f;
+    scaleA = fade * 0.985f + 0.015f;
+    scaleB = fade * 0.8f + 0.2f;
+    scaleC = fade * 0.044999998062849045f + 0.015f;
 
-    func_L00_00424B70(a, b);
-    func_L00_00424BB8(c, 0.2f);
-    func_L00_00424C00();
+    SetCameraSpeedsIfNonZero(scaleA, scaleB);
+    SetCameraTurnSpeedsIfNonZero(scaleC, 0.2f);
+    SetCameraSnapFlag();
 
     if (*counter < 0x5A)
         *counter = *counter + 1;
@@ -97,44 +99,45 @@ extern char D_00189E20[];
 extern char D_00138180[];
 extern s32 D_001A79F0;
 
-void func_L08_003C6528(f32 *a1, f32 *a2, f32 *a3, f32 *a4, f32 *a5, f32 *a6) {
-    char *p = (char *)D_00189E20;
-    f32 v;
+/* Reads the player's aim and stick values and gives back six values clamped to the range -1 to 1. */
+void func_L08_003C6528(f32 *outX, f32 *outY, f32 *outZ, f32 *outA, f32 *outB, f32 *outC) {
+    char *playerData = (char *)gHeroState;
+    f32 value;
     {
-        char *q = (char *)D_00138180;
-        *a1 = -*(f32 *)(p + 0x1FB0);
-        *a3 = -*(f32 *)(p + 0x1FB4);
-        *a2 = func_002A7798(*(f32 *)(q + 0x128)) - func_002A7798(*(f32 *)(q + 0x124));
+        char *settings = (char *)gPadState;
+        *outX = -*(f32 *)(playerData + 0x1FB0);
+        *outZ = -*(f32 *)(playerData + 0x1FB4);
+        *outY = EaseOutQuad(*(f32 *)(settings + 0x128)) - EaseOutQuad(*(f32 *)(settings + 0x124));
     }
-    if (D_001A79F0 == 8 || D_001A79F0 == 0x1E || D_001A79F0 == 0x15) {
-        char *q = (char *)D_00138180;
-        *a4 = *(f32 *)(q + 0x12C);
-        *a6 = 0;
+    if (gCurrentMapIndex == 8 || gCurrentMapIndex == 0x1E || gCurrentMapIndex == 0x15) {
+        char *settings = (char *)gPadState;
+        *outA = *(f32 *)(settings + 0x12C);
+        *outC = 0;
     } else {
-        char *q = (char *)D_00138180;
-        *a6 = *(f32 *)(q + 0x12C);
-        *a4 = 0;
+        char *settings = (char *)gPadState;
+        *outC = *(f32 *)(settings + 0x12C);
+        *outA = 0;
     }
     {
-        char *q = (char *)D_00138180;
-        *a5 = func_002A7798(*(f32 *)(q + 0x138)) - func_002A7798(*(f32 *)(q + 0x13C));
+        char *settings = (char *)gPadState;
+        *outB = EaseOutQuad(*(f32 *)(settings + 0x138)) - EaseOutQuad(*(f32 *)(settings + 0x13C));
     }
 
-    v = *a1;
-    if (v > 1.0f)
-        *a1 = 1.0f;
-    else if (v < -1.0f)
-        *a1 = -1.0f;
+    value = *outX;
+    if (value > 1.0f)
+        *outX = 1.0f;
+    else if (value < -1.0f)
+        *outX = -1.0f;
 
-    v = *a2;
-    if (v > 1.0f)
-        *a2 = 1.0f;
-    else if (v < -1.0f)
-        *a2 = -1.0f;
+    value = *outY;
+    if (value > 1.0f)
+        *outY = 1.0f;
+    else if (value < -1.0f)
+        *outY = -1.0f;
 
-    v = *a5;
-    if (v > 1.0f)
-        *a5 = 1.0f;
-    else if (v < -1.0f)
-        *a5 = -1.0f;
+    value = *outB;
+    if (value > 1.0f)
+        *outB = 1.0f;
+    else if (value < -1.0f)
+        *outB = -1.0f;
 }

@@ -10,9 +10,10 @@ extern int func_002A77E0(int n);
 extern void func_L00_00403900(int *v);
 extern void func_L00_00403C68(int *v);
 
+/* Adds a sheep to the list of 16 active sheep. If the list is full, a random old sheep is removed to make room. */
 void func_L00_00403CB8(int *arg)
 {
-    if (func_L00_00403C30() == 0) {
+    if (IsActiveSheepListFull() == 0) {
         int i;
         for (i = 0; i < 16; i++) {
             if (D_L00_001B2C30[i] == 0) {
@@ -21,7 +22,7 @@ void func_L00_00403CB8(int *arg)
             }
         }
     } else {
-        int **slot = &D_L00_001B2C30[func_002A77E0(16)];
+        int **slot = &D_L00_001B2C30[RandomIntBelow(16)];
         func_L00_00403900(*slot);
         func_L00_00403C68(*slot);
         *slot = arg;

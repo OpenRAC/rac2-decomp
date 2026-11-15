@@ -30,6 +30,7 @@ extern f32 ref_L02_00332900_03 __attribute__((sda));
 extern f32 ref_L02_00332900_04 __attribute__((sda));
 extern volatile s32 ref_L02_00332900_05;
 
+/* Reads the hardware timer once per frame and works out how many timer ticks a frame takes. Then it restarts the timer. */
 void func_L02_00332900(void) {
     if (ref_L02_00332900_01 != ref_L02_00332900_05) {
         if (ref_L02_00332900_02 != 0) {

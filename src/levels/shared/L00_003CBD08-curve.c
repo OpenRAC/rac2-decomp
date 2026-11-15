@@ -1,34 +1,34 @@
 #include "common.h"
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
-void func_L00_003CBD08(float *out, float *b, float *c, float *a, float *d, float t)
+void func_L00_003CBD08(float *out, float *start, float *end, float *startTangent, float *endTangent, float amount)
 {
-    float t2, t3, p, q, r;
+    float tSquared, tCubed, cubicTerm, squareTerm, linearTerm;
 
-    if (t == 0.0f) {
-        qcopy(out, b);
+    if (amount == 0.0f) {
+        qcopy(out, start);
         return;
     }
-    if (t == 1.0f) {
-        qcopy(out, c);
+    if (amount == 1.0f) {
+        qcopy(out, end);
         return;
     }
-    t2 = t * t;
-    t3 = t2 * t;
+    tSquared = amount * amount;
+    tCubed = tSquared * amount;
 
-    p = (d[0] - c[0]) - (a[0] - b[0]);
-    q = (a[0] - b[0]) - p;
-    r = c[0] - a[0];
-    out[0] = p * t3 + q * t2 + r * t + b[0];
+    cubicTerm = (endTangent[0] - end[0]) - (startTangent[0] - start[0]);
+    squareTerm = (startTangent[0] - start[0]) - cubicTerm;
+    linearTerm = end[0] - startTangent[0];
+    out[0] = cubicTerm * tCubed + squareTerm * tSquared + linearTerm * amount + start[0];
 
-    p = (d[1] - c[1]) - (a[1] - b[1]);
-    q = (a[1] - b[1]) - p;
-    r = c[1] - a[1];
-    out[1] = p * t3 + q * t2 + r * t + b[1];
+    cubicTerm = (endTangent[1] - end[1]) - (startTangent[1] - start[1]);
+    squareTerm = (startTangent[1] - start[1]) - cubicTerm;
+    linearTerm = end[1] - startTangent[1];
+    out[1] = cubicTerm * tCubed + squareTerm * tSquared + linearTerm * amount + start[1];
 
-    p = (d[2] - c[2]) - (a[2] - b[2]);
-    q = (a[2] - b[2]) - p;
-    r = c[2] - a[2];
-    out[2] = p * t3 + q * t2 + r * t + b[2];
+    cubicTerm = (endTangent[2] - end[2]) - (startTangent[2] - start[2]);
+    squareTerm = (startTangent[2] - start[2]) - cubicTerm;
+    linearTerm = end[2] - startTangent[2];
+    out[2] = cubicTerm * tCubed + squareTerm * tSquared + linearTerm * amount + start[2];
     out[3] = 0.0f;
 }

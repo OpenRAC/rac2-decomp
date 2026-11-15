@@ -12,6 +12,7 @@ extern int *volatile D_001B22A8 MACRO_ADDR;
 
 extern void func_002FC560(int, long);
 
+/* Draws a screen-wide set of thin sprite strips that prepare the buffer used for shadows. */
 void func_002DF838(void)
 {
     int x, y, n;
@@ -24,19 +25,19 @@ void func_002DF838(void)
     int step;
     long *corners;
 
-    x = D_001A6480.x;
-    y = D_001A6480.y;
+    x = gScreenAdjustOffsets.x;
+    y = gScreenAdjustOffsets.y;
     n = x / 32;
 
-    func_002FC560(0x42, 0x64);
+    VU1_addGSregister(0x42, 0x64);
 
     /* The packet cursor is reloaded between these header writes in retail. */
-    *(int *)D_001B22A8 = (n + 5) | 0x10000000;
-    *(int *)((char *)D_001B22A8 + 4) = 0;
-    *(int *)((char *)D_001B22A8 + 8) = 0;
-    *(int *)((char *)D_001B22A8 + 12) = (n + 5) | 0x50000000;
-    p = D_001B22A8;
-    D_001B22A8 = p + 4;
+    *(int *)gDmaPacketCursor = (n + 5) | 0x10000000;
+    *(int *)((char *)gDmaPacketCursor + 4) = 0;
+    *(int *)((char *)gDmaPacketCursor + 8) = 0;
+    *(int *)((char *)gDmaPacketCursor + 12) = (n + 5) | 0x50000000;
+    p = gDmaPacketCursor;
+    gDmaPacketCursor = p + 4;
     q = (long *)(p + 4);
     zero = 0;
     q[zero] = 0x1000000000000001L;
@@ -67,5 +68,5 @@ void func_002DF838(void)
             i++;
         } while (i < n);
     }
-    D_001B22A8 = (int *)((char *)D_001B22A8 + (n * 16 + 0x50));
+    gDmaPacketCursor = (int *)((char *)gDmaPacketCursor + (n * 16 + 0x50));
 }

@@ -4,18 +4,19 @@
 
 extern char *D_L07_001AEC08 __attribute__((sda));
 
-extern float func_2E5480(float a0, float a1);
+extern float func_2E5480(float offset, float a1);
 
-extern void func_338D20(int a0, int a1, char *a2, void *a3, int a4, float f12);
+extern void func_338D20(int offset, int a1, char *a2, void *a3, int a4, float f12);
 
-extern void func_2E4B70(char *a0, void *a1);
+extern void func_2E4B70(char *offset, void *a1);
 
-void func_L07_00379180(float a0) {
-    char *s0 = *(char **)(D_L07_001AEC08 + 0x68);
-    int v;
+/* Updates the snow effect object using the given value to set its sound or brightness. */
+void func_L07_00379180(float offset) {
+    char *vars = *(char **)(gSnowfallMoby + 0x68);
+    int pos2;
 
-    func_338D20(*(int *)(s0 + 0x14), 1, s0 + 0x50, &v, 0, func_2E5480(a0 + 45.0f, 1000.0f));
-    func_2E4B70(s0 + 0x20, &v);
+    func_338D20(*(int *)(vars + 0x14), 1, vars + 0x50, &pos2, 0, func_2E5480(offset + 45.0f, 1000.0f));
+    func_2E4B70(vars + 0x20, &pos2);
 }
 
 extern int D_001A79F0;
@@ -73,6 +74,7 @@ extern void func_00282D30(Vec2 *out, Vec2 *in, f32 scale);
 
 extern void func_00282CC0(Vec2 *out, Vec2 *in, Vec2 *add);
 
+/* Places four marker points around the level object, scaled and turned to match the object it follows. */
 void func_L07_002F2C70(void) {
     Vec2 mat[3];
     Vec2 buf[3];
@@ -84,7 +86,7 @@ void func_L07_002F2C70(void) {
     Vec2 *q;
     int i;
 
-    if (D_001A79F0 != 7)
+    if (gCurrentMapIndex != 7)
         return;
 
     obj = 0;
@@ -111,14 +113,14 @@ void func_L07_002F2C70(void) {
     p = &g->m[0];
     q = (Vec2 *)&D_L07_001A93E0;
 
-    func_00283AF0((u8 *)((L07Obj *)obj)->f58 + 0x10, buf);
-    func_00283958(buf, mat);
+    FastVectorToIntHelper((u8 *)((L07Obj *)obj)->f58 + 0x10, buf);
+    quaternion_to_rotation_basis(buf, mat);
     scale = ((L07Obj *)obj)->f2C / *(f32 *)((u8 *)((L07Obj *)obj)->f24 + 0x24);
 
     for (i = 0; i < 4; i++) {
-        func_00283098(p, q, mat);
-        func_00282D30(p, p, scale);
-        func_00282CC0(p, p, (Vec2 *)((u8 *)obj + 0x10));
+        matrix_mul_vec3(p, q, mat);
+        FastVecScale(p, p, scale);
+        FastVecAdd(p, p, (Vec2 *)((u8 *)obj + 0x10));
         p++;
         q++;
     }

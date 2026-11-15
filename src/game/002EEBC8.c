@@ -11,16 +11,17 @@ extern RpcBufferState D_001A7240 __attribute__((sda));
 extern int D_00215050[][4];
 
 /* Bind asynchronously, obtain the remote buffer descriptor and clear the slots. */
+/* Connects to the remote IO server, waits until it is ready, reads its buffer size, and clears the table of 64 buffer slots. */
 void func_002EEBC8(void) {
     int reply[4];
     int i;
-    func_0011CF78(0);
+    InitSifRpc(0);
     for (;;) {
-        if (func_0011D450(D_001A7240.cd, 0x11, 1) < 0) {
+        if (BindRpcServer(D_001A7240.cd, 0x11, 1) < 0) {
             for (;;) {
             }
         }
-        while (func_0011D810(D_001A7240.cd) != 0) {
+        while (IsRpcHandleValid(D_001A7240.cd) != 0) {
         }
         if (D_001A7240.cd[9] != 0) {
             goto bound;
@@ -31,7 +32,7 @@ void func_002EEBC8(void) {
         }
     }
 bound:
-    func_0011D620(D_001A7240.cd, 2, 0, 0, 0, reply, 16, 0, 0);
+    CallRpcServer(D_001A7240.cd, 2, 0, 0, 0, reply, 16, 0, 0);
     D_001A7240.base = reply[0];
     D_001A7240.size = reply[1];
     D_001A7240.cursor = reply[0];

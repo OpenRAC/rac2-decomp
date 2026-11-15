@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned int D_L02_001A8F00;
 
@@ -53,80 +54,80 @@ extern void func_002A0F48(void *e);
    angle and advances its phase; a hit by the player while it is active switches it off and spawns
    the debris (func_L00_0032A258, func_002ABBB8); a live one tilts toward its turning speed
    (func_002AA2E8) and runs the level's two update calls. */
-void func_L02_0038C998(unsigned char *arg0) {
-    unsigned char *o = *(unsigned char **)(arg0 + 0x68);
-    int *path = *(int **)(o + 0x60);
+void func_L02_0038C998(unsigned char *moby) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    int *path = *(int **)(vars + 0x60);
     float range = (float)*path;
-    float step = *(float *)(o + 0x14);
-    int seg = *(short *)(o + 0x70);
+    float step = *(float *)(vars + 0x14);
+    int seg = *(short *)(vars + 0x70);
     float rate = D_L02_001AEF50 * 0.00029088825f;
     unsigned short *q;
-    unsigned char *e;
-    unsigned char *s1;
+    unsigned char *target;
+    unsigned char *targetVars;
     float prev;
     float h;
 
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    q = (unsigned short *)gEntityGroupLists[moby[0x21]];
+    while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && q != 0 &&
+           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)gEntityGroupLists[moby[0x21]])) {
+        target = (unsigned char *)(gMobyPool_L02 + ((*q & 0x7FFF) << 8));
+        if (target == 0)
             break;
-        s1 = *(unsigned char **)(e + 0x68);
-        prev = *(float *)(e + 0xF8);
-        h = *(float *)(s1 + 0x10) + *(float *)(s1 + 0x7C) * func_00283198(*(float *)(s1 + 0x80));
+        targetVars = *(unsigned char **)(target + 0x68);
+        prev = *(float *)(target + 0xF8);
+        h = *(float *)(targetVars + 0x10) + *(float *)(targetVars + 0x7C) * FastSinOrCosB(*(float *)(targetVars + 0x80));
         if (range <= h)
             h -= range;
         else if (h < 0.0f)
             h += range;
-        func_002C9828(path, seg, e + 0x10, e + 0xF0, 0, h);
-        *(float *)(s1 + 0x68) = func_00283B98(*(float *)(s1 + 0x68), *(float *)(s1 + 0x6C));
-        *(float *)(e + 0x18) += func_00283198(*(float *)(s1 + 0x68));
-        *(float *)(s1 + 0x10) += step;
-        if (range <= *(float *)(s1 + 0x10))
-            *(float *)(s1 + 0x10) -= range;
-        *(float *)(s1 + 0x80) = func_00283B98(*(float *)(s1 + 0x80), *(float *)(s1 + 0x84));
-        if (func_002A9640(e, 0x4010000, 0) != 0) {
-            if (e[0x31] != 0) {
+        SamplePathPosition(path, seg, target + 0x10, target + 0xF0, 0, h);
+        *(float *)(targetVars + 0x68) = FastAddRotations(*(float *)(targetVars + 0x68), *(float *)(targetVars + 0x6C));
+        *(float *)(target + 0x18) += FastSinOrCosB(*(float *)(targetVars + 0x68));
+        *(float *)(targetVars + 0x10) += step;
+        if (range <= *(float *)(targetVars + 0x10))
+            *(float *)(targetVars + 0x10) -= range;
+        *(float *)(targetVars + 0x80) = FastAddRotations(*(float *)(targetVars + 0x80), *(float *)(targetVars + 0x84));
+        if (FindOwnedEffectSlot(target, 0x4010000, 0) != 0) {
+            if (target[0x31] != 0) {
                 Vec4 dir;
                 float pos[4] __attribute__((aligned(16)));
 
-                ((Ent *)e)->f31 = 0;
-                ((Ent *)e)->f34 |= 1;
-                ((Ent *)e)->f98 = 0;
+                ((Ent *)target)->f31 = 0;
+                ((Ent *)target)->f34 |= 1;
+                ((Ent *)target)->f98 = 0;
                 D_L02_001A9048++;
-                func_L00_0032A258(e, D_L02_001AEE50, D_L02_001AEE48, D_L02_001AEE40, 0x3F, 2,
+                ExplodeObjectIntoPieces(target, D_L02_001AEE50, D_L02_001AEE48, D_L02_001AEE40, 0x3F, 2,
                                   D_L02_001AEE70, 0, 0xFFFF, 0xFF, 0);
                 dir.q = 0;
                 dir.f[2] = 0.05000000447f;
-                func_L01_0031A278((char *)e, pos, 0.0f, 0.0f, 0.0f);
-                if (*(short *)(e + 0xAA) == 0x1290)
-                    func_002E5CF8(0, 0, e);
-                if (*(short *)(e + 0xAA) == 0x134B)
-                    func_002E5CF8(0, 0, e);
-                if (*(short *)(e + 0xAA) == 0xB15)
-                    func_002E5CF8(1, 0, e);
-                if (*(short *)(e + 0xAA) == 0xB13)
-                    func_002E5CF8(1, 0, e);
-                func_002ABBB8(e, 0.0f, &dir, 0.0f, pos, 5.0f, 0x23, 2.5f, 8, 0x10, 0.0f, 3.0f, -1,
+                ComputeMobyLocalPoint((char *)target, pos, 0.0f, 0.0f, 0.0f);
+                if (*(short *)(target + 0xAA) == 0x1290 /* moby class 4752 */)
+                    PlayMobySound(0, 0, target);
+                if (*(short *)(target + 0xAA) == 0x134B /* moby class 4939 */)
+                    PlayMobySound(0, 0, target);
+                if (*(short *)(target + 0xAA) == 0xB15 /* moby class 2837 */)
+                    PlayMobySound(1, 0, target);
+                if (*(short *)(target + 0xAA) == 0xB13 /* moby class 2835 */)
+                    PlayMobySound(1, 0, target);
+                SpawnExplosionEffects(target, 0.0f, &dir, 0.0f, pos, 5.0f, 0x23, 2.5f, 8, 0x10, 0.0f, 3.0f, -1,
                               15.0f, 1, 10, -1, 0, 0x810001);
             }
         }
-        e[0xA8] = 0xFF;
-        if (e[0x31] != 0) {
-            if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
-                h = -func_00283BE0(*(float *)(e + 0xF8), prev) * 50.0f;
+        target[0xA8] = 0xFF;
+        if (target[0x31] != 0) {
+            if ((*(unsigned short *)(target + 0x34) ^ 1) & 1) {
+                h = -fast_subtract_rotations(*(float *)(target + 0xF8), prev) * 50.0f;
                 if (0.78539824f < h)
                     h = 0.78539824f;
                 if (h < -0.78539824f)
                     h = -0.78539824f;
-                func_002AA2E8((float *)(e + 0xF0), h, rate);
-                if (*(short *)(s1 + 0x72) != 0)
-                    func_L02_0038CDE8(e);
-                func_L02_0038D978(e);
+                ApproachValue((float *)(target + 0xF0), h, rate);
+                if (*(short *)(targetVars + 0x72) != 0)
+                    UpdateLampGlowEffects(target);
+                UpdateBlinkingLampMoby(target);
             }
         }
-        func_002A0F48(e);
+        func_002A0F48(target);
         q++;
     }
 }

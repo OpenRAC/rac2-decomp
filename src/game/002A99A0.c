@@ -57,13 +57,13 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
                         float radius;
                         if (kind < 2) {
                             qcopy_nc(&center, shape + 16);
-                            func_00282D60(&center, &center, *(float *)(object + 0x2C) * (1.0f / 1024.0f));
+                            scale_vector(&center, &center, *(float *)(object + 0x2C) * (1.0f / 1024.0f));
                             radius = center.w;
                         } else {
                             qcopy_nc(&center, (void *)(0x70000000 + (*(int *)(data) << 4)));
                             qcopy_nc(&random, shape + 16);
-                            func_00282CC0(&center, &center, &random);
-                            func_00282D30(&center, &center, *(float *)(object + 0x2C) * (1.0f / 1024.0f));
+                            FastVecAdd(&center, &center, &random);
+                            FastVecScale(&center, &center, *(float *)(object + 0x2C) * (1.0f / 1024.0f));
                             radius = *(float *)(object + 0x2C);
                             radius = *(float *)(data + 8) * radius * (1.0f / 1024.0f);
                         }
@@ -73,7 +73,7 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
                     case 3: {
                         float radius, height, scaled_height;
                         qcopy_nc(&center, shape + 16);
-                        func_00282D30(&center, &center, *(float *)(object + 0x2C));
+                        FastVecScale(&center, &center, *(float *)(object + 0x2C));
                         radius = center.w * *(float *)(object + 0x2C);
                         radius *= 1.0f / 1024.0f;
                         height = *(float *)(data);
@@ -86,8 +86,8 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
                         float radius, height;
                         func_00129148(&center, (void *)(0x70000000 + (*(short *)(data) << 4)), *(float *)(object + 0x2C) * (1.0f / 1024.0f));
                         func_00129148(&random, (void *)(0x70000000 + (*(short *)(data + 2) << 4)), *(float *)(object + 0x2C) * (1.0f / 1024.0f));
-                        func_00282CF0(&delta, &center, &random);
-                        radius = func_00282DF0(&delta);
+                        FastVecSub(&delta, &center, &random);
+                        radius = FastVecLength(&delta);
                         height = *(float *)(data + 8) * *(float *)(object + 0x2C) * (1.0f / 1024.0f);
                         volumes[count] = height * (height * 1.5707963705062866f) * radius;
                         break;
@@ -104,7 +104,7 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
     n = (int)(density * total + 0.5f);
     if (limit < n) n = limit;
     for (i = 0; i < n; i++) {
-        value = func_002A7878(0.0f, total);
+        value = RandomFloatRange(0.0f, total);
         {
             int selected;
             for (selected = 0; selected < count; selected++) {
@@ -119,26 +119,26 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
             float radius, negative;
             if (kind < 2) {
                 qcopy_nc(&center, shape + 16);
-                func_00282D30(&center, &center, *(float *)(object + 0x2C));
+                FastVecScale(&center, &center, *(float *)(object + 0x2C));
                 radius = center.w * *(float *)(object + 0x2C);
             } else {
                 qcopy_nc(&center, (void *)(0x70000000 + (*(int *)(shape + 4) << 4)));
                 qcopy_nc(&random, shape + 16);
-                func_00282CC0(&center, &center, &random);
-                func_00282D30(&center, &center, *(float *)(object + 0x2C));
+                FastVecAdd(&center, &center, &random);
+                FastVecScale(&center, &center, *(float *)(object + 0x2C));
                 radius = *(float *)(shape + 12) * *(float *)(object + 0x2C);
             }
             radius = radius * (1.0f / 1024.0f);
-            func_00282D90(&center, &center, 1024.0f);
+            divide_vector_xyz(&center, &center, 1024.0f);
             negative = -radius;
             for (;;) {
-                random.x = func_002A7878(negative, radius);
-                random.y = func_002A7878(negative, radius);
-                random.z = func_002A7878(negative, radius);
-                if (func_00282DF0(&random) <= radius) {
-                    func_00282CC0(&random, &random, &center);
-                    func_00283098(&random, &random, object + 0xC0);
-                    func_00282CC0(&output[i], &random, object + 0x10);
+                random.x = RandomFloatRange(negative, radius);
+                random.y = RandomFloatRange(negative, radius);
+                random.z = RandomFloatRange(negative, radius);
+                if (FastVecLength(&random) <= radius) {
+                    FastVecAdd(&random, &random, &center);
+                    matrix_mul_vec3(&random, &random, object + 0xC0);
+                    FastVecAdd(&output[i], &random, object + 0x10);
                     break;
                 }
             }
@@ -147,20 +147,20 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
         case 3: {
             float radius, height, a, b, angle;
             qcopy_nc(&center, shape + 16);
-            func_00282D30(&center, &center, *(float *)(object + 0x2C));
+            FastVecScale(&center, &center, *(float *)(object + 0x2C));
             radius = center.w * *(float *)(object + 0x2C);
             height = *(float *)(shape + 4) * *(float *)(object + 0x2C);
-            func_00282D90(&center, &center, 1024.0f);
+            divide_vector_xyz(&center, &center, 1024.0f);
             radius *= 1.0f / 1024.0f;
             height *= 1.0f / 1024.0f;
-            a = func_00282C10(func_002A7878(0.0f, radius * radius));
-            b = func_002A7878(0.0f, height);
-            angle = func_002A7940();
-            random.x = func_00283180(angle) * a;
-            random.y = func_00283198(angle) * a;
+            a = square_root(RandomFloatRange(0.0f, radius * radius));
+            b = RandomFloatRange(0.0f, height);
+            angle = RandomAngle();
+            random.x = FastSinOrCosA(angle) * a;
+            random.y = FastSinOrCosB(angle) * a;
             random.z = b;
-            func_00282CC0(&random, &random, object + 0x10);
-            func_00282CC0(&output[i], &center, &random);
+            FastVecAdd(&random, &random, object + 0x10);
+            FastVecAdd(&output[i], &center, &random);
             break;
         }
         case 4: {
@@ -168,22 +168,22 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
             char *data = shape + 4;
             func_00129148(&center, (void *)(0x70000000 + (*(short *)(data) << 4)), *(float *)(object + 0x2C));
             func_00129148(&random, (void *)(0x70000000 + (*(short *)(data + 2) << 4)), *(float *)(object + 0x2C));
-            func_00282CF0(&delta, &random, &center);
-            value = func_002A7878(0.0f, 1.0f);
-            func_00282D30(&delta, &delta, value);
-            func_00282CC0(&point, &delta, &center);
-            func_00282D90(&point, &point, 1024.0f);
+            FastVecSub(&delta, &random, &center);
+            value = RandomFloatRange(0.0f, 1.0f);
+            FastVecScale(&delta, &delta, value);
+            FastVecAdd(&point, &delta, &center);
+            divide_vector_xyz(&point, &point, 1024.0f);
             radius = *(float *)(shape + 12) * *(float *)(object + 0x2C);
             radius *= 1.0f / 1024.0f;
             negative = -radius;
             do {
-                jitter.x = func_002A7878(negative, radius);
-                jitter.y = func_002A7878(negative, radius);
-                jitter.z = func_002A7878(negative, radius);
-            } while (!(func_00282DF0(&jitter) <= radius));
-            func_00282CC0(&jitter, &jitter, &point);
-            func_00283098(&jitter, &jitter, object + 0xC0);
-            func_00282CC0(&output[i], &jitter, object + 0x10);
+                jitter.x = RandomFloatRange(negative, radius);
+                jitter.y = RandomFloatRange(negative, radius);
+                jitter.z = RandomFloatRange(negative, radius);
+            } while (!(FastVecLength(&jitter) <= radius));
+            FastVecAdd(&jitter, &jitter, &point);
+            matrix_mul_vec3(&jitter, &jitter, object + 0xC0);
+            FastVecAdd(&output[i], &jitter, object + 0x10);
             break;
         }
         }

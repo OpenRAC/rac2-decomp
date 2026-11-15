@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002C3150: spawns a particle at position with velocity; mode 1 keeps it
    relative to the hero. Its own unit for the grouped lq/sq profile. */
@@ -33,10 +34,11 @@ typedef struct {
 extern char D_00189E20[];
 extern unsigned char *D_001F2614;
 
-Particle_002C3150 *func_002C3150(TI128 *position, TI128 *velocity, int arg2,
-                                 unsigned char arg3, unsigned char arg4, int mode, float scale)
+/* Creates a particle with a starting speed. In mode 1 it keeps its distance from the hero. */
+Particle_002C3150 *func_002C3150(TI128 *position, TI128 *velocity, int colour,
+                                 unsigned char life, unsigned char seed, int mode, float scale)
 {
-    Particle_002C3150 *p = func_002B9030(0x3C);
+    Particle_002C3150 *p = AllocParticle(0x3C);
     typeof(p->motion) *m;
 
     if (p != 0) {
@@ -45,18 +47,18 @@ Particle_002C3150 *func_002C3150(TI128 *position, TI128 *velocity, int arg2,
         m->velocity = *velocity;
         m->mode = mode;
         if (mode == 1) {
-            m->offset[0] = ((float *)&p->position)[0] - ((HeroView_002C3150 *)D_00189E20)->position[0];
-            m->offset[1] = ((float *)&p->position)[1] - ((HeroView_002C3150 *)D_00189E20)->position[1];
-            m->offset[2] = ((float *)&p->position)[2] - ((HeroView_002C3150 *)D_00189E20)->position[2];
+            m->offset[0] = ((float *)&p->position)[0] - ((HeroView_002C3150 *)gHeroState)->position[0];
+            m->offset[1] = ((float *)&p->position)[1] - ((HeroView_002C3150 *)gHeroState)->position[1];
+            m->offset[2] = ((float *)&p->position)[2] - ((HeroView_002C3150 *)gHeroState)->position[2];
         }
-        p->unk04 = arg2;
-        p->unk09 = func_00283CF0(1.0f) + 0x20;
+        p->unk04 = colour;
+        p->unk09 = FloatToInt(1.0f) + 0x20;
         p->unk03 = 0x48;
-        p->unk08 = arg4;
+        p->unk08 = seed;
         p->unk01 = 0;
         p->unk0C = scale * 210000.0f;
         p->unk02 = *D_001F2614;
-        p->unk0A = arg3;
+        p->unk0A = life;
     }
     return p;
 }

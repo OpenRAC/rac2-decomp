@@ -5,6 +5,7 @@
 extern unsigned char D_001395C1[];
 extern unsigned char D_001A7B00[] __attribute__((sda));
 
+/* Returns 1 only if three separate status bytes are all non-zero. */
 int func_0029DC90(void)
 {
     if (D_001395C1[0] == 0)

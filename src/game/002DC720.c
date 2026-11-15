@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Draws a menu text box: the box from the menu's own geometry (func_002DE810), then per
    state (+0x50) either the -1 terminated list of text ids at +0x34, centred by the line
@@ -18,10 +19,10 @@ int func_002DC720(char *menu_text_box)
     int text_start_y_offset;
     int i;
 
-    func_002FC560(0x47, 0x30000);
-    func_002FC560(0x42, 0x8000000044LL);
-    func_0027C540(0);
-    func_002DE810(box, menu_text_box);
+    VU1_addGSregister(0x47, 0x30000);
+    VU1_addGSregister(0x42, 0x8000000044LL);
+    SetupGifPaging(0);
+    pack_image_descriptor(box, menu_text_box);
     box[9] = 9;
     box[3] = *(int *)(menu_text_box + 0x18) + *(int *)(menu_text_box + 0x20);
     box[0] = *(int *)(menu_text_box + 0x1C) + 4;
@@ -51,7 +52,7 @@ int func_002DC720(char *menu_text_box)
         for (i = 0; (*(int **)(menu_text_box + 0x34))[i] != -1; i++) {
             box[5] = ypos;
             box[11] = (*(int *)(menu_text_box + 0x3C) >> 4) & 0xF;
-            func_00280190(box, 0x80FFA888L, func_00288FB8((*(int **)(menu_text_box + 0x34))[i]), -1);
+            DrawTextWindowSmallFont(box, 0x80FFA888L, GetLocalizedString((*(int **)(menu_text_box + 0x34))[i]), -1);
             ypos += box[7];
             ypos += 10;
         }
@@ -63,11 +64,11 @@ int func_002DC720(char *menu_text_box)
     case 15:
     case 19:
         box[5] = *(int *)(menu_text_box + 0x1C) + 0x20;
-        func_00280190(box, 0x80FFA888L, func_00288FB8(*(int *)(menu_text_box + 0x34)), -1);
+        DrawTextWindowSmallFont(box, 0x80FFA888L, GetLocalizedString(*(int *)(menu_text_box + 0x34)), -1);
         break;
     case 0:
         break;
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

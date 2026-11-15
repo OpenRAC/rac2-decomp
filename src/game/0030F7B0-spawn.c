@@ -29,8 +29,9 @@ extern float func_002A7878(float lo, float hi);
 extern int D_001B1688;
 extern void func_002A0F48(void *moby);
 
+/* Creates the object the hero throws, at the given spot, owned by the thrower and with a small random spin. */
 unsigned char *func_003158A8(int owner, void *pos) {
-    unsigned char *obj = (unsigned char *)func_0029EFD0(0x81F);
+    unsigned char *obj = (unsigned char *)CreateMoby(0x81F /* moby class 2079 */);
     Vars003158A8 *data;
 
     if (obj) {
@@ -44,12 +45,12 @@ unsigned char *func_003158A8(int owner, void *pos) {
         data->x36 = 0;
         data->x78 = 0;
         qcopy(obj + 0x10, pos);
-        func_00282C88(data);
-        data->x38 = func_002A7878(0.017453296f, 0.052359886f);
-        data->x3C = func_002A7878(0.017453296f, 0.052359886f);
+        ClearVector128(data);
+        data->x38 = RandomFloatRange(0.017453296f, 0.052359886f);
+        data->x3C = RandomFloatRange(0.017453296f, 0.052359886f);
         data->x6C = data->x70 = data->x60 = data->x64 = 0.0f;
         data->x74 = 0;
-        data->x5C = D_001B1688;
+        data->x5C = gGameTime;
         data->x68 = -1;
         *(int *)(obj + 0x98) = 0;
         func_002A0F48(obj);

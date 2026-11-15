@@ -41,31 +41,32 @@ typedef struct SpawnObject {
     float forward[4], right[4], up[4];
 } SpawnObject;
 
+/* Creates a flash effect object (moby class 3777) at a position, facing the camera, and shakes the camera if it is close. */
 char *func_L16_00406080(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0xec1);
+    char *object = CreateMoby(0xec1);
     SpawnState *state;
-    SpawnObject *m;
+    SpawnObject *spawnObject;
     char *camera;
     float angle;
     if (object != 0) {
-        m = (SpawnObject *)object;
-        state = m->state;
+        spawnObject = (SpawnObject *)object;
+        state = spawnObject->state;
         *(unsigned char *)(object + 0x30) = 0xff;
         *(short *)(object + 0x32) = 0xff;
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         camera = (char *)D_L16_001B99C0.f140;
-        func_00282CF0(direction, camera, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
-        func_002AFFD8(object + 0x10, (char *)up, 1);
+        FastVecSub(direction, camera, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
+        ComputeViewDirection(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
-        m->forward[3] = m->right[3] = m->up[3] = 0.0f;
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
+        spawnObject->forward[3] = spawnObject->right[3] = spawnObject->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
         state->outer = size + size;
@@ -81,19 +82,19 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (func_00283DB8(sphere, 128.0f) == 1) {
+        if (FastMathHelperA(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_00282E48(position, camera) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
                 char *manager = camera - 0x140;
                 *(int *)(manager + 0x16c) = 0;
                 *(volatile float *)(manager + 0x160) = 0.075f;
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L16_001B99C0.f140);
-                func_00282F20(difference, difference, 1.0f);
-                angle = func_002831B0(func_00282DB0(difference, (char *)&D_L16_001B99C0 + 0x370));
+                FastVecSub(difference, object + 0x10, D_L16_001B99C0.f140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                angle = FastAngleHelper(FastVecDot(difference, (char *)&D_L16_001B99C0 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -103,7 +104,7 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
             state->delay = 0;
             state->flags = 0;
         }
-        func_L16_00406550(object, (char *)up);
+        SpawnExplosionBurst_L16(object, (char *)up);
     }
     return object;
 }

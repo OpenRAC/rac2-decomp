@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L02_003D9728: state handler of a Maktar walker: ten-state switch, footstep and
  * impact camera shakes (D_L02_001BA3C0), beam pursuit. */
 extern int D_L02_001B359C;
@@ -23,105 +24,106 @@ extern float func_00283C28(float);
 extern void func_L02_003DAB68(char *);
 extern float func_002AA2E8(float *, float, float);
 
-void func_L02_003D9728(char *self) {
-    float before[4];
-    float after[4];
-    float delta[4];
-    char *state = *(char **)(self + 0x68);
-    float *target = (float *)(state + 0x230);
-    float distance = func_00282E80(self + 0x10, target);
-    float heading = func_00283248(target[0] - *(float *)(self + 0x10), target[1] - *(float *)(self + 0x14));
-    float frame = func_0029F530(self);
-    char *part = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C);
-    int saved = *(int *)(part + 0x98);
-    unsigned int mode;
-    float speed;
-    *(int *)(part + 0x98) = 0;
-    func_002B60B0(self, 0.0016666667f, 0.05166667f, 0.003490659f, 0.10471977f);
-    mode = *(unsigned char *)(self + 0x42);
-    switch (mode) {
+/* Makes the walker move and shake the camera with its footsteps and impacts, based on its current walking mode. */
+void func_L02_003D9728(char *moby) {
+    float jointBefore[4];
+    float jointAfter[4];
+    float moveDelta[4];
+    char *vars = *(char **)(moby + 0x68);
+    float *targetPos = (float *)(vars + 0x230);
+    float distance = vec_distance_xy(moby + 0x10, targetPos);
+    float heading = FastMatrixHelperA(targetPos[0] - *(float *)(moby + 0x10), targetPos[1] - *(float *)(moby + 0x14));
+    float animFrame = GetMobyAnimationValue(moby);
+    char *legsMoby = (char *)((*(int *)(*(char **)(moby + 0x68) + 0x244) << 8) + gMobyPool_L02);
+    int savedValue = *(int *)(legsMoby + 0x98);
+    unsigned int walkMode;
+    float pursuitSpeed;
+    *(int *)(legsMoby + 0x98) = 0;
+    SetControllerSpeedLimits(moby, 0.0016666667f, 0.05166667f, 0.003490659f, 0.10471977f);
+    walkMode = *(unsigned char *)(moby + 0x42);
+    switch (walkMode) {
     case 0:
-    if (*(unsigned char *)(self + 0x20) != 4)
-        func_002B5278(self, *(float *)(self + 0xF8));
+    if (*(unsigned char *)(moby + 0x20) != 4)
+        StepMovementAtOwnPositionWithFactor(moby, *(float *)(moby + 0xF8));
     else
-        func_L02_00321C30(self + 0x10, &D_L02_001B03F0, 0.16666667f);
+        StepPositionTowardTargetLimited(moby + 0x10, &D_L02_001B03F0, 0.16666667f);
     break;
     case 1:
-    if (func_L00_003206B8(self + 0x10, func_L02_003FC0B8(*(void **)(self + 0xB8))))
-        func_L01_00321178(self, target);
+    if (IsPointInsideRecordVolume(moby + 0x10, GetArenaStateWord84(*(void **)(moby + 0xB8))))
+        TurnMobyTowardTarget(moby, targetPos);
     else
-        func_L01_00321178(self, func_L02_003FC098(*(void **)(self + 0xB8)));
-    if ((frame > 0.0f && frame < 2.0f) || (frame > 15.0f && frame < 17.0f) ||
-        (frame > 30.0f && frame < 32.0f) || (frame > 45.0f && frame < 47.0f)) {
+        TurnMobyTowardTarget(moby, GetArenaCameraPoint(*(void **)(moby + 0xB8)));
+    if ((animFrame > 0.0f && animFrame < 2.0f) || (animFrame > 15.0f && animFrame < 17.0f) ||
+        (animFrame > 30.0f && animFrame < 32.0f) || (animFrame > 45.0f && animFrame < 47.0f)) {
         D_L02_001BA3C0.amount = 0.05f;
         D_L02_001BA3C0.time = 15;
         D_L02_001BA3C0.phase = 0;
     }
     break;
     case 2:
-    if (frame > 12.0f && frame < 25.0f) {
-        func_0029FCC0(self, 4, before);
-        func_002B5278(self, heading);
-        func_002833F0(self + 0xC0, self + 0xF0);
-        func_0029FCC0(self, 4, after);
-        func_00282CF0(delta, before, after);
-        func_00282CC0(self + 0x10, self + 0x10, delta);
-    } else if (frame > 42.0f && frame < 55.0f) {
-        func_0029FCC0(self, 8, before);
-        func_002B5278(self, heading);
-        func_002833F0(self + 0xC0, self + 0xF0);
-        func_0029FCC0(self, 8, after);
-        func_00282CF0(delta, before, after);
-        func_00282CC0(self + 0x10, self + 0x10, delta);
+    if (animFrame > 12.0f && animFrame < 25.0f) {
+        TransformMobyJointToWorld(moby, 4, jointBefore);
+        StepMovementAtOwnPositionWithFactor(moby, heading);
+        euler_rotation_basis(moby + 0xC0, moby + 0xF0);
+        TransformMobyJointToWorld(moby, 4, jointAfter);
+        FastVecSub(moveDelta, jointBefore, jointAfter);
+        FastVecAdd(moby + 0x10, moby + 0x10, moveDelta);
+    } else if (animFrame > 42.0f && animFrame < 55.0f) {
+        TransformMobyJointToWorld(moby, 8, jointBefore);
+        StepMovementAtOwnPositionWithFactor(moby, heading);
+        euler_rotation_basis(moby + 0xC0, moby + 0xF0);
+        TransformMobyJointToWorld(moby, 8, jointAfter);
+        FastVecSub(moveDelta, jointBefore, jointAfter);
+        FastVecAdd(moby + 0x10, moby + 0x10, moveDelta);
     }
-    if ((frame > 0.0f && frame < 2.0f) || (frame > 29.0f && frame < 31.0f)) {
+    if ((animFrame > 0.0f && animFrame < 2.0f) || (animFrame > 29.0f && animFrame < 31.0f)) {
         D_L02_001BA3C0.amount = 0.1f;
         D_L02_001BA3C0.time = 15;
         D_L02_001BA3C0.phase = 0;
     }
     break;
     case 3:
-        if (frame < 23.0f)
+        if (animFrame < 23.0f)
             break;
     case 4:
-    func_L01_00322288(self, func_00283248(*(float *)(state + 0xF0), *(float *)(state + 0xF4)));
-    *(float *)(state + 0xF8) -= *(float *)(state + 0x7C);
-    func_00282CC0(self + 0x10, self + 0x10, state + 0xF0);
+    StartMobyEffectFromEntry(moby, FastMatrixHelperA(*(float *)(vars + 0xF0), *(float *)(vars + 0xF4)));
+    *(float *)(vars + 0xF8) -= *(float *)(vars + 0x7C);
+    FastVecAdd(moby + 0x10, moby + 0x10, vars + 0xF0);
     break;
     case 5:
-    if (frame > 3.0f && frame < 5.0f) {
+    if (animFrame > 3.0f && animFrame < 5.0f) {
         D_L02_001BA3C0.amount = 0.4f;
         D_L02_001BA3C0.time = 25;
         D_L02_001BA3C0.phase = 0;
     }
     break;
     case 6:
-    if (frame > 20.0f && frame < 22.0f) {
+    if (animFrame > 20.0f && animFrame < 22.0f) {
         D_L02_001BA3C0.amount = 0.2f;
         D_L02_001BA3C0.time = 25;
         D_L02_001BA3C0.phase = 0;
     }
     break;
     case 7:
-    if ((unsigned int)(*(unsigned char *)(self + 0x20) - 10) >= 2) {
-        *(float *)(self + 0xF8) += ((*(float *)(state + 0x20) / (float)*(short *)(state + 0x24)) * -90.0f + 160.0f) * 0.00029088825f;
-        *(float *)(self + 0xF8) = func_00283C28(*(float *)(self + 0xF8));
-        func_002833F0(self + 0xC0, self + 0xF0);
-        func_L02_003DAB68(self);
-        if (distance > 12.0f && *(unsigned char *)(self + 0x20) != 10) {
-            if (func_L00_003206B8(self + 0x10, func_L02_003FC0B8(*(void **)(self + 0xB8)))) {
-                speed = ((*(float *)(state + 0x20) / (float)*(short *)(state + 0x24)) * -2.2f + 3.0f) * 0.016666668f;
-                func_002AA2E8((float *)(self + 0x10), target[0], speed);
-                func_002AA2E8((float *)(self + 0x14), target[1], speed);
+    if ((unsigned int)(*(unsigned char *)(moby + 0x20) - 10) >= 2) {
+        *(float *)(moby + 0xF8) += ((*(float *)(vars + 0x20) / (float)*(short *)(vars + 0x24)) * -90.0f + 160.0f) * 0.00029088825f;
+        *(float *)(moby + 0xF8) = FastFloatHelperG(*(float *)(moby + 0xF8));
+        euler_rotation_basis(moby + 0xC0, moby + 0xF0);
+        SpawnBeamHitEffects(moby);
+        if (distance > 12.0f && *(unsigned char *)(moby + 0x20) != 10) {
+            if (IsPointInsideRecordVolume(moby + 0x10, GetArenaStateWord84(*(void **)(moby + 0xB8)))) {
+                pursuitSpeed = ((*(float *)(vars + 0x20) / (float)*(short *)(vars + 0x24)) * -2.2f + 3.0f) * 0.016666668f;
+                ApproachValue((float *)(moby + 0x10), targetPos[0], pursuitSpeed);
+                ApproachValue((float *)(moby + 0x14), targetPos[1], pursuitSpeed);
             } else {
-                func_002AA2E8((float *)(self + 0x10), func_L02_003FC098(*(void **)(self + 0xB8))[0], 0.33333334f);
-                func_002AA2E8((float *)(self + 0x14), func_L02_003FC098(*(void **)(self + 0xB8))[1], 0.33333334f);
+                ApproachValue((float *)(moby + 0x10), GetArenaCameraPoint(*(void **)(moby + 0xB8))[0], 0.33333334f);
+                ApproachValue((float *)(moby + 0x14), GetArenaCameraPoint(*(void **)(moby + 0xB8))[1], 0.33333334f);
             }
         }
     }
     break;
     case 8:
-    if (frame > 30.0f && frame < 32.0f) {
+    if (animFrame > 30.0f && animFrame < 32.0f) {
         D_L02_001BA3C0.amount = 0.2f;
         D_L02_001BA3C0.time = 25;
         D_L02_001BA3C0.phase = 0;
@@ -129,7 +131,7 @@ void func_L02_003D9728(char *self) {
     case 9:
         break;
     }
-    if (*(float *)(self + 0x18) < func_L02_003FC098(*(void **)(self + 0xB8))[2])
-        *(float *)(self + 0x18) = func_L02_003FC098(*(void **)(self + 0xB8))[2];
-    *(int *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C + 0x98) = saved;
+    if (*(float *)(moby + 0x18) < GetArenaCameraPoint(*(void **)(moby + 0xB8))[2])
+        *(float *)(moby + 0x18) = GetArenaCameraPoint(*(void **)(moby + 0xB8))[2];
+    *(int *)((*(int *)(*(char **)(moby + 0x68) + 0x244) << 8) + gMobyPool_L02 + 0x98) = savedValue;
 }

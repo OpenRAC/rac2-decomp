@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_004216F0 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -20,33 +21,34 @@ extern float D_L02_001B1F98 __attribute__((sda));
 extern float D_L02_001B1FA0 __attribute__((sda));
 extern float D_L02_001B1FA4 __attribute__((sda));
 
-u8 *func_L02_004216F0(u8 *a0, int a1, u8 *a2, float a3) {
-    u8 *obj = func_0029EFD0(0xD08);
-    u8 *v;
-    int n;
-    float t;
+/* Creates a new moving object (moby class 3336) at the given position, aimed along the given direction, and starts it. Returns the new object, or 0 if none could be made. */
+u8 *func_L02_004216F0(u8 *position, int owner, u8 *direction, float speed) {
+    u8 *spawned = CreateMoby(0xD08 /* moby class 3336 */);
+    u8 *vars;
+    int steps;
+    float frameTime;
 
-    if (obj != 0) {
-        *(u8 *)(obj + 0x20) = 0;
-        *(u8 *)(obj + 0x30) = 0xFF;
-        t = D_L02_001B1FA0 * 0.016666668f;
-        v = *(u8 **)(obj + 0x68);
-        *(float *)(v + 0x64) = a3;
-        func_00282F20(v + 0x40, a2, t);
-        *(TI128 *)(obj + 0x10) = *(TI128 *)a0;
-        *(TI128 *)(obj + 0xC0) = *(TI128 *)(v + 0x40);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, D_0018A0E0);
-        func_00282F20(obj + 0xD0, obj + 0xD0, -1.0f);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
-        t = D_L02_001B1FA0 * 0.016666668f;
-        n = func_00283CF0(D_L02_001B1FA4 / t);
-        *(int *)(v + 0x58) = n;
-        *(float *)(v + 0x5C) = 1.0f / func_00283CE0(n);
-        *(int *)(v + 0x50) = a1;
-        *(u8 *)(obj + 0x20) = 0;
-        *(float *)(v + 0x60) = D_L02_001B1F98;
-        func_L02_004224C8(obj);
-        func_002E5CF8(1, 0, obj);
+    if (spawned != 0) {
+        *(u8 *)(spawned + 0x20) = 0;
+        *(u8 *)(spawned + 0x30) = 0xFF;
+        frameTime = D_L02_001B1FA0 * 0.016666668f;
+        vars = *(u8 **)(spawned + 0x68);
+        *(float *)(vars + 0x64) = speed;
+        vec_scale_to_length(vars + 0x40, direction, frameTime);
+        *(TI128 *)(spawned + 0x10) = *(TI128 *)position;
+        *(TI128 *)(spawned + 0xC0) = *(TI128 *)(vars + 0x40);
+        FastVecCross(spawned + 0xD0, spawned + 0xC0, D_0018A0E0);
+        vec_scale_to_length(spawned + 0xD0, spawned + 0xD0, -1.0f);
+        FastVecCross(spawned + 0xE0, spawned + 0xD0, spawned + 0xC0);
+        frameTime = D_L02_001B1FA0 * 0.016666668f;
+        steps = FloatToInt(D_L02_001B1FA4 / frameTime);
+        *(int *)(vars + 0x58) = steps;
+        *(float *)(vars + 0x5C) = 1.0f / IntToFloat(steps);
+        *(int *)(vars + 0x50) = owner;
+        *(u8 *)(spawned + 0x20) = 0;
+        *(float *)(vars + 0x60) = D_L02_001B1F98;
+        RebuildFrameFromTransform(spawned);
+        PlayMobySound(1, 0, spawned);
     }
-    return obj;
+    return spawned;
 }

@@ -59,70 +59,71 @@ extern void func_00310C88(void);
 /* Updates the hit state of the object, and when its mask word still has bits set, spawns one
    particle per set bit (at most ten, fewer the fuller the value at +0x20 is), each launched at
    a random angle and speed, and clears the bit. */
-void func_L23_004160B0(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Handles hits on this object: loses health, plays hit effects, and throws out sparks as it gets more damaged. */
+void func_L23_004160B0(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
     char *hit;
-    int n;
+    int particleCount;
     int i;
-    float vec[3];
+    float velocity[3];
 
-    hit = func_002A9640(arg0, 0x30000, 1);
-    *(unsigned char *)(arg0 + 0xA8) = 0xFF;
-    func_00282978(state + 0x26);
+    hit = FindOwnedEffectSlot(moby, 0x30000, 1);
+    *(unsigned char *)(moby + 0xA8) = 0xFF;
+    FastDecTimer(vars + 0x26);
     if (hit != 0) {
-        if (*(short *)(state + 0x26) != 0 || (D_L23_001B1484 != 0 && func_L23_0041B948() != 0)) {
-            if (func_L23_0041B948() != 0)
-                func_L23_0041E570();
+        if (*(short *)(vars + 0x26) != 0 || (gMothershipBossMoby != 0 && IsBossHeldFlagSet() != 0)) {
+            if (IsBossHeldFlagSet() != 0)
+                StartBossFightOnce();
             hit = 0;
         }
     }
     if (hit != 0) {
-        *(unsigned char *)(state + 0x147) = 0xFF;
-        func_002AB800(arg0, state + 0x140);
-        func_L23_0041C578(*(char **)(hit + 0x20));
-        if (*(float *)(state + 0x20) <= D_L23_001B13CC) {
-            func_L23_0041BE70(hit);
-            *(float *)(state + 0x20) = D_L23_001B13CC;
+        *(unsigned char *)(vars + 0x147) = 0xFF;
+        StartColorFade(moby, vars + 0x140);
+        SpawnHitSparks_L23(*(char **)(hit + 0x20));
+        if (*(float *)(vars + 0x20) <= D_L23_001B13CC) {
+            AttachHitEffectToBoss(hit);
+            *(float *)(vars + 0x20) = D_L23_001B13CC;
         } else {
-            *(float *)(state + 0x20) = *(float *)(state + 0x20) - *(float *)(hit + 0x2C);
+            *(float *)(vars + 0x20) = *(float *)(vars + 0x20) - *(float *)(hit + 0x2C);
         }
-        if (*(float *)(state + 0x20) <= D_L23_001B13CC)
-            *(float *)(state + 0x20) = D_L23_001B13CC;
-        if (*(short *)(*(char **)(hit + 0x20) + 0xAA) != 0x118F)
-            *(short *)(state + 0x26) = 0x14;
-        if (*(unsigned short *)(arg0 + 0x7C) != 0) {
-            float f;
+        if (*(float *)(vars + 0x20) <= D_L23_001B13CC)
+            *(float *)(vars + 0x20) = D_L23_001B13CC;
+        if (*(short *)(*(char **)(hit + 0x20) + 0xAA) != 0x118F /* moby class 4495 */)
+            *(short *)(vars + 0x26) = 0x14;
+        if (*(unsigned short *)(moby + 0x7C) != 0) {
+            float damageRatio;
 
-            f = *(float *)(state + 0x20) / D_L23_001B13C8;
-            n = 10 - (int)(f * 10.0f);
-            if (*(float *)(state + 0x20) <= D_L23_001B13CC)
-                n = 10;
-            for (i = 0; i < n; i++) {
-                int mask = *(unsigned short *)(arg0 + 0x7C);
+            damageRatio = *(float *)(vars + 0x20) / D_L23_001B13C8;
+            particleCount = 10 - (int)(damageRatio * 10.0f);
+            if (*(float *)(vars + 0x20) <= D_L23_001B13CC)
+                particleCount = 10;
+            for (i = 0; i < particleCount; i++) {
+                int mask = *(unsigned short *)(moby + 0x7C);
 
                 if ((mask >> i) & 1) {
                     float angle, speed;
-                    char *p;
+                    char *particle;
                     char *base = D_L23_001BA500;
                     float spread = 90.0f;
                     float per_tick = 0.016666668f;
                     float to_rad = 0.017453294f;
 
-                    *(unsigned short *)(arg0 + 0x7C) = mask & ~(1 << i);
-                    angle = func_00283B98(func_002A78D8(spread, 120.0f) * to_rad,
+                    *(unsigned short *)(moby + 0x7C) = mask & ~(1 << i);
+                    angle = FastAddRotations(RandomSignedFloatRange(spread, 120.0f) * to_rad,
                                           *(float *)(base + 0x158));
-                    speed = func_002A7878(2.0f, 4.0f) * per_tick;
-                    vec[0] = func_00283180(angle) * speed;
-                    vec[1] = func_00283198(angle) * speed;
-                    vec[2] = 0.0f;
-                    vec[2] = func_002A7878(5.0f, 8.0f) * per_tick;
-                    p = func_00273730(arg0, 1, *(short *)(arg0 + 0xAA), i, arg0 + 0x10, arg0 + 0xF0,
-                                      vec, spread, 15.0f, 0xFF);
-                    if (p != 0)
-                        *(void (**)(void))(p + 0x64) = func_00310C88;
+                    speed = RandomFloatRange(2.0f, 4.0f) * per_tick;
+                    velocity[0] = FastSinOrCosA(angle) * speed;
+                    velocity[1] = FastSinOrCosB(angle) * speed;
+                    velocity[2] = 0.0f;
+                    velocity[2] = RandomFloatRange(5.0f, 8.0f) * per_tick;
+                    particle = CreateCameraMoby(moby, 1, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0,
+                                      velocity, spread, 15.0f, 0xFF);
+                    if (particle != 0)
+                        *(void (**)(void))(particle + 0x64) = UpdateFadeOutMoby;
                 }
             }
         }
     }
-    func_002AB8C0(arg0, state + 0x140);
+    UpdateColorFade(moby, vars + 0x140);
 }

@@ -122,12 +122,12 @@ void func_L09_003F6B28(DobboMoby *moby)
     }
     state = moby->data;
     /* each axis draws its own random turn */
-    moby->rotation[0] = func_00283B98(moby->rotation[0],
-        func_002A7878(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
-    moby->rotation[1] = func_00283B98(moby->rotation[1],
-        func_002A7878(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
-    moby->rotation[2] = func_00283B98(moby->rotation[2],
-        func_002A7878(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+    moby->rotation[0] = FastAddRotations(moby->rotation[0],
+        RandomFloatRange(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+    moby->rotation[1] = FastAddRotations(moby->rotation[1],
+        RandomFloatRange(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+    moby->rotation[2] = FastAddRotations(moby->rotation[2],
+        RandomFloatRange(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
     switch (moby->state) {
     case 0:
         func_002A7750_3((unsigned char *)moby, 1, -1);
@@ -135,12 +135,12 @@ void func_L09_003F6B28(DobboMoby *moby)
     case 1:
         if (moby->f60 & 2) {
             if (moby->f43 != 1)
-                func_002A7470((unsigned char *)moby, 1, 0, 10);
+                StartAnimationBlended((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
-        func_L09_003F69A0((unsigned char *)moby,
-            D_L09_001B0EE4 * func_002A7790(1.0f - func_00283CE0(state->timer) / state->duration_f));
-        if (func_00282948((char *)&state->timer))
+        BlendPositionTowardTarget((unsigned char *)moby,
+            D_L09_001B0EE4 * Square(1.0f - IntToFloat(state->timer) / state->duration_f));
+        if (FastFloatHelperD((char *)&state->timer))
             func_002A7750_3((unsigned char *)moby, 2, -1);
         if (!state->owner || state->owner->state == 254 || state->owner->state == 253)
             func_002A7750_3((unsigned char *)moby, 3, -1);
@@ -149,20 +149,20 @@ void func_L09_003F6B28(DobboMoby *moby)
     case 3:
         if (moby->f60 & 2) {
             if (moby->f43 != 1)
-                func_002A7470((unsigned char *)moby, 1, 0, 10);
+                StartAnimationBlended((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
-        func_L09_003F69A0((unsigned char *)moby, D_L09_001B0EE0);
-        func_L09_003F6AB8((unsigned char *)moby);
+        BlendPositionTowardTarget((unsigned char *)moby, D_L09_001B0EE0);
+        RescaleObjectVector((unsigned char *)moby);
         owner = state->owner;
-        if (state->max_distance < func_00282E80(moby->position, owner->position) || !state->owner ||
+        if (state->max_distance < vec_distance_xy(moby->position, owner->position) || !state->owner ||
             state->owner->state == 254 || state->owner->state == 253)
             func_002A7750_3((unsigned char *)moby, 3, -1);
         if (moby->state == 3) {
             if (moby->alpha < D_L09_001B0EF0) {
             destroy:
-                func_L09_003FB788(moby);
-                func_0029F338(moby);
+                ReleaseRecordSlot(moby);
+                MarkMobySpawned(moby);
                 return;
             }
             moby->scale *= D_L09_001B0F00;
@@ -170,7 +170,7 @@ void func_L09_003F6B28(DobboMoby *moby)
         }
         break;
     }
-    distance = func_00282E80(moby->position, D_00189EA0);
+    distance = vec_distance_xy(moby->position, gHeroPosition);
     if (distance < state->radius * 2 + 1) {
         owner = state->owner;
         if (owner && owner->type == 0xCEA && owner->state != 254 && owner->state != 253) {
@@ -180,21 +180,21 @@ void func_L09_003F6B28(DobboMoby *moby)
                 if (moby->f_bc == 1 && owner->data) {
                     qcopy(&ray_start, moby->position);
                     qcopy(&ray_end, partner->position);
-                    func_002ACB48(&ray_start, 0.1f);
-                    func_002ACB48(&ray_end, 0.1f);
-                    if (func_L01_003120A8(state->owner, &ray_start, &ray_end, 0x210001, 0, 1, 0,
+                    AddRandomOffsetToVector(&ray_start, 0.1f);
+                    AddRandomOffsetToVector(&ray_end, 0.1f);
+                    if (CastObjectCollisionLine(state->owner, &ray_start, &ray_end, 0x210001, 0, 1, 0,
                                           state->f2c, 1)) {
-                        if (D_L09_001BFE58 == *(void **)(D_00189EA0 + 0x2210))
+                        if (D_L09_001BFE58 == *(void **)(gHeroPosition + 0x2210))
                             hit = 1;
                     }
                 }
-                if (!func_002A77E0(4) && distance < 2 &&
-                    func_002A8C28(state->owner, moby->position, 0x210001, 0, 1, 0,
+                if (!RandomIntBelow(4) && distance < 2 &&
+                    SweepCollisionFromObject(state->owner, moby->position, 0x210001, 0, 1, 0,
                                   moby->scale * 0.4f / moby->cls->scale, state->f2c, 1)) {
-                    if (D_L09_001BFE58 == D_0018C0B0)
+                    if (D_L09_001BFE58 == gHeroMoby_0018C0B0)
                         hit = 1;
                 }
-                if (func_00282948((char *)&state->hit_timer) && hit)
+                if (FastFloatHelperD((char *)&state->hit_timer) && hit)
                     state->hit_timer = 60;
             }
         }
@@ -207,12 +207,12 @@ void func_L09_003F6B28(DobboMoby *moby)
     if (moby->f_bc == 1) {
         DobboMoby *partner = state->partner;
         if (partner && partner->state != 254 && partner->state != 253) {
-            func_00282CF0(basis[0].f, partner->position, moby->position);
-            func_00282F20(basis, basis, 1);
+            FastVecSub(basis[0].f, partner->position, moby->position);
+            vec_scale_to_length(basis, basis, 1);
             qcopy(&basis[2], D_L09_001AC5A0);
-            func_00282DD8(&basis[2], basis, &basis[1]);
+            FastVecCross(&basis[2], basis, &basis[1]);
             qcopy(&basis[3], moby->position);
-            func_L09_003FB908(moby, basis);
+            UpdateBeamLinkRecord(moby, basis);
         }
     }
 }

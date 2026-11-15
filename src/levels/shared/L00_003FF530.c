@@ -30,33 +30,33 @@ void func_L00_003FF530(char *object) {
     int i;
     int j;
 
-    func_002E5CF8(0, 0, object);
+    PlayMobySound(0, 0, object);
     for (j = 1; j >= 0; j--) {
-        func_0032C700(strength, 20.0f, object + 0x10, 1, 14, 10, 15, 10, 20, 1,
+        SpawnExplosion(strength, 20.0f, object + 0x10, 1, 14, 10, 15, 10, 20, 1,
                        0, 1, 0, D_L00_001ADB2C);
         strength += 0.3f;
     }
-    func_002FE8D8(position, basis[2]);
+    GetObjectFacingDirection(position, basis[2]);
     perpendicular[0] = basis[2][2];
     perpendicular[1] = basis[2][2];
     perpendicular[2] = -(basis[2][0] + basis[2][1]);
-    func_00282F20(basis[0], perpendicular, 1.0f);
-    func_00282DD8(basis[1], basis[0], basis[2]);
+    vec_scale_to_length(basis[0], perpendicular, 1.0f);
+    FastVecCross(basis[1], basis[0], basis[2]);
     basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
     for (i = 0; i < D_L00_001B0C24; i++) {
-        heading = func_002A7940();
+        heading = RandomAngle();
         if (*(int *)(state + 0x2C) != 0) {
-            elevation = func_002A7878(0.698131799697876f, 1.3089970350265503f);
-            speed = func_002A7878(4.0f, 12.0f) * 0.016666668f;
+            elevation = RandomFloatRange(0.698131799697876f, 1.3089970350265503f);
+            speed = RandomFloatRange(4.0f, 12.0f) * 0.016666668f;
         } else {
-            elevation = func_002A7878(0.8726646900177002f, 1.5707964897155762f);
-            speed = func_002A7878(4.0f, 9.0f) * 0.016666668f;
+            elevation = RandomFloatRange(0.8726646900177002f, 1.5707964897155762f);
+            speed = RandomFloatRange(4.0f, 9.0f) * 0.016666668f;
         }
-        func_002AF000(direction, speed, heading, elevation);
+        BuildSphericalOffset(direction, speed, heading, elevation);
         direction[3] = 0.0f;
-        func_00283098(direction, direction, basis);
-        fragment = func_L00_00409558(position, direction, i, *(int *)(state + 0x2C));
+        matrix_mul_vec3(direction, direction, basis);
+        fragment = CreateTumblingDebris(position, direction, i, *(int *)(state + 0x2C));
         if (fragment != 0) *(int *)(fragment + 0xB8) = *(int *)(object + 0xB8);
     }
-    func_002FEE50(*(int *)(state + 0x30));
+    ClearEntryFlag(*(int *)(state + 0x30));
 }

@@ -86,6 +86,8 @@ static __inline__ int StreamGroup(u8 *state, int i, int base)
  * reduces the rereads to one load and a copy. D_L18_001B2568 and D_001A7A7B are
  * written as a base plus offset, which keeps those stores out of delay slots.
  */
+/* Runs the level's main sequence: it tracks four groups of enemies, steps through
+   its stages as triggers fire, and opens and closes the linked doors and gates. */
 void func_L18_003F90A0(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -105,51 +107,51 @@ void func_L18_003F90A0(u8 *object)
                  StreamGroup(state, i, 0) <= D_L18_001B2838[0] && entry &&
                  ((s16)entry[-1] >= 0 || entry == D_L18_001FB320[StreamGroup(state, i, 0)]);
                  entry++) {
-                entity = D_L18_001B281C[0] + ((*entry & 0x7FFF) << 8);
+                entity = gMobyTable_L18[0] + ((*entry & 0x7FFF) << 8);
                 if (!entity) break;
-                func_L00_0043DA18(entity, object);
+                SetObjectWordB8(entity, object);
             }
         }
         HALF(state, 0xA8) = 1;
         object[0x20] = 1;
         WORD(state, 0x88) = -1;
-        HALF(state, 0xAA) = func_002A77E0(D_L18_001B0454);
+        HALF(state, 0xAA) = RandomIntBelow(D_L18_001B0454);
         HALF(state, 0xAE) = -1;
         HALF(state, 0xAC) = 0;
-        func_L18_003FA7C0(object);
+        ResetAllGroupMembers(object);
         if (WORD(state, 0xC4) != -1) {
-            u8 *base = D_L18_001B281C[0];
+            u8 *base = gMobyTable_L18[0];
             FLAGS(LOCAL_ENTITY(0xC4)) |= 2;
             FLAGS(LOCAL_ENTITY(0xC4)) |= 1;
             WORD(LOCAL_ENTITY(0xC4), 0x98) = 0;
         }
         if (WORD(state, 0xC8) != -1) {
-            u8 *base = D_L18_001B281C[0];
+            u8 *base = gMobyTable_L18[0];
             FLAGS(LOCAL_ENTITY(0xC8)) |= 2;
             FLAGS(LOCAL_ENTITY(0xC8)) |= 1;
             WORD(LOCAL_ENTITY(0xC8), 0x98) = 0;
         }
         if (TRIGGER(0xB4) && !TRIGGER(0xB8)) {
-            func_L00_003672F8();
-            func_L00_002B9D60(ENTITY(0xE4) + 0x10, ENTITY(0xE4) + 0xF0, 0, 1);
+            SetFlagToOne();
+            ResetHeroPositionAndDirection(ENTITY(0xE4) + 0x10, ENTITY(0xE4) + 0xF0, 0, 1);
         }
         if (D_001395B8[0x9F]) {
-            func_L00_003672F8();
-            func_L00_002B9D60(D_L18_001B0500, D_L18_001B0510, 0, 1);
+            SetFlagToOne();
+            ResetHeroPositionAndDirection(D_L18_001B0500, D_L18_001B0510, 0, 1);
             D_001395B8[0x9F] = 0;
             D_L18_001B04F0 = 1;
         }
-        if (func_002ACBC8(D_00189EA0, WORD(state, 0x84)))
+        if (IsPointInCuboid(gHeroPosition, WORD(state, 0x84)))
             WORD(state, 0x88) = 5;
     } else {
         if (D_L18_001B2348[0] < 10 && D_L18_001B04F0 == 1) {
-            if (func_00288AA0(D_L18_001BF9C0, 0x95)) {
-                func_00288BE8(D_L18_001BF9C0);
-                func_002F5CC8();
+            if (PushRequestQueue(D_L18_001BF9C0, 0x95)) {
+                LaunchQueuedRequest(D_L18_001BF9C0);
+                SetSlowdownFactorAndLowFpsFade();
                 D_L18_001B04F0 = 2;
             }
         } else if (D_L18_001B04F0 == 2) {
-            if (func_002F5D10()) {
+            if (IsEitherModeTwo()) {
                 D_L18_001B2564[1] = 1;
                 if (D_L18_001A8F00[0] == 2) {
                     object[0x31] = 0;
@@ -157,44 +159,44 @@ void func_L18_003F90A0(u8 *object)
                 }
             } else {
                 D_L18_001B2564[1] = 0;
-                func_L18_002E4090(0);
+                StartModeSound(0);
                 D_L18_001B04F0 = 0;
                 if (!D_001A7AFD[0] && D_001395B8[0xA1]) {
-                    func_00288308(5);
-                    func_002AD860(5);
-                    func_002B0A18(0x129F, -1);
+                    UnlockHelpEntry(5);
+                    HandleRequestSlotState(5);
+                    SetEntryValueByIndex(0x129F, -1);
                 }
-                func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);
-                func_0029B3E0(0, -1);
+                CaptureCheckpointState(gHeroPosition, gHeroPosition + 0x10);
+                MemcardSave(0, -1);
             }
         }
         if (D_0018C0B4[0] != 0x6F) {
             for (i = 0; i < 4; i++) {
                 if (!*StreamFlag(state, i)) {
-                    if (func_002ACBC8(D_00189EA0, *StateSlot(state, i, 0x30)))
+                    if (IsPointInCuboid(gHeroPosition, *StateSlot(state, i, 0x30)))
                         *StreamFlag(state, i) = 1;
                 } else if (*StreamFlag(state, i) > 0) {
-                    if (func_00282978((s16 *)(state + 0xAA)) &&
-                        func_L18_003FA920(object, i))
-                        HALF(state, 0xAA) = func_002A77E0(D_L18_001B0454);
+                    if (FastDecTimer((s16 *)(state + 0xAA)) &&
+                        SelectGroupMembersAndTarget(object, i))
+                        HALF(state, 0xAA) = RandomIntBelow(D_L18_001B0454);
                 }
             }
         }
-        if (func_002ACBC8(D_00189EA0, *StateSlot(state, WORD(state, 0x88) + 1, 0x40))) {
+        if (IsPointInCuboid(gHeroPosition, *StateSlot(state, WORD(state, 0x88) + 1, 0x40))) {
             WORD(state, 0x88)++;
             if (WORD(state, 0x88) == 6) {
-                func_L18_003F9FB0(object);
-                func_L01_00323310(WORD(state, 0x104), -1);
+                WakeAllGroupMembers(object);
+                QueueKeyedRequest(WORD(state, 0x104), -1);
             } else {
                 if (!WORD(state, 0x88))
-                    func_L01_00323310(WORD(state, 0x100), -1);
-                func_L18_003FA180(object, WORD(state, 0x88));
+                    QueueKeyedRequest(WORD(state, 0x100), -1);
+                L18_DisableModeGroups(object, WORD(state, 0x88));
             }
         }
-        if (WORD(state, 0x88) == 5 && func_002ACBC8(D_00189EA0, WORD(state, 0x44))) {
-            func_L18_003F9FB0(object);
+        if (WORD(state, 0x88) == 5 && IsPointInCuboid(gHeroPosition, WORD(state, 0x44))) {
+            WakeAllGroupMembers(object);
             WORD(state, 0x88) = 1;
-            func_L18_003FA180(object, 1);
+            L18_DisableModeGroups(object, 1);
         }
         mode = 0;
         switch (WORD(state, 0x88)) {
@@ -205,34 +207,34 @@ void func_L18_003F90A0(u8 *object)
             mode = 1;
             break;
         }
-        func_L18_003F9DA0(object, mode);
+        SetObjectColorEffect(object, mode);
         if (HALF(state, 0xAC)) {
-            func_L18_003F9EF0(object);
+            UpdateTimedEffectSequence(object);
         } else {
             int i;
             for (i = 0; i < 4; i++) {
                 if (*StateSlot(state, i, 0x90) != -1 &&
                     ((u32)i >= 8 || (((D_001395B8[0x94] >> i) ^ 1) & 1)) &&
-                    func_002ACBC8(D_00189EA0, *StateSlot(state, i, 0x90))) {
+                    IsPointInCuboid(gHeroPosition, *StateSlot(state, i, 0x90))) {
                     *StateSlot(state, i, 0x90) = -1;
                     HALF(state, 0xAE) = i;
-                    func_L18_003F9E50(object);
+                    StartTimedEffectSequence(object);
                     if ((u32)i < 8) D_001395B8[0x94] |= 1 << i;
                 }
             }
         }
     }
-    func_L00_002E6EF8(func_L18_003FAE50, object);
+    AddDrawCallbackToList3(DrawSegmentedBeams, object);
     if (TRIGGER(0xBC) || (TRIGGER(0xB0) && !TRIGGER(0xB4))) {
         if (WORD(state, 0xC8) != -1 && WORD(state, 0xCC) != -1) {
-            u8 *base = D_L18_001B281C[0];
+            u8 *base = gMobyTable_L18[0];
             if ((FLAGS(LOCAL_ENTITY(0xC8)) & 1) && ((FLAGS(LOCAL_ENTITY(0xCC)) ^ 1) & 1)) {
                 FLAGS(LOCAL_ENTITY(0xC8)) &= 0xFFFD;
                 FLAGS(LOCAL_ENTITY(0xC8)) &= 0xFFFE;
                 WORD(LOCAL_ENTITY(0xC8), 0x98) = WORD(*(u8 **)(LOCAL_ENTITY(0xC8) + 0x24), 0x10);
                 if (WORD(state, 0xCC) != -1) FLAGS(LOCAL_ENTITY(0xCC)) |= 2;
                 {
-                    u8 *nextBase = D_L18_001B281C[0];
+                    u8 *nextBase = gMobyTable_L18[0];
                     FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase)) |= 1;
                     WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase), 0x98) = 0;
                 }
@@ -240,50 +242,50 @@ void func_L18_003F90A0(u8 *object)
         }
     }
     if (TRIGGER(0xB4) && !TRIGGER(0xB8)) {
-        u8 *base = D_L18_001B281C[0];
+        u8 *base = gMobyTable_L18[0];
         if (WORD(state, 0xC8) != -1) {
             FLAGS(LOCAL_ENTITY(0xC8)) |= 2;
             FLAGS(LOCAL_ENTITY(0xC8)) |= 1;
             WORD(LOCAL_ENTITY(0xC8), 0x98) = 0;
-            func_L18_003FE010(base + (WORD(state, 0xD8) << 8));
-            func_L18_003FE010(ENTITY(0xDC));
+            ClearLinkToMinusOne(base + (WORD(state, 0xD8) << 8));
+            ClearLinkToMinusOne(ENTITY(0xDC));
         }
     }
-    if (!TRIGGER(0xB8) && func_002B38B8(object)) {
+    if (!TRIGGER(0xB8) && IsThirdPendingFlagSet(object)) {
         object[0xBC] = 1;
         object[0xBE] &= 0xFB;
-        func_002A0430(WORD(state, 0xB8));
-        func_L18_002CFF48(0);
+        MarkTableEntryFlagged(WORD(state, 0xB8));
+        DetachHeroFromObject(0);
         if (WORD(state, 0xC4) != -1) {
-            u8 *base = D_L18_001B281C[0];
+            u8 *base = gMobyTable_L18[0];
             FLAGS(LOCAL_ENTITY(0xC4)) &= 0xFFFD;
             FLAGS(LOCAL_ENTITY(0xC4)) &= 0xFFFE;
             WORD(LOCAL_ENTITY(0xC4), 0x98) = WORD(*(u8 **)(LOCAL_ENTITY(0xC4) + 0x24), 0x10);
         }
         if (WORD(state, 0xC0) != -1) {
-            if (WORD(state, 0xD0) != -1) func_L00_003294F0(ENTITY(0xD0), 1);
-            if (WORD(state, 0xD4) != -1) func_L00_003294F0(ENTITY(0xD0), 1);
-            ((u8 *)((WORD(state, 0xC0) << 8) + (s32)D_L18_001B281C[0]))[0xBC] = 1;
+            if (WORD(state, 0xD0) != -1) SetObjectFlagBit(ENTITY(0xD0), 1);
+            if (WORD(state, 0xD4) != -1) SetObjectFlagBit(ENTITY(0xD0), 1);
+            ((u8 *)((WORD(state, 0xC0) << 8) + (s32)gMobyTable_L18[0]))[0xBC] = 1;
         }
     }
     if (object[0xBC] && TRIGGER(0xBC)) {
         object[0xBC] = 0;
         if (WORD(state, 0xC8) != -1) {
-            u8 *base = D_L18_001B281C[0];
+            u8 *base = gMobyTable_L18[0];
             FLAGS(LOCAL_ENTITY(0xC8)) &= 0xFFFD;
             FLAGS(LOCAL_ENTITY(0xC8)) &= 0xFFFE;
             WORD(LOCAL_ENTITY(0xC8), 0x98) = WORD(*(u8 **)(LOCAL_ENTITY(0xC8) + 0x24), 0x10);
         }
         if (WORD(state, 0xC4) != -1) {
-            u8 *base = D_L18_001B281C[0];
+            u8 *base = gMobyTable_L18[0];
             FLAGS(LOCAL_ENTITY(0xC4)) |= 2;
             FLAGS(LOCAL_ENTITY(0xC4)) |= 1;
             WORD(LOCAL_ENTITY(0xC4), 0x98) = 0;
         }
-        if (WORD(state, 0xD0) != -1) func_L00_003294F0(ENTITY(0xD0), 1);
-        if (WORD(state, 0xD4) != -1) func_L00_003294F0(ENTITY(0xD0), 1);
-        func_L18_003FE020(ENTITY(0xD8));
-        func_L18_003FE020(ENTITY(0xDC));
+        if (WORD(state, 0xD0) != -1) SetObjectFlagBit(ENTITY(0xD0), 1);
+        if (WORD(state, 0xD4) != -1) SetObjectFlagBit(ENTITY(0xD0), 1);
+        ClearLinkToZero(ENTITY(0xD8));
+        ClearLinkToZero(ENTITY(0xDC));
     }
     {
         if (!D_001A7A78[3]) {
@@ -294,7 +296,7 @@ void func_L18_003F90A0(u8 *object)
             for (entry = D_L18_001FB320[WORD(state, 0xE0)];
             (WORD(state, 0xE0) & 255) != 255 && WORD(state, 0xE0) <= D_L18_001B2838[0] && entry &&
             ((entry && (s16)entry[-1] >= 0) || entry == D_L18_001FB320[WORD(state, 0xE0)]); entry++) {
-                entity = D_L18_001B281C[0] + ((*entry & 0x7FFF) << 8);
+                entity = gMobyTable_L18[0] + ((*entry & 0x7FFF) << 8);
                 if (!entity) break;
                 if (entity[0x20] != 0xFE) {
                     if (entity[0x20] != 0xFD) {
@@ -314,7 +316,7 @@ void func_L18_003F90A0(u8 *object)
                     StreamGroup(state, i, 0xF0) <= D_L18_001B2838[0] && entry &&
                     ((s16)entry[-1] >= 0 || entry == D_L18_001FB320[StreamGroup(state, i, 0xF0)]);
                     entry++) {
-                        entity = D_L18_001B281C[0] + ((*entry & 0x7FFF) << 8);
+                        entity = gMobyTable_L18[0] + ((*entry & 0x7FFF) << 8);
                         if (!entity) break;
                         if (entity[0x20] != 0xFE) {
                             if (entity[0x20] != 0xFD) {
@@ -329,11 +331,11 @@ void func_L18_003F90A0(u8 *object)
                 if (allReady) {
                     if (!D_001A7A78[3]) {
                         D_001A7A78[3] = 1;
-                        func_002E5E58(1, 0, 0);
-                        func_002B0A18(0x1233, -1);
+                        PlaySoundFromGlobalBank(1, 0, 0);
+                        SetEntryValueByIndex(0x1233, -1);
                         D_L18_001A903C[0] = 1;
                     }
-                    func_002A0430(WORD(state, 0xE8));
+                    MarkTableEntryFlagged(WORD(state, 0xE8));
                 }
             }
         }

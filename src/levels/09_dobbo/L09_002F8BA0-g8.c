@@ -18,15 +18,15 @@ extern void func_00282CC0(char *, char *, char *);
    into a 16-byte frame local, that difference is scaled by the level's step
    coefficient, and the scaled vector is written back through both points. The
    sub-object itself is left alone. */
-void func_L09_003F6AB8(unsigned char *a0) {
-    unsigned char *s0 = a0;
-    unsigned char *p = *(unsigned char **)(s0 + 0x68);
-    unsigned char *s1 = p + 0x10;
+void func_L09_003F6AB8(unsigned char *moby) {
+    unsigned char *self = moby;
+    unsigned char *pointA = *(unsigned char **)(self + 0x68);
+    unsigned char *pointB = pointA + 0x10;
     char buf[16];
-    func_00282CF0((f32 *)buf, (const f32 *)p, (const f32 *)s1);
-    func_00282D30(buf, buf, D_L09_001B0EE8);
-    func_00282CC0((char *)s1, (char *)s1, buf);
-    func_00282CC0((char *)(s0 + 0x10), (char *)(s0 + 0x10), (char *)s1);
+    FastVecSub((f32 *)buf, (const f32 *)pointA, (const f32 *)pointB);
+    FastVecScale(buf, buf, D_L09_001B0EE8);
+    FastVecAdd((char *)pointB, (char *)pointB, buf);
+    FastVecAdd((char *)(self + 0x10), (char *)(self + 0x10), (char *)pointB);
 }
 
 /* The pulse table's entry count, reached as 0x21E8($gp). */
@@ -39,14 +39,14 @@ extern int func_00283CF0(float);
    part (FloatToInt, so one step every other frame) to every live phase in the D_L09_002A27A0 table.
    A phase above 0x90 falls back by 0x80; the phase, folded back above 0x50, becomes the alpha byte of
    the matching D_L09_002A2658 colour. */
-void func_L09_003FE2D8(unsigned char *a0) {
-    unsigned char *state = *(unsigned char **)(a0 + 0x68);
+void func_L09_003FE2D8(unsigned char *moby) {
+    unsigned char *state = *(unsigned char **)(moby + 0x68);
     float *timer = (float *)(state + 0x384);
     float t = *timer + 0.5f;
     int step;
     int i;
     *timer = t;
-    step = func_00283CF0(t);
+    step = FloatToInt(t);
     if (*timer >= 1.0f)
         *timer = 0.0f;
     for (i = 0; i < D_L09_001B11D8; i++) {
@@ -76,28 +76,28 @@ extern unsigned short *D_L09_001FB560[];
    the object's group whose own word at +0x310 equals the object's. Nothing happens when the
    object's group byte (+0x21) or the word at +0x310 of its state is 0xFF. The state pointer is
    loaded ahead of the first test, as retail does. */
-void func_L09_003FE978(unsigned char *a0) {
+void func_L09_003FE978(unsigned char *moby) {
     unsigned char *state;
-    unsigned short *p;
-    unsigned char *e;
-    unsigned char *s;
+    unsigned short *trackEntry;
+    unsigned char *peer;
+    unsigned char *peerState;
 
-    state = *(unsigned char **)(a0 + 0x68);
-    if (a0[0x21] == 0xFF)
+    state = *(unsigned char **)(moby + 0x68);
+    if (moby[0x21] == 0xFF)
         return;
     if (*(int *)(state + 0x310) == 0xFF)
         return;
-    for (p = D_L09_001FB560[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L09_001B2878 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L09_001FB560[a0[0x21]]);
-         p++) {
-        e = D_L09_001B285C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (trackEntry = D_L09_001FB560[moby[0x21]];
+         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && trackEntry != 0 &&
+         ((trackEntry != 0 && (short)trackEntry[-1] >= 0) || trackEntry == D_L09_001FB560[moby[0x21]]);
+         trackEntry++) {
+        peer = D_L09_001B285C_1[0] + ((*trackEntry & 0x7FFF) << 8);
+        if (peer == 0)
             break;
-        s = *(unsigned char **)(e + 0x68);
-        if (s != 0) {
-            if (*(int *)(s + 0x310) == *(int *)(state + 0x310))
-                s[0x440] = 1;
+        peerState = *(unsigned char **)(peer + 0x68);
+        if (peerState != 0) {
+            if (*(int *)(peerState + 0x310) == *(int *)(state + 0x310))
+                peerState[0x440] = 1;
         }
     }
 }
@@ -114,21 +114,21 @@ extern f32 func_00282C48(f32);
    result against the object's own angle and adds the scaled difference to it.
    The frame holds five vectors: the two the body uses and three the retail
    frame leaves unused, which its 0x90 frame size records. */
-void func_L09_003F69A0(unsigned char *a0, f32 f) {
-    unsigned char *s2 = a0;
-    unsigned char *s1 = *(unsigned char **)(s2 + 0x68);
+void func_L09_003F69A0(unsigned char *moby, f32 blend) {
+    unsigned char *self = moby;
+    unsigned char *vars = *(unsigned char **)(self + 0x68);
     f32 v[4];
     f32 w[4];
     f32 x[4];
     f32 y[4];
     f32 z[4];
-    func_00282CF0(v, (f32 *)(s2 + 0x10), (f32 *)(*(int *)(s1 + 0x20) + 0x10));
-    func_00283698(w, (f32 *)(*(int *)(s1 + 0x20) + 0xC0));
-    func_002830C0(v, v, w);
-    v[1] = v[1] + (v[1] / func_00282C48(v[1])) *
-        (*(f32 *)(s1 + 0x28) - func_00282C48(v[1])) * f;
-    func_00283098(v, v, (f32 *)(*(int *)(s1 + 0x20) + 0xC0));
-    func_00282CC0((char *)(s2 + 0x10), (char *)v, (char *)(*(int *)(s1 + 0x20) + 0x10));
-    *(f32 *)(s2 + 0x18) = *(f32 *)(s2 + 0x18) +
-        (*(f32 *)(*(int *)(s1 + 0x20) + 0x18) + D_L09_001B0F04 - *(f32 *)(s2 + 0x18)) * f;
+    FastVecSub(v, (f32 *)(self + 0x10), (f32 *)(*(int *)(vars + 0x20) + 0x10));
+    matrix_from_basis_rows(w, (f32 *)(*(int *)(vars + 0x20) + 0xC0));
+    transform_vector(v, v, w);
+    v[1] = v[1] + (v[1] / FloatAbs(v[1])) *
+        (*(f32 *)(vars + 0x28) - FloatAbs(v[1])) * blend;
+    matrix_mul_vec3(v, v, (f32 *)(*(int *)(vars + 0x20) + 0xC0));
+    FastVecAdd((char *)(self + 0x10), (char *)v, (char *)(*(int *)(vars + 0x20) + 0x10));
+    *(f32 *)(self + 0x18) = *(f32 *)(self + 0x18) +
+        (*(f32 *)(*(int *)(vars + 0x20) + 0x18) + D_L09_001B0F04 - *(f32 *)(self + 0x18)) * blend;
 }

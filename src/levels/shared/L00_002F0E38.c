@@ -27,6 +27,7 @@ void func_L00_002F0EA8(u32 value) {
 
 extern short D_L00_001BEF84[];
 
+/* Sets the first entry of a level table to zero. */
 void func_L00_002F3478(void) {
     D_L00_001BEF84[0] = 0;
 }

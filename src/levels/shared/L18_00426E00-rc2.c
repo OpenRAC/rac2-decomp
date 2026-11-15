@@ -23,18 +23,19 @@
  */
 #include "common.h"
 
-s32 func_L18_00426E00(s8 *arg0) {
-    s32 r = 0;
-    if (arg0 != 0) {
-        u8 t = *(u8 *)(arg0 + 0x20);
-        if (t != 0xFE) {
-            if (t != 0xFD) {
-                s16 s = *(s16 *)(arg0 + 0xAA);
-                if (s == 0xEC0 || s == 0xED4 || s == 0xEE1) {
-                    r = 1;
+/* Returns 1 when this object is a live enemy of one of the three shooter classes. */
+s32 func_L18_00426E00(s8 *moby) {
+    s32 result = 0;
+    if (moby != 0) {
+        u8 stateId = *(u8 *)(moby + 0x20);
+        if (stateId != 0xFE) {
+            if (stateId != 0xFD) {
+                s16 classId = *(s16 *)(moby + 0xAA);
+                if (classId == 0xEC0 /* moby class 3776 */ || classId == 0xED4 /* moby class 3796 */ || classId == 0xEE1 /* Receiver Bot */) {
+                    result = 1;
                 }
             }
         }
     }
-    return r;
+    return result;
 }

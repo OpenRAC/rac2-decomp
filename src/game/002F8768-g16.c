@@ -3,7 +3,7 @@
 /* Level reset: frees the two sound handles, restores the camera pose from the 16-byte
    default (a quadword copy of the small-data vector, so this unit is built with -G16). */
 #include "common.h"
-typedef struct { char pad[0x28]; char *obj; char pad2[0x60 - 0x2C]; int f60; char pad3[0x78 - 0x64]; int f78; int f7C; char pad4[0x8C - 0x80]; int f8C; } Reset2F8768;
+typedef struct { char pad[0x28]; char *obj; char pad2[0x60 - 0x2C]; int f60; char pad3[0x78 - 0x64]; int soundHandle1; int soundHandle2; char pad4[0x8C - 0x80]; int f8C; } Reset2F8768;
 typedef struct { float v[4]; } Vec4_2F8768 __attribute__((aligned(16)));
 typedef struct { char pad[0x72]; unsigned short mode; } Mode2F8768;
 extern Reset2F8768 D_0021F240;
@@ -32,35 +32,35 @@ void func_002F8768(void)
     float dir[4];
     Vec4_2F8768 in;
 
-    if (D_0021F240.f7C != -1)
-        func_0028B6C8(D_0021F240.f7C, 0);
-    if (D_0021F240.f78 != -1)
-        func_0028B6C8(D_0021F240.f78, 0);
-    D_0021F240.f7C = -1;
-    D_0021F240.f78 = -1;
-    func_0028E440();
-    D_001A8BB0 = 0;
-    func_0026F748(0, 1);
-    D_00189E20[0x22B5] = 0;
-    func_0026F728();
-    if (D_0021F240.f60 == 0) {
+    if (gVendorMenuState.soundHandle2 != -1)
+        set_animation_parameter(gVendorMenuState.soundHandle2, 0);
+    if (gVendorMenuState.soundHandle1 != -1)
+        set_animation_parameter(gVendorMenuState.soundHandle1, 0);
+    gVendorMenuState.soundHandle2 = -1;
+    gVendorMenuState.soundHandle1 = -1;
+    TickCountdown();
+    gCurrentGameMode = 0;
+    EmptyStubF748(0, 1);
+    gHeroState[0x22B5] = 0;
+    EmptyStubF728();
+    if (gVendorMenuState.f60 == 0) {
         qcopy(&in, &D_001AD200);
-        func_00283098(&out, &in, D_0021F240.obj + 0xC0);
-        func_00282CC0(&out, &out, D_0021F240.obj + 0x10);
+        matrix_mul_vec3(&out, &in, gVendorMenuState.obj + 0xC0);
+        FastVecAdd(&out, &out, gVendorMenuState.obj + 0x10);
         dir[0] = 0;
         dir[1] = 0;
-        dir[2] = func_00283B98(*(float *)(D_0021F240.obj + 0xF8), 3.1415927f);
-        func_0026F778((char *)&out, dir, 0, 0);
-        func_003355A8(2);
+        dir[2] = FastAddRotations(*(float *)(gVendorMenuState.obj + 0xF8), 3.1415927f);
+        EmptyStubF778((char *)&out, dir, 0, 0);
+        SetCameraModeState(2);
     }
-    D_0021F240.obj[0x20] = 1;
-    if ((unsigned short)(D_001A63A8.mode - 6) >= 2)
-        D_001A63A8.mode = 5;
-    if (D_0021F240.f8C != 0)
-        func_002FB170();
-    if (D_0021F240.f60 != 0)
-        func_0029F338(D_0021F240.obj);
-    func_00132B28(0x5D);
-    func_002B7320();
-    func_00132028();
+    gVendorMenuState.obj[0x20] = 1;
+    if ((unsigned short)(gMusicState.mode - 6) >= 2)
+        gMusicState.mode = 5;
+    if (gVendorMenuState.f8C != 0)
+        ClearShopPreview();
+    if (gVendorMenuState.f60 != 0)
+        MarkMobySpawned(gVendorMenuState.obj);
+    SendSoundCommand23(0x5D);
+    music_Unpause();
+    snd_Pump();
 }

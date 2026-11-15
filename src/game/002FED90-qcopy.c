@@ -22,6 +22,7 @@ extern EffectSlot D_002212E0[];
 extern char D_00189E20[];
 extern void func_002AFFD8(void *, void *, int);
 
+/* Claims a free effect slot for the object and returns its number, or -1 if all are used. */
 int func_002FED90(char *obj, Quad *src, float x, float y, float z)
 {
     int i = 0;
@@ -42,11 +43,11 @@ int func_002FED90(char *obj, Quad *src, float x, float y, float z)
             e->y = y;
             e->z = z;
             pos = &e->pos;
-            h = D_00189E20;
+            h = gHeroState;
             if (*(short *)(h + 0x348) != 0)
                 qcopy(pos, *(char **)(h + 0x2290) + 0xE0);
             else
-                func_002AFFD8(&v, e, 1);
+                ComputeViewDirection(&v, e, 1);
             return i;
         }
         i++;

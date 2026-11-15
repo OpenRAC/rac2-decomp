@@ -1,5 +1,7 @@
+#include "names.h"
 extern float func_0034A4E0(char *object, int type, int *columns, int *rows, float *spacing, int *xOffset, int *yOffset, int *flag, float *extra);
 
+/* Works out where one tile of a grid goes: its x and y position, its size and which corner variant it uses. */
 void func_0034A808(char *object, int type, int value, float *x, float *y, float *size, int *mode)
 {
     int quadrant = value % 4;
@@ -12,7 +14,7 @@ void func_0034A808(char *object, int type, int value, float *x, float *y, float 
     int yOffset = 0;
     int flag = 0;
     float extra = 0.0f;
-    *size = func_0034A4E0(object, type, &columns, &rows, &spacing, &xOffset, &yOffset, &flag, &extra);
+    *size = LayoutItemGrid(object, type, &columns, &rows, &spacing, &xOffset, &yOffset, &flag, &extra);
     *x = row % columns;
     if (row >= columns)
         vertical = 1.0f;

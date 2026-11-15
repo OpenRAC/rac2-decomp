@@ -29,9 +29,10 @@ extern s32 func_00283CF0(f32 value);
 extern f32 func_002A7878(f32 a, f32 b);
 extern unsigned char *ref_L00_00338AE0_00;
 
+/* Creates a short-lived visual effect at a position, with a random start color and a size set by the given value. */
 Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f32 value2)
 {
-    Obj_L00_00338AE0 *o = (Obj_L00_00338AE0 *)func_002B9030(0x2E);
+    Obj_L00_00338AE0 *o = (Obj_L00_00338AE0 *)AllocParticle(0x2E);
     f32 r;
     u8 tag;
     EffectPayload *payload;
@@ -39,8 +40,8 @@ Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f
     if (o != 0) {
         qcopy(&o->v10, src1);
         payload = (EffectPayload *)&o->v20;
-        o->w4 = ((func_002A77E0(10) + 0x26) << 24) | 0x00808080;
-        o->b9 = func_00283CF0(1.0f) + 0x20;
+        o->w4 = ((RandomIntBelow(10) + 0x26) << 24) | 0x00808080;
+        o->b9 = FloatToInt(1.0f) + 0x20;
         o->b3 = 0x48;
         o->b1 = 1;
         tag = *ref_L00_00338AE0_00;
@@ -48,9 +49,9 @@ Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f
         o->b2 = tag;
         o->f_c = value * 210000.0f;
         qcopy(&payload->vector, src2);
-        r = func_002A7878(0.0f, 256.0f);
+        r = RandomFloatRange(0.0f, 256.0f);
         payload->random = r;
-        o->b8 = func_00283CF0(r);
+        o->b8 = FloatToInt(r);
         payload->rate = value2;
         payload->id = a2;
     }

@@ -1,14 +1,16 @@
+#include "names.h"
 extern void func_L00_00310D30(unsigned char *, unsigned char *);
 
-void func_L00_00311080(unsigned char *a0, unsigned char *a1, int a2, int a3, int t0, int t1)
+/* Sets up an animation state from a source animation and optionally advances it right away. */
+void func_L00_00311080(unsigned char *source, unsigned char *state, int valueA, int valueB, int frameCount, int advanceNow)
 {
-    a1[0x22] = a0[0x43];
-    a1[0x20] = a0[0x41];
-    a1[0x23] = a2;
-    a1[0x21] = a3;
-    *(int *)(a1 + 0x24) = 0;
-    *(float *)(a1 + 0x28) = 1.0f;
-    *(float *)(a1 + 0x2C) = 1.0f / (float)t0;
-    if (t1 != 0)
-        func_L00_00310D30(a0, a1);
+    state[0x22] = source[0x43];
+    state[0x20] = source[0x41];
+    state[0x23] = valueA;
+    state[0x21] = valueB;
+    *(int *)(state + 0x24) = 0;
+    *(float *)(state + 0x28) = 1.0f;
+    *(float *)(state + 0x2C) = 1.0f / (float)frameCount;
+    if (advanceNow != 0)
+        AdvanceAndDecodeAnimationFrames(source, state);
 }

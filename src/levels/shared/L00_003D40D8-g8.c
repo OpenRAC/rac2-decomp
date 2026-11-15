@@ -50,40 +50,40 @@ typedef struct {
 /* Per-frame fire step: on its cooldown and frame slot, looks for a target (skipping some
  * classes), aims, spawns two particles, fires one of two shot kinds (the first while charges
  * remain) and restarts the cooldown from the weapon table's rate at +0x54. */
-void func_L00_003D40D8(unsigned char *p, EffectLauncherState *s)
+void func_L00_003D40D8(unsigned char *moby, EffectLauncherState *state)
 {
     float pos[4], delta[4], target[4], step[4], velocity[4];
     char *obj;
-    int n;
+    int hue;
     float angle;
 
-    if (!ref_L00_003D40D8_00(&s->cooldown))
+    if (!ref_L00_003D40D8_00(&state->cooldown))
         return;
-    if (D_L00_001B19C8 % 4 != s->frame)
+    if (gFrameCounter_L00 % 4 != state->frame)
         return;
-    ref_L00_003D40D8_01(p, 1, pos);
-    s->alternate ^= 1;
+    ref_L00_003D40D8_01(moby, 1, pos);
+    state->alternate ^= 1;
     obj = ref_L00_003D40D8_02(pos, D_L00_001B8FF0, 0,
                               D_L00_001B0254 * 0.017453294f, D_L00_001B0258 * 0.017453294f,
                               D_L00_001B0250,
                               D_L00_001B0254 * 0.017453294f, D_L00_001B0258 * 0.017453294f);
     if (obj) {
-        if ((*(short *)(obj + 0xaa) == 0xee1 || *(short *)(obj + 0xaa) == 0xec0
-             || *(short *)(obj + 0xaa) == 0xed4)
+        if ((*(short *)(obj + 0xaa) == 0xee1 /* Receiver Bot */ || *(short *)(obj + 0xaa) == 0xec0 /* moby class 3776 */
+             || *(short *)(obj + 0xaa) == 0xed4 /* moby class 3796 */)
             && *(unsigned char *)(*(char **)(obj + 0x68) + 0x3b1) == 255) {
-            s->target = 0;
+            state->target = 0;
             return;
         }
-        if (*(short *)(obj + 0xaa) == 0xef4) {
-            s->target = 0;
+        if (*(short *)(obj + 0xaa) == 0xef4 /* moby class 3828 */) {
+            state->target = 0;
             return;
         }
-        s->target = obj;
-        if ((unsigned char)p[0x43] != 2)
-            ref_L00_003D40D8_03(p, 2, 0, 5);
-        ref_L00_003D40D8_04(delta, p + 0x10, D_00189EA0);
-        angle = ref_L00_003D40D8_05(delta, p + 0xe0);
-        if (D_L00_001A8F00 == 2 || p[0x42] != p[0x43] || (unsigned char)p[0x42] != 2
+        state->target = obj;
+        if ((unsigned char)moby[0x43] != 2)
+            ref_L00_003D40D8_03(moby, 2, 0, 5);
+        ref_L00_003D40D8_04(delta, moby + 0x10, gHeroPosition);
+        angle = ref_L00_003D40D8_05(delta, moby + 0xe0);
+        if (D_L00_001A8F00 == 2 || moby[0x42] != moby[0x43] || (unsigned char)moby[0x42] != 2
             || !(angle > 1.1f))
             return;
         qcopy(target, obj + 0x10);
@@ -95,16 +95,16 @@ void func_L00_003D40D8(unsigned char *p, EffectLauncherState *s)
             else
                 target[2] += D_L00_001B0260;
         }
-        n = ref_L00_003D40D8_07(255);
+        hue = ref_L00_003D40D8_07(255);
         {
-            char *result = ref_L00_003D40D8_08(pos, D_L00_001A8F20, 3, 0x202080, n, 127, 16,
+            char *result = ref_L00_003D40D8_08(pos, D_L00_001A8F20, 3, 0x202080, hue, 127, 16,
                                                420000.0f, 420000.0f, 0.0f, 0);
 
             if (result)
                 result[2] = *D_L00_001FEA14;
         }
         {
-            char *result = ref_L00_003D40D8_08(pos, D_L00_001A8F20, 3, 0x601080, (n + 128) % 255,
+            char *result = ref_L00_003D40D8_08(pos, D_L00_001A8F20, 3, 0x601080, (hue + 128) % 255,
                                                127, 16, 420000.0f, 420000.0f, 0.0f, 0);
 
             if (result)
@@ -113,34 +113,34 @@ void func_L00_003D40D8(unsigned char *p, EffectLauncherState *s)
         ref_L00_003D40D8_04(step, target, pos);
         ref_L00_003D40D8_09(step, step, D_L00_001B025C);
         ref_L00_003D40D8_10(pos, pos, step);
-        if (s->charges && !ref_L00_003D40D8_07(D_L00_001B029C)) {
+        if (state->charges && !ref_L00_003D40D8_07(D_L00_001B029C)) {
             float f;
             char *result;
 
-            if (--s->charges < 0)
-                s->charges = 0;
+            if (--state->charges < 0)
+                state->charges = 0;
             f = ref_L00_003D40D8_11(pos, target, 0, D_L00_001B02A0 * 0.016666668f,
                                     -(D_L00_001B02A4 * 0.00027777778f));
             ref_L00_003D40D8_04(velocity, target, pos);
             velocity[2] = 0;
             ref_L00_003D40D8_09(velocity, velocity, D_L00_001B02A0 * 0.016666668f);
             velocity[2] = f;
-            result = ref_L00_003D40D8_12(p, pos, velocity, 180, D_L00_001B02A4 * 0.00027777778f);
-            ref_L00_003D40D8_13(3, 0, p);
+            result = ref_L00_003D40D8_12(moby, pos, velocity, 180, D_L00_001B02A4 * 0.00027777778f);
+            ref_L00_003D40D8_13(3, 0, moby);
             *(float *)(result + 0x2c) = D_L00_001B02A8;
         } else {
-            ref_L00_003D40D8_14(pos, p, obj);
-            ref_L00_003D40D8_13(0, 0, p);
+            ref_L00_003D40D8_14(pos, moby, obj);
+            ref_L00_003D40D8_13(0, 0, moby);
         }
         {
-            char *v = D_L00_00262570 + D_00139587 * 0xe0;
+            char *v = gWeaponTable_L00 + D_00139587 * 0xe0;
             float f = ref_L00_003D40D8_15(0.0f, 0.17f);
             float delay = 1.0f / *(float *)(v + 0x54);
 
-            ++s->shots;
-            s->cooldown = delay + f;
+            ++state->shots;
+            state->cooldown = delay + f;
         }
         return;
     }
-    s->target = 0;
+    state->target = 0;
 }

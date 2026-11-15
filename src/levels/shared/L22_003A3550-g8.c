@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L22_003A3550 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give
@@ -21,39 +22,40 @@ extern int func_L22_003A48F8(int);
 
 extern void func_L22_003A2988(char *, float);
 
-int func_L22_003A3550(char *arg0, int arg1, float arg2) {
+/* Picks a random lane point that is not close to the ship and returns it, pushed out by the given distance. */
+int func_L22_003A3550(char *outPoint, int requireAllowed, float extra) {
     char *state = *(char **)(ref_L22_003A3550_00 + 0x68);
     char *slots = state + 0x2A0;
     float best = 45.0f;
     int found;
-    int w;
+    int laneIndex;
     int j;
-    int *list;
-    char *p;
-    int k;
+    int *lane;
+    char *point;
+    int pointIndex;
 
     for (;;) {
         found = 0;
-        w = func_002A77E0(0x20);
-        list = D_L22_001FE940[*(int *)(slots + (w << 2))];
-        p = (char *)list + 0x10;
-        for (j = 0; j < *list; j++) {
-            if (func_002F3C40(D_00189EA0, p) < best) {
+        laneIndex = RandomIntBelow(0x20);
+        lane = D_L22_001FE940[*(int *)(slots + (laneIndex << 2))];
+        point = (char *)lane + 0x10;
+        for (j = 0; j < *lane; j++) {
+            if (func_002F3C40(gHeroPosition, point) < best) {
                 found = 1;
                 break;
             }
-            p += 0x10;
+            point += 0x10;
         }
         if (found)
             continue;
-        if (arg1 == 0)
+        if (requireAllowed == 0)
             continue;
-        if (func_L22_003A48F8(w) == 0)
+        if (IsKeyMissingFromList(laneIndex) == 0)
             continue;
         break;
     }
-    k = func_002A77E0(*list - 1);
-    *(TI128 *)arg0 = *(TI128 *)((char *)list + k * 16 + 0x10);
-    func_L22_003A2988(arg0, arg2);
+    pointIndex = RandomIntBelow(*lane - 1);
+    *(TI128 *)outPoint = *(TI128 *)((char *)lane + pointIndex * 16 + 0x10);
+    PushPointOutOfArena(outPoint, extra);
     return 1;
 }

@@ -72,6 +72,7 @@ extern float func_002702C8(float *, float, float, float, float, float);
 extern int func_00282978(short *);
 extern float func_00283CE0(int);
 
+/* Reads the controller and turns the stick and buttons into ship turning, tilting and barrel rolls. */
 void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
 {
     float axis[4] __attribute__((aligned(16)));
@@ -79,16 +80,16 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
     float vertical, horizontal;
     RollState *roll;
 
-    func_L05_00442880(obj);
-    horizontal = -D_00138180.stickX;
-    vertical = D_00138180.stickY;
-    if (func_00282C48(vertical) < D_L05_001B1A68) {
+    LoadCameraParameterSet(obj);
+    horizontal = -gPadState.stickX;
+    vertical = gPadState.stickY;
+    if (FloatAbs(vertical) < D_L05_001B1A68) {
         if (vertical == 0.0f) {
-            if (D_00138180.input.words.held & 0x1000) {
+            if (gPadState.input.words.held & 0x1000) {
                 vertical = -D_L05_001B1B78;
                 D_L05_001B1B78 += D_L05_001B1B7C;
                 if (D_L05_001B1B78 > 1.0f) D_L05_001B1B78 = 1.0f;
-            } else if (D_00138180.input.words.held & 0x4000) {
+            } else if (gPadState.input.words.held & 0x4000) {
                 vertical = D_L05_001B1B78;
                 D_L05_001B1B78 += D_L05_001B1B7C;
                 if (D_L05_001B1B78 > 1.0f) D_L05_001B1B78 = 1.0f;
@@ -107,11 +108,11 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
             vertical = (vertical + D_L05_001B1A68) / (1.0f - D_L05_001B1A68);
     }
     if (horizontal == 0.0f) {
-        if (D_00138180.input.words.held & 0x8000) {
+        if (gPadState.input.words.held & 0x8000) {
             horizontal = D_L05_001B1B74;
             D_L05_001B1B74 += D_L05_001B1B7C;
             if (D_L05_001B1B74 > 1.0f) D_L05_001B1B74 = 1.0f;
-        } else if (D_00138180.input.words.held & 0x2000) {
+        } else if (gPadState.input.words.held & 0x2000) {
             horizontal = -D_L05_001B1B74;
             D_L05_001B1B74 += D_L05_001B1B7C;
             if (D_L05_001B1B74 > 1.0f) D_L05_001B1B74 = 1.0f;
@@ -121,7 +122,7 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
     } else {
         D_L05_001B1B74 = 0.0f;
     }
-    if ((D_001A79F0 != 5 && D_001A79F0 != 10) || !func_L05_00379F38()) {
+    if ((gCurrentMapIndex != 5 && gCurrentMapIndex != 10) || !GetPlayerStateField15()) {
         if (horizontal < 0.0f) horizontal = -(horizontal * horizontal);
         else horizontal = horizontal * horizontal;
         if (vertical < 0.0f) vertical = -(vertical * vertical);
@@ -135,51 +136,51 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
     }
     *(Quad *)axis = 0;
     axis[3] = axis[2] = 1.0f;
-    if (state->mode < 2 && ((D_00138180.input.words.pressed & 3) || func_L05_004459B0(obj))) {
-        if (func_00282C48(func_00282DB0(axis, obj)) < 0.7f)
+    if (state->mode < 2 && ((gPadState.input.words.pressed & 3) || IsTouchingLinkedPoint(obj))) {
+        if (FloatAbs(FastVecDot(axis, obj)) < 0.7f)
             state->mode = 2;
     }
-    if (func_L05_00442F90(obj)) {
+    if (UpdateShipTurnAnimation(obj)) {
         *pitchRate = (*yawRate = 0.0f);
     }
     *pitchRate = (-vertical * 0.017453294f) * state->pitchLimit;
     *yawRate = (horizontal * 0.017453294f) * state->yawLimit;
-    state->pitch = func_002702C8(&state->pitchVelocity, state->pitch, *pitchRate,
+    state->pitch = StepSpringDamperClamped(&state->pitchVelocity, state->pitch, *pitchRate,
                                  state->pitchParams[0], state->pitchParams[1], state->pitchParams[2]);
-    state->yaw = func_002702C8(&state->yawVelocity, state->yaw, *yawRate,
+    state->yaw = StepSpringDamperClamped(&state->yawVelocity, state->yaw, *yawRate,
                                state->yawParams[0], state->yawParams[1], state->yawParams[2]);
     {
         SteeringRecord *record = *(SteeringRecord **)(obj + 0x70);
-        record->value = func_002702C8(&record->velocity, record->value, vertical,
+        record->value = StepSpringDamperClamped(&record->velocity, record->value, vertical,
                                       D_L05_001B1A40, D_L05_001B1A44, D_L05_001B1A48);
     }
     *pitchRate = state->pitch;
     *yawRate = state->yaw;
     roll = (RollState *)(*(char **)(obj + 0x70) + 0xD4);
-    if (roll->rollTimer && func_00282978(&roll->rollTimer))
+    if (roll->rollTimer && FastDecTimer(&roll->rollTimer))
         roll->rollDirection = 0;
     if (roll->rollDelay == 0) {
-        if (D_00138180.input.buttons & 0xC) {
+        if (gPadState.input.buttons & 0xC) {
             roll->rollTimer = D_L05_001B1AE8;
             {
-                float inverse = 1.0f / func_00283CE0(roll->rollTimer);
+                float inverse = 1.0f / IntToFloat(roll->rollTimer);
                 roll->rollDelay = roll->rollTimer + D_L05_001B1AEC;
                 roll->rollInverse = inverse;
             }
-            if (D_00138180.input.words.held & 4) roll->rollDirection = -1;
+            if (gPadState.input.words.held & 4) roll->rollDirection = -1;
             else roll->rollDirection = 1;
             if (D_001A7A44) roll->rollDirection = roll->rollDirection == -1 ? 1 : -1;
         }
     } else {
-        func_00282978(&roll->rollDelay);
+        FastDecTimer(&roll->rollDelay);
     }
-    if (func_00282978(&roll->comboDelay) && D_L05_002A18E0 && D_001A79F0 != 20) {
-        if ((D_00138180.input.words.held & 3) == 3 || (D_00138180.input.words.held & 0xC) == 0xC) {
+    if (FastDecTimer(&roll->comboDelay) && D_L05_002A18E0 && gCurrentMapIndex != 20) {
+        if ((gPadState.input.words.held & 3) == 3 || (gPadState.input.words.held & 0xC) == 0xC) {
             unsigned short duration = D_L05_001B1AF0;
             roll->comboDelay = D_L05_001B1AF4;
-            D_L05_001B1B20 = 7;
+            gShipState = 7;
             roll->comboTimer = duration;
-            roll->comboInverse = 1.0f / func_00283CE0((short)duration);
+            roll->comboInverse = 1.0f / IntToFloat((short)duration);
         }
     }
 }

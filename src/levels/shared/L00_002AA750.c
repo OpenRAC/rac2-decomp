@@ -28,9 +28,10 @@ extern int func_002A7820(int, int);
 extern Effect2BFB38 *func_002BFB38(void *, void *, int, int);
 extern int func_002A77E0(int);
 
+/* Every so often, sprinkles a small spark particle near the hero that drifts the way the hero moves. */
 void func_L00_002AA750(int period, int threshold)
 {
-    EmissionStateView *state = (EmissionStateView *)D_00189E20;
+    EmissionStateView *state = (EmissionStateView *)gHeroState;
     float position[4];
     float velocity[4];
     float angle;
@@ -38,19 +39,19 @@ void func_L00_002AA750(int period, int threshold)
     int lifetime;
     state->counter++;
     if (threshold < state->counter) {
-        position[0] = state->x + func_002A7878(-0.15f, 0.15f) + state->vx * 8.0f;
-        position[1] = state->y + func_002A7878(-0.15f, 0.15f) + state->vy * 8.0f;
+        position[0] = state->x + RandomFloatRange(-0.15f, 0.15f) + state->vx * 8.0f;
+        position[1] = state->y + RandomFloatRange(-0.15f, 0.15f) + state->vy * 8.0f;
         position[2] = state->z + 0.1f;
-        angle = func_002A7940();
-        radius = func_002A7878(0.0f, 0.05000000447034836f);
-        velocity[0] = func_00283180(angle) * radius + state->vx * 0.75f;
-        velocity[1] = func_00283198(angle) * radius + state->vy * 0.75f;
-        velocity[2] = func_002A7878(0.05000000447034836f, 0.10833334177732468f);
-        lifetime = func_002A7820(90, 120);
+        angle = RandomAngle();
+        radius = RandomFloatRange(0.0f, 0.05000000447034836f);
+        velocity[0] = FastSinOrCosA(angle) * radius + state->vx * 0.75f;
+        velocity[1] = FastSinOrCosB(angle) * radius + state->vy * 0.75f;
+        velocity[2] = RandomFloatRange(0.05000000447034836f, 0.10833334177732468f);
+        lifetime = RandomIntRange(90, 120);
         if (state->amount < 0.25f)
-            func_002BFB38(position, velocity, 3, lifetime);
+            SpawnSparkParticle_002BFB38(position, velocity, 3, lifetime);
         else
-            func_002BFB38(position, velocity, 1, lifetime);
-        ((EmissionStateView *)D_00189E20)->counter = func_002A77E0(period);
+            SpawnSparkParticle_002BFB38(position, velocity, 1, lifetime);
+        ((EmissionStateView *)gHeroState)->counter = RandomIntBelow(period);
     }
 }

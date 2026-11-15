@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_001A8BB0;
 extern int D_001B1870 __attribute__((section(".sdata")));
@@ -11,12 +12,12 @@ extern int D_L00_001A9070[2] __attribute__((sda));
 typedef struct {
     int active;
     int timer;
-    int unk08;
-    int unk0C;
-    int unk10;
-    int unk14;
-    int unk18;
-    int unk1C;
+    int halfWidth;
+    int halfHeight;
+    int x;
+    int y;
+    int boxHalfWidth;
+    int boxHalfHeight;
     int entryIndex;
     int unk24;
     int pad28[8];
@@ -39,30 +40,30 @@ extern int func_1157AC(int);
 void func_00289020(void)
 {
     unsigned short metrics[12];
-    int id;
-    int h;
+    int textId;
+    int screenHeight;
 
-    D_00254E78.active = 1;
-    D_00254E78.timer = 0;
+    gSubtitleState.active = 1;
+    gSubtitleState.timer = 0;
     if (D_001A7B94 != 0)
         func_2E5E58(0, 1, 0);
-    id = D_001B1840[D_00254E78.entryIndex].unk00;
+    textId = gSubtitleEntries[gSubtitleState.entryIndex].unk00;
     func_2802E0(metrics, 0xF0, 0x1E0, 0x2C, 0x1D4, 0x100, 0x168, 0x10, 7);
-    func_280200(metrics, 0x80FFA888LL, id, -1);
-    D_00254E78.unk08 = ((short)metrics[6] >> 1) + 10;
-    D_00254E78.unk0C = ((short)metrics[7] >> 1) + 5;
-    D_00254E78.unk10 = 0x100;
-    D_00254E78.unk14 = D_L00_001A9070[D_001A7B90];
-    D_00254E78.unk18 = 8;
-    D_00254E78.unk1C = 8;
-    D_00254E78.unk48 = 0;
-    if (id != 0)
-        D_00254E78.unk48 = func_1157AC(id) * 7;
-    h = D_001A7344;
-    D_00254E78.unk14 = h - 0x3C;
-    if (h - 0xC < D_00254E78.unk14 + D_00254E78.unk0C) {
-        int bottom = D_00254E78.unk0C + 0xC;
-        D_00254E78.unk14 = h - bottom;
+    func_280200(metrics, 0x80FFA888LL, textId, -1);
+    gSubtitleState.halfWidth = ((short)metrics[6] >> 1) + 10;
+    gSubtitleState.halfHeight = ((short)metrics[7] >> 1) + 5;
+    gSubtitleState.x = 0x100;
+    gSubtitleState.y = D_L00_001A9070[gIsPalVideo];
+    gSubtitleState.boxHalfWidth = 8;
+    gSubtitleState.boxHalfHeight = 8;
+    gSubtitleState.unk48 = 0;
+    if (textId != 0)
+        gSubtitleState.unk48 = func_1157AC(textId) * 7;
+    screenHeight = gScreenHeight;
+    gSubtitleState.y = screenHeight - 0x3C;
+    if (screenHeight - 0xC < gSubtitleState.y + gSubtitleState.halfHeight) {
+        int boxBottom = gSubtitleState.halfHeight + 0xC;
+        gSubtitleState.y = screenHeight - boxBottom;
     }
 }
 
@@ -77,6 +78,7 @@ extern char *D_001B18DC;
 extern int D_001B18E0;
 extern int D_001B18E4;
 
+/* Switches between two saved sets of buffer pointers when the requested index differs from the current one. */
 void func_0028B338(int requested)
 {
     int state = D_001A8D44;
@@ -105,34 +107,35 @@ void func_0028B338(int requested)
     }
 }
 
+/* Sets up a HUD slot with a new item and its parameters. Returns the slot serial number, unchanged if nothing differs. */
 int func_0028B3D0(int slot, int id, int callback, int value1, int value2, int value3, int value4)
 {
     int index = slot & 15;
-    char *p = D_00255330 + index * 0x90;
+    char *slotData = gHudElements + index * 0x90;
     int flags = slot & 0xfff0;
     int refresh;
     int serial;
-    if (D_001A8BB0 == 5 && index != 2 && index != 0) return 0;
-    if (*(int *)(p + 0x2c) == value3 && *(int *)(p + 0x28) == value4 &&
-        *(int *)(p + 0x20) == id && *(int *)(p + 0x24) == flags &&
-        *(int *)(p + 0x30) == callback && *(int *)(p + 0x34) == value1 &&
-        *(int *)(p + 0x38) == value2) return *(int *)(p + 0x64);
-    serial = D_001B1870;
-    *(int *)(p + 0x2c) = value3;
-    refresh = flags & *(int *)(p + 4);
-    *(int *)(p + 0x64) = serial;
+    if (gCurrentGameMode == 5 && index != 2 && index != 0) return 0;
+    if (*(int *)(slotData + 0x2c) == value3 && *(int *)(slotData + 0x28) == value4 &&
+        *(int *)(slotData + 0x20) == id && *(int *)(slotData + 0x24) == flags &&
+        *(int *)(slotData + 0x30) == callback && *(int *)(slotData + 0x34) == value1 &&
+        *(int *)(slotData + 0x38) == value2) return *(int *)(slotData + 0x64);
+    serial = gHudState;
+    *(int *)(slotData + 0x2c) = value3;
+    refresh = flags & *(int *)(slotData + 4);
+    *(int *)(slotData + 0x64) = serial;
     refresh &= 0x20;
     serial++;
-    *(int *)(p + 0x28) = value4;
-    *(int *)(p + 0x20) = id;
-    *(int *)(p + 0x30) = callback;
-    *(int *)(p + 0x34) = value1;
-    *(int *)(p + 0x38) = value2;
-    D_001B1870 = serial;
-    *(int *)(p + 0x68) = 1;
-    *(int *)(p + 0x24) = flags;
-    *(int *)(p + 0x7c) = 0;
-    *(int *)(p + 0x70) = 0;
-    if (refresh) func_0028B4D8(p);
-    return *(int *)(p + 0x64);
+    *(int *)(slotData + 0x28) = value4;
+    *(int *)(slotData + 0x20) = id;
+    *(int *)(slotData + 0x30) = callback;
+    *(int *)(slotData + 0x34) = value1;
+    *(int *)(slotData + 0x38) = value2;
+    gHudState = serial;
+    *(int *)(slotData + 0x68) = 1;
+    *(int *)(slotData + 0x24) = flags;
+    *(int *)(slotData + 0x7c) = 0;
+    *(int *)(slotData + 0x70) = 0;
+    if (refresh) FinishHudElementSetup(slotData);
+    return *(int *)(slotData + 0x64);
 }

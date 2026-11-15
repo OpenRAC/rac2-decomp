@@ -37,6 +37,7 @@ extern void func_0011AEA0(int);
 extern int func_0011D810(const void *);
 extern int func_0011D620(const void *, int, int, int *, int, unsigned int *, int, int, int);
 
+/* Loads a sound bank from a disc position and waits for the answer. */
 unsigned int func_00132318(int loc, int offset) {
     unsigned int reply;
     unsigned int busy;
@@ -44,26 +45,26 @@ unsigned int func_00132318(int loc, int offset) {
     D_001A7488 = 0;
     if (D_001A74C8 != 0) {
         if (D_001A74F8 == 0)
-            func_00115D48(D_001A7600);
+            Printf(D_001A7600);
         return 0;
     }
-    if (func_00133580(1) == 1) {
+    if (snd_CheckLoadInProgress(1) == 1) {
         if (D_001A74F8 == 0)
-            func_00115D48(D_001A7630);
+            Printf(D_001A7630);
         return 0;
     }
     D_001A71C0 = loc;
     D_001A71C4 = offset;
     D_001A7180 = -1u;
-    while (func_0011D810(&D_001A7140) != 0) {
+    while (IsRpcHandleValid(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)
-            func_00115D48(D_001A7578);
-        func_00132028();
-        func_0011AEA0(0);
+            Printf(D_001A7578);
+        snd_Pump();
+        FlushCache(0);
     }
-    if (func_0011D620(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0) < 0) {
+    if (CallRpcServer(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0) < 0) {
         if (D_001A74F8 == 0)
-            func_00115D48(D_001A7650);
+            Printf(D_001A7650);
         D_001A7488 = 0x106;
         return 0;
 reread:
@@ -74,7 +75,7 @@ reread:
         goto reread;
     busy = -1u;
     for (;;) {
-        func_0011AEA0(0);
+        FlushCache(0);
         reply = D_001A7180_abs;
         if (reply != busy) {
 done:
@@ -83,7 +84,8 @@ done:
     }
 }
 
-unsigned int func_001326D8(int arg0) {
+/* Loads a sound bank by id and waits for the answer. */
+unsigned int func_001326D8(int bankId) {
     unsigned int reply;
     unsigned int busy;
 
@@ -91,21 +93,21 @@ unsigned int func_001326D8(int arg0) {
     if (D_001A74C8 != 0) {
         if (D_001A74F8 != 0)
             return 0;
-        func_00115D48(D_001A7730);
+        Printf(D_001A7730);
         return 0;
     }
-    D_001A71C0 = arg0;
+    D_001A71C0 = bankId;
     D_001A7180 = -1u;
-    while (func_0011D810(&D_001A7140) != 0) {
+    while (IsRpcHandleValid(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)
-            func_00115D48(D_001A7578);
-        func_00132028();
-        func_0011AEA0(0);
+            Printf(D_001A7578);
+        snd_Pump();
+        FlushCache(0);
     }
-    if (func_0011D620(&D_001A7140, 0x59, 1, &D_001A71C0, 4, &D_001A7180, 4, 0,
+    if (CallRpcServer(&D_001A7140, 0x59, 1, &D_001A71C0, 4, &D_001A7180, 4, 0,
                       0) < 0) {
         if (D_001A74F8 == 0)
-            func_00115D48(D_001A7760);
+            Printf(D_001A7760);
         D_001A7488 = 0x106;
         return 0;
 reread:
@@ -116,7 +118,7 @@ reread:
         goto reread;
     busy = -1u;
     for (;;) {
-        func_0011AEA0(0);
+        FlushCache(0);
         reply = D_001A7180_abs;
         if (reply != busy) {
 done:

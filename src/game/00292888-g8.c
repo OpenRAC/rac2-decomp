@@ -18,6 +18,7 @@ extern void func_0011AEA0(int);
 extern void func_0028AE88(int, void *);
 
 /* RAC1 loaders.c LoadHudBanks supplies the arena layout and bank sequence. */
+/* Loads the HUD graphics banks from the level archive into memory and sets up their tables and texture uploads. */
 void func_00292888(void)
 {
     int *root = D_001A7288;
@@ -34,8 +35,8 @@ void func_00292888(void)
     allocation_file = D_001A91F0;
     resources = D_001BAEC0;
     bank_size = (root[7]+63)&0xffffffc0U;
-    header = func_0028B2B8(bank_size, 0, allocation_file, 0x2ff);
-    func_00282B50(header, (void *)(root[6] + (int)root), bank_size);
+    header = AllocHudMemory(bank_size, 0, allocation_file, 0x2ff);
+    FastMemoryHelperC(header, (void *)(root[6] + (int)root), bank_size);
     D_001B1888.header = header;
     D_001B1888.table04 = (int *)((char *)header + header[1]);
     bank1_target = (char *)(resources[4] + 0x60000);
@@ -44,26 +45,26 @@ void func_00292888(void)
     D_001B1888.table10 = (int *)((char *)header + header[4]);
     if (header[0x15]) {
         bank1_qwords = ((root[9] + 63) & 0xffffffc0U) >> 4;
-        func_00292B20(0, bank1_target);
-        D_001B1888.header[0x25] = func_002EED58((void *)(root[8] + (int)root), bank1_qwords, bank1_qwords, D_001A9200);
-        func_0028B160(0, bank1_target, 1);
+        UnpackHudBankData(0, bank1_target);
+        D_001B1888.header[0x25] = AllocateBufferSlot((void *)(root[8] + (int)root), bank1_qwords, bank1_qwords, D_001A9200);
+        Hud_SendResidentBank(0, bank1_target, 1);
     }
     if (D_001B1888.header[0x16]) {
-        bank2_data = func_0028B2B8(D_001B1888.header[0x16], 0, allocation_file, 0x327);
-        func_00292B20(1, bank2_data);
-        func_0011AEA0(0);
-        func_0028AE88(1, bank2_data);
+        bank2_data = AllocHudMemory(D_001B1888.header[0x16], 0, allocation_file, 0x327);
+        UnpackHudBankData(1, bank2_data);
+        FlushCache(0);
+        LinkHudBank(1, bank2_data);
     }
     if (D_001B1888.header[0x17]) {
         bank3_qwords = ((root[13] + 63) & 0xffffffc0U) >> 4;
-        D_001B1888.header[0x27] = func_002EED58((void *)(root[12] + (int)root), bank3_qwords, bank3_qwords, D_001A9210);
+        D_001B1888.header[0x27] = AllocateBufferSlot((void *)(root[12] + (int)root), bank3_qwords, bank3_qwords, D_001A9210);
     }
     if (D_001B1888.header[0x18]) {
         bank4_qwords = ((root[15] + 63) & 0xffffffc0U) >> 4;
-        D_001B1888.header[0x28] = func_002EED58((void *)(root[14] + (int)root), bank4_qwords, bank4_qwords, D_001A9220);
+        D_001B1888.header[0x28] = AllocateBufferSlot((void *)(root[14] + (int)root), bank4_qwords, bank4_qwords, D_001A9220);
     }
     if (D_001B1888.header[0x19]) {
         bank5_qwords = ((root[17] + 63) & 0xffffffc0U) >> 4;
-        D_001B1888.header[0x29] = func_002EED58((void *)(root[16] + (int)root), bank5_qwords, bank5_qwords, D_001A9230);
+        D_001B1888.header[0x29] = AllocateBufferSlot((void *)(root[16] + (int)root), bank5_qwords, bank5_qwords, D_001A9230);
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The threshold lives in small data, so this file is built with -G8. It differs
    from program to program, so it carries no level. */
@@ -12,10 +13,10 @@ void func_00327D08(char *a0)
 {
     float value;
 
-    func_002FC808();
+    AppendVu1DmaChainTable3();
     value = *(float *)(*(char **)(a0 + 0x68) + 0x24);
     if (value < ref_L00_00327D08_00)
-        func_00327D50(a0);
+        DrawDistortionRing(a0);
 }
 
 extern int D_001B1688;
@@ -60,13 +61,14 @@ void func_0032E4F0(float size)
     block->field_230 = 0xFF;
     block->field_234 = 0xFF;
     block->field_238 = 0xFF;
-    func_0027AB40();
+    UpdateViewContext();
 }
 
+/* Looks through the live objects and reacts to each one of a certain kind that is close to this object. */
 void func_00327A60(char *object)
 {
     char *cursor;
-    if (D_001B1688 & 1) {
+    if (gGameTime & 1) {
         cursor = D_001B1B68;
         while (cursor) {
             int kind = *(unsigned char *)(cursor + 0x20);
@@ -74,8 +76,8 @@ void func_00327A60(char *object)
             if (kind == 0xfd) return;
             if (cursor && *(char **)(cursor + 0x24) &&
                 *(short *)(*(char **)(cursor + 0x24) + 0x46) == 0x13) {
-                if (func_00282E48(cursor + 0x10, object + 0x10) < ref_L00_00327A60_00)
-                    func_00302440(cursor, object);
+                if (fast_vec_dist(cursor + 0x10, object + 0x10) < ref_L00_00327A60_00)
+                    StartPickupFlyIfIdle(cursor, object);
             }
             cursor = *(char **)(cursor + 0x28);
         }

@@ -26,11 +26,12 @@ typedef struct {
    copies 0x7A8 bytes of r1_D_00130428 to 0x80074000. Indexing the table in
    the loop keeps its base live, so the argument loads keep source
    order. */
+/* Installs the system call entries and copies a block of start-up code into place when the hardware allows it. */
 void func_0011F938(void) {
     SysEnt *t;
     unsigned int i;
 
-    if (func_0011F8D0() == 0) {
+    if (TestHardwareBitField() == 0) {
         return;
     }
     t = (SysEnt *)r1_D_00130BD0;
@@ -51,6 +52,7 @@ void func_0011F938(void) {
  * with `dst++` before the branch as retail has it. (Under 2.95.3 reorg
  * sinks `dst++` into the slot, 44 bytes against 48: the old revert.)
  */
+/* Copies bytes from one place to another and returns zero. */
 int func_0011F9E4(char *dst, char *src, unsigned int n) {
     unsigned int i;
     for (i = 0; i < n; i++) {

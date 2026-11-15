@@ -44,16 +44,16 @@ extern float func_00283CE0(int);
 void func_002A75E0(Moby_2A75E0 *m, int anim, int f41, int frames, int flags)
 {
     if (frames <= 0) {
-        func_002A7398(m, anim, f41);
+        StartAnimationImmediate(m, anim, f41);
         return;
     }
     if (m->f44 > 0.025f || m->f50 != 0 || m->f54 != 0 || (flags & 4)) {
-        int slot = func_0029FA88(m);
+        int slot = AllocObjectSlot(m);
         if (slot >= 0) {
-            int v = slot;
-            if (flags & 1) v |= 0x100;
-            if (flags & 2) v |= 0x200;
-            func_002A2450(m, v);
+            int slotFlags = slot;
+            if (flags & 1) slotFlags |= 0x100;
+            if (flags & 2) slotFlags |= 0x200;
+            func_002A2450(m, slotFlags);
             qcopy(D_001CD540[slot], m->f80);
             if (m->f42 != 0xFF) m->fA9 = m->f42;
             m->f42 = 0xFF;
@@ -62,9 +62,9 @@ void func_002A75E0(Moby_2A75E0 *m, int anim, int f41, int frames, int flags)
     }
     m->f41 = f41;
     m->anim = anim;
-    func_0029F390(m);
+    update_moby_animation_state(m);
     m->f48 = 1.0f;
-    m->f4C = 1.0f / func_00283CE0(frames);
+    m->f4C = 1.0f / IntToFloat(frames);
     m->f44 = 0;
     m->f60 &= ~2;
     m->f6C = m->cls->anims[anim]->f11;

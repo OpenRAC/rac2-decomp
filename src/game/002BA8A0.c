@@ -17,7 +17,7 @@ extern unsigned char *ref_002BA8A0_00;
  * first 16 bytes into the record and fills the record's header. */
 void func_002BA8A0(void *a0, int a1)
 {
-    char *obj = (char *)func_002B9030(1);
+    char *obj = (char *)AllocParticle(1);
     unsigned char byte;
     int r;
 

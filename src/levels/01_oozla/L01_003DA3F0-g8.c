@@ -30,50 +30,51 @@ extern int func_00283CF0(float);
 extern void *func_002BAA28(void *,void *,void *,int,int,int,int,int,int);
 extern void func_002ABBB8(void *,void *,int,int,int,int,int,int,int,int,int, int, float, float,float, float,float, float,float);
 /* Emits randomized particle trails, then the owner's explosion effect. */
-void func_L01_003DA3F0(u8 *a0, void *a1)
+/* Sprays random trails of particles, then starts the explosion effect. */
+void func_L01_003DA3F0(u8 *moby, void *baseVelocity)
 {
     float pos[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
     float acc[4] __attribute__((aligned(16)));
-    u8 *p = *(u8 **)(a0 + 0x68);
-    int i, j, c1, c2, n;
-    float angle, speed, z, r, scale, lifetime, maximum, upperScale;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    int i, j, startColor, endColor, particleLife;
+    float angle, speed, rise, spread, scale, lifetime, maximum, upperScale;
     u8 *position;
 
     for (i = 0; i < D_L01_001B0844; i++) {
-        position = a0 + 0x10;
+        position = moby + 0x10;
         qcopy(pos, position);
-        func_002ACB48(pos, D_L01_001B084C);
+        AddRandomOffsetToVector(pos, D_L01_001B084C);
         pos[2] += 0.25f;
-        angle = func_002A7940();
-        speed = func_002A7878(D_L01_001B0858, D_L01_001B085C);
-        z = func_002A7878(D_L01_001B0860, D_L01_001B0864);
-        r = func_002A7878(0.0f, D_L01_001B0890);
-        func_00282D30(vel, a1, r * 0.016666668f);
-        vel[0] += func_00283180(angle) * 0.016666668f * speed;
-        vel[1] += func_00283198(angle) * 0.016666668f * speed;
-        vel[2] += z * 0.016666668f;
+        angle = RandomAngle();
+        speed = RandomFloatRange(D_L01_001B0858, D_L01_001B085C);
+        rise = RandomFloatRange(D_L01_001B0860, D_L01_001B0864);
+        spread = RandomFloatRange(0.0f, D_L01_001B0890);
+        FastVecScale(vel, baseVelocity, spread * 0.016666668f);
+        vel[0] += FastSinOrCosA(angle) * 0.016666668f * speed;
+        vel[1] += FastSinOrCosB(angle) * 0.016666668f * speed;
+        vel[2] += rise * 0.016666668f;
         qcopy(acc, vel);
         acc[2] -= D_L01_001B0868 * ((float)D_L01_001B0888 * 0.00027777778f);
         for (j = 0; j < D_L01_001B0848; j++) {
-            scale = func_002A7878(0.5f, 1.5f);
+            scale = RandomFloatRange(0.5f, 1.5f);
             vel[3] = scale * D_L01_001B086C;
             acc[3] = scale * D_L01_001B0870;
-            func_002ACB48(pos, D_L01_001B0850);
-            func_002ACB48(acc, D_L01_001B0854 * 0.016666668f);
-            c1 = func_00283D38(D_L01_001B0874, D_L01_001B087C,
-                              func_002A7878(0.0f, 1.0f));
+            AddRandomOffsetToVector(pos, D_L01_001B0850);
+            AddRandomOffsetToVector(acc, D_L01_001B0854 * 0.016666668f);
+            startColor = FastTweenColor(D_L01_001B0874, D_L01_001B087C,
+                              RandomFloatRange(0.0f, 1.0f));
             upperScale = 2.5f;
-            c2 = func_00283D38(D_L01_001B0878, D_L01_001B0880,
-                              func_002A7878(0.0f, 1.0f));
+            endColor = FastTweenColor(D_L01_001B0878, D_L01_001B0880,
+                              RandomFloatRange(0.0f, 1.0f));
             lifetime = (float)D_L01_001B088C;
             maximum = lifetime * upperScale;
-            n = func_00283CF0(func_002A7878(lifetime * 0.5f, maximum));
-            func_002BAA28(pos, vel, acc, c1, c2, D_L01_001B0884,
-                          D_L01_001B0888, n, -1);
+            particleLife = FloatToInt(RandomFloatRange(lifetime * 0.5f, maximum));
+            SpawnTrailParticle_002BAA28(pos, vel, acc, startColor, endColor, D_L01_001B0884,
+                          D_L01_001B0888, particleLife, -1);
         }
     }
-    func_002ABBB8(a0, p, 0, 4, 0, 0, -1, 0, 0, -1, 1, 0x810001,
-                  D_L01_001B083C, *(float *)(p + 0x18), 4.0f, 2.0f,
+    SpawnExplosionEffects(moby, vars, 0, 4, 0, 0, -1, 0, 0, -1, 1, 0x810001,
+                  D_L01_001B083C, *(float *)(vars + 0x18), 4.0f, 2.0f,
                   9.0f, 1.2f, 0.0f);
 }

@@ -25,53 +25,55 @@ extern void func_003087A0(u8 *a0);
 extern void func_L10_00418BA0(u8 *arg0);
 extern void func_L10_00418968(u8 *arg0);
 
-void func_L10_00418768(u8 *arg0) {
-    u8 *s2 = *(u8 **)(arg0 + 0x68);
-    u8 *s3;
-    u8 *p;
-    s32 id;
+/* Per-frame update of the class 3982 ship: on the first frame it starts up, afterwards it plays
+   its hit reaction, keeps its sound effect alive and leaves trail marks. */
+void func_L10_00418768(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *actor;
+    u8 *record;
+    s32 effectId;
     s32 tmp[4];
     s32 one;
 
-    if (arg0[0x20] == 0) {
-        arg0[0x30] = 0xFF;
-        if (func_0037B670(arg0) == 0)
+    if (moby[0x20] == 0) {
+        moby[0x30] = 0xFF;
+        if (func_0037B670(moby) == 0)
             return;
-        func_L10_004189D8(arg0);
+        InitFlyingPiece(moby);
         func_00308AF8((u8 *)tmp);
-        if (*(s32 *)(s2 + 0x264) != 0)
-            func_0037BC48(arg0, (s32)func_L10_00418968, 0, 0);
+        if (*(s32 *)(vars + 0x264) != 0)
+            func_0037BC48(moby, (s32)StopMobySoundEffect, 0, 0);
         return;
     }
-    s3 = func_0037BA88(arg0);
-    if (*(s32 *)(s3 + 0x110) == 0)
+    actor = func_0037BA88(moby);
+    if (*(s32 *)(actor + 0x110) == 0)
         return;
-    func_0037DFB8(arg0);
+    func_0037DFB8(moby);
     one = 1;
-    if (func_0037D390(arg0, 0, 0, 0) == one) {
-        id = *(s32 *)(s2 + 0x26C);
-        if (id != -1) {
-            p = D_L10_00188660 + id * 0x70;
-            if (*(u8 **)(p + 0x88) == arg0 && p[0x74] != 0)
-                func_00373410(id);
+    if (func_0037D390(moby, 0, 0, 0) == one) {
+        effectId = *(s32 *)(vars + 0x26C);
+        if (effectId != -1) {
+            record = D_L10_00188660 + effectId * 0x70;
+            if (*(u8 **)(record + 0x88) == moby && record[0x74] != 0)
+                func_00373410(effectId);
         }
-        *(s32 *)(s2 + 0x26C) = -1;
-        func_003737B8(2, 0, arg0, 0xF8E);
+        *(s32 *)(vars + 0x26C) = -1;
+        func_003737B8(2, 0, moby, 0xF8E);
     }
-    func_0037D7A0(arg0, 0, 176.0f);
-    if (*(s32 *)(s3 + 0x110) == 1) {
-        if (*(s32 *)(s2 + 0x260) != -1) {
-            *(s32 *)(s3 + 0x11C) = *(s32 *)(s3 + 0x110);
-            *(u8 **)(s3 + 0x120) = D_001B251C + (*(s32 *)(s2 + 0x260) << 8);
+    func_0037D7A0(moby, 0, 176.0f);
+    if (*(s32 *)(actor + 0x110) == 1) {
+        if (*(s32 *)(vars + 0x260) != -1) {
+            *(s32 *)(actor + 0x11C) = *(s32 *)(actor + 0x110);
+            *(u8 **)(actor + 0x120) = D_001B251C + (*(s32 *)(vars + 0x260) << 8);
         }
-        if (*(s32 *)(s3 + 0x104) != 0)
-            func_L10_00418AD8(arg0);
-        if (func_0037D6E0(arg0) != 0)
-            func_0037D528(arg0);
-        func_003087A0(s2 + 0x268);
-        func_L10_00418BA0(arg0);
+        if (*(s32 *)(actor + 0x104) != 0)
+            StartTimedEffect(moby);
+        if (func_0037D6E0(moby) != 0)
+            func_0037D528(moby);
+        func_003087A0(vars + 0x268);
+        SpawnSmallTailTrailMarks(moby);
     }
-    p = D_L10_00188660 + *(s32 *)(s2 + 0x26C) * 0x70;
-    if (*(u8 **)(p + 0x88) != arg0 || p[0x74] == 0)
-        *(s32 *)(s2 + 0x26C) = func_003737B8(0, 6, arg0, 0xF8E);
+    record = D_L10_00188660 + *(s32 *)(vars + 0x26C) * 0x70;
+    if (*(u8 **)(record + 0x88) != moby || record[0x74] == 0)
+        *(s32 *)(vars + 0x26C) = func_003737B8(0, 6, moby, 0xF8E);
 }

@@ -35,21 +35,21 @@ Moby_L05_00425FE0 *func_L05_00425FE0(Moby_L05_00425FE0 *object)
     Moby_L05_00425FE0 *moby;
     Moby_L05_00425FE0 *m;
 
-    moby = func_0029EFD0(0x117C);
+    moby = CreateMoby(0x117C);
     if (moby != 0) {
         moby->updateDist = 0xFF;
         moby->drawDist = 0xFF;
         moby->drawn = 1;
         qcopy(moby->position, object->position);
-        func_00282C88(moby->rot);
-        moby->rot[2] = func_002A7940();
+        ClearVector128(moby->rot);
+        moby->rot[2] = RandomAngle();
         if (D_L05_001B14FC == 0) {
             for (m = D_L05_001B2528; m != 0; m = m->pChain) {
                 if (m->oClass == 0xFBF)
                     D_L05_001B14FC = m;
             }
         }
-        func_L05_00426270(moby);
+        InitGlowRingState_L05_3(moby);
         moby->scale = *(float *)(moby->pClass + 0x24);
         return moby;
     }

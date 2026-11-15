@@ -7,19 +7,22 @@ extern void ref_L00_0042ABF8_00(char *);
 
 extern void ref_L00_0042B688_00(char *);
 
-void func_L00_00428560(char *o)
+/* Calls this level's own setup routine for the object. */
+void func_L00_00428560(char *object)
 {
-    ref_L00_00428560_00(o);
+    ref_L00_00428560_00(object);
 }
 
-void func_L00_0042ABF8(char *o)
+/* Calls this level's own setup routine for the object. */
+void func_L00_0042ABF8(char *object)
 {
-    ref_L00_0042ABF8_00(o);
+    ref_L00_0042ABF8_00(object);
 }
 
-void func_L00_0042B688(char *o)
+/* Calls this level's own setup routine for the object. */
+void func_L00_0042B688(char *object)
 {
-    ref_L00_0042B688_00(o);
+    ref_L00_0042B688_00(object);
 }
 extern char D_L00_001ADC68[4] __attribute__((sda));
 
@@ -27,22 +30,25 @@ extern char D_L00_001ADC48[4] __attribute__((sda));
 
 extern void func_L00_0042B408(char *);
 
-void func_L00_0042B6A8(char *a0)
+/* Stores the first shared data pointer in the object and then runs its common setup. */
+void func_L00_0042B6A8(char *object)
 {
-    *(char **)a0 = D_L00_001ADC68;
-    func_L00_0042B408(a0);
+    *(char **)object = D_L00_001ADC68;
+    func_L00_0042B408(object);
 }
 
-void func_L00_0042B6C8(char *a0)
+/* Stores the second shared data pointer in the object and then runs its common setup. */
+void func_L00_0042B6C8(char *object)
 {
-    *(char **)a0 = D_L00_001ADC48;
-    func_L00_0042B408(a0);
+    *(char **)object = D_L00_001ADC48;
+    func_L00_0042B408(object);
 }
 
 /* The global this one writes sits at a different address from level to level, and it is
  * not the one func_L00_004272A0 reads in every level, so it takes a name of its own. */
 extern int ref_L00_00427290_00 __attribute__((sda));
 
+/* Turns on a flag that other code checks later. */
 void func_L00_00427290(void)
 {
     ref_L00_00427290_00 = 1;
@@ -53,11 +59,13 @@ extern int D_L00_001B2700 __attribute__((sda));
 
 extern int D_L00_001B15DC __attribute__((sda));
 
+/* Returns a saved value from this level. */
 int func_L00_004272A0(void)
 {
     return D_L00_001B15DC;
 }
 
+/* Returns another saved value from this level. */
 int func_L00_0042B730(void)
 {
     return D_L00_001B2700;
@@ -105,17 +113,17 @@ void func_L00_004263B8(char *object)
     float first;
 
     D_L00_001A8904 = value;
-    func_00282CC0(local, hero, parameters);
+    FastVecAdd(local, hero, parameters);
     first = *(float *)(hero + 12);
     if (D_L00_001A8FF0 != 0) {
         first = 0.0f;
     }
-    *(float *)(local + 12) = func_00283B98(first, *(float *)(parameters + 12));
-    func_L00_004208C8(self, (float *)local);
-    func_L00_004224D0(self);
-    func_L00_00421C50(self);
-    func_L00_00426340((int)self);
-    func_L00_00422268(self);
+    *(float *)(local + 12) = FastAddRotations(first, *(float *)(parameters + 12));
+    TranslateObjectAndView(self, (float *)local);
+    UpdateFollowCameraMoby(self);
+    UpdateFollowCameraCollision(self);
+    RunFollowCameraFrame((int)self);
+    ResetWeaponViewState(self);
 }
 
 
@@ -168,49 +176,50 @@ extern Rec_42A698 *D_L00_001B1844;
 extern float D_L00_001B1644 __attribute__((sda));
 extern float D_L00_001B1648 __attribute__((sda));
 
+/* Works out the object's position and facing from the hero and the model, then nudges its position gradually toward the new spot. */
 void func_L00_0042A698(Self_42A698 *self)
 {
-    float e0[4];
+    float baseRow[4];
     float l1[4];
     float l2[4];
     float l3[4];
     float l4[4];
-    float e1[4];
+    float modelRow[4];
     float l6[4];
     float l7[4];
     float l8[4];
-    Ent_42A698 *e;
-    float *p;
-    float f;
+    Ent_42A698 *entity;
+    float *position;
+    float dot;
 
-    e = D_L00_001B1844[self->idx].ent;
-    if (func_L00_003DF108(self) != 0 || func_L00_00401E28() != 0) {
-        qcopy(e0, e->model->mE0);
+    entity = D_L00_001B1844[self->idx].ent;
+    if (GetTrackedObjectFlag(self) != 0 || GetGlobalObjectFlag() != 0) {
+        qcopy(baseRow, entity->model->mE0);
     } else {
-        func_L00_003252C8(self->m30, e0);
+        ClearOrComputeVector(self->m30, baseRow);
     }
-    p = self->m30;
-    if (func_L00_003DE260() != 0 || func_L00_00400F38() != 0) {
-        e->f28 = D_L00_001B1644;
-        e->f2C = D_L00_001B1648;
+    position = self->m30;
+    if (IsTrackedObjectActive() != 0 || IsGlobalObjectBusy() != 0) {
+        entity->f28 = D_L00_001B1644;
+        entity->f2C = D_L00_001B1648;
     }
-    func_00282F20(l1, e->model->mE0, 0.25f);
-    func_00282CC0((char *)l1, (char *)e->model + 0x10, (char *)l1);
-    func_00282CF0(l2, l1, p);
-    func_00282F20(self, l2, 1.0f);
-    func_00282DD8(self->m10, self, e0);
-    func_00282F20(self->m10, self->m10, 1.0f);
-    func_00282DD8(self->m20, self->m10, self);
-    qcopy(e1, e->model->mE0);
-    func_002ACF68(e->v60, e->v60, e1, 0, 0.125f);
-    func_00282D30(l2, l2, -1.0f);
-    f = func_00282DB0(l2, e->v60);
-    func_00282D30(l3, e->v60, f);
-    func_00282CF0(l4, l2, l3);
-    func_00282F20(l3, l3, e->f34);
-    func_00282F20(l6, l4, e->f30);
-    func_00282CC0((char *)l6, (char *)l3, (char *)l6);
-    func_00282CC0((char *)l7, (char *)l1, (char *)l6);
-    func_L00_0042A908(self, l8, l1, l7);
-    func_00282D08(p, p, l8, 0.1f);
+    vec_scale_to_length(l1, entity->model->mE0, 0.25f);
+    FastVecAdd((char *)l1, (char *)entity->model + 0x10, (char *)l1);
+    FastVecSub(l2, l1, position);
+    vec_scale_to_length(self, l2, 1.0f);
+    FastVecCross(self->m10, self, baseRow);
+    vec_scale_to_length(self->m10, self->m10, 1.0f);
+    FastVecCross(self->m20, self->m10, self);
+    qcopy(modelRow, entity->model->mE0);
+    BuildRotationTowardVector(entity->v60, entity->v60, modelRow, 0, 0.125f);
+    FastVecScale(l2, l2, -1.0f);
+    dot = FastVecDot(l2, entity->v60);
+    FastVecScale(l3, entity->v60, dot);
+    FastVecSub(l4, l2, l3);
+    vec_scale_to_length(l3, l3, entity->f34);
+    vec_scale_to_length(l6, l4, entity->f30);
+    FastVecAdd((char *)l6, (char *)l3, (char *)l6);
+    FastVecAdd((char *)l7, (char *)l1, (char *)l6);
+    ClampCameraSegmentByCollision(self, l8, l1, l7);
+    lerp_vector(position, position, l8, 0.1f);
 }

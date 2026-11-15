@@ -31,24 +31,25 @@ extern s8 D_001B9250[];
 extern s32 D_001A7340;
 extern s32 D_001A7344;
 
-void func_0027C768(s32 arg0, f32 *arg1, f32 *arg2) {
-    f32 sp[4];
-    s8 *base;
-    f32 den;
-    f32 temp_f1;
-    f32 temp_f2;
+/* Turns a point in the world into a screen position between 0 and 1. */
+void func_0027C768(s32 worldPos, f32 *screenX, f32 *screenY) {
+    f32 point[4];
+    s8 *matrices;
+    f32 w;
+    f32 pixelX;
+    f32 pixelY;
 
-    base = D_001B5340;
-    func_00282CF0(sp, arg0, base);
-    func_00282D30(sp, sp, 1024.0f);
-    sp[3] = 1.0f;
-    func_002830C0(sp, sp, base - 0x100);
-    den = sp[3];
-    func_00282D30(sp, sp, *(f32 *)D_001B9250 / den);
-    temp_f1 = sp[0] + (f32)(D_001A7340 >> 1);
-    *arg1 = temp_f1;
-    *arg1 = temp_f1 / (f32)D_001A7340;
-    temp_f2 = sp[1] + (f32)(D_001A7344 >> 1);
-    *arg2 = temp_f2;
-    *arg2 = temp_f2 / (f32)D_001A7344;
+    matrices = gCameraState_001B5340;
+    FastVecSub(point, worldPos, matrices);
+    FastVecScale(point, point, 1024.0f);
+    point[3] = 1.0f;
+    transform_vector(point, point, matrices - 0x100);
+    w = point[3];
+    FastVecScale(point, point, *(f32 *)D_001B9250 / w);
+    pixelX = point[0] + (f32)(gScreenWidth >> 1);
+    *screenX = pixelX;
+    *screenX = pixelX / (f32)gScreenWidth;
+    pixelY = point[1] + (f32)(gScreenHeight >> 1);
+    *screenY = pixelY;
+    *screenY = pixelY / (f32)gScreenHeight;
 }

@@ -23,15 +23,16 @@
  */
 #include "common.h"
 
-s32 func_L14_00427210(s8 *arg0) {
-    s32 var_a1;
-    s8 *temp_v1;
-    u8 temp_a0;
+/* Returns 1 when the moby is missing, dead, or has been flagged as finished, otherwise 0. */
+s32 func_L14_00427210(s8 *guard) {
+    s32 result;
+    s8 *vars;
+    u8 state;
 
-    var_a1 = 0;
-    temp_v1 = (*(s8 **)((s8 *)(arg0) + (0x68)));
-    if ((arg0 == 0) || (temp_a0 = (*(u8 *)((s8 *)(arg0) + (0x20))), (temp_a0 == 0xFE)) || (temp_a0 == 0xFD) || ((*(s32 *)((s8 *)(temp_v1) + (4))) != 0)) {
-        var_a1 = 1;
+    result = 0;
+    vars = (*(s8 **)((s8 *)(guard) + (0x68)));
+    if ((guard == 0) || (state = (*(u8 *)((s8 *)(guard) + (0x20))), (state == 0xFE)) || (state == 0xFD) || ((*(s32 *)((s8 *)(vars) + (4))) != 0)) {
+        result = 1;
     }
-    return var_a1;
+    return result;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -64,37 +65,37 @@ extern void func_002A04B8(void *a, s32 *b, s32 *c, s32 *d);
 /* Builds the level's spawn record: the caller's blocks are copied into the
    level's object and into the one the spawner allocated, and the colour and
    the scale are computed from what the engine's helpers return. */
-void *func_L04_0030C4C0(void *a0, void *a1, void *a2, void *a3, void *a4, void *a5,
-                       s32 a6, void *a7, u32 a8) {
-    L04Object *p = (L04Object *)(u32)func_0029EFD0(0xE44);
-    L04Level *lv = (L04Level *)a0;
-    L04Target *q;
-    u32 r, g, b;
-    u32 t;
+void *func_L04_0030C4C0(void *levelObj, void *block0, void *block1, void *block2, void *block3, void *block5,
+                       s32 divisor, void *userPtr, u32 userValue) {
+    L04Object *newObject = (L04Object *)(u32)CreateMoby(0xE44);
+    L04Level *lv = (L04Level *)levelObj;
+    L04Target *targetBlock;
+    u32 red, green, blue;
+    u32 packed;
 
-    if ((u32)p != 0) {
-        lv->field10 = *(L04Quad *)a3;
-        lv->fieldF0 = *(L04Quad *)a5;
-        func_002833F0((f32 *)((u8 *)lv + 0xC0), (f32 *)((u8 *)lv + 0xF0));
-        p->fieldB8 = (u32)a0;
-        p->field30 = 0xFF;
-        p->field10 = lv->field10;
-        q = (L04Target *)(u32)p->field68;
-        q->field48 = (u32)a0;
-        q->field50 = lv->field34;
-        q->field00 = *(L04Quad *)a1;
-        q->field20 = *(L04Quad *)a3;
-        q->field10 = *(L04Quad *)a2;
-        q->field30 = *(L04Quad *)a4;
-        q->field40 = (u32)a7;
-        q->field44 = a8;
-        q->field5C = 1.0f / func_00283CE0(a6);
-        func_002A04B8(a0, (s32 *)&r, (s32 *)&g, (s32 *)&b);
-        t = (g << 8) + 0x80000000;
-        q->field54 = (b << 16) + t + r;
+    if ((u32)newObject != 0) {
+        lv->field10 = *(L04Quad *)block2;
+        lv->fieldF0 = *(L04Quad *)block5;
+        euler_rotation_basis((f32 *)((u8 *)lv + 0xC0), (f32 *)((u8 *)lv + 0xF0));
+        newObject->fieldB8 = (u32)levelObj;
+        newObject->field30 = 0xFF;
+        newObject->field10 = lv->field10;
+        targetBlock = (L04Target *)(u32)newObject->field68;
+        targetBlock->field48 = (u32)levelObj;
+        targetBlock->field50 = lv->field34;
+        targetBlock->field00 = *(L04Quad *)block0;
+        targetBlock->field20 = *(L04Quad *)block2;
+        targetBlock->field10 = *(L04Quad *)block1;
+        targetBlock->field30 = *(L04Quad *)block3;
+        targetBlock->field40 = (u32)userPtr;
+        targetBlock->field44 = userValue;
+        targetBlock->field5C = 1.0f / IntToFloat(divisor);
+        get_moby_color(levelObj, (s32 *)&red, (s32 *)&green, (s32 *)&blue);
+        packed = (green << 8) + 0x80000000;
+        targetBlock->field54 = (blue << 16) + packed + red;
         lv->field98 = 0;
         lv->field31 = 0;
         lv->field34 = (u16)(lv->field34 | 0x103);
     }
-    return (u32)p;
+    return (u32)newObject;
 }

@@ -25,7 +25,8 @@ extern void func_L00_0038DE70(void *, void *, void *);
 
 extern void func_00282CC0(char *, char *, char *);
 
-void func_L01_003839F0(char *obj) {
+/* Moves a bouncing piece of debris through the air. It bounces off surfaces and counts its bounces, then breaks up in a bigger way after 20. */
+void func_L01_003839F0(char *object) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -38,8 +39,8 @@ void func_L01_003839F0(char *obj) {
             int enabled;
         } packet;
     } frame;
-    char *ctx = *(char **)(obj + 0x68);
-    char *position = obj + 0x10;
+    char *vars = *(char **)(object + 0x68);
+    char *position = object + 0x10;
     char *hit;
     Collision *collision;
 
@@ -48,65 +49,65 @@ void func_L01_003839F0(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
-    frame.packet.moby = obj;
+    FastVecAdd(position, position, vars);
+    ComputeViewDirection(position, &frame.surface, 0);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
+    SpawnSparkPuff(object);
+    frame.packet.moby = object;
     frame.packet.flags = 0x830000;
-    if (*(int *)(ctx + 0x18) < 0x122)
+    if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L01_002637A0)->material;
-    qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    qcopy(&frame.packet.vector, vars);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
-    frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
+    frame.packet.class_id = *(unsigned short *)(object + 0xAA);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
-    (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    (*(int *)(vars + 0x14))++;
+    if (CollLine(&frame.old, position, 0x10, object, &frame.packet)) {
         collision = &D_L01_001BF900;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L01_001BF900;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L01_001AC810 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L01_001AC810 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
-            obj[0xBC] = 1;
+            object[0xBC] = 1;
             {
                 void *source = &reread->point;
-                void *dest = obj + 0x10;
+                void *dest = object + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L01_001BF900;
             if (collision->count <= 0)
                 goto finish;
-            obj[0xBC] = 1;
+            object[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
-        obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+    } else if (FastFloatHelperD(vars + 0x18)) {
+        object[0xBC] = 1;
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
-    if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+    if (*(unsigned char *)(object + 0xBC)) {
+        ClearEntryFlag(*(int *)(vars + 0x1C));
+        if (*(int *)(vars + 0x14) < 20)
+            SpawnBigExplosionEffect(object, &frame.velocity, &frame.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            SpawnImpactBurst(object, &frame.velocity, &frame.normal);
     }
 }

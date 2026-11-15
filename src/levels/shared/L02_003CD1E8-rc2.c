@@ -32,23 +32,24 @@ extern f32 ref_L02_003CD1E8_03(f32, f32);
 extern f32 ref_L02_003CD1E8_04(void);
 extern s32 ref_L02_003CD1E8_05(void *, void *, void *, s32, f32);
 
-void func_L02_003CD1E8(void *arg0, void *arg1) {
-    f32 temp_f0;
-    f32 temp_f0_2;
-    f32 temp_f21;
-    void *temp_s1;
-    TI temp_s128;
-    TI temp_v0 ;
+/* Picks a random sideways direction and speed, then turns it to match the object facing and stores it as a velocity. */
+void func_L02_003CD1E8(void *moby, void *outVelocity) {
+    f32 angle;
+    f32 velY;
+    f32 speed;
+    void *vars;
+    TI homeCopy;
+    TI homeRaw ;
 
-    temp_s1 = (*(void **)((s8 *)(arg0) + (0x68)));
-    temp_f21 = ref_L02_003CD1E8_03(2.0f, 5.0f);
-    temp_f0 = ref_L02_003CD1E8_04();
-    (*(f32 *)((s8 *)(arg1) + (0))) = ref_L02_003CD1E8_00(temp_f0) * temp_f21;
-    temp_f0_2 = ref_L02_003CD1E8_01(temp_f0) * temp_f21;
-    (*(s32 *)((s8 *)(arg1) + (8))) = 0;
-    (*(f32 *)((s8 *)(arg1) + (4))) = temp_f0_2;
-    ref_L02_003CD1E8_02(arg1, arg1, temp_s1 + 0x340);
-    temp_v0 = *(volatile TI *)((char *)temp_s1 + 0x340);
-    temp_s128 = temp_v0;
-    ref_L02_003CD1E8_05(&temp_s128, arg1, arg1, (*(s32 *)((s8 *)(temp_s1) + (0x318))), (*(f32 *)((s8 *)(temp_s1) + (0x100))));
+    vars = (*(void **)((s8 *)(moby) + (0x68)));
+    speed = ref_L02_003CD1E8_03(2.0f, 5.0f);
+    angle = ref_L02_003CD1E8_04();
+    (*(f32 *)((s8 *)(outVelocity) + (0))) = ref_L02_003CD1E8_00(angle) * speed;
+    velY = ref_L02_003CD1E8_01(angle) * speed;
+    (*(s32 *)((s8 *)(outVelocity) + (8))) = 0;
+    (*(f32 *)((s8 *)(outVelocity) + (4))) = velY;
+    ref_L02_003CD1E8_02(outVelocity, outVelocity, vars + 0x340);
+    homeRaw = *(volatile TI *)((char *)vars + 0x340);
+    homeCopy = homeRaw;
+    ref_L02_003CD1E8_05(&homeCopy, outVelocity, outVelocity, (*(s32 *)((s8 *)(vars) + (0x318))), (*(f32 *)((s8 *)(vars) + (0x100))));
 }

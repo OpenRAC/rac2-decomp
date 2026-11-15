@@ -20,47 +20,48 @@ extern void func_00282CC0(float *, float *, u8 *);
 extern void func_L01_00321178(char *, float *);
 extern float func_00282E80(char *, void *);
 
+/* Looks for a nearby target in front of the robot and turns it toward that target. Returns 1 if it found one, otherwise 0. */
 int func_L02_0040BBD8(char *self) {
     char *state = *(char **)(self + 0x68);
-    float buf[4];
-    u16 *p;
-    char *e;
-    float saved;
-    float r;
-    char *ax;
+    float aimPoint[4];
+    u16 *listEntry;
+    char *target;
+    float savedValue;
+    float turnAngle;
+    char *axis;
 
 #define GROUP (*(int *)(state + 0x2D0))
 #define ANGLE()                                                                       \
-    func_00283248(*(float *)(e + 0x10) - *(float *)(self + 0x10),                    \
-                  *(float *)(e + 0x14) - *(float *)(self + 0x14))
+    FastMatrixHelperA(*(float *)(target + 0x10) - *(float *)(self + 0x10),                    \
+                  *(float *)(target + 0x14) - *(float *)(self + 0x14))
     if (GROUP == -1)
         return 0;
-    for (p = D_L02_001FC060[GROUP];
-         (GROUP & 0xFF) != 0xFF && GROUP <= D_L02_001B35B8 && p != 0 &&
-         ((p != 0 && (s16)p[-1] >= 0) || p == D_L02_001FC060[GROUP]);
-         p++) {
-        e = (char *)D_L02_001B359C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (listEntry = gEntityGroupLists[GROUP];
+         (GROUP & 0xFF) != 0xFF && GROUP <= D_L02_001B35B8 && listEntry != 0 &&
+         ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == gEntityGroupLists[GROUP]);
+         listEntry++) {
+        target = (char *)D_L02_001B359C_1[0] + ((*listEntry & 0x7FFF) << 8);
+        if (target == 0)
             return 0;
-        if (func_L02_003D7300(e) == 0)
+        if (GetMobyBusyFlag(target) == 0)
             continue;
-        if (!(func_00282E80(self + 0x10, e + 0x10) < D_L02_001B1918))
+        if (!(vec_distance_xy(self + 0x10, target + 0x10) < D_L02_001B1918))
             continue;
-        if (!(func_00283C80(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B191C * 0.017453294f))
+        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B191C * 0.017453294f))
             continue;
-        if (p == 0)
+        if (listEntry == 0)
             return 0;
 
-        func_00282CF0(buf, (float *)(self + 0x10), (float *)(e + 0x10));
-        ax = self + 0xE0;
-        r = D_L02_001B1920 * 0.017453294f;
-        func_002ACEC0(buf, buf, ax,
-                      0.0f <= func_00283BE0(*(float *)(self + 0xF8), ANGLE()) ? -r : r);
-        func_00282CC0(buf, buf, e + 0x10);
-        saved = *(float *)(state + 0x134);
+        FastVecSub(aimPoint, (float *)(self + 0x10), (float *)(target + 0x10));
+        axis = self + 0xE0;
+        turnAngle = D_L02_001B1920 * 0.017453294f;
+        ApplyAxisRotationToQuaternion(aimPoint, aimPoint, axis,
+                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -turnAngle : turnAngle);
+        FastVecAdd(aimPoint, aimPoint, target + 0x10);
+        savedValue = *(float *)(state + 0x134);
         *(float *)(state + 0x134) = 0.0001f;
-        func_L01_00321178(self, buf);
-        *(float *)(state + 0x134) = saved;
+        TurnMobyTowardTarget(self, aimPoint);
+        *(float *)(state + 0x134) = savedValue;
         return 1;
     }
 #undef ANGLE

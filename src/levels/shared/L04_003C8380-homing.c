@@ -40,89 +40,89 @@ extern void func_00282DD8(void *, void *, void *);
 typedef struct __attribute__((packed, aligned(4))) { long a; int b; } TurnRecord;
 
 /* Moves a homing shot with its trail of followers; breaks up on contact, on timeout or out of bounds. */
-void func_L04_003F9718(unsigned char *m)
+void func_L04_003F9718(unsigned char *moby)
 {
-    float old[4];
+    float prevPos[4];
     TurnRecord turn = *(TurnRecord *)D_L04_001B0448;
     SweepProbe probe;
-    float delta[4], random[4], spark[4], velocity[4];
-    unsigned char *v = *(unsigned char **)(m + 0x68), *particle;
-    int i, count, age;
+    float delta[4], sparkDir[4], spark[4], velocity[4];
+    unsigned char *vars = *(unsigned char **)(moby + 0x68), *particle;
+    int i, trailIndex, shotAge;
     unsigned char **trail;
     float scale, length;
-    qcopy(old, (m + 0x10));
-    func_00282CC0(m + 0x10, m + 0x10, v);
-    if (*(float *)(m + 0x10) < 0 || *(float *)(m + 0x14) < 0 ||
-        *(float *)(m + 0x18) < 0 || 64.0f < func_00282E80(m + 0x10, D_L04_001B9680)) {
-        func_L04_003F9C60(m, 0);
-        func_0029F338(m);
+    qcopy(prevPos, (moby + 0x10));
+    FastVecAdd(moby + 0x10, moby + 0x10, vars);
+    if (*(float *)(moby + 0x10) < 0 || *(float *)(moby + 0x14) < 0 ||
+        *(float *)(moby + 0x18) < 0 || 64.0f < vec_distance_xy(moby + 0x10, D_L04_001B9680)) {
+        DestroyMobyEffectsWithBurst(moby, 0);
+        MarkMobySpawned(moby);
         return;
     }
-    probe.owner = *(void **)(v + 0x18);
+    probe.owner = *(void **)(vars + 0x18);
     probe.flags = 0x30000;
     probe.radius = 13;
     probe.active = 1;
-    *(QuadWord *)probe.v = *(QuadWord *)v;
-    func_00282F70(&probe, &probe, 1);
+    *(QuadWord *)probe.v = *(QuadWord *)vars;
+    FastVectorNormalizeHelper(&probe, &probe, 1);
     probe.v[2] = 1;
     probe.v[3] = 5627.9248046875f;
     probe.mode = 1;
     probe.enabled = 1;
-    probe.kind = *(unsigned short *)(m + 0xAA);
-    if (func_00282948(v + 0x10)) {
-        func_L04_003F9C60(m, 0);
-        func_0029F338(m);
+    probe.kind = *(unsigned short *)(moby + 0xAA);
+    if (FastFloatHelperD(vars + 0x10)) {
+        DestroyMobyEffectsWithBurst(moby, 0);
+        MarkMobySpawned(moby);
         return;
     }
-    if (func_002761F8(old, m + 0x10, 0, *(void **)(v + 0x18), &probe)) {
-        if (!func_00278E78()) {
-            if (*(int *)(v + 0x10) >= 4) *(int *)(v + 0x10) = 3;
+    if (CollLine(prevPos, moby + 0x10, 0, *(void **)(vars + 0x18), &probe)) {
+        if (!GetCollHitMaterial()) {
+            if (*(int *)(vars + 0x10) >= 4) *(int *)(vars + 0x10) = 3;
         } else {
-            qcopy((m + 0x10), D_L04_001BFAE0);
+            qcopy((moby + 0x10), D_L04_001BFAE0);
             for (i = 4; i >= 0; i--) {
-                *(QuadWord *)random = 0;
-                random[0] = func_002A7878(-1, 1);
-                random[1] = func_002A7878(-1, 1);
-                random[2] = func_002A7878(-1, 1);
-                *(QuadWord *)delta = *(QuadWord *)random;
-                func_00283028(random, v, D_L04_001BFB00);
-                func_00282F20((char *)delta, (char *)delta, func_00282DF0(random) * 0.5f);
-                func_00282CC0(random, random, delta);
-                func_00282F20((char *)random, (char *)random, func_002A7878(0.050000004f, 0.10000001f));
-                func_L04_00358AE8(m + 0x10, random, 0x7F2F4F6F, func_002A7820(10, 15), 30000);
+                *(QuadWord *)sparkDir = 0;
+                sparkDir[0] = RandomFloatRange(-1, 1);
+                sparkDir[1] = RandomFloatRange(-1, 1);
+                sparkDir[2] = RandomFloatRange(-1, 1);
+                *(QuadWord *)delta = *(QuadWord *)sparkDir;
+                FastVectorNormalize(sparkDir, vars, D_L04_001BFB00);
+                vec_scale_to_length((char *)delta, (char *)delta, FastVecLength(sparkDir) * 0.5f);
+                FastVecAdd(sparkDir, sparkDir, delta);
+                vec_scale_to_length((char *)sparkDir, (char *)sparkDir, RandomFloatRange(0.050000004f, 0.10000001f));
+                SpawnVelocityParticle(moby + 0x10, sparkDir, 0x7F2F4F6F, RandomIntRange(10, 15), 30000);
             }
-            func_L04_003F9C60(m, 0);
-            func_0029F338(m);
+            DestroyMobyEffectsWithBurst(moby, 0);
+            MarkMobySpawned(moby);
             return;
         }
     }
-    *(float *)(m + 0xF4) = func_00283B98(*(float *)(m + 0xF4), ((float *)&turn)[1]);
-    age = *(int *)(v + 0x14) - *(int *)(v + 0x10);
-    if (age < 13) scale = (func_00283CE0(age) / func_00283CE0(13)) * 0.15f;
+    *(float *)(moby + 0xF4) = FastAddRotations(*(float *)(moby + 0xF4), ((float *)&turn)[1]);
+    shotAge = *(int *)(vars + 0x14) - *(int *)(vars + 0x10);
+    if (shotAge < 13) scale = (IntToFloat(shotAge) / IntToFloat(13)) * 0.15f;
     else scale = 0.15f;
-    func_00282CF0(delta, old, m + 0x10);
-    func_00282F20((char *)delta, (char *)delta, scale);
-    qcopy(random, (m + 0x10));
-    { unsigned char *head = *(unsigned char **)(v + 0x1C);
-      if (head) qcopy(head + 0x10, random); }
-    for (count = 0; count < 16; count++) {
-        particle = ((unsigned char **)(v + 0x20))[count];
+    FastVecSub(delta, prevPos, moby + 0x10);
+    vec_scale_to_length((char *)delta, (char *)delta, scale);
+    qcopy(sparkDir, (moby + 0x10));
+    { unsigned char *head = *(unsigned char **)(vars + 0x1C);
+      if (head) qcopy(head + 0x10, sparkDir); }
+    for (trailIndex = 0; trailIndex < 16; trailIndex++) {
+        particle = ((unsigned char **)(vars + 0x20))[trailIndex];
         if (particle) {
-            func_00282CC0(particle + 0x10, random, delta);
-            qcopy(random, (particle + 0x10));
-            *(float *)(particle + 0x10) += func_002A78D8(0, 0.075f);
-            *(float *)(particle + 0x14) += func_002A78D8(0, 0.075f);
-            *(float *)(particle + 0x18) += func_002A78D8(0, 0.075f);
-            func_00282D30(delta, delta, 0.85f);
+            FastVecAdd(particle + 0x10, sparkDir, delta);
+            qcopy(sparkDir, (particle + 0x10));
+            *(float *)(particle + 0x10) += RandomSignedFloatRange(0, 0.075f);
+            *(float *)(particle + 0x14) += RandomSignedFloatRange(0, 0.075f);
+            *(float *)(particle + 0x18) += RandomSignedFloatRange(0, 0.075f);
+            FastVecScale(delta, delta, 0.85f);
         }
     }
-    if (func_002A77E0(5) == 0) {
-        func_00282DD8(spark, delta, D_L04_001B98D0);
-        func_002ACEC0(spark, spark, delta, func_002A78D8(0, 3.1415927f));
-        length = func_00282DF0(spark);
+    if (RandomIntBelow(5) == 0) {
+        FastVecCross(spark, delta, D_L04_001B98D0);
+        ApplyAxisRotationToQuaternion(spark, spark, delta, RandomSignedFloatRange(0, 3.1415927f));
+        length = FastVecLength(spark);
         if (length != 0) {
-            func_00282D30(velocity, spark, func_002A7878(0.008333334f, 0.033333335f) / length);
-            func_L04_00358AE8(m + 0x10, velocity, 0x7F2F4F6F, func_002A7820(10, 15), 30000);
+            FastVecScale(velocity, spark, RandomFloatRange(0.008333334f, 0.033333335f) / length);
+            SpawnVelocityParticle(moby + 0x10, velocity, 0x7F2F4F6F, RandomIntRange(10, 15), 30000);
         }
     }
 }

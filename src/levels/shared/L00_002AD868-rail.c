@@ -34,11 +34,11 @@ int func_L00_002AD868(Vector *source, void **pathOut, Vector *destination,
         if (excludePath && RAILS[index].path == excludePath) continue;
         if (requiredPath && RAILS[index].path != requiredPath) continue;
         if (*RAILS[index].path == 0) continue;
-        distance = func_00282E48(&RAILS[index], p);
+        distance = fast_vec_dist(&RAILS[index], p);
         if (RAILS[index].sphere.f[3] < distance) continue;
-        if (!func_L00_00341FA8(RAILS[index].path, p, destination,
+        if (!find_nearest_path_point(RAILS[index].path, p, destination,
                               &segment, &offset, RAILS[index].mode, 12.0f, 10.0f, 0.0f)) continue;
-        hero = D_00189E20;
+        hero = gHeroState;
         radius = 0.9f;
         height = 1.5f;
         if (*(unsigned int *)(hero + 0x229C) < 2) radius = 0.3f;
@@ -49,10 +49,10 @@ int func_L00_002AD868(Vector *source, void **pathOut, Vector *destination,
             qcopy(&lower, destination);
             upper.f[2] += 0.25f;
             lower.f[2] -= 1.0f;
-            if (!func_002761F8(&upper, &lower, 2, 0, 0)) clear = 0;
+            if (!CollLine(&upper, &lower, 2, 0, 0)) clear = 0;
         }
-        distance = func_00282E80(p, destination);
-        vertical = func_00282C48(p->f[2] - destination->f[2]);
+        distance = vec_distance_xy(p, destination);
+        vertical = FloatAbs(p->f[2] - destination->f[2]);
         if (distance < radius && vertical < height && clear) {
             *pathOut = RAILS[index].path;
             *segmentOut = segment;

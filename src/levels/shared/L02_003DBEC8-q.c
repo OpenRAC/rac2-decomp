@@ -16,15 +16,15 @@ struct TableState {
 void func_L02_003DBEC8(char *object)
 {
     struct TableState *q = *(struct TableState **)(object + 0x68);
-    char *e;
+    char *entry;
 
     if (*(u8 *)(object + 0x20) != 0)
         return;
     *(u8 *)(object + 0x30) = 0x80;
     q->phase = -1.0f;
-    e = D_L02_001FF1C0[q->index];
-    q->target = e;
+    entry = gRoutePolygons[q->index];
+    q->target = entry;
     q->elapsed = 0;
-    qcopy(object + 0x10, e + 0x10);
-    func_002A7750((u8 *)object, 1, -1);
+    qcopy(object + 0x10, entry + 0x10);
+    SetMobyState((u8 *)object, 1, -1);
 }

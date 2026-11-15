@@ -44,83 +44,84 @@ extern float D_001BAFC0[];
 static __inline__ int frac_byte(float value, float scale)
 {
     float scaled = value * scale;
-    int result = func_00283CF0(scaled);
+    int result = FloatToInt(scaled);
 
     if (result != 0)
         scaled = scale;
     return result;
 }
-void func_002BB100(Particle_BB100 *p)
+/* Moves an effect particle each frame. It bounces off walls, changes colour, fade, size and spin, and is removed when it is out of range or invisible. */
+void func_002BB100(Particle_BB100 *particle)
 {
     float next[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
     float matrix[16] __attribute__((aligned(16)));
-    ParticleMotion_BB100 *q = &p->motion;
-    ParticleConfig_BB100 *cfg;
+    ParticleMotion_BB100 *motion = &particle->motion;
+    ParticleConfig_BB100 *config;
     float r,g,b;
     int ri,gi,bi,ai,packed;
     float x,y,z;
-    x = p->position[0]+q->velocity[0];
-    y = p->position[1]+q->velocity[1];
-    z = p->position[2]+q->velocity[2];
+    x = particle->position[0]+motion->velocity[0];
+    y = particle->position[1]+motion->velocity[1];
+    z = particle->position[2]+motion->velocity[2];
     next[0]=x; next[1]=y; next[2]=z;
-    cfg = q->config;
-    if ((cfg->flags&1) && func_002761F8(p->position,next,4,p,0)) {
-        velocity[0]=q->velocity[0]; velocity[1]=q->velocity[1]; velocity[2]=q->velocity[2];
-        func_002AB168(temp,velocity,D_001BAFC0,cfg->bounce);
-        q->velocity[0]=temp[0]; q->velocity[1]=temp[1]; q->velocity[2]=temp[2];
-        func_00282F20(offset,D_001BAFC0,0.055f);
-        func_00282CC0((char *)p->position,(char *)(D_001BAFC0-8),(char *)offset);
-    } else *(Quad_BB100 *)p->position=*(Quad_BB100 *)next;
-    if (cfg->flags&2) {
-        r=Fe617c30b_FUN_00283CE0((PB(p,4)<<8)|q->fractional[0])* (1.0f/65535.0f);
-        g=func_00283CF0((float)((p->color&0xff00)|q->fractional[1]))*(1.0f/65535.0f);
-        b=func_00283CF0((float)(int)(((u32)p->color>>8 &0xff00)|q->fractional[2]))*(1.0f/65535.0f);
-        if(q->direction&16) r-=cfg->colorStep[0]; else r+=cfg->colorStep[0];
-        if(q->direction&32) g-=cfg->colorStep[1]; else g+=cfg->colorStep[1];
-        if(q->direction&64) b-=cfg->colorStep[2]; else b+=cfg->colorStep[2];
-        if(r>cfg->colorMax[0]) {r=cfg->colorMax[0];if(cfg->flags&0x100)q->direction^=16;}
-        if(r<cfg->colorMin[0]) {r=cfg->colorMin[0];if(cfg->flags&0x10)q->direction^=16;}
-        if(g>cfg->colorMax[1]) {g=cfg->colorMax[1];if(cfg->flags&0x200)q->direction^=32;}
-        if(g<cfg->colorMin[1]) {g=cfg->colorMin[1];if(cfg->flags&0x20)q->direction^=32;}
-        if(b>cfg->colorMax[2]) {b=cfg->colorMax[2];if(cfg->flags&0x400)q->direction^=64;}
-        if(b<cfg->colorMin[2]) {b=cfg->colorMin[2];if(cfg->flags&0x40)q->direction^=64;}
-        q->fractional[0]=frac_byte(r,65535.0f);
-        q->fractional[1]=func_00283CF0(g*65535.0f);
-        q->fractional[2]=func_00283CF0(b*65535.0f);
-        ri=func_00283CF0(r*255.0f);
-        gi=func_00283CF0(g*255.0f);
-        bi=func_00283CF0(b*255.0f);
-        ai=func_00283CF0(q->alpha*255.0f);
+    config = motion->config;
+    if ((config->flags&1) && CollLine(particle->position,next,4,particle,0)) {
+        velocity[0]=motion->velocity[0]; velocity[1]=motion->velocity[1]; velocity[2]=motion->velocity[2];
+        AddVectorAlongAxis(temp,velocity,D_001BAFC0,config->bounce);
+        motion->velocity[0]=temp[0]; motion->velocity[1]=temp[1]; motion->velocity[2]=temp[2];
+        vec_scale_to_length(offset,D_001BAFC0,0.055f);
+        FastVecAdd((char *)particle->position,(char *)(D_001BAFC0-8),(char *)offset);
+    } else *(Quad_BB100 *)particle->position=*(Quad_BB100 *)next;
+    if (config->flags&2) {
+        r=Fe617c30b_FUN_00283CE0((PB(particle,4)<<8)|motion->fractional[0])* (1.0f/65535.0f);
+        g=FloatToInt((float)((particle->color&0xff00)|motion->fractional[1]))*(1.0f/65535.0f);
+        b=FloatToInt((float)(int)(((u32)particle->color>>8 &0xff00)|motion->fractional[2]))*(1.0f/65535.0f);
+        if(motion->direction&16) r-=config->colorStep[0]; else r+=config->colorStep[0];
+        if(motion->direction&32) g-=config->colorStep[1]; else g+=config->colorStep[1];
+        if(motion->direction&64) b-=config->colorStep[2]; else b+=config->colorStep[2];
+        if(r>config->colorMax[0]) {r=config->colorMax[0];if(config->flags&0x100)motion->direction^=16;}
+        if(r<config->colorMin[0]) {r=config->colorMin[0];if(config->flags&0x10)motion->direction^=16;}
+        if(g>config->colorMax[1]) {g=config->colorMax[1];if(config->flags&0x200)motion->direction^=32;}
+        if(g<config->colorMin[1]) {g=config->colorMin[1];if(config->flags&0x20)motion->direction^=32;}
+        if(b>config->colorMax[2]) {b=config->colorMax[2];if(config->flags&0x400)motion->direction^=64;}
+        if(b<config->colorMin[2]) {b=config->colorMin[2];if(config->flags&0x40)motion->direction^=64;}
+        motion->fractional[0]=frac_byte(r,65535.0f);
+        motion->fractional[1]=FloatToInt(g*65535.0f);
+        motion->fractional[2]=FloatToInt(b*65535.0f);
+        ri=FloatToInt(r*255.0f);
+        gi=FloatToInt(g*255.0f);
+        bi=FloatToInt(b*255.0f);
+        ai=FloatToInt(motion->alpha*255.0f);
         packed=ri&255;
         packed|=(gi&255)<<8;
         packed|=(bi&255)<<16;
         packed|=ai<<24;
-        p->color=packed;
-    } else if(cfg->flags&4) p->color=(p->color&0xffffff)|(func_00283CF0(q->alpha*255.0f)<<24);
-    if(cfg->flags&4) {
-        if(q->direction&128) q->alpha-=cfg->alphaStep; else q->alpha+=cfg->alphaStep;
-        if(q->alpha>cfg->alphaMax) {q->alpha=cfg->alphaMax;if(cfg->flags&0x800)q->direction^=128;}
-        if(q->alpha<cfg->alphaMin) {q->alpha=cfg->alphaMin;if(cfg->flags&0x80)q->direction^=128;}
+        particle->color=packed;
+    } else if(config->flags&4) particle->color=(particle->color&0xffffff)|(FloatToInt(motion->alpha*255.0f)<<24);
+    if(config->flags&4) {
+        if(motion->direction&128) motion->alpha-=config->alphaStep; else motion->alpha+=config->alphaStep;
+        if(motion->alpha>config->alphaMax) {motion->alpha=config->alphaMax;if(config->flags&0x800)motion->direction^=128;}
+        if(motion->alpha<config->alphaMin) {motion->alpha=config->alphaMin;if(config->flags&0x80)motion->direction^=128;}
     }
-    p->spin=func_00283CF0(q->spin*255.0f);
-    if(cfg->flags&8) {
-        next[0]=q->velocity[0];next[1]=q->velocity[1];next[2]=q->velocity[2];
-        if(cfg->flags&0x8000) {
-            func_00283410(matrix,cfg->owner+0xf0);
-            func_002830C0(temp,cfg,matrix);
-        } else *(Quad_BB100 *)temp=*(Quad_BB100 *)cfg;
-        func_00282CC0((char *)next,(char *)next,(char *)temp);
-        func_00282FB8(next,next,cfg->damping);
-        q->velocity[0]=next[0];q->velocity[1]=next[1];q->velocity[2]=next[2];
+    particle->spin=FloatToInt(motion->spin*255.0f);
+    if(config->flags&8) {
+        next[0]=motion->velocity[0];next[1]=motion->velocity[1];next[2]=motion->velocity[2];
+        if(config->flags&0x8000) {
+            euler_to_matrix(matrix,config->owner+0xf0);
+            transform_vector(temp,config,matrix);
+        } else *(Quad_BB100 *)temp=*(Quad_BB100 *)config;
+        FastVecAdd((char *)next,(char *)next,(char *)temp);
+        FastVectorDivideHelper(next,next,config->damping);
+        motion->velocity[0]=next[0];motion->velocity[1]=next[1];motion->velocity[2]=next[2];
     }
-    p->size+=cfg->sizeStep;
-    if(p->size<cfg->sizeMin)p->size=cfg->sizeMin;
-    if(p->size>cfg->sizeMax)p->size=cfg->sizeMax;
-    q->spin+=cfg->spinStep;
-    if(q->alpha<=0.0f || func_00282978(&p->life) || p->position[0]<cfg->minimum[0] || p->position[1]<cfg->minimum[1] || p->position[2]<cfg->minimum[2] || p->position[0]>cfg->maximum[0] || p->position[1]>cfg->maximum[1] || p->position[2]>cfg->maximum[2]) func_002B9180((char *)p);
+    particle->size+=config->sizeStep;
+    if(particle->size<config->sizeMin)particle->size=config->sizeMin;
+    if(particle->size>config->sizeMax)particle->size=config->sizeMax;
+    motion->spin+=config->spinStep;
+    if(motion->alpha<=0.0f || FastDecTimer(&particle->life) || particle->position[0]<config->minimum[0] || particle->position[1]<config->minimum[1] || particle->position[2]<config->minimum[2] || particle->position[0]>config->maximum[0] || particle->position[1]>config->maximum[1] || particle->position[2]>config->maximum[2]) KillParticle((char *)particle);
 }
 #undef PF
 #undef PI

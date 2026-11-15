@@ -21,6 +21,7 @@ extern void func_L23_0041C7D8(void *, int);
 extern int func_002A77E0(int);
 extern void *func_00115484(void *, int, unsigned int);
 
+/* Picks seven random points along the paths and spawns an effect at each of them. */
 void func_L23_0041CA58(char *obj) {
     int cumulative[47];
     int selected[7];
@@ -30,17 +31,17 @@ void func_L23_0041CA58(char *obj) {
     State *st = *(State **)(obj + 0x68);
     int total = 0, i, j, next, unused, chosen, duplicate;
 
-    func_L23_0041CCC0(obj);
-    func_002A77E0(3);
-    func_00115484(selected, -1, 28);
+    ResetEffectPools(obj);
+    RandomIntBelow(3);
+    memset(selected, -1, 28);
     for (i = 0; i < 47; i++) {
         cumulative[i] = total;
-        total += D_L23_001FF300[st->ids[i]]->count - 1;
+        total += gPathLists[st->ids[i]]->count - 1;
     }
     for (i = 0; i < 7; i++) {
         duplicate = 1;
         do {
-            chosen = func_002A77E0(total);
+            chosen = RandomIntBelow(total);
             for (j = 0; j < 7; j++) {
                 if (chosen == selected[j]) {
                     duplicate = 1;
@@ -52,18 +53,18 @@ void func_L23_0041CA58(char *obj) {
         selected[i] = chosen;
         for (j = 0; j < 47; j = next) {
             if (j == 46) {
-                qcopy_nc(&v.point, (char *)((chosen - cumulative[46]) * 16 + (int)D_L23_001FF300[st->ids[46]]) + 16);
+                qcopy_nc(&v.point, (char *)((chosen - cumulative[46]) * 16 + (int)gPathLists[st->ids[46]]) + 16);
                 break;
             }
             next = j + 1;
             if (chosen >= cumulative[j] && chosen < cumulative[next]) {
-                qcopy_nc(&v.point, (char *)((chosen - cumulative[j]) * 16 + (int)D_L23_001FF300[st->ids[j]]) + 16);
+                qcopy_nc(&v.point, (char *)((chosen - cumulative[j]) * 16 + (int)gPathLists[st->ids[j]]) + 16);
                 break;
             }
         }
         if (j != 10 && j != 27 && j != 28 && j != 31 && j != 15) {
             unused = i % 3;
-            func_L23_0041C7D8(&v.point, 0);
+            SpawnRandomRowEffect(&v.point, 0);
         }
     }
 }

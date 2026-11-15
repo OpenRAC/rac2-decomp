@@ -45,60 +45,60 @@ typedef struct {
 
 void func_L00_003EB8E8(char *self, State3EB8E8 *st)
 {
-    float pos[4], v[4], target[4], dir[4];
-    char *obj, *part, *bone;
-    int angle;
+    float pos[4], toPlayer[4], target[4], dir[4];
+    char *candidate, *spark, *targetInfo;
+    int sparkSeed;
     float dot;
     char *entry;
 
-    if (!func_002829D8(&st->cooldown) || D_L00_001B19C8 % 4 != st->slot)
+    if (!FastVectorHelperB(&st->cooldown) || gFrameCounter_L00 % 4 != st->slot)
         return;
-    func_0029FCC0(self, 1, pos);
+    TransformMobyJointToWorld(self, 1, pos);
     st->phase ^= 1;
-    obj = func_L00_00324D18(pos, D_L00_001B8FF0, 0, D_L00_001B074C * 0.01745329424738884f,
+    candidate = GetOrFindTargetMoby(pos, D_L00_001B8FF0, 0, D_L00_001B074C * 0.01745329424738884f,
                             D_L00_001B0750 * 0.01745329424738884f, D_L00_001B0748,
                             D_L00_001B074C * 0.01745329424738884f, D_L00_001B0750 * 0.01745329424738884f);
-    if (obj) {
-        if ((*(short *)(obj + 0xAA) == 0xEE1 || *(short *)(obj + 0xAA) == 0xEC0 || *(short *)(obj + 0xAA) == 0xED4) &&
-            *(unsigned char *)(*(char **)(obj + 0x68) + 0x3B1) == 255) {
+    if (candidate) {
+        if ((*(short *)(candidate + 0xAA) == 0xEE1 /* Receiver Bot */ || *(short *)(candidate + 0xAA) == 0xEC0 /* moby class 3776 */ || *(short *)(candidate + 0xAA) == 0xED4 /* moby class 3796 */) &&
+            *(unsigned char *)(*(char **)(candidate + 0x68) + 0x3B1) == 255) {
             st->target = 0;
             return;
         }
-        if (*(short *)(obj + 0xAA) == 0xEF4) {
+        if (*(short *)(candidate + 0xAA) == 0xEF4 /* moby class 3828 */) {
             st->target = 0;
             return;
         }
-        st->target = obj;
+        st->target = candidate;
         if (*(unsigned char *)(self + 0x43) != 2)
-            func_002A7470(self, 2, 0, 5);
-        func_00282CF0(v, self + 0x10, D_00189EA0);
-        dot = func_00282DB0(v, self + 0xE0);
+            StartAnimationBlended(self, 2, 0, 5);
+        FastVecSub(toPlayer, self + 0x10, gHeroPosition);
+        dot = FastVecDot(toPlayer, self + 0xE0);
         if (D_L00_001A8F00[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
             *(unsigned char *)(self + 0x42) == 2 && dot > 1.1f) {
-            qcopy_nc(target, obj + 0x10);
-            bone = func_002AB1F0(obj);
-            if (bone)
-                target[2] += *(float *)(bone + 0x10);
+            qcopy_nc(target, candidate + 0x10);
+            targetInfo = GetMobyPrivateValue0(candidate);
+            if (targetInfo)
+                target[2] += *(float *)(targetInfo + 0x10);
             else
                 target[2] += D_L00_001B0758;
-            angle = func_002A77E0(255);
-            part = func_002C65A0(pos, D_L00_001A8F20, 3, 0x202080, angle, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
-            if (part)
-                part[2] = *D_L00_001FEA14;
-            part = func_002C65A0(pos, D_L00_001A8F20, 3, 0x601080, (angle + 128) % 255, 127, 16,
+            sparkSeed = RandomIntBelow(255);
+            spark = SpawnGravityFadeParticle(pos, D_L00_001A8F20, 3, 0x202080, sparkSeed, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
+            if (spark)
+                spark[2] = *D_L00_001FEA14;
+            spark = SpawnGravityFadeParticle(pos, D_L00_001A8F20, 3, 0x601080, (sparkSeed + 128) % 255, 127, 16,
                                  420000.0f, 420000.0f, 0.0f, 0);
-            if (part)
-                part[2] = *D_L00_001FEA14;
-            func_00282CF0(dir, target, pos);
-            func_00282F20(dir, dir, D_L00_001B0754);
-            func_00282CC0(pos, pos, dir);
-            func_L00_003ECD80(pos, self, obj);
-            func_002E5CF8(0, 0, self);
+            if (spark)
+                spark[2] = *D_L00_001FEA14;
+            FastVecSub(dir, target, pos);
+            vec_scale_to_length(dir, dir, D_L00_001B0754);
+            FastVecAdd(pos, pos, dir);
+            SpawnHomingShot_L00(pos, self, candidate);
+            PlayMobySound(0, 0, self);
             {
-                int selected = D_00139568.selected;
-                entry = D_L00_00262570[selected];
+                int selected = gItemSlotToRecord.selected;
+                entry = gWeaponTable_L00[selected];
             }
-            dot = func_002A7878(0.0f, 0.17f);
+            dot = RandomFloatRange(0.0f, 0.17f);
             st->cooldown = 1.0f / *(float *)(entry + 0x54) + dot;
             st->shots++;
         }

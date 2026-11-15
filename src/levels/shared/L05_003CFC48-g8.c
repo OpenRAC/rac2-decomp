@@ -7,15 +7,16 @@ extern int func_002ED8A0(int);
 extern char *func_L05_0041C118(char *);
 extern char *func_L05_0041D498(char *);
 
+/* Drops a reward, choosing a different kind if the first kind is already full, and counts it. */
 void func_L05_003CFC48(char *object)
 {
-    int slot=func_002ED8A0(1);
+    int slot=FindLastUsedChainEntry(1);
     if(slot<0 || D_L05_002A1800[slot].value==D_L05_002A1800[slot].limit) {
-        func_L05_0041C118(object);
+        SpawnHomingPickup(object);
         D_L05_00221D10[23]++;
         D_L05_00221D10[28]++;
     } else {
-        func_L05_0041D498(object);
+        SpawnHomingPickupVariant(object);
         D_L05_00221D10[25]++;
         D_L05_00221D10[28]++;
     }

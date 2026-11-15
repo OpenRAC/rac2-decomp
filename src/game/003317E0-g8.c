@@ -10,6 +10,7 @@ typedef struct {
 } ActiveRoot_3317E0;
 extern ActiveRoot_3317E0 *D_001B0A70 __attribute__((sda));
 
+/* Turns on the active flag in the data of the global root object, if there is one. */
 void func_003317E0(void) {
     if (D_001B0A70 != 0) D_001B0A70->data->active = 1;
 }

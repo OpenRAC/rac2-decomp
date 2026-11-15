@@ -11,81 +11,82 @@ extern void func_00282CF0(void *,void *,void *),func_00282DD8(void *,void *,void
 extern void func_00282F20(void *,void *,float),func_00282D30(void *,void *,float);
 extern void func_00280B90(void *,int,int);
 extern float func_00283CE0(int);
+/* Draws a glowing trail as two ribbons through a list of points. The second one is wider and fainter. */
 void func_L00_00418230(char *object,int alpha,V *points,int count)
 {
-    /* As in the resident trail renderer, retail never initializes b.color[1].
+    /* As in the resident trail renderer, retail never initializes wide.color[1].
        The assembly consumer transfers that packet word unchanged. The caller
-       does not read it as a C value or claim a fully initialized packet. */
-    Packet a,b;
+       does not read it as narrow C value or claim narrow fully initialized packet. */
+    Packet narrow,wide;
     V frame[4], inner,outer;
     unsigned color;
     V *previous;
     int i;
-    float u,v;
+    float uStart,uEnd;
     if(*(int *)(*(char **)(object+0x68)+4)==0) color=0x800000ff;
-    else { int c=D_L00_0025A9B8*10; color=((unsigned)alpha<<24)|((unsigned)c<<16)|(unsigned)(255-c); }
-    a.texture=func_0027C878(43);
-    a.mode=0xff9000000260ULL;
-    a.prim=((unsigned long long)alpha<<32)|0x68;
+    else { int shade=D_L00_0025A9B8*10; color=((unsigned)alpha<<24)|((unsigned)shade<<16)|(unsigned)(255-shade); }
+    narrow.texture=GetEffectTextureDescriptor(43);
+    narrow.mode=0xff9000000260ULL;
+    narrow.prim=((unsigned long long)alpha<<32)|0x68;
     previous=points+1;
-    a.color[0]=a.color[1]=0x7fffffff;
-    a.flags=0;
-    b.texture=func_0027C878(43);
-    b.mode=0xff9000000260ULL;
-    b.flags=0;
-    b.prim=((unsigned long long)(alpha/3)<<32)|0x68;
+    narrow.color[0]=narrow.color[1]=0x7fffffff;
+    narrow.flags=0;
+    wide.texture=GetEffectTextureDescriptor(43);
+    wide.mode=0xff9000000260ULL;
+    wide.flags=0;
+    wide.prim=((unsigned long long)(alpha/3)<<32)|0x68;
     inner.q=0; outer.q=0;
     inner.f[2]=.04f; outer.f[2]=.16f;
-    a.color[1]=color; b.color[0]=color;
+    narrow.color[1]=color; wide.color[0]=color;
     inner.f[3]=1; outer.f[3]=1;
     ref_L00_00418230_00(points,count);
-    ref_L00_00418230_01(&a);
-    ref_L00_00418230_01(&b);
-    a.tex.uvBits[0][0]=0; a.tex.uvBits[0][1]=0; a.tex.uvBits[1][0]=0;
-    a.tex.uv[1][1]=1; a.tex.uv[2][0]=1; a.tex.uvBits[2][1]=0;
-    a.tex.uv[3][0]=1; a.tex.uv[3][1]=1;
-    b.tex.uvBits[0][0]=0; b.tex.uvBits[0][1]=0; b.tex.uvBits[1][0]=0;
-    b.tex.uv[1][1]=1; b.tex.uv[2][0]=.33f; b.tex.uvBits[2][1]=0;
-    b.tex.uv[3][0]=.33f;b.tex.uv[3][1]=1;
-    func_00282CF0(&frame[0],previous,points);
-    func_00282F20(&frame[0],&frame[0],1);
-    func_00282CF0(&frame[1],D_L00_001B8C80+0x140,points);
-    func_00282DD8(&frame[2],&frame[1],&frame[0]);
-    func_00282F20(&frame[2],&frame[2],1);
-    func_00282DD8(&frame[1],&frame[0],&frame[2]);
+    ref_L00_00418230_01(&narrow);
+    ref_L00_00418230_01(&wide);
+    narrow.tex.uvBits[0][0]=0; narrow.tex.uvBits[0][1]=0; narrow.tex.uvBits[1][0]=0;
+    narrow.tex.uv[1][1]=1; narrow.tex.uv[2][0]=1; narrow.tex.uvBits[2][1]=0;
+    narrow.tex.uv[3][0]=1; narrow.tex.uv[3][1]=1;
+    wide.tex.uvBits[0][0]=0; wide.tex.uvBits[0][1]=0; wide.tex.uvBits[1][0]=0;
+    wide.tex.uv[1][1]=1; wide.tex.uv[2][0]=.33f; wide.tex.uvBits[2][1]=0;
+    wide.tex.uv[3][0]=.33f;wide.tex.uv[3][1]=1;
+    FastVecSub(&frame[0],previous,points);
+    vec_scale_to_length(&frame[0],&frame[0],1);
+    FastVecSub(&frame[1],D_L00_001B8C80+0x140,points);
+    FastVecCross(&frame[2],&frame[1],&frame[0]);
+    vec_scale_to_length(&frame[2],&frame[2],1);
+    FastVecCross(&frame[1],&frame[0],&frame[2]);
     qcopy(&frame[3],points);
-    qcopy(&a.vertex[0],&inner);
-    func_00282D30(&a.vertex[1],&a.vertex[0],-1);
-    func_002830C0(&a.vertex[0],&a.vertex[0],frame);
-    func_002830C0(&a.vertex[1],&a.vertex[1],frame);
-    qcopy(&b.vertex[0],&outer);
-    func_00282D30(&b.vertex[1],&b.vertex[0],-1);
-    func_002830C0(&b.vertex[0],&b.vertex[0],frame);
-    func_002830C0(&b.vertex[1],&b.vertex[1],frame);
+    qcopy(&narrow.vertex[0],&inner);
+    FastVecScale(&narrow.vertex[1],&narrow.vertex[0],-1);
+    transform_vector(&narrow.vertex[0],&narrow.vertex[0],frame);
+    transform_vector(&narrow.vertex[1],&narrow.vertex[1],frame);
+    qcopy(&wide.vertex[0],&outer);
+    FastVecScale(&wide.vertex[1],&wide.vertex[0],-1);
+    transform_vector(&wide.vertex[0],&wide.vertex[0],frame);
+    transform_vector(&wide.vertex[1],&wide.vertex[1],frame);
     for(i=1;i<count-1;i++) {
-        qcopy(&a.vertex[2],&inner);
-        func_00282D30(&a.vertex[3],&a.vertex[2],-1);
-        qcopy(&b.vertex[2],&outer);
-        func_00282D30(&b.vertex[3],&b.vertex[2],-1);
-        func_00282CF0(&frame[0],&points[i+1],&points[i]);
-        func_00282F20(&frame[0],&frame[0],1);
-        func_00282CF0(&frame[1],D_L00_001B8C80+0x140,&points[i]);
-        func_00282DD8(&frame[2],&frame[1],&frame[0]);
-        func_00282F20(&frame[2],&frame[2],1);
-        func_00282DD8(&frame[1],&frame[0],&frame[2]);
+        qcopy(&narrow.vertex[2],&inner);
+        FastVecScale(&narrow.vertex[3],&narrow.vertex[2],-1);
+        qcopy(&wide.vertex[2],&outer);
+        FastVecScale(&wide.vertex[3],&wide.vertex[2],-1);
+        FastVecSub(&frame[0],&points[i+1],&points[i]);
+        vec_scale_to_length(&frame[0],&frame[0],1);
+        FastVecSub(&frame[1],D_L00_001B8C80+0x140,&points[i]);
+        FastVecCross(&frame[2],&frame[1],&frame[0]);
+        vec_scale_to_length(&frame[2],&frame[2],1);
+        FastVecCross(&frame[1],&frame[0],&frame[2]);
         qcopy(&frame[3],&points[i]);
-        func_002830C0(&a.vertex[2],&a.vertex[2],frame);
-        func_002830C0(&a.vertex[3],&a.vertex[3],frame);
-        func_002830C0(&b.vertex[2],&b.vertex[2],frame);
-        func_002830C0(&b.vertex[3],&b.vertex[3],frame);
-        a.color[2]=a.color[3]=0x7f7f7f7f;
-        b.color[2]=b.color[3]=color;
-        func_00280B90(&a,0,0);func_00280B90(&b,0,0);
-        u=func_00283CE0(i)*.33f;v=u+.33f;
-        if(u>=1){u-=1;v-=1;}
-        b.tex.uv[1][0]=b.tex.uv[0][0]=u;
-        b.tex.uv[3][0]=b.tex.uv[2][0]=v;
-        qcopy(&a.vertex[0],&a.vertex[2]);qcopy(&a.vertex[1],&a.vertex[3]);
-        qcopy(&b.vertex[0],&b.vertex[2]);qcopy(&b.vertex[1],&b.vertex[3]);
+        transform_vector(&narrow.vertex[2],&narrow.vertex[2],frame);
+        transform_vector(&narrow.vertex[3],&narrow.vertex[3],frame);
+        transform_vector(&wide.vertex[2],&wide.vertex[2],frame);
+        transform_vector(&wide.vertex[3],&wide.vertex[3],frame);
+        narrow.color[2]=narrow.color[3]=0x7f7f7f7f;
+        wide.color[2]=wide.color[3]=color;
+        draw_world_quad(&narrow,0,0);draw_world_quad(&wide,0,0);
+        uStart=IntToFloat(i)*.33f;uEnd=uStart+.33f;
+        if(uStart>=1){uStart-=1;uEnd-=1;}
+        wide.tex.uv[1][0]=wide.tex.uv[0][0]=uStart;
+        wide.tex.uv[3][0]=wide.tex.uv[2][0]=uEnd;
+        qcopy(&narrow.vertex[0],&narrow.vertex[2]);qcopy(&narrow.vertex[1],&narrow.vertex[3]);
+        qcopy(&wide.vertex[0],&wide.vertex[2]);qcopy(&wide.vertex[1],&wide.vertex[3]);
     }
 }

@@ -106,28 +106,28 @@ int func_002EB1E0(void)
     float fade;
     int skip, done, camera, i;
 
-    if (D_001B8840.done)
+    if (gScenePlaybackState.done)
         return 0;
-    if (D_001B8840.frame + 1 >= D_001B8840.end) {
-        D_001A8BB8 = 0;
-        D_001B8840.done = 1;
+    if (gScenePlaybackState.frame + 1 >= gScenePlaybackState.end) {
+        gRequestedGameMode = 0;
+        gScenePlaybackState.done = 1;
         return 0;
     }
-    func_002F5220();
-    func_002ED0A0();
-    fade = D_001B15A0 - 0.34f;
-    D_001B8840.tick++;
-    D_001B8840.frame++;
-    D_001B15A0 = fade;
+    ResetFrameCounters();
+    UpdateSceneBackdropQuads();
+    fade = gScreenFade - 0.34f;
+    gScenePlaybackState.tick++;
+    gScenePlaybackState.frame++;
+    gScreenFade = fade;
     if (fade < 0.0f)
-        D_001B15A0 = 0.0f;
-    if (D_001B8840.frame >= D_001B8840.wait)
-        func_002B6D28();
+        gScreenFade = 0.0f;
+    if (gScenePlaybackState.frame >= gScenePlaybackState.wait)
+        ResumeMusicStream();
 
     skip = 0;
-    done = D_001B8840.frame >= D_001B8840.end;
-    if (D_001B8840.frame >= 18 && D_001B15A0 == 0.0f) {
-        if ((D_001A7A00.x0A || D_001A7A00.x0B || D_001A7478 || D_001A79F0 <= 0)
+    done = gScenePlaybackState.frame >= gScenePlaybackState.end;
+    if (gScenePlaybackState.frame >= 18 && gScreenFade == 0.0f) {
+        if ((D_001A7A00.x0A || D_001A7A00.x0B || D_001A7478 || gCurrentMapIndex <= 0)
             && (INPUT->buttons.words[1] & 0x800))
             skip = 1;
         else if ((INPUT->buttons.held & 0x8000000000FULL) == 0x8000000000FULL)
@@ -135,51 +135,51 @@ int func_002EB1E0(void)
     }
 
     if (skip || done) {
-        D_001B8840.done = 1;
-        D_001A8BB8 = 0;
+        gScenePlaybackState.done = 1;
+        gRequestedGameMode = 0;
     } else {
-        int ticks = D_001A7B90 ? 80 : 96;
-        if (D_001B8840.tick >= ticks) {
-            D_001B8840.chunk++;
+        int ticks = gIsPalVideo ? 80 : 96;
+        if (gScenePlaybackState.tick >= ticks) {
+            gScenePlaybackState.chunk++;
             if (*(short *)(D_001A63A8_3 + 4))
-                func_002B7CE0(1);
-            func_002EB598();
-            func_002EB158(D_001B8840.chunk + 1);
+                PumpMusicAndDiscRead(1);
+            SpawnModelPartMobys();
+            LoadSceneChunkData(gScenePlaybackState.chunk + 1);
         }
-        camera = func_002F5AF8();
-        for (i = 0; i < D_001B8840.count; i++) {
+        camera = ApplyCutsceneCameraKey();
+        for (i = 0; i < gScenePlaybackState.count; i++) {
             char *keys;
             int key, type;
 
-            actor = D_001B8840.actors[i];
-            key = D_001B8840.tick >> 1;
+            actor = gScenePlaybackState.actors[i];
+            key = gScenePlaybackState.tick >> 1;
             actor->next_key = key + 1;
             actor->key = key;
-            func_0029F390(actor);
-            actor->blend = func_00283CE0(D_001B8840.tick & 1) * 0.5f;
-            if (camera && (D_001B8840.tick & 1))
+            update_moby_animation_state(actor);
+            actor->blend = IntToFloat(gScenePlaybackState.tick & 1) * 0.5f;
+            if (camera && (gScenePlaybackState.tick & 1))
                 actor->blend = 1.0f;
             keys = actor->keys;
-            func_00282D30(first, keys + actor->key * 16, 1.0f - actor->blend);
-            func_00282D30(last, keys + actor->next_key * 16, actor->blend);
-            func_00282CC0(actor->pos, first, last);
+            FastVecScale(first, keys + actor->key * 16, 1.0f - actor->blend);
+            FastVecScale(last, keys + actor->next_key * 16, actor->blend);
+            FastVecAdd(actor->pos, first, last);
             type = actor->type;
-            if (type == 0xD54) {
+            if (type == 0xD54 /* moby class 3412 */) {
                 actor->flags = 8;
-                func_002E64A0(actor);
+                UpdateEquipmentPieces(actor);
                 if (!D_001B2148 || D_001B2148->type == type)
-                    func_0027CFD0(func_002ECB70, actor);
+                    RegisterOverlayDrawCallback(render_environment_mapped_object, actor);
             }
             actor->alpha = 255;
             func_002A0F48(actor);
             if (actor->type == 0) {
                 D_00189E20_9.focus = actor;
-                func_0026F788(actor, 1);
+                EmptyStubF788(actor, 1);
             }
         }
     }
-    func_002E4AC8();
-    func_002914B8();
-    func_002F52B8();
+    UpdateSoundVoices();
+    UpdateLightingEnvironment();
+    UpdateIdleFrameCounters();
     return skip;
 }

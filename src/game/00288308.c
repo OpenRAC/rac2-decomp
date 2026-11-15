@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00288308: the two per-class flag tables are sda arrays, which -G0 addresses with
  * the la macro (lui/addiu together) as retail does; func_00287FF8 returns a value (it
  * ends with daddu $v0,$s2), which keeps the final store's high half out of $v0. */
@@ -65,22 +66,23 @@ extern void func_002883E8(int);
 
 extern void func_00288208(int);
 
-void func_00288308(int a0)
+/* Marks a help id as unlocked and makes its record ready to be shown. */
+void func_00288308(int helpId)
 {
     ClassRecord *record;
 
-    if (D_001A7AF8[a0] != 0)
+    if (gItemOwnedFlags[helpId] != 0)
         return;
-    D_001A7AF8[a0] = 1;
-    D_001A7B30[a0] = 1;
-    record = &D_00239BA0[D_00139568[a0]];
-    if (record->half88 != 0 && D_00139688[a0] == 0)
-        D_00139688[a0] = record->half92;
-    func_002883E8(a0);
-    func_00288208(a0);
-    if (a0 == 0x10) {
-        if (func_00288D58() != 0) {
-            func_00287FF8(0x10, 2);
+    gItemOwnedFlags[helpId] = 1;
+    D_001A7B30[helpId] = 1;
+    record = &gWeaponTable_00239BA0[gItemSlotToRecord[helpId]];
+    if (record->half88 != 0 && gItemAmmoCounts[helpId] == 0)
+        gItemAmmoCounts[helpId] = record->half92;
+    StoreHelpIdInSlotList(helpId);
+    QueuePendingHelpId(helpId);
+    if (helpId == 0x10) {
+        if (IsFlagByteSet() != 0) {
+            SeekChainEntry(0x10, 2);
             D_001398A8 = 0;
         }
     }

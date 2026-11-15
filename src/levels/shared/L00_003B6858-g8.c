@@ -24,7 +24,7 @@ int func_L00_003B6858(char *object)
     Quad *out,*velocity;
     slot=state->objects;
     velocity=state->velocity;
-    state->seed=func_002A77E0(255);
+    state->seed=RandomIntBelow(255);
     material=D_L00_001AFA98;
     scale=D_L00_001AFA90;
     rate=D_L00_001AFAA0;
@@ -32,8 +32,8 @@ int func_L00_003B6858(char *object)
     source=D_L00_001AFA70;
     out=state->positions;
     do {
-        *slot=func_0029EFD0(i?0xe7d:0xeb0);
-        func_002B37E8(*slot,0);
+        *slot=CreateMoby(i?0xe7d /* Sheep */:0xeb0 /* Dark Sheep */);
+        InitChildObjectFromParent(*slot,0);
         *(unsigned short *)(*slot+0x34)|=0x4100;
         (*slot)[0xbc]=i;
         *(Quad *)(*slot+0xf0)=*source;
@@ -41,7 +41,7 @@ int func_L00_003B6858(char *object)
         *velocity=0;
         ((float *)velocity)[1]=*rate*(1.0f/60.0f);
         *(float *)(*slot+0x2c)=*(float *)(*(char **)(*slot+0x24)+0x24)* *scale;
-        func_002AEC18(*slot,*material);
+        SetMobyLightColor(*slot,*material);
         slot++;rate++;position++;out++;source++;velocity++;scale++;material++;i++;
     }while(i<2);
     if(state->objects[0]) {

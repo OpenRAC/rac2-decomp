@@ -27,6 +27,7 @@ extern void func_003384C0(char *, unsigned int, unsigned int, float, float, floa
 extern s32 D_001A8CFC;
 
 /* The renderer consumes all four FP bounds, unchanged by this setup. */
+/* Passes a screen rectangle (top, bottom, left, right) to the level object, if one is loaded. */
 void func_0029B658(s32 arg0, s32 arg1, float top, float bottom, float left, float right) {
     s32 a;
     s32 b;

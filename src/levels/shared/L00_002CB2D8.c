@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     char pad0[0x1248];
     int f1248;
@@ -27,28 +28,29 @@ extern unsigned int D_001A7390 __attribute__((section(".sdata")));
 extern int D_001A79F0 __attribute__((section(".sdata")));
 extern int func_L00_002D3FB0(int);
 
+/* Applies a pending hero change request: counts it in the statistics and switches the hero to the new value. */
 void func_L00_002CB2D8(void)
 {
-    int v;
-    int alt;
+    int newValue;
+    int altValue;
 
-    if (D_00189E20.f2538 == 0)
+    if (gHeroState.f2538 == 0)
         return;
-    alt = D_001A7398;
-    v = D_001A7A04;
-    if (D_00189E20.f1248 == 10)
-        v = alt;
-    D_00189E20.f2538 = 0;
-    if (v == 0)
+    altValue = D_001A7398;
+    newValue = D_001A7A04;
+    if (gHeroState.f1248 == 10)
+        newValue = altValue;
+    gHeroState.f2538 = 0;
+    if (newValue == 0)
         return;
-    if (D_00189E20.f1248 == D_001A7A04)
+    if (gHeroState.f1248 == D_001A7A04)
         return;
-    if (D_0018C750.count <= 0xFFFE)
-        D_0018C750.count++;
-    if (D_001A7390 > D_0018C750.best)
-        D_0018C750.best = D_001A7390;
-    D_0018C750.mask = D_0018C750.mask | (1 << D_001A79F0) | 0x80000000;
-    D_00189E20.f22C8 = func_L00_002D3FB0(v);
-    D_00189E20.h24F8 = 0;
-    D_00189E20.h24FA = 0;
+    if (gProgressStatistics.count <= 0xFFFE)
+        gProgressStatistics.count++;
+    if (D_001A7390 > gProgressStatistics.best)
+        gProgressStatistics.best = D_001A7390;
+    gProgressStatistics.mask = gProgressStatistics.mask | (1 << gCurrentMapIndex) | 0x80000000;
+    gHeroState.f22C8 = ReturnArgument_L00_2(newValue);
+    gHeroState.h24F8 = 0;
+    gHeroState.h24FA = 0;
 }

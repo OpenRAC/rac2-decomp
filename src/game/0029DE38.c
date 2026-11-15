@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern void func_00282A60(unsigned int *, unsigned int, int);
 extern char *ref_0029EFD0_00[] __attribute__((sda));
 extern char *ref_0029EFD0_01[] __attribute__((sda));
@@ -126,22 +127,23 @@ int func_0029DE38(void)
 
 
 
-char *func_0029EFD0(int arg)
+/* Finds a free moby slot, initialises it for the given class, and returns it (or 0 if the pool is full). */
+char *func_0029EFD0(int classId)
 {
-    MobyPoolSlot *p;
-    for (p = (MobyPoolSlot *)ref_0029EFD0_01[0];
-         p < (MobyPoolSlot *)ref_0029EFD0_00[0]; p++) {
-        if (p->state >= 254 && ref_0029EFD0_02[0] >= p->spawn_frame) {
-            if (p->state == 255) p[1].state = 255;
-            func_0029F0C8((char *)p, arg);
-            p->vars = ref_0029EFD0_03[0] +
-                (p - (MobyPoolSlot *)ref_0029EFD0_01[0]) * 128;
-            func_00282A60(p->vars, 0, 128);
+    MobyPoolSlot *slot;
+    for (slot = (MobyPoolSlot *)ref_0029EFD0_01[0];
+         slot < (MobyPoolSlot *)ref_0029EFD0_00[0]; slot++) {
+        if (slot->state >= 254 && ref_0029EFD0_02[0] >= slot->spawn_frame) {
+            if (slot->state == 255) slot[1].state = 255;
+            InitMobyInstance((char *)slot, classId);
+            slot->vars = ref_0029EFD0_03[0] +
+                (slot - (MobyPoolSlot *)ref_0029EFD0_01[0]) * 128;
+            ClearMemory(slot->vars, 0, 128);
             if (ref_0029EFD0_04[0]) --ref_0029EFD0_04[0];
-            return (char *)p;
+            return (char *)slot;
         }
     }
-    func_0026FEB8(ref_0029EFD0_05, ref_0029EFD0_02[0], arg);
+    STUB_printf(ref_0029EFD0_05, ref_0029EFD0_02[0], classId);
     return 0;
 }
 
@@ -151,90 +153,93 @@ extern char *D_001B1B60 __attribute__((sda));
 extern int D_001B1688 __attribute__((sda));
 extern void func_002A0C68(char *, unsigned int);
 
+/* Marks a moby as ready: sets its state byte by pool position and records the spawn frame. */
 void func_0029F338(void *object)
 {
-    char *p = (char *)object;
-    if ((unsigned int)p < (unsigned int)D_001B1B60)
-        ((unsigned char *)p)[0x20] = 0xFD;
+    char *moby = (char *)object;
+    if ((unsigned int)moby < (unsigned int)D_001B1B60)
+        ((unsigned char *)moby)[0x20] = 0xFD;
     else
-        ((unsigned char *)p)[0x20] = 0xFE;
-    *(int *)(p + 0xA0) = D_001B1688 + 2;
-    func_002A0C68(p, 0x80807F7Fu);
+        ((unsigned char *)moby)[0x20] = 0xFE;
+    *(int *)(moby + 0xA0) = gGameTime + 2;
+    func_002A0C68(moby, 0x80807F7Fu);
 }
 
 /* shared native body of family d1172b6afb7d978b */
-void func_0029F390(u8 *param_1)
+void func_0029F390(u8 *moby)
 {
-    if (param_1[66] != 255) {
-        u8 *tbl = (u8 *)(*(volatile int *)(param_1 + 36) + 72);
+    if (moby[66] != 255) {
+        u8 *animTable = (u8 *)(*(volatile int *)(moby + 36) + 72);
 
-        *(int *)(param_1 + 88) = *(int *)(*(int *)(tbl + (*(volatile u8 *)(param_1 + 66) << 2)) + (param_1[64] << 2) + 28);
-        param_1[110] = *(u8 *)(*(int *)(tbl + (*(volatile u8 *)(param_1 + 66) << 2)) + 18);
-        param_1[108] = *(u8 *)(*(int *)(tbl + (*(volatile u8 *)(param_1 + 66) << 2)) + 17);
+        *(int *)(moby + 88) = *(int *)(*(int *)(animTable + (*(volatile u8 *)(moby + 66) << 2)) + (moby[64] << 2) + 28);
+        moby[110] = *(u8 *)(*(int *)(animTable + (*(volatile u8 *)(moby + 66) << 2)) + 18);
+        moby[108] = *(u8 *)(*(int *)(animTable + (*(volatile u8 *)(moby + 66) << 2)) + 17);
     } else {
-        param_1[108] = 255;
-        param_1[110] = 0;
-        *(int *)(param_1 + 88) = (int)(D_L03_001D2540 + (param_1[64] << 11));
+        moby[108] = 255;
+        moby[110] = 0;
+        *(int *)(moby + 88) = (int)(D_L03_001D2540 + (moby[64] << 11));
     }
 
-    *(int *)(param_1 + 92) = *(int *)(*(int *)(*(volatile int *)(param_1 + 36) + (param_1[67] << 2) + 72) + (param_1[65] << 2) + 28);
+    *(int *)(moby + 92) = *(int *)(*(int *)(*(volatile int *)(moby + 36) + (moby[67] << 2) + 72) + (moby[65] << 2) + 28);
 }
 
 extern u8 D_00188660[];
 extern void func_002E59F8(int);
 extern int func_002E5CF8(int, int, char *);
 
+/* Starts or stops the sound attached to a moby depending on its flags. */
 void func_0029F450(void *object)
 {
-    u8 *s = (u8 *)object;
+    u8 *moby = (u8 *)object;
 
-    if (s[0x6D] != 0xFF) {
-        u8 *e = D_00188660 + s[0x6D] * 0x70;
+    if (moby[0x6D] != 0xFF) {
+        u8 *soundSlot = gSoundState + moby[0x6D] * 0x70;
 
-        if (*(int *)(e + 0x88) != (int)s) {
-            s[0x6D] = 0xFF;
-        } else if (*(short *)(e + 0x7E) != s[0x6C] ||
-                   (*(unsigned short *)(s + 0x34) & 0x40) != 0 ||
-                   (*(unsigned short *)(s + 0x7C) & 0x8000) != 0) {
-            func_002E59F8(s[0x6D]);
-            s[0x6D] = 0xFF;
+        if (*(int *)(soundSlot + 0x88) != (int)moby) {
+            moby[0x6D] = 0xFF;
+        } else if (*(short *)(soundSlot + 0x7E) != moby[0x6C] ||
+                   (*(unsigned short *)(moby + 0x34) & 0x40) != 0 ||
+                   (*(unsigned short *)(moby + 0x7C) & 0x8000) != 0) {
+            StopSoundVoice(moby[0x6D]);
+            moby[0x6D] = 0xFF;
         }
-    } else if (s[0x6C] != 0xFF &&
-               (*(unsigned short *)(s + 0x34) & 0x40) == 0 &&
-               (*(unsigned short *)(s + 0x7C) & 0x8000) == 0) {
-        s[0x6D] = (u8)func_002E5CF8(s[0x6C], 4, (char *)s);
+    } else if (moby[0x6C] != 0xFF &&
+               (*(unsigned short *)(moby + 0x34) & 0x40) == 0 &&
+               (*(unsigned short *)(moby + 0x7C) & 0x8000) == 0) {
+        moby[0x6D] = (u8)PlayMobySound(moby[0x6C], 4, (char *)moby);
     }
 }
 
 
 /* Picks one of two pointers held at +88 and +92 of the receiver, choosing +92 when the byte at +66 equals 255, then returns a value derived from the scale word at +68: either a halved table lookup, or a weighted blend of two table lookups plus the scale, or an interpolation between a lookup at +92 and a lookup at +88 weighted by one minus the scale. */
-float func_0029F530(char *s1)
+float func_0029F530(char *moby)
 {
     char *p;
     char *q;
     float t;
 
-    if (*(unsigned char *)(s1 + 66) != 255)
-        p = *(char **)(s1 + 88);
+    if (*(unsigned char *)(moby + 66) != 255)
+        p = *(char **)(moby + 88);
     else
-        p = *(char **)(s1 + 92);
+        p = *(char **)(moby + 92);
 
-    if (*(float *)(s1 + 68) == 0.0f)
+    if (*(float *)(moby + 68) == 0.0f)
         return func_00283CE0_4(*(short *)(p + 4)) * 0.0625f;
 
-    if (*(unsigned char *)(s1 + 66) != *(unsigned char *)(s1 + 67) ||
-        *(unsigned char *)(s1 + 64) > *(unsigned char *)(s1 + 65))
-        return func_00283CE0_4(*(short *)(p + 4)) * 0.0625f + *(float *)(s1 + 68);
+    if (*(unsigned char *)(moby + 66) != *(unsigned char *)(moby + 67) ||
+        *(unsigned char *)(moby + 64) > *(unsigned char *)(moby + 65))
+        return func_00283CE0_4(*(short *)(p + 4)) * 0.0625f + *(float *)(moby + 68);
 
-    q = *(char **)(s1 + 92);
-    t = func_00283CE0_4(*(short *)(p + 4)) * (1.0f - *(float *)(s1 + 68));
-    t = t + func_00283CE0_4(*(short *)(q + 4)) * *(float *)(s1 + 68);
+    q = *(char **)(moby + 92);
+    t = func_00283CE0_4(*(short *)(p + 4)) * (1.0f - *(float *)(moby + 68));
+    t = t + func_00283CE0_4(*(short *)(q + 4)) * *(float *)(moby + 68);
     return t * 0.0625f;
 }
 
 
 extern int func_00282A18(int);
 
+/* Reads the number of animation entries for a moby and a value built from that count. */
 void func_0029F648(char *object, int *count, int *value)
 {
     char *p = *(char **)(object + 0x24);
@@ -244,13 +249,14 @@ void func_0029F648(char *object, int *count, int *value)
         index = (int)p + (index << 4);
         n = *(short *)(index + 2);
         *count = n;
-        *value = func_00282A18(n * 2);
+        *value = log2dim(n * 2);
     } else {
         *count = 0;
         *value = 0;
     }
 }
 
+/* Works out the midpoint position between two joints of a moby, in world space, and its radius. */
 void func_0029F6A0(
     unsigned char *obj, unsigned int index, unsigned char *dest)
 {
@@ -289,18 +295,19 @@ void func_0029F6A0(
     *(float *)(dest + 12) = Ff2d8e5ad_FUN_00282E48(dest, m0);
 }
 
-void func_0029F978(u8 *a0,u32 a1,u8 *a2) {
+/* Attaches a manipulator record to a moby and adds it to the moby's list. */
+void func_0029F978(u8 *moby,u32 jointId,u8 *record) {
  u8 *p;
- if(a2[1]!=0) return;
- a2[0]=a1; a2[1]=1;
- *(f32 *)(a2+0x1c)=1.0f;
- *(f32 *)(a2+0x20)=1.0f;
- *(f32 *)(a2+0x24)=1.0f;
- *(f32 *)(a2+0x28)=1.0f;
- p=*(u8 **)(*(u8 **)(*(u8 **)(a0+0x24)+0x1c)+a2[0]*4+4);
- *(u32 *)(a2+4)=p[p[0]+4]*0x40+0x70000000;
- *(u8 **)(a2+8)=*(u8 **)(a0+0x54);
- *(u8 **)(a0+0x54)=a2;
+ if(record[1]!=0) return;
+ record[0]=jointId; record[1]=1;
+ *(f32 *)(record+0x1c)=1.0f;
+ *(f32 *)(record+0x20)=1.0f;
+ *(f32 *)(record+0x24)=1.0f;
+ *(f32 *)(record+0x28)=1.0f;
+ p=*(u8 **)(*(u8 **)(*(u8 **)(moby+0x24)+0x1c)+record[0]*4+4);
+ *(u32 *)(record+4)=p[p[0]+4]*0x40+0x70000000;
+ *(u8 **)(record+8)=*(u8 **)(moby+0x54);
+ *(u8 **)(moby+0x54)=record;
 }
 
 /* unlinks a node from a singly linked list (head case and inner-chain case) and calls a release routine on it; does nothing for a null node */
@@ -341,6 +348,7 @@ int func_0029FA88(void *object)
     return -1;
 }
 
+/* Empties all 16 slots of the object slot table. */
 void func_0029FAE0(void)
 {
     int i;
@@ -352,48 +360,48 @@ void func_0029FAE0(void)
 
 
 /* Copies an int argument into a 64-byte stack local, scales the float at offset 44 of the first pointer by 1/1024, and runs five helpers over the two pointers and that local buffer. */
-void func_0029FC20(char *p1, int p2, char *p3)
+void func_0029FC20(char *moby, int jointIndex, char *out)
 {
     int n;
     char buf[64];
     float f;
 
-    n = p2;
-    f = *(float *)(p1 + 44) * 0.0009765625f;
-    func_002A3F10_1(p1, 1, &n, p3);
-    func_00282D30_4(p3 + 48, p3 + 48, f);
-    func_00283658(buf, p1 + 192);
-    func_00283788_1(p3, buf, p3);
-    func_00282CC0_7(p3 + 48, p3 + 48, p1 + 16);
+    n = jointIndex;
+    f = *(float *)(moby + 44) * 0.0009765625f;
+    func_002A3F10_1(moby, 1, &n, out);
+    func_00282D30_4(out + 48, out + 48, f);
+    copy_matrix_rotation(buf, moby + 192);
+    func_00283788_1(out, buf, out);
+    func_00282CC0_7(out + 48, out + 48, moby + 16);
 }
 
 /* scales a float field by 1/1024, stores an int argument in a stack record, and drives four helper calls with frame and object-field pointers */
-void func_0029FCC0(char *a0, int a1, char *a2)
+void func_0029FCC0(char *moby, int jointIndex, char *out)
 {
     char buf[80];
     float x;
 
-    x = *(float *)(a0 + 44);
-    *(int *)(buf + 64) = a1;
+    x = *(float *)(moby + 44);
+    *(int *)(buf + 64) = jointIndex;
     x = x * 0.0009765625f;
-    func_002A3F10_2(a0, 1, buf + 64, buf);
-    func_00282D30_19(a2, buf + 48, x);
-    func_00283098_6(a2, a2, a0 + 192);
-    func_00282CC0_20(a2, a2, a0 + 16);
+    func_002A3F10_2(moby, 1, buf + 64, buf);
+    func_00282D30_19(out, buf + 48, x);
+    func_00283098_6(out, out, moby + 192);
+    func_00282CC0_20(out, out, moby + 16);
 }
 
 /* Loops n times over a 16-byte-strided pointer, scaling the first pointer float at offset 44 by 1/1024 and calling three helpers with that pointer and two offsets of the first argument. */
-void func_0029FD48(char *p1, int n, char *p3, char *p4)
+void func_0029FD48(char *moby, int n, char *p3, char *points)
 {
-    float f = *(float *)(p1 + 44) * 0.0009765625f;
+    float f = *(float *)(moby + 44) * 0.0009765625f;
 
-    func_002A3DB8(p1);
+    get_moby_joint_matrices_batch(moby);
     if (n > 0) {
         do {
-            func_00282D30_7(p4, p4, f);
-            func_00283098_3(p4, p4, p1 + 192);
-            func_00282CC0_9(p4, p4, p1 + 16);
-            p4 += 16;
+            func_00282D30_7(points, points, f);
+            func_00283098_3(points, points, moby + 192);
+            func_00282CC0_9(points, points, moby + 16);
+            points += 16;
         } while (--n != 0);
     }
 }
@@ -451,15 +459,16 @@ extern float func_00283248(float, float);
 extern float func_00283180(float);
 extern float func_00283198(float);
 
+/* Works out a small direction vector (length 0.14) from a stored angle and saves it, with a fixed -0.99 height. */
 void func_0029FFB8(void)
 {
     float v[2];
     float a;
 
-    func_002A04E8(D_0018C0B0, v);
-    a = func_00283248(v[0], v[1]);
-    D_001B1B90[0] = func_00283180(a) * 0.14f;
-    D_001B1B90[1] = func_00283198(a) * 0.14f;
+    func_002A04E8(gHeroMoby_0018C0B0, v);
+    a = FastMatrixHelperA(v[0], v[1]);
+    D_001B1B90[0] = FastSinOrCosA(a) * 0.14f;
+    D_001B1B90[1] = FastSinOrCosB(a) * 0.14f;
     D_001B1B90[2] = -0.99f;
 }
 
@@ -471,29 +480,33 @@ extern void *D_001B16B0 __attribute__((sda));
 extern int D_001B16B4 __attribute__((sda));
 extern void func_002A4D88(void *, int);
 
+/* Copies a block of data to the graphics scratch area and starts the next upload. */
 void func_002A0180(void)
 {
-    func_0011AEA0(0);
-    func_00282B50((void *)0x70003800, D_00238F00, 0x800);
-    func_002A4D88(D_001B16B0, D_001B16B4);
+    FlushCache(0);
+    FastMemoryHelperC((void *)0x70003800, D_00238F00, 0x800);
+    MobyAnimProc(D_001B16B0, D_001B16B4);
 }
 
+/* Fills a small scratch area with a fixed pattern. */
 void func_002A01C8(void)
 {
-    func_00282A60((unsigned int *)0x70003A00, 0x40000000, 0x3C0);
+    ClearMemory((unsigned int *)0x70003A00, 0x40000000, 0x3C0);
 }
 
 extern void func_00282B50(void *, void *, int);
 
+/* Saves the scratch area to a backup buffer. */
 void func_002A01F0(void)
 {
-    func_00282B50((void *)((char *)D_L03_001DAB80 - 0x3C0), (void *)0x70003A00, 0x3C0);
+    FastMemoryHelperC((void *)((char *)D_L03_001DAB80 - 0x3C0), (void *)0x70003A00, 0x3C0);
 }
 
 
+/* Restores the scratch area from the backup buffer. */
 void func_002A0220(void)
 {
-    func_00282B50((void *)0x70003A00, (void *)((char *)D_L03_001DAB80 - 0x3C0), 0x3C0);
+    FastMemoryHelperC((void *)0x70003A00, (void *)((char *)D_L03_001DAB80 - 0x3C0), 0x3C0);
 }
 
 
@@ -506,14 +519,15 @@ extern void func_002A0180(void);
 extern int func_002A0048(void);
 extern int D_001B1B80;
 
+/* Runs the texture upload, and then the graphics setup if it is switched on. */
 int func_002A0380(void)
 {
     int result;
-    func_0029FDF0();
-    func_002A0180();
+    DmaMobyTextures();
+    UploadScratchTextureData();
     result = D_001B1B80;
     if (result != 0)
-        result = func_002A0048();
+        result = ConfigureGraphicsSetupDmaChain();
     return result;
 }
 

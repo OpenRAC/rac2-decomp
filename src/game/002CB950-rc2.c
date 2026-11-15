@@ -41,49 +41,50 @@ extern void func_002B49C0(s32);
 extern s32 func_002B49E0(s32, s32, s32, s32, s32);
 extern s32 func_002D5B38(s32, s8 *);
 
-s32 func_002CB950(s32 arg0) {
-    s32 r;
+/* Handles one of five menu commands by number. Some call an optional callback, others open a sub screen. */
+s32 func_002CB950(s32 command) {
+    s32 result;
 
-    r = 0;
+    result = 0;
     {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4};
-    u32 rc2_selector = (u32)(arg0);
+    u32 rc2_selector = (u32)(command);
     if (rc2_selector > 4U) goto rc2_switch_end;
 goto *D_0026CCE0[rc2_selector];
 
     rc2_case_0:
         D_0018A000.a = 10;
-        r = 1;
+        result = 1;
         goto rc2_switch_end;
     rc2_case_1:
-        r = 1;
+        result = 1;
         D_0018A000.a = 10;
         if (D_001AA420 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA420)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_2:
-        r = 1;
+        result = 1;
         D_0018A000.a = 10;
         if (D_001AA428 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA428)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_3:
-        r = func_002D5B38(3, D_0025BA90);
+        result = SendMenuRequest(3, D_0025BA90);
         goto rc2_switch_end;
     rc2_case_4:
-        if (func_002B49E0(4, 2, 8, 4, 0) == 0) {
-            func_002B49C0(3);
-            r = 1;
+        if (BeginSlotRequest(4, 2, 8, 4, 0) == 0) {
+            SetRequestSettingB(3);
+            result = 1;
         }
         goto rc2_switch_end;
     
 rc2_switch_end: ;
 }
-    return r;
+    return result;
 }

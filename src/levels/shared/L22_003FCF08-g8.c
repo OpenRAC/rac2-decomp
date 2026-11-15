@@ -35,8 +35,8 @@ void func_L22_003FCF08(u8 *origin, u8 *base, int count)
     f32 dir[4] __attribute__((aligned(16)));
     f32 v[4] __attribute__((aligned(16)));
     f32 q[4] __attribute__((aligned(16)));
-    f32 ang;
-    f32 a;
+    f32 life;
+    f32 tilt;
     f32 heading;
     int side;
 
@@ -49,25 +49,25 @@ void func_L22_003FCF08(u8 *origin, u8 *base, int count)
         for (; left != 0; left--) {
             f32 out[4] __attribute__((aligned(16)));
 
-            ang = func_002A7878(D_L22_001B0D1C, D_L22_001B0D20);
-            side = func_002A77E0(2);
+            life = RandomFloatRange(D_L22_001B0D1C, D_L22_001B0D20);
+            side = RandomIntBelow(2);
             if (side == 0)
                 side--;
-            heading = func_002A7940();
-            a = func_002A7878(0.698131799697876f, 1.5358898639678955f);
-            func_002AF000(dir, func_002A7878(D_L22_001B0D0C * scale, D_L22_001B0D10 * scale),
-                          heading, a);
+            heading = RandomAngle();
+            tilt = RandomFloatRange(0.698131799697876f, 1.5358898639678955f);
+            BuildSphericalOffset(dir, RandomFloatRange(D_L22_001B0D0C * scale, D_L22_001B0D10 * scale),
+                          heading, tilt);
             *(TI128 *)q = *(TI128 *)base;
-            func_00282D30((char *)q, (char *)base, func_002A7878(0.75f, 0.95f));
-            func_00282CD8((char *)out, (char *)dir, (char *)q);
+            FastVecScale((char *)q, (char *)base, RandomFloatRange(0.75f, 0.95f));
+            add_vectors((char *)out, (char *)dir, (char *)q);
             qcopy(v, origin);
-            v[0] += func_002A78D8(zero, step);
-            v[1] += func_002A78D8(zero, step);
-            v[2] += func_002A78D8(zero, step);
-            func_002C2210((char *)v, D_L22_001B0D34, D_L22_001B0D2C, 0, side,
-                          (char *)dir, 0, ang * 0.1f, ang, D_L22_001B0D08);
-            func_002C2210((char *)v, D_L22_001B0D34, D_L22_001B0D30, 1, -side,
-                          (char *)dir, 0, ang * 0.07f, ang * 0.7f, D_L22_001B0D08);
+            v[0] += RandomSignedFloatRange(zero, step);
+            v[1] += RandomSignedFloatRange(zero, step);
+            v[2] += RandomSignedFloatRange(zero, step);
+            SpawnGroundEffectParticle((char *)v, D_L22_001B0D34, D_L22_001B0D2C, 0, side,
+                          (char *)dir, 0, life * 0.1f, life, D_L22_001B0D08);
+            SpawnGroundEffectParticle((char *)v, D_L22_001B0D34, D_L22_001B0D30, 1, -side,
+                          (char *)dir, 0, life * 0.07f, life * 0.7f, D_L22_001B0D08);
         }
     }
 }

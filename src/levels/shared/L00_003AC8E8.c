@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 typedef struct {
@@ -23,25 +24,26 @@ typedef struct {
     int arg;
 } Trail_3AC8E8;
 
-void func_L00_003AC8E8(char *a0, void *a1, int a2)
+/* Makes the blast of a homing shot: hurts everything close by and shows the explosion. */
+void func_L00_003AC8E8(char *moby, void *normal, int hitTarget)
 {
-    Trail_3AC8E8 s;
-    Entry262570b *e;
+    Trail_3AC8E8 blast;
+    Entry262570b *entry;
     float scale;
     int count;
     int i;
 
-    s.arg = a2;
-    func_00282D30(s.head, a1, -3.0f);
-    e = &D_L00_00262570[D_00139568[0x1B]];
-    scale = e->scale;
-    count = func_00277F48(e->flag != 0 ? 3.0f : 4.0f, (int)(a0 + 0x10), 0x10, (int)a0, 0);
+    blast.arg = hitTarget;
+    FastVecScale(blast.head, normal, -3.0f);
+    entry = &gWeaponTable_L00[gItemSlotToRecord[0x1B]];
+    scale = entry->scale;
+    count = ProcessCollisionHit(entry->flag != 0 ? 3.0f : 4.0f, (int)(moby + 0x10), 0x10, (int)moby, 0);
     for (i = 0; i < count; i++) {
-        if ((D_L00_00262570 + D_00139568[0x1B])->flag != 0)
-            func_0032D758(D_L00_001C3280[i], 0x45, *(int *)(a0 + 0xB8));
+        if ((gWeaponTable_L00 + gItemSlotToRecord[0x1B])->flag != 0)
+            StartAttachedEffect(gAreaHitTargets[i], 0x45, *(int *)(moby + 0xB8));
         else
-            func_0032D758(D_L00_001C3280[i], 0x1B, *(int *)(a0 + 0xB8));
+            StartAttachedEffect(gAreaHitTargets[i], 0x1B, *(int *)(moby + 0xB8));
     }
-    *(TI128 *)s.vec = *(TI128 *)(a0 + 0x10);
-    func_002A9850(a0, s.vec, D_L00_001C3280, count, s.arg, 0x810000, 3, 1, scale, 1.0f, 1.0f);
+    *(TI128 *)blast.vec = *(TI128 *)(moby + 0x10);
+    QueueKnockbackForNodes(moby, blast.vec, gAreaHitTargets, count, blast.arg, 0x810000, 3, 1, scale, 1.0f, 1.0f);
 }

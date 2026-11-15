@@ -39,60 +39,61 @@ extern void ref_L11_00447360_10(void *);
 extern void ref_L11_00447360_11(void *);
 extern void ref_L11_00447360_12(void *);
 
-void func_L11_00447360(s32 arg0) {
-    s8 *temp_s0;
-    s16 var_v1;
+/* Goes through every game object in the world and calls the special update for its type (decoy, sheep, turrets, robots and so on). */
+void func_L11_00447360(s32 param) {
+    s8 *moby;
+    s16 classId;
 
-    temp_s0 = ref_L11_00447360_00;
-    if (temp_s0 != 0) {
+    moby = ref_L11_00447360_00;
+    if (moby != 0) {
         do {
-            var_v1 = *(s16 *)(temp_s0 + 0xAA);
-            switch (var_v1) {
-            case 0xCB:
-                ref_L11_00447360_02(temp_s0, arg0, 0x10000, temp_s0 + 0x10, ref_L11_00447360_01, 100.0f);
+            classId = *(s16 *)(moby + 0xAA);
+            switch (classId) {
+            case 0xCB: /* Decoy */
+                ref_L11_00447360_02(moby, param, 0x10000, moby + 0x10, ref_L11_00447360_01, 100.0f);
                 break;
-            case 0xE7D:
-                ref_L11_00447360_11(temp_s0);
+            case 0xE7D: /* Sheep */
+                ref_L11_00447360_11(moby);
                 break;
-            case 0xEB0:
-                ref_L11_00447360_12(temp_s0);
+            case 0xEB0: /* Dark Sheep */
+                ref_L11_00447360_12(moby);
                 break;
-            case 0xCB2:
-                ref_L11_00447360_06(temp_s0);
+            case 0xCB2: /* Synthenoid */
+                ref_L11_00447360_06(moby);
                 break;
-            case 0xB02:
-                ref_L11_00447360_05(temp_s0);
+            case 0xB02: /* Kilonoid */
+                ref_L11_00447360_05(moby);
                 break;
-            case 0x1366:
-                ref_L11_00447360_07(temp_s0);
+            case 0x1366: /* Miniturret */
+                ref_L11_00447360_07(moby);
                 break;
-            case 0x1367:
-                ref_L11_00447360_08(temp_s0);
+            case 0x1367: /* Megaturret */
+                ref_L11_00447360_08(moby);
                 break;
-            case 0x326:
-                ref_L11_00447360_03(temp_s0);
+            case 0x326: /* moby class 806 */
+                ref_L11_00447360_03(moby);
                 break;
-            case 0xA5C:
-            case 0x1192:
-                ref_L11_00447360_04(temp_s0);
+            case 0xA5C: /* Shield Charger */
+            case 0x1192: /* Tesla Barrier */
+                ref_L11_00447360_04(moby);
                 break;
-            case 0xE20:
-                ref_L11_00447360_10(temp_s0);
+            case 0xE20: /* moby class 3616 */
+                ref_L11_00447360_10(moby);
                 break;
-            case 0xAE0:
+            case 0xAE0: /* moby class 2784 */
             case 0xAE1:
             case 0xAE2:
             case 0xAEC:
             case 0xB06:
             case 0xB09:
             case 0xCC0 ... 0xCC9:
-            case 0xCDB:
-                ref_L11_00447360_09(temp_s0);
+            case 0xCDB: /* Ammo */
+                ref_L11_00447360_09(moby);
                 break;
             default:
                 break;
             }
-            temp_s0 = *(s8 **)(temp_s0 + 0x28);
-        } while (temp_s0 != 0);
+            moby = *(s8 **)(moby + 0x28);
+        } while (moby != 0);
     }
 }

@@ -8,14 +8,15 @@ typedef __attribute__((mode(TI))) int QI_002ACDE8;
 extern void func_00282D30(void *, void *, float);
 extern void func_002837D0(void *, void *, void *);
 
-void func_002ACDE8(void *a0, void *a1, void *a2)
+/* Rotates a vector by a quaternion and stores the result. */
+void func_002ACDE8(void *result, void *vector, void *quat)
 {
-    QI_002ACDE8 m[3];
+    QI_002ACDE8 quats[3];
 
-    func_00282D30(&m[0], a2, -1.0f);
-    *(float *)((char *)&m[0] + 0xC) = *(float *)((char *)a2 + 0xC);
-    qcopy(&m[1], a1);
-    ((int *)m)[7] = 0;
-    func_002837D0(&m[2], a2, &m[1]);
-    func_002837D0(a0, &m[2], &m[0]);
+    FastVecScale(&quats[0], quat, -1.0f);
+    *(float *)((char *)&quats[0] + 0xC) = *(float *)((char *)quat + 0xC);
+    qcopy(&quats[1], vector);
+    ((int *)quats)[7] = 0;
+    multiply_quaternions(&quats[2], quat, &quats[1]);
+    multiply_quaternions(result, &quats[2], &quats[0]);
 }

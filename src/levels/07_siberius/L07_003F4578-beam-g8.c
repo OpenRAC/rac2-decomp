@@ -36,7 +36,8 @@ extern f32 D_L07_001B0EE4[] __attribute__((sda));
 
 #define F(p, o) (*(f32 *)((p) + (o)))
 
-void func_L07_003F4CC0(u8 *a)
+/* Draws the glowing beam between its two end points: a flat strip along it plus a string of sprites that spin and fade with the beam's strength. */
+void func_L07_003F4CC0(u8 *moby)
 {
     f32 start[4], end[4], delta[4], side[4], normal[4], base[4];
     struct Vec4 { f32 x, y, z, w; };
@@ -47,22 +48,22 @@ void func_L07_003F4CC0(u8 *a)
         u8 rest[32];
     } draw;
     f32 current[4], step[4];
-    u8 *p = *(u8 **)(a + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     s32 i, color;
     f32 length, count, alpha, rotation, width;
     f32 uvOffset;
 
-    func_L07_003F4C18(a, start, end);
-    func_00282CF0(delta, end, start);
-    func_00282CF0(side, D_L07_001B9200, a + 0x10);
-    func_00282DD8(normal, side, delta);
-    func_00282F20(normal, normal, 1);
+    GetBeamEndPoints(moby, start, end);
+    FastVecSub(delta, end, start);
+    FastVecSub(side, D_L07_001B9200, moby + 0x10);
+    FastVecCross(normal, side, delta);
+    vec_scale_to_length(normal, normal, 1);
     qzero_nc(side);
     qcopy_nc(base, start);
     base[3] = 1;
-    func_00281DE8(&draw, D_L07_001B0EB0, 1, 128);
+    InitQuadPacketState(&draw, D_L07_001B0EB0, 1, 128);
     uvOffset = 0.0f;
-    color = func_00283D38(D_L07_001B0EA8 & 0xffffff, D_L07_001B0EA8, F(p, 0x24));
+    color = FastTweenColor(D_L07_001B0EA8 & 0xffffff, D_L07_001B0EA8, F(vars, 0x24));
     {
         s32 i;
 
@@ -84,8 +85,8 @@ void func_L07_003F4CC0(u8 *a)
             draw.colors[i] = color;
         }
     }
-    func_00280B90(&draw, delta, 0);
-    color = func_00283D38(D_L07_001B0EAC[0] & 0xffffff, D_L07_001B0EAC[0], F(p, 0x24));
+    draw_world_quad(&draw, delta, 0);
+    color = FastTweenColor(D_L07_001B0EAC[0] & 0xffffff, D_L07_001B0EAC[0], F(vars, 0x24));
     {
         s32 i;
 
@@ -98,20 +99,20 @@ void func_L07_003F4CC0(u8 *a)
             draw.colors[i] = color;
         }
     }
-    func_00280B90(&draw, delta, 0);
-    length = func_00282DF0(delta) / D_L07_001B0EC0;
-    rotation = F(p, 0x28);
-    if (a[0x20] == 0) {
+    draw_world_quad(&draw, delta, 0);
+    length = FastVecLength(delta) / D_L07_001B0EC0;
+    rotation = F(vars, 0x28);
+    if (moby[0x20] == 0) {
         alpha = 1;
-        count = (length * F(p, 0x24)) * 2.0f;
+        count = (length * F(vars, 0x24)) * 2.0f;
         if (count > length + 1)
             count = length + 1;
     } else {
-        alpha = F(p, 0x24) * F(p, 0x24);
+        alpha = F(vars, 0x24) * F(vars, 0x24);
         count = length + 1;
     }
     qcopy(current, base);
-    func_00282F20(step, delta, D_L07_001B0EC0);
+    vec_scale_to_length(step, delta, D_L07_001B0EC0);
     for (i = 0; (f32)i < count; i++) {
         f32 *pos;
 
@@ -122,14 +123,14 @@ void func_L07_003F4CC0(u8 *a)
             width = D_L07_001B0EC8[0];
         else
             width = D_L07_001B0EC8[1];
-        color = func_00283D38(D_L07_001B0ED0 & 0xffffff, D_L07_001B0ED0, alpha);
+        color = FastTweenColor(D_L07_001B0ED0 & 0xffffff, D_L07_001B0ED0, alpha);
         pos = current;
-        func_00281EB8(pos, 49, color, 1, width, 0, rotation);
-        color = func_00283D38(D_L07_001B0ED4[0] & 0xffffff, D_L07_001B0ED4[0], alpha);
-        func_00281EB8(pos, 49, color, 1, width, 0, func_00283B98(rotation, D_L07_001B0ED8));
-        rotation = -func_00283B98(rotation, D_L07_001B0EDC * 0.017453294f);
+        DrawBillboardQuad_00281EB8(pos, 49, color, 1, width, 0, rotation);
+        color = FastTweenColor(D_L07_001B0ED4[0] & 0xffffff, D_L07_001B0ED4[0], alpha);
+        DrawBillboardQuad_00281EB8(pos, 49, color, 1, width, 0, FastAddRotations(rotation, D_L07_001B0ED8));
+        rotation = -FastAddRotations(rotation, D_L07_001B0EDC * 0.017453294f);
         if ((f32)i < length - 1)
-            func_00282CC0(current, current, step);
+            FastVecAdd(current, current, step);
         else
             qcopy(current, end);
     }

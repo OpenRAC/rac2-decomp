@@ -10,26 +10,31 @@ extern int ref_L00_002FC020_00;
 
 extern int ref_L00_002FC028_00;
 
+/* Turns a flag on. */
 void func_L00_002FBF60(void)
 {
     ref_L00_002FBF60_00 = 1;
 }
 
+/* Turns a flag on. */
 void func_L00_002FC008(void)
 {
     ref_L00_002FC008_00 = 1;
 }
 
+/* Gets a stored flag value. */
 int func_L00_002FC018(void)
 {
     return ref_L00_002FC018_00;
 }
 
+/* Turns a flag off. */
 void func_L00_002FC020(void)
 {
     ref_L00_002FC020_00 = 0;
 }
 
+/* Turns a flag off. */
 void func_L00_002FC028(void)
 {
     ref_L00_002FC028_00 = 0;

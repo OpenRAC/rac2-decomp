@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 void func_00288B38(int);
 
@@ -29,10 +30,11 @@ extern s32 func_002B49E0(s32, s32, u32, u32, u8 *);
 
 extern void func_L00_002F4180(BarlowUtilityQueueView *);
 
-void func_00288BB8(void *param)
+/* Marks every request in the queue as used, clears its first word and resets the queue. */
+void func_00288BB8(void *queue)
 {
-  func_00288B38((int)param);
-  *(unsigned int *)param = 0;
-  func_00288B18(param);
+  MarkQueuedRequestsInFlagTable((int)queue);
+  *(unsigned int *)queue = 0;
+  ResetOwnerRequestQueue(queue);
 }
 extern s32 func_00288BE8(BarlowUtilityQueueView *queue);

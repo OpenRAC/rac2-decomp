@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_00336F20's two colour tables are 4 and 2 words at $gp (0x001ADAF8, 0x001ADB08 in the
    boot; D_001ADB10 follows them), hence a unit of its own with -G16 and the assembler's -G16. */
@@ -27,8 +28,8 @@ static __inline__ int itemInShortSet(int item)
 
 static __inline__ int itemCountReached(int item)
 {
-    if (D_00239BA0[D_00139568[item]].enabled) {
-        int count = func_00287F60(item);
+    if (gWeaponTable_00239BA0[gItemSlotToRecord[item]].enabled) {
+        int count = CountChainEntriesAfterHead(item);
         if (count >= 2 || (count == 1 && itemInShortSet(item))) return 1;
     }
     return 0;
@@ -36,9 +37,9 @@ static __inline__ int itemCountReached(int item)
 
 static __inline__ int itemLevelReached(int item)
 {
-    if (D_00239BA0[D_00139568[item]].enabled) {
-        if (D_00239BA0[D_00139568[item]].level == 2
-            || (D_00239BA0[D_00139568[item]].level == 1 && itemInShortSet(item))) return 1;
+    if (gWeaponTable_00239BA0[gItemSlotToRecord[item]].enabled) {
+        if (gWeaponTable_00239BA0[gItemSlotToRecord[item]].level == 2
+            || (gWeaponTable_00239BA0[gItemSlotToRecord[item]].level == 1 && itemInShortSet(item))) return 1;
     }
     return 0;
 }
@@ -52,25 +53,25 @@ void func_00336F20(int item, unsigned int *first, unsigned int *second, unsigned
     *first = 0x55F0C070;
     *second = 0x55F0C070;
     if (itemInShortSet(item)) {
-        int index = D_00139568[item];
-        colour = D_001ADB08[D_00239BA0[index].level];
+        int index = gItemSlotToRecord[item];
+        colour = gItemShortSetColors[gWeaponTable_00239BA0[index].level];
     } else {
-        int index = D_00139568[item];
-        colour = D_001ADAF8[D_00239BA0[index].level];
+        int index = gItemSlotToRecord[item];
+        colour = gItemLevelColors[gWeaponTable_00239BA0[index].level];
     }
     *value = colour;
     if (item == 16) {
-        if (D_00239BA0[D_00139568[16]].level >= 2)
-            *value = D_001ADAF8[D_00239BA0[D_00139568[16]].level - 2];
+        if (gWeaponTable_00239BA0[gItemSlotToRecord[16]].level >= 2)
+            *value = gItemLevelColors[gWeaponTable_00239BA0[gItemSlotToRecord[16]].level - 2];
     }
-    if (D_00239BA0[D_00139568[item]].enabled && func_00287F60(item) > 0) {
-        if (func_00288D58() && itemCountReached(item)) {
+    if (gWeaponTable_00239BA0[gItemSlotToRecord[item]].enabled && CountChainEntriesAfterHead(item) > 0) {
+        if (IsFlagByteSet() && itemCountReached(item)) {
             if (itemLevelReached(item)) {
                 *first = 0x60664088;
                 *second = 0x606600D8;
             }
         } else {
-            ItemRow *row = &D_00239BA0[D_00139568[item]];
+            ItemRow *row = &gWeaponTable_00239BA0[gItemSlotToRecord[item]];
             if (row->level == 0 && row->cost > 0) {
                 *first = 0x6049C1FF;
                 *second = 0x60001EFF;

@@ -44,35 +44,36 @@ extern long long D_L01_001AFF50 __attribute__((sda));
 extern long long D_L01_001AFF40 __attribute__((sda));
 extern char D_L01_002A4C50[];
 
-void func_L01_003C2680(L01_003C2680_OBJ *a0)
+/* Updates an object that sits on the water: it waits until water is present, then bobs along and reacts when the camera gets close. */
+void func_L01_003C2680(L01_003C2680_OBJ *moby)
 {
-    char *p = (char *)a0;
-    L01_003C2680_OWNED *s1 = a0->f68;
+    char *mobyBytes = (char *)moby;
+    L01_003C2680_OWNED *vars = moby->f68;
     Quad frame[2];
 
-    if (s1 == 0) {
-        func_002A6CF0(D_L01_002A4C50, a0->fAA, a0->fB2);
+    if (vars == 0) {
+        func_002A6CF0(D_L01_002A4C50, moby->fAA, moby->fB2);
         return;
     }
-    qcopy(&frame[0], p + 0x10);
-    qcopy(&frame[1], p + 0xF0);
-    switch (a0->f20) {
+    qcopy(&frame[0], mobyBytes + 0x10);
+    qcopy(&frame[1], mobyBytes + 0xF0);
+    switch (moby->f20) {
     case 0:
-        if (func_L01_003BAFB0(p + 0x10) > 0.0f) {
-            s1->f120 = func_002A7940();
-            s1->f124 = func_002A7940();
-            s1->f128 = 0.02f;
-            qcopy(&s1->f130, p + 0xF0);
-            qzero(&s1->f140);
-            func_002A7750(a0, 1, -1);
+        if (GetWaterHeight(mobyBytes + 0x10) > 0.0f) {
+            vars->f120 = RandomAngle();
+            vars->f124 = RandomAngle();
+            vars->f128 = 0.02f;
+            qcopy(&vars->f130, mobyBytes + 0xF0);
+            qzero(&vars->f140);
+            SetMobyState(moby, 1, -1);
         }
-        a0->f18 = a0->f18 + D_L01_001AFF6C;
-        func_002B41A8(a0, (char *)s1 + 0x60, 0, 0, &D_L01_001AFF40, 0, 0, 0, &D_L01_001AFF60, &D_L01_001AFF50, 0);
+        moby->f18 = moby->f18 + D_L01_001AFF6C;
+        InitMovementControllerParams(moby, (char *)vars + 0x60, 0, 0, &D_L01_001AFF40, 0, 0, 0, &D_L01_001AFF60, &D_L01_001AFF50, 0);
         return;
     case 1:
-        if (a0->f31 != 0 && func_00282E80(p + 0x10, D_L01_001B94C0) < 32.0f) {
-            s1->f68 = func_L01_003BAFB0() + D_L01_001AFF6C;
-            func_002B44C0(a0, (char *)s1 + 0x60, 0);
+        if (moby->f31 != 0 && vec_distance_xy(mobyBytes + 0x10, D_L01_001B94C0) < 32.0f) {
+            vars->f68 = GetWaterHeight() + D_L01_001AFF6C;
+            UpdateObjectSway(moby, (char *)vars + 0x60, 0);
         }
         return;
     }

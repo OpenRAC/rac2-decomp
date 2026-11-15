@@ -97,6 +97,7 @@ extern void *func_002C2210(void *, int, float, float, int, int, int, void *, int
 extern void func_00282CF0(void *, void *, void *);
 extern u8 *func_L12_00408050(void *, void *, void *, int, float);
 
+/* Updates the Megacorp Robot Guard: it patrols a path, notices the hero, calls its group, charges and shoots, and blows up when hurt enough. */
 void func_L12_003E2460(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     L12Vector pos;
@@ -131,15 +132,15 @@ void func_L12_003E2460(u8 *obj) {
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(obj + 0x98) = *(int *)(*(u8 **)(obj + 0x24) + 0x10);
     }
-    func_L12_003E3A88(obj);
-    distance = func_00282E80(((L12PathEnemyState *)state)->targetObject + 0x10, obj + 0x10);
+    InitAndUpdateRobotGuardState(obj);
+    distance = vec_distance_xy(((L12PathEnemyState *)state)->targetObject + 0x10, obj + 0x10);
     if (distance < 8.0f && !((L12PathEnemyState *)state)->damageState) {
         ((L12PathEnemyState *)state)->damageState = 3;
         ((L12PathEnemyState *)state)->alertTimer = 50;
     }
     if (((L12PathEnemyState *)state)->damageState == 5) {
-        func_002E5CF8(3, 0, obj);
-        func_0032C700((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        PlayMobySound(3, 0, obj);
+        SpawnExplosion((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         if (((L12PathEnemyState *)state)->persistent) {
             u16 id = *(u16 *)(obj + 0xB2);
             if (id & 1) {
@@ -155,14 +156,14 @@ void func_L12_003E2460(u8 *obj) {
         int damage;
         float oldAngle = *(float *)(obj + 0xF8);
         qcopy(&pos, (obj + 0x10));
-        damage = func_002B1C20(obj, state + 0x60);
+        damage = DispatchActionByKind(obj, state + 0x60);
         if (*(float *)(state + 0x218) >= D_L12_001B0B04 * 0.01666666753590107f) {
-            func_0026FEB8(D_L12_001B0B38);
+            STUB_printf(D_L12_001B0B38);
             *(float *)(state + 0x218) = 0;
         }
         if (damage & 1) {
-            func_002E5CF8(3, 0, obj);
-            func_0032C700((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+            PlayMobySound(3, 0, obj);
+            SpawnExplosion((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
             if (((L12PathEnemyState *)state)->persistent) {
                 u16 id = *(u16 *)(obj + 0xB2);
                 if (id & 1) {
@@ -176,9 +177,9 @@ void func_L12_003E2460(u8 *obj) {
                 }
             }
 deathFinish:
-            func_002A6C58(obj, 0, 3);
+            SetDeathBits(obj, 0, 3);
 destroy:
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
             return;
         }
         if (damage & 2)
@@ -191,11 +192,11 @@ destroy:
         if (((L12PathEnemyState *)state)->perception == 1 || ((L12PathEnemyState *)state)->damageState == 1 || ((L12PathEnemyState *)state)->damageState == 2) {
             ((L12PathEnemyState *)state)->destination = ((L12PathEnemyState *)state)->nextPoint = -1;
             if (!((L12PathEnemyState *)state)->grouped) {
-                func_002A7750(obj, 15, 5);
+                SetMobyState(obj, 15, 5);
             } else {
-                func_L12_003E2370(obj);
+                TryClaimGroupAttackSlot(obj);
                 if (obj[0x20] != 15) {
-                    func_002A7750(obj, 4, 10);
+                    SetMobyState(obj, 4, 10);
                     ((L12PathEnemyState *)state)->reserveTimer = 800;
                 }
             }
@@ -204,7 +205,7 @@ destroy:
     case 7:
         i = ((L12PathEnemyState *)state)->perception;
         if (i == 1) {
-            func_002A7750(obj, 3, 8);
+            SetMobyState(obj, 3, 8);
             obj[0x31] = i;
             *(u16 *)(obj + 0x34) &= 0xFFFE;
         } else {
@@ -213,95 +214,95 @@ destroy:
         }
         break;
     case 9:
-        func_002B3890(obj);
+        SetSecondPendingFlag(obj);
         if (obj[0x20] == 23 && ((L12PathEnemyState *)state)->damageState != 1) {
-            func_002A7750(obj, 4, -1);
+            SetMobyState(obj, 4, -1);
             if (obj[0x43] != 3)
-                func_002A7470(obj, 3, 0, 20);
+                StartAnimationBlended(obj, 3, 0, 20);
         }
-        if (func_00282978(state + 0x29E)) {
-            func_L12_003E2418(obj);
-            func_002A7750(obj, 4, 10);
+        if (FastDecTimer(state + 0x29E)) {
+            ReleaseGroupAttackSlot(obj);
+            SetMobyState(obj, 4, 10);
             if (obj[0x43] != 3)
-                func_002A7470(obj, 3, 0, 20);
+                StartAnimationBlended(obj, 3, 0, 20);
         } else if (((L12PathEnemyState *)state)->damageState == 1 && obj[0x20] == 4) {
-            func_002A7750(obj, 15, 5);
+            SetMobyState(obj, 15, 5);
             ((L12PathEnemyState *)state)->groupTimer = 150;
         }
         break;
     case 10:
-        if (func_002B3890(obj))
-            func_L12_003E1CB0(obj);
+        if (SetSecondPendingFlag(obj))
+            ChooseNearestVisiblePathPoint(obj);
         if ((obj[0x60] & 2) && obj[0x42] != 2 && obj[0x43] != 2)
-            func_002A7470(obj, 2, 0, 20);
-        func_L12_003E2370(obj);
+            StartAnimationBlended(obj, 2, 0, 20);
+        TryClaimGroupAttackSlot(obj);
         if (((L12PathEnemyState *)state)->damageState == 1) {
-            func_002A7750(obj, 15, 5);
+            SetMobyState(obj, 15, 5);
             ((L12PathEnemyState *)state)->groupTimer = 150;
         } else {
             if (((L12PathEnemyState *)state)->perception == 1 || ((L12PathEnemyState *)state)->damageState)
                 ((L12PathEnemyState *)state)->idleTimer = 250;
-            if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && func_00282978(state + 0x260)) {
+            if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && FastDecTimer(state + 0x260)) {
                 if (obj[0x43] != 0)
-                    func_002A7470(obj, 0, 0, 20);
-                func_002A7750(obj, 5, 0);
+                    StartAnimationBlended(obj, 0, 0, 20);
+                SetMobyState(obj, 5, 0);
             }
         }
         break;
     case 5:
-        if (func_002B3890(obj)) {
+        if (SetSecondPendingFlag(obj)) {
             float turn = D_L12_001B0AA8 * 0.00027777778450399637f;
             float speed = D_L12_001B0AAC * 0.01666666753590107f;
             *(float *)(state + 0x198) = D_L12_001B0AB0;
-            func_002B60B0(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
+            SetControllerSpeedLimits(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
             ((L12PathEnemyState *)state)->flags |= 0x10;
         }
         if (((L12PathEnemyState *)state)->damageState == 3) {
             if (obj[0x95] != 15)
-                func_002A7750(obj, obj[0x20], 6);
-            func_002B3868(obj);
+                SetMobyState(obj, obj[0x20], 6);
+            SetFirstPendingFlag(obj);
         }
-        if (((L12PathEnemyState *)state)->grouped && func_00282978(state + 0x29C) && ((L12PathEnemyState *)state)->damageState != 1) {
-            func_L12_003E2448(obj);
+        if (((L12PathEnemyState *)state)->grouped && FastDecTimer(state + 0x29C) && ((L12PathEnemyState *)state)->damageState != 1) {
+            InitMobyStateByte(obj);
             break;
         }
-        func_0029FC20(obj, 2, matrix);
-        func_002830C0(&pos, D_L12_001B0A90, matrix);
-        if (obj[0x95] != 15 && func_002761F8(&pos, state + 0x130, 2, obj, 0)) {
-            func_002A7750(obj, obj[0x20], 6);
-            func_002B3868(obj);
+        TransformMobyJointPoint(obj, 2, matrix);
+        transform_vector(&pos, D_L12_001B0A90, matrix);
+        if (obj[0x95] != 15 && CollLine(&pos, state + 0x130, 2, obj, 0)) {
+            SetMobyState(obj, obj[0x20], 6);
+            SetFirstPendingFlag(obj);
         }
         if (((L12PathEnemyState *)state)->perception == 1 || ((L12PathEnemyState *)state)->damageState)
             ((L12PathEnemyState *)state)->idleTimer = 250;
-        if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && func_00282978(state + 0x260)) {
+        if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && FastDecTimer(state + 0x260)) {
             if (obj[0x43] != 0)
-                func_002A7470(obj, 0, 0, 20);
-            func_002A7750(obj, 5, 0);
+                StartAnimationBlended(obj, 0, 0, 20);
+            SetMobyState(obj, 5, 0);
             break;
         }
         {
             u8 *other = ((L12PathEnemyState *)state)->targetObject;
-            angle = func_00283248(*(float *)(other + 0x10) - *(float *)(obj + 0x10),
+            angle = FastMatrixHelperA(*(float *)(other + 0x10) - *(float *)(obj + 0x10),
                                   *(float *)(other + 0x14) - *(float *)(obj + 0x14));
-            func_002AA800(obj + 0xF8, 0, angle, 0.10471977293491364f);
+            StepAngleTowardTarget(obj + 0xF8, 0, angle, 0.10471977293491364f);
         }
         break;
     case 6: {
         u8 *path;
         int flags;
         float oldZ, ground, angle;
-        if (func_002B3890(obj)) {
+        if (SetSecondPendingFlag(obj)) {
             u8 *initialPath;
             float initialDistance;
             ((L12PathEnemyState *)state)->destination = -1;
             initialPath = D_L12_001FEAC0[*(int *)(state + 0x158)];
-            func_L12_003E1CB0(obj);
-            initialDistance = func_00282E48((obj + 0x10), initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
+            ChooseNearestVisiblePathPoint(obj);
+            initialDistance = fast_vec_dist((obj + 0x10), initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
             if (initialDistance > 0.5f)
-                func_0026FEB8(D_L12_001B0B50, (double)initialDistance);
+                STUB_printf(D_L12_001B0B50, (double)initialDistance);
         }
         if (*(int *)(state + 0x16C)) {
-            func_L12_003E20F0(obj);
+            MoveAlongPathKeepingHeight(obj);
             break;
         }
         path = D_L12_001FEAC0[*(int *)(state + 0x158)];
@@ -313,29 +314,29 @@ destroy:
                 i = *(int *)path - 1;
             if (next == *(int *)path)
                 next = 0;
-            if (i >= 0 && !func_002761F8(path + 0x10 + i * 16, state + 0x130, 2, 0, 0))
+            if (i >= 0 && !CollLine(path + 0x10 + i * 16, state + 0x130, 2, 0, 0))
                 ((L12PathEnemyState *)state)->destination = i;
             if (((L12PathEnemyState *)state)->destination == -1) {
-                if (next < *(int *)path && !func_002761F8(path + 0x10 + next * 16, state + 0x130, 2, 0, 0))
+                if (next < *(int *)path && !CollLine(path + 0x10 + next * 16, state + 0x130, 2, 0, 0))
                     ((L12PathEnemyState *)state)->destination = next;
                 if (((L12PathEnemyState *)state)->destination == -1) {
                     int j;
                     for (j = i - 1; j >= 0; j--) {
-                        if (!func_002761F8(path + 0x10 + j * 16, state + 0x130, 2, 0, 0)) {
+                        if (!CollLine(path + 0x10 + j * 16, state + 0x130, 2, 0, 0)) {
                             ((L12PathEnemyState *)state)->destination = j;
                             break;
                         }
                     }
                     if (((L12PathEnemyState *)state)->destination == -1) {
                         for (i = next + 1; i < *(int *)path; i++) {
-                            if (!func_002761F8(path + 0x10 + i * 16, state + 0x130, 2, 0, 0)) {
+                            if (!CollLine(path + 0x10 + i * 16, state + 0x130, 2, 0, 0)) {
                                 ((L12PathEnemyState *)state)->destination = i;
                                 break;
                             }
                         }
                         if (((L12PathEnemyState *)state)->destination == -1) {
-                            func_002A7750(obj, obj[0x20], 5);
-                            func_002B3868(obj);
+                            SetMobyState(obj, obj[0x20], 5);
+                            SetFirstPendingFlag(obj);
                             break;
                         }
                     }
@@ -343,10 +344,10 @@ destroy:
             }
             forward = ((L12PathEnemyState *)state)->destination - ((L12PathEnemyState *)state)->pathIndex;
             if (forward < 0)
-                { int t = forward - 1; forward = t + *(int *)path; }
+                { int step = forward - 1; forward = step + *(int *)path; }
             backward = ((L12PathEnemyState *)state)->pathIndex - ((L12PathEnemyState *)state)->destination;
             if (backward < 0)
-                { int t = backward - 1; backward = t + *(int *)path; }
+                { int step = backward - 1; backward = step + *(int *)path; }
             ((L12PathEnemyState *)state)->nextPoint = forward < backward ? ((L12PathEnemyState *)state)->pathIndex + 1 : ((L12PathEnemyState *)state)->pathIndex - 1;
             if (((L12PathEnemyState *)state)->nextPoint < 0)
                 ((L12PathEnemyState *)state)->nextPoint = *(int *)path - 1;
@@ -355,21 +356,21 @@ destroy:
         }
         {
             u8 *other = ((L12PathEnemyState *)state)->targetObject;
-            angle = func_00283248(*(float *)(other + 0x10) - *(float *)(obj + 0x10),
+            angle = FastMatrixHelperA(*(float *)(other + 0x10) - *(float *)(obj + 0x10),
                                   *(float *)(other + 0x14) - *(float *)(obj + 0x14));
-            func_002AA800(obj + 0xF8, 0, angle, 6.000000476837158f);
+            StepAngleTowardTarget(obj + 0xF8, 0, angle, 6.000000476837158f);
         }
         oldZ = *(float *)(obj + 0x18);
         *(float *)(state + 0x218) = 0;
-        flags = func_L01_00321178(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
-        ground = func_002A89A8((obj + 0x10), 0, 0.5f);
+        flags = TurnMobyTowardTarget(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
+        ground = ProbeGroundHeightBelow((obj + 0x10), 0, 0.5f);
         if (flags & 0x20) {
             if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > D_L12_001B0B14)
                 *(float *)(obj + 0x18) = oldZ;
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                STUB_printf(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - ProbeGroundHeightBelow((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
         }
         if (*(float *)(obj + 0x18) < *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) > 0.8f) {
@@ -387,16 +388,16 @@ destroy:
             if (((L12PathEnemyState *)state)->destination == ((L12PathEnemyState *)state)->nextPoint) {
                 ((L12PathEnemyState *)state)->pathIndex = ((L12PathEnemyState *)state)->nextPoint;
                 ((L12PathEnemyState *)state)->nextPoint = -1;
-                func_002A7750(obj, obj[0x20], 5);
-                func_002B3868(obj);
+                SetMobyState(obj, obj[0x20], 5);
+                SetFirstPendingFlag(obj);
             } else {
                 forward = ((L12PathEnemyState *)state)->destination - ((L12PathEnemyState *)state)->nextPoint;
                 ((L12PathEnemyState *)state)->pathIndex = ((L12PathEnemyState *)state)->nextPoint;
                 if (forward < 0)
-                    { int t = forward - 1; forward = t + *(int *)path; }
+                    { int step = forward - 1; forward = step + *(int *)path; }
                 backward = ((L12PathEnemyState *)state)->nextPoint - ((L12PathEnemyState *)state)->destination;
                 if (backward < 0)
-                    { int t = backward - 1; backward = t + *(int *)path; }
+                    { int step = backward - 1; backward = step + *(int *)path; }
                 ((L12PathEnemyState *)state)->nextPoint = forward < backward ? ((L12PathEnemyState *)state)->nextPoint + 1 : ((L12PathEnemyState *)state)->nextPoint - 1;
                 if (((L12PathEnemyState *)state)->nextPoint < 0)
                     ((L12PathEnemyState *)state)->nextPoint = *(int *)path - 1;
@@ -409,29 +410,29 @@ destroy:
     }
     switch (obj[0x20]) {
     case 5:
-        if (func_002B3868(obj)) {
+        if (SetFirstPendingFlag(obj)) {
             ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(float *)(state + 0x198) = D_L12_001B0AB0 * 0.5f;
             if (obj[0x43] != 0)
-                func_002A7470(obj, 0, 0, 20);
+                StartAnimationBlended(obj, 0, 0, 20);
             ((L12PathEnemyState *)state)->attackTimer = 150;
         }
-        if (func_00282978(state + 0x262)) {
+        if (FastDecTimer(state + 0x262)) {
             if (obj[0x43] != 1)
-                func_002A7470(obj, 1, 0, 20);
-            func_002A7750(obj, 21, -1);
+                StartAnimationBlended(obj, 1, 0, 20);
+            SetMobyState(obj, 21, -1);
         }
         break;
     case 3:
-        if (func_002B3868(obj)) {
-            func_002B60B0(obj, 0.008888889104127884f, 0.5333333611488342f, 0.10471977293491364f, 0.10471977293491364f);
+        if (SetFirstPendingFlag(obj)) {
+            SetControllerSpeedLimits(obj, 0.008888889104127884f, 0.5333333611488342f, 0.10471977293491364f, 0.10471977293491364f);
             ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(int *)(state + 0x168) = 1;
         }
-        if (func_L12_003E1EE8(obj, D_L12_001FEAC0[*(int *)(state + 0x164)])) {
-            func_002A7750(obj, 5, 0);
+        if (AdvanceAlongPath(obj, D_L12_001FEAC0[*(int *)(state + 0x164)])) {
+            SetMobyState(obj, 5, 0);
             if (obj[0x43] != 0)
-                func_002A7470(obj, 0, 0, 0);
+                StartAnimationBlended(obj, 0, 0, 0);
             ((L12PathEnemyState *)state)->flags |= 0x10;
         }
         break;
@@ -440,27 +441,27 @@ destroy:
         int flags;
         float oldZ, ground, heightLimit;
         path = D_L12_001FEAC0[*(int *)(state + 0x158)];
-        if (func_002B3868(obj)) {
+        if (SetFirstPendingFlag(obj)) {
             int nextIndex = ((L12PathEnemyState *)state)->pathIndex + 1;
             if (nextIndex == *(int *)path)
                 ((L12PathEnemyState *)state)->nextPoint = 0;
             else
                 ((L12PathEnemyState *)state)->nextPoint = nextIndex;
-            func_L12_003E1CB0(obj);
+            ChooseNearestVisiblePathPoint(obj);
         }
         if (*(int *)(state + 0x16C))
-            func_L12_003E20F0(obj);
+            MoveAlongPathKeepingHeight(obj);
         oldZ = *(float *)(obj + 0x18);
         *(float *)(state + 0x218) = 0;
-        flags = func_L01_00321178(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
-        ground = func_002A89A8((obj + 0x10), 0, 0.5f);
+        flags = TurnMobyTowardTarget(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
+        ground = ProbeGroundHeightBelow((obj + 0x10), 0, 0.5f);
         if (flags & 0x20) {
             if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > D_L12_001B0B14)
                 *(float *)(obj + 0x18) = oldZ;
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                STUB_printf(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - ProbeGroundHeightBelow((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
             heightLimit = *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) < oldZ ? *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) : oldZ;
             if (*(float *)(obj + 0x18) < heightLimit)
                 *(float *)(obj + 0x18) = heightLimit;
@@ -481,88 +482,88 @@ destroy:
             ((L12PathEnemyState *)state)->attackTimer = 200;
             ((L12PathEnemyState *)state)->pathIndex = ((L12PathEnemyState *)state)->nextPoint;
             if (obj[0x43] != 0)
-                func_002A7470(obj, 0, 0, 20);
+                StartAnimationBlended(obj, 0, 0, 20);
             changeModeL12Patrol(obj, 5, -1);
         }
         break;
     }
     case 15:
-        if (func_002B3868(obj)) {
+        if (SetFirstPendingFlag(obj)) {
             ((L12PathEnemyState *)state)->attackTimer = 40;
             if (obj[0x43] != 8)
-                func_002A7470(obj, 8, 0, 20);
-            func_002B60B0(obj, D_L12_001B0AA8 * 0.000034722223062999546f,
+                StartAnimationBlended(obj, 8, 0, 20);
+            SetControllerSpeedLimits(obj, D_L12_001B0AA8 * 0.000034722223062999546f,
                           D_L12_001B0AAC * 0.0020833334419876337f,
                           0.10471977293491364f, 0.10471977293491364f);
             *(float *)(state + 0x198) = D_L12_001B0AB0 * 0.25f;
         }
-        if (func_00282978(state + 0x262) || (distance < 4.0f && ((L12PathEnemyState *)state)->attackTimer < 20)) {
+        if (FastDecTimer(state + 0x262) || (distance < 4.0f && ((L12PathEnemyState *)state)->attackTimer < 20)) {
             float turn = D_L12_001B0AA8 * 0.00027777778450399637f;
             float speed = D_L12_001B0AAC * 0.01666666753590107f;
             *(float *)(state + 0x198) = D_L12_001B0AB0;
-            func_002B60B0(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
+            SetControllerSpeedLimits(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
             if (obj[0x43] != 7)
-                func_002A7470(obj, 7, 0, 20);
+                StartAnimationBlended(obj, 7, 0, 20);
             ((L12PathEnemyState *)state)->attackTimer = 20;
-            func_002A7750(obj, 16, -1);
+            SetMobyState(obj, 16, -1);
         } else {
-            func_0029FC20(obj, 2, matrix);
-            func_002830C0(&pos, D_L12_001B0A90, matrix);
+            TransformMobyJointPoint(obj, 2, matrix);
+            transform_vector(&pos, D_L12_001B0A90, matrix);
             goto smoke;
         }
         break;
     case 16:
-        if (func_002B3868(obj))
-            func_002E5CF8(3, 0, obj);
-        func_0029FC20(obj, 2, matrix);
-        func_002830C0(&pos, D_L12_001B0A90, matrix);
-        angle = func_00283248(*(float *)(state + 0x130) - *(float *)(obj + 0x10),
+        if (SetFirstPendingFlag(obj))
+            PlayMobySound(3, 0, obj);
+        TransformMobyJointPoint(obj, 2, matrix);
+        transform_vector(&pos, D_L12_001B0A90, matrix);
+        angle = FastMatrixHelperA(*(float *)(state + 0x130) - *(float *)(obj + 0x10),
                               *(float *)(state + 0x134) - *(float *)(obj + 0x14));
-        if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
-            float speed = func_00282E80(&pos, (obj + 0x10));
-            func_00282F20(&velocity, obj + 0xC0, speed * 0.01666666753590107f);
+        if (FloatAbs(fast_subtract_rotations(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
+            float speed = vec_distance_xy(&pos, (obj + 0x10));
+            vec_scale_to_length(&velocity, obj + 0xC0, speed * 0.01666666753590107f);
             velocity.z = (*(float *)(state + 0x138) - pos.z) * 0.01666666753590107f;
         }
-        if (!func_002AEB60(obj, D_L12_001B0A50)) {
+        if (!IsValueWithinStepOfThreshold(obj, D_L12_001B0A50)) {
 smoke:
-            limit = func_002A7878(D_L12_001B0A80, D_L12_001B0A84);
-            i = func_002A77E0(D_L12_001B0A8C);
-            func_002C2210(&pos, (int)D_L12_001B0A88, limit * 0.3f, limit,
+            limit = RandomFloatRange(D_L12_001B0A80, D_L12_001B0A84);
+            i = RandomIntBelow(D_L12_001B0A8C);
+            SpawnGroundEffectParticle(&pos, (int)D_L12_001B0A88, limit * 0.3f, limit,
                          D_L12_001B0A58, 0, i, D_L12_001A8F20, 0, 0.0f);
             break;
         }
-        if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
-            func_00282F20(&velocity, obj + 0xC0, 0.5333333611488342f);
+        if (FloatAbs(fast_subtract_rotations(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
+            vec_scale_to_length(&velocity, obj + 0xC0, 0.5333333611488342f);
             velocity.z = (*(float *)(state + 0x138) - pos.z + D_L12_001B0B34) * 0.01666666753590107f;
         } else {
             qcopy(&target, state + 0x130);
             target.z += D_L12_001B0B34;
-            func_00282CF0(&velocity, &target, &pos);
-            func_00282F20(&velocity, &velocity, 0.5333333611488342f);
+            FastVecSub(&velocity, &target, &pos);
+            vec_scale_to_length(&velocity, &velocity, 0.5333333611488342f);
         }
         if (velocity.z > D_L12_001B0B08 * 0.01666666753590107f)
             velocity.z = D_L12_001B0B08 * 0.01666666753590107f;
         else if (velocity.z < -100.0f)
             velocity.z = -100.0f;
-        func_L12_00408050(obj, &velocity, &pos, 0, (float)state[0x34]);
+        SpawnBlastProjectile(obj, &velocity, &pos, 0, (float)state[0x34]);
         ((L12PathEnemyState *)state)->attackTimer = 50;
-        func_002A7750(obj, 23, -1);
+        SetMobyState(obj, 23, -1);
         break;
     case 23:
-        if (func_00282978(state + 0x262))
-            func_002A7750(obj, 15, -1);
+        if (FastDecTimer(state + 0x262))
+            SetMobyState(obj, 15, -1);
         if (((L12PathEnemyState *)state)->attackTimer < 30 && obj[0x42] != 3 && obj[0x43] != 3)
-            func_002A7470(obj, 3, 0, 20);
-        if (func_00282E80(state + 0x130, (obj + 0x10)) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 35) {
+            StartAnimationBlended(obj, 3, 0, 20);
+        if (vec_distance_xy(state + 0x130, (obj + 0x10)) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 35) {
             if (obj[0x43] != 7)
-                func_002A7470(obj, 7, 0, 20);
-            func_002A7750(obj, 16, -1);
+                StartAnimationBlended(obj, 7, 0, 20);
+            SetMobyState(obj, 16, -1);
         }
         break;
     case 24:
-        if (func_002B3868(obj) && obj[0x43] != 9)
-            func_002A7470(obj, 9, 0, 20);
-        if (func_002AEB60(obj, 12.5f))
+        if (SetFirstPendingFlag(obj) && obj[0x43] != 9)
+            StartAnimationBlended(obj, 9, 0, 20);
+        if (IsValueWithinStepOfThreshold(obj, 12.5f))
             *(int *)(obj + 0x48) = 0;
         break;
     }

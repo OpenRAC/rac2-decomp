@@ -44,34 +44,35 @@ extern float func_00283180(float);
 extern float func_00283198(float);
 extern float func_00283B98(float, float);
 
+/* Spins each orbiting spark owned by this moby around it and frees the ones that finish. */
 void func_L00_003BCC10(Moby3BCC10 *self) {
     f32 tmp[4] __attribute__((aligned(16)));
     Vars3BCC10 *vars = self->vars;
     f32 *pos = self->pos;
-    Orbit3BCC10 *tab = D_L00_0023F060;
-    Orbit3BCC10 *e;
+    Orbit3BCC10 *table = D_L00_0023F060;
+    Orbit3BCC10 *entry;
     s32 i;
 
     for (i = 0; i < 16; i++) {
-        e = &tab[i];
-        if (e->owner == self) {
-            e->a[0] = func_00283B98(e->a[0], e->da[0]);
-            e->a[1] = func_00283B98(e->a[1], e->da[1]);
-            e->a[2] = func_00283B98(e->a[2], e->da[2]);
-            e->b[0] = func_00283B98(e->b[0], e->db[0]);
-            e->b[1] = func_00283B98(e->b[1], e->db[1]);
-            e->b[2] = func_00283B98(e->b[2], e->db[2]);
-            e->v0[0] = func_00283180(e->a[0]) * e->ra[0];
-            e->v0[1] = func_00283198(e->a[1]) * e->ra[1];
-            e->v0[2] = -func_00283198(e->a[2]) * e->ra[2];
-            e->v1[0] = func_00283180(e->b[0]) * e->rb[0];
-            e->v1[1] = func_00283198(e->b[1]) * e->rb[1];
-            e->v1[2] = -func_00283198(e->b[2]) * e->rb[2];
-            func_00283098(tmp, e->off, self->mtx);
-            qcopy(e->at, pos);
-            func_00282CC0(e->out, tmp, pos);
-            if (func_00282948(&e->timer)) {
-                e->owner = 0;
+        entry = &table[i];
+        if (entry->owner == self) {
+            entry->a[0] = FastAddRotations(entry->a[0], entry->da[0]);
+            entry->a[1] = FastAddRotations(entry->a[1], entry->da[1]);
+            entry->a[2] = FastAddRotations(entry->a[2], entry->da[2]);
+            entry->b[0] = FastAddRotations(entry->b[0], entry->db[0]);
+            entry->b[1] = FastAddRotations(entry->b[1], entry->db[1]);
+            entry->b[2] = FastAddRotations(entry->b[2], entry->db[2]);
+            entry->v0[0] = FastSinOrCosA(entry->a[0]) * entry->ra[0];
+            entry->v0[1] = FastSinOrCosB(entry->a[1]) * entry->ra[1];
+            entry->v0[2] = -FastSinOrCosB(entry->a[2]) * entry->ra[2];
+            entry->v1[0] = FastSinOrCosA(entry->b[0]) * entry->rb[0];
+            entry->v1[1] = FastSinOrCosB(entry->b[1]) * entry->rb[1];
+            entry->v1[2] = -FastSinOrCosB(entry->b[2]) * entry->rb[2];
+            matrix_mul_vec3(tmp, entry->off, self->mtx);
+            qcopy(entry->at, pos);
+            FastVecAdd(entry->out, tmp, pos);
+            if (FastFloatHelperD(&entry->timer)) {
+                entry->owner = 0;
                 vars->count--;
             }
         }

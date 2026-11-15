@@ -24,6 +24,7 @@ extern void func_00282F20(TI128 *, TI128 *, float);
 extern void func_002B0A68(char *, int, TI128 *, float, float, float, float, int);
 
 
+/* Fires a burst of effects and a sound from the object. */
 void func_L14_00429A18(char *arg)
 {
     char *o;
@@ -31,14 +32,14 @@ void func_L14_00429A18(char *arg)
     TI128 w;
 
     o = *(char **)(arg + 0x68);
-    func_00325D30(arg, o + 0x300);
-    func_002A6C58(arg, 0, 3);
+    DestroyAttachedParts(arg, o + 0x300);
+    SetDeathBits(arg, 0, 3);
     v[0] = 0;
     ((float *)v)[2] = 0.75f;
-    func_00283098(v, v, arg + 0xC0);
-    func_00282CC0(v, v, arg + 0x10);
-    func_0032C700(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, 0);
-    func_002E5CF8(6, 0, arg);
-    func_00282F20(&w, o + 0x1C0, 0.05000000447034836f);
-    func_002B0A68(arg, 1016, &w, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+    matrix_mul_vec3(v, v, arg + 0xC0);
+    FastVecAdd(v, v, arg + 0x10);
+    SpawnExplosion(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, 0);
+    PlayMobySound(6, 0, arg);
+    vec_scale_to_length(&w, o + 0x1C0, 0.05000000447034836f);
+    SpawnDebrisForMaskedParts(arg, 1016, &w, 3.0f, 6.0f, 3.0f, 6.0f, 255);
 }

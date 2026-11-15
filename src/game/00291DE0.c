@@ -1,3 +1,4 @@
+#include "names.h"
 /* Reads `count` records of four words (two scaled positions and two ids) into the shared
    table of 16-byte entries, resetting the table cursor first. */
 typedef struct {
@@ -24,8 +25,8 @@ void func_00291DE0(int *p, int count) {
         int w3 = *p++;
         D_001B9740[D_001B1600].a = w0 >> 4;
         D_001B9740[D_001B1600].b = w1 >> 4;
-        D_001B9740[D_001B1600].c = func_00282A18(w2);
-        D_001B9740[D_001B1600].d = func_00282A18(w3);
+        D_001B9740[D_001B1600].c = log2dim(w2);
+        D_001B9740[D_001B1600].d = log2dim(w3);
         D_001B9740[D_001B1600].head.clear = 0;
     }
 }
@@ -93,8 +94,8 @@ void func_00291EC0(SkyDef *s)
 
             D_001B20C0->pages[i].unk0A = a >> 4;
             D_001B20C0->pages[i].unk08 = b >> 4;
-            D_001B20C0->pages[i].unk0C = func_00282A18(c);
-            D_001B20C0->pages[i].unk0E = func_00282A18(d);
+            D_001B20C0->pages[i].unk0C = log2dim(c);
+            D_001B20C0->pages[i].unk0E = log2dim(d);
             D_001B20C0->pages[i].tag = 0;
         }
     }

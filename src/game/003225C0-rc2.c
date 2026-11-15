@@ -34,11 +34,12 @@ extern f32 func_002A7878(f32, f32);
 extern void func_0029FCC0(void *, s32, struct R192V *);
 extern void func_002820D0(struct R192V *, s32, s32, f32, f32, f32);
 
-void func_003225C0(void *arg0) {
-    struct R192V sp;
-    f32 f20;
-    sp.z += func_002A7878(0.1f, 0.4f);
-    func_0029FCC0(arg0, 4, &sp);
-    f20 = func_002A7878(0.5f, 0.75f);
-    func_002820D0(&sp, 0x40, 0, f20, func_002A7878(0.025f, 0.05f), 0.08f);
+/* Draws a small glowing flash of random size at one joint of the robot enemy. */
+void func_003225C0(void *moby) {
+    struct R192V position;
+    f32 size;
+    position.z += RandomFloatRange(0.1f, 0.4f);
+    TransformMobyJointToWorld(moby, 4, &position);
+    size = RandomFloatRange(0.5f, 0.75f);
+    DrawBillboardQuadWithUv(&position, 0x40, 0, size, RandomFloatRange(0.025f, 0.05f), 0.08f);
 }

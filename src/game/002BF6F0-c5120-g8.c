@@ -34,53 +34,53 @@ extern float D_001AA3C0 __attribute__((sda));
    the cross product of that offset with D_0018A0E0, and its velocity is set
    along the offset (length 0.03 when within 0.5, else its current speed) and
    raised by 0.02 on z. */
-void func_002C5120(char *p)
+void func_002C5120(char *particle)
 {
-    char *q = p + 32;
-    Vec16_C5120 v;
+    char *state = particle + 32;
+    Vec16_C5120 velocity;
     float delta[4], side[4];
-    float *vel;
-    float t;
+    float *velocityOut;
+    float progress;
     int alpha;
 
-    p[8] += (unsigned char)q[10];
-    if (*(short *)(q + 8) - *(short *)(p + 10) < 6) {
-        t = (float)(*(short *)(q + 8) - *(short *)(p + 10)) * 0.2f;
-        *(float *)(p + 12) = *(float *)(q + 4) +
-            ((*(float *)q + *(float *)(q + 4)) * 0.5f - *(float *)(q + 4)) * t;
+    particle[8] += (unsigned char)state[10];
+    if (*(short *)(state + 8) - *(short *)(particle + 10) < 6) {
+        progress = (float)(*(short *)(state + 8) - *(short *)(particle + 10)) * 0.2f;
+        *(float *)(particle + 12) = *(float *)(state + 4) +
+            ((*(float *)state + *(float *)(state + 4)) * 0.5f - *(float *)(state + 4)) * progress;
         {
-            int c2 = (unsigned char)q[11] >> 1;
-            int c = (unsigned char)q[11];
-            alpha = func_00283CF0((float)c + (float)(c2 - c) * t);
+            int c2 = (unsigned char)state[11] >> 1;
+            int c = (unsigned char)state[11];
+            alpha = FloatToInt((float)c + (float)(c2 - c) * progress);
         }
     } else {
-        t = func_00283CE0(*(short *)(q + 8) - 6);
-        t = (float)*(short *)(p + 10) / t;
-        *(float *)(p + 12) = *(float *)q +
-            ((*(float *)q + *(float *)(q + 4)) * 0.5f - *(float *)q) * t;
-        alpha = func_00283CF0((float)((unsigned char)q[11] >> 1) * t);
+        progress = IntToFloat(*(short *)(state + 8) - 6);
+        progress = (float)*(short *)(particle + 10) / progress;
+        *(float *)(particle + 12) = *(float *)state +
+            ((*(float *)state + *(float *)(state + 4)) * 0.5f - *(float *)state) * progress;
+        alpha = FloatToInt((float)((unsigned char)state[11] >> 1) * progress);
     }
-    *(int *)(p + 4) = (alpha << 24) | (*(int *)(p + 4) & 0xffffff);
-    particle_copy_xyz(v.f, (float *)(q + 12));
-    func_00282CC0(p + 16, p + 16, (char *)&v);
-    func_00300190(p + 16, p + 16);
-    if (*(char **)(q + 24) != 0) {
-        func_00282CF0(delta, *(char **)(q + 24) + 16, p + 16);
+    *(int *)(particle + 4) = (alpha << 24) | (*(int *)(particle + 4) & 0xffffff);
+    particle_copy_xyz(velocity.f, (float *)(state + 12));
+    FastVecAdd(particle + 16, particle + 16, (char *)&velocity);
+    TransformVectorOrCopy(particle + 16, particle + 16);
+    if (*(char **)(state + 24) != 0) {
+        FastVecSub(delta, *(char **)(state + 24) + 16, particle + 16);
         if (delta[0] <= 2.0f && delta[1] <= 2.0f) {
-            func_00282DD8(side, delta, D_0018A0E0);
-            func_00282F20(side, side, D_001AA3C0);
-            func_00282CC0(p + 16, p + 16, side);
+            FastVecCross(side, delta, D_0018A0E0);
+            vec_scale_to_length(side, side, D_001AA3C0);
+            FastVecAdd(particle + 16, particle + 16, side);
             if (delta[0] <= 0.5f && delta[1] <= 0.5f)
-                func_00282F20(v.f, delta, 0.03f);
+                vec_scale_to_length(velocity.f, delta, 0.03f);
             else
-                func_00282F20(v.f, delta, func_00282DF0(v.f));
-            v.f[2] += 0.02f;
-            vel = (float *)(q + 12);
-            vel[0] = v.f[0];
-            vel[1] = v.f[1];
-            vel[2] = v.f[2];
+                vec_scale_to_length(velocity.f, delta, FastVecLength(velocity.f));
+            velocity.f[2] += 0.02f;
+            velocityOut = (float *)(state + 12);
+            velocityOut[0] = velocity.f[0];
+            velocityOut[1] = velocity.f[1];
+            velocityOut[2] = velocity.f[2];
         }
     }
-    if (func_00282978((short *)(p + 10)))
-        func_002B9180(p);
+    if (FastDecTimer((short *)(particle + 10)))
+        KillParticle(particle);
 }

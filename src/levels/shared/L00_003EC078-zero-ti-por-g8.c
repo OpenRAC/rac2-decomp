@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* A cleared velocity vector is adjusted and copied before the three emissions. */
 typedef int Quad __attribute__((mode(TI)));
@@ -12,16 +13,17 @@ extern char D_L00_001B0308 __attribute__((sda));
 extern char ref_L00_003EC078_00 __attribute__((sda));
 extern char ref_L00_003EC078_01 __attribute__((sda));
 extern char ref_L00_003EC078_02 __attribute__((sda));
+/* Shoots out three small downward puffs from the object when it is visible. */
 void func_L00_003EC078(char *object)
 {
     Vector position, velocity, temporary;
     if (*(unsigned char *)(object + 0x31) != 0) {
         temporary.q = 0;
-        temporary.v[2] = -(func_002A7878(1.0f, 2.0f) * 0.016666668f);
+        temporary.v[2] = -(RandomFloatRange(1.0f, 2.0f) * 0.016666668f);
         velocity.q = temporary.q;
-        func_0029FCC0(object, 0, &position);
-        func_L00_0033C0D0(object, &position, &velocity, &ref_L00_003EC078_00, 1);
-        func_L00_0033C0D0(object, &position, &velocity, &ref_L00_003EC078_01, 1);
-        func_L00_0033C0D0(object, &position, &velocity, &ref_L00_003EC078_02, 1);
+        TransformMobyJointToWorld(object, 0, &position);
+        SpawnObjectRelativeParticle(object, &position, &velocity, &ref_L00_003EC078_00, 1);
+        SpawnObjectRelativeParticle(object, &position, &velocity, &ref_L00_003EC078_01, 1);
+        SpawnObjectRelativeParticle(object, &position, &velocity, &ref_L00_003EC078_02, 1);
     }
 }

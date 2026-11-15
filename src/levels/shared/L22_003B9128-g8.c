@@ -51,8 +51,8 @@ extern void func_L22_003A2988(void *, float);
 
 /* makes sure the word chosen by the key holds an object (creating and aiming it when it does
    not), then moves it to the given position */
-void func_L22_003B9128(u8 *arg0, TI128 *arg1, s32 arg2) {
-    s32 *word = &ref_L22_003B8FE8_00;
+void func_L22_003B9128(u8 *owner, TI128 *position, s32 isAlternate) {
+    s32 *slot = &ref_L22_003B8FE8_00;
     TI128 local;
     TI128 *pos = &local;
     TI128 dir;
@@ -65,52 +65,52 @@ void func_L22_003B9128(u8 *arg0, TI128 *arg1, s32 arg2) {
     float dot;
     float dist;
 
-    if (arg2 != 0) {
-        word = &ref_L22_003B8FE8_01;
+    if (isAlternate != 0) {
+        slot = &ref_L22_003B8FE8_01;
     }
-    local = *arg1;
-    if (*word == 0) {
-        func_L22_003B8FE8(arg0, &local);
-        if (arg2 != 0) {
-            D_L22_001AFA00 = func_L00_0035F5A0(0x14, 0, 0);
+    local = *position;
+    if (*slot == 0) {
+        CreateKeyedObject(owner, &local);
+        if (isAlternate != 0) {
+            D_L22_001AFA00 = StartEffectInSlot(0x14, 0, 0);
         } else {
-            D_L22_001AFA04 = func_L00_0035F5A0(0x14, 0, 0);
+            D_L22_001AFA04 = StartEffectInSlot(0x14, 0, 0);
         }
-        found = (u8 *)*word;
+        found = (u8 *)*slot;
         if (found == 0) {
             return;
         }
         obj = found;
         payload = *(u8 **)(obj + 0x68);
-        if (*(s16 *)(obj + 0xAA) != 0x5F3) {
+        if (*(s16 *)(obj + 0xAA) != 0x5F3 /* moby class 1523 */) {
             return;
         }
         if (D_L22_001A8FF0 != 0) {
             target = ref_L22_003B9128_00;
             if (target == 0) {
                 *(s32 *)(payload + 0x48) = 0;
-            } else if ((hero = (u8 *)D_0018C0B0[0]) == 0) {
+            } else if ((hero = (u8 *)gHeroMoby_0018C0B0[0]) == 0) {
                 *(s32 *)(payload + 0x48) = 0;
             } else {
-                if (arg2 != 0) {
+                if (isAlternate != 0) {
                     *(u8 **)(payload + 0x44) = target;
                 } else {
                     *(u8 **)(payload + 0x44) = hero;
                 }
-                if (arg2 != 0) {
-                    func_00282D30(&dir, *(u8 **)(payload + 0x44) + 0xE0, 4.0f);
-                    func_00282CC0(&dir, &dir, *(u8 **)(payload + 0x44) + 0x10);
+                if (isAlternate != 0) {
+                    FastVecScale(&dir, *(u8 **)(payload + 0x44) + 0xE0, 4.0f);
+                    FastVecAdd(&dir, &dir, *(u8 **)(payload + 0x44) + 0x10);
                 } else {
                     qcopy(&dir, *(u8 **)(payload + 0x44) + 0x10);
-                    func_L22_003A2988(&dir, 2.2f);
+                    PushPointOutOfArena(&dir, 2.2f);
                 }
-                func_00282CF0(payload + 0x50, &dir, arg0 + 0x10);
-                func_00282F20(payload + 0x50, payload + 0x50, 1.0f);
-                qcopy(&facing, arg0 + 0xC0);
-                func_00282F20(&facing, &facing, 1.0f);
-                dot = func_00282DB0(payload + 0x50, &facing);
-                if (arg2 != 0) {
-                    dist = func_00282E48(target + 0x10, &((Hero *)D_00189E20)->q[8]);
+                FastVecSub(payload + 0x50, &dir, owner + 0x10);
+                vec_scale_to_length(payload + 0x50, payload + 0x50, 1.0f);
+                qcopy(&facing, owner + 0xC0);
+                vec_scale_to_length(&facing, &facing, 1.0f);
+                dot = FastVecDot(payload + 0x50, &facing);
+                if (isAlternate != 0) {
+                    dist = fast_vec_dist(target + 0x10, &((Hero *)gHeroState)->q[8]);
                     if (dot < D_L22_001AF9E4) {
                         *(s32 *)(payload + 0x44) = 0;
                     } else if (D_L22_001AF9E8 < dist) {
@@ -124,9 +124,9 @@ void func_L22_003B9128(u8 *arg0, TI128 *arg1, s32 arg2) {
                 *(s32 *)(payload + 0x48) = 0;
             }
         }
-        *(s16 *)(payload + 0x40) = arg2;
+        *(s16 *)(payload + 0x40) = isAlternate;
     }
-    obj = (u8 *)*word;
+    obj = (u8 *)*slot;
     *(TI128 *)(obj + 0x10) = *pos;
     payload = *(u8 **)(obj + 0x68);
     *(s16 *)(payload + 0x2E) = 1;

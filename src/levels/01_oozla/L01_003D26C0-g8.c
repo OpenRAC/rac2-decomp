@@ -11,36 +11,37 @@ extern void func_0029F338(void *a0);
 extern void func_00282CF0(void *a0, void *a1, void *a2);
 extern void func_002AD6F0(void *a0, void *a1, void *a2, void *a3);
 
-void func_L01_003D26C0(u8 *self)
+/* Moves a launched object along its path and removes it at the end. */
+void func_L01_003D26C0(u8 *moby)
 {
-    u8 *state = *(u8 **)(self + 0x68);
-    u8 *os = *(u8 **)(*(u8 **)(state + 0x70) + 0x68);
-    u8 *tbl;
-    u8 *link;
-    f32 tmp[4];
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *launcherVars = *(u8 **)(*(u8 **)(vars + 0x70) + 0x68);
+    u8 *pathTable;
+    u8 *soundHandle;
+    f32 moveDelta[4];
 
-    *(f32 *)(self + 0x2C) = *(f32 *)(*(u8 **)(self + 0x24) + 0x24) * D_L01_001B0540;
-    qcopy(state + 0x60, self + 0x10);
-    tbl = D_L01_001FE180[*(s32 *)(state + 0x74)];
-    *(s32 *)(state + 0x78) =
-        func_L01_00337888(self, tbl, self + 0x10, *(s32 *)(state + 0x78), 1,
-                          *(f32 *)(os + 0x20) * 0.016666668f);
-    if (*(f32 *)(self + 0x18) < *(f32 *)(state + 0x68)) {
-        if (!(*(u16 *)(state + 0x7C) & 0x80)) {
-            func_002E5CF8(1, 0, self);
-            *(u16 *)(state + 0x7C) = *(u16 *)(state + 0x7C) | 0x80;
+    *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B0540;
+    qcopy(vars + 0x60, moby + 0x10);
+    pathTable = D_L01_001FE180[*(s32 *)(vars + 0x74)];
+    *(s32 *)(vars + 0x78) =
+        AdvancePointAlongPolyline(moby, pathTable, moby + 0x10, *(s32 *)(vars + 0x78), 1,
+                          *(f32 *)(launcherVars + 0x20) * 0.016666668f);
+    if (*(f32 *)(moby + 0x18) < *(f32 *)(vars + 0x68)) {
+        if (!(*(u16 *)(vars + 0x7C) & 0x80)) {
+            PlayMobySound(1, 0, moby);
+            *(u16 *)(vars + 0x7C) = *(u16 *)(vars + 0x7C) | 0x80;
         }
-        D_L01_001B255C[(*(s32 *)(*(u8 **)(*(u8 **)(state + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 1;
+        gMobyTable_L01[(*(s32 *)(*(u8 **)(*(u8 **)(vars + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 1;
     }
-    link = D_00188660 + *(s16 *)(state + 0x7E) * 0x70;
-    if (*(u8 **)(link + 0x88) != self || link[0x74] == 0)
-        *(s16 *)(state + 0x7E) = func_002E5CF8(0, 4, self);
-    if (*(s32 *)(state + 0x78) == *(s32 *)tbl - 1) {
-        D_L01_001B255C[(*(s32 *)(*(u8 **)(*(u8 **)(state + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 0;
-        func_0029F338(self);
+    soundHandle = gSoundState + *(s16 *)(vars + 0x7E) * 0x70;
+    if (*(u8 **)(soundHandle + 0x88) != moby || soundHandle[0x74] == 0)
+        *(s16 *)(vars + 0x7E) = PlayMobySound(0, 4, moby);
+    if (*(s32 *)(vars + 0x78) == *(s32 *)pathTable - 1) {
+        gMobyTable_L01[(*(s32 *)(*(u8 **)(*(u8 **)(vars + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 0;
+        MarkMobySpawned(moby);
     } else {
-        func_00282CF0(tmp, self + 0x10, state + 0x60);
-        func_002AD6F0(state + 0x20, tmp, self + 0xF0, self + 0xF0);
-        qcopy(state + 0x60, self + 0x10);
+        FastVecSub(moveDelta, moby + 0x10, vars + 0x60);
+        CombineTransformsAndStore(vars + 0x20, moveDelta, moby + 0xF0, moby + 0xF0);
+        qcopy(vars + 0x60, moby + 0x10);
     }
 }

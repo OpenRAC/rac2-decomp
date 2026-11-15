@@ -15,38 +15,38 @@ void func_L09_00410BC8(u8 *arg)
     vel[2] = -0.5f;
     vel[3] = 1.0f;
     vel[1] = 0.0f;
-    count = func_002A77E0(16);
-    if (func_002A77E0(2)) count = -count;
+    count = RandomIntBelow(16);
+    if (RandomIntBelow(2)) count = -count;
     qcopy(pos, arg + 0x10);
     pos[2] -= 0.25f;
-    first = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, count, vel, 420000.0f, 0xdf204080, 0);
+    first = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, count, vel, 420000.0f, 0xdf204080, 0);
     if (first) {
         u8 *data = first + 0x20;
         *(s16 *)(first + 0xa) = 10;
-        first[9] = func_00283CF0(4.0f) + 112;
+        first[9] = FloatToInt(4.0f) + 112;
         *(s32 *)(data + 4) = 2;
         data[0xa] = 0xdf;
         data[0xb] = first[0xa];
     }
     {
-        u8 *p = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, count, vel, 420000.0f, 0xdf204080, 0);
+        u8 *p = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, count, vel, 420000.0f, 0xdf204080, 0);
         if (p) {
             u8 *data = p + 0x20;
             /* Retail updates the first particle here as well. */
             *(s16 *)(first + 0xa) = 10;
-            first[9] = func_00283CF0(4.0f) + 112;
+            first[9] = FloatToInt(4.0f) + 112;
             *(s32 *)(data + 4) = 2;
             data[0xa] = 0xdf;
             data[0xb] = first[0xa];
         }
     }
     {
-        u8 *p = func_002BDCE8(pos, 0.05f, 1.0f, 0.97f, 16, vel, 210000.0f, 0xdfffffff, 0);
+        u8 *p = SpawnSpinningSparkParticle(pos, 0.05f, 1.0f, 0.97f, 16, vel, 210000.0f, 0xdfffffff, 0);
         if (p) {
             u8 *data = p + 0x20;
-            p[9] = func_00283CF0(4.0f) + 112;
+            p[9] = FloatToInt(4.0f) + 112;
             *(s16 *)(p + 0xa) = 5;
-            p[8] = func_002A77E0(255);
+            p[8] = RandomIntBelow(255);
             *(s32 *)(data + 4) = 2;
             data[0xa] = 0xdf;
             data[0xb] = first[0xa];

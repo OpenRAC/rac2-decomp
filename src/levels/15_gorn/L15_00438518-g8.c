@@ -11,6 +11,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_00282CF0(void *, void *, void *);
 extern int func_00283CF0(float);
 extern void func_00280B90(void *, void *, int);
+/* Draws four scrolling, fading translucent layers of the backdrop, with alpha depending on the tracked object height. */
 void func_L15_00438518(char *object)
 {
     GornLayer a, b, c, d;
@@ -19,34 +20,34 @@ void func_L15_00438518(char *object)
     char *record = D_L15_001B261C + (*(int *)state << 8);
     int alpha, fade;
     unsigned int color;
-    func_00281DE8(&a, 0x48, 0, 0x80);
+    InitQuadPacketState(&a, 0x48, 0, 0x80);
     qcopy(&center, &D_L15_001B99F0[0]);
-    func_00282F20(0.5f, &center, &center);
-    func_00282CC0(&center, (char *)D_L15_001B99F0 - 0x230, &center);
+    vec_scale_to_length(0.5f, &center, &center);
+    FastVecAdd(&center, (char *)D_L15_001B99F0 - 0x230, &center);
     qcopy(&up, &D_L15_001B99F0[1]);
-    func_00282F20(0.35f, &up, &up);
+    vec_scale_to_length(0.35f, &up, &up);
     qcopy(&side, &D_L15_001B99F0[2]);
-    func_00282F20(0.35f, &side, &side);
-    func_00282CF0(&corner, &center, &up);
-    func_00282CC0(&corner, &corner, &side);
+    vec_scale_to_length(0.35f, &side, &side);
+    FastVecSub(&corner, &center, &up);
+    FastVecAdd(&corner, &corner, &side);
     qcopy(&a.position[0], &corner);
     qcopy(&b.position[0], &corner);
     qcopy(&c.position[0], &corner);
     qcopy(&d.position[0], &corner);
-    func_00282CF0(&corner, &center, &up);
-    func_00282CF0(&corner, &corner, &side);
+    FastVecSub(&corner, &center, &up);
+    FastVecSub(&corner, &corner, &side);
     qcopy(&a.position[1], &corner);
     qcopy(&b.position[1], &corner);
     qcopy(&c.position[1], &corner);
     qcopy(&d.position[1], &corner);
-    func_00282CC0(&corner, &center, &up);
-    func_00282CC0(&corner, &corner, &side);
+    FastVecAdd(&corner, &center, &up);
+    FastVecAdd(&corner, &corner, &side);
     qcopy(&a.position[2], &corner);
     qcopy(&b.position[2], &corner);
     qcopy(&c.position[2], &corner);
     qcopy(&d.position[2], &corner);
-    func_00282CC0(&corner, &center, &up);
-    func_00282CF0(&corner, &corner, &side);
+    FastVecAdd(&corner, &center, &up);
+    FastVecSub(&corner, &corner, &side);
     qcopy(&a.position[3], &corner);
     qcopy(&b.position[3], &corner);
     qcopy(&c.position[3], &corner);
@@ -57,11 +58,11 @@ void func_L15_00438518(char *object)
     a.uv[2] = 0; a.uv[3] = *(float *)(state + 4) + 1;
     a.uv[4] = 1; a.uv[5] = *(float *)(state + 4);
     a.uv[6] = 1; a.uv[7] = *(float *)(state + 4) + 1;
-    alpha = func_00283CF0(650.0f - *(float *)(record + 0x18));
+    alpha = FloatToInt(650.0f - *(float *)(record + 0x18));
     if (alpha > 90) alpha = 90;
     a.color[0] = a.color[1] = a.color[2] = a.color[3] = ((unsigned int)(128 - alpha) << 24) | 0x808080;
-    func_00280B90(&a, 0, 0);
-    func_00281DE8(&b, 0x48, 0, 0x80);
+    draw_world_quad(&a, 0, 0);
+    InitQuadPacketState(&b, 0x48, 0, 0x80);
     *(float *)(state + 0x10) -= 0.0015f;
     if (*(float *)(state + 0x10) <= -8.0f) *(float *)(state + 0x10) += 8.0f;
     b.uv[0] = *(float *)(state + 16); b.uv[1] = 0;
@@ -70,23 +71,23 @@ void func_L15_00438518(char *object)
     b.uv[6] = *(float *)(state + 16) + 1; b.uv[7] = 1;
     color = ((unsigned int)(90 - alpha) << 24) | 0x808080;
     b.color[0] = b.color[1] = b.color[2] = b.color[3] = color;
-    func_00280B90(&b, 0, 0);
+    draw_world_quad(&b, 0, 0);
     if (*(float *)(record + 0x18) < 465.0f && D_L15_001B1874) {
-    func_00281DE8(&c, 0x48, 0, 0x80);
+    InitQuadPacketState(&c, 0x48, 0, 0x80);
     *(float *)(state + 0x14) -= 0.0025f;
     if (*(float *)(state + 0x14) <= -8.0f) *(float *)(state + 0x14) += 8.0f;
     c.uv[0] = 0; c.uv[1] = *(float *)(state + 0x14);
     c.uv[2] = 0; c.uv[3] = *(float *)(state + 0x14) + 1;
     c.uv[4] = 1; c.uv[5] = *(float *)(state + 0x14);
     c.uv[6] = 1; c.uv[7] = *(float *)(state + 0x14) + 1;
-    fade = func_00283CF0(*(float *)(record + 0x18) - 422.0f);
+    fade = FloatToInt(*(float *)(record + 0x18) - 422.0f);
     if (fade > 42) fade = 42;
     alpha = 64 - fade * 3;
     if (alpha > 128) alpha = 128; else if (alpha < 0) alpha = 0;
     color = ((unsigned int)alpha << 24) | 0x808080;
     c.color[0] = c.color[1] = c.color[2] = c.color[3] = color;
-    func_00280B90(&c, 0, 0);
-    func_00281DE8(&d, 0x48, 0, 0x80);
+    draw_world_quad(&c, 0, 0);
+    InitQuadPacketState(&d, 0x48, 0, 0x80);
     *(float *)(state + 0x18) -= 0.0035f;
     if (*(float *)(state + 0x18) <= -8.0f) *(float *)(state + 0x18) += 8.0f;
     d.uv[0] = *(float *)(state + 24); d.uv[1] = 0;
@@ -97,6 +98,6 @@ void func_L15_00438518(char *object)
     if (alpha < 0) alpha = 0;
     color = ((unsigned int)alpha << 24) | 0x808080;
     d.color[0] = d.color[1] = d.color[2] = d.color[3] = color;
-    func_00280B90(&d, 0, 0);
+    draw_world_quad(&d, 0, 0);
     }
 }

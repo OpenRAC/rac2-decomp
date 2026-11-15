@@ -61,7 +61,7 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
     float speed;
     int count, ownerIndex, ownerKind;
 
-    object = func_0029EFD0(0xC89);
+    object = CreateMoby(0xC89 /* moby class 3209 */);
     if (object) {
         ((unsigned char *)object)[0x30] = 255;
         *(short *)(object + 0x34) = 0x100;
@@ -70,40 +70,40 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         *(char **)(object + 0xB8) = owner;
         object[0x20] = 0;
         state = *(ShotState **)(object + 0x68);
-        speed = (D_L00_00262570 + ((unsigned char *)D_00139570)[0x16])->speed * 0.016666668f;
-        hero = D_00189E20;
+        speed = (gWeaponTable_L00 + ((unsigned char *)D_00139570)[0x16])->speed * 0.016666668f;
+        hero = gHeroState;
         if (*(short *)(hero + 0x24EC) == 1) {
-            func_00282F20(state->velocity, owner + 0xD0, -speed);
+            vec_scale_to_length(state->velocity, owner + 0xD0, -speed);
             *(Quad128 *)(object + 0x10) = *origin;
         } else {
             if (target) {
                 char *point = target + 0x10;
 
                 qcopy(&position, point);
-                collision = func_002AB1F0(target);
+                collision = GetMobyPrivateValue0(target);
                 if (collision) {
-                    func_002AFFD8(point, &normal, 1);
-                    func_00282D30(&normal, &normal, *(float *)(collision + 0x10));
-                    func_00282CC0(&position, &position, &normal);
+                    ComputeViewDirection(point, &normal, 1);
+                    FastVecScale(&normal, &normal, *(float *)(collision + 0x10));
+                    FastVecAdd(&position, &position, &normal);
                 }
-                func_00282CF0(state->velocity, &position, origin);
-                func_00282F20(state->velocity, state->velocity, speed);
+                FastVecSub(state->velocity, &position, origin);
+                vec_scale_to_length(state->velocity, state->velocity, speed);
             } else if (*(int *)(hero + 0x1500)) {
-                func_L00_0037FA90(state->velocity, origin, speed, 30.0f, 0.3490658998f);
+                ComputeAimDirection(state->velocity, origin, speed, 30.0f, 0.3490658998f);
             } else {
-                func_00282F20(state->velocity, hero + 0x760, speed);
+                vec_scale_to_length(state->velocity, hero + 0x760, speed);
             }
             *(Quad128 *)(object + 0x10) = *origin;
         }
         state->speed = speed;
-        count = func_00283CF0(30.0f / speed) + 1;
+        count = FloatToInt(30.0f / speed) + 1;
         state->count = count;
-        state->step = 1.0f / func_00283CE0(count);
+        state->step = 1.0f / IntToFloat(count);
         *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * D_L00_001B1498;
         object[0x20] = 0;
         state->target = target;
         if (target) {
-            collision = func_002AB1F0(target);
+            collision = GetMobyPrivateValue0(target);
             if (collision)
                 *(unsigned short *)(collision + 0x1E) |= 0x80;
         }
@@ -112,8 +112,8 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         state->ownerIndex = ownerIndex;
         ownerKind = *(short *)(owner + 0xAA);
         state->ownerKind = ownerKind;
-        if (!func_002B4038(ownerKind, ownerIndex)) {
-            func_0029F338(object);
+        if (!IsSavedRecordValue(ownerKind, ownerIndex)) {
+            MarkMobySpawned(object);
             return 0;
         }
         state->frame = 0;
@@ -125,10 +125,10 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         if ((int)D_L00_001B1490 > 15)
             D_L00_001B1490 = 0;
         position = *(Quad128 *)(object + 0x10);
-        *(Quad128 *)(object + 0x10) = D_00189EA0;
-        state->handle = func_002FED90(object, 1.0f, 1.0f, 1.0f, 0);
+        *(Quad128 *)(object + 0x10) = gHeroPosition;
+        state->handle = AllocEffectSlot_002FED90(object, 1.0f, 1.0f, 1.0f, 0);
         *(Quad128 *)(object + 0x10) = position;
-        ref_L00_0041EB38_00(func_L00_0041F570, object);
+        ref_L00_0041EB38_00(UpdateAndDrawShotTrail, object);
         func_002A0F48(object);
     }
     return object;

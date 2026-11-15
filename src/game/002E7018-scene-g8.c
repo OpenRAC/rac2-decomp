@@ -26,6 +26,7 @@ extern char D_001B13D0[] MACRO_ADDR;
    scene arena cursor down by 0x60000 and lists the variant's archive chunks (at most
    70, up to the first empty one). The header is read only after the cursor is
    stored: that source order is what gives retail's allocation and schedule. */
+/* Sets up a loading scene: picks one of four scenes at random and lists the data chunks it needs. */
 void func_002EA968(void) {
     SceneHeader *header;
     int data_base;
@@ -33,25 +34,25 @@ void func_002EA968(void) {
     int k;
     int workspace_offset;
 
-    D_00152C00.variant = (func_001163B0() >> 16) & 3;
-    D_00152C00.counter = 0;
+    gHeroMoby_00152C00.variant = (Rand() >> 16) & 3;
+    gHeroMoby_00152C00.counter = 0;
     qcopy(&ref_L00_003646F8_00, &ref_L00_003646F8_01);
-    func_00282A60(&D_001B8840, 0, 0x1D0);
-    func_00282A60(D_001B1390, 0, 0x40);
-    func_00282A60(D_001B13D0, 0, 0x40);
+    ClearMemory(&gScenePlaybackState, 0, 0x1D0);
+    ClearMemory(D_001B1390, 0, 0x40);
+    ClearMemory(D_001B13D0, 0, 0x40);
     workspace_offset = D_001B22B0 - 0x60000;
-    D_001B8840.unk6C = D_001BAEC0.unkC + workspace_offset;
-    D_001B8840.unk70 = D_001BAEC0.unk10 + workspace_offset;
+    gScenePlaybackState.unk6C = D_001BAEC0.unkC + workspace_offset;
+    gScenePlaybackState.unk70 = D_001BAEC0.unk10 + workspace_offset;
     D_001B22B0 = workspace_offset;
     header = D_001BAEC0.header;
     data_base = (int)header + header->data_offset;
-    scene_chunk = (SceneChunk *)(data_base + header->scenes[D_00152C00.variant]);
+    scene_chunk = (SceneChunk *)(data_base + header->scenes[gHeroMoby_00152C00.variant]);
     for (k = 0; k < 70 && scene_chunk->size != 0; k++) {
         {
             int chunk_offset = scene_chunk->offset + 0x800;
-            D_001B8840.chunks[k] = (char *)(data_base + header->scenes[D_00152C00.variant] + chunk_offset);
+            gScenePlaybackState.chunks[k] = (char *)(data_base + header->scenes[gHeroMoby_00152C00.variant] + chunk_offset);
         }
         scene_chunk++;
     }
-    func_00294070(0);
+    SelectSegmentAndUpdateWorld(0);
 }

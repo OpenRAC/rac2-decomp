@@ -25,29 +25,30 @@
 
 extern s8 *ref_L04_0040A5C0_00;
 
-void func_L04_0040A5C0(s8 *arg0) {
-    s8 *base;
-    s32 *var_a0;
-    s32 temp_v0;
-    s32 var_a1;
-    s32 km1;
-    s32 k1;
-    s32 k2;
+/* Wakes up every racer linked to this one: sets a flag in its variables and puts it in state 2. */
+void func_L04_0040A5C0(s8 *moby) {
+    s8 *vars;
+    s32 *slotPtr;
+    s32 racerIndex;
+    s32 remaining;
+    s32 noRacer;
+    s32 flagOn;
+    s32 activeState;
 
-    base = *(s8 **)(arg0 + 0x68);
-    km1 = -1;
-    k1 = 1;
-    k2 = 2;
+    vars = *(s8 **)(moby + 0x68);
+    noRacer = -1;
+    flagOn = 1;
+    activeState = 2;
 
-    var_a0 = (s32 *)(base + 0x1E4);
-    var_a1 = 0x14;
+    slotPtr = (s32 *)(vars + 0x1E4);
+    remaining = 0x14;
     do {
-        temp_v0 = *var_a0;
-        var_a1 -= 1;
-        if (temp_v0 != km1) {
-            *(s8 *)(*(s8 **)((s32)((temp_v0 << 8) + (s32)ref_L04_0040A5C0_00) + 0x68) + 0xA0) = k1;
-            *(s8 *)((s32)((*var_a0 << 8) + (s32)ref_L04_0040A5C0_00) + 0x20) = k2;
+        racerIndex = *slotPtr;
+        remaining -= 1;
+        if (racerIndex != noRacer) {
+            *(s8 *)(*(s8 **)((s32)((racerIndex << 8) + (s32)ref_L04_0040A5C0_00) + 0x68) + 0xA0) = flagOn;
+            *(s8 *)((s32)((*slotPtr << 8) + (s32)ref_L04_0040A5C0_00) + 0x20) = activeState;
         }
-        var_a0 += 1;
-    } while (var_a1 >= 0);
+        slotPtr += 1;
+    } while (remaining >= 0);
 }

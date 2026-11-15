@@ -37,26 +37,27 @@ extern float func_00282DB0(void *,void *);
 extern char * func_L00_003E6778(char *,int,float,float,void *);
 extern void func_00280B90(void *,int,int);
 
+/* Draws the large blast shell around the object as 215 quads, skipping the ones that face away from the camera. */
 void func_L00_003E5BD8(char *object_)
 {
-    Quad5BD8 q;
+    Quad5BD8 quad;
     RenderVec5BD8 matrix[3];
     RenderVec5BD8 normal, center, edge1, edge2;
     int p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15;
     char *object = object_;
     int index;
     char *data = *(char **)(object + 0x68);
-    q.gs[1] = func_0027C878(D_L00_001B0614);
-    q.gs[3] = (unsigned long)D_L00_001B0600 | ((unsigned long)D_L00_001B0604 << 2);
-    q.gs[3] |= (unsigned long)D_L00_001B0608 << 4;
-    q.gs[3] |= (unsigned long)D_L00_001B060C << 6;
-    q.gs[3] |= (unsigned long)D_L00_001B0610 << 32;
-    q.gs[2] = 0xFF9000000260UL;
-    q.gs[0] = 0;
-    q.colors[0] = q.colors[1] = q.colors[2] = q.colors[3] = D_L00_001B0618 + (*(int *)(data+28) << 24);
-    func_00282C88(matrix[0]);
-    func_00282C88(matrix[1]);
-    func_00282C88(matrix[2]);
+    quad.gs[1] = GetEffectTextureDescriptor(D_L00_001B0614);
+    quad.gs[3] = (unsigned long)D_L00_001B0600 | ((unsigned long)D_L00_001B0604 << 2);
+    quad.gs[3] |= (unsigned long)D_L00_001B0608 << 4;
+    quad.gs[3] |= (unsigned long)D_L00_001B060C << 6;
+    quad.gs[3] |= (unsigned long)D_L00_001B0610 << 32;
+    quad.gs[2] = 0xFF9000000260UL;
+    quad.gs[0] = 0;
+    quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3] = D_L00_001B0618 + (*(int *)(data+28) << 24);
+    ClearVector128(matrix[0]);
+    ClearVector128(matrix[1]);
+    ClearVector128(matrix[2]);
     matrix[0][0] = 1.0f;
     matrix[1][1] = 1.0f;
     matrix[2][2] = *(float *)(data+16)*0.865f;
@@ -66,37 +67,37 @@ void func_L00_003E5BD8(char *object_)
         for (i=0;i<4;i++) {
             int vertex_index = D_L00_002983B0[index][i][0];
             int uv_index = D_L00_002983B0[index][i][1];
-            func_00282D30(q.vertices[i],D_L00_002976D0[vertex_index],D_L00_001B061C);
-            q.uv[i][0] = D_L00_00299130[uv_index][0] + D_L00_001B05D4;
-            q.uv[i][1] = D_L00_00299130[uv_index][1] + D_L00_001B05D8;
+            FastVecScale(quad.vertices[i],D_L00_002976D0[vertex_index],D_L00_001B061C);
+            quad.uv[i][0] = D_L00_00299130[uv_index][0] + D_L00_001B05D4;
+            quad.uv[i][1] = D_L00_00299130[uv_index][1] + D_L00_001B05D8;
             if (D_L00_002976D0[vertex_index][2] == -0.001052f)
-                q.colors[i] = D_L00_001B0618;
+                quad.colors[i] = D_L00_001B0618;
             else
-                q.colors[i] = D_L00_001B0618 | (*(int *)(data+28)<<24);
+                quad.colors[i] = D_L00_001B0618 | (*(int *)(data+28)<<24);
         }
-        func_00283098(q.vertices[0],q.vertices[0],matrix);
-        func_00283098(q.vertices[1],q.vertices[1],matrix);
-        func_00283098(q.vertices[2],q.vertices[2],matrix);
-        func_00283098(q.vertices[3],q.vertices[3],matrix);
-        func_00282C88(center);
+        matrix_mul_vec3(quad.vertices[0],quad.vertices[0],matrix);
+        matrix_mul_vec3(quad.vertices[1],quad.vertices[1],matrix);
+        matrix_mul_vec3(quad.vertices[2],quad.vertices[2],matrix);
+        matrix_mul_vec3(quad.vertices[3],quad.vertices[3],matrix);
+        ClearVector128(center);
         for(i=0;i<4;i++) {
-            q.uv[i][0] -= q.vertices[i][2]*0.125f;
-            q.vertices[i][0] *= ref_L00_003E5BD8_00(q.vertices[i][2]) + 2.0f;
-            q.vertices[i][1] *= ref_L00_003E5BD8_00(q.vertices[i][2]) + 2.0f;
-            func_00283098(q.vertices[i],q.vertices[i],object+192);
-            q.vertices[i][0] += *(float *)(object+16);
-            q.vertices[i][1] += *(float *)(object+20);
-            q.vertices[i][2] += *(float *)(object+24);
-            func_00282CC0(center,center,q.vertices[i]);
+            quad.uv[i][0] -= quad.vertices[i][2]*0.125f;
+            quad.vertices[i][0] *= ref_L00_003E5BD8_00(quad.vertices[i][2]) + 2.0f;
+            quad.vertices[i][1] *= ref_L00_003E5BD8_00(quad.vertices[i][2]) + 2.0f;
+            matrix_mul_vec3(quad.vertices[i],quad.vertices[i],object+192);
+            quad.vertices[i][0] += *(float *)(object+16);
+            quad.vertices[i][1] += *(float *)(object+20);
+            quad.vertices[i][2] += *(float *)(object+24);
+            FastVecAdd(center,center,quad.vertices[i]);
         }
-        func_00282D30(center,center,0.25f);
-        func_00282CF0(normal,center,D_L00_001B8DC0);
-        func_00282F20(normal,normal,1.0f);
-        func_00282CF0(edge1,q.vertices[2],q.vertices[0]);
-        func_00282CF0(edge2,q.vertices[2],q.vertices[1]);
-        func_00282DD8(center,edge1,edge2);
-        func_00282F20(center,center,1.0f);
-        if(func_00282DB0(normal,center)>0.0f)
-            func_00280B90(&q,0,0);
+        FastVecScale(center,center,0.25f);
+        FastVecSub(normal,center,gCameraPosition_L00);
+        vec_scale_to_length(normal,normal,1.0f);
+        FastVecSub(edge1,quad.vertices[2],quad.vertices[0]);
+        FastVecSub(edge2,quad.vertices[2],quad.vertices[1]);
+        FastVecCross(center,edge1,edge2);
+        vec_scale_to_length(center,center,1.0f);
+        if(FastVecDot(normal,center)>0.0f)
+            draw_world_quad(&quad,0,0);
     } while(++index<215);
 }

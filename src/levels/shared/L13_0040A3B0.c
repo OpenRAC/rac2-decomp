@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L13_0040A3B0 is a unit of its own: it needs the opt-in clear profile
    (-frac2-zero-ti-barrier, docs/build/compiler-notes.md), as its level-0 twin func_L00_003BFF68 does. */
@@ -22,19 +23,20 @@ extern float func_00282C48(float f);
    before folding the starter's result against the state's own reading of that float: the
    twin of func_L00_003BFF68 with fixed turn rates. One `char scratch[0x50]` gives retail's
    frame. */
+/* Turns a creature toward a wanted direction and returns how much it turned. */
 float func_L13_0040A3B0(char *a0, char *a1, char *a2, char *a3)
 {
     char scratch[0x50];
     float f;
 
     *(Rac2TI128 *)scratch = *(Rac2TI128 *)a2;
-    f = func_002B04E0(a0, scratch, a3);
+    f = GetHeadingAngleOfVector(a0, scratch, a3);
     *(int *)(scratch + 0x40) = 0;
-    func_002AAA00(scratch + 0x40, f, 0.0034906589426100254f, 0.0034906589426100254f,
+    ApproachTargetWithDirectionMode(scratch + 0x40, f, 0.0034906589426100254f, 0.0034906589426100254f,
                   0.29786956310272217f, a1 + 0xB4, 0);
     *(Rac2TI128 *)scratch = 0;
     *(float *)(scratch + 8) = *(float *)(a1 + 0xB4);
-    func_002833F0(scratch + 0x10, scratch);
-    func_00283738(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
-    return func_00282C48(f) - func_00282C48(*(float *)(a1 + 0xB4));
+    euler_rotation_basis(scratch + 0x10, scratch);
+    multiply_matrix3x3(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
+    return FloatAbs(f) - FloatAbs(*(float *)(a1 + 0xB4));
 }

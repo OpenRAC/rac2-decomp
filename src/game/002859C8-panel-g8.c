@@ -5,6 +5,7 @@
  * the switches.
  */
 #include "include_asm.h"
+#include "names.h"
 
 /* Near miss: func_002859C8 (boot 0x2859C8, 3436 bytes, in every level too).
 
@@ -82,15 +83,15 @@ typedef struct {
 typedef struct {
     char pad0[0x40];
     int mode;
-    int f44;
+    int countdown;
     char pad48[0x10];
-    int f58;
-    int f5C;
-    int f60;
+    int phase;
+    int elapsed;
+    int inputDelay;
     char pad64[0x18];
-    short f7C;
-    short f7E;
-    int f80;
+    short timer;
+    short cameraActive;
+    int savedValue;
 } MenuState;
 
 extern MenuState D_001BAC80;
@@ -140,6 +141,7 @@ extern void func_0027C660(void);
 
 #define SPR ((unsigned char *)0x70000000)
 
+/* Draws the pop-up message panel for the current menu mode: save and load prompts, retry messages, the fade-in confirmation box and the countdown box, with the right button icons. */
 void func_002859C8(void)
 {
     char buf[0x300];
@@ -148,14 +150,14 @@ void func_002859C8(void)
     MenuBox tmp2;
     char buf2[0x100];
 
-    if (D_001BAC80.f7E == 0)
-        func_0027DDC0(0, 0, 0, 0x30);
-    if (D_001BAC80.f7C != 0)
+    if (gModalState.cameraActive == 0)
+        SetClearColorPacket(0, 0, 0, 0x30);
+    if (gModalState.timer != 0)
         return;
-    func_0027C540(0);
-    func_002FC560(0x42, 0x8000000044UL);
-    func_002FC560(0x47, 0x5360B);
-    switch (D_001BAC80.mode) {
+    SetupGifPaging(0);
+    VU1_addGSregister(0x42, 0x8000000044UL);
+    VU1_addGSregister(0x47, 0x5360B);
+    switch (gModalState.mode) {
     case 2: {
         unsigned char *spr;
         unsigned char *p;
@@ -163,7 +165,7 @@ void func_002859C8(void)
 
         box = D_001A8A88;
         spr = SPR;
-        func_00115AC0(spr, func_00288FB8(0x9B4), 0x400);
+        strncpy(spr, GetLocalizedString(0x9B4), 0x400);
         p = spr;
         while (*p >= 2)
             p++;
@@ -172,29 +174,29 @@ void func_002859C8(void)
             p++;
         }
         box.flags |= 4;
-        func_00280190(&box, 0x80000000UL, spr, -1);
+        DrawTextWindowSmallFont(&box, 0x80000000UL, spr, -1);
         box.flags ^= 4;
         h = box.h;
-        len = func_001157AC(spr);
+        len = strlen_001157AC(spr);
         for (i = 4; i >= 0; i--)
             spr[len + i] = 1;
         spr[len + 5] = 0;
-        func_0029B888(&box, 0x80F0F0F0, spr, 1, 1, -1, 1, func_00288FB8(0x1137), 0, 0);
+        ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, spr, 1, 1, -1, 1, GetLocalizedString(0x1137), 0, 0);
         x = box.x + h;
-        func_002FC560(0x47, 0x3004B);
+        VU1_addGSregister(0x47, 0x3004B);
         y = x + 8;
-        func_0028E868(func_0028E588(0x755D, 0), 0xE0, y, 0x40, 0x40, 0x80);
-        func_0028F410(4096.0f, (x + 40) * 16, 272.0f, 272.0f,
+        DrawHudSprite(GetIconFrame(0x755D, 0), 0xE0, y, 0x40, 0x40, 0x80);
+        DrawRotatedSprite(4096.0f, (x + 40) * 16, 272.0f, 272.0f,
                       (D_001B1598 % 55) * -0.11423973f, 0x40, 0x40,
-                      func_0028E640(func_0028E588(0x755D, 1)));
+                      GetFrameTexture(GetIconFrame(0x755D, 1)));
         break;
     }
     case 4:
-        if (D_001BAC80.f5C > 0) {
+        if (gModalState.elapsed > 0) {
             unsigned char *p;
             int id;
 
-            func_00115AC0(SPR, func_00288FB8(0x2DE5), 0x400);
+            strncpy(SPR, GetLocalizedString(0x2DE5), 0x400);
             p = SPR;
             while (*p >= 2)
                 p++;
@@ -202,9 +204,9 @@ void func_002859C8(void)
                 *p = 0;
                 p++;
             }
-            id = D_001BAC80.f44 ? 0 : 0x1137;
-            func_00115484(&tmp, 0, sizeof(tmp));
-            tmp.f02 = D_001A7344;
+            id = gModalState.countdown ? 0 : 0x1137;
+            memset(&tmp, 0, sizeof(tmp));
+            tmp.f02 = gScreenHeight;
             tmp.f04 = 0x60;
             tmp.f06 = 0x1A0;
             tmp.f08 = 0x100;
@@ -212,18 +214,18 @@ void func_002859C8(void)
             tmp.f10 = 0x10;
             tmp.flags = 1;
             box = tmp;
-            func_0029B888(&box, 0x80F0F0F0, p, 1, 1, -1, 0, id ? func_00288FB8(id) : 0, 0, 0);
+            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, p, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
         }
         break;
     case 5:
-        if (D_001BAC80.f5C > 0) {
+        if (gModalState.elapsed > 0) {
             char *text;
             int id;
 
-            text = func_00288FB8(D_001BAC80.f80 ? 0x2E04 : 0x2E03);
-            id = D_001BAC80.f44 ? 0 : 0x1137;
-            func_00115484(&tmp2, 0, sizeof(tmp2));
-            tmp2.f02 = D_001A7344;
+            text = GetLocalizedString(gModalState.savedValue ? 0x2E04 : 0x2E03);
+            id = gModalState.countdown ? 0 : 0x1137;
+            memset(&tmp2, 0, sizeof(tmp2));
+            tmp2.f02 = gScreenHeight;
             tmp2.f04 = 0x60;
             tmp2.f06 = 0x1A0;
             tmp2.f08 = 0x100;
@@ -231,7 +233,7 @@ void func_002859C8(void)
             tmp2.f10 = 0x10;
             tmp2.flags = 1;
             box = tmp2;
-            func_0029B888(&box, 0x80F0F0F0, text, 1, 1, -1, 0, id ? func_00288FB8(id) : 0, 0, 0);
+            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, text, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
         }
         break;
     case 1: {
@@ -239,114 +241,114 @@ void func_002859C8(void)
         char *text;
 
         show = 1;
-        if (D_001BAC80.f5C > 0) {
+        if (gModalState.elapsed > 0) {
             text = D_001A8AA0;
             id1 = 0;
             id2 = 0;
-            if (func_00288D80()) {
+            if (GetFlagWord()) {
                 id1 = 0x1137;
-                text = func_00288FB8(0x2E04);
+                text = GetLocalizedString(0x2E04);
             } else {
-                switch (D_001A7420) {
+                switch (gSaveMenuScreen) {
                 case 6:
                     id1 = 0x113C;
                     id2 = 0x1138;
-                    text = func_00288FB8(0x2DF4);
+                    text = GetLocalizedString(0x2DF4);
                     break;
                 case 12:
                     if (D_001F29A0[0]) {
                         id1 = 0x2DE8;
-                        text = func_00288FB8(0x2DE6);
+                        text = GetLocalizedString(0x2DE6);
                         break;
                     }
                 case 13:
                     id1 = 0x113C;
                     id2 = 0x1138;
-                    text = func_00288FB8(0x2DF0);
+                    text = GetLocalizedString(0x2DF0);
                     break;
                 case 10:
                 case 11:
-                    text = func_00288FB8(0x2E00);
+                    text = GetLocalizedString(0x2E00);
                     break;
                 case 7:
                 case 8:
-                    text = func_00288FB8(0x2DFE);
+                    text = GetLocalizedString(0x2DFE);
                     break;
                 case 14:
                 case 15:
-                    text = func_00288FB8(0x2DFF);
+                    text = GetLocalizedString(0x2DFF);
                     break;
                 case 17:
                     id1 = 0x1137;
-                    text = func_00288FB8(0x2E01);
+                    text = GetLocalizedString(0x2E01);
                     break;
                 case 18:
                     id1 = 0x1137;
-                    text = func_00288FB8(0x2E03);
+                    text = GetLocalizedString(0x2E03);
                     break;
                 case 2:
-                    text = func_00288FB8(0x2DE5);
-                    id1 = D_001BAC80.f44 ? 0 : 0x1137;
+                    text = GetLocalizedString(0x2DE5);
+                    id1 = gModalState.countdown ? 0 : 0x1137;
                     break;
                 case 19:
                     if (D_001F29A0[0]) {
                         id1 = 0x2DE8;
-                        text = func_00288FB8(0x2DE6);
+                        text = GetLocalizedString(0x2DE6);
                     } else if (D_001A8C88) {
                         id1 = 0x113B;
                         id2 = 0x1138;
-                        func_00115DA8(buf, D_001A8AA8, func_00288FB8(0x2DE9), 1, 1,
-                                      func_00288FB8(0x2DEB));
+                        Sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
+                                      GetLocalizedString(0x2DEB));
                         text = buf;
                     } else {
                         id1 = 0x113B;
-                        func_00115DA8(buf, D_001A8AA8, func_00288FB8(0x2DE9), 1, 1,
-                                      func_00288FB8(0x2DEB));
+                        Sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
+                                      GetLocalizedString(0x2DEB));
                         text = buf;
                         if (D_001A8C8C)
                             id1 = 0x113C;
                     }
                     break;
                 case 21:
-                    text = func_00288FB8((!D_001A8C88 && func_00287E90()) ? 0x2E04 : 0x2E03);
+                    text = GetLocalizedString((!D_001A8C88 && IsConfirmPending()) ? 0x2E04 : 0x2E03);
                     id1 = 0x1137;
                     break;
                 case 20:
                     id1 = 0x1137;
-                    text = func_00288FB8(0x2E02);
+                    text = GetLocalizedString(0x2E02);
                     break;
                 case 24:
                     id1 = 0x113B;
                     id2 = 0x1138;
-                    func_00115DA8(buf, D_001A8AA8, func_00288FB8(0x2DF2), 1, 1,
-                                  func_00288FB8(0x2DEB));
+                    Sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DF2), 1, 1,
+                                  GetLocalizedString(0x2DEB));
                     text = buf;
                     break;
                 case 23:
                     id1 = 0x113B;
                     id2 = 0x1138;
-                    text = func_00288FB8(0x2DF6);
+                    text = GetLocalizedString(0x2DF6);
                     break;
                 case 3:
                 case 4:
                     if (D_001A8C88 && !D_001F29A0[0]) {
                         id1 = 0x113B;
                         id2 = 0x1138;
-                        text = func_00288FB8(0x2DEC);
+                        text = GetLocalizedString(0x2DEC);
                     } else if (D_001A8C8C) {
                         id1 = 0x113B;
-                        text = func_00288FB8(0x2DEC);
+                        text = GetLocalizedString(0x2DEC);
                     } else if (D_001F29A0[0]) {
                         id1 = 0x2DE8;
-                        text = func_00288FB8(0x2DE6);
+                        text = GetLocalizedString(0x2DE6);
                     } else {
                         id1 = 0x2DE8;
-                        text = func_00288FB8(0x2DEE);
+                        text = GetLocalizedString(0x2DEE);
                     }
                     break;
                 case 5:
                     id1 = 0x2DE8;
-                    text = func_00288FB8(0x2DE6);
+                    text = GetLocalizedString(0x2DE6);
                     break;
                 default:
                     show = 0;
@@ -354,8 +356,8 @@ void func_002859C8(void)
                 }
             }
             if (show) {
-                func_00115484(&tmp, 0, sizeof(tmp));
-                tmp.f02 = D_001A7344;
+                memset(&tmp, 0, sizeof(tmp));
+                tmp.f02 = gScreenHeight;
                 tmp.f04 = 0x60;
                 tmp.f06 = 0x1A0;
                 tmp.f08 = 0x100;
@@ -363,35 +365,35 @@ void func_002859C8(void)
                 tmp.f10 = 0x10;
                 tmp.flags = 1;
                 box = tmp;
-                func_0029B888(&box, 0x80F0F0F0, text, 1, 1, -1, 0,
-                              id1 ? func_00288FB8(id1) : 0, id2 ? func_00288FB8(id2) : 0, 0);
+                ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, text, 1, 1, -1, 0,
+                              id1 ? GetLocalizedString(id1) : 0, id2 ? GetLocalizedString(id2) : 0, 0);
             }
         }
         break;
     }
     case 3: {
-        float t;
-        int c1, c2, id;
+        float fade;
+        int textColor, promptColor, id;
 
-        t = 1.0f - D_001BAC80.f44 * 0.033333335f;
+        fade = 1.0f - gModalState.countdown * 0.033333335f;
         box = D_001A8AB8;
-        func_0027EB88(0x64, 0x12C, 0x60, 0x1A0, (int)(t * 80.0f), 0x40404);
-        c1 = func_00283D38(D_001A8A70, D_001A8A74, t);
-        c2 = func_00283D38(0x20FFFF, 0x8020FFFF, t);
-        switch (D_001BAC80.f58) {
+        DrawRoundedBox(0x64, 0x12C, 0x60, 0x1A0, (int)(fade * 80.0f), 0x40404);
+        textColor = FastTweenColor(D_001A8A70, D_001A8A74, fade);
+        promptColor = FastTweenColor(0x20FFFF, 0x8020FFFF, fade);
+        switch (gModalState.phase) {
         case 0:
         case 1:
-            func_0027FAA8(0xCA, 0x118, c2, func_00288FB8(0x113B), -1);
-            func_0027FAA8(0x135, 0x118, c2, func_00288FB8(0x1138), -1);
+            DrawTextCenteredSmallFont(0xCA, 0x118, promptColor, GetLocalizedString(0x113B), -1);
+            DrawTextCenteredSmallFont(0x135, 0x118, promptColor, GetLocalizedString(0x1138), -1);
             id = 0x2F28;
             break;
         case 2:
-            func_0027FAA8(0xCA, 0x118, c2, func_00288FB8(0x113B), -1);
-            func_0027FAA8(0x135, 0x118, c2, func_00288FB8(0x1138), -1);
+            DrawTextCenteredSmallFont(0xCA, 0x118, promptColor, GetLocalizedString(0x113B), -1);
+            DrawTextCenteredSmallFont(0x135, 0x118, promptColor, GetLocalizedString(0x1138), -1);
             id = 0x2F29;
             break;
         case 3:
-            func_0027FAA8(0x100, 0x118, c2, func_00288FB8(0x1137), -1);
+            DrawTextCenteredSmallFont(0x100, 0x118, promptColor, GetLocalizedString(0x1137), -1);
             id = 0x2F2A;
             break;
         default:
@@ -399,43 +401,43 @@ void func_002859C8(void)
             break;
         }
         if (id)
-            func_0027FC70(&box, c1, func_00288FB8(id), -1, func_0027C878(1), D_00263B50);
+            FontPrintWindow(&box, textColor, GetLocalizedString(id), -1, GetEffectTextureDescriptor(1), D_00263B50);
         break;
     }
     case 9: {
-        char *a, *b, *c;
+        char *icon1, *icon2, *message;
 
-        func_002802E0(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
+        FontSetWindow(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
                       (int)(D_001B23A4 * 100.0f + 0.5f), 0x10, 3);
-        a = D_001A8A4C;
-        if (!a)
-            a = func_00288FB8(0x113B);
-        b = D_001A8A50;
-        if (!b)
-            b = func_00288FB8(0x1138);
-        c = D_001A8A54;
-        if (!c)
-            c = func_00288FB8(0x2DCD);
-        func_0029B888(&box, 0x80F0F0F0, c, 1, 1, -1, 0, a, b, D_001A8A58);
+        icon1 = D_001A8A4C;
+        if (!icon1)
+            icon1 = GetLocalizedString(0x113B);
+        icon2 = D_001A8A50;
+        if (!icon2)
+            icon2 = GetLocalizedString(0x1138);
+        message = D_001A8A54;
+        if (!message)
+            message = GetLocalizedString(0x2DCD);
+        ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, icon2, D_001A8A58);
         break;
     }
     case 10: {
-        char *a, *c;
+        char *icon1, *message;
 
-        func_002802E0(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
+        FontSetWindow(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
                       (int)(D_001B23A4 * 100.0f + 0.5f), 0x10, 3);
-        a = D_001A8A4C;
-        if (!a)
-            a = func_00288FB8(0x113B);
-        c = D_001A8A54;
-        if (!c)
-            c = func_00288FB8(0x2DCD);
-        func_0029B888(&box, 0x80F0F0F0, c, 1, 1, -1, 0, a, 0, D_001A8A58);
+        icon1 = D_001A8A4C;
+        if (!icon1)
+            icon1 = GetLocalizedString(0x113B);
+        message = D_001A8A54;
+        if (!message)
+            message = GetLocalizedString(0x2DCD);
+        ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, 0, D_001A8A58);
         break;
     }
     case 11: {
         int enabled;
-        char *a;
+        char *icon1;
         float k, sc, h;
         int n;
         MenuBox *pb;
@@ -444,33 +446,33 @@ void func_002859C8(void)
         pb = &box;
         n = 3;
         enabled = 1;
-        func_002802E0(pb, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
+        FontSetWindow(pb, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
                       (int)(sc * k + h), 0x10, n);
-        switch (D_001BAC80.f58) {
+        switch (gModalState.phase) {
         case 0:
             break;
         case 1: {
-            char *b;
+            char *icon2;
 
-            a = func_00288FB8(0x1137);
-            b = func_00288FB8(0x2805);
-            func_00115DA8(buf2, func_00288FB8(0x31E6), 15);
-            func_0029B888(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, a, b, 0);
+            icon1 = GetLocalizedString(0x1137);
+            icon2 = GetLocalizedString(0x2805);
+            Sprintf(buf2, GetLocalizedString(0x31E6), 15);
+            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1, icon2, 0);
             break;
         }
         case 2:
             break;
         case 3:
-            D_001BAC80.f60 = D_001BAC80.f5C / 60 + 1;
-            func_00115DA8(buf2, D_001A8AD0, func_00288FB8(0x31ED), func_00288FB8(0x31EE),
-                          D_001BAC80.f60, func_00288FB8(0x31EF));
-            a = func_00288FB8(0x113B);
-            func_0029B888(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, a,
-                          func_00288FB8(0x1138), 0);
+            gModalState.inputDelay = gModalState.elapsed / 60 + 1;
+            Sprintf(buf2, D_001A8AD0, GetLocalizedString(0x31ED), GetLocalizedString(0x31EE),
+                          gModalState.inputDelay, GetLocalizedString(0x31EF));
+            icon1 = GetLocalizedString(0x113B);
+            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1,
+                          GetLocalizedString(0x1138), 0);
             break;
         }
         break;
     }
     }
-    func_0027C660();
+    DoGifPaging();
 }

@@ -55,7 +55,7 @@ void func_0027AB40(void) {
 
     depth_scale = -8388080.0f;
     depth_bias = 8388112.0f;
-    if (D_001A7B90 != 0) {
+    if (gIsPalVideo != 0) {
         D_001B9040.fov.f[1] = D_001B9040.fov.f[0] * 0.756f;
     } else {
         D_001B9040.fov.f[1] = D_001B9040.fov.f[0] * 0.775f;
@@ -66,15 +66,15 @@ void func_0027AB40(void) {
     view = &D_001B9040;
     view->aspect_x = view->scr_x / view->half_width;
     view->aspect_y = view->scr_y / view->half_height;
-    view->fov.f[2] = 1.0f / func_00283180(func_00283248(1.0f, view->fov.f[0]));
-    view->fov.f[3] = 1.0f / func_00283180(func_00283248(1.0f, view->fov.f[1]));
-    horizontal_clip_scale = 1.0f / func_00283180(func_00283248(1.0f, view->fov.f[0] * view->aspect_x));
-    vertical_clip_scale = 1.0f / func_00283180(func_00283248(1.0f, view->fov.f[1] * view->aspect_y));
+    view->fov.f[2] = 1.0f / FastSinOrCosA(FastMatrixHelperA(1.0f, view->fov.f[0]));
+    view->fov.f[3] = 1.0f / FastSinOrCosA(FastMatrixHelperA(1.0f, view->fov.f[1]));
+    horizontal_clip_scale = 1.0f / FastSinOrCosA(FastMatrixHelperA(1.0f, view->fov.f[0] * view->aspect_x));
+    vertical_clip_scale = 1.0f / FastSinOrCosA(FastMatrixHelperA(1.0f, view->fov.f[1] * view->aspect_y));
     horizontal_clip_scale /= view->fov.f[2];
     vertical_clip_scale /= view->fov.f[3];
     horizontal_clip_scale += vertical_clip_scale;
     horizontal_clip_scale *= 0.5f;
-    if (D_001A8BB0 == 2 && view->fov.f[0] < 0.62f)
+    if (gCurrentGameMode == 2 && view->fov.f[0] < 0.62f)
         horizontal_clip_scale *= 1.15f;
     clip_view = &D_001B9040;
     clip_view->aspect_scale.f[2] = 1.0f / clip_view->aspect_x;
@@ -122,7 +122,7 @@ void func_0027AB40(void) {
     D_00263690.near_int = near_bits;
     D_00263640.max = 0x437EFFFF;
     D_00263690.max = 0x437EFFFF;
-    func_002EF080();
+    SetTfragDists();
 
     projection_near_clip = clip_view->near_clip;
     far_clip = clip_view->far_clip;
@@ -153,9 +153,9 @@ void func_0027AB40(void) {
     clip_view->proj[14] = projection_near_clip * (far_clip * -2.0f) /
                            (projection_near_clip * (far_clip - projection_near_clip)) * depth_scale;
     clip_view->proj[15] = 0.0f;
-    func_00282AB0(clip_view->proj2, clip_view->proj, 0x40);
+    CopyMemoryAligned(clip_view->proj2, clip_view->proj, 0x40);
     clip_view->proj2[11] = 1.0f / clip_view->near_clip;
-    func_00282AB0(clip_view->proj3, clip_view->proj2, 0x40);
+    CopyMemoryAligned(clip_view->proj3, clip_view->proj2, 0x40);
     clip_view->proj3[0] /= clip_view->scr_x;
     clip_view->proj3[5] /= clip_view->scr_y;
     clip_view->proj3[10] /= depth_scale;

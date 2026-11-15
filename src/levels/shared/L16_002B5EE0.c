@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -99,6 +100,6 @@ extern void func_L16_00435CE8(void);
 /* runs the level's one-shot start-up; the caller uses this only for its side effects */
 int func_L16_004364B0(void)
 {
-    func_L16_00435CE8();
+    UpdateCameraZoneControl();
     return 0;
 }

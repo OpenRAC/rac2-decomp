@@ -27,57 +27,58 @@ extern int func_001163B0(void);
 extern int func_00283CF0(float);
 extern float func_00283CE0(int);
 
+/* Moves every beam record this object owns toward the hero, releases finished ones, and shakes the camera the first time a beam hits the hero. */
 void func_L05_004161B0(char *obj)
 {
-    char a[16] __attribute__((aligned(16)));
-    char b[16] __attribute__((aligned(16)));
+    char aimPoint[16] __attribute__((aligned(16)));
+    char lift[16] __attribute__((aligned(16)));
     int i;
     char *position;
     for (i = 0; i < 128; i++) {
-        Entry05 *p = &D_L05_002659E0[i];
+        Entry05 *record = &D_L05_002659E0[i];
         char *state;
-        if (p->owner != obj) continue;
-        position = (char *)&p->position;
-        state = func_002ED688(obj);
+        if (record->owner != obj) continue;
+        position = (char *)&record->position;
+        state = GetMobyMotionData(obj);
         if (D_L05_00221D10[11] == 1 || *(int *)(state + 0x110) == 0) {
-            p->owner = 0;
+            record->owner = 0;
             continue;
         }
-        func_0029FCC0(obj, 0, (char *)&p->origin);
-        qcopy(a, *(char **)(state + 0x120) + 0x10);
-        func_00282CC0(a, (char *)&p->offset, a);
-        func_00282D30(b, *(char **)(state + 0x120) + 0xC0, 0.5f);
-        func_00282CF0(a, a, b);
-        switch (p->mode) {
+        TransformMobyJointToWorld(obj, 0, (char *)&record->origin);
+        qcopy(aimPoint, *(char **)(state + 0x120) + 0x10);
+        FastVecAdd(aimPoint, (char *)&record->offset, aimPoint);
+        FastVecScale(lift, *(char **)(state + 0x120) + 0xC0, 0.5f);
+        FastVecSub(aimPoint, aimPoint, lift);
+        switch (record->mode) {
         case 0: {
-            float d;
-            qcopy(position, (char *)&p->origin);
-            func_00282D08((char *)&p->next, (char *)p, a, p->progress);
-            d = func_00282E48((char *)&p->origin, a);
-            if (d > 64.0f) d = 64.0f;
-            else if (d < 1.0f) d = 1.0f;
-            p->progress += 2.0f / d;
-            if (p->progress >= 1.0f) {
-                p->progress = 1.0f;
-                p->mode = 1;
+            float distance;
+            qcopy(position, (char *)&record->origin);
+            lerp_vector((char *)&record->next, (char *)record, aimPoint, record->progress);
+            distance = fast_vec_dist((char *)&record->origin, aimPoint);
+            if (distance > 64.0f) distance = 64.0f;
+            else if (distance < 1.0f) distance = 1.0f;
+            record->progress += 2.0f / distance;
+            if (record->progress >= 1.0f) {
+                record->progress = 1.0f;
+                record->mode = 1;
             }
             break;
         }
         case 1:
-            qcopy((char *)&p->next, a);
-            func_00282D08((char *)p, a, (char *)&p->origin, p->progress);
-            p->progress -= 0.25f;
-            if (p->progress <= 0.0f) p->owner = 0;
+            qcopy((char *)&record->next, aimPoint);
+            lerp_vector((char *)record, aimPoint, (char *)&record->origin, record->progress);
+            record->progress -= 0.25f;
+            if (record->progress <= 0.0f) record->owner = 0;
             break;
         }
-        if (p->hit == 0 && func_002761F8(p, (char *)&p->next, 4, obj, 0)) {
+        if (record->hit == 0 && CollLine(record, (char *)&record->next, 4, obj, 0)) {
             char *hit = D_L05_001BFB00.hit;
-            if (hit && *(short *)(hit + 0xAA) == 0xFBF) {
+            if (hit && *(short *)(hit + 0xAA) == 0xFBF /* moby class 4031 */) {
                 D_L05_001B9580.timer = 30;
                 D_L05_001B9580.strength = 0.05f;
                 D_L05_001B9580.mode = 0;
-                func_L05_0037AC80(1.0f);
-                p->hit = 1;
+                ApplyDamageToHero(1.0f);
+                record->hit = 1;
             }
         }
     }
@@ -95,51 +96,51 @@ void func_L05_0041CB68(char *object)
     char origin[16] __attribute__((aligned(16)));
     char colors[8];
     char *state = *(char **)(object + 0x68);
-    char *v = func_002ED688(object);
+    char *targetInfo = GetMobyMotionData(object);
     int i;
     char *position;
-    if (!v || !*(char **)(v + 0x120) || *(int *)(state + 0x268)) return;
+    if (!targetInfo || !*(char **)(targetInfo + 0x120) || *(int *)(state + 0x268)) return;
     position = object + 0x10;
-    func_00282CF0(delta, *(char **)(v + 0x120) + 0x10, position);
+    FastVecSub(delta, *(char **)(targetInfo + 0x120) + 0x10, position);
     {
         float speed = 0.5833333730697632f;
         qcopy_nc(pos, position);
-        func_00282F20(velocity, delta, speed);
+        vec_scale_to_length(velocity, delta, speed);
     }
 
-    func_00282F20(end, delta, 5.0f);
-    func_00282CC0(end, end, position);
-    if (func_002761F8(position, end, 0, object, 0)) {
+    vec_scale_to_length(end, delta, 5.0f);
+    FastVecAdd(end, end, position);
+    if (CollLine(position, end, 0, object, 0)) {
         char *hit = D_L05_001BFB00.hit;
-        if (hit && *(short *)(hit + 0xAA) == 0xFBF) {
+        if (hit && *(short *)(hit + 0xAA) == 0xFBF /* moby class 4031 */) {
             D_L05_001B9580.strength = 0.05f;
             D_L05_001B9580.timer = 30;
             D_L05_001B9580.mode = 0;
-            func_L05_0037AC80(1.0f);
+            ApplyDamageToHero(1.0f);
         }
     }
-    func_0029FCC0(object, 0, origin);
+    TransformMobyJointToWorld(object, 0, origin);
     {
         float scale = 1.0f, size = 210000.0f;
         for (i = 0; i < 3; i++) {
-            int kind = func_002A7820(1, 5);
-            char *particle = func_002BDCE8(origin, 0.0f, scale, 1.01f, func_002A7878(0.25f, scale) * size,
+            int kind = RandomIntRange(1, 5);
+            char *particle = SpawnSpinningSparkParticle(origin, 0.0f, scale, 1.01f, RandomFloatRange(0.25f, scale) * size,
                                            kind, velocity, 0x5A182, 1);
             __builtin_memcpy(colors, D_L05_001B1308, 8);
             if (particle) {
                 char *data = particle + 0x20;
                 {
-                    int index = func_001163B0() % 2;
+                    int index = Rand() % 2;
                     particle[3] = colors[index * 4];
                 }
                 *(short *)(particle + 0xA) = 0x23;
-                particle[9] = func_00283CF0(4.0f) + 0x40;
+                particle[9] = FloatToInt(4.0f) + 0x40;
                 {
-                    float value = func_00283CE0(5);
+                    float value = IntToFloat(5);
                     *(int *)(data + 4) = 3;
                     *(float *)(data + 0x1C) = value;
                 }
-                data[0xA] = func_002A7820(0x40, 0x80);
+                data[0xA] = RandomIntRange(0x40, 0x80);
                 data[0xB] = particle[0xA];
             }
         }

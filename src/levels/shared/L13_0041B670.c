@@ -32,6 +32,7 @@ extern void func_00282F20(void *, void *, float);
 extern float func_00282DB0(void *, void *);
 extern void func_L13_004388C8(char *);
 
+/* Starts the path camera: copies the current camera view, measures the path segments and checks which way the player faces along the path. */
 void func_L13_00439820(char *camera) {
     float projected[4] __attribute__((aligned(16)));
     float tangent[4] __attribute__((aligned(16)));
@@ -50,7 +51,7 @@ void func_L13_00439820(char *camera) {
         CameraPath *path = D_L13_001FE580[*(int *)(settings + 0x20)];
         int i;
         for (i = 0; i < path->count; i++) {
-            path->point[i].w = func_00282E48(&path->point[i], &path->point[(i + 1) % path->count]);
+            path->point[i].w = fast_vec_dist(&path->point[i], &path->point[(i + 1) % path->count]);
         }
     }
     *(short *)(settings + 0x36) = 0;
@@ -58,18 +59,18 @@ void func_L13_00439820(char *camera) {
         CameraPath *path = D_L13_001FE580[*(int *)(settings + 0x20)];
         segment = 0;
         fraction = 0.0f;
-        if (func_L00_00341FA8(path, D_00189EA0, projected, &segment, &fraction, 0, 20.0f, 1.0f, 0.0f)) {
+        if (find_nearest_path_point(path, gHeroPosition, projected, &segment, &fraction, 0, 20.0f, 1.0f, 0.0f)) {
             int count = path->count;
             int next = segment + 1;
             if (next >= count) next = count - 1;
-            func_00282CF0(tangent, &path->point[next], &path->point[segment]);
-            if (func_00282DF0(tangent) != 0.0f && next != segment) {
-                func_00282F20(tangent, tangent, 1.0f);
-                func_00282CF0(difference, camera + 0x30, D_00189EA0);
-                if (func_00282DB0(difference, tangent) > 0.0f)
+            FastVecSub(tangent, &path->point[next], &path->point[segment]);
+            if (FastVecLength(tangent) != 0.0f && next != segment) {
+                vec_scale_to_length(tangent, tangent, 1.0f);
+                FastVecSub(difference, camera + 0x30, gHeroPosition);
+                if (FastVecDot(difference, tangent) > 0.0f)
                     *(short *)(settings + 0x36) = 1;
             }
         }
     }
-    func_L13_004388C8(camera);
+    InitPathCamera(camera);
 }

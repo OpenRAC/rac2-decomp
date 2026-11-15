@@ -7,6 +7,7 @@ extern Rac2Native_a33fc77309a5e461_u32 ref_L00_002F05B8_01;
 
 extern Rac2Native_a33fc77309a5e461_u32 ref_L00_002F05B8_00;
 
+/* Adds a draw-list entry that runs the small screen-buffer packet. */
 void func_00284FC0(void)
 {
     *(Rac2Native_a33fc77309a5e461_u32 *)(ref_L00_002F05B8_01 + 0) = 0x30000009u;

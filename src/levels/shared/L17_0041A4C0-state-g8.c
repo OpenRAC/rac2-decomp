@@ -19,28 +19,29 @@ extern void func_0029F338(char *);
    object (func_L17_00326F38) and the closing spray is sized by the object's scale.
    func_L00_0032A258 is void here: a value-returning prototype moves the 0xFFFF
    argument's load. */
-void func_L17_0041A4C0(char *obj)
+/* Runs a three-step effect: starts a glow, waits for it to finish, then sprays a burst and removes the object. */
+void func_L17_0041A4C0(char *object)
 {
-    V4_F41A4C0 v;
-    s32 *rec = *(s32 **)(obj + 0x68);
+    V4_F41A4C0 origin;
+    s32 *vars = *(s32 **)(object + 0x68);
 
-    v.q = 0;
-    switch (*(u8 *)(obj + 0x20)) {
+    origin.q = 0;
+    switch (*(u8 *)(object + 0x20)) {
     case 0:
-        func_L17_00326F38(obj, &v, 0.0f, 0.0f, 20.0f);
-        func_L00_0033E220(&v, obj, 0x10008080, -1, 336000.0f, 0.75f, 1, -1, 0, 0x60);
-        func_002A7750(obj, 1, -1);
+        TransformLocalPointToWorld(object, &origin, 0.0f, 0.0f, 20.0f);
+        SpawnObjectFollowingEffect(&origin, object, 0x10008080, -1, 336000.0f, 0.75f, 1, -1, 0, 0x60);
+        SetMobyState(object, 1, -1);
         return;
     case 1:
-        if (func_002A9640(obj, 0x04010000, 0) != 0 && *rec == 0)
-            func_002A7750(obj, 2, -1);
-        *(u8 *)(obj + 0xA8) = 0xFF;
+        if (FindOwnedEffectSlot(object, 0x04010000, 0) != 0 && *vars == 0)
+            SetMobyState(object, 2, -1);
+        *(u8 *)(object + 0xA8) = 0xFF;
         return;
     case 2:
-        func_L00_0032A258(obj, &D_L17_001B1EF0, &D_L17_001B1EE8, &D_L17_001B1EE0, 0xFFFF, 0, D_L17_001B1F10, 0, 0xFFFF, 0xFF, 0);
-        func_L00_00324F18(obj, &v, 0.0f, 0.0f, 20.0f);
-        func_0032C700(&v, 0, 0xC, 0xA, *(float *)(obj + 0x2C) * 10.0f, 20.0f, 0xA, 0xA, 0, 0, 1, 0, 0, 0);
-        func_0029F338(obj);
+        ExplodeObjectIntoPieces(object, &D_L17_001B1EF0, &D_L17_001B1EE8, &D_L17_001B1EE0, 0xFFFF, 0, D_L17_001B1F10, 0, 0xFFFF, 0xFF, 0);
+        LocalOffsetToWorld(object, &origin, 0.0f, 0.0f, 20.0f);
+        SpawnExplosion(&origin, 0, 0xC, 0xA, *(float *)(object + 0x2C) * 10.0f, 20.0f, 0xA, 0xA, 0, 0, 1, 0, 0, 0);
+        MarkMobySpawned(object);
         return;
     }
 }

@@ -44,23 +44,23 @@ void func_L22_003FC048(u8 * obj) {
             u8 * v = ctl->particles[j];
             if (v) {
                 u8 * s = v + 0x20;
-                *(float *)(s + 8) = ref_L22_003FC048_01 * func_00283198(*(float *)(s + 12)) + ref_L22_003FC048_02;
-                *(float *)(s + 12) = func_00283B98(*(float *)(s + 12), ref_L22_003FC048_00[j]);
+                *(float *)(s + 8) = ref_L22_003FC048_01 * FastSinOrCosB(*(float *)(s + 12)) + ref_L22_003FC048_02;
+                *(float *)(s + 12) = FastAddRotations(*(float *)(s + 12), ref_L22_003FC048_00[j]);
             }
         }
     }
     if (D_L22_001B1D6C == obj)
-        func_L22_003FBFD0();
+        RotateAnchorTable();
     qcopy(p, obj + 0x10);
-    func_00282D30(tmp, obj + 0xE0, ref_L22_003FC048_03);
-    func_00282CC0(p, p, tmp);
+    FastVecScale(tmp, obj + 0xE0, ref_L22_003FC048_03);
+    FastVecAdd(p, p, tmp);
     p[3] = 1.0f;
-    if (func_00283DB8(p, 64.0f) < 0)
+    if (FastMathHelperA(p, 64.0f) < 0)
         return;
-    func_L00_002E6CF0(func_L22_003FC338, obj);
+    AddDrawCallbackToList1(DrawPulsingRing, obj);
     if (obj[0x20])
         return;
-    distance = func_00282E80(obj + 0x10, D_L22_001B9C80);
+    distance = vec_distance_xy(obj + 0x10, D_L22_001B9C80);
     if (distance > 30.0f)
         count = 2;
     else if (distance > 10.0f)
@@ -69,13 +69,13 @@ void func_L22_003FC048(u8 * obj) {
         count = 40;
     for (i = 0, slot = ctl->particles; i < 8; i++, slot++) {
         u8 * v, *old;
-        func_L22_003FBF00(obj, point, i);
-        v = func_002C36D0(point, count, 2, 0);
+        GetParticleAnchorPosition(obj, point, i);
+        v = SpawnBluishFadeParticle(point, count, 2, 0);
         if (v) {
             u8 * s = v + 0x20;
             qcopy(origin, obj + 0x10);
             qzero_nc(zero);
-            func_00282CC0(point, point, zero);
+            FastVecAdd(point, point, zero);
             *(float *)(s + 0x10) = *(float *)(v + 0x10)-origin[0];
             *(float *)(s + 0x14) = *(float *)(v + 0x14)-origin[1];
             *(float *)(s + 0x18) = *(float *)(v + 0x18)-origin[2];
@@ -88,7 +88,7 @@ void func_L22_003FC048(u8 * obj) {
         }
         old = *slot;
         if (!old) {
-            *slot=func_002C36D0(point,0,1,0);
+            *slot=SpawnBluishFadeParticle(point,0,1,0);
             v = *slot;
             if (v) {
                 ParticleState * s = (ParticleState *)(v + 0x20);

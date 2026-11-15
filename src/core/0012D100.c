@@ -60,60 +60,62 @@ extern void r1_func_0012C468_a(void *, void *) __asm__("r1_func_0012C468");
  * +0x840/+0x844 either way. The chroma variants aren't hardware-supported:
  * setting either just logs a warning through r1_func_0012C468.
  */
-void func_0012D100(void *arg0) {
-    char *s = (char *)arg0;
-    int flag;
+/* Reads the quantizer matrix flags of an MPEG video header and tells the video chip to load the matrices. */
+void func_0012D100(void *decoder) {
+    char *dec = (char *)decoder;
+    int loadFlag;
 
-    flag = func_0012C878(s, 1);        /* load_intra_quantizer_matrix */
-    *(int *)(s + 0x840) = flag;
-    if (flag != 0) {
-        func_0012C3B0(s);
-        func_0012C380(s, 0x50000000);
-        func_0012C3B0(s);
+    loadFlag = ReadMpegBits(dec, 1);        /* load_intra_quantizer_matrix */
+    *(int *)(dec + 0x840) = loadFlag;
+    if (loadFlag != 0) {
+        WaitIpuIdle(dec);
+        SendIpuCommand(dec, 0x50000000);
+        WaitIpuIdle(dec);
     }
 
-    flag = func_0012C878(s, 1);        /* load_non_intra_quantizer_matrix */
-    *(int *)(s + 0x844) = flag;
-    if (flag != 0) {
-        func_0012C3B0(s);
-        func_0012C380(s, 0x58000000);
-        func_0012C3B0(s);
+    loadFlag = ReadMpegBits(dec, 1);        /* load_non_intra_quantizer_matrix */
+    *(int *)(dec + 0x844) = loadFlag;
+    if (loadFlag != 0) {
+        WaitIpuIdle(dec);
+        SendIpuCommand(dec, 0x58000000);
+        WaitIpuIdle(dec);
     }
 
-    if (func_0012C878(s, 1) != 0) {    /* load_chroma_intra_quantizer_matrix */
-        r1_func_0012C468(s, r1_D_001539E8);
+    if (ReadMpegBits(dec, 1) != 0) {    /* load_chroma_intra_quantizer_matrix */
+        r1_func_0012C468(dec, r1_D_001539E8);
     }
 
-    if (func_0012C878(s, 1) != 0) {    /* load_chroma_non_intra_quantizer_matrix */
-        r1_func_0012C468(s, r1_D_00153A10);
+    if (ReadMpegBits(dec, 1) != 0) {    /* load_chroma_non_intra_quantizer_matrix */
+        r1_func_0012C468(dec, r1_D_00153A10);
     }
 }
 
 /* rac1-decomp src/core/00125630.c: func_001293A8 */
-void func_0012D1C8(void *arg0) {
-    State *s = (State *)arg0;
-    int count;
+/* Reads the display offsets of an MPEG picture header into the video decoder. */
+void func_0012D1C8(void *decoderArg) {
+    State *dec = (State *)decoderArg;
+    int offsetCount;
     int i;
 
-    if (s->unk_13C != 0) {
-        if (s->unk_184 == 0) {
-            count = 1;
+    if (dec->unk_13C != 0) {
+        if (dec->unk_184 == 0) {
+            offsetCount = 1;
         } else {
-            count = s->unk_178 != 0 ? 3 : 2;
+            offsetCount = dec->unk_178 != 0 ? 3 : 2;
         }
     } else {
-        if (s->unk_174 != 3) {
-            count = 1;
+        if (dec->unk_174 != 3) {
+            offsetCount = 1;
         } else {
-            count = s->unk_184 != 0 ? 3 : 2;
+            offsetCount = dec->unk_184 != 0 ? 3 : 2;
         }
     }
 
-    for (i = 0; i < count; i++) {
-        s->f1[i] = func_0012C878(s, 0x10);
-        func_0012C878(s, 1);
-        s->f2[i] = func_0012C878(s, 0x10);
-        func_0012C878(s, 1);
+    for (i = 0; i < offsetCount; i++) {
+        dec->f1[i] = ReadMpegBits(dec, 0x10);
+        ReadMpegBits(dec, 1);
+        dec->f2[i] = ReadMpegBits(dec, 0x10);
+        ReadMpegBits(dec, 1);
     }
 }
 
@@ -126,17 +128,18 @@ void func_0012D1C8(void *arg0) {
  * elides -- the sequence is bare `nextBit(s, width)` calls, and the final
  * one, its value discarded, becomes 2.9-ee's bare tail jump.
  */
-void func_0012D2C0(void *arg0) {
-    func_0012C878(arg0, 1);   /* copyright_flag */
-    func_0012C878(arg0, 8);   /* copyright_identifier */
-    func_0012C878(arg0, 1);   /* original_or_copy */
-    func_0012C878(arg0, 7);   /* reserved */
-    func_0012C878(arg0, 1);   /* marker_bit */
-    func_0012C878(arg0, 20);  /* copyright_number_1 */
-    func_0012C878(arg0, 1);   /* marker_bit */
-    func_0012C878(arg0, 22);  /* copyright_number_2 */
-    func_0012C878(arg0, 1);   /* marker_bit */
-    func_0012C878(arg0, 22);  /* copyright_number_3 */
+/* Skips over the copyright information in an MPEG video header. */
+void func_0012D2C0(void *decoder) {
+    ReadMpegBits(decoder, 1);   /* copyright_flag */
+    ReadMpegBits(decoder, 8);   /* copyright_identifier */
+    ReadMpegBits(decoder, 1);   /* original_or_copy */
+    ReadMpegBits(decoder, 7);   /* reserved */
+    ReadMpegBits(decoder, 1);   /* marker_bit */
+    ReadMpegBits(decoder, 20);  /* copyright_number_1 */
+    ReadMpegBits(decoder, 1);   /* marker_bit */
+    ReadMpegBits(decoder, 22);  /* copyright_number_2 */
+    ReadMpegBits(decoder, 1);   /* marker_bit */
+    ReadMpegBits(decoder, 22);  /* copyright_number_3 */
 }
 
 /* rac1-decomp src/core/00125630.c: func_00129530 */
@@ -157,65 +160,67 @@ void func_0012D2C0(void *arg0) {
  * re-read into the local after the report, as 2.95.3 needs; switching on
  * the memory re-read is exact under 2.9-ee too.
  */
-int func_0012D350(void *arg0) {
-    char *s = arg0;
-    int state = *(int *)(s + 0x174);
+/* Picks the frame buffer for the current MPEG picture, decodes it and marks it ready. */
+int func_0012D350(void *decoder) {
+    char *dec = decoder;
+    int state = *(int *)(dec + 0x174);
     char *target;
-    int r;
+    int result;
 
-    if (state == 3 && *(int *)(s + 0x120) != 0) {
-        r1_func_0012C468(s, r1_D_00153A40);
-        *(int *)(s + 0x120) = 0;
-        state = *(int *)(s + 0x174);
+    if (state == 3 && *(int *)(dec + 0x120) != 0) {
+        r1_func_0012C468(dec, r1_D_00153A40);
+        *(int *)(dec + 0x120) = 0;
+        state = *(int *)(dec + 0x174);
     }
     switch (state) {
     case 3:
-        target = *(char **)(s + 0x1C0);
+        target = *(char **)(dec + 0x1C0);
         break;
     case 1:
-        target = *(char **)(s + 0x1D0);
+        target = *(char **)(dec + 0x1D0);
         break;
     case 2:
-        target = *(char **)(s + 0x1E0);
+        target = *(char **)(dec + 0x1E0);
         break;
     default:
-        target = *(char **)(s + 0x1C0);
-        r1_func_0012C468(s, r1_D_00153A60);
+        target = *(char **)(dec + 0x1C0);
+        r1_func_0012C468(dec, r1_D_00153A60);
         break;
     }
-    r = func_0012B678(s);
-    if (r != 0) {
+    result = DecodeMpegPicture(dec);
+    if (result != 0) {
         *(int *)(target + 0x28) = 1;
     }
-    return r;
+    return result;
 }
 
 /* rac1-decomp src/core/00125630.c: func_00129600 */
-void func_0012D420(void *arg0, int arg1, int arg2) {
-    char *s = (char *)arg0;
-    int v, w;
+/* Decodes the pending MPEG picture into its frame buffer and advances the decoder state. */
+void func_0012D420(void *decoder, int sliceCount, int doDecode) {
+    char *dec = (char *)decoder;
+    int bufA, bufB;
 
-    if (arg2 != 0) {
-        if (*(int *)(s + 0x174) == 3) {
-            if (*(int *)(s + 0x150) == 3) {
-                v = *(int *)(s + 0x1C4);
+    if (doDecode != 0) {
+        if (*(int *)(dec + 0x174) == 3) {
+            if (*(int *)(dec + 0x150) == 3) {
+                bufA = *(int *)(dec + 0x1C4);
             } else {
-                v = *(int *)(s + 0x1B8);
+                bufA = *(int *)(dec + 0x1B8);
             }
-            r1_func_00129E30(s, v, arg1 - 1);
+            r1_func_00129E30(dec, bufA, sliceCount - 1);
         } else {
-            if (*(int *)(s + 0x150) == 3) {
-                v = *(int *)(s + 0x1D4);
-                w = *(int *)(s + 0x1E4);
+            if (*(int *)(dec + 0x150) == 3) {
+                bufA = *(int *)(dec + 0x1D4);
+                bufB = *(int *)(dec + 0x1E4);
             } else {
-                v = *(int *)(s + 0x1C8);
-                w = *(int *)(s + 0x1D8);
+                bufA = *(int *)(dec + 0x1C8);
+                bufB = *(int *)(dec + 0x1D8);
             }
-            r1_func_00129F40(s, v, w, arg1 - 1);
+            r1_func_00129F40(dec, bufA, bufB, sliceCount - 1);
         }
     }
-    if (*(int *)(s + 0xF8) == 1) {
-        *(int *)(s + 0xF8) = 2;
+    if (*(int *)(dec + 0xF8) == 1) {
+        *(int *)(dec + 0xF8) = 2;
     }
 }
 
@@ -224,21 +229,22 @@ void func_0012D420(void *arg0, int arg1, int arg2) {
 #define RDY_(o) (*(int *)(PP_(o) + 0x28))
 
 /* rac1-decomp src/core/00125630.c: func_0012D4B0 */
-int func_0012D4B0(void *p, int arg1) {
-    char *rec;
-    int ret;
-    int n;
-    char *tmp;
-    char *cur;
+/* Picks and prepares the next MPEG frame buffers, then fills in the picture record. Returns 1 when a picture is ready. */
+int func_0012D4B0(void *p, int swapBuffers) {
+    char *record;
+    int ready;
+    int fieldCount;
+    char *swapTmp;
+    char *curBuf;
 
-    rec = 0;
-    ret = 0;
-    n = (PI_(0x174) == 3) ? 2 : 4;
+    record = 0;
+    ready = 0;
+    fieldCount = (PI_(0x174) == 3) ? 2 : 4;
     if (PI_(0x150) == 3) {
         PP_(0x1C0) = PP_(0x1C4);
         PP_(0x1D0) = PP_(0x1D4);
         PP_(0x1E0) = PP_(0x1E4);
-        if (PI_(0xA0) + PI_(0xA4) >= n) {
+        if (PI_(0xA0) + PI_(0xA4) >= fieldCount) {
             PI_(0xE8) = 0;
             PI_(0x1A8) = 0;
             PI_(0x1A4) = 0;
@@ -253,74 +259,74 @@ int func_0012D4B0(void *p, int arg1) {
         if (PI_(0x174) == 3) {
             if (RDY_(0x1B8) == 1 || PI_(0x1A4) != 0) {
                 if (RDY_(0x1BC) == 1) {
-                    ret = 1;
+                    ready = 1;
                 }
             }
         } else {
             if ((RDY_(0x1C8) == 1 && RDY_(0x1D8) == 1) || PI_(0x1A4) != 0) {
                 if (RDY_(0x1CC) == 1) {
                     if (RDY_(0x1DC) == 1) {
-                        ret = 1;
+                        ready = 1;
                     }
                 }
             }
         }
     } else {
-        if (arg1 == 0) {
-            tmp = PP_(0x1B8);
+        if (swapBuffers == 0) {
+            swapTmp = PP_(0x1B8);
             PP_(0x1B8) = PP_(0x1BC);
-            PP_(0x1BC) = tmp;
-            tmp = PP_(0x1C8);
+            PP_(0x1BC) = swapTmp;
+            swapTmp = PP_(0x1C8);
             PP_(0x1C8) = PP_(0x1CC);
-            PP_(0x1CC) = tmp;
-            tmp = PP_(0x1D8);
+            PP_(0x1CC) = swapTmp;
+            swapTmp = PP_(0x1D8);
             PP_(0x1D8) = PP_(0x1DC);
-            PP_(0x1DC) = tmp;
+            PP_(0x1DC) = swapTmp;
         }
         PP_(0x1C0) = PP_(0x1BC);
         PP_(0x1D0) = PP_(0x1CC);
         PP_(0x1E0) = PP_(0x1DC);
         if (PI_(0x174) == 3) {
             if (PI_(0x150) != 2 || RDY_(0x1B8) == 1) {
-                ret = 1;
+                ready = 1;
             }
         } else {
-            cur = (PI_(0x174) == 1) ? PP_(0x1E0) : PP_(0x1D0);
-            if (PI_(0x150) != 2 || (arg1 != 0 && *(int *)(cur + 0x28) == 1) ||
+            curBuf = (PI_(0x174) == 1) ? PP_(0x1E0) : PP_(0x1D0);
+            if (PI_(0x150) != 2 || (swapBuffers != 0 && *(int *)(curBuf + 0x28) == 1) ||
                 (RDY_(0x1C8) == 1 && RDY_(0x1D8) == 1)) {
-                ret = 1;
+                ready = 1;
             }
         }
     }
     switch (PI_(0x174)) {
     case 3:
-        rec = PP_(0x1C0);
+        record = PP_(0x1C0);
         break;
     case 1:
-        rec = PP_(0x1D0);
+        record = PP_(0x1D0);
         break;
     case 2:
-        rec = PP_(0x1E0);
+        record = PP_(0x1E0);
         break;
     }
-    *(int *)(rec + 0x28) = 0;
-    *(long *)(rec + 0x18) = *(long *)((char *)p + 0x828);
-    *(int *)(rec + 0x2C) = PI_(0x150);
-    *(long *)(rec + 0x20) = *(long *)((char *)p + 0x830);
-    *(int *)(rec + 0x30) = PI_(0x174);
-    *(int *)(rec + 0x34) = PI_(0x13C);
-    *(int *)(rec + 0x38) = PI_(0x188);
-    *(int *)(rec + 0x3C) = PI_(0x178);
-    *(int *)(rec + 0x40) = PI_(0x184);
-    *(int *)(rec + 0x44) = PI_(0x18C);
-    *(int *)(rec + 0x48) = PI_(0x190);
-    *(int *)(rec + 0x4C) = PI_(0x194);
-    *(int *)(rec + 0x50) = PI_(0x198);
-    *(int *)(rec + 0x54) = PI_(0x19C);
-    *(int *)(rec + 0x58) = PI_(0x1A0);
-    *(int *)(rec + 0x5C) = PI_(0x148);
-    *(int *)(rec + 0x60) = PI_(0x14C);
-    return ret;
+    *(int *)(record + 0x28) = 0;
+    *(long *)(record + 0x18) = *(long *)((char *)p + 0x828);
+    *(int *)(record + 0x2C) = PI_(0x150);
+    *(long *)(record + 0x20) = *(long *)((char *)p + 0x830);
+    *(int *)(record + 0x30) = PI_(0x174);
+    *(int *)(record + 0x34) = PI_(0x13C);
+    *(int *)(record + 0x38) = PI_(0x188);
+    *(int *)(record + 0x3C) = PI_(0x178);
+    *(int *)(record + 0x40) = PI_(0x184);
+    *(int *)(record + 0x44) = PI_(0x18C);
+    *(int *)(record + 0x48) = PI_(0x190);
+    *(int *)(record + 0x4C) = PI_(0x194);
+    *(int *)(record + 0x50) = PI_(0x198);
+    *(int *)(record + 0x54) = PI_(0x19C);
+    *(int *)(record + 0x58) = PI_(0x1A0);
+    *(int *)(record + 0x5C) = PI_(0x148);
+    *(int *)(record + 0x60) = PI_(0x14C);
+    return ready;
 }
 
 /* rac1-decomp src/core/00125630.c: func_00129948 */
@@ -329,23 +335,24 @@ int func_0012D4B0(void *p, int arg1) {
    the entry budget at +0xE0; an unsized one has to fit width * height
    against +0xE4. On a refusal, format the two figures into the message
    at r1_D_00153A80 and report it. Returns whether it fits. */
-int func_0012D768(void *arg0, void *arg1) {
+/* Checks that a picture fits in the decoder memory and reports an error if not. */
+int func_0012D768(void *decoder, void *picture) {
     char buf[0x100];
-    char *h = (char *)arg0;
-    char *q = (char *)arg1;
-    int e = *(int *)(h + 0xE0);
-    int ok;
+    char *dec = (char *)decoder;
+    char *pic = (char *)picture;
+    int budget = *(int *)(dec + 0xE0);
+    int fits;
 
-    if (e != 0) {
-        ok = *(int *)(h + 0xDC) >= *(int *)(q + 0x4) &&
-             e >= *(int *)(q + 0x8);
+    if (budget != 0) {
+        fits = *(int *)(dec + 0xDC) >= *(int *)(pic + 0x4) &&
+             budget >= *(int *)(pic + 0x8);
     } else {
-        ok = *(int *)(h + 0xE4) >= *(int *)(q + 0xC) * *(int *)(q + 0x10);
+        fits = *(int *)(dec + 0xE4) >= *(int *)(pic + 0xC) * *(int *)(pic + 0x10);
     }
-    if (ok == 0) {
-        r1_func_00116248_4(buf, r1_D_00153A80, *(int *)(q + 0x4),
-                        *(int *)(q + 0x8));
-        r1_func_0012C468_a(arg0, buf);
+    if (fits == 0) {
+        r1_func_00116248_4(buf, r1_D_00153A80, *(int *)(pic + 0x4),
+                        *(int *)(pic + 0x8));
+        r1_func_0012C468_a(decoder, buf);
     }
-    return ok;
+    return fits;
 }

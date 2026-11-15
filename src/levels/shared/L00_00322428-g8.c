@@ -12,6 +12,7 @@ extern int D_001A7B90;
 extern float D_001A7918_gp SDATA(D_001A7918);
 extern float D_001A7928_gp SDATA(D_001A7928);
 
+/* Sets the frame timing constants for either the normal or the alternate timing mode. */
 void func_L00_00322428(int mode) {
     if (mode == 0) {
         float one = 1.0f;
@@ -23,7 +24,7 @@ void func_L00_00322428(int mode) {
         D_001A7920 = cube;
         D_001A7924 = 5;
         D_001A7928 = frame;
-        D_001A7B90 = 0;
+        gIsPalVideo = 0;
         D_001A790C = one;
         D_001A7910 = one;
         D_001A7918_gp = frame;
@@ -40,7 +41,7 @@ void func_L00_00322428(int mode) {
         frame2 = 0.00040000001899898052215576171875f;
         frame3 = 0.000008f;
         baseline = 0.02f;
-        D_001A7B90 = enabled;
+        gIsPalVideo = enabled;
         D_001A790C = rate;
         D_001A7910 = square;
         D_001A7914 = inverse;

@@ -58,23 +58,23 @@ void func_L16_00417210(char *object)
 
     qcopy(&local.position, (object + 0x10));
     qcopy(&local.angles, (object + 0xf0));
-    if (func_00282C48(D_0018BDD0) < D_L16_001B1B50)
-        D_L16_001B1B50 = func_00282C48(D_0018BDD0);
-    else if (D_L16_001B1B50 < -func_00282C48(D_0018BDD0))
-        D_L16_001B1B50 = -func_00282C48(D_0018BDD0);
-    if (func_00282C48(D_0018BDD4) < D_L16_001B1B44.filteredY)
-        D_L16_001B1B44.filteredY = func_00282C48(D_0018BDD4);
-    else if (D_L16_001B1B44.filteredY < -func_00282C48(D_0018BDD4))
-        D_L16_001B1B44.filteredY = -func_00282C48(D_0018BDD4);
-    func_002AA2E8(&D_L16_001B1B50, D_0018BDD0, 0.15f);
-    func_002AA2E8(&D_L16_001B1B44.filteredY, D_0018BDD4, 0.15f);
+    if (FloatAbs(D_0018BDD0) < D_L16_001B1B50)
+        D_L16_001B1B50 = FloatAbs(D_0018BDD0);
+    else if (D_L16_001B1B50 < -FloatAbs(D_0018BDD0))
+        D_L16_001B1B50 = -FloatAbs(D_0018BDD0);
+    if (FloatAbs(D_0018BDD4) < D_L16_001B1B44.filteredY)
+        D_L16_001B1B44.filteredY = FloatAbs(D_0018BDD4);
+    else if (D_L16_001B1B44.filteredY < -FloatAbs(D_0018BDD4))
+        D_L16_001B1B44.filteredY = -FloatAbs(D_0018BDD4);
+    ApproachValue(&D_L16_001B1B50, D_0018BDD0, 0.15f);
+    ApproachValue(&D_L16_001B1B44.filteredY, D_0018BDD4, 0.15f);
     deceleration = D_L16_001B1B20*0.000004848137451f;
     if (D_L16_001B1B50 != 0.0f) {
-        if (func_00282C48(D_L16_001B1B50) >= 1.0f) {
+        if (FloatAbs(D_L16_001B1B50) >= 1.0f) {
             acceleration = D_L16_001B1B14[0]*0.000004848137451f;
             target = D_L16_001B1B1C[0]*((-D_L16_001B1B50)*0.0002908882452f);
         } else {
-            acceleration = D_L16_001B1B10*(func_00282C48(D_L16_001B1B50)*0.000004848137451f);
+            acceleration = D_L16_001B1B10*(FloatAbs(D_L16_001B1B50)*0.000004848137451f);
             target = D_L16_001B1B18*((-D_L16_001B1B50)*0.0002908882452f);
         }
     } else {
@@ -82,23 +82,23 @@ void func_L16_00417210(char *object)
         target = 0.0f;
     }
     {
-        float oldMagnitude = func_00282C48(*(float *)(state + 0x80));
-        newMagnitude = func_00282C48(target);
+        float oldMagnitude = FloatAbs(*(float *)(state + 0x80));
+        newMagnitude = FloatAbs(target);
         if (newMagnitude < oldMagnitude)
-            func_002AA2E8((float *)(state + 0x80), target, deceleration);
+            ApproachValue((float *)(state + 0x80), target, deceleration);
         else
-            func_002AA2E8((float *)(state + 0x80), target, acceleration);
+            ApproachValue((float *)(state + 0x80), target, acceleration);
     }
     {
         float inputY = D_L16_001B1B44.filteredY;
         deceleration = smallRateSettings.deceleration*0.000004848137451f;
         if (inputY != 0.0f) {
-            if (func_00282C48(inputY) >= 1.0f) {
+            if (FloatAbs(inputY) >= 1.0f) {
                 float turn = -D_L16_001B1B44.filteredY;
                 acceleration = D_L16_001B1B28.highAcceleration*0.000004848137451f;
                 target = D_L16_001B1B28.highSpeed*(turn*0.0002908882452f);
             } else {
-                acceleration = smallRateSettings.lowAcceleration*(func_00282C48(D_L16_001B1B44.filteredY)*0.000004848137451f);
+                acceleration = smallRateSettings.lowAcceleration*(FloatAbs(D_L16_001B1B44.filteredY)*0.000004848137451f);
                 target = smallRateSettings.lowSpeed*((-D_L16_001B1B44.filteredY)*0.0002908882452f);
             }
         } else {
@@ -107,22 +107,22 @@ void func_L16_00417210(char *object)
         }
     }
     {
-        float oldMagnitude = func_00282C48(*(float *)(state + 0x84));
-        newMagnitude = func_00282C48(target);
+        float oldMagnitude = FloatAbs(*(float *)(state + 0x84));
+        newMagnitude = FloatAbs(target);
         if (newMagnitude < oldMagnitude)
-            func_002AA2E8((float *)(state + 0x84), target, deceleration);
+            ApproachValue((float *)(state + 0x84), target, deceleration);
         else
-            func_002AA2E8((float *)(state + 0x84), target, acceleration);
+            ApproachValue((float *)(state + 0x84), target, acceleration);
     }
     if (*(float *)(state + 0x80) != 0.0f)
-        *(float *)(object + 0xf8) = func_00283B98(*(float *)(object + 0xf8), *(float *)(state + 0x80));
+        *(float *)(object + 0xf8) = FastAddRotations(*(float *)(object + 0xf8), *(float *)(state + 0x80));
     if (*(float *)(state + 0x84) != 0.0f) {
         local.limits.high = D_L16_001B1B40*0.017453294f;
         local.limits.low = D_L16_001B1B44.minAngle*0.017453294f;
         local.work.bounds = local.limits;
-        func_L16_00317C90((float *)(state + 0x84), local.work.bounds.high - *(float *)(state + 0x90), deceleration);
-        func_L16_00317C90((float *)(state + 0x84), local.work.bounds.low - *(float *)(state + 0x90), deceleration);
-        *(float *)(state + 0x90) = func_00283B98(*(float *)(state + 0x90), *(float *)(state + 0x84));
+        ClampSpeedToBrakingLimit((float *)(state + 0x84), local.work.bounds.high - *(float *)(state + 0x90), deceleration);
+        ClampSpeedToBrakingLimit((float *)(state + 0x84), local.work.bounds.low - *(float *)(state + 0x90), deceleration);
+        *(float *)(state + 0x90) = FastAddRotations(*(float *)(state + 0x90), *(float *)(state + 0x84));
         if (*(float *)(state + 0x90)>local.work.bounds.high) {
             *(float *)(state + 0x90) = local.work.bounds.high;
             *(float *)(state + 0x84) = 0.0f;
@@ -131,20 +131,20 @@ void func_L16_00417210(char *object)
             *(float *)(state + 0x84) = 0.0f;
         }
     }
-    if (func_00282C48(*(float *)(state + 0x80))>0.0f || func_00282C48(*(float *)(state + 0x84))>0.0f) {
+    if (FloatAbs(*(float *)(state + 0x80))>0.0f || FloatAbs(*(float *)(state + 0x84))>0.0f) {
         int handle = *(int *)(state + 0xa4);
-        char *sound = D_00188660 + 0x70*handle;
+        char *sound = gSoundState + 0x70*handle;
         if ((*(char **)(sound + 0x88)) != object || (*(unsigned char *)(sound + 0x74)) == 0)
-            *(int *)(state + 0xa4) = func_002E5CF8(4, 4, object);
+            *(int *)(state + 0xa4) = PlayMobySound(4, 4, object);
     } else {
         int handle = *(int *)(state + 0xa4);
         if (handle != -1) {
-            char *sound = D_00188660 + 0x70*handle;
+            char *sound = gSoundState + 0x70*handle;
             if ((*(char **)(sound + 0x88)) == object && (*(unsigned char *)(sound + 0x74)) != 0)
-                func_002E59F8(handle);
+                StopSoundVoice(handle);
         }
         *(int *)(state + 0xa4) = -1;
     }
-    func_00282CF0(&local.work.delta, object + 0x10, &local.position);
-    func_002AD6F0(state + 0x20, &local.work.delta, &local.angles, object + 0xf0);
+    FastVecSub(&local.work.delta, object + 0x10, &local.position);
+    CombineTransformsAndStore(state + 0x20, &local.work.delta, &local.angles, object + 0xf0);
 }

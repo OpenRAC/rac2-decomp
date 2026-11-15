@@ -27,59 +27,60 @@ extern Quad16 D_L13_001A8F20 MACRO_ADDR;
 extern float D_L13_001B1A30 __attribute__((sda));
 extern float D_L13_001B1A34 __attribute__((sda));
 extern float D_L13_001B1A38 __attribute__((sda));
-void func_L13_0041F8B8(char *object)
+/* Updates a floating marker the player can target. It spins, glows, and reacts when the player aims at it or touches it. */
+void func_L13_0041F8B8(char *moby)
 {
-    MarkerWorkspace local;
-    float *state=*(float **)(object+0x68);
+    MarkerWorkspace work;
+    float *vars=*(float **)(moby+0x68);
     float value;
     int i;
-    switch (*(unsigned char *)(object+0x20)) { case 1: goto active; case 0: break; case 2: default: goto common; }
+    switch (*(unsigned char *)(moby+0x20)) { case 1: goto active; case 0: break; case 2: default: goto common; }
 
-        state[0]=1.0f;
-        state[8]=func_002A7940();
-        state[2]=0.5f;
-        state[1]=0.0f;
-        state[0]=1.0f;
-        for(i=3;i>=0;i--) state[i+4]=1.0f;
-        *(unsigned char *)(object+0x30)=0xff;
-        func_002A7750((unsigned char *)object,1,-1);
-        object[0x31]=0;
-        *(unsigned short *)(object+0x34)|=1;
+        vars[0]=1.0f;
+        vars[8]=RandomAngle();
+        vars[2]=0.5f;
+        vars[1]=0.0f;
+        vars[0]=1.0f;
+        for(i=3;i>=0;i--) vars[i+4]=1.0f;
+        *(unsigned char *)(moby+0x30)=0xff;
+        SetMobyState((unsigned char *)moby,1,-1);
+        moby[0x31]=0;
+        *(unsigned short *)(moby+0x34)|=1;
     goto common;
 active:
-    if (D_001A79F0==16) {
+    if (gCurrentMapIndex==16) {
 
-        qcopy(&local.position,&H->q[8]);
-        func_00282F20(&local.offset,H->ptr[2212]+0xe0,0.75f);
-        func_00282CC0(&local.position,&local.position,&local.offset);
-        if (func_00277258(&local.position,0,H->ptr[2212],0.5f)!=0 && D_L13_001BFD18!=0 && D_L13_001BFD18==object) {
-            func_002A8C00((char *)&local.request,(int)object,1,100.0f,&D_L13_001A8F20);
-            local.request.id=*(unsigned short *)(object+0xaa);
-            func_L00_002B30E8();
+        qcopy(&work.position,&H->q[8]);
+        vec_scale_to_length(&work.offset,H->ptr[2212]+0xe0,0.75f);
+        FastVecAdd(&work.position,&work.position,&work.offset);
+        if (TestPointAgainstCollision(&work.position,0,H->ptr[2212],0.5f)!=0 && D_L13_001BFD18!=0 && D_L13_001BFD18==moby) {
+            make_hit_descriptor((char *)&work.request,(int)moby,1,100.0f,&D_L13_001A8F20);
+            work.request.id=*(unsigned short *)(moby+0xaa);
+            RecordHeroPlayCounters();
         }
-        if (H->ptr[207]!=0 && H->ptr[207]==object && H->i[208]!=0) {
-            ((float *)&local.direction)[0]=0.0f;
-            ((float *)&local.direction)[1]=1.0f;
-            ((float *)&local.direction)[2]=0.0f;
-            ((float *)&local.direction)[3]=1.0f;
-            func_00282F20(&local.direction,&local.direction,10.0f);
-            func_002A8C00((char *)&local.request,(int)object,1,10.0f,(Quad16 *)&local.direction);
-            local.request.id=*(unsigned short *)(object+0xaa);
-            func_L00_002B30E8();
+        if (H->ptr[207]!=0 && H->ptr[207]==moby && H->i[208]!=0) {
+            ((float *)&work.direction)[0]=0.0f;
+            ((float *)&work.direction)[1]=1.0f;
+            ((float *)&work.direction)[2]=0.0f;
+            ((float *)&work.direction)[3]=1.0f;
+            vec_scale_to_length(&work.direction,&work.direction,10.0f);
+            make_hit_descriptor((char *)&work.request,(int)moby,1,10.0f,(Quad16 *)&work.direction);
+            work.request.id=*(unsigned short *)(moby+0xaa);
+            RecordHeroPlayCounters();
         }
     }
 common:
-    if (state[0]!=0.0f) {
-        func_00282D60(&local.position,object,0.0009765625f);
-        state[8]=func_00283B98(state[8],D_L13_001B1A30*0.0002908882452f);
-        state[3]+=(D_L13_001B1A34+func_002A78D8(0.25f,0.5f))*0.016666668f;
-        if (state[3]>1.0f) state[3]-=1.0f;
+    if (vars[0]!=0.0f) {
+        scale_vector(&work.position,moby,0.0009765625f);
+        vars[8]=FastAddRotations(vars[8],D_L13_001B1A30*0.0002908882452f);
+        vars[3]+=(D_L13_001B1A34+RandomSignedFloatRange(0.25f,0.5f))*0.016666668f;
+        if (vars[3]>1.0f) vars[3]-=1.0f;
         for(i=1;i<=2;i++) {
-            value=state[i]+D_L13_001B1A38*0.016666668f;
-            state[i]=value;
-            if(value>1.0f) state[i]=value-1.0f;
+            value=vars[i]+D_L13_001B1A38*0.016666668f;
+            vars[i]=value;
+            if(value>1.0f) vars[i]=value-1.0f;
         }
-        func_L00_002E6CF0(func_L13_0041FBE0,object);
-        func_002AA2E8(state,1.0f,0.008333333768f);
+        AddDrawCallbackToList1(DrawPulsingGlowStrip,moby);
+        ApproachValue(vars,1.0f,0.008333333768f);
     }
 }

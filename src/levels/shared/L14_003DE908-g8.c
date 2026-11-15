@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The -G8 bodies of src/levels/shared/L14_003DE908.c live here: their small data is
    reached through $gp, which the unit's own file (built -G0) cannot produce. */
@@ -20,7 +21,7 @@ extern u32 D_L14_001B0928 __attribute__((sda));
 extern void func_L14_003F0F38(char *a, char *b, f32 e, u32 c, u32 d, int f);
 
 /* Binds the object and its +0x10 companion to the two small-data words. */
-void func_L14_003F0E68(char *a0)
+void func_L14_003F0E68(char *moby)
 {
-    func_L14_003F0F38(a0, a0 + 0x10, 1.0f, D_L14_001B0924, D_L14_001B0928, 0x40000000);
+    DrawFadingQuads(moby, moby + 0x10, 1.0f, D_L14_001B0924, D_L14_001B0928, 0x40000000);
 }

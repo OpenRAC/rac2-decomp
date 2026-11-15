@@ -67,10 +67,11 @@ extern void func_00282CF0(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
 extern void func_00282DD8(void *, void *, void *);
 
+/* Places the follow camera and rebuilds its direction vectors. When asked, it first moves the camera to its spot behind the hero, pulling it in if a wall is in the way. */
 void func_L00_00423038(int reposition)
 {
     CameraScratch scratch;
-    char *object = D_L00_001B8E10;
+    char *object = gFollowCameraObject;
     char *state = *(char **)(object + 0x70);
     char *movement = state + 0x160;
     char *transform = state + 0x60;
@@ -82,20 +83,20 @@ void func_L00_00423038(int reposition)
         scratch.offset.y = 0.0f;
         scratch.offset.z = *(float *)(movement + 0x30);
         scratch.offset.w = 0.0f;
-        func_00283678(&scratch.basis, D_00189E20);
-        func_00283098(&scratch.transformed, &scratch.offset, *(char **)(transform + 0xC0) + 0xC0);
+        copy_matrix3x4(&scratch.basis, gHeroState);
+        matrix_mul_vec3(&scratch.transformed, &scratch.offset, *(char **)(transform + 0xC0) + 0xC0);
         target = object + 0x30;
-        func_00282CC0(target, transform, &scratch.transformed);
-        func_00282D30(&scratch.scaled, *(char **)(transform + 0xC0) + 0xE0, *(float *)(transform + 0xB0));
-        func_00282CC0(&scratch.endpoint, transform, &scratch.scaled);
-        if (func_002761F8(&scratch.endpoint, target, D_L00_001B184C, *(char **)(D_00189E20 + 0x2290), 0)) {
-            func_00282CF0(&scratch.difference, &D_L00_001BF220, &scratch.endpoint);
-            length = func_00282DF0(&scratch.difference);
+        FastVecAdd(target, transform, &scratch.transformed);
+        FastVecScale(&scratch.scaled, *(char **)(transform + 0xC0) + 0xE0, *(float *)(transform + 0xB0));
+        FastVecAdd(&scratch.endpoint, transform, &scratch.scaled);
+        if (CollLine(&scratch.endpoint, target, D_L00_001B184C, *(char **)(gHeroState + 0x2290), 0)) {
+            FastVecSub(&scratch.difference, &D_L00_001BF220, &scratch.endpoint);
+            length = FastVecLength(&scratch.difference);
             if (length == 0.0f) {
                 qcopy(target, &scratch.endpoint);
             } else {
-                func_00282D30(&scratch.difference, &scratch.difference, (length - 0.5f) / length);
-                func_00282CC0(target, &scratch.endpoint, &scratch.difference);
+                FastVecScale(&scratch.difference, &scratch.difference, (length - 0.5f) / length);
+                FastVecAdd(target, &scratch.endpoint, &scratch.difference);
             }
         }
     }
@@ -107,14 +108,14 @@ void func_L00_00423038(int reposition)
         previous[2] = *(float *)(position + 8);
     }
     qcopy(&scratch.up, &D_L00_001B8E50);
-    func_00282F20(&scratch.scaled, &scratch.up, *(float *)(transform + 0xB0));
-    func_00282CC0(&scratch.endpoint, &scratch.scaled, transform);
-    func_00282CF0(&scratch.delta, &scratch.endpoint, position);
-    func_00282F20(object, &scratch.delta, 1.0f);
+    vec_scale_to_length(&scratch.scaled, &scratch.up, *(float *)(transform + 0xB0));
+    FastVecAdd(&scratch.endpoint, &scratch.scaled, transform);
+    FastVecSub(&scratch.delta, &scratch.endpoint, position);
+    vec_scale_to_length(object, &scratch.delta, 1.0f);
     qcopy(object + 0x20, &scratch.up);
-    func_00282DD8(object + 0x10, object, object + 0x20);
-    func_00282F20(object + 0x10, object + 0x10, 1.0f);
-    func_00282DD8(object + 0x20, object + 0x10, object);
+    FastVecCross(object + 0x10, object, object + 0x20);
+    vec_scale_to_length(object + 0x10, object + 0x10, 1.0f);
+    FastVecCross(object + 0x20, object + 0x10, object);
     qcopy(object + 0x40, object);
 }
 
@@ -128,48 +129,49 @@ void func_L00_00423038(int reposition)
 
 /* func_L00_004239A8 is in L00_004239A8-g8.c. */
 
+/* Camera check that does nothing and always answers no. */
 int func_L00_00423BB0(void)
 {
-    char buf[80];
+    char unused[80];
 
     return 0;
 }
 
 /* reads a pointer from the field at +112 of the first argument, advances it by 176, then runs three 16-byte records and two float parameters through a fixed sequence of seven calls that alternate between three helpers */
-void func_L00_00423BC0(char *a0, void *a1, void *a2, void *a3,
-                                      void *a4, float t0, float t1)
+void func_L00_00423BC0(char *camera, void *result, void *point, void *direction,
+                                      void *original, float pushAmount, float blend)
 {
-    V4_F0fba48d3 b0, b1, b2, b3;
-    void *p = (void *)(*(int *)(a0 + 112));
+    V4_F0fba48d3 delta, scaled, toGoal, blended;
+    void *movement = (void *)(*(int *)(camera + 112));
 
-    p = (void *)((int)p + 176);
+    movement = (void *)((int)movement + 176);
 
-    func_00282CF0_2(&b0, a2, a3);
-    func_00282F20(&b1, &b0, t0);
-    func_00282CC0(a2, a2, &b1);
-    func_00282CF0_2(&b2, a2, p);
-    func_00282F20(&b2, &b2, t1);
-    func_00282CC0(&b3, p, &b2);
-    func_00282CF0_2(a1, &b3, a4);
+    func_00282CF0_2(&delta, point, direction);
+    vec_scale_to_length(&scaled, &delta, pushAmount);
+    FastVecAdd(point, point, &scaled);
+    func_00282CF0_2(&toGoal, point, movement);
+    vec_scale_to_length(&toGoal, &toGoal, blend);
+    FastVecAdd(&blended, movement, &toGoal);
+    func_00282CF0_2(result, &blended, original);
 }
 
 /* func_L00_00423CA8 is in L00_00423CA8-g8.c. */
 
 /* Returns 0 unless the second argument equals 1; then it takes a pointer out of the first argument's field at +112, adds 352 to it, passes a 16-byte stack buffer and a data symbol to one routine, passes the same buffer and the shifted pointer to a second routine that returns a float, and returns 1 only when that float is below zero. */
-int func_L00_00424070(int a0, int a1)
+int func_L00_00424070(int camera, int index)
 {
-    char local[16];
-    int s0;
-    int r;
+    char vec[16];
+    int movementPtr;
+    int result;
 
-    if (a1 != 1) {
-        r = 0;
+    if (index != 1) {
+        result = 0;
     } else {
-        s0 = *(int *)(a0 + 112) + 352;
-        func_00282CF0_7(local, D_L00_001BF220_1);
-        r = func_00282DB0_1(local, (char *)s0) < 0.0f ? 1 : 0;
+        movementPtr = *(int *)(camera + 112) + 352;
+        func_00282CF0_7(vec, D_L00_001BF220_1);
+        result = func_00282DB0_1(vec, (char *)movementPtr) < 0.0f ? 1 : 0;
     }
-    return r;
+    return result;
 }
 
 /* func_L00_004240D8 is in L00_004240D8-g8-dbg.c. */
@@ -178,17 +180,18 @@ int func_L00_00424070(int a0, int a1)
 
 extern char *D_L00_001B8E10;
 
-int func_L00_00424940(int a0)
+/* Checks whether the camera request slot holds this request and, if so, clears it. Returns -1 if the camera is not in the normal mode. */
+int func_L00_00424940(int request)
 {
-    char *p = D_L00_001B8E10;
-    char *q;
+    char *camera = gFollowCameraObject;
+    char *state;
 
-    if (*(short *)(p + 134) != 0) {
+    if (*(short *)(camera + 134) != 0) {
         return -1;
     }
-    q = *(char **)(p + 112);
-    if (*(int *)(q + 576) == a0) {
-        *(int *)(q + 576) = 0;
+    state = *(char **)(camera + 112);
+    if (*(int *)(state + 576) == request) {
+        *(int *)(state + 576) = 0;
         return 1;
     }
     return 0;
@@ -196,156 +199,163 @@ int func_L00_00424940(int a0)
 
 /* func_L00_00424978 is matched in L00_00424978.c (built with -mno-split-addresses). */
 
-void func_L00_00424A08(int a0, float a, float b)
+/* Sets a new camera goal value and its speed, and can also set the current value straight away. */
+void func_L00_00424A08(int alsoSetCurrent, float goal, float rate)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 352;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 352;
 
-        *(short *)(r + 60) = 1;
-        *(float *)(r + 72) = b;
-        *(float *)(r + 64) = a;
-        if (a0) {
-            *(float *)(r + 88) = a;
+        *(short *)(block + 60) = 1;
+        *(float *)(block + 72) = rate;
+        *(float *)(block + 64) = goal;
+        if (alsoSetCurrent) {
+            *(float *)(block + 88) = goal;
         }
     }
 }
 
 /* Stores the two incoming floats and a flag into the block at +352 of the owner object. */
-void func_L00_00424A50(float a, float b)
+void func_L00_00424A50(float firstValue, float secondValue)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 352;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 352;
 
-        *(short *)(r + 62) = 1;
-        *(float *)(r + 76) = a;
-        *(float *)(r + 84) = b;
+        *(short *)(block + 62) = 1;
+        *(float *)(block + 76) = firstValue;
+        *(float *)(block + 84) = secondValue;
     }
 }
 
 /* Sets a flag and a value on the block at +96; the value is offset by a shared float when a0 is set. */
-void func_L00_00424A88(int a0, float a, float b)
+void func_L00_00424A88(int addBase, float offset, float speed)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 0x60;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 0x60;
 
-        *(short *)(r + 0xDA) = 1;
-        *(float *)(r + 0xB8) = b;
-        if (a0) {
-            *(float *)(r + 0xB4) = *(float *)(D_L00_001BB040 + 0x110) + a;
+        *(short *)(block + 0xDA) = 1;
+        *(float *)(block + 0xB8) = speed;
+        if (addBase) {
+            *(float *)(block + 0xB4) = *(float *)(D_L00_001BB040 + 0x110) + offset;
         } else {
-            *(float *)(r + 0xB4) = a;
+            *(float *)(block + 0xB4) = offset;
         }
     }
 }
 
 /* Stores one float and two scaled by an arcsecond-sized constant into the block at +32. */
-void func_L00_00424AD8(float a, float b, float c)
+void func_L00_00424AD8(float distance, float yaw, float pitch)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 32;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 32;
 
-        *(float *)(r + 44) = a;
-        *(float *)(r + 52) = b * 4.848137450608192e-06f;
-        *(float *)(r + 56) = c * 4.848137450608192e-06f;
+        *(float *)(block + 44) = distance;
+        *(float *)(block + 52) = yaw * 4.848137450608192e-06f;
+        *(float *)(block + 56) = pitch * 4.848137450608192e-06f;
     }
 }
 
-void func_L00_00424B20(float t)
+/* Sets one camera tuning value. */
+void func_L00_00424B20(float value)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        *(float *)(q + 484) = t;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        *(float *)(state + 484) = value;
     }
 }
 
-void func_L00_00424B48(int t)
+/* Sets the camera's on/off value. */
+void func_L00_00424B48(int value)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        *(short *)(q + 16) = (short)t;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        *(short *)(state + 16) = (short)value;
     }
 }
 
 /* Stores each incoming float only when it is not zero. */
-void func_L00_00424B70(float a, float b)
+void func_L00_00424B70(float first, float second)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 0x60;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 0x60;
 
-        if (a != 0.0f) {
-            *(float *)(r + 0xDC) = a;
+        if (first != 0.0f) {
+            *(float *)(block + 0xDC) = first;
         }
-        if (b != 0.0f) {
-            *(float *)(r + 0xE0) = b;
+        if (second != 0.0f) {
+            *(float *)(block + 0xE0) = second;
         }
     }
 }
 
-void func_L00_00424BB8(float a, float b)
+/* Sets two camera speed values, skipping any that are zero. */
+void func_L00_00424BB8(float first, float second)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 0x60;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 0x60;
 
-        if (a != 0.0f) {
-            *(float *)(r + 228) = a;
+        if (first != 0.0f) {
+            *(float *)(block + 228) = first;
         }
-        if (b != 0.0f) {
-            *(float *)(r + 232) = b;
+        if (second != 0.0f) {
+            *(float *)(block + 232) = second;
         }
     }
 }
 
+/* Turns on a camera flag. */
 void func_L00_00424C00(void)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        *(short *)(q + 582) = 1;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        *(short *)(state + 582) = 1;
     }
 }
 
+/* Turns on a camera lock flag. */
 void func_L00_00424C28(void)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        *(char *)(q + 310) = 1;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        *(char *)(state + 310) = 1;
     }
 }
 
+/* Turns on two input flags for the camera. */
 void func_L00_00424C60(void)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
-        char *r = q + 448;
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
+        char *block = state + 448;
 
-        *(int *)(r + 16) |= 3;
+        *(int *)(block + 16) |= 3;
     }
 }
 
@@ -359,6 +369,7 @@ extern float func_00283BE0(float, float);
 extern float func_00282C48(float);
 extern float func_002A7AA8(float, float, float, float, float);
 
+/* Turns the camera sideways to face a direction. It works out the signed angle between the camera and the target and stores a steering amount. */
 float func_L00_00424C90(char *object, char *vector, float threshold)
 {
     float temporary[4] __attribute__((aligned(16)));
@@ -373,62 +384,62 @@ float func_L00_00424C90(char *object, char *vector, float threshold)
     float dot;
     float length;
     float angle;
-    float signed_angle = 0.0f;
+    float signedAngle = 0.0f;
     float sign;
     float factor;
-    func_00282D30(temporary, up, func_00282DB0(vector, up));
-    func_00282CF0(first, vector, temporary);
-    func_00282D30(temporary, up, func_00282DB0(direction, up));
-    func_00282CF0(second, direction, temporary);
-    dot = func_00282DB0(first, second);
-    length = func_00282DF0(first);
+    FastVecScale(temporary, up, FastVecDot(vector, up));
+    FastVecSub(first, vector, temporary);
+    FastVecScale(temporary, up, FastVecDot(direction, up));
+    FastVecSub(second, direction, temporary);
+    dot = FastVecDot(first, second);
+    length = FastVecLength(first);
     if (length == 0.0f) return 0.0f;
-    length *= func_00282DF0(second);
+    length *= FastVecLength(second);
     if (length == 0.0f) return 0.0f;
-    angle = 1.57079632679f - func_002831B0(dot / length);
+    angle = 1.57079632679f - FastAngleHelper(dot / length);
     sign = -1.0f;
-    func_00282DD8(cross, first, up);
-    if (func_00282DB0(cross, second) >= 0.0f) sign = 1.0f;
-    signed_angle = func_00283BE0(3.14159265359f, angle);
-    if (threshold != 0.0f && func_00282C48(signed_angle) > threshold) return signed_angle;
-    factor = func_002A7AA8(-1.0f, 0.0f, 1.0f, 0.0f, signed_angle * 0.63661975f);
+    FastVecCross(cross, first, up);
+    if (FastVecDot(cross, second) >= 0.0f) sign = 1.0f;
+    signedAngle = fast_subtract_rotations(3.14159265359f, angle);
+    if (threshold != 0.0f && FloatAbs(signedAngle) > threshold) return signedAngle;
+    factor = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, signedAngle * 0.63661975f);
     if (factor > 1.0f) factor = 1.0f;
     *(float *)(output + 0x1C) = factor * sign;
-    return signed_angle;
+    return signedAngle;
 }
 
 /* Builds a vector from a1 and the +96 source block, then feeds it to the inner routine. */
-void func_L00_00424EB0(char *a0, char *a1, float t)
+void func_L00_00424EB0(char *camera, char *target, float threshold)
 {
-    char local[16];
+    char direction[16];
 
-    func_00282CF0_8(local, a1, *(char **)(a0 + 112) + 96);
-    func_L00_00424C90(a0, local, t);
+    func_00282CF0_8(direction, target, *(char **)(camera + 112) + 96);
+    SteerCameraTowardDirection(camera, direction, threshold);
 }
 
 /* Stores a non-zero value, then hands it to the inner routine. */
-void func_L00_00424F00(char *a0, float a, float b)
+void func_L00_00424F00(char *target, float strength, float threshold)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0 && a != 0.0f) {
-        char *q = *(char **)(p + 112);
+    if (*(short *)(camera + 134) == 0 && strength != 0.0f) {
+        char *state = *(char **)(camera + 112);
 
-        *(float *)(q + 468) = a;
-        func_L00_00424C90(p, a0, b);
+        *(float *)(state + 468) = strength;
+        SteerCameraTowardDirection(camera, target, threshold);
     }
 }
 
 /* Stores the value, then builds a vector and hands it to the inner routine. */
-void func_L00_00424F58(char *a0, float a, float b)
+void func_L00_00424F58(char *target, float strength, float threshold)
 {
-    char *p = D_L00_001B8E10;
+    char *camera = gFollowCameraObject;
 
-    if (*(short *)(p + 134) == 0) {
-        char *q = *(char **)(p + 112);
+    if (*(short *)(camera + 134) == 0) {
+        char *state = *(char **)(camera + 112);
 
-        *(float *)(q + 468) = a;
-        func_L00_00424EB0(p, a0, b);
+        *(float *)(state + 468) = strength;
+        SteerCameraTowardTarget(camera, target, threshold);
     }
 }
 
@@ -436,32 +447,32 @@ void func_L00_00424F58(char *a0, float a, float b)
 /* func_L00_00425118 is in L00_00425118-g8.c. */
 
 /* Builds three vectors from an owner block, blends the stored value toward the closest of the sampled vector length and the stored reference gap, and writes the remaining gap back. */
-void func_L00_00425490(char *obj)
+void func_L00_00425490(char *camera)
 {
-    char *p = *(char **)(obj + 112);
-    char *r = p + 496;
-    char *q = p + 352;
-    float buf[4];
-    float a, b, c;
+    char *state = *(char **)(camera + 112);
+    char *follow = state + 496;
+    char *movement = state + 352;
+    float offset[4];
+    float reach, maxReach, current;
 
-    if (*(short *)(p + 16) <= 0) return;
-    func_00282CF0_4(buf, p, p + 176);
-    func_00282D08((float *)q, q, (char *)buf, D_L00_001A8900);
-    a = func_00282DF0((float *)q);
-    b = *(float *)(q + 44);
-    if (b < a) {
-        a = b;
-        func_00282F20_3((float *)q, (float *)q, a);
-        c = *(float *)(q + 44);
+    if (*(short *)(state + 16) <= 0) return;
+    func_00282CF0_4(offset, state, state + 176);
+    lerp_vector((float *)movement, movement, (char *)offset, D_L00_001A8900);
+    reach = FastVecLength((float *)movement);
+    maxReach = *(float *)(movement + 44);
+    if (maxReach < reach) {
+        reach = maxReach;
+        func_00282F20_3((float *)movement, (float *)movement, reach);
+        current = *(float *)(movement + 44);
     } else {
-        float d = b - *(float *)(r + 48);
-        if (a < d) {
-            a = d;
-            func_00282F20_3((float *)q, (float *)q, a);
+        float minReach = maxReach - *(float *)(follow + 48);
+        if (reach < minReach) {
+            reach = minReach;
+            func_00282F20_3((float *)movement, (float *)movement, reach);
         }
-        c = *(float *)(q + 44);
+        current = *(float *)(movement + 44);
     }
-    *(float *)(r + 48) = c - a;
+    *(float *)(follow + 48) = current - reach;
 }
 
 /* func_L00_00425560 is in L00_004224D0-follow-g8.c. */
@@ -503,7 +514,7 @@ void func_L00_00426248(void)
                 GridCellEntry *entry = (GridCellEntry *)((char *)cell + 16) + k;
 
                 if (entry->type == 5) {
-                    func_00282DF0(D_L00_001B1F94[0] + (entry->index << 7));
+                    FastVecLength(D_L00_001B1F94[0] + (entry->index << 7));
                 }
             }
         }

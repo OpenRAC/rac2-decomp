@@ -28,59 +28,60 @@ extern int *D_L06_001C3D00[];
 extern Vec4 D_L06_001BFCA0, D_L06_001BFCB0;
 /* Adapted from OpenRAC/rac1-decomp (GPL-3.0),
  * src/overlays/shared/moby_ground_collision.c, mine_fall. */
+/* Drops a falling object under gravity, lands it on the ground and slides it along walls. Returns flags that say what it touched. */
 int func_L06_0035EA68(char *moby, char *st) {
-    float v0[4];
-    float v10[4];
-    float v20[4];
-    float v30[4];
-    float v40[4];
-    float v50[4];
-    float f60, f64, f68, f6c;
+    float startPos[4];
+    float probePos[4];
+    float endPos[4];
+    float sweepEnd[4];
+    float hitNormal[4];
+    float slideVec[4];
+    float speed, root0, root1, clampedSpeed;
 
-    Vec4 *g;
-    char *q;
+    Vec4 *hit;
+    char *hitRecord;
     int flags = 0;
 
-    float sc, f21, f20, t, rr, one;
-    int n, i;
+    float unitScale, groundHeight, timeToLand, tmp, rate, one;
+    int count, i;
 
     *(float *)(st + 0x8) = *(float *)(st + 0x8) - *(float *)(st + 0x10);
     if (*(unsigned char *)(st + 0x2E) == 1) {
         if (*(unsigned char *)(st + 0x2F) != 0) {
-            func_002AB250(moby, st, (void *)(int)*(unsigned char *)(st + 0x2F));
+            SpawnSparksAroundMoby_002AB250(moby, st, (void *)(int)*(unsigned char *)(st + 0x2F));
         }
     }
 
-    f60 = func_00282E20(st);
-    t = (*(short *)(st + 0x3E) == 2) ? 0.0f : *(float *)(st + 0x4C);
-    func_002AA2E8(&f60, t, *(float *)(st + 0x14));
-    func_00282F70((float *)st, (float *)st, f60);
+    speed = vec_length_xy(st);
+    tmp = (*(short *)(st + 0x3E) == 2) ? 0.0f : *(float *)(st + 0x4C);
+    ApproachValue(&speed, tmp, *(float *)(st + 0x14));
+    FastVectorNormalizeHelper((float *)st, (float *)st, speed);
     if (*(float *)(st + 0x1C) < *(float *)(st + 0x8)) {
         *(float *)(st + 0x8) = *(float *)(st + 0x1C);
     }
 
-    qcopy(v10, moby + 0x10);
-    v10[2] = v10[2] + *(float *)(st + 0x28);
-    f21 = func_002A89A8(v10, 0, 0.5f);
-    if (func_00278E78() == 0) {
-        if (*(float *)(st + 0x5C) == 0.0f && f21 <= v10[2] && v10[2] + *(float *)(st + 0x8) < f21) {
+    qcopy(probePos, moby + 0x10);
+    probePos[2] = probePos[2] + *(float *)(st + 0x28);
+    groundHeight = ProbeGroundHeightBelow(probePos, 0, 0.5f);
+    if (GetCollHitMaterial() == 0) {
+        if (*(float *)(st + 0x5C) == 0.0f && groundHeight <= probePos[2] && probePos[2] + *(float *)(st + 0x8) < groundHeight) {
             *(float *)(st + 0x5C) = 1.0f;
-            v10[2] = f21;
-            func_00312D58(v10, 3.0f);
+            probePos[2] = groundHeight;
+            SpawnScaledEffectMoby(probePos, 3.0f);
         }
-        f21 = func_002A8A20((moby + 0x10));
+        groundHeight = GetGroundHeightUnderObject((moby + 0x10));
     } else {
         if ((*(int *)(st + 0x24) & 0x10) || *(short *)(st + 0x3E) == 2) {
-            func_00282CC0(v20, (moby + 0x10), st);
-            if (func_002A8A20(v20) < f21 - 0.25f) {
-                func_00282F70((float *)st, (float *)st, 0.0f);
+            FastVecAdd(endPos, (moby + 0x10), st);
+            if (GetGroundHeightUnderObject(endPos) < groundHeight - 0.25f) {
+                FastVectorNormalizeHelper((float *)st, (float *)st, 0.0f);
             }
         }
     }
 
     if (*(float *)(st + 0x5C) != 0.0f) {
         if (*(float *)(st + 0x5C) < 4.0f) {
-            func_00282D30(st, st, 0.7f);
+            FastVecScale(st, st, 0.7f);
         }
         if (*(float *)(st + 0x5C) < 7.0f) {
             *(float *)(st + 0x5C) = *(float *)(st + 0x5C) + 1.0f;
@@ -96,43 +97,43 @@ int func_L06_0035EA68(char *moby, char *st) {
     if (*(float *)(st + 0x54) != -1.0f && *(float *)(st + 0x50) != -1.0f) {
         switch (*(short *)(st + 0x3E)) {
         case 0: {
-            float s0;
+            float fallRate;
             float numerator0;
-            s0 = func_00282C48(*(float *)(st + 0x8) / *(float *)(st + 0x10));
-            if (2.0f < s0) {
-                t = func_0029F530(moby);
-                numerator0 = *(float *)(st + 0x50) - t;
-                rr = numerator0 / s0;
-                if (0.0f < rr) {
-                    func_002AA2E8((float *)(moby + 0x48), rr, 0.1f);
+            fallRate = FloatAbs(*(float *)(st + 0x8) / *(float *)(st + 0x10));
+            if (2.0f < fallRate) {
+                tmp = GetMobyAnimationValue(moby);
+                numerator0 = *(float *)(st + 0x50) - tmp;
+                rate = numerator0 / fallRate;
+                if (0.0f < rate) {
+                    ApproachValue((float *)(moby + 0x48), rate, 0.1f);
                 }
             }
             break;
         }
         case 1:
-            t = func_0029F530(moby);
-            if (*(float *)(st + 0x54) <= t) {
+            tmp = GetMobyAnimationValue(moby);
+            if (*(float *)(st + 0x54) <= tmp) {
                 *(int *)(moby + 0x48) = 0;
             } else {
                 float numerator1;
-                float h = *(float *)(st + 0x10) * -0.5f;
-                f20 = 60.0f;
-                n = func_002A88A0(&f64, &f68, h, *(float *)(st + 0x8) - h, *(float *)(moby + 0x18) - f21);
-                if (n > 0 && 0.0f < f64 && f64 < f20) {
-                    f20 = f64;
+                float halfDrop = *(float *)(st + 0x10) * -0.5f;
+                timeToLand = 60.0f;
+                count = SolveQuadratic(&root0, &root1, halfDrop, *(float *)(st + 0x8) - halfDrop, *(float *)(moby + 0x18) - groundHeight);
+                if (count > 0 && 0.0f < root0 && root0 < timeToLand) {
+                    timeToLand = root0;
                 }
-                if (f20 < 0.0001f) {
-                    f20 = 0.0001f;
+                if (timeToLand < 0.0001f) {
+                    timeToLand = 0.0001f;
                 }
-                t = func_0029F530(moby);
-                numerator1 = *(float *)(st + 0x54) - t;
-                rr = numerator1 / f20;
-                if (2.0f < rr) {
-                    rr = 2.0f;
-                } else if (rr < 0.0f) {
-                    rr = 0.0f;
+                tmp = GetMobyAnimationValue(moby);
+                numerator1 = *(float *)(st + 0x54) - tmp;
+                rate = numerator1 / timeToLand;
+                if (2.0f < rate) {
+                    rate = 2.0f;
+                } else if (rate < 0.0f) {
+                    rate = 0.0f;
                 }
-                func_002AA2E8((float *)(moby + 0x48), rr, 0.1f);
+                ApproachValue((float *)(moby + 0x48), rate, 0.1f);
             }
             break;
         case 2:
@@ -145,63 +146,63 @@ int func_L06_0035EA68(char *moby, char *st) {
         flags |= 0x40;
     }
     if (!(*(int *)(st + 0x24) & 4)) {
-        func_002A7CA0(moby, (float *)(st + 0x44), *(float *)(st + 0x40), 0.02f, 0.3f, *(float *)(st + 0x48));
+        MobySpringTurn(moby, (float *)(st + 0x44), *(float *)(st + 0x40), 0.02f, 0.3f, *(float *)(st + 0x48));
     }
 
     i = 0;
-    qcopy(v0, (moby + 0x10));
-    v0[2] = v0[2] + *(float *)(st + 0x28);
-    func_00282CC0((moby + 0x10), (moby + 0x10), st);
-    qcopy(v20, (moby + 0x10));
-    v20[2] = v20[2] + *(float *)(st + 0x28);
-    func_00282CC0(v30, v20, st);
-    n = func_00277F48(func_00283CE0(*(int *)(st + 0x20)) * 0.0010742187732830644f, v30, 16, moby, 0);
-    if (i < n) {
-        int **pp = D_L06_001C3D00;
-        int k = n;
+    qcopy(startPos, (moby + 0x10));
+    startPos[2] = startPos[2] + *(float *)(st + 0x28);
+    FastVecAdd((moby + 0x10), (moby + 0x10), st);
+    qcopy(endPos, (moby + 0x10));
+    endPos[2] = endPos[2] + *(float *)(st + 0x28);
+    FastVecAdd(sweepEnd, endPos, st);
+    count = ProcessCollisionHit(IntToFloat(*(int *)(st + 0x20)) * 0.0010742187732830644f, sweepEnd, 16, moby, 0);
+    if (i < count) {
+        int **listPtr = D_L06_001C3D00;
+        int remaining = count;
         do {
-            if (func_002ABB78(*pp) != 0) {
-                func_002A8F70((char *)*pp, 1.0f, (int)moby, 0x10000, (moby + 0x10), st);
+            if (IsMobyInSpecialClassRange(*listPtr) != 0) {
+                QueueImpactEffect((char *)*listPtr, 1.0f, (int)moby, 0x10000, (moby + 0x10), st);
             }
-            pp++;
-        } while (--k != 0);
+            listPtr++;
+        } while (--remaining != 0);
     }
 
-    sc = 0.0009765625f;
-    t = func_00282DF0(st);
-    if ((float)*(int *)(st + 0x20) * sc < t) {
-        func_002761F8(v0, v20, 36, moby, 0);
-        qcopy(v20, &D_L06_001BFCA0);
+    unitScale = 0.0009765625f;
+    tmp = FastVecLength(st);
+    if ((float)*(int *)(st + 0x20) * unitScale < tmp) {
+        CollLine(startPos, endPos, 36, moby, 0);
+        qcopy(endPos, &D_L06_001BFCA0);
     }
-    if (func_00277258(v20, func_00283CE0(*(int *)(st + 0x20)) * sc, 36, moby) != 0) {
+    if (TestPointAgainstCollision(endPos, IntToFloat(*(int *)(st + 0x20)) * unitScale, 36, moby) != 0) {
         flags |= 2;
-        g = &D_L06_001BFCB0;
-        qcopy((moby + 0x10), g);
+        hit = &D_L06_001BFCB0;
+        qcopy((moby + 0x10), hit);
         one = 1.0f;
         *(float *)(moby + 0x18) = *(float *)(moby + 0x18) - *(float *)(st + 0x28);
-        func_00282F20(v40, (char *)g + 0x10, one);
-        if (0.7070000171661377f <= v40[2]) {
-            float e = func_00282DB0(st, v40);
-            if (e < 0.0f) {
-                q = (char *)g - 0x30;
-                if (*(int *)(q + 0x18) == 0 || *(int *)(q + 0x1C) > 0) {
+        vec_scale_to_length(hitNormal, (char *)hit + 0x10, one);
+        if (0.7070000171661377f <= hitNormal[2]) {
+            float impact = FastVecDot(st, hitNormal);
+            if (impact < 0.0f) {
+                hitRecord = (char *)hit - 0x30;
+                if (*(int *)(hitRecord + 0x18) == 0 || *(int *)(hitRecord + 0x1C) > 0) {
                     flags |= 1;
                     *(short *)(st + 0x3E) = 2;
                 }
-                func_00282F20(v50, v40, e);
-                func_00282CF0(st, st, v50);
+                vec_scale_to_length(slideVec, hitNormal, impact);
+                FastVecSub(st, st, slideVec);
                 if (*(short *)(st + 0x3E) == 2) {
-                    f6c = func_00282DF0(st);
-                    func_002AA2E8(&f6c, 0.0f, *(float *)(st + 0x10));
-                    func_00282F20(st, st, f6c);
+                    clampedSpeed = FastVecLength(st);
+                    ApproachValue(&clampedSpeed, 0.0f, *(float *)(st + 0x10));
+                    vec_scale_to_length(st, st, clampedSpeed);
                 }
             }
         } else {
-            float d = func_00282DB0(st, v40);
-            if (d < 0.0f) {
-                d = d * -(*(float *)(st + 0x30) + one);
-                func_00282F20(v50, v40, d);
-                func_00282CC0(st, st, v50);
+            float dot = FastVecDot(st, hitNormal);
+            if (dot < 0.0f) {
+                dot = dot * -(*(float *)(st + 0x30) + one);
+                vec_scale_to_length(slideVec, hitNormal, dot);
+                FastVecAdd(st, st, slideVec);
             }
         }
     }

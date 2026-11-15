@@ -59,9 +59,10 @@ extern Sequence D_L06_001B0000;
 extern float D_L06_001AFF20 __attribute__((sda));
 extern void func_L06_004009B8(void);
 
+/* Updates moby class 1067, a flowing ribbon of glowing strips. It picks a random order for the strips, plays a hum, and starts drawing the ribbon when the player is near. */
 void func_L06_003E5428(char *obj) {
-    Object *m = (Object *)obj;
-    Data *data = m->data;
+    Object *moby = (Object *)obj;
+    Data *data = moby->data;
     /* State 0's shuffle and state 2's sphere share their temporary storage. */
     union {
         Sequence seq;
@@ -69,80 +70,81 @@ void func_L06_003E5428(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        func_0026FEB8(D_L06_001AF6A0);
-        func_0026FEB8(D_L06_001AF6E0, *(short *)(obj + 0xB2));
-        func_0029F338(obj);
+        STUB_printf(D_L06_001AF6A0);
+        STUB_printf(D_L06_001AF6E0, *(short *)(obj + 0xB2));
+        MarkMobySpawned(obj);
     }
-    switch (m->state) {
+    switch (moby->state) {
     case 0: {
         int i, j, k;
-        float r;
-        if (D_001A79F0 == 10 && D_0018C0D4 == 1) {
-            func_0029F338(obj);
+        float sphereRadius;
+        if (gCurrentMapIndex == 10 && D_0018C0D4 == 1) {
+            MarkMobySpawned(obj);
             break;
         }
         buffer.seq = D_L06_001AF700;
         for (i = 0; i < 10; i++) {
-            for (j = 0; j < func_002A77E0(9); j++) {
-                u8 b = buffer.seq.x[j + 1];
+            for (j = 0; j < RandomIntBelow(9); j++) {
+                u8 tmp = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
-                buffer.seq.x[j] = b;
+                buffer.seq.x[j] = tmp;
             }
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = func_00283B98(m->angle, 1.5707964897155762f);
-        m->mode = 0x60;
-        m->state = 1;
-        m->angle = r;
+        sphereRadius = FastAddRotations(moby->angle, 1.5707964897155762f);
+        moby->mode = 0x60;
+        moby->state = 1;
+        moby->angle = sphereRadius;
         data->effect = -1;
-        data->timer = func_00283CF0(D_L06_001AF620 * 60.0f);
-        m->flags |= 0x41;
+        data->timer = FloatToInt(D_L06_001AF620 * 60.0f);
+        moby->flags |= 0x41;
         break;
     }
     case 1: {
-        float r, h;
+        float sphereRadius, halfHeight;
         float sphere[4];
-        r = data->radius * 0.5f;
-        h = (float)data->count * data->step * 0.5f;
+        sphereRadius = data->radius * 0.5f;
+        halfHeight = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
-        sphere[2] += h;
-        sphere[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f) {
-            if ((float)func_00283DB8(sphere, 80.0f) >= 0.0f)
-                func_L00_002E6EF8(func_L06_003E57E8, obj);
+        sphere[2] += halfHeight;
+        sphere[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
+            if ((float)FastMathHelperA(sphere, 80.0f) >= 0.0f)
+                AddDrawCallbackToList3(DrawRibbonEffect_L06, obj);
         }
-        if (!func_002E59B0(obj, data->effect))
-            data->effect = func_002E5CF8(0, 4, obj);
+        if (!IsVoicePlayingForOwner(obj, data->effect))
+            data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
         int i;
-        float r, h;
-        func_00282948(&data->timer);
+        float sphereRadius, halfHeight;
+        FastFloatHelperD(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *e = (Effect *)(D_00188660 + i * 0x70);
-            if (e->owner == obj && e->active)
-                func_002E59F8(i);
+            Effect *soundEffect = (Effect *)(gSoundState + i * 0x70);
+            if (soundEffect->owner == obj && soundEffect->active)
+                StopSoundVoice(i);
         }
         data->effect = -1;
-        r = data->radius * 0.5f;
-        h = (float)data->count * data->step * 0.5f;
+        sphereRadius = data->radius * 0.5f;
+        halfHeight = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
-        buffer.f[2] += h;
-        buffer.f[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f &&
-            (float)func_00283DB8(&buffer, 80.0f) >= 0.0f)
-            func_L00_002E6EF8(func_L06_003E57E8, obj);
+        buffer.f[2] += halfHeight;
+        buffer.f[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
+            (float)FastMathHelperA(&buffer, 80.0f) >= 0.0f)
+            AddDrawCallbackToList3(DrawRibbonEffect_L06, obj);
         break;
     }
     }
 }
 
+/* Updates moby class 2208, another flowing ribbon of glowing strips. It works like the first one but uses its own settings and drawing. */
 void func_L06_004005F8(char *obj) {
-    Object *m = (Object *)obj;
-    Data *data = m->data;
+    Object *moby = (Object *)obj;
+    Data *data = moby->data;
     /* State 0's shuffle and state 2's sphere share their temporary storage. */
     union {
         Sequence seq;
@@ -150,72 +152,72 @@ void func_L06_004005F8(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        func_0026FEB8(D_L06_001AFFA0);
-        func_0026FEB8(D_L06_001AFFE0, *(short *)(obj + 0xB2));
-        func_0029F338(obj);
+        STUB_printf(D_L06_001AFFA0);
+        STUB_printf(D_L06_001AFFE0, *(short *)(obj + 0xB2));
+        MarkMobySpawned(obj);
     }
-    switch (m->state) {
+    switch (moby->state) {
     case 0: {
         int i, j, k;
-        float r;
-        if (D_001A79F0 == 10 && D_0018C0D4 == 1) {
-            func_0029F338(obj);
+        float sphereRadius;
+        if (gCurrentMapIndex == 10 && D_0018C0D4 == 1) {
+            MarkMobySpawned(obj);
             break;
         }
         buffer.seq = D_L06_001B0000;
         for (i = 0; i < 10; i++) {
-            for (j = 0; j < func_002A77E0(9); j++) {
-                u8 b = buffer.seq.x[j + 1];
+            for (j = 0; j < RandomIntBelow(9); j++) {
+                u8 tmp = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
-                buffer.seq.x[j] = b;
+                buffer.seq.x[j] = tmp;
             }
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = func_00283B98(m->angle, 1.5707964897155762f);
-        m->mode = 0xFF;
-        m->state = 1;
-        m->angle = r;
+        sphereRadius = FastAddRotations(moby->angle, 1.5707964897155762f);
+        moby->mode = 0xFF;
+        moby->state = 1;
+        moby->angle = sphereRadius;
         data->effect = -1;
-        data->timer = func_00283CF0(D_L06_001AFF20 * 60.0f);
-        m->flags |= 0x41;
+        data->timer = FloatToInt(D_L06_001AFF20 * 60.0f);
+        moby->flags |= 0x41;
         break;
     }
     case 1: {
-        float r, h;
+        float sphereRadius, halfHeight;
         float sphere[4];
-        r = data->radius * 0.5f;
-        h = (float)data->count * data->step * 0.5f;
+        sphereRadius = data->radius * 0.5f;
+        halfHeight = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
-        sphere[2] += h;
-        sphere[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f) {
-            if ((float)func_00283DB8(sphere, 80.0f) >= 0.0f)
-                func_L00_002E6EF8(func_L06_004009B8, obj);
+        sphere[2] += halfHeight;
+        sphere[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
+            if ((float)FastMathHelperA(sphere, 80.0f) >= 0.0f)
+                AddDrawCallbackToList3(DrawRippleGrid, obj);
         }
-        if (!func_002E59B0(obj, data->effect))
-            data->effect = func_002E5CF8(0, 4, obj);
+        if (!IsVoicePlayingForOwner(obj, data->effect))
+            data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
         int i;
-        float r, h;
-        func_00282948(&data->timer);
+        float sphereRadius, halfHeight;
+        FastFloatHelperD(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *e = (Effect *)(D_00188660 + i * 0x70);
-            if (e->owner == obj && e->active)
-                func_002E59F8(i);
+            Effect *soundEffect = (Effect *)(gSoundState + i * 0x70);
+            if (soundEffect->owner == obj && soundEffect->active)
+                StopSoundVoice(i);
         }
         data->effect = -1;
-        r = data->radius * 0.5f;
-        h = (float)data->count * data->step * 0.5f;
+        sphereRadius = data->radius * 0.5f;
+        halfHeight = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
-        buffer.f[2] += h;
-        buffer.f[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f &&
-            (float)func_00283DB8(&buffer, 80.0f) >= 0.0f)
-            func_L00_002E6EF8(func_L06_004009B8, obj);
+        buffer.f[2] += halfHeight;
+        buffer.f[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
+            (float)FastMathHelperA(&buffer, 80.0f) >= 0.0f)
+            AddDrawCallbackToList3(DrawRippleGrid, obj);
         break;
     }
     }

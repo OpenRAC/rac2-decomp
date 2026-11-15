@@ -4,6 +4,7 @@
    src/core/00116378.c: func_001163E0. The file it came from is an SDK unit, but
    this body only reproduces under the game compiler, which is the one that pads
    short loops (the retail assembler's rule). */
+/* Finds the first place where one text string appears inside another. */
 char *func_001163E0(const char *searchee, const char *lookfor) {
     unsigned int i;
 

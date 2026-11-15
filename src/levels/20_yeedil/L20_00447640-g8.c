@@ -14,6 +14,7 @@ extern void func_L18_003F74B8(u8 *, int);
    its doubled p test leaves the exit test at the bottom, so retail's `b test` entry and the
    %hi copy in its delay slot come out (see func_L02_003EB138).  The entity bank is an `sda`
    array of unknown size, which gives retail's absolute lui/lw load in this -G8 unit. */
+/* Destroys every Protopet that belongs to this object group. */
 void func_L20_00447640(u8 *self) {
     u16 *p;
     u8 *e;
@@ -27,9 +28,9 @@ void func_L20_00447640(u8 *self) {
         e = D_L20_001B2F9C[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (*(s16 *)(e + 0xAA) == 0xB69 && e[0x20] != 0xFE && e[0x20] != 0xFD) {
-            func_002A6C58(e, 0, 1);
-            func_L18_003F74B8(e, 0);
+        if (*(s16 *)(e + 0xAA) == 0xB69 /* Protopet */ && e[0x20] != 0xFE && e[0x20] != 0xFD) {
+            SetDeathBits(e, 0, 1);
+            EndCurrentAction(e, 0);
         }
     }
 }

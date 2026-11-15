@@ -38,87 +38,89 @@ extern int D_L07_001B0A48[] __attribute__((sda));
 extern int D_L07_001B0A48_gp[] SDATA(D_L07_001B0A48);
 extern float D_L07_001B0A40[] __attribute__((sda));
 /* Update the launcher state, dispatch its target effect and emit particles. */
-void func_L07_003E4BD0(unsigned char *o)
+/* Per-frame update for moby class 3356: it waits, then looks for a group member to send off
+   while giving off sparks. */
+void func_L07_003E4BD0(unsigned char *moby)
 {
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    float d[4] __attribute__((aligned(16)));
+    float probePos[4] __attribute__((aligned(16)));
+    float aimPos[4] __attribute__((aligned(16)));
+    float sparkPos[4] __attribute__((aligned(16)));
+    float sparkVel[4] __attribute__((aligned(16)));
     int count;
-    char *p = *(char **)(o+0x68);
+    char *vars = *(char **)(moby+0x68);
     unsigned char *target;
     float angle, size, speed;
     const float lift = 0.05f;
     const float turn = 0.0002908882457f;
     int color, life;
-    switch (o[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         D_L07_001BF640.object=0;
-        func_002B0178(o+0x10,o,o+0x10);
+        GetGroundDistanceBelowPosition(moby+0x10,moby,moby+0x10);
         {
-            float height = *(float *)(o + 0x18);
+            float height = *(float *)(moby + 0x18);
             height = lift + height;
-            *(float *)(o + 0x18) = height;
+            *(float *)(moby + 0x18) = height;
         }
-        *(int *)(p+0x20)=-1;
-        if (D_L07_001BF640.object && func_002AD0B0(D_L07_001BF640.object))
-            *(int *)(p+0x10)=(int)D_L07_001BF640.object;
-        func_002A7750(o,1,-1);
+        *(int *)(vars+0x20)=-1;
+        if (D_L07_001BF640.object && GetMobyPrivateValue2(D_L07_001BF640.object))
+            *(int *)(vars+0x10)=(int)D_L07_001BF640.object;
+        SetMobyState(moby,1,-1);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0,*(int *)(p+4)) || func_002B38B8(o)) func_002A7750(o,2,-1);
+        if (IsPointInCuboid(gHeroPosition,*(int *)(vars+4)) || IsThirdPendingFlagSet(moby)) SetMobyState(moby,2,-1);
         break;
     case 2:
-        if (func_002B3868(o) && o[0x43]!=1) func_002A7470(o,1,0,20);
-        if (func_00282948(p+0x14)) {
-            target=func_L07_003E5B70(*(int *)p,&count);
+        if (SetFirstPendingFlag(moby) && moby[0x43]!=1) StartAnimationBlended(moby,1,0,20);
+        if (FastFloatHelperD(vars+0x14)) {
+            target=FindLastIdleGroupMember(*(int *)vars,&count);
             if (target) {
-                *(u128 *)a=0;
-                a[2]=0.7f;
-                func_00283098(a,a,o+0xC0);
-                func_00282CC0(a,a,o+0x10);
-                if (!func_00277258(a,0.5f,0,o)) {
-                    *(u128 *)b=0;
-                    b[2]=0.5f;
-                    func_00282CC0(b,b,o+0x10);
-                    func_L07_003E5C78(target,o+0x10,b,*(int *)(p+0x10));
-                    func_002E5CF8(0,0,o);
-                    *(int *)(p+0x14)=60;
+                *(u128 *)probePos=0;
+                probePos[2]=0.7f;
+                matrix_mul_vec3(probePos,probePos,moby+0xC0);
+                FastVecAdd(probePos,probePos,moby+0x10);
+                if (!TestPointAgainstCollision(probePos,0.5f,0,moby)) {
+                    *(u128 *)aimPos=0;
+                    aimPos[2]=0.5f;
+                    FastVecAdd(aimPos,aimPos,moby+0x10);
+                    SendEntityToPositionAndShrink(target,moby+0x10,aimPos,*(int *)(vars+0x10));
+                    PlayMobySound(0,0,moby);
+                    *(int *)(vars+0x14)=60;
                 }
-            } else if (!count) func_002A7750(o,3,-1);
+            } else if (!count) SetMobyState(moby,3,-1);
         }
-        func_002AA2E8(p+0x18,1.0f,0.05000000447f);
+        ApproachValue(vars+0x18,1.0f,0.05000000447f);
         {
             float delta = D_L07_001B0A50;
             delta = turn * delta;
-            *(float *)(p + 0x1C) = func_00283B98(*(float *)(p + 0x1C), delta);
+            *(float *)(vars + 0x1C) = FastAddRotations(*(float *)(vars + 0x1C), delta);
         }
-        func_L00_002E6CF0(func_L07_003E5070,o);
-        if (o[0x31] && !func_002A77E0(5)) {
-            qzero_nc(b); qzero_nc(a);
-            if (*(void **)(p+0x10)) {
-                func_002AD0E0(o,*(void **)(p+0x10),o+0x10,a,b,a);
-                func_00282CF0(b,b,o+0x10);
+        AddDrawCallbackToList1(DrawEntityGlowDisc,moby);
+        if (moby[0x31] && !RandomIntBelow(5)) {
+            qzero_nc(aimPos); qzero_nc(probePos);
+            if (*(void **)(vars+0x10)) {
+                TransformPointAndRotationByParent(moby,*(void **)(vars+0x10),moby+0x10,probePos,aimPos,probePos);
+                FastVecSub(aimPos,aimPos,moby+0x10);
             }
-            angle=func_002A7940();
-            c[0]=func_00283180(angle)*0.4f;
-            c[1]=func_00283198(angle)*0.4f;
-            c[2]=0;
-            func_00282CC0(c,c,o+0x10);
-            size=func_002A7878(D_L07_001B0A40[0],D_L07_001B0A40[1]);
-            color=func_00283D38(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],func_002A7878(0,1));
-            speed=func_002A7878(1,2);
-            life=func_002A7820(30,60);
-            qcopy(d,b);
-            d[2]=speed/func_00283CE0(life);
-            func_002C3150(c,d,color,size,(unsigned char)life,(unsigned char)func_002A77E0(255),0);
+            angle=RandomAngle();
+            sparkPos[0]=FastSinOrCosA(angle)*0.4f;
+            sparkPos[1]=FastSinOrCosB(angle)*0.4f;
+            sparkPos[2]=0;
+            FastVecAdd(sparkPos,sparkPos,moby+0x10);
+            size=RandomFloatRange(D_L07_001B0A40[0],D_L07_001B0A40[1]);
+            color=FastTweenColor(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],RandomFloatRange(0,1));
+            speed=RandomFloatRange(1,2);
+            life=RandomIntRange(30,60);
+            qcopy(sparkVel,aimPos);
+            sparkVel[2]=speed/IntToFloat(life);
+            SpawnHeroRelativeParticle(sparkPos,sparkVel,color,size,(unsigned char)life,(unsigned char)RandomIntBelow(255),0);
         }
         break;
     case 3:
-        if (func_002B3868(o) && o[0x43]) func_002A7470(o,0,0,20);
-        func_002AA2E8(p+0x18,0,0.05000000447f);
-        func_L00_002E6CF0(func_L07_003E5070,o);
-        if (o[0x42]==o[0x43] && *(float *)(p+0x18)<=0) *(unsigned short *)(o+0x34)|=2;
+        if (SetFirstPendingFlag(moby) && moby[0x43]) StartAnimationBlended(moby,0,0,20);
+        ApproachValue(vars+0x18,0,0.05000000447f);
+        AddDrawCallbackToList1(DrawEntityGlowDisc,moby);
+        if (moby[0x42]==moby[0x43] && *(float *)(vars+0x18)<=0) *(unsigned short *)(moby+0x34)|=2;
         break;
     }
 }

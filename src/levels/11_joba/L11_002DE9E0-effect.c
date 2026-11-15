@@ -20,17 +20,19 @@ extern u8 D_001A7A72 NOT_SDA;
 
 extern u8 D_001A7A74 NOT_SDA;
 
-void func_L11_003983F0(u8 *arg0) {
-    u8 *v1 = arg0;
-    int s0 = v1[0x20];
+/* Watches a few level counters and, once they pass their limits, switches on two one-time
+   flags. */
+void func_L11_003983F0(u8 *moby) {
+    u8 *self = moby;
+    int state = self[0x20];
     int enabled;
 
-    if (s0 != 1) {
-        if (s0 < 2) {
-            if (s0 == 0) {
-                v1[0x30] = 0xFF;
+    if (state != 1) {
+        if (state < 2) {
+            if (state == 0) {
+                self[0x30] = 0xFF;
                 D_L11_001AED08 = 0;
-                func_002A7750(v1, 1, -1);
+                SetMobyState(self, 1, -1);
             }
         }
         return;
@@ -39,8 +41,8 @@ void func_L11_003983F0(u8 *arg0) {
     if (D_L11_001B30C8 >= 6 && D_L11_001AED04 == 0 &&
         enabled != 0 && D_001A7A72 == 0) {
         D_001A7A72 = 1;
-        func_002E5E58(1, 0, 0);
-        func_002B0A18(0x1233, -1);
+        PlaySoundFromGlobalBank(1, 0, 0);
+        SetEntryValueByIndex(0x1233, -1);
         D_L11_001A903C = 1;
     }
     if (D_L11_001AED08 < 12)
@@ -48,7 +50,7 @@ void func_L11_003983F0(u8 *arg0) {
     if (D_001A7A74 != 0)
         return;
     D_001A7A74 = 1;
-    func_002E5E58(1, 0, 0);
-    func_002B0A18(0x1233, -1);
+    PlaySoundFromGlobalBank(1, 0, 0);
+    SetEntryValueByIndex(0x1233, -1);
     D_L11_001A903C = 1;
 }

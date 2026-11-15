@@ -42,6 +42,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
 
 
+/* Draws up to three glowing rings and the side strips that join them, fading out over time. */
 void func_L00_003A91A0(unsigned char *object)
 {
     int ring;
@@ -50,28 +51,28 @@ void func_L00_003A91A0(unsigned char *object)
     BeamVector vertices[3][20];
     BeamVector temp, side;
     unsigned char *vars = *(unsigned char **)(object + 0x68);
-    char *base = func_L00_0032A088(0x5cb, *(short *)(vars + 0x1a));
-    BeamRing *rings = (BeamRing *)(base + *func_L00_0032A0B8(0x5cb, *(short *)(vars + 0x1a)));
+    char *base = GetSlotBody(0x5cb, *(short *)(vars + 0x1a));
+    BeamRing *rings = (BeamRing *)(base + *GetSlotHeader(0x5cb, *(short *)(vars + 0x1a)));
     int row, j;
     u32 primary, col, alpha;
     float side_u, fade, phase, u, next, phase2;
 
-    func_00281DE8(&quad, 21, 0, 128);
+    InitQuadPacketState(&quad, 21, 0, 128);
     for (ring = 0; ring < 3; ring++) {
         if (rings[ring].enabled == 0) continue;
         qcopy(matrix[0], rings[ring].basis[0]);
         qcopy(matrix[2], rings[ring].basis[1]);
-        func_00282DD8(matrix[1], matrix[0], matrix[2]);
+        FastVecCross(matrix[1], matrix[0], matrix[2]);
         fade = (float)rings[ring].timer * rings[ring].rate;
-        alpha = func_00283CF0(fade * (float)D_L00_001AF76C) << 24;
+        alpha = FloatToInt(fade * (float)D_L00_001AF76C) << 24;
         col = D_L00_001AF764;
         primary = alpha | col;
         quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
         for (row = 0; row < 3; row++) {
             qcopy(matrix[3], rings[ring].origin[row]);
             for (j = 0; j < 20; j++) {
-                func_00282D30(temp, D_L00_00294B60[j], D_L00_001AF75C);
-                func_002830C0(vertices[row][j], temp, matrix);
+                FastVecScale(temp, D_L00_00294B60[j], D_L00_001AF75C);
+                transform_vector(vertices[row][j], temp, matrix);
             }
         }
         phase = rings[ring].phase;
@@ -95,12 +96,12 @@ void func_L00_003A91A0(unsigned char *object)
                 quad.uv[3][0] = side_u;
                 quad.uv[3][1] = next;
                 u = next;
-                func_00280B90(&quad, 0, 0);
+                draw_world_quad(&quad, 0, 0);
             }
             col = primary;
         }
-        func_00281DE8(&quad, 14, 1, 128);
-        alpha = func_00283CF0(fade * (float)D_L00_001AF784) << 24;
+        InitQuadPacketState(&quad, 14, 1, 128);
+        alpha = FloatToInt(fade * (float)D_L00_001AF784) << 24;
         col = D_L00_001AF780;
         quad.uv[0][0] = 0;
         quad.uv[0][1] = 0;
@@ -113,22 +114,22 @@ void func_L00_003A91A0(unsigned char *object)
         quad.uv[3][0] = 0.5f;
         quad.uv[2][0] = 0.5f;
         col = D_L00_001AF77C;
-        func_00282CF0(temp, &D_L00_001B8DC0, rings[ring].origin[0]);
-        func_00282DD8(matrix[1], matrix[0], temp);
-        func_00282F20(side, matrix[1], D_L00_001AF778);
+        FastVecSub(temp, &gCameraPosition_L00, rings[ring].origin[0]);
+        FastVecCross(matrix[1], matrix[0], temp);
+        vec_scale_to_length(side, matrix[1], D_L00_001AF778);
         for (j = 0; j < 2; j++) {
-            func_00282CC0(quad.point[0], rings[ring].origin[j + 1], side);
-            func_00282CF0(quad.point[1], rings[ring].origin[j + 1], side);
-            func_00282CC0(quad.point[2], rings[ring].origin[j], side);
-            func_00282CF0(quad.point[3], rings[ring].origin[j], side);
+            FastVecAdd(quad.point[0], rings[ring].origin[j + 1], side);
+            FastVecSub(quad.point[1], rings[ring].origin[j + 1], side);
+            FastVecAdd(quad.point[2], rings[ring].origin[j], side);
+            FastVecSub(quad.point[3], rings[ring].origin[j], side);
             quad.color[3] = quad.color[2] = col;
-            func_00280B90(&quad, 0, 0);
+            draw_world_quad(&quad, 0, 0);
             col = primary;
             quad.uv[0][0] = quad.uv[1][0] = quad.uv[2][0];
             quad.uv[2][0] = quad.uv[3][0] = 3.0f;
         }
-        func_00281DE8(&quad, 23, 1, 128);
-        alpha = func_00283CF0(fade * (float)D_L00_001AF794) << 24;
+        InitQuadPacketState(&quad, 23, 1, 128);
+        alpha = FloatToInt(fade * (float)D_L00_001AF794) << 24;
         col = D_L00_001AF790;
         primary = alpha | col;
         quad.uv[2][0] = 1;
@@ -143,14 +144,14 @@ void func_L00_003A91A0(unsigned char *object)
         phase2 = rings[ring].phase2;
         quad.uv[2][0] = quad.uv[3][0] = phase2 + 0.5f;
         col = D_L00_001AF78C;
-        func_00282F20(side, matrix[1], D_L00_001AF788);
+        vec_scale_to_length(side, matrix[1], D_L00_001AF788);
         for (j = 0; j < 2; j++) {
-            func_00282CC0(quad.point[0], rings[ring].origin[j + 1], side);
-            func_00282CF0(quad.point[1], rings[ring].origin[j + 1], side);
-            func_00282CC0(quad.point[2], rings[ring].origin[j], side);
-            func_00282CF0(quad.point[3], rings[ring].origin[j], side);
+            FastVecAdd(quad.point[0], rings[ring].origin[j + 1], side);
+            FastVecSub(quad.point[1], rings[ring].origin[j + 1], side);
+            FastVecAdd(quad.point[2], rings[ring].origin[j], side);
+            FastVecSub(quad.point[3], rings[ring].origin[j], side);
             quad.color[3] = quad.color[2] = col;
-            func_00280B90(&quad, 0, 0);
+            draw_world_quad(&quad, 0, 0);
             col = primary;
             quad.uv[0][0] = quad.uv[1][0] = quad.uv[2][0];
             quad.uv[2][0] = quad.uv[3][0] = phase2 + 3.0f;

@@ -13,31 +13,32 @@ extern void func_00282F20(char *out, char *in, float length);
 extern void func_002836E8(float *out, float *in);
 extern void func_00283098(void *out, void *a, void *b);
 
+/* Aims the Miniturret at its locked target. Drops the target and goes idle when the target is gone. */
 void func_00304F28(char *object)
 {
     float vec[28];
-    char *child = *(char **)(object + 0x68);
-    char *motion = func_002AB1F0(*(char **)(child + 0x68));
-    char *e;
+    char *vars = *(char **)(object + 0x68);
+    char *targetInfo = GetMobyPrivateValue0(*(char **)(vars + 0x68));
+    char *target;
 
-    func_002FE8D8(object + 0x10, &vec[4]);
-    e = *(char **)(child + 0x68);
-    qcopy(&vec[0], e + 0x10);
-    if (motion != 0) {
-        func_00282D30((char *)&vec[12], e + 0xE0, *(float *)(motion + 0x10));
-        func_00282CC0(&vec[0], &vec[0], &vec[12]);
+    GetObjectFacingDirection(object + 0x10, &vec[4]);
+    target = *(char **)(vars + 0x68);
+    qcopy(&vec[0], target + 0x10);
+    if (targetInfo != 0) {
+        FastVecScale((char *)&vec[12], target + 0xE0, *(float *)(targetInfo + 0x10));
+        FastVecAdd(&vec[0], &vec[0], &vec[12]);
     }
-    if (*(char **)(child + 0x68) == 0
-            || *(unsigned char *)(*(char **)(child + 0x68) + 0x20) == 0xFE
-            || *(unsigned char *)(*(char **)(child + 0x68) + 0x20) == 0xFD
-            || !(*(unsigned short *)(*(char **)(child + 0x68) + 0x34) & 0x1000)) {
+    if (*(char **)(vars + 0x68) == 0
+            || *(unsigned char *)(*(char **)(vars + 0x68) + 0x20) == 0xFE
+            || *(unsigned char *)(*(char **)(vars + 0x68) + 0x20) == 0xFD
+            || !(*(unsigned short *)(*(char **)(vars + 0x68) + 0x34) & 0x1000)) {
         *(unsigned char *)(object + 0x20) = 3;
-        *(char **)(child + 0x68) = 0;
+        *(char **)(vars + 0x68) = 0;
         return;
     }
-    func_0029FCC0(object, 0, &vec[8]);
-    func_00282CF0(&vec[12], &vec[0], &vec[8]);
-    func_00282F20(child + 0x20, (char *)&vec[12], 1.0f);
-    func_002836E8(&vec[16], (float *)(object + 0xC0));
-    func_00283098(child + 0x20, child + 0x20, &vec[16]);
+    TransformMobyJointToWorld(object, 0, &vec[8]);
+    FastVecSub(&vec[12], &vec[0], &vec[8]);
+    vec_scale_to_length(vars + 0x20, (char *)&vec[12], 1.0f);
+    FastMatrixHelperC(&vec[16], (float *)(object + 0xC0));
+    matrix_mul_vec3(vars + 0x20, vars + 0x20, &vec[16]);
 }

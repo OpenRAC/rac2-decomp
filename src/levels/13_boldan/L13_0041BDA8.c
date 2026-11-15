@@ -6,18 +6,19 @@ extern u8 *D_L13_001B2A0C __attribute__((sda));
 extern s32 func_002ACBC8(u8 *, s32);
 extern void func_00282F20(u8 *, u8 *, f32);
 
-void func_L13_0041BDA8(u8 *a0) {
-    s32 *ids = *(s32 **)(a0 + 0x68);
+/* Checks up to eight trigger boxes. When the player is inside one, it pushes the player along a set direction and sets a speed value. */
+void func_L13_0041BDA8(u8 *moby) {
+    s32 *boxIds = *(s32 **)(moby + 0x68);
     s32 i;
 
-    if (a0[0x20] == 0) {
-        a0[0x30] = 0xFF;
-        a0[0x20] = 1;
+    if (moby[0x20] == 0) {
+        moby[0x30] = 0xFF;
+        moby[0x20] = 1;
     }
     for (i = 0; i < 8; i++) {
-        if (ids[i] != -1 && func_002ACBC8(D_00189E20.data, ids[i]) != 0) {
-            func_00282F20(D_00189E20.data + 0x270, D_L13_001B2A0C + (ids[i] << 7), -1.0f);
-            D_00189E20.value = 10.0f;
+        if (boxIds[i] != -1 && IsPointInCuboid(gHeroState.data, boxIds[i]) != 0) {
+            vec_scale_to_length(gHeroState.data + 0x270, D_L13_001B2A0C + (boxIds[i] << 7), -1.0f);
+            gHeroState.value = 10.0f;
         }
     }
 }

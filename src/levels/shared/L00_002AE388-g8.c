@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad0[0xE98];
@@ -36,15 +37,16 @@ extern int func_L00_002ADEA0(int);
 extern char *ref_L00_002AF3D8_0(int, int);
 extern void ref_L00_002AF3D8_1(int, void *, int, int, int, int);
 
-void func_L00_002AF3D8(int arg0, int arg1)
+/* Creates the objects for the two item slots if they are missing, using the current item. */
+void func_L00_002AF3D8(int inhibit, int request)
 {
     int id, i;
 
     if (D_00189E20_26.disabled || !D_00189E20_26.enabled ||
-        !D_00189E20_26.active || arg0 || !arg1)
+        !D_00189E20_26.active || inhibit || !request)
         return;
 
-    id = ((EntryAF3D8 *)D_L00_00262570)[D_00139568[func_L00_002ADEA0(0)]].id;
+    id = ((EntryAF3D8 *)gWeaponTable_L00)[gItemSlotToRecord[hero_slot_item_id(0)]].id;
     if (id == -1)
         return;
 

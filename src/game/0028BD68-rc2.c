@@ -26,22 +26,23 @@
 extern s32 D_001A73B8[];
 extern s32 *D_001B18D4;
 
+/* Copies the eight weapon slot ids from the menu entries back into the weapon list. */
 void func_0028BD68(void) {
     s32 i;
-    s32 *var_a0;
-    s32 var_a2;
-    s32 v0;
-    s32 v1;
+    s32 *slot;
+    s32 offset;
+    s32 newValue;
+    s32 oldValue;
 
-    var_a2 = 0;
-    var_a0 = D_001A73B8;
+    offset = 0;
+    slot = gWeaponMenuSlots;
     for (i = 0; i < 8; i++) {
-        v0 = *(s32 *)((s8 *)(var_a2 + *D_001B18D4) + 0x18);
-        v1 = *var_a0;
-        if (v1 != v0) {
-            *var_a0 = v0;
+        newValue = *(s32 *)((s8 *)(offset + *gRadialMenuPages) + 0x18);
+        oldValue = *slot;
+        if (oldValue != newValue) {
+            *slot = newValue;
         }
-        var_a2 += 0x1C;
-        var_a0 += 1;
+        offset += 0x1C;
+        slot += 1;
     }
 }

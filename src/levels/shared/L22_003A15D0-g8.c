@@ -193,6 +193,7 @@ extern void func_002A7750(void *,int,int),func_L00_002AF7D0(void),func_L00_00310
    scan, then the tuning block) and keeps the three child objects in step. The tuning
    block's order matters to the scheduler: f11C is the 34th memory reference after the
    call, so it flushes the pending list, and f1F8 and f1F9 precede the second health read. */
+/* Sets up the space combat ship on its first update. After that it keeps the attached parts, health and start-up controls up to date. */
 void func_L22_003A15D0(Obj_15D0 *obj) {
     Vars_15D0 *p = obj->f68;
     Obj_15D0 *found = 0;
@@ -201,7 +202,7 @@ void func_L22_003A15D0(Obj_15D0 *obj) {
     char *base;
     typedef int Quad __attribute__((mode(TI)));
     union { Quad q; float f[4]; } vec;
-    func_L22_003A6230(obj);
+    ChooseNextAnimation(obj);
     if (obj->f20 == 0) {
         float factor, health, damageScale, rangeScale;
         short x380;
@@ -215,9 +216,9 @@ void func_L22_003A15D0(Obj_15D0 *obj) {
 full_health:
         D_L22_001B2AA8 = p->f326;
 health_done:
-        func_L00_0042A500(p->f46C);
+        ResetCameraEntry(p->f46C);
         D_L22_001AF304 = 1;
-        func_001163A0(T1_COUNT);
+        Srand(T1_COUNT);
         p->f4EC=1;
         D_L22_001B2A8C=0; D_L22_001B2AB4=D_L22_001B1910;
         D_L22_001B2A90=0;
@@ -235,10 +236,10 @@ health_done:
             Obj_15D0 *it;
             it=(Obj_15D0 *)(base+i*256);
             id=it->fAA;
-            if(id==0x27D) found=it;
-            if(id==0xE0B) ref_L22_003A15D0_00=it;
-            if(id==0x133A) it->f34|=0x41;
-            if(it->fAA==0xF6E) {
+            if(id==0x27D /* moby class 637 */) found=it;
+            if(id==0xE0B /* moby class 3595 */) ref_L22_003A15D0_00=it;
+            if(id==0x133A /* moby class 4922 */) it->f34|=0x41;
+            if(it->fAA==0xF6E /* moby class 3950 */) {
                 Sub_15D0 *sub;
                 D_L22_001AF2E0=it; it->f30=255;
                 sub=(Sub_15D0 *)D_L22_001AF2E0->f68;
@@ -248,12 +249,12 @@ health_done:
             base=D_L22_001B211C;
         } while(base+i*256<D_L22_001B2120);
         vec.q=0; vec.f[0]=0.00161f; vec.f[1]=0.29459f; vec.f[2]=1.57105f;
-        qcopy(&D_00189E20.rotation,&vec); qcopy(&D_00189E20.position,(char *)found+0x10);
-        D_00189E20.health=p->f324;
-        func_00282CF0(&vec,(char *)obj+0x10,(char *)&D_00189E20.rotation+0x20);
-        D_L22_001B2AA4=func_00282DF0(&vec);
+        qcopy(&gHeroState.rotation,&vec); qcopy(&gHeroState.position,(char *)found+0x10);
+        gHeroState.health=p->f324;
+        FastVecSub(&vec,(char *)obj+0x10,(char *)&gHeroState.rotation+0x20);
+        D_L22_001B2AA4=FastVecLength(&vec);
         obj->f34|=0x100;
-        x380=func_002A77E0(30);
+        x380=RandomIntBelow(30);
         eight=8;
         p->fD7=1; p->f70=37; p->f71=4;
         p->f77=eight; p->f72=eight; p->f76=eight;
@@ -282,12 +283,12 @@ health_done:
         p->f35E=0; p->f350=0;
         obj->f34|=0x4000;
         obj->f2C=obj->f24->f24*D_L22_001AF39C;
-        func_L22_003A3368(obj); func_L22_003A36A0((char *)obj);
-        p->f440=func_0029EFD0(0xE0A); func_00283360((char *)p->f440+0xC0);
-        p->f444=func_0029EFD0(0xE0C); p->f448=func_0029EFD0(0xF8F);
+        BuildLaneConnectionMasks(obj); SpawnInitialPickups((char *)obj);
+        p->f440=CreateMoby(0xE0A /* moby class 3594 */); set_identity_rotation_rows((char *)p->f440+0xC0);
+        p->f444=CreateMoby(0xE0C /* moby class 3596 */); p->f448=CreateMoby(0xF8F /* moby class 3983 */);
         p->f384=30; p->f43A=0;
     }
-    func_0029B758(func_L22_003A4FF8,func_L22_003A5018);
+    StoreLevelObjectValuePair(CallLevelHelperReturnTrue,DrawSpaceCombatHud);
     if(p->f440) {
         p->f440->f32=obj->f32; p->f440->f30=obj->f30;
         p->f440->f38=obj->f38;
@@ -295,8 +296,8 @@ health_done:
         p->f440->f31=1;
         it=p->f440; it->f2C=it->f24->f24*D_L22_001AF39C;
         it=p->f440;
-        if(it->f31 && func_00282E48((char *)it+0x10,D_L22_001B9C80)<24.0f) {
-            func_002A93B0(p->f440); p->f440->f6F=22;
+        if(it->f31 && fast_vec_dist((char *)it+0x10,D_L22_001B9C80)<24.0f) {
+            UpdateMobyGroundCheck(p->f440); p->f440->f6F=22;
         }
     }
     if(p->f444) {
@@ -314,26 +315,26 @@ health_done:
         it=p->f448; it->f2C=it->f24->f24*D_L22_001AF330;
         func_002A0F48(p->f448);
     }
-    func_002AFFD8((char *)obj+0x10,(char *)p+0x200,0); func_L00_00325600((char *)obj+0xC0,(char *)p+0x200,0); func_002B0ED8(obj,(char *)p+0x60,0);
+    ComputeViewDirection((char *)obj+0x10,(char *)p+0x200,0); NegateAndForwardVector((char *)obj+0xC0,(char *)p+0x200,0); ApplyDamageToObject(obj,(char *)p+0x60,0);
     obj->f2C=obj->f24->f24*D_L22_001AF39C;
     if(D_L22_001AF304) {
         if(++D_L22_001AF304>32000) D_L22_001AF304=1;
-        D_00189E20.mode=10;
+        gHeroState.mode=10;
         if(obj->f95!=1) {
-            p->f350=0; p->f3E4=p->f3E8=0.0f; func_002A7750(obj,1,1);
+            p->f350=0; p->f3E4=p->f3E8=0.0f; SetMobyState(obj,1,1);
         }
-        if(D_00138180.buttons&0x50) {
-            D_L22_001AF304=0; func_002A7750(obj,5,0); D_00138180.buttons=0; D_00189E20.mode=20;
+        if(gPadState.buttons&0x50) {
+            D_L22_001AF304=0; SetMobyState(obj,5,0); gPadState.buttons=0; gHeroState.mode=20;
         } else if(D_L22_001AF304<30) {
-            D_00189E20.field2294=0; func_L00_002AF7D0();
-            func_L00_00310C88(D_00189E20.field2290,&D_00189E20.field1870);
-            D_00189E20.field187C=0; func_L22_002C9898(0,1);
+            gHeroState.field2294=0; cancel_hero_item_animation();
+            release_moby_animation_slot(gHeroState.field2290,&gHeroState.field1870);
+            gHeroState.field187C=0; SetHeroAction_L22(0,1);
         }
-    } else if(D_00189E20.health<=0 && obj->f95!=1) {
+    } else if(gHeroState.health<=0 && obj->f95!=1) {
         p->f350=0; p->f3E4=p->f3E8=0.0f;
-        func_002A7750(obj,2,1); p->f384=30;
+        SetMobyState(obj,2,1); p->f384=30;
     }
-    if(obj->f31 && func_00282E48((char *)obj+0x10,D_L22_001B9C80)<24.0f) {
-        func_002A93B0(obj); obj->f6F=22;
+    if(obj->f31 && fast_vec_dist((char *)obj+0x10,D_L22_001B9C80)<24.0f) {
+        UpdateMobyGroundCheck(obj); obj->f6F=22;
     }
 }

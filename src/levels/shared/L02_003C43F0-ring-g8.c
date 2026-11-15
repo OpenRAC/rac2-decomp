@@ -50,37 +50,37 @@ void func_L02_003E2150(char *obj) {
     u32 color;
     int i, j;
 
-    func_00283658(first, obj + 0xC0);
+    copy_matrix_rotation(first, obj + 0xC0);
     qcopy(first + 12, obj + 0x10);
     *(Quad2150 *)angles = 0;
     first[15] = 1.0f;
     angles[2] = 0.1963495463f;
-    func_002833F0(rotate, angles);
-    color = func_L01_0031BC68(*(float *)(data + 0x18), ref_L02_003E2150_00[0], ref_L02_003E2150_00[1]);
-    func_L02_002EF968(&packets[0], 5, color, ref_L02_003E2150_01, ref_L02_003E2150_02, 1);
-    func_L02_002EF968(&packets[1], 5, color, ref_L02_003E2150_01, ref_L02_003E2150_02 + 0x40, 1);
-    func_L01_002E1510(&packets[0], 2, rotate, 32, first);
+    euler_rotation_basis(rotate, angles);
+    color = PulseColor(*(float *)(data + 0x18), ref_L02_003E2150_00[0], ref_L02_003E2150_00[1]);
+    FillQuadPacket(&packets[0], 5, color, ref_L02_003E2150_01, ref_L02_003E2150_02, 1);
+    FillQuadPacket(&packets[1], 5, color, ref_L02_003E2150_01, ref_L02_003E2150_02 + 0x40, 1);
+    TransformAndDrawEntries(&packets[0], 2, rotate, 32, first);
 
-    func_00283658(second, obj + 0xC0);
+    copy_matrix_rotation(second, obj + 0xC0);
     qcopy(second + 12, obj + 0x10);
     second[15] = 1.0f;
-    second[14] += ref_L02_003E2150_04 + ref_L02_003E2150_03 * func_00283198(*(float *)(data + 0x1C));
+    second[14] += ref_L02_003E2150_04 + ref_L02_003E2150_03 * FastSinOrCosB(*(float *)(data + 0x1C));
     angles[2] = 6.283185482f / ref_L02_003E2150_05;
-    func_002833F0(rotate, angles);
-    color = func_L01_0031BC68(*(float *)(data + 0x18), *(u32 *)(data + 0x28), *(u32 *)(data + 0x2C));
-    color = func_00283D38(color & 0xFFFFFF, color, *(float *)(data + 0x20));
-    func_L02_002EF968(&packets[0], ref_L02_003E2150_06, color, ref_L02_003E2150_07, ref_L02_003E2150_08, 1);
-    func_L01_002E1510(&packets[0], 1, rotate, ref_L02_003E2150_05, second);
+    euler_rotation_basis(rotate, angles);
+    color = PulseColor(*(float *)(data + 0x18), *(u32 *)(data + 0x28), *(u32 *)(data + 0x2C));
+    color = FastTweenColor(color & 0xFFFFFF, color, *(float *)(data + 0x20));
+    FillQuadPacket(&packets[0], ref_L02_003E2150_06, color, ref_L02_003E2150_07, ref_L02_003E2150_08, 1);
+    TransformAndDrawEntries(&packets[0], 1, rotate, ref_L02_003E2150_05, second);
 
     angles[2] = 2.09439516f;
-    func_002833F0(rotate, angles);
-    func_L02_002EF968(&packets[0], ref_L02_003E2150_09, color, ref_L02_003E2150_10, ref_L02_003E2150_11, 1);
-    func_L02_002EF968(&packets[1], ref_L02_003E2150_09, color, ref_L02_003E2150_10, ref_L02_003E2150_11, 1);
+    euler_rotation_basis(rotate, angles);
+    FillQuadPacket(&packets[0], ref_L02_003E2150_09, color, ref_L02_003E2150_10, ref_L02_003E2150_11, 1);
+    FillQuadPacket(&packets[1], ref_L02_003E2150_09, color, ref_L02_003E2150_10, ref_L02_003E2150_11, 1);
     for (j = 0; j < 4; j++)
         packets[1].vertices[j].f[2] += 0.1f;
     for (i = 2; i >= 0; i--) {
-        func_00280B90(&packets[0], second, 1);
-        func_00280B90(&packets[1], second, 1);
-        func_00283738(second, second, rotate);
+        draw_world_quad(&packets[0], second, 1);
+        draw_world_quad(&packets[1], second, 1);
+        multiply_matrix3x3(second, second, rotate);
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -55,8 +56,9 @@ extern s32 func_L23_0041C0B0(void);
 extern float D_L23_001B3930 __attribute__((sda));
 
 /* reports whether the current state object carries byte 0x20 equal to four */
+/* Says whether the current boss-fight object is in state 4. Returns 0 if there is none. */
 s32 func_L23_0041E548(void) {
-    u8 *state = D_L23_001B1484;
+    u8 *state = gMothershipBossMoby;
 
     if (state == 0) {
         return 0;
@@ -78,117 +80,126 @@ extern void func_002E59F8(s32 handle);
 extern void func_0029F338(u8 *object);
 
 /* releases the handle of the slot chosen by the key, then the object the slot holds */
+/* Cleans up a charged shot: stops its charging sound, stops its glow and removes the shot
+   object. The key tells whether it belongs to the hero or to the enemy. */
 void func_L23_00423588(s32 key, s32 flag) {
     s32 *slot;
     s32 handle;
     u8 *obj;
-    u8 *v;
+    u8 *vars;
 
-    if (key == D_0018C0B0) {
-        handle = D_L23_001B194C;
-        slot = &D_L23_001B1954;
+    if (key == gHeroMoby_0018C0B0) {
+        handle = gHeroChargeSoundHandle;
+        slot = &gHeroChargedShotMoby;
         if (handle != -1) {
-            func_002E59F8(handle);
-            D_L23_001B194C = -1;
+            StopSoundVoice(handle);
+            gHeroChargeSoundHandle = -1;
         }
     } else {
-        handle = D_L23_001B1950;
-        slot = &D_L23_001B1958;
+        handle = gEnemyChargeSoundHandle;
+        slot = &gEnemyChargedShotMoby;
         if (handle != -1) {
-            func_002E59F8(handle);
-            D_L23_001B1950 = -1;
+            StopSoundVoice(handle);
+            gEnemyChargeSoundHandle = -1;
         }
     }
     obj = (u8 *)*slot;
     if (obj != 0) {
-        if (*(s16 *)(obj + 0xAA) != 0x1190) {
+        if (*(s16 *)(obj + 0xAA) != 0x1190 /* moby class 4496 */) {
             *slot = 0;
         } else {
             if (flag == 0 && obj[0x20] != 0) {
                 return;
             }
-            v = *(u8 **)(obj + 0x68);
+            vars = *(u8 **)(obj + 0x68);
             D_L23_001A8AB0[0] = 0;
             D_L23_001A8AC0[0] = 0;
-            if (*(s16 *)(v + 0x2C) != -1) {
-                func_00291450(*(s16 *)(v + 0x2C));
+            if (*(s16 *)(vars + 0x2C) != -1) {
+                FreePointLight(*(s16 *)(vars + 0x2C));
             }
-            func_0029F338((u8 *)*slot);
+            MarkMobySpawned((u8 *)*slot);
             *slot = 0;
         }
     }
 }
 
 /* returns one of the two pinned words, chosen by the measured key */
-s32 func_L23_00423698(s32 arg0) {
-    s32 *word = &D_L23_001B1958;
+/* Gets the charged shot object that belongs to the hero or to the enemy, depending on the
+   key. */
+s32 func_L23_00423698(s32 key) {
+    s32 *word = &gEnemyChargedShotMoby;
 
-    if (arg0 == D_0018C0B0) {
-        word = &D_L23_001B1954;
+    if (key == gHeroMoby_0018C0B0) {
+        word = &gHeroChargedShotMoby;
     }
     return *word;
 }
 
 /* releases both measured handles and clears them */
+/* Stops both looping sounds and marks them as not playing. */
 void func_L23_0042AC70(void) {
     s16 handle = D_L23_001B1B94;
 
     if (handle != -1) {
-        func_00291450(handle);
+        FreePointLight(handle);
         D_L23_001B1B94 = -1;
     }
     handle = D_L23_001B1B96;
     if (handle != -1) {
-        func_00291450(handle);
+        FreePointLight(handle);
         D_L23_001B1B96 = -1;
     }
 }
 
 /* releases the measured handles and seeds the frame */
-void func_L23_00429CC0(u8 *arg0) {
-    s32 *payload = *(s32 **)(arg0 + 0x68);
+/* Per-frame update of the effect controller object. It sets up on the first frame, runs
+   the active effect, and stops the looping sounds when they are no longer needed. */
+void func_L23_00429CC0(u8 *moby) {
+    s32 *payload = *(s32 **)(moby + 0x68);
 
-    func_L23_00429DC8(arg0);
+    InitControllerLinkTable(moby);
     if (D_L23_001B1484_2 != 0) {
-        if (func_L23_0041B948() != 0) {
-            func_L00_002E6CF0((void *)func_L23_0042A018, arg0);
-        } else if (func_L23_0041C0C0() != 0) {
-            func_L00_002E6CF0((void *)func_L23_0042A438, arg0);
-        } else if (func_L23_0041C0B0() != 0) {
-            func_L23_0042A8C0(arg0);
+        if (IsBossHeldFlagSet() != 0) {
+            AddDrawCallbackToList1((void *)DrawSpinningStarQuads, moby);
+        } else if (IsBlastTimerRunning() != 0) {
+            AddDrawCallbackToList1((void *)DrawHeroTrailRibbons, moby);
+        } else if (IsBlastCoolingDown() != 0) {
+            SpawnHeroTrailEffect(moby);
         } else {
             payload[1] = 0;
         }
-        if (func_L23_0041C0C0() == 0) {
+        if (IsBlastTimerRunning() == 0) {
             s16 handle = D_L23_001B1B94;
 
             if (handle != -1) {
                 D_L23_001B3930 = 0.02f;
-                func_00291450(handle);
+                FreePointLight(handle);
                 D_L23_001B1B94 = -1;
             }
         }
-        if (func_L23_0041C0B0() == 0) {
+        if (IsBlastCoolingDown() == 0) {
             s16 handle = D_L23_001B1B96;
 
             if (handle != -1) {
-                func_00291450(handle);
+                FreePointLight(handle);
                 D_L23_001B1B96 = -1;
             }
         }
     }
-    func_L23_00429FF8(arg0);
+    IncrementFrameCounterB(moby);
 }
 
 /* refreshes the two counters around the measured callback */
-void func_L23_0042ACC0(void *arg0) {
-    func_L23_0042AD10(arg0);
+/* Per-frame update of a small effect object. It runs the effect while the boss fight is
+   active and counts frames. */
+void func_L23_0042ACC0(void *moby) {
+    InitFixedPositionObject(moby);
     if (D_L23_001B1484_2 != 0) {
         if (D_L23_001B1430 != 0) {
-            func_L00_002E6CF0((void *)func_L23_0042ADB0, arg0);
+            AddDrawCallbackToList1((void *)DrawSpinningQuadTable, moby);
         }
     }
-    func_L23_0042AD90(arg0);
+    IncrementFrameCounterC(moby);
 }
 
 
@@ -199,12 +210,13 @@ extern s32 D_L23_001B13E8 __attribute__((sda));
 extern void func_002E5CF8(int, int, u8 *);
 
 /* publishes the boot stamp once, seeding the shared state first */
+/* Starts the boss fight state once and remembers the starting time. */
 void func_L23_0041E570(void) {
     if (D_L23_001B3714 == 0) {
-        u8 *state = D_L23_001B1484;
+        u8 *state = gMothershipBossMoby;
 
         if (state != 0) {
-            func_002E5CF8(0x10, 0, state);
+            PlayMobySound(0x10, 0, state);
         }
     }
     D_L23_001B3714 = D_L23_001B13E8;
@@ -235,16 +247,17 @@ extern D00189E20_View D_00189E20;
 extern s32 func_002A77E0(s32);
 
 /* collects the timing entries that apply and returns one of them at random (-1 when none does) */
+/* Picks a random attack that is ready to be used. Returns -1 when none is ready. */
 s32 func_L23_0041E418(void) {
-    u8 *obj = *(u8 **)(D_L23_001B1484 + 0x68);
+    u8 *obj = *(u8 **)(gMothershipBossMoby + 0x68);
     L23Table3 table = D_L23_001B17B0;
     s32 count = 0;
 
-    if (D_00189E20.f1874 < *(s16 *)(obj + 0x2F4) - 5) {
+    if (gHeroState.f1874 < *(s16 *)(obj + 0x2F4) - 5) {
         table.v[0] = 0;
         count = 1;
     }
-    if (count == 0 || !(D_00189E20.f1874 < *(s16 *)(obj + 0x2F4) / 2)) {
+    if (count == 0 || !(gHeroState.f1874 < *(s16 *)(obj + 0x2F4) / 2)) {
         if (D_L23_001B1F90.f18 < *(s16 *)(obj + 0x2FA)) {
             table.v[count++] = 1;
         }
@@ -255,7 +268,7 @@ s32 func_L23_0041E418(void) {
     if (count == 0) {
         return -1;
     }
-    switch (func_002A77E0(count)) {
+    switch (RandomIntBelow(count)) {
     case 0:
         return table.v[0];
     case 1:
@@ -285,24 +298,26 @@ extern s16 func_00291308(TI16 *, s32, float, float);
 extern u8 *func_0029EFD0(s32);
 
 /* allocates the object, records it in the word chosen by the key and fills its fields and the level block */
-u8 *func_L23_00423380(u8 *arg0, TI16 *arg1) {
+/* Creates a charged shot object for the hero or the enemy and sets it up. Does nothing if
+   that side already has one. */
+u8 *func_L23_00423380(u8 *owner, TI16 *position) {
     u8 *obj;
     u8 *payload;
     s32 *word;
 
-    obj = func_0029EFD0(0x1190);
-    word = &D_L23_001B1958;
-    if (arg0 == (u8 *)D_0018C0B0) {
-        word = &D_L23_001B1954;
+    obj = CreateMoby(0x1190 /* moby class 4496 */);
+    word = &gEnemyChargedShotMoby;
+    if (owner == (u8 *)gHeroMoby_0018C0B0) {
+        word = &gHeroChargedShotMoby;
     }
     if (obj != 0 && *word == 0) {
         *(u8 *)(obj + 0x30) = 0xFF;
         *(s16 *)(obj + 0x32) = 0xFF;
         *(u8 *)(obj + 0x31) = 1;
-        *(u8 **)(obj + 0xB8) = arg0;
+        *(u8 **)(obj + 0xB8) = owner;
         *(u8 *)(obj + 0x20) = 0;
         payload = *(u8 **)(obj + 0x68);
-        *(TI16 *)(obj + 0x10) = *arg1;
+        *(TI16 *)(obj + 0x10) = *position;
         *word = (s32)obj;
         D_L23_001A8AB4[0] = 0xFF;
         D_L23_001A8AC4[0] = 0x00FFFFFF;
@@ -311,13 +326,13 @@ u8 *func_L23_00423380(u8 *arg0, TI16 *arg1) {
         D_L23_001A8AB0[0] = 0;
         D_L23_001A8AC0[0] = 0;
         *(s32 *)(payload + 0x10) = 0;
-        *(s16 *)(payload + 0x2C) = func_00291308(arg1, 0, 0.0f, 0.0f);
+        *(s16 *)(payload + 0x2C) = AddPointLight(position, 0, 0.0f, 0.0f);
     }
     if (D_L23_001A8FF0 != 0) {
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x100;
-        *(TI16 *)(obj + 0xC0) = *(TI16 *)(arg0 + 0xC0);
-        *(TI16 *)(obj + 0xD0) = *(TI16 *)(arg0 + 0xD0);
-        *(TI16 *)(obj + 0xE0) = *(TI16 *)(arg0 + 0xE0);
+        *(TI16 *)(obj + 0xC0) = *(TI16 *)(owner + 0xC0);
+        *(TI16 *)(obj + 0xD0) = *(TI16 *)(owner + 0xD0);
+        *(TI16 *)(obj + 0xE0) = *(TI16 *)(owner + 0xE0);
     }
     return obj;
 }
@@ -325,24 +340,25 @@ u8 *func_L23_00423380(u8 *arg0, TI16 *arg1) {
 extern s32 func_L00_0035F5A0(s32, s32, s32);
 
 /* makes sure the word chosen by the flag holds an object, then moves it to the given position */
-void func_L23_004234C0(u8 *arg0, TI16 *arg1, s32 arg2) {
-    s32 *word = &D_L23_001B1958;
+/* Makes sure a charged shot exists for one side, then moves it to the given spot. */
+void func_L23_004234C0(u8 *owner, TI16 *position, s32 isHero) {
+    s32 *word = &gEnemyChargedShotMoby;
     TI16 local;
     TI16 *pos = &local;
     u8 *obj;
     u8 *payload;
     u8 *found;
 
-    if (arg2 != 0) {
-        word = &D_L23_001B1954;
+    if (isHero != 0) {
+        word = &gHeroChargedShotMoby;
     }
-    local = *arg1;
+    local = *position;
     if (*word == 0) {
-        func_L23_00423380(arg0, &local);
-        if (arg2 != 0) {
-            D_L23_001B194C = func_L00_0035F5A0(0x14, 0, 0);
+        CreateChargedShot(owner, &local);
+        if (isHero != 0) {
+            gHeroChargeSoundHandle = StartEffectInSlot(0x14, 0, 0);
         } else {
-            D_L23_001B1950 = func_L00_0035F5A0(0x14, 0, 0);
+            gEnemyChargeSoundHandle = StartEffectInSlot(0x14, 0, 0);
         }
         found = (u8 *)*word;
         if (found == 0) {
@@ -350,10 +366,10 @@ void func_L23_004234C0(u8 *arg0, TI16 *arg1, s32 arg2) {
         }
         obj = found;
         payload = *(u8 **)(obj + 0x68);
-        if (*(s16 *)(obj + 0xAA) != 0x1190) {
+        if (*(s16 *)(obj + 0xAA) != 0x1190 /* moby class 4496 */) {
             return;
         }
-        *(s16 *)(payload + 0x40) = arg2;
+        *(s16 *)(payload + 0x40) = isHero;
         *(s32 *)(payload + 0x48) = 0;
         *(s32 *)(payload + 0x44) = 0;
     }
@@ -372,6 +388,7 @@ extern float D_L23_001B36FC __attribute__((sda));
 
 /* state 0 arms the draw distances and a 2000-tick timer and moves to state 1; state 1 copies the
    shared timer when it is set and moves to state 2; both then run the per-frame handler */
+/* Starts the object's life: sets its health, then runs its hit handler every frame. */
 void func_L23_004277E8(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 state = moby[0x20];
@@ -383,7 +400,7 @@ void func_L23_004277E8(u8 *moby) {
         *(float *)(vars + 0x20) = 2000.0f;
         *(s16 *)(vars + 0x24) = 2000;
         *(u16 *)(moby + 0x7C) = 0x3FF;
-        func_002A7750(moby, 1, 0);
+        SetMobyState(moby, 1, 0);
         *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x4000;
     } else if (state == 1) {
         float t = D_L23_001B36FC;
@@ -392,9 +409,9 @@ void func_L23_004277E8(u8 *moby) {
             *(float *)(vars + 0x20) = t;
             *(s16 *)(vars + 0x24) = (s16)t;
         }
-        func_002A7750(moby, 2, 0);
+        SetMobyState(moby, 2, 0);
     }
-    func_L23_004278D8(moby);
+    HandleBossPartHit(moby);
 }
 
 extern s32 D_L23_001B19C4 __attribute__((sda));
@@ -414,25 +431,26 @@ extern s32 D_L23_001B19D8 __attribute__((sda));
 extern void func_L23_00425AF8(void *obj, s32 a, s32 b, s32 c, float x, float y, float z, s32 d, s32 e);
 
 /* draws the record twice: once plain (or with the override word when byte 0x2B is set), once scaled */
-void func_L23_004259E0(u8 *a0) {
-    u8 *obj = *(u8 **)(a0 + 0x68);
+/* Draws the energy ribbon of a trail object, once normally and once larger as a glow. */
+void func_L23_004259E0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (obj[0x2A] == 0) {
-        func_L23_00425AF8(obj + 0x30, obj[0x28], obj[0x29], 5,
-                          *(float *)(obj + 0x10), *(float *)(obj + 0x14), *(float *)(obj + 0x18),
-                          *(s32 *)obj, *(s32 *)(obj + 4));
+    if (vars[0x2A] == 0) {
+        DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28], vars[0x29], 5,
+                          *(float *)(vars + 0x10), *(float *)(vars + 0x14), *(float *)(vars + 0x18),
+                          *(s32 *)vars, *(s32 *)(vars + 4));
         return;
     }
-    if (obj[0x2B] != 0) {
-        func_L23_00425AF8(obj + 0x30, obj[0x28], obj[0x29], 5,
-                          *(float *)(obj + 0x10), *(float *)(obj + 0x14), *(float *)(obj + 0x18),
+    if (vars[0x2B] != 0) {
+        DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28], vars[0x29], 5,
+                          *(float *)(vars + 0x10), *(float *)(vars + 0x14), *(float *)(vars + 0x18),
                           D_L23_001B19D8, D_L23_001B19D8);
     } else {
-        func_L23_00425AF8(obj + 0x30, obj[0x28], obj[0x29], 5,
-                          *(float *)(obj + 0x10), *(float *)(obj + 0x14), *(float *)(obj + 0x18),
-                          *(s32 *)obj, *(s32 *)(obj + 4));
+        DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28], vars[0x29], 5,
+                          *(float *)(vars + 0x10), *(float *)(vars + 0x14), *(float *)(vars + 0x18),
+                          *(s32 *)vars, *(s32 *)(vars + 4));
     }
-    func_L23_00425AF8(obj + 0x30, obj[0x28] * D_L23_001B19C4, obj[0x29] * D_L23_001B19C8, 5,
-                      *(float *)(obj + 0x10) * D_L23_001B19CC, *(float *)(obj + 0x14) * D_L23_001B19D0,
-                      *(float *)(obj + 0x18) * D_L23_001B19D4, *(s32 *)obj, *(s32 *)(obj + 4));
+    DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28] * D_L23_001B19C4, vars[0x29] * D_L23_001B19C8, 5,
+                      *(float *)(vars + 0x10) * D_L23_001B19CC, *(float *)(vars + 0x14) * D_L23_001B19D0,
+                      *(float *)(vars + 0x18) * D_L23_001B19D4, *(s32 *)vars, *(s32 *)(vars + 4));
 }

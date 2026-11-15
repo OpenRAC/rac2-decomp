@@ -19,29 +19,30 @@ extern void func_00115D48(char *, ...);
 extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
 extern int func_00132220(void);
 extern void func_00133108(void);
-int func_00132C48(int cmd, int size, void *arg) {
-    unsigned char *data = arg;
+/* Sends a sound command to the sound server and waits for the answer. Returns the reply value. */
+int func_00132C48(int command, int size, void *argData) {
+    unsigned char *bytes = argData;
     int i;
     int result;
-    for (i = 0; i < size; i++) D_001A70C0[i] = data[i];
+    for (i = 0; i < size; i++) D_001A70C0[i] = bytes[i];
     goto check;
     do {
-        func_00132028();
-        func_0011AEA0(0);
+        snd_Pump();
+        FlushCache(0);
 check:;
     } while (D_001A7480 != 0);
-    func_001322B8(D_001A7080, 1);
-    while (func_0011D810(D_001A7040) != 0) {
-        if (D_001A74F8 == 0) func_00115D48(D_001A7578);
-        func_00132028();
-        func_0011AEA0(0);
+    PrepareSoundReplyBuffer(D_001A7080, 1);
+    while (IsRpcHandleValid(D_001A7040) != 0) {
+        if (D_001A74F8 == 0) Printf(D_001A7578);
+        snd_Pump();
+        FlushCache(0);
     }
     if (size != 0)
-        func_0011D620(D_001A7040, cmd, 1, D_001A70C0, size, D_001A7080, 12, 0, 0);
+        CallRpcServer(D_001A7040, command, 1, D_001A70C0, size, D_001A7080, 12, 0, 0);
     else
-        func_0011D620(D_001A7040, cmd, 1, 0, 0, D_001A7080, 12, 0, 0);
-    while (func_00132220() == 0) {}
+        CallRpcServer(D_001A7040, command, 1, 0, 0, D_001A7080, 12, 0, 0);
+    while (PollSoundRpcDone() == 0) {}
     result = D_001A7080[1];
-    if (*D_001A74A0[D_001A74C0] != 0 && D_001A74C4 == 0) func_00133108();
+    if (*D_001A74A0[D_001A74C0] != 0 && D_001A74C4 == 0) SubmitSoundDmaBuffer();
     return result;
 }

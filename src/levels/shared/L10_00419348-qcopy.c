@@ -33,20 +33,20 @@ void func_L10_00419348(char *obj)
         alt.f[3] = 1.0f;
         qcopy(&dir, &alt);
     }
-    func_00283098(&tail, &dir, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
     qcopy(&mark3, &tail);
-    func_002ACB48(&tail, 0.1f);
-    func_002ACB48(&mark1, 0.1f);
-    func_002ACB48(&mark2, 0.1f);
-    func_002ACB48(&mark3, 0.1f);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.016666668f) * k;
-    func_L00_0033C0D0(obj, &mark1, &drift, &D_L10_001B0FB0, 1);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.016666668f) * k;
-    func_L00_0033C0D0(obj, &mark2, &drift, &D_L10_001B0FC0, 1);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.016666668f) * k;
-    func_L00_0033C0D0(obj, &mark3, &drift, &D_L10_001B0FD0, 1);
+    AddRandomOffsetToVector(&tail, 0.1f);
+    AddRandomOffsetToVector(&mark1, 0.1f);
+    AddRandomOffsetToVector(&mark2, 0.1f);
+    AddRandomOffsetToVector(&mark3, 0.1f);
+    drift.f[0] = -(RandomFloatRange(30.0f, 40.0f) * 0.016666668f) * k;
+    SpawnObjectRelativeParticle(obj, &mark1, &drift, &D_L10_001B0FB0, 1);
+    drift.f[0] = -(RandomFloatRange(30.0f, 40.0f) * 0.016666668f) * k;
+    SpawnObjectRelativeParticle(obj, &mark2, &drift, &D_L10_001B0FC0, 1);
+    drift.f[0] = -(RandomFloatRange(30.0f, 40.0f) * 0.016666668f) * k;
+    SpawnObjectRelativeParticle(obj, &mark3, &drift, &D_L10_001B0FD0, 1);
 }

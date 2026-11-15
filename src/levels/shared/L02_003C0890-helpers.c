@@ -13,6 +13,7 @@ struct ActorPrefix {
     u16 kind, flags;
 };
 
+/* Update for the moby class 2163 rotating piece. On the first frame it remembers its start angle and spawns a linked helper object that copies its flags and position. */
 void func_L02_003C0890(u8 *object) {
     u8 *data = *(u8 **)(object + 0x68);
     u8 *child;
@@ -27,7 +28,7 @@ void func_L02_003C0890(u8 *object) {
             *(f32 *)(data + 0x10) = heading;
             *(int *)(data + 0x18) = value;
         }
-        child = func_0029EFD0(0xAFC);
+        child = CreateMoby(0xAFC /* moby class 2812 */);
         *(u8 **)(data + 0x1C) = child;
         if (child) {
             child[0x30] = object[0x30];
@@ -44,7 +45,7 @@ void func_L02_003C0890(u8 *object) {
                 flags->flags |= 0x41;
             }
         } else {
-            func_0026FEB8(ref_L02_003C0890_00, *(short *)(object + 0xB2));
+            STUB_printf(ref_L02_003C0890_00, *(short *)(object + 0xB2));
         }
     }
 }

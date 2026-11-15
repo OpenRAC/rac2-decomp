@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned long u64;
 typedef int s32;
@@ -9,6 +10,7 @@ extern int D_001B166C;
 extern int D_001B1668 __attribute__((sda));
 extern int D_001A89B0[8] __attribute__((sda));
 extern void func_0027E018(int,int,int,int,int,int,int,int,long,long);
+/* Draws a line of text one letter at a time. Special bytes change the color or add little icons. */
 void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 texture,
                       u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
@@ -22,7 +24,7 @@ void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 t
     if (D_001B166C == 0) {
         D_001A89B0[0] = color;
     }
-    func_002FC560(0x47, 0x33001);
+    VU1_addGSregister(0x47, 0x33001);
     character_count = 0;
     if (character_limit == 0 || *text == 0) {
         return;
@@ -41,7 +43,7 @@ void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 t
                 /* Characters 0x80..0xa7 also draw the glyph 0x40 entries later. */
                 if ((u8)(character + 0x80) < 0x28) {
                     overlay_glyph = (struct Glyph_F6668 *)(((character + 0x40) << 2) + (s32)glyphs);
-                    func_0027E018(x + overlay_glyph->adv, y + overlay_glyph->top, 16, 16,
+                    DrawTexturedQuad(x + overlay_glyph->adv, y + overlay_glyph->top, 16, 16,
                                        overlay_glyph->u, overlay_glyph->v, 16, 16, color, texture);
                 }
                 /* Control glyphs use 24-pixel grayscale sprites. */
@@ -52,10 +54,10 @@ void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 t
                     gray_color += gray_value << 16;
                     gray_color += gray_value << 8;
                     gray_value += gray_color;
-                    func_0027E018(x, y + glyphs[*cursor].top, 24, 16, glyphs[*cursor].u,
+                    DrawTexturedQuad(x, y + glyphs[*cursor].top, 24, 16, glyphs[*cursor].u,
                                        glyphs[*cursor].v, 24, 16, gray_value, texture);
                 } else if (*cursor > 0x20) {
-                    func_0027E018(x, y + glyphs[*cursor].top, 16, 16, glyphs[*cursor].u,
+                    DrawTexturedQuad(x, y + glyphs[*cursor].top, 16, 16, glyphs[*cursor].u,
                                        glyphs[*cursor].v, 16, 16, color, texture);
                 }
                 x += glyphs[*cursor].adv;
@@ -75,6 +77,7 @@ extern void func_0027E1A0(float x, float y, float draw_width, float draw_height,
                          unsigned int *colors, u64 texture);
 
 /* The scaled, floating-point counterpart of func_0027F2A8. */
+/* Draws text letter by letter at a chosen size, with smooth scaling. */
 void func_0027F640(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
                    u64 texture, u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
@@ -101,16 +104,16 @@ void func_0027F640(float x, float y, u64 color, u8 *text, s32 character_limit, f
             }
         } else {
             if (glyphs[*cursor].adv != 0) {
-                offset = func_00283CE0(glyphs[*cursor].top) * scale;
+                offset = IntToFloat(glyphs[*cursor].top) * scale;
                 if ((u8)(*cursor + 0x80) < 0x28) {
                     overlay_glyph = (struct Glyph_F6668 *)(((*cursor + 0x40) << 2) + (s32)glyphs);
-                    dx = func_00283CE0(overlay_glyph->adv) * scale;
-                    dy = func_00283CE0(overlay_glyph->top) * scale;
+                    dx = IntToFloat(overlay_glyph->adv) * scale;
+                    dy = IntToFloat(overlay_glyph->top) * scale;
                     colors[0] = color;
                     colors[1] = color;
                     colors[2] = color;
                     colors[3] = color;
-                    func_0027E1A0(x + dx, y + dy, height, height,
+                    EmitTexturedRectangle(x + dx, y + dy, height, height,
                                   overlay_glyph->u, overlay_glyph->v, 16, 16, colors, texture);
                 }
                 if (*cursor < 0x20) {
@@ -125,17 +128,17 @@ void func_0027F640(float x, float y, u64 color, u8 *text, s32 character_limit, f
                     colors[1] = gray_value;
                     colors[2] = gray_value;
                     colors[3] = gray_value;
-                    func_0027E1A0(x, y + offset, scale * 24.0f, scale * 16.0f,
+                    EmitTexturedRectangle(x, y + offset, scale * 24.0f, scale * 16.0f,
                                   glyphs[*cursor].u, glyphs[*cursor].v, 24, 16, colors, texture);
                 } else if (*cursor > 0x20) {
                     colors[0] = color;
                     colors[1] = color;
                     colors[2] = color;
                     colors[3] = color;
-                    func_0027E1A0(x, y + offset, height, height,
+                    EmitTexturedRectangle(x, y + offset, height, height,
                                   glyphs[*cursor].u, glyphs[*cursor].v, 16, 16, colors, texture);
                 }
-                x += func_00283CE0(glyphs[*cursor].adv) * scale;
+                x += IntToFloat(glyphs[*cursor].adv) * scale;
             }
         }
         character_count++;

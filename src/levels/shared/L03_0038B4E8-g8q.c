@@ -3,31 +3,32 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern int D_001AEF60 __attribute__((sda));
 
-void func_L03_0038B4E8(unsigned char *a0) {
-    unsigned char *p = *(unsigned char **)(a0 + 0x68);
-    unsigned char *q = a0;
-    int v;
+/* Sets the starting values (colors, sizes, timers and position) of an effect moby when it is created. */
+void func_L03_0038B4E8(unsigned char *object) {
+    unsigned char *state = *(unsigned char **)(object + 0x68);
+    unsigned char *source = object;
+    int value;
 
-    v = *(int *)(p + 0x9C);
-    *(int *)(p + 0x94) = 0;
-    if (v < 0)
-        *(int *)(p + 0x9C) = 0xE;
-    v = *(int *)(p + 0x80);
-    if (v < 0)
-        *(int *)(p + 0x80) = 0x10;
-    *(int *)(p + 0xBC) = 0x80402080;
-    *(int *)(p + 0xC0) = 0x80004880;
-    *(float *)(p + 0xA4) = 1.0f;
-    *(float *)(p + 0xA0) = 0.25f;
-    *(int *)(p + 0xA8) = 0;
-    *(int *)(p + 0x60) = 0x807F0000;
-    *(int *)(p + 0x64) = 0x8000007F;
-    *(int *)(p + 0x68) = 0x807F0000;
-    *(int *)(p + 0x6C) = 0x8000007F;
-    q += 0x10;
-    *(TI128 *)(p + 0xE0) = *(TI128 *)q;
-    *(int *)(p + 0xD8) = -1;
-    *(int *)(p + 0xDC) = *(int *)(p + 0xDC) << 3;
-    *(float *)(p + 0xE8) = *(float *)(p + 0xE8) + 1.1f;
+    value = *(int *)(state + 0x9C);
+    *(int *)(state + 0x94) = 0;
+    if (value < 0)
+        *(int *)(state + 0x9C) = 0xE;
+    value = *(int *)(state + 0x80);
+    if (value < 0)
+        *(int *)(state + 0x80) = 0x10;
+    *(int *)(state + 0xBC) = 0x80402080;
+    *(int *)(state + 0xC0) = 0x80004880;
+    *(float *)(state + 0xA4) = 1.0f;
+    *(float *)(state + 0xA0) = 0.25f;
+    *(int *)(state + 0xA8) = 0;
+    *(int *)(state + 0x60) = 0x807F0000;
+    *(int *)(state + 0x64) = 0x8000007F;
+    *(int *)(state + 0x68) = 0x807F0000;
+    *(int *)(state + 0x6C) = 0x8000007F;
+    source += 0x10;
+    *(TI128 *)(state + 0xE0) = *(TI128 *)source;
+    *(int *)(state + 0xD8) = -1;
+    *(int *)(state + 0xDC) = *(int *)(state + 0xDC) << 3;
+    *(float *)(state + 0xE8) = *(float *)(state + 0xE8) + 1.1f;
     D_001AEF60 = 0;
 }

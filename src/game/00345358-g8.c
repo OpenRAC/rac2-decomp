@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The 23-word descriptor func_00337210 takes, filled from the object: the defaults
    first, then the object's own fields. The same shape as func_00344F98, in the -G8
@@ -21,35 +22,36 @@ extern int D_001AE4C0 __attribute__((sda));
 
 extern int D_001AE4C8 __attribute__((sda));
 
-void func_003464D0(char *o)
+/* Fills in the draw descriptor for the item grid, in mode 1, and hands it to the grid drawer. */
+void func_003464D0(char *menu)
 {
-    int f[23];
+    int desc[23];
 
-    f[20] = 0;
-    f[14] = 1;
-    f[11] = 0;
-    f[13] = 0;
-    f[21] = 1;
-    f[19] = *(int *)(o + 0x494);
-    f[21] = ((*(int *)(o + 0x498) ^ 1) == 0);
-    f[3] = *(int *)(o + 0x48C);
-    f[4] = *(int *)(o + 0x490);
-    f[16] = (int)(o + 0x448);
-    f[9] = (int)&D_001AE4C8;
-    f[1] = D_001AE4A0;
-    f[2] = D_001AE4A4;
-    f[0] = (int)D_001AA898;
-    f[17] = (int)(o + 0x210);
-    f[10] = (int)(o + 0x130);
-    f[12] = (int)(o + 0x17C);
-    f[15] = (int)(o + 0x258);
-    f[18] = *(int *)(o + 0x400);
-    f[8] = (int)&D_001AE4C0;
-    f[7] = (int)&D_001AE4B8;
-    f[6] = (int)&D_001AE4B0;
-    f[5] = (int)&D_001AE4A8;
-    f[22] = 1;
-    func_00337210(f);
+    desc[20] = 0;
+    desc[14] = 1;
+    desc[11] = 0;
+    desc[13] = 0;
+    desc[21] = 1;
+    desc[19] = *(int *)(menu + 0x494);
+    desc[21] = ((*(int *)(menu + 0x498) ^ 1) == 0);
+    desc[3] = *(int *)(menu + 0x48C);
+    desc[4] = *(int *)(menu + 0x490);
+    desc[16] = (int)(menu + 0x448);
+    desc[9] = (int)&D_001AE4C8;
+    desc[1] = D_001AE4A0;
+    desc[2] = D_001AE4A4;
+    desc[0] = (int)D_001AA898;
+    desc[17] = (int)(menu + 0x210);
+    desc[10] = (int)(menu + 0x130);
+    desc[12] = (int)(menu + 0x17C);
+    desc[15] = (int)(menu + 0x258);
+    desc[18] = *(int *)(menu + 0x400);
+    desc[8] = (int)&D_001AE4C0;
+    desc[7] = (int)&D_001AE4B8;
+    desc[6] = (int)&D_001AE4B0;
+    desc[5] = (int)&D_001AE4A8;
+    desc[22] = 1;
+    DrawItemGrid(desc);
 }
 
 extern char D_001AA7D8[];
@@ -68,35 +70,36 @@ extern int D_001AE490 __attribute__((sda));
 
 extern int D_001AE498 __attribute__((sda));
 
-void func_003463C8(char *o)
+/* Fills in the draw descriptor for the item grid, in mode 3, and hands it to the grid drawer. */
+void func_003463C8(char *menu)
 {
-    int f[23];
+    int desc[23];
 
-    f[20] = 0;
-    f[11] = 0;
-    f[13] = 0;
-    f[21] = 1;
-    f[19] = *(int *)(o + 0x494);
-    f[21] = ((*(int *)(o + 0x498) ^ 3) == 0);
-    f[3] = *(int *)(o + 0x48C);
-    f[4] = *(int *)(o + 0x490);
-    f[16] = (int)(o + 0x448);
-    f[9] = (int)&D_001AE498;
-    f[14] = 3;
-    f[1] = D_001AE470;
-    f[2] = D_001AE474;
-    f[0] = (int)D_001AA7D8;
-    f[17] = (int)(o + 0x210);
-    f[10] = (int)(o + 0x130);
-    f[12] = (int)(o + 0x17C);
-    f[15] = (int)(o + 0x258);
-    f[18] = *(int *)(o + 0x400);
-    f[8] = (int)&D_001AE490;
-    f[7] = (int)&D_001AE488;
-    f[6] = (int)&D_001AE480;
-    f[5] = (int)&D_001AE478;
-    f[22] = 1;
-    func_00337210(f);
+    desc[20] = 0;
+    desc[11] = 0;
+    desc[13] = 0;
+    desc[21] = 1;
+    desc[19] = *(int *)(menu + 0x494);
+    desc[21] = ((*(int *)(menu + 0x498) ^ 3) == 0);
+    desc[3] = *(int *)(menu + 0x48C);
+    desc[4] = *(int *)(menu + 0x490);
+    desc[16] = (int)(menu + 0x448);
+    desc[9] = (int)&D_001AE498;
+    desc[14] = 3;
+    desc[1] = D_001AE470;
+    desc[2] = D_001AE474;
+    desc[0] = (int)D_001AA7D8;
+    desc[17] = (int)(menu + 0x210);
+    desc[10] = (int)(menu + 0x130);
+    desc[12] = (int)(menu + 0x17C);
+    desc[15] = (int)(menu + 0x258);
+    desc[18] = *(int *)(menu + 0x400);
+    desc[8] = (int)&D_001AE490;
+    desc[7] = (int)&D_001AE488;
+    desc[6] = (int)&D_001AE480;
+    desc[5] = (int)&D_001AE478;
+    desc[22] = 1;
+    DrawItemGrid(desc);
 }
 
 /* Pad input on the 3 x 2 selection grid: up/down/left/right move the cursor (sound 3) and
@@ -114,11 +117,12 @@ extern int D_001F2880[];
 extern int D_001ADB10 __attribute__((sda));
 extern SelectionEntry D_00259CE0[];
 
+/* Moves the cursor on a small selection grid with the pad and lets the player pick an item they own. */
 void func_003458F8(SelectionOwner *owner, int buttons)
 {
     if (buttons & 0x1000) {
         int row;
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         row = owner->row - 1;
         owner->row = row;
         if (row < 0) {
@@ -126,7 +130,7 @@ void func_003458F8(SelectionOwner *owner, int buttons)
             owner->state = 1;
         }
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (owner->row == 0) {
             if (owner->column == 0) {
                 owner->column = 1;
@@ -139,14 +143,14 @@ void func_003458F8(SelectionOwner *owner, int buttons)
             owner->column--;
         }
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         --owner->column;
         if (owner->row == 0)
             owner->column = owner->column < 0 ? 2 : owner->column;
         else
             owner->column = owner->column < 1 ? 2 : owner->column;
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         ++owner->column;
         if (owner->row == 0)
             owner->column = owner->column > 2 ? 0 : owner->column;
@@ -154,18 +158,18 @@ void func_003458F8(SelectionOwner *owner, int buttons)
             owner->column = owner->column > 2 ? 1 : owner->column;
     } else if (buttons & 0x40) {
         int id = D_00259CE0[owner->column + owner->row * 3].v[3];
-        if (id && D_001A7AF8[id]) {
-            func_002E5E58(4, 0, 0);
+        if (id && gItemOwnedFlags[id]) {
+            PlaySoundFromGlobalBank(4, 0, 0);
             D_001F2880[0] = id;
             owner->selected = id;
         } else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
     }
     {
         int id = D_00259CE0[owner->column + owner->row * 3].v[3];
         owner->selected = id;
-        if (id && D_001A7AF8[id])
-            D_001ADB10 = ((SelectionMaterial *)(D_00239BA0 + D_00139568[id] * 0xE0))->material;
+        if (id && gItemOwnedFlags[id])
+            gSelectedItemMaterial = ((SelectionMaterial *)(gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 0xE0))->material;
     }
 }
 
@@ -236,50 +240,51 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_00348EC0(char *o)
+/* Draws the list menu rows centred on the screen and highlights the selected row. */
+void func_00348EC0(char *rawMenu)
 {
-    int color = func_002A9588(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
-    int start, i, sp, h, n;
-    float half, spf;
-    ListMenu *menu = (ListMenu *)o;
+    int color = PingPongBlendValues(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
+    int startY, i, spacing, halfHeight, rowCount;
+    float half, spacingF;
+    ListMenu *menu = (ListMenu *)rawMenu;
 
     if (menu->enabled) {
-        func_00336320(o);
-        func_00336320(o + 0x130);
-        func_00336320(o + 0x4C);
-        func_00336320(o + 0x98);
-        func_00336320(o + 0xE4);
-        n = menu->count;
-        half = (float)n * 0.5f;
-        sp = label_y(o, D_001AE5F0, D_001B23A4[0], 0.5f, 1);
-        spf = (float)sp;
-        h = D_001A7344[0] >> 1;
-        start = (int)((float)h - spf * half);
+        DrawScreenElementAtStoredPosition(rawMenu);
+        DrawScreenElementAtStoredPosition(rawMenu + 0x130);
+        DrawScreenElementAtStoredPosition(rawMenu + 0x4C);
+        DrawScreenElementAtStoredPosition(rawMenu + 0x98);
+        DrawScreenElementAtStoredPosition(rawMenu + 0xE4);
+        rowCount = menu->count;
+        half = (float)rowCount * 0.5f;
+        spacing = label_y(rawMenu, D_001AE5F0, D_001B23A4[0], 0.5f, 1);
+        spacingF = (float)spacing;
+        halfHeight = gScreenHeight[0] >> 1;
+        startY = (int)((float)halfHeight - spacingF * half);
         for (i = 0; i < menu->count; i++) {
-            ListRect *p;
+            ListRect *rect;
             char *slot;
-            ListVtable *v;
-            int c;
+            ListVtable *vtable;
+            int rowColor;
 
             if (i == 7 && !menu->showSpecial)
                 continue;
-            p = (ListRect *)((float *)func_00335E10(o + 0x17C));
-            p->x = D_001AE5D0 + menu->origin->x;
-            p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
-            c = i == menu->selected ? color : 0x55F0C070;
-            *((int *)func_00335E20(o + 0x1C8)) = c;
-            func_00336320(o + 0x17C);
-            p = (ListRect *)((float *)func_00335E10(o + 0x1C8));
-            p->x = D_001AE5D0 + menu->origin->x;
-            p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
-            func_00336320(o + 0x1C8);
-            slot = (char *)&((ListSlot *)(o + 0x218))[i];
-            p = (ListRect *)((float *)func_00335E10(slot));
-            p->x = D_001AE5E0 + menu->origin->x;
-            p->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)start;
-            v = *(ListVtable **)(o + i * 72 + 0x248);
-            sp = v->offset;
-            v->call(slot + sp);
+            rect = (ListRect *)((float *)GetFirstField(rawMenu + 0x17C));
+            rect->x = D_001AE5D0 + menu->origin->x;
+            rect->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)startY;
+            rowColor = i == menu->selected ? color : 0x55F0C070;
+            *((int *)GetFieldC(rawMenu + 0x1C8)) = rowColor;
+            DrawScreenElementAtStoredPosition(rawMenu + 0x17C);
+            rect = (ListRect *)((float *)GetFirstField(rawMenu + 0x1C8));
+            rect->x = D_001AE5D0 + menu->origin->x;
+            rect->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)startY;
+            DrawScreenElementAtStoredPosition(rawMenu + 0x1C8);
+            slot = (char *)&((ListSlot *)(rawMenu + 0x218))[i];
+            rect = (ListRect *)((float *)GetFirstField(slot));
+            rect->x = D_001AE5E0 + menu->origin->x;
+            rect->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)startY;
+            vtable = *(ListVtable **)(rawMenu + i * 72 + 0x248);
+            spacing = vtable->offset;
+            vtable->call(slot + spacing);
         }
     }
 }

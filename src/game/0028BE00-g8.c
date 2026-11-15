@@ -44,141 +44,142 @@ extern int func_0028B5D0(int);
 
 static inline Info *InfoOf(int id)
 {
-    return &D_00239BA0[D_00139568[id]];
+    return &gWeaponTable_00239BA0[gItemSlotToRecord[id]];
 }
 
-void func_0028BE00(Selector *p)
+/* Updates the round weapon-select menu: reads the stick, picks a slot, plays the click sound and equips the chosen weapon when the button is let go. */
+void func_0028BE00(Selector *selector)
 {
-    float x, y, mag, ang, a, f, r;
-    int old, n, s, k, id;
+    float stickX, stickY, stickMagnitude, stickAngle, shiftedAngle, slotPosition, oldSlotAngle;
+    int oldSelection, nudge, slot, nextSlot, weaponId;
     int active;
-    unsigned char *c, *e;
+    unsigned char *fade, *fadeStart;
 
-    if (D_001A8C64) return;
+    if (gNoticeOwner) return;
     active = 0;
-    if (!D_001A7BB3 || func_00287E48() || !D_001A7BB3) {
+    if (!D_001A7BB3 || IsMenuStateSeven() || !D_001A7BB3) {
         active = 1;
         if (!D_001A7BB3) {
-            func_00290730();
-            if (!func_00290748()) active = 0;
+            RequestHudOpen();
+            if (!IsHudOpenDone()) active = 0;
         }
     }
-    e = p->fade;
+    fadeStart = selector->fade;
     if (active && D_001A8CFC) {
-        func_0034CB88((char *)D_001A8CFC + 0x376C8, func_00287E48() ? D_001A8D30 : 2);
-        func_00287E60();
+        SetScreenValueAndRestartSixFades((char *)D_001A8CFC + 0x376C8, IsMenuStateSeven() ? D_001A8D30 : 2);
+        SetStateWordToThree();
     }
-    p->timeout = 180;
-    p->timer = 24;
-    if (func_00282978(D_0018C316) && !D_001A7BB3) D_00138180.inhibit = 2;
-    x = D_00138180.x;
-    y = D_00138180.y;
-    mag = func_00282C10(x * x + y * y);
-    if (mag != 0.0f) {
-        x /= mag;
-        y /= mag;
+    selector->timeout = 180;
+    selector->timer = 24;
+    if (FastDecTimer(D_0018C316) && !D_001A7BB3) gPadState.inhibit = 2;
+    stickX = gPadState.x;
+    stickY = gPadState.y;
+    stickMagnitude = square_root(stickX * stickX + stickY * stickY);
+    if (stickMagnitude != 0.0f) {
+        stickX /= stickMagnitude;
+        stickY /= stickMagnitude;
     }
-    ang = func_00283248(x, y);
-    if ((p->state >> 24) == 0) {
-        if ((D_00138180.pressed & 0xF000) || mag < 0.5f || --p->state == -1) {
-            p->selected = -1;
-            p->state = 0x10000FF;
+    stickAngle = FastMatrixHelperA(stickX, stickY);
+    if ((selector->state >> 24) == 0) {
+        if ((gPadState.pressed & 0xF000) || stickMagnitude < 0.5f || --selector->state == -1) {
+            selector->selected = -1;
+            selector->state = 0x10000FF;
         }
     }
-    n = 0;
-    old = p->selected;
-    if ((p->state >> 24) == 1 && (D_00138180.held & 0x10) && active) {
-        if (mag > 0.9f) {
-            a = ang + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)D_001B18D0;
-            f = a * 0.15915494f * (float)D_001B18D0;
-            r = (float)old * 6.2831855f / func_00283CE0(D_001B18D0) - 3.1415927f;
-            if (old == -1 || func_00283C80(r, func_00283BE0(ang, 1.5707964f)) > 0.5890487f) {
-                s = (int)f % D_001B18D0;
-                if ((s ^ 1) & 1) {
-                    float fr = f - (float)func_00283CF0(f);
-                    if (fr > 0.8f) s++;
-                    else if (fr < 0.2f) s--;
-                    s = (s + D_001B18D0) % D_001B18D0;
+    nudge = 0;
+    oldSelection = selector->selected;
+    if ((selector->state >> 24) == 1 && (gPadState.held & 0x10) && active) {
+        if (stickMagnitude > 0.9f) {
+            shiftedAngle = stickAngle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)gRadialSlotCount;
+            slotPosition = shiftedAngle * 0.15915494f * (float)gRadialSlotCount;
+            oldSlotAngle = (float)oldSelection * 6.2831855f / IntToFloat(gRadialSlotCount) - 3.1415927f;
+            if (oldSelection == -1 || FastDiffRots(oldSlotAngle, fast_subtract_rotations(stickAngle, 1.5707964f)) > 0.5890487f) {
+                slot = (int)slotPosition % gRadialSlotCount;
+                if ((slot ^ 1) & 1) {
+                    float fraction = slotPosition - (float)FloatToInt(slotPosition);
+                    if (fraction > 0.8f) slot++;
+                    else if (fraction < 0.2f) slot--;
+                    slot = (slot + gRadialSlotCount) % gRadialSlotCount;
                 }
-                p->selected = s;
-                n = -1;
-                D_001A8E10 = func_00283C28(a - ((float)s * 0.78539824f + 0.39269912f));
-                if (D_001A8E10 > 0.0f) n = 1;
+                selector->selected = slot;
+                nudge = -1;
+                D_001A8E10 = FastFloatHelperG(shiftedAngle - ((float)slot * 0.78539824f + 0.39269912f));
+                if (D_001A8E10 > 0.0f) nudge = 1;
             }
-        } else if (D_00138180.repeat == 0 && (D_00138180.pressed & 0xF000)) {
-            int w;
-            w = old;
-            if (D_00138180.pressed & 0x1000) {
-                int t;
-                if (w == -1) t = D_001A8D90[4];
-                else t = D_001B18D4[D_001A8D48][w].f10;
-                w = t;
+        } else if (gPadState.repeat == 0 && (gPadState.pressed & 0xF000)) {
+            int wanted;
+            wanted = oldSelection;
+            if (gPadState.pressed & 0x1000) {
+                int target;
+                if (wanted == -1) target = D_001A8D90[4];
+                else target = gRadialMenuPages[gRadialMenuPageIndex][wanted].f10;
+                wanted = target;
             }
-            if (D_00138180.pressed & 0x4000) {
-                int t;
-                if (w == -1) t = D_001A8D90[5];
-                else t = D_001B18D4[D_001A8D48][w].f14;
-                w = t;
+            if (gPadState.pressed & 0x4000) {
+                int target;
+                if (wanted == -1) target = D_001A8D90[5];
+                else target = gRadialMenuPages[gRadialMenuPageIndex][wanted].f14;
+                wanted = target;
             }
-            if (D_00138180.pressed & 0x8000) {
-                int t;
-                if (w == -1) t = D_001A8D90[2];
-                else t = D_001B18D4[D_001A8D48][w].f8;
-                w = t;
+            if (gPadState.pressed & 0x8000) {
+                int target;
+                if (wanted == -1) target = D_001A8D90[2];
+                else target = gRadialMenuPages[gRadialMenuPageIndex][wanted].f8;
+                wanted = target;
             }
-            if (D_00138180.pressed & 0x2000) {
-                int t;
-                if (w == -1) t = D_001A8D90[3];
-                else t = D_001B18D4[D_001A8D48][w].fC;
-                w = t;
+            if (gPadState.pressed & 0x2000) {
+                int target;
+                if (wanted == -1) target = D_001A8D90[3];
+                else target = gRadialMenuPages[gRadialMenuPageIndex][wanted].fC;
+                wanted = target;
             }
-            p->selected = w;
+            selector->selected = wanted;
         }
         {
-            Slot *t = D_001B18D4[D_001A8D48];
-            int cur = p->selected;
-            if (t[cur].f0 == 0 && n != 0) {
-                k = (cur + n) % D_001B18D0;
-                if (t[k].f0 != 0) p->selected = k;
+            Slot *target = gRadialMenuPages[gRadialMenuPageIndex];
+            int current = selector->selected;
+            if (target[current].f0 == 0 && nudge != 0) {
+                nextSlot = (current + nudge) % gRadialSlotCount;
+                if (target[nextSlot].f0 != 0) selector->selected = nextSlot;
             }
         }
     }
-    c = p->fade;
-    if (p->selected != old) {
-        func_0026FEB8(D_001A8E18);
-        func_002B7AD0();
-        c[1] = 0;
-        func_002E5E58(3, 0, 0);
-    } else if (c[1] < 8) c[1]++;
-    if (p->selected >= 0 && !func_00294630(InfoOf(D_001B18D4[D_001A8D48][p->selected].f18)->name)) {
-        func_00294420(InfoOf(D_001B18D4[D_001A8D48][p->selected].f18)->name);
+    fade = selector->fade;
+    if (selector->selected != oldSelection) {
+        STUB_printf(D_001A8E18);
+        RequestDiscReadBreak();
+        fade[1] = 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+    } else if (fade[1] < 8) fade[1]++;
+    if (selector->selected >= 0 && !IsClassCached(InfoOf(gRadialMenuPages[gRadialMenuPageIndex][selector->selected].f18)->name)) {
+        LoadClassIntoFreeCacheSlot(InfoOf(gRadialMenuPages[gRadialMenuPageIndex][selector->selected].f18)->name);
     } else {
-        if (!(D_00138180.held & 0x10) && !D_001A63AC) {
-            if (c[0]) c[0]--;
-            if (c[0] == 0 && p->selected >= 0 && (id = D_001B18D4[D_001A8D48][p->selected].f18) != 0) {
-                Info *rr;
-                if (D_00189E20.selected != id && D_0018C750.uses < 0xFFFF) D_0018C750.uses++;
-                if (D_0018C750.maxFrame < D_001A7390) D_0018C750.maxFrame = D_001A7390;
-                D_0018C750.levels = D_0018C750.levels | (1 << D_001A79F0) | 0x80000000;
-                D_00189E20.pending = id;
-                rr = InfoOf(id);
-                if (rr->valid && rr->ammo < D_00139688[id]) D_00139688[id] = rr->ammo;
+        if (!(gPadState.held & 0x10) && !D_001A63AC) {
+            if (fade[0]) fade[0]--;
+            if (fade[0] == 0 && selector->selected >= 0 && (weaponId = gRadialMenuPages[gRadialMenuPageIndex][selector->selected].f18) != 0) {
+                Info *info;
+                if (gHeroState.selected != weaponId && gProgressStatistics.uses < 0xFFFF) gProgressStatistics.uses++;
+                if (gProgressStatistics.maxFrame < D_001A7390) gProgressStatistics.maxFrame = D_001A7390;
+                gProgressStatistics.levels = gProgressStatistics.levels | (1 << gCurrentMapIndex) | 0x80000000;
+                gHeroState.pending = weaponId;
+                info = InfoOf(weaponId);
+                if (info->valid && info->ammo < gItemAmmoCounts[weaponId]) gItemAmmoCounts[weaponId] = info->ammo;
             }
-            if (D_001A7BB3) func_00287E18();
+            if (D_001A7BB3) AdvanceMenuStateOnMode7();
             else {
-                func_00290728();
-                func_00290720();
+                ClearHudFlagB();
+                ClearHudFlagA();
             }
-        } else if (c[0] < 8) c[0]++;
+        } else if (fade[0] < 8) fade[0]++;
     }
-    if (e[0] == 0) {
+    if (fadeStart[0] == 0) {
         {
-            int state = p->state;
-            D_001B1900 = p->selected;
+            int state = selector->state;
+            D_001B1900 = selector->selected;
             D_001B18FC = state;
         }
-        func_0028B5D0(p->handle);
-        p->timer = -6;
+        CloseHudElementByKey(selector->handle);
+        selector->timer = -6;
         D_001B18F8 = D_001B1598;
     }
 }

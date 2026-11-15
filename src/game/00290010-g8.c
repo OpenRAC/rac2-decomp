@@ -14,16 +14,17 @@ extern int func_002900B8(void);
 extern void func_0029B7C0(int (*)(void), int (*)(void), int);
 extern float func_002AA340(int *, int, int);
 
+/* Shows the gauge pop-up in the given mode with two bar colours and a fill amount. */
 void func_00290010(int mode, int first, int second, float amount)
 {
-    if (D_001A9000 == 0 || (D_001A9004 != 2 && mode == 2)) {
-        D_001A9004 = mode;
-        func_0029B7C0(func_00290628, func_002900B8, 1);
+    if (gGaugePopupBlend == 0 || (gGaugePopupMode != 2 && mode == 2)) {
+        gGaugePopupMode = mode;
+        SetLevelObjectTableEntry(PollGaugePopupInput, DrawGaugePopup, 1);
     }
-    if (mode == D_001A9004) {
-        D_001A900C = first;
-        D_001A9010 = second;
-        D_001A9008 = amount;
-        func_002AA340(&D_001A9000, 10, 2);
+    if (mode == gGaugePopupMode) {
+        gGaugePopupColorA = first;
+        gGaugePopupColorB = second;
+        gGaugePopupAmount = amount;
+        StepIntTowardTarget(&gGaugePopupBlend, 10, 2);
     }
 }

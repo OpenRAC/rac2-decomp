@@ -25,24 +25,25 @@
 
 extern s32 ref_L00_003FE8D0_00 __attribute__((sda));
 
-void func_L00_003FE8D0(void *arg0) {
-    s8 *temp_v1 ;
-    s32 var_v0 ;
-    s8 *var_v1;
+/* First-frame setup: clears the object's private data and moves it to the running state. */
+void func_L00_003FE8D0(void *object) {
+    s8 *vars ;
+    s32 count ;
+    s8 *slot;
 
-    temp_v1 = (*(s8 **)((s8 *)(arg0) + (0x68)));
-    if ((*(u8 *)((s8 *)(arg0) + (0x20))) == 0) {
-        var_v0 = ref_L00_003FE8D0_00;
-        (*(s32 *)((s8 *)(temp_v1) + (0))) = 0;
-        (*(s16 *)((s8 *)(temp_v1) + (6))) = 0;
-        if (var_v0 > 0) {
-            var_v1 = temp_v1 + 0x10;
+    vars = (*(s8 **)((s8 *)(object) + (0x68)));
+    if ((*(u8 *)((s8 *)(object) + (0x20))) == 0) {
+        count = ref_L00_003FE8D0_00;
+        (*(s32 *)((s8 *)(vars) + (0))) = 0;
+        (*(s16 *)((s8 *)(vars) + (6))) = 0;
+        if (count > 0) {
+            slot = vars + 0x10;
             do {
-                *(s32 *)var_v1 = 0;
-                var_v0 -= 1;
-                var_v1 += 4;
-            } while (var_v0 != 0);
+                *(s32 *)slot = 0;
+                count -= 1;
+                slot += 4;
+            } while (count != 0);
         }
-        (*(u8 *)((s8 *)(arg0) + (0x20))) = 1U;
+        (*(u8 *)((s8 *)(object) + (0x20))) = 1U;
     }
 }

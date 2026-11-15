@@ -24,13 +24,14 @@ extern void func_L00_002D7140(void *);
 /* While D_L18_001C9D40 is clear: allocates the vector at +0x80 of the object's state block
    (func_L00_002D70A0(5)) when it has none, else sets it to the constant triple of MODE (1, 2 or
    any other). Once D_L18_001C9D40 is set: frees the vector and clears the pointer. */
-void func_L18_003F9DA0(char *a0, s32 mode)
+/* Turns a colour effect on the object on or off, and picks one of three colours for it. */
+void func_L18_003F9DA0(char *object, s32 mode)
 {
-    char *state = *(char **)(a0 + 0x68);
+    char *state = *(char **)(object + 0x68);
 
     if (D_L18_001C9D40 == 0) {
         if (*(float **)(state + 0x80) == 0) {
-            *(void **)(state + 0x80) = func_L00_002D70A0(5);
+            *(void **)(state + 0x80) = AllocCameraOverrideSlot(5);
         } else {
             switch (mode) {
             case 1:
@@ -51,7 +52,7 @@ void func_L18_003F9DA0(char *a0, s32 mode)
             }
         }
     } else {
-        func_L00_002D7140(*(void **)(state + 0x80));
+        EndCameraOverride(*(void **)(state + 0x80));
         *(int *)(state + 0x80) = 0;
     }
 }

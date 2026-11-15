@@ -10,6 +10,7 @@ extern f32 D_L03_001B1A98 __attribute__((sda));
 
 extern void func_L03_00339128(Vec4 *, u8 *, s32, s32, f32, s32, s32, s32);
 
+/* Draws a small marker sprite just above the object. */
 void func_L03_00419850(u8 *object)
 {
     Vec4 frame;
@@ -17,6 +18,6 @@ void func_L03_00419850(u8 *object)
 
     qcopy(&frame, object + 0x10);
     frame.v[2] = frame.v[2] + D_L03_001B1A9C;
-    func_L03_00339128(&frame, object, *(s32 *)(state + 0x10) + 2,
+    CreateTimedEffectEntry(&frame, object, *(s32 *)(state + 0x10) + 2,
                       D_L03_001B1A94, D_L03_001B1A98, 0x20, 2, 0xFF);
 }

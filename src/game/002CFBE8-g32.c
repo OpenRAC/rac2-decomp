@@ -20,36 +20,37 @@ extern FlagTarget *D_0025C024[];
 extern int D_0025C094[];
 extern TextEntry D_0026CF18[];
 
+/* Handles input on the skill points list: moves the cursor through the 30 entries and shows the earned entry text. */
 int func_002CFBE8(void)
 {
     int result = 0;
-    int flags = D_00138180.flags;
-    int old = D_001AB9FC;
+    int flags = gPadState.flags;
+    int oldCursor = D_001AB9FC;
 
     if (flags & 0x10) {
         int value;
-        int status;
+        int returnCode;
         D_001AB9FC = 0;
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
+            returnCode = -1;
             goto finish;
         }
-        status = 0;
+        returnCode = 0;
 finish:
-        return status;
+        return returnCode;
     }
     if (flags & 0x900) {
         D_001AB9FC = 0;
         result = 1;
     } else if (flags & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (--D_001AB9FC < 0)
             D_001AB9FC = 29;
     } else if (flags & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (++D_001AB9FC >= 30)
             D_001AB9FC = 0;
     }
@@ -57,11 +58,11 @@ finish:
         MenuFields *menu = &D_0025C0B8;
         menu->f58 = D_001AB9FC;
         if (D_001A7A60[D_001AB9FC] != 0) {
-            if (old == D_001AB9FC) {
+            if (oldCursor == D_001AB9FC) {
                 if (D_001A63AC[0] == 0) {
-                    if (menu->f50 == old && menu->f44 == 2) {
+                    if (menu->f50 == oldCursor && menu->f44 == 2) {
                         D_0025C024[0]->flags &= -5;
-                    } else if (menu->f54 == old && menu->f44 == 4) {
+                    } else if (menu->f54 == oldCursor && menu->f44 == 4) {
                         D_0025C024[0]->flags &= -5;
                     }
                 }

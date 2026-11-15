@@ -75,6 +75,7 @@ extern void func_002AB6D8(float *, float *);
 extern void func_L00_00403CB8(void *);
 
 /* Spawns moby 0xE7D at self's position: random scale, orientation copied from self's matrix or randomised, then starts it in state 4. */
+/* Turns a thrown object into a Sheep (moby class 3709) at the same spot and adds it to the list of active sheep. */
 Moby403730 *func_L00_00403730(Moby403730 *self) {
     f32 mtx[16] __attribute__((aligned(16)));
     Moby403730 *m;
@@ -83,47 +84,47 @@ Moby403730 *func_L00_00403730(Moby403730 *self) {
     Weapon403730 *w;
     f32 rate;
 
-    m = func_0029EFD0(0xE7D);
+    m = CreateMoby(0xE7D /* Sheep */);
     if (m != 0) {
         m->alpha = 0x7F;
         m->f32 = 0x7F;
         m->f31 = 1;
         vars = m->vars;
-        m->scale = func_002A7878(0.85f, 1.15f);
+        m->scale = RandomFloatRange(0.85f, 1.15f);
         qcopy(m->pos, self->pos);
         if (D_001A8FF4[0] != 0 || D_001A8FF0[0] != 0) {
-            func_00283658(mtx, self->mtx);
-            func_002AB6D8(mtx, m->rot);
+            copy_matrix_rotation(mtx, self->mtx);
+            GetEulerAnglesFromMatrix(mtx, m->rot);
         } else {
-            func_00282C88(m->rot);
-            m->rot[2] = func_002A7940();
+            ClearVector128(m->rot);
+            m->rot[2] = RandomAngle();
         }
         m->state = 0;
         vars->f56 = 0;
-        vars->delay = func_002A7820(0x78, 0x12C);
+        vars->delay = RandomIntRange(0x78, 0x12C);
         vars->f70 = 600;
         vars->f74 = 30;
         vars->f5C = 0;
         vars->f78 = 0;
         m->state = 4;
-        func_L00_00403CB8(m);
+        AddSheepToActiveList(m);
         m->f98 = m->cls->f10;
-        w = &D_L00_00262570[D_00139578[0]];
+        w = &gWeaponTable_L00[D_00139578[0]];
         rate = 1.0f;
         if (w->f4 != 0) {
             rate = 4.0f;
         }
         vars->rate = rate;
         vars->f60 = -1;
-        link = func_002AB1F0(self);
+        link = GetMobyPrivateValue0(self);
         link->f17 = 0x10;
         if (m->flags & 0x1000) {
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
         }
         if (link != 0 && link->mode == 1) {
             link->mode = 2;
         } else {
-            func_0029F338(self);
+            MarkMobySpawned(self);
         }
         func_002A0F48(m);
     }

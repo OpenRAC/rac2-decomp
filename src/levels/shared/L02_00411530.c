@@ -11,14 +11,14 @@ typedef unsigned char u8;
 extern float D_L02_001B2FE0 __attribute__((sda));
 
 /* Clamps the state's float at 0x3C to 0..1 and stores its complement. */
-void func_L02_00411530(u8 *a0)
+void func_L02_00411530(u8 *object)
 {
-    float *s = *(float **)(a0 + 0x68);
-    float x = s[0x3C / 4];
+    float *vars = *(float **)(object + 0x68);
+    float value = vars[0x3C / 4];
 
-    if (x > 1.0f)
-        x = 1.0f;
-    else if (x < 0.0f)
-        x = 0.0f;
-    D_L02_001B2FE0 = 1.0f - x;
+    if (value > 1.0f)
+        value = 1.0f;
+    else if (value < 0.0f)
+        value = 0.0f;
+    D_L02_001B2FE0 = 1.0f - value;
 }

@@ -40,6 +40,7 @@ extern int func_002B5E48(void *, void *);
 /* Retail callers also pass a fourth scratch pointer. This body does not read it;
  * keep the slot explicit so its C interface agrees with those callers.
  */
+/* Moves the object by its speed and then pushes it out of walls and objects, trying up to eight times, and updates the speed. */
 void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *unused_output)
 {
     Vec4Q_002B5678 saved;
@@ -47,23 +48,23 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
     int changed, i, r;
     float len;
 
-    func_00282CC0(position, position, ctl->vel);
+    FastVecAdd(position, position, ctl->vel);
     qcopy(&saved, position);
     ctl->w84 = 0;
     qzero(&ctl->q60);
     changed = 0;
     for (i = 0; i < 8; i++) {
-        r = func_002B5D38(self, ctl);
-        r |= func_002B5E48(self, ctl);
+        r = ResolveWallFloorCollision(self, ctl);
+        r |= ResolveObjectCollision(self, ctl);
         changed |= r;
         if (r == 0)
             break;
     }
     if (changed) {
-        func_00282CF0(ctl->vel, self->pos, target);
-        len = func_00282E20(ctl->vel);
+        FastVecSub(ctl->vel, self->pos, target);
+        len = vec_length_xy(ctl->vel);
         if (ctl->speed < len)
-            func_00282F70(ctl->vel, ctl->vel, ctl->speed);
+            FastVectorNormalizeHelper(ctl->vel, ctl->vel, ctl->speed);
         else
             ctl->speed = len;
         if (self->pos[2] <= ctl->f90) {
@@ -75,9 +76,9 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
         if (ctl->speed < ctl->f28 * 0.5f)
             ctl->w80 += 1;
         else
-            func_00282948(&ctl->w80);
+            FastFloatHelperD(&ctl->w80);
     } else {
-        func_00282948(&ctl->w80);
+        FastFloatHelperD(&ctl->w80);
     }
-    func_00282CF0(ctl->out70, self->pos, &saved);
+    FastVecSub(ctl->out70, self->pos, &saved);
 }

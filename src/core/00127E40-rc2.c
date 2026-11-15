@@ -39,38 +39,39 @@ extern s8 D_00141B00[];
 extern s8 D_00141BB0[];
 extern s8 D_001430C0[];
 
-s32 func_00127E40(s32 arg0, s32 arg1, s8 *arg2, s32 arg3, s32 arg4, s32 arg5) {
-    s8 *g;
-    s8 *rec;
-    s32 r;
+/* Changes the information stored with a file on a memory card. */
+s32 func_00127E40(s32 port, s32 slot, s8 *fname, s32 flags, s32 blockCount, s32 bufferAddr) {
+    s8 *client;
+    s8 *request;
+    s32 result;
 
-    g = D_00141B00;
-    if (*(s32 *)(g + 0x24) == 0) {
+    client = D_00141B00;
+    if (*(s32 *)(client + 0x24) == 0) {
         return -0x64;
     }
-    if (func_0011AC70(D_00137E6C) < 0) {
+    if (PollSema(D_00137E6C) < 0) {
         return -0xC8;
     }
-    if (arg2 == NULL || *arg2 == 0) {
-        func_0011AC40(D_00137E6C);
+    if (fname == NULL || *fname == 0) {
+        SignalSema(D_00137E6C);
         return -0xD2;
     }
-    *(s32 *)D_00141BB0 = arg0;
-    rec = D_00141BB0;
-    *(s32 *)(rec + 4) = arg1;
-    *(s32 *)(rec + 8) = arg3;
-    *(s32 *)(rec + 0xC) = arg4;
-    *(s32 *)(rec + 0x10) = arg5;
-    func_00115AC0(rec + 0x14, arg2, 0x3FF);
-    rec[0x413] = 0;
-    if (arg4 >= 0) {
-        func_0011CEC8(arg5, arg4 << 6);
+    *(s32 *)D_00141BB0 = port;
+    request = D_00141BB0;
+    *(s32 *)(request + 4) = slot;
+    *(s32 *)(request + 8) = flags;
+    *(s32 *)(request + 0xC) = blockCount;
+    *(s32 *)(request + 0x10) = bufferAddr;
+    strncpy(request + 0x14, fname, 0x3FF);
+    request[0x413] = 0;
+    if (blockCount >= 0) {
+        ProcessSifCmdQueueB(bufferAddr, blockCount << 6);
     }
-    r = func_0011D620(g, 13, 1, rec, 0x414, D_001430C0, 4, 0, 0);
-    if (r == 0) {
+    result = CallRpcServer(client, 13, 1, request, 0x414, D_001430C0, 4, 0, 0);
+    if (result == 0) {
         D_00137E68 = 13;
     } else {
-        func_0011AC40(D_00137E6C);
+        SignalSema(D_00137E6C);
     }
-    return r;
+    return result;
 }

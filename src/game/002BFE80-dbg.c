@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002BFE80 under its parent unit's profile (-g); its own file keeps its
    prototypes apart from 002BF6F0.c's per-caller spellings. */
@@ -27,6 +28,8 @@ extern char D_001B5340[];
 /* Moves an orbiting effect a quarter of the way toward D_001B5340 (capped when
    far), spins it, and fades it with the cosine of its angle; it dies with its
    owner, or once its timer runs out while the cosine is below its minimum. */
+/* Updates a glowing effect that circles around a point and fades in and out.
+   It disappears when its owner is gone. */
 void func_002BFE80(char *effect)
 {
     float d[4] __attribute__((aligned(16)));
@@ -36,25 +39,25 @@ void func_002BFE80(char *effect)
     float den;
     float t;
 
-    func_00282CF0(d, D_001B5340, effect + 0x30);
+    FastVecSub(d, gCameraState_001B5340, effect + 0x30);
     o = (Orbit_002BFE80 *)(effect + 0x20);
-    if (func_00282DF0(d) > 1.0f)
-        func_00282F20(d, d, 0.25f);
+    if (FastVecLength(d) > 1.0f)
+        vec_scale_to_length(d, d, 0.25f);
     else
-        func_00282D30(d, d, 0.25f);
-    func_00282CC0(effect + 0x10, o->target, d);
-    o->angle = func_00283B98(o->angle, o->rate);
-    c = func_00283198(o->angle);
-    if ((func_00282978(effect + 0xA) != 0 && (c < o->minimum || c < -0.9f)) || *o->owner == 0) {
+        FastVecScale(d, d, 0.25f);
+    FastVecAdd(effect + 0x10, o->target, d);
+    o->angle = FastAddRotations(o->angle, o->rate);
+    c = FastSinOrCosB(o->angle);
+    if ((FastDecTimer(effect + 0xA) != 0 && (c < o->minimum || c < -0.9f)) || *o->owner == 0) {
         *o->owner = 0;
-        func_002B9180(effect);
+        KillParticle(effect);
         return;
     }
     if (o->minimum < c) {
         num = c - o->minimum;
         den = 1.0f - o->minimum;
         t = num / den;
-        *(int *)(effect + 4) = func_002A9568(t, 0, o->colour);
+        *(int *)(effect + 4) = ForwardTwoValuesAndAmount(t, 0, o->colour);
     }
     else
         *(int *)(effect + 4) = 0;

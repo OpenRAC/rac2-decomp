@@ -14,28 +14,28 @@ extern void func_00129218(void *, void *, float);
 /* Apply the selected record and build the output basis from its Euler angles. */
 int func_002E6A60(void)
 {
-    float m[16];
+    float rotation[16];
     char *rec = ref_L00_002E6A60_00.records + (ref_L00_002E6A60_00.index << 5);
     char *angles = rec + 0x10;
     int result = *(unsigned char *)(rec + 12);
     float *out;
     ref_L00_002E6A60_01 = *(float *)(angles + 12);
-    func_0027AB40();
+    UpdateViewContext();
     out = (float *)&ref_L00_002E6A60_02.position;
     qcopy(out, rec);
-    func_00129178(m);
-    func_001292C0(m, m, *(float *)(rec + 16));
-    func_00129368(m, m, *(float *)(angles + 4));
-    func_00129218(m, m, *(float *)(angles + 8));
+    func_00129178(rotation);
+    SceVibRoutine1292C0(rotation, rotation, *(float *)(rec + 16));
+    SceVibRoutine129368(rotation, rotation, *(float *)(angles + 4));
+    SceVibRoutine129218(rotation, rotation, *(float *)(angles + 8));
 
-    ref_L00_002E6A60_02.basis[0].x = -m[8];
-    ref_L00_002E6A60_02.basis[1].x = -m[0];
-    ref_L00_002E6A60_02.basis[2].x = m[4];
-    ref_L00_002E6A60_02.basis[0].y = -m[9];
-    ref_L00_002E6A60_02.basis[1].y = -m[1];
-    ref_L00_002E6A60_02.basis[2].y = m[5];
-    ref_L00_002E6A60_02.basis[0].z = -m[10];
-    ref_L00_002E6A60_02.basis[1].z = -m[2];
-    ref_L00_002E6A60_02.basis[2].z = m[6];
+    ref_L00_002E6A60_02.basis[0].x = -rotation[8];
+    ref_L00_002E6A60_02.basis[1].x = -rotation[0];
+    ref_L00_002E6A60_02.basis[2].x = rotation[4];
+    ref_L00_002E6A60_02.basis[0].y = -rotation[9];
+    ref_L00_002E6A60_02.basis[1].y = -rotation[1];
+    ref_L00_002E6A60_02.basis[2].y = rotation[5];
+    ref_L00_002E6A60_02.basis[0].z = -rotation[10];
+    ref_L00_002E6A60_02.basis[1].z = -rotation[2];
+    ref_L00_002E6A60_02.basis[2].z = rotation[6];
     return result;
 }

@@ -12,6 +12,7 @@ extern int D_L20_001B2FB8 __attribute__((sda));
    it; then the member of the group at state+0x218 nearest to this object (within 200,
    skipping those func_00312B58 accepts), or 0.  The loop is the group-iteration form used
    by func_00325DA0. */
+/* Chooses a target for the enemy. It keeps its current one if that is still good, otherwise the nearest valid object of its group within 200 units. */
 char *func_L20_004433B0(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -21,7 +22,7 @@ char *func_L20_004433B0(char *object)
     char *e;
     float closest;
 
-    if (!func_L03_003CA138(candidate) && !func_L20_00449AD8(candidate)) {
+    if (!IsMobyInState1_L03(candidate) && !GetMobyTargetedFlag(candidate)) {
         return candidate;
     }
     best = 0;
@@ -33,8 +34,8 @@ char *func_L20_004433B0(char *object)
         e = D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (!func_00312B58(e)) {
-            float distance = func_00282E80(e + 0x10, object + 0x10);
+        if (!IsMobyInState6(e)) {
+            float distance = vec_distance_xy(e + 0x10, object + 0x10);
             if (distance < closest) {
                 closest = distance;
                 best = e;

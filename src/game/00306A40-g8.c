@@ -71,45 +71,45 @@ extern void func_0027CFD0(void (*)(void *),void *);
    bursts on what it hit, then follows what it stuck to until it is destroyed. */
 void func_00306A40(ProjectileObject *self)
 {
-    Vec old;
+    Vec oldPos;
     int filter[2];
     Vec direction, velocity, quaternion, axis;
     float matrix[12];
     Sweep sweep;
     Vec relative;
     float inverse[16];
-    ProjectileData *child = self->data;
+    ProjectileData *vars = self->data;
     ProjectileObject *hit;
     float angle;
-    int result, counter;
+    int hitResult, slotCounter;
 
     switch (self->state) {
     case 0:
         self->state = 1;
-        counter = D_001AEC0C;
-        child->slot = counter;
-        D_001AEC0C = (counter + 1) % 100;
+        slotCounter = D_001AEC0C;
+        vars->slot = slotCounter;
+        D_001AEC0C = (slotCounter + 1) % 100;
         self->collision = 0;
         /* fall through */
     case 1:
-        func_002FE8D8(&self->position, &direction);
-        func_00282F20(&velocity, &self->transform[8], 1.0f);
-        func_00282DD8(&axis, &velocity, &direction);
-        angle = func_00282DB0(&velocity, &direction) / 2.0f;
-        func_00282D30(&quaternion, &axis, func_00283198(angle));
-        quaternion.w = func_00283180(angle);
-        func_00283958(&quaternion, matrix);
-        func_00283738(self->transform, matrix, self->transform);
-        qcopy(&old, &self->position);
-        func_00282CC0(&self->position, &self->position, child);
-        func_002FEE70(child->flightEffect, child, 0);
-        func_002FE880(&self->position, child, D_001AEC50 * 0.00027777778f);
-        func_00300190(&self->position, &self->position);
+        GetObjectFacingDirection(&self->position, &direction);
+        vec_scale_to_length(&velocity, &self->transform[8], 1.0f);
+        FastVecCross(&axis, &velocity, &direction);
+        angle = FastVecDot(&velocity, &direction) / 2.0f;
+        FastVecScale(&quaternion, &axis, FastSinOrCosB(angle));
+        quaternion.w = FastSinOrCosA(angle);
+        quaternion_to_rotation_basis(&quaternion, matrix);
+        multiply_matrix3x3(self->transform, matrix, self->transform);
+        qcopy(&oldPos, &self->position);
+        FastVecAdd(&self->position, &self->position, vars);
+        SteerEffectDirection(vars->flightEffect, vars, 0);
+        AddObjectDirectionScaled(&self->position, vars, D_001AEC50 * 0.00027777778f);
+        TransformVectorOrCopy(&self->position, &self->position);
         filter[0] = 0;
         filter[1] = 0xc5a;
-        qcopy(&sweep.from, &old);
+        qcopy(&sweep.from, &oldPos);
         qcopy(&sweep.to, &self->position);
-        qcopy(&sweep.velocity, child);
+        qcopy(&sweep.velocity, vars);
         sweep.object = self;
         sweep.filter = filter;
         sweep.mode = 2;
@@ -121,52 +121,52 @@ void func_00306A40(ProjectileObject *self)
         sweep.flag = 1;
         sweep.flag58 = 1;
         sweep.epsilon = 0.0962f;
-        result = func_002FE9D0(&sweep);
+        hitResult = CollideSweptSphere(&sweep);
         qcopy(&self->position, &sweep.to);
-        qcopy(child, &sweep.velocity);
-        if (result != 2)
+        qcopy(vars, &sweep.velocity);
+        if (hitResult != 2)
             break;
         hit = sweep.object;
-        if (!hit || (hit->classId != 0xcb && hit->classId != 0x1366 && hit->classId != 0x1367)) {
-            qzero_nc(child);
-            child->attachment = hit;
+        if (!hit || (hit->classId != 0xcb /* Decoy */ && hit->classId != 0x1366 /* Miniturret */ && hit->classId != 0x1367 /* Megaturret */)) {
+            qzero_nc(vars);
+            vars->attachment = hit;
             if (hit) {
-                child->attachX = hit->position.x;
-                child->attachY = hit->position.y;
-                child->attachZ = hit->position.z;
+                vars->attachX = hit->position.x;
+                vars->attachY = hit->position.y;
+                vars->attachZ = hit->position.z;
             }
-            result = func_00300540(sweep.surface);
-            if (result == 2) {
-                child->velocity.z = -0.025000002f;
+            hitResult = GetWeaponGroup(sweep.surface);
+            if (hitResult == 2) {
+                vars->velocity.z = -0.025000002f;
                 self->state = 7;
                 if (!sweep.surface) {
-                    func_002FD1B8(D_001B22D0, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
-                    hit = func_00312D58(&self->position, 2.0f);
+                    RippleDisturb(gSurfaceHeightTiles, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
+                    hit = SpawnScaledEffectMoby(&self->position, 2.0f);
                     if (hit)
                         hit->field23 = 0x70;
                 }
-            } else if (result == 1) {
+            } else if (hitResult == 1) {
                 self->state = 8;
             } else {
-                child->managerIndex = func_00300280(&ref_00306A40_00, self);
-                func_00307BD0();
-                if (ref_00306A40_00.active[child->managerIndex]) {
+                vars->managerIndex = AddToSlotList(&ref_00306A40_00, self);
+                CleanupProjectileTableAlt();
+                if (ref_00306A40_00.active[vars->managerIndex]) {
                     self->state = 2;
-                    func_002E5DA0(1, 0, self, 0x1367);
-                    func_002A75E0(self, 1, 0, 0, 0);
+                    PlaySoundFromClassBank(1, 0, self, 0x1367 /* Megaturret */);
+                    StartAnimationBlendedWithFlags(self, 1, 0, 0, 0);
                 } else {
                     self->state = 6;
                 }
             }
-            func_002FEE50(child->flightEffect);
-            ref_00306A40_01[child->slot] = D_001AD7EC;
+            ClearEntryFlag(vars->flightEffect);
+            ref_00306A40_01[vars->slot] = D_001AD7EC;
             if (D_001AD7EC) {
-                func_00282CF0(&relative, &self->position, &D_001AD7EC->position);
-                func_00283698(inverse, ref_00306A40_01[child->slot]->transform);
-                func_002830C0(&relative, &relative, inverse);
+                FastVecSub(&relative, &self->position, &D_001AD7EC->position);
+                matrix_from_basis_rows(inverse, ref_00306A40_01[vars->slot]->transform);
+                transform_vector(&relative, &relative, inverse);
                 {
                     /* Set twice, so alias analysis keeps the row's stores in order with the stack. */
-                    int row = child->slot * 12;
+                    int row = vars->slot * 12;
 
                     row += (int)ref_00306A40_02;
                     ((float *)row)[0] = relative.x;
@@ -176,23 +176,23 @@ void func_00306A40(ProjectileObject *self)
             }
             self->collision = *(int *)(self->classData + 0x10);
         } else {
-            func_00282D30(child, child, 1.1f);
+            FastVecScale(vars, vars, 1.1f);
         }
         break;
     case 2:
-        if (func_0029F530(self) >= 6.5f) {
-            func_002A75E0(self, 2, 0, 0, 0);
+        if (GetMobyAnimationValue(self) >= 6.5f) {
+            StartAnimationBlendedWithFlags(self, 2, 0, 0, 0);
             self->state = 3;
         }
         break;
     case 3:
-        func_00307500(self);
+        FindMegaturretTarget(self);
         goto attachment;
     case 4:
-        func_003076F0(self);
-        func_00307808(self);
+        AimMegaturretAtTarget(self);
+        FireMegaturretShot(self);
     attachment: {
-        ProjectileObject *attached = child->attachment;
+        ProjectileObject *attached = vars->attachment;
 
         if (attached) {
             if (attached->state == 254)
@@ -201,83 +201,83 @@ void func_00306A40(ProjectileObject *self)
                 break;
         detached:
             self->collision = 0;
-            child->flightEffect = func_002FED90(self, 0, 1.0f, 1.0f, 1.0f);
+            vars->flightEffect = AllocEffectSlot_002FED90(self, 0, 1.0f, 1.0f, 1.0f);
             self->state = 1;
-            child->attachment = 0;
+            vars->attachment = 0;
         }
     }
         break;
     case 5:
-        if (func_0029F530(self) <= 1.0f) {
-            func_002A75E0(self, 0, 0, 0, 0);
+        if (GetMobyAnimationValue(self) <= 1.0f) {
+            StartAnimationBlendedWithFlags(self, 0, 0, 0, 0);
             self->playback = 1.0f;
             self->state = 6;
         }
         break;
     case 6:
-        if (ref_00306A40_00.active[child->managerIndex]) {
+        if (ref_00306A40_00.active[vars->managerIndex]) {
             self->state = 2;
-            func_002E5DA0(1, 0, self, 0x1367);
-            func_002A75E0(self, 1, 0, 0, 0);
-            child->effect48 = func_002FEC78(self, 0);
+            PlaySoundFromClassBank(1, 0, self, 0x1367 /* Megaturret */);
+            StartAnimationBlendedWithFlags(self, 1, 0, 0, 0);
+            vars->effect48 = AllocateSlotForObject(self, 0);
         }
         break;
     case 7:
-        func_00307298(self);
-        func_00307330(self);
+        UpdateMegaturretFall(self);
+        ApplyRandomPushToProjectileAlt(self);
         break;
     case 8:
-        func_002E5DA0(3, 0, self, 0x1367);
-        func_002AC728(self, &self->position, -1, 0.5f, 13.0f);
+        PlaySoundFromClassBank(3, 0, self, 0x1367 /* Megaturret */);
+        SpawnExplosionWithSparks(self, &self->position, -1, 0.5f, 13.0f);
         self->state = 9;
         self->flags |= 0x41;
         break;
     case 9: {
         int invalid = -1;
 
-        if (child->effect48 != invalid)
-            func_002FED28(child->effect48);
-        if (child->managerIndex != invalid)
-            func_00300300(&ref_00306A40_00, child->managerIndex);
-        func_0029F338(self);
+        if (vars->effect48 != invalid)
+            FreeSlot(vars->effect48);
+        if (vars->managerIndex != invalid)
+            RemoveFromSlotList(&ref_00306A40_00, vars->managerIndex);
+        MarkMobySpawned(self);
         return;
     }
     }
-    if (self->state >= 2 && ref_00306A40_01[child->slot]) {
+    if (self->state >= 2 && ref_00306A40_01[vars->slot]) {
         /* Set twice, as above. */
-        int row = child->slot * 12;
+        int row = vars->slot * 12;
 
         row += (int)ref_00306A40_02;
         direction.x = ((float *)row)[0];
         direction.y = ((float *)row)[1];
         direction.z = ((float *)row)[2];
         direction.w = 0;
-        func_00283098(&direction, &direction, ref_00306A40_01[child->slot]->transform);
-        func_00282CC0(&self->position, &ref_00306A40_01[child->slot]->position, &direction);
+        matrix_mul_vec3(&direction, &direction, ref_00306A40_01[vars->slot]->transform);
+        FastVecAdd(&self->position, &ref_00306A40_01[vars->slot]->position, &direction);
     }
     if (self->state == 3 || self->state == 4)
-        func_003079E8(self);
-    func_002829D8(&child->timer5c);
-    if (func_00282948(&child->timer40) || D_0018C0B4 == 0x6f)
+        AdvanceGrowEffectAlt(self);
+    FastVectorHelperB(&vars->timer5c);
+    if (FastFloatHelperD(&vars->timer40) || D_0018C0B4 == 0x6f)
         if (self->state != 9)
             self->state = 8;
     if (self->state == 3 || self->state == 4) {
-        func_003073E0(self);
-        if (!ref_00306A40_00.active[child->managerIndex]) {
-            func_002A75E0(self, 1, 11, 0, 0);
+        CheckProjectileHitBreakAlt(self);
+        if (!ref_00306A40_00.active[vars->managerIndex]) {
+            StartAnimationBlendedWithFlags(self, 1, 11, 0, 0);
             self->state = 5;
             self->playback = -1.0f;
-            func_002FED28(child->effect48);
-            child->effect48 = -1;
-            child->field4c = 1;
-            child->field50 = 0;
-            child->field44 = 0;
-            child->field64 = 0;
-            qcopy(&child->next, &child->initial);
-            qcopy(&child->previous, &child->initial);
+            FreeSlot(vars->effect48);
+            vars->effect48 = -1;
+            vars->field4c = 1;
+            vars->field50 = 0;
+            vars->field44 = 0;
+            vars->field64 = 0;
+            qcopy(&vars->next, &vars->initial);
+            qcopy(&vars->previous, &vars->initial);
         }
     }
-    if (self->state < 8 && child->attachment)
-        func_00307440(self);
-    func_0027CFD0(func_00307BF0, self);
+    if (self->state < 8 && vars->attachment)
+        FollowAttachedMobyMotionAlt(self);
+    RegisterOverlayDrawCallback(DrawProjectileEffectsAlt, self);
 }

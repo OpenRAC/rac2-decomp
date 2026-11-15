@@ -90,6 +90,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
  * func_002AA800 returns a float (it ends by calling func_002AA738, like its sibling
  * func_002AA898): the ignored call_value is what orders the yaw loads.
  */
+/* A lift that carries the player between two stops: it waits for the player to step on, rides to the other stop and lets the player off. Update handler of moby class 3215. */
 void func_L02_00412D50(u8 *object)
 {
     LiftVector old_position;
@@ -113,16 +114,16 @@ void func_L02_00412D50(u8 *object)
         object[0x30] = 0xFF;
         state->sound = -1;
         if (state->stops[0] == -1 || state->stops[1] == -1) {
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
         if (state->launch_nodes[0] == -1 || state->launch_nodes[1] == -1)
-            func_00282A28();
+            TrapAlways();
         if (state->cameras[0] == -1 || state->cameras[1] == -1)
-            func_00282A28();
+            TrapAlways();
         if (state->flag != -1) {
             if (D_001A7B00[0x1E]) {
-                func_0029F338(object);
+                MarkMobySpawned(object);
                 return;
             }
             *(s32 *)(object + 0x98) = 0;
@@ -130,55 +131,55 @@ void func_L02_00412D50(u8 *object)
                 s16 flags = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
                 *(u16 *)(object + 0x34) = flags;
             }
-            func_002A7750(object, 4, -1);
+            SetMobyState(object, 4, -1);
         } else
-            func_002A7750(object, 1, -1);
+            SetMobyState(object, 1, -1);
         if (object[0x43] != 2)
-            func_002A7470(object, 2, 0, 1);
+            StartAnimationBlended(object, 2, 0, 1);
         index = state->stops[0];
         qcopy_nc(&state->position, &D_L02_001B368C[index].position);
         qcopy_nc(&state->rotation, &D_L02_001B368C[index].rotation);
         break;
     }
     case 4:
-        if (D_0019B2E8[state->flag + (D_001A79F0[0] << 4)] & 0x80) {
-            func_00282D60(&delta, object, 0.0009765625f);
-            if (func_00283DB8(&delta, 64.0f) == -1) {
+        if (D_0019B2E8[state->flag + (gCurrentMapIndex[0] << 4)] & 0x80) {
+            scale_vector(&delta, object, 0.0009765625f);
+            if (FastMathHelperA(&delta, 64.0f) == -1) {
                 s16 flags = (*(u16 *)(object + 0x34) & 0xFFBE) | 0x1000;
                 *(u16 *)(object + 0x34) = flags;
                 *(u32 *)(object + 0x98) = *(u32 *)(*(u8 **)(object + 0x24) + 0x10);
-                func_002A7750(object, 1, -1);
+                SetMobyState(object, 1, -1);
             }
         }
         break;
     case 1: {
         LiftNode *record;
         if (state->flag != -1 && D_001A7B00[0x1E]) {
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
-        if (D_00189E20.lift == object && D_00189E20.active) {
-            func_00282CF0(&delta, D_00189E20.position, object + 0x10);
+        if (gHeroState.lift == object && gHeroState.active) {
+            FastVecSub(&delta, gHeroState.position, object + 0x10);
             point.quad = 0;
             point.f[0] = -1.2f;
             point.f[2] = -0.69f;
-            func_00283098(&point, &point, object + 0xC0);
-            func_00282CC0(&point, &point, object + 0x10);
-            func_00282CF0(&aim, &point, D_00189E20.position);
-            distance = func_00282E20(&aim);
-            func_002AFDD8((char *)object, (char *)&delta, (char *)&delta, 0);
+            matrix_mul_vec3(&point, &point, object + 0xC0);
+            FastVecAdd(&point, &point, object + 0x10);
+            FastVecSub(&aim, &point, gHeroState.position);
+            distance = vec_length_xy(&aim);
+            TransformVectorByObjectOrGiven((char *)object, (char *)&delta, (char *)&delta, 0);
             if (delta.f[2] < -0.6f) {
-                func_0026FEB8(D_L02_001B1C70, func_001234F0(distance));
-                func_L00_002C42E0(0x6F, 1);
-                func_002A7750(object, 2, -1);
+                STUB_printf(D_L02_001B1C70, FloatToDouble(distance));
+                SetHeroAction_L00(0x6F, 1);
+                SetMobyState(object, 2, -1);
             }
-        } else if ((D_L02_001B30C8[0] & 0x3F) == 0) {
+        } else if ((gFrameCounter_L02[0] & 0x3F) == 0) {
             float current;
             side = (state->side + 1) & 1;
             record = &D_L02_001B368C[state->stops[side]];
-            distance = func_00282E80(D_00189E20.position, &record->position);
+            distance = vec_distance_xy(gHeroState.position, &record->position);
             record = &D_L02_001B368C[state->stops[state->side]];
-            current = func_00282E80(D_00189E20.position, &record->position);
+            current = vec_distance_xy(gHeroState.position, &record->position);
             if (distance < current) {
                 s32 index;
                 state->side = side;
@@ -195,27 +196,27 @@ void func_L02_00412D50(u8 *object)
         LiftNode *record;
         s32 count;
         u32 layer;
-        if (D_00189E20.active == 0) {
-            func_003355A8(0);
+        if (gHeroState.active == 0) {
+            SetCameraModeState(0);
             break;
         }
-        if (func_002B3868(object)) {
-            func_00335438(D_L02_001BA500, D_L02_001BA500 + 0x10, 1, 0, 0);
+        if (SetFirstPendingFlag(object)) {
+            SetCamera5Pose(gCameraPosition_L02, gCameraPosition_L02 + 0x10, 1, 0, 0);
             delta.quad = 0;
             delta.f[0] = -1.2f;
             delta.f[2] = -0.69f;
-            func_00283098(&delta, &delta, object + 0xC0);
-            func_00282CC0(&delta, &delta, object + 0x10);
-            func_L00_002D40A0(&delta, 0, *(float *)(object + 0xF8));
-            D_00189E20.boarding = 1;
-            func_002E5CF8(1, 0, (char *)object);
+            matrix_mul_vec3(&delta, &delta, object + 0xC0);
+            FastVecAdd(&delta, &delta, object + 0x10);
+            StartHeroTargetState(&delta, 0, *(float *)(object + 0xF8));
+            gHeroState.boarding = 1;
+            PlayMobySound(1, 0, (char *)object);
             if (object[0x43])
-                func_002A7470(object, 0, 0, 45);
+                StartAnimationBlended(object, 0, 0, 45);
         }
-        func_002AA2E8(&state->speed, D_L02_001B1C50 * 0.016666668f, D_L02_001B1C54 * 0.00027777778f);
-        func_00282F20(&delta, object + 0xC0, state->speed);
+        ApproachValue(&state->speed, D_L02_001B1C50 * 0.016666668f, D_L02_001B1C54 * 0.00027777778f);
+        vec_scale_to_length(&delta, object + 0xC0, state->speed);
         delta.f[2] = 0.0f;
-        func_00282CC0(&state->position, &state->position, &delta);
+        FastVecAdd(&state->position, &state->position, &delta);
         i = 0;
         count = 2;
         layer = 0x10000;
@@ -223,20 +224,20 @@ void func_L02_00412D50(u8 *object)
             qcopy_nc(&point, &D_L02_001B1C60);
             if (i)
                 point.f[1] = -point.f[1];
-            func_00283098(&point, &point, object + 0xC0);
-            func_00282CC0(&point, &point, object + 0x10);
-            func_002A8C28(object, &point, layer, D_L02_001B1C6C[0], 1.0f, 1.0f, 0, 1, 0);
+            matrix_mul_vec3(&point, &point, object + 0xC0);
+            FastVecAdd(&point, &point, object + 0x10);
+            SweepCollisionFromObject(object, &point, layer, D_L02_001B1C6C[0], 1.0f, 1.0f, 0, 1, 0);
         } while (++i < count);
-        qcopy_nc(&point, D_L02_001BA500);
+        qcopy_nc(&point, gCameraPosition_L02);
         point.f[2] += 0.016666668f;
-        qcopy_nc(&aim, (D_L02_001BA500 + 0x10));
-        distance = func_00282E80(&point, D_00189E20.position);
-        target = func_00283248(distance, D_00189E20.position[2] - point.f[2]);
-        func_002AA800(aim.f + 1, 0, -target, 0.013089971616864204f);
-        target = func_00283248(D_00189E20.position[0] - point.f[0], D_00189E20.position[1] - point.f[1]);
-        func_002AA800(aim.f + 2, 0, target, 0.02617994323372841f);
-        func_00335370(&point);
-        func_003353C8(&aim);
+        qcopy_nc(&aim, (gCameraPosition_L02 + 0x10));
+        distance = vec_distance_xy(&point, gHeroState.position);
+        target = FastMatrixHelperA(distance, gHeroState.position[2] - point.f[2]);
+        StepAngleTowardTarget(aim.f + 1, 0, -target, 0.013089971616864204f);
+        target = FastMatrixHelperA(gHeroState.position[0] - point.f[0], gHeroState.position[1] - point.f[1]);
+        StepAngleTowardTarget(aim.f + 2, 0, target, 0.02617994323372841f);
+        CopyVectorToSelectedObject(&point);
+        SetCameraStateRotation(&aim);
         {
             u16 previous = *(u16 *)(object + 0x96);
             s32 ticks = previous + 1;
@@ -245,59 +246,59 @@ void func_L02_00412D50(u8 *object)
                 *(u16 *)(object + 0x96) = stored;
             }
             if (previous >= 121)
-                func_002AA2E8(&D_L02_001B2FE0[0], 1.0f, 0.033333335f);
+                ApproachValue(&D_L02_001B2FE0[0], 1.0f, 0.033333335f);
             else {
                 s32 slot;
                 u8 *sound_record;
                 if ((u16)ticks == 45)
-                    func_L00_002C42E0(0x6F, 1);
+                    SetHeroAction_L00(0x6F, 1);
                 slot = state->sound;
-                sound_record = (u8 *)&D_00188660[slot];
+                sound_record = (u8 *)&gSoundState[slot];
                 if (*(u8 **)(sound_record + 0x88) != object || !sound_record[0x74])
-                    state->sound = func_002E5CF8(0, 4, (char *)object);
+                    state->sound = PlayMobySound(0, 4, (char *)object);
             }
         }
         if (D_L02_001B2FE0[0] >= 1.0f) {
             s32 slot;
-            func_L00_002C42E0(0, 1);
+            SetHeroAction_L00(0, 1);
             slot = state->sound;
             if (slot != -1) {
-                u8 *sound_record = (u8 *)&D_00188660[slot];
+                u8 *sound_record = (u8 *)&gSoundState[slot];
                 if (*(u8 **)(sound_record + 0x88) == object && sound_record[0x74])
-                    func_002E59F8(slot);
+                    StopSoundVoice(slot);
             }
             state->sound = -1;
-            func_002A7398((s8 *)object, 2, 0);
-            func_002A7750(object, 3, -1);
+            StartAnimationImmediate((s8 *)object, 2, 0);
+            SetMobyState(object, 3, -1);
             state->side = (state->side + 1) & 1;
             {
                 s32 index = state->stops[state->side];
                 qcopy_nc(&state->position, &D_L02_001B368C[index].position);
                 qcopy_nc(&state->rotation, &D_L02_001B368C[index].rotation);
             }
-            func_002833F0(object + 0xC0, &state->rotation);
+            euler_rotation_basis(object + 0xC0, &state->rotation);
             record = &D_L02_001B368C[state->launch_nodes[state->side]];
-            func_00282D30(&launch, record, -0.9f);
-            func_00282CC0(&launch, &launch, &record->position);
+            FastVecScale(&launch, record, -0.9f);
+            FastVecAdd(&launch, &launch, &record->position);
             qcopy_nc(&rotation, (&record->rotation));
-            func_L00_002B9D60(&launch, &rotation, 0, 1);
-            func_L00_002D40A0(&record->position, 1, record->rotation.f[2]);
-            func_003355A8(0);
-            func_L00_0042A500(state->cameras[state->side]);
-            func_L02_00413730(object);
+            ResetHeroPositionAndDirection(&launch, &rotation, 0, 1);
+            StartHeroTargetState(&record->position, 1, record->rotation.f[2]);
+            SetCameraModeState(0);
+            ResetCameraEntry(state->cameras[state->side]);
+            ApplyLiftWobble(object);
         }
         break;
     }
     case 3:
-        func_002AA2E8(&D_L02_001B2FE0[0], 0.0f, 0.033333335f);
+        ApproachValue(&D_L02_001B2FE0[0], 0.0f, 0.033333335f);
         if (D_L02_001B2FE0[0] <= 0.0f) {
             state->speed = 0.0f;
-            func_002A7750(object, 1, -1);
+            SetMobyState(object, 1, -1);
         }
         break;
     }
     if (object[0x31])
-        func_L02_00413730(object);
-    func_00282CF0(&delta, object + 0x10, &old_position);
-    func_002AD6F0((u8 *)state + 0x20, &delta, &old_rotation, object + 0xF0);
+        ApplyLiftWobble(object);
+    FastVecSub(&delta, object + 0x10, &old_position);
+    CombineTransformsAndStore((u8 *)state + 0x20, &delta, &old_rotation, object + 0xF0);
 }

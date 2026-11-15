@@ -14,23 +14,23 @@ extern float func_00282E80(char *, char *);
 /* Find the nearest active target and fill the target's position frames. */
 int func_L06_00361728(char *moby, char *target, float distance)
 {
-    char *best = D_00189E20.target;
+    char *best = gHeroState.target;
     int kind = 0;
     int index;
-    if (D_00189E20.mode == 0x18 ||
-        D_00189E20.state == 0x6F) {
+    if (gHeroState.mode == 0x18 ||
+        gHeroState.state == 0x6F) {
         best = 0;
         kind = 2;
     }
     for (index = 1; index <= D_L06_001B2970[0]; index++) {
         char *candidate = D_L06_001B281C + (D_L06_001B2970[index] << 8);
         if (candidate &&
-            (*(short *)(candidate + 0xAA) == 0xCB ||
-             *(short *)(candidate + 0xAA) == 0x76C) &&
+            (*(short *)(candidate + 0xAA) == 0xCB /* Decoy */ ||
+             *(short *)(candidate + 0xAA) == 0x76C /* moby class 1900 */) &&
             *(unsigned char *)(candidate + 0x20) != 0xFE &&
             *(unsigned char *)(candidate + 0x20) != 0xFD &&
             *(unsigned char *)(candidate + 0x20) == 3) {
-            float current = func_00282E80(moby + 0x10, candidate + 0x10);
+            float current = vec_distance_xy(moby + 0x10, candidate + 0x10);
             if (current < distance) {
                 best = candidate;
                 distance = current;
@@ -42,9 +42,9 @@ int func_L06_00361728(char *moby, char *target, float distance)
         *(char **)(target + 0x40) = best;
         qcopy(target, (best + 0x10));
         qcopy((target + 0x10), (best + 0xF0));
-        if (best == D_00189E20.target) {
-            qcopy((target + 0x20), &D_00189E20.first);
-            qcopy((target + 0x30), &D_00189E20.second);
+        if (best == gHeroState.target) {
+            qcopy((target + 0x20), &gHeroState.first);
+            qcopy((target + 0x30), &gHeroState.second);
         } else {
             qcopy((target + 0x30), target);
             *(float *)(target + 0x38) += 0.6f;

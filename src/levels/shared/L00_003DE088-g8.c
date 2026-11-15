@@ -12,7 +12,7 @@ extern int func_002FED90(void *object, int mode, float x, float y, float z);
 /* Spawns the object of type 0xB58 at position with velocity in its state, quarter size, and registers it as the shared one. */
 char *func_L00_003DE088(Quad *position, Quad *velocity)
 {
-    char *object = func_0029EFD0(0xb58);
+    char *object = CreateMoby(0xb58 /* Spider Bot */);
     char *state;
     char *base;
 
@@ -25,15 +25,15 @@ char *func_L00_003DE088(Quad *position, Quad *velocity)
         *(unsigned char *)(object + 0x20) = 0;
         *(unsigned short *)(object + 0x34) |= 0x100;
         *(float *)(object + 0x2c) *= 0.25f;
-        base = D_00189E20;
+        base = gHeroState;
         *(float *)(object + 0xf0) = *(float *)(base + 0x90);
         *(float *)(object + 0xf4) = *(float *)(base + 0x94);
         *(float *)(object + 0xf8) = *(float *)(base + 0x98);
-        func_002833F0(object + 0xc0, object + 0xf0);
+        euler_rotation_basis(object + 0xc0, object + 0xf0);
         *(int *)(state + 0x1c) = 0x7f000000;
-        D_L00_001B043C = object;
+        gSpiderBotMoby = object;
         func_002A0F48(object);
-        D_L00_001B2B4C = func_002FED90(object, 0, 1.0f, 1.0f, 1.0f);
+        D_L00_001B2B4C = AllocEffectSlot_002FED90(object, 0, 1.0f, 1.0f, 1.0f);
     }
     return object;
 }

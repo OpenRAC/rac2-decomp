@@ -24,12 +24,14 @@ extern float func_3067D8(void *, void *);
 extern float func_306720(void *, void *);
 extern float func_306C38(float);
 extern void func_L05_00399268(void *, void *);
+/* Creates a shockwave effect object at a position, may shake the camera when the player is
+   close, and checks if it is on screen. */
 char *func_L05_00398F18(void *position, int shake, int a2, int a3, int a4, int a5, int a6, int a7, float scale)
 {
     float direction[4], normal[4], sphere[4], delta[4];
     char *obj;
     struct EffectState98 *state;
-    obj = func_0029EFD0(0x12e8);
+    obj = CreateMoby(0x12e8);
     if (obj) {
         state = *(struct EffectState98 **)(obj + 0x68);
         *(unsigned char *)(obj + 0x30) = 0xff;
@@ -78,7 +80,7 @@ char *func_L05_00398F18(void *position, int shake, int a2, int a3, int a4, int a
             state->delay = 0;
             state->visible = 0;
         }
-        func_L05_00399268(obj, normal);
+        EmitScaledParticleBurst(obj, normal);
     }
     return obj;
 }

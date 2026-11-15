@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 typedef int s32;
@@ -32,49 +33,55 @@ extern s32 func_0011AC40(s32 a0);
 extern void func_00350A78(int *owner, int *first_address, int *first_count,
                          int *second_address, int *second_count);
 
-s32 func_003506B0(u8 *a0, u8 *a1, s32 a2, s32 a3) {
-    u8 mode[3];
-    s32 sectors = a2 >> 11;
-    s32 out = 0;
-    mode[0] = 100; mode[1] = 1; mode[2] = 0;
-    func_001253A8(*(s32 *)(a0+4), sectors, a1, mode);
-    if (a3 == 0) {
-        *(s32 *)(a0+4) += sectors;
-        func_00124B88(0);
-        out = a2;
+/* Reads disc sectors into a buffer and moves the read position forward when it succeeds. */
+s32 func_003506B0(u8 *reader, u8 *dest, s32 byteCount, s32 failFlag) {
+    u8 readMode[3];
+    s32 sectors = byteCount >> 11;
+    s32 result = 0;
+    readMode[0] = 100; readMode[1] = 1; readMode[2] = 0;
+    StartCdSectorRead(*(s32 *)(reader+4), sectors, dest, readMode);
+    if (failFlag == 0) {
+        *(s32 *)(reader+4) += sectors;
+        WaitSCommandDone(0);
+        result = byteCount;
     }
-    return out;
+    return result;
 }
 
-s32 func_00350750(u8 *a2, s32 a1) {
-    u32 v1 = ((*(u32 *)(a2 + 8) << 4) + *(u32 *)(a2 + 4) + 0x10) & 0x0FFFFFFF;
-    if (a1 == v1) return 0;
-    return (u32)(a1 - *(u32 *)a2) >> 11;
+/* Turns a memory address inside the video buffer into a slot number. */
+s32 func_00350750(u8 *buf, s32 addr) {
+    u32 endAddress = ((*(u32 *)(buf + 8) << 4) + *(u32 *)(buf + 4) + 0x10) & 0x0FFFFFFF;
+    if (addr == endAddress) return 0;
+    return (u32)(addr - *(u32 *)buf) >> 11;
 }
 
-void func_00350798(u32 a0) {
-    func_0011F5E0();
+/* Starts DMA channel 3 with the given control value. */
+void func_00350798(u32 control) {
+    DIntr();
     D_ENABLEW = D_ENABLER | 0x10000;
-    D3_CHCR = a0;
+    D3_CHCR = control;
     D_ENABLEW = D_ENABLER & 0xfffeffff;
     func_0011F628();
 }
 
-void func_00350808(u32 a0) {
-    func_0011F5E0();
+/* Starts DMA channel 4 with the given control value. */
+void func_00350808(u32 control) {
+    DIntr();
     D_ENABLEW = D_ENABLER | 0x10000;
-    D4_CHCR = a0;
+    D4_CHCR = control;
     D_ENABLEW = D_ENABLER & 0xfffeffff;
     func_0011F628();
 }
 
-void func_00350878(unsigned long *a0,unsigned long a1,unsigned long a2,unsigned long a3) {
- *a0=(a1<<32)|((a2<<32)>>4)|((a3<<32)>>32);
+/* Builds a DMA tag from an address, flags and size. */
+void func_00350878(unsigned long *tag,unsigned long a1,unsigned long flags,unsigned long quadCount) {
+ *tag=(a1<<32)|((flags<<32)>>4)|((quadCount<<32)>>32);
 }
 
 extern int func_0011AC20(int *);
 extern int func_00350918(int *);
 
+/* Sets up the video input buffer and then resets it. */
 int func_003508A0(int *object, int address, unsigned int buffer, int count, int *records, int capacity)
 {
     int semaphore[5];
@@ -86,54 +93,56 @@ int func_003508A0(int *object, int address, unsigned int buffer, int count, int 
     object[6] = count << 11;
     semaphore[2] = 1;
     semaphore[1] = 1;
-    object[16] = func_0011AC20(semaphore);
-    func_00350918(object);
+    object[16] = CreateSema(semaphore);
+    ViBufReset(object);
     *(long long *)(object + 18) = 0;
     return 1;
 }
 
-int func_00350918(int *p)
+/* Clears the video input buffer, builds its DMA tag chain and starts DMA channel 4. */
+int func_00350918(int *buf)
 {
     int i;
 
-    p[17] = 1;
-    p[3] = 0;
-    p[4] = 0;
-    p[5] = 0;
-    p[22] = 0;
-    p[23] = 0;
-    for (i = 0; i < p[21]; i++) {
-        *(long long *)((char *)p[20] + i * 24) = -1;
-        *(long long *)((char *)p[20] + i * 24 + 8) = -1;
-        *(int *)((char *)p[20] + i * 24 + 16) = 0;
-        *(int *)((char *)p[20] + i * 24 + 20) = 0;
+    buf[17] = 1;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[22] = 0;
+    buf[23] = 0;
+    for (i = 0; i < buf[21]; i++) {
+        *(long long *)((char *)buf[20] + i * 24) = -1;
+        *(long long *)((char *)buf[20] + i * 24 + 8) = -1;
+        *(int *)((char *)buf[20] + i * 24 + 16) = 0;
+        *(int *)((char *)buf[20] + i * 24 + 20) = 0;
     }
-    for (i = 0; i < p[2]; i++) {
-        F0b028b34_FUN_00350878((char *)(p[1] + i * 16), (i * 2048 + p[0]) & 0x0FFFFFFF, 3, 128);
+    for (i = 0; i < buf[2]; i++) {
+        F0b028b34_FUN_00350878((char *)(buf[1] + i * 16), (i * 2048 + buf[0]) & 0x0FFFFFFF, 3, 128);
     }
-    F0b028b34_FUN_00350878((char *)(p[1] + i * 16), p[1] & 0x0FFFFFFF, 2, 0);
+    F0b028b34_FUN_00350878((char *)(buf[1] + i * 16), buf[1] & 0x0FFFFFFF, 2, 0);
     D4_QWC = 0;
-    D4_MADR = p[0] & 0x0FFFFFFF;
-    D4_TADR = p[1] & 0x0FFFFFFF;
+    D4_MADR = buf[0] & 0x0FFFFFFF;
+    D4_TADR = buf[1] & 0x0FFFFFFF;
     F0b028b34_FUN_00350808(5);
     return 1;
 }
 
-void func_00350A78(s32 *a0, s32 *a1, s32 *a2, s32 *a3, s32 *a4) {
-    s32 pos, left;
-    func_0011AC60(a0[16]);
-    left = (s32)((long)a0[2] - (long)(a0[4]+2)) * 2048 - a0[5];
-    pos = ((a0[3] + a0[4]) * 2048 + a0[5]) % a0[6];
-    if (left <= a0[6]-pos) {
-        *a1 = a0[0]+pos;
-        *a2 = left;
-        *a3 = 0;
-        *a4 = 0;
+/* Works out the free space in the video buffer as one or two memory ranges. */
+void func_00350A78(s32 *buf, s32 *firstAddress, s32 *firstCount, s32 *secondAddress, s32 *secondCount) {
+    s32 writePos, freeBytes;
+    WaitSema(buf[16]);
+    freeBytes = (s32)((long)buf[2] - (long)(buf[4]+2)) * 2048 - buf[5];
+    writePos = ((buf[3] + buf[4]) * 2048 + buf[5]) % buf[6];
+    if (freeBytes <= buf[6]-writePos) {
+        *firstAddress = buf[0]+writePos;
+        *firstCount = freeBytes;
+        *secondAddress = 0;
+        *secondCount = 0;
     } else {
-        *a1 = a0[0]+pos;
-        *a2 = a0[6]-pos;
-        *a3 = a0[0];
-        *a4 = left - (a0[6]-pos);
+        *firstAddress = buf[0]+writePos;
+        *firstCount = buf[6]-writePos;
+        *secondAddress = buf[0];
+        *secondCount = freeBytes - (buf[6]-writePos);
     }
-    func_0011AC40(a0[16]);
+    SignalSema(buf[16]);
 }

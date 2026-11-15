@@ -58,6 +58,7 @@ extern int r1_func_0011BC40_arg(int) __asm__("func_0011DD98");
 
 /* rac1-decomp src/core/00119D88.c: func_0011C208 */
 /* sceClose: close a SIF file handle, adapted from Lombyte (GPL-3.0) for PAL. */
+/* Closes a file number that was opened earlier. Returns 0 on success or a negative error code. */
 int func_0011E360(unsigned int fd) {
     CloseSema sema;
     int result;
@@ -66,14 +67,14 @@ int func_0011E360(unsigned int fd) {
     CloseIob *iob;
     CloseState *state = &r1_D_00156980;
 
-    iob = func_0011D950(fd);
+    iob = GetFileSlot(fd);
     r1_func_0011BC40_arg(1);
     if (r1_D_0012FD94 == 0) {
-        func_0011DDC8();
+        UnlockFileIo();
         return -1;
     }
     if (iob == 0 || iob->active == 0) {
-        func_0011DDC8();
+        UnlockFileIo();
         return -9;
     }
     state->handle = iob->handle;
@@ -89,12 +90,12 @@ int func_0011E360(unsigned int fd) {
                                 r1_D_001575C0, 4, 0, 0);
     if (rpcResult < 0) {
         r1_func_00118C80(sid);
-        func_0011DDC8();
+        UnlockFileIo();
         return -11;
     }
     iob->active = 0;
     rpcResult = *(int *)((unsigned int)r1_D_001575C0 | 0x20000000);
-    func_0011DDC8();
+    UnlockFileIo();
     if (rpcResult == 0) {
         r1_func_00118C80(sid);
         return -11;

@@ -7,6 +7,7 @@ extern float D_L01_001B27A0[];
 extern float D_L01_001B27B0 MACRO_ADDR;
 extern float D_L01_001B27A8 MACRO_ADDR;
 
+/* Moves a falling particle each frame and removes it when it leaves the map or sinks below the ground. */
 void func_L01_00331E08(char *object)
 {
     float offset[4] __attribute__((aligned(16)));
@@ -19,7 +20,7 @@ void func_L01_00331E08(char *object)
     int x;
     int y;
     if (*(float *)(object + 0x10) < 0.0f || *(float *)(object + 0x14) < 0.0f || *(float *)(object + 0x10) > 512.0f || *(float *)(object + 0x14) > 512.0f || *(float *)(object + 0x18) < height) {
-        func_002B9180(object);
+        KillParticle(object);
         return;
     }
     position = (float *)(object + 0x10);
@@ -27,19 +28,19 @@ void func_L01_00331E08(char *object)
     x = (int)*(float *)(object + 0x10);
     y = (int)*(float *)(object + 0x14);
     offset[3] = 0.0f;
-    func_00282CC0(position, position, offset);
-    func_00282CC0(position, position, D_L01_001B27A0);
+    FastVecAdd(position, position, offset);
+    FastVecAdd(position, position, D_L01_001B27A0);
     if (x != (int)*(float *)(object + 0x10) || y != (int)*(float *)(object + 0x14)) {
         *(Quad *)test1 = *(Quad *)position;
-        measured = func_002B0520(test1);
+        measured = GetHeightmapHeightAtPosition(test1);
         if (D_L01_001B27B0 <= measured) {
             *(Quad *)test2 = *(Quad *)position;
-            height = func_002B0520(test2);
+            height = GetHeightmapHeightAtPosition(test2);
         } else {
             height = D_L01_001B27B0;
         }
         if (*(float *)(object + 0x18) < height) {
-            func_002B9180(object);
+            KillParticle(object);
             return;
         }
     }
@@ -47,6 +48,6 @@ void func_L01_00331E08(char *object)
     offset[1] = 0.0f;
     offset[2] = -0.00013888889225199819f;
     offset[3] = 0.0f;
-    func_00282CC0(velocity, offset, velocity);
+    FastVecAdd(velocity, offset, velocity);
     velocity[3] = height + D_L01_001B27A8;
 }

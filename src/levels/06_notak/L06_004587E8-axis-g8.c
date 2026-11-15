@@ -48,15 +48,16 @@ extern int func_002E5DA0(int, int, void *, int);
 extern void func_L00_002E6EF8(void *, void *);
 extern void func_L06_00458F30(char *);
 
-void func_L06_004587E8(char *o) {
+/* Updates a flying projectile: it moves, leaves a twisting trail and bursts when it hits something. */
+void func_L06_004587E8(char *moby) {
     float pos[4];
     typedef union { NotakQuad q; float f[4]; } Vec;
-    char *st = *(char **)(o + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     char *hit;
     float *impact;
-    char *s;
+    char *soundRecord;
     int snd, index, row, col;
-    char *p;
+    char *slot;
     int k, j, sign;
     int count = 6;
     typedef NotakQuad Trail[6][4];
@@ -64,65 +65,65 @@ void func_L06_004587E8(char *o) {
     float size;
     int i;
     int one = 1;
-    int type = *(unsigned char *)(o + 0x20);
+    int type = *(unsigned char *)(moby + 0x20);
     {
     if (type == 0) goto c0;
     if (type == one) goto c1;
     goto def;
     c0: {
         char collision[112];
-        *(float *)(o + 0xF0) = func_00283B98(*(float *)(o + 0xF0), 0.104719773f);
-        func_00282CC0(pos, o + 0x10, st);
-        func_002A8C00(collision, o, 1, st, *(float *)(st + 0x40));
-        *(unsigned short *)(collision + 0x1A) = *(unsigned short *)(o + 0xAA);
-        if (func_002761F8(o + 0x10, pos, 0, o, collision) ||
-            func_0031EBF8(0.3f, o + 0x10, 0, o) || func_00282948(st + 0x38)) {
+        *(float *)(moby + 0xF0) = FastAddRotations(*(float *)(moby + 0xF0), 0.104719773f);
+        FastVecAdd(pos, moby + 0x10, vars);
+        make_hit_descriptor(collision, moby, 1, vars, *(float *)(vars + 0x40));
+        *(unsigned short *)(collision + 0x1A) = *(unsigned short *)(moby + 0xAA);
+        if (CollLine(moby + 0x10, pos, 0, moby, collision) ||
+            func_0031EBF8(0.3f, moby + 0x10, 0, moby) || FastFloatHelperD(vars + 0x38)) {
             hit = D_L06_001BFC80.hit;
             if (hit) {
-                if (hit == *(char **)(st + 0x3C)) goto update_position;
-                if (*(short *)(hit + 0xAA) != 0x4E)
-                    func_002A8C28(o, o + 0x10, 0x10001, 0, 1, 0, 0.5f, *(float *)(st + 0x40), 1.0f);
-                impact = (float *)(o + 0x10);
+                if (hit == *(char **)(vars + 0x3C)) goto update_position;
+                if (*(short *)(hit + 0xAA) != 0x4E /* moby class 78 */)
+                    SweepCollisionFromObject(moby, moby + 0x10, 0x10001, 0, 1, 0, 0.5f, *(float *)(vars + 0x40), 1.0f);
+                impact = (float *)(moby + 0x10);
             } else {
                 impact = D_L06_001BFC80.point;
             }
-            func_L06_00459828(impact, 20);
-            snd = *(int *)(st + 0x4C);
+            EmitPairedSpinParticles(impact, 20);
+            snd = *(int *)(vars + 0x4C);
             if (snd != -1) {
-                s = D_00188660 + snd * 0x70;
-                if (*(char **)(s + 0x88) == o && *(unsigned char *)(s + 0x74)) func_002E59F8(snd);
+                soundRecord = gSoundState + snd * 0x70;
+                if (*(char **)(soundRecord + 0x88) == moby && *(unsigned char *)(soundRecord + 0x74)) StopSoundVoice(snd);
             }
-            *(int *)(st + 0x4C) = -1;
-            func_002A7750(o, 1, -1);
+            *(int *)(vars + 0x4C) = -1;
+            SetMobyState(moby, 1, -1);
             return;
         }
     update_position:
-        qcopy(o + 0x10, pos);
+        qcopy(moby + 0x10, pos);
         goto def;
     }
     c1: {
-        index = D_L06_001B3778[*(int *)(st + 0x48)];
+        index = D_L06_001B3778[*(int *)(vars + 0x48)];
         if (index >= 0) {
-            p = D_L06_001C79C0 + index * 32;
-            *(float *)(p + 0x1C) -= 0.166666672f;
-            if (!(*(float *)(p + 0x1C) <= 0)) return;
-            func_00291450(D_L06_001B3778[*(int *)(st + 0x48)]);
-            D_L06_001B3778[*(int *)(st + 0x48)] = -1;
-            D_L06_001B3760[*(int *)(st + 0x48)] = 0;
+            slot = D_L06_001C79C0 + index * 32;
+            *(float *)(slot + 0x1C) -= 0.166666672f;
+            if (!(*(float *)(slot + 0x1C) <= 0)) return;
+            FreePointLight(D_L06_001B3778[*(int *)(vars + 0x48)]);
+            D_L06_001B3778[*(int *)(vars + 0x48)] = -1;
+            D_L06_001B3760[*(int *)(vars + 0x48)] = 0;
             for (row = 0; row < 6; row++) {
                 for (col = 1; col < 4; col++)
-                    qzero_nc(&((NotakQuad *)(D_L06_0025FFC0 + *(int *)(st + 0x48) * 0x180 + (row << 6)))[col]);
+                    qzero_nc(&((NotakQuad *)(D_L06_0025FFC0 + *(int *)(vars + 0x48) * 0x180 + (row << 6)))[col]);
             }
-            func_00350388(o);
+            func_00350388(moby);
             return;
         }
-        D_L06_001B3760[*(int *)(st + 0x48)] = 0;
-        func_00350388(o);
+        D_L06_001B3760[*(int *)(vars + 0x48)] = 0;
+        func_00350388(moby);
         return;
     }
     }
 def:
-    qcopy(pos, o + 0x10);
+    qcopy(pos, moby + 0x10);
     {
         k = 0;
         if (D_L06_001B3790[k]) goto scanned;
@@ -136,30 +137,30 @@ def:
     }
     for (i = 0; i < count; i++) {
         Vec velocity, axis;
-        short *base = D_L06_001B3790; short *t = &base[i];
-        if (--*t < 0) *t = 0;
-        *t = 2;
+        short *base = D_L06_001B3790; short *timer = &base[i];
+        if (--*timer < 0) *timer = 0;
+        *timer = 2;
         D_L06_001B37A0[i] = 64;
-        func_002A7988(velocity.f, 0.2f, 0.2f);
-        if (func_00282DF0(velocity.f) > 0.2f) func_00282F20((char *)velocity.f, (char *)velocity.f, 0.2f);
-        qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
+        SpawnRandomDirectionEffect(velocity.f, 0.2f, 0.2f);
+        if (FastVecLength(velocity.f) > 0.2f) vec_scale_to_length((char *)velocity.f, (char *)velocity.f, 0.2f);
+        qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][0], pos);
         direction = 1.0f;
         for (j = 1; j < 4; j++) {
-            float *prev = (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]);
-            func_00282CF0(axis.f, prev, (float *)D_L06_001B9840);
-            func_002ACEC0(velocity.f, velocity.f, axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);
+            float *prev = (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][j - 1]);
+            FastVecSub(axis.f, prev, (float *)D_L06_001B9840);
+            ApplyAxisRotationToQuaternion(velocity.f, velocity.f, axis.f, RandomFloatRange(0.17453295f, 0.7853982448577881f) * direction);
             direction = -direction;
-            func_00282CC0(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], velocity.f);
+            FastVecAdd(&((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][j - 1], velocity.f);
         }
     }
-    if (!func_002A77E0(2)) {
-        size = func_002A7878(0.2f, 0.9f);
-        sign = func_002A77E0(2);
+    if (!RandomIntBelow(2)) {
+        size = RandomFloatRange(0.2f, 0.9f);
+        sign = RandomIntBelow(2);
         if (!sign) sign--;
-        func_002C2210(o + 0x10, 2, size * 0.1f, size, 0x7F7F2020, 0, sign, D_L06_001A8F20, 0, 0);
-        func_002C2210(o + 0x10, 2, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, D_L06_001A8F20, 0, 0);
+        SpawnGroundEffectParticle(moby + 0x10, 2, size * 0.1f, size, 0x7F7F2020, 0, sign, D_L06_001A8F20, 0, 0);
+        SpawnGroundEffectParticle(moby + 0x10, 2, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, D_L06_001A8F20, 0, 0);
     }
-    if (!func_002E59B0(o, *(int *)(st + 0x4C)))
-        *(int *)(st + 0x4C) = func_002E5DA0(7, 4, o, *(short *)(*(char **)(st + 0x3C) + 0xAA));
-    func_L00_002E6EF8(func_L06_00458F30, o);
+    if (!IsVoicePlayingForOwner(moby, *(int *)(vars + 0x4C)))
+        *(int *)(vars + 0x4C) = PlaySoundFromClassBank(7, 4, moby, *(short *)(*(char **)(vars + 0x3C) + 0xAA));
+    AddDrawCallbackToList3(DrawProjectileTrails, moby);
 }

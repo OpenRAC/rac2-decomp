@@ -10,7 +10,8 @@ typedef struct {
 extern Screen2DF9E0 D_001A6480;
 extern int *volatile D_001B22A8 MACRO_ADDR;
 
-void func_002DF9E0(long arg)
+/* Draws a strip of sprites across the screen in one colour, built straight into the graphics packet list. It resets the buffer used for shadows. */
+void func_002DF9E0(long color)
 {
     int x, y, n;
     long *q;
@@ -22,17 +23,17 @@ void func_002DF9E0(long arg)
     int step;
     long *corners;
 
-    x = D_001A6480.x;
-    y = D_001A6480.y;
+    x = gScreenAdjustOffsets.x;
+    y = gScreenAdjustOffsets.y;
     n = x / 32;
 
     /* The packet cursor is reloaded between these header writes in retail. */
-    *(int *)D_001B22A8 = (n + 5) | 0x10000000;
-    *(int *)((char *)D_001B22A8 + 4) = 0;
-    *(int *)((char *)D_001B22A8 + 8) = 0;
-    *(int *)((char *)D_001B22A8 + 12) = (n + 5) | 0x50000000;
-    p = D_001B22A8;
-    D_001B22A8 = p + 4;
+    *(int *)gDmaPacketCursor = (n + 5) | 0x10000000;
+    *(int *)((char *)gDmaPacketCursor + 4) = 0;
+    *(int *)((char *)gDmaPacketCursor + 8) = 0;
+    *(int *)((char *)gDmaPacketCursor + 12) = (n + 5) | 0x50000000;
+    p = gDmaPacketCursor;
+    gDmaPacketCursor = p + 4;
     q = (long *)(p + 4);
     zero = 0;
     q[zero] = 0x1000000000000001L;
@@ -43,7 +44,7 @@ void func_002DF9E0(long arg)
     q[4] = 0x2400000000000001L;
     q[5] = 0x10;
     q[6] = 0x146;
-    q[7] = arg;
+    q[7] = color;
     q[8] = (long)(n | 0x8000) | 0x2400000000000000L;
     q[9] = 0x44;
     i = zero;
@@ -64,12 +65,12 @@ void func_002DF9E0(long arg)
         } while (i < n);
     }
     {
-        int *end = (int *)((char *)D_001B22A8 + (n * 16 + 0x50));
-        D_001B22A8 = end;
+        int *end = (int *)((char *)gDmaPacketCursor + (n * 16 + 0x50));
+        gDmaPacketCursor = end;
         *end = 0x10000000;
     }
-    *(int *)((char *)D_001B22A8 + 4) = 0;
-    *(int *)((char *)D_001B22A8 + 8) = 0x13000000;
-    *(int *)((char *)D_001B22A8 + 12) = 0;
-    D_001B22A8 = D_001B22A8 + 4;
+    *(int *)((char *)gDmaPacketCursor + 4) = 0;
+    *(int *)((char *)gDmaPacketCursor + 8) = 0x13000000;
+    *(int *)((char *)gDmaPacketCursor + 12) = 0;
+    gDmaPacketCursor = gDmaPacketCursor + 4;
 }

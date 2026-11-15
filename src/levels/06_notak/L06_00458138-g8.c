@@ -55,140 +55,142 @@ extern void func_L06_00459B18(char *a0);
 extern int func_L06_00459BA8(char *a0, char *a1);
 extern void func_L06_00459C38(unsigned char *a0, u8 *a1);
 
-void func_L06_00458568(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+/* Turns this part to follow the progress value of the object it is linked to, and plays a sound while it moves. */
+void func_L06_00458568(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
     char *other;
     float tmp[4];
-    switch (*(unsigned char *)(a0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(float *)(state + 8) = *(float *)(a0 + 0xF8);
-        *(float *)(state + 0x18) = *(float *)(a0 + 0xF4);
-        *(int *)(state + 0x10) = 0;
-        func_003514C8(a0, 0, tmp);
-        func_00282CF0(tmp, tmp, (float *)(a0 + 0x10));
+        *(float *)(vars + 8) = *(float *)(moby + 0xF8);
+        *(float *)(vars + 0x18) = *(float *)(moby + 0xF4);
+        *(int *)(vars + 0x10) = 0;
+        func_003514C8(moby, 0, tmp);
+        FastVecSub(tmp, tmp, (float *)(moby + 0x10));
         {
-            float f = func_00282DF0(tmp);
-            *(float *)(state + 4) -= f;
-            *(float *)(state + 0x1C) = f;
+            float length = FastVecLength(tmp);
+            *(float *)(vars + 4) -= length;
+            *(float *)(vars + 0x1C) = length;
         }
-        if (*(float *)(state + 0xC) == 0.0f) *(float *)(state + 0xC) = 1.0f;
-        func_L06_004583A8(a0);
-        *(float *)(state + 0x24) = 0;
-        a0[0x20] = 1;
+        if (*(float *)(vars + 0xC) == 0.0f) *(float *)(vars + 0xC) = 1.0f;
+        SpawnChainedSegment(moby);
+        *(float *)(vars + 0x24) = 0;
+        moby[0x20] = 1;
         break;
     case 1:
-        if (*(int *)state != -1) {
-            other = D_L06_001B281C + *(int *)state * 256;
+        if (*(int *)vars != -1) {
+            other = D_L06_001B281C + *(int *)vars * 256;
             if (other) {
-                char *data = *(char **)(other + 0x68);
-                if (func_00282C48(*(float *)(state + 0xC)) > 0.0f)
-                    *(float *)(state + 0x14) = *(float *)data * (*(float *)(state + 0xC) * 3.1415927f);
-                else *(float *)(state + 0x14) = 0;
-                *(float *)(a0 + 0xF8) = func_00283B98(*(float *)(state + 8), *(float *)(state + 0x14));
-                if (*(float *)data > 0.6f)
-                    *(float *)(a0 + 0xF4) = func_00283BE0(*(float *)(state + 0x18), (*(float *)data - 0.6f) * 0.13089971244335175f);
-                if (*(int *)(state + 0x10) == 0) {
-                    if (*(float *)data != *(float *)(state + 0x24) && *(float *)data != 1.0f && *(float *)data != 0.0f) {
-                        if (!func_002E59B0(a0, *(int *)(state + 0x20)))
-                            *(int *)(state + 0x20) = func_003A0948(0, 4, a0);
-                    } else if (func_002E59B0(a0, *(int *)(state + 0x20))) {
-                        if (*(int *)(state + 0x20) != -1) {
-                        char *snd = D_00188660 + *(int *)(state + 0x20) * 0x70;
-                        if (*(char **)(snd + 0x88) == a0 && *(unsigned char *)(snd + 0x74)) func_002E59F8(*(int *)(state + 0x20));
+                char *linkVars = *(char **)(other + 0x68);
+                if (FloatAbs(*(float *)(vars + 0xC)) > 0.0f)
+                    *(float *)(vars + 0x14) = *(float *)linkVars * (*(float *)(vars + 0xC) * 3.1415927f);
+                else *(float *)(vars + 0x14) = 0;
+                *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(vars + 8), *(float *)(vars + 0x14));
+                if (*(float *)linkVars > 0.6f)
+                    *(float *)(moby + 0xF4) = fast_subtract_rotations(*(float *)(vars + 0x18), (*(float *)linkVars - 0.6f) * 0.13089971244335175f);
+                if (*(int *)(vars + 0x10) == 0) {
+                    if (*(float *)linkVars != *(float *)(vars + 0x24) && *(float *)linkVars != 1.0f && *(float *)linkVars != 0.0f) {
+                        if (!IsVoicePlayingForOwner(moby, *(int *)(vars + 0x20)))
+                            *(int *)(vars + 0x20) = func_003A0948(0, 4, moby);
+                    } else if (IsVoicePlayingForOwner(moby, *(int *)(vars + 0x20))) {
+                        if (*(int *)(vars + 0x20) != -1) {
+                        char *sound = gSoundState + *(int *)(vars + 0x20) * 0x70;
+                        if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74)) StopSoundVoice(*(int *)(vars + 0x20));
                         }
-                        *(int *)(state + 0x20) = -1;
+                        *(int *)(vars + 0x20) = -1;
                     }
                 }
-                *(float *)(state + 0x24) = *(float *)data;
+                *(float *)(vars + 0x24) = *(float *)linkVars;
             }
         }
-        if (*(int *)(state + 0x10)) func_003514C8((void *)*(int *)(state + 0x10), 0, a0 + 0x10);
+        if (*(int *)(vars + 0x10)) func_003514C8((void *)*(int *)(vars + 0x10), 0, moby + 0x10);
         break;
     }
 }
 
 /* Resolves the table entries a spawn record names; returns 1 after reporting a missing one. */
-int func_L06_00459D08(u8 *a0, u8 *a1)
+int func_L06_00459D08(u8 *moby, u8 *vars)
 {
-    s32 i1, i2, i3, i4;
-    u8 *e1, *e2;
+    s32 pathIdxA, pathIdxB, anchorIdx, homeIdx;
+    u8 *pathA, *pathB;
 
-    i1 = *(s32 *)(a1 + 0x100);
-    if (i1 == -1) {
-        func_0026FEB8(D_L06_001B1990, (a0 - D_L06_001B281C) >> 8);
+    pathIdxA = *(s32 *)(vars + 0x100);
+    if (pathIdxA == -1) {
+        STUB_printf(D_L06_001B1990, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    e1 = D_L06_001FE500[i1];
-    *(u8 **)(a1 + 0x118) = e1;
-    func_L06_00459B18((char *)e1);
-    i2 = *(s32 *)(a1 + 0x134);
-    if (i2 == -1) {
-        func_0026FEB8(D_L06_001B19C8, (a0 - D_L06_001B281C) >> 8);
+    pathA = gPathList[pathIdxA];
+    *(u8 **)(vars + 0x118) = pathA;
+    ComputePathSegmentLengths_L06((char *)pathA);
+    pathIdxB = *(s32 *)(vars + 0x134);
+    if (pathIdxB == -1) {
+        STUB_printf(D_L06_001B19C8, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    e2 = D_L06_001FE500[i2];
-    *(u8 **)(a1 + 0x138) = e2;
-    func_L06_00459B18((char *)e2);
-    i3 = *(s32 *)(a1 + 0x108);
-    if (i3 == -1) {
-        func_0026FEB8(D_L06_001B1A00, (a0 - D_L06_001B281C) >> 8);
+    pathB = gPathList[pathIdxB];
+    *(u8 **)(vars + 0x138) = pathB;
+    ComputePathSegmentLengths_L06((char *)pathB);
+    anchorIdx = *(s32 *)(vars + 0x108);
+    if (anchorIdx == -1) {
+        STUB_printf(D_L06_001B1A00, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    *(u8 **)(a1 + 0x11C) = D_L06_001B281C + (i3 << 8) + 0x18;
-    a0[0xBC] = func_L06_00459BA8((char *)a0, (char *)a1);
-    i4 = *(s32 *)(a1 + 0x104);
-    if (i4 == -1) {
-        func_0026FEB8(D_L06_001B1A30, (a0 - D_L06_001B281C) >> 8);
+    *(u8 **)(vars + 0x11C) = D_L06_001B281C + (anchorIdx << 8) + 0x18;
+    moby[0xBC] = ClassifyHeadroomSize((char *)moby, (char *)vars);
+    homeIdx = *(s32 *)(vars + 0x104);
+    if (homeIdx == -1) {
+        STUB_printf(D_L06_001B1A30, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    qcopy(a1 + 0xE0, D_L06_001B290C + 0x30 + (i4 << 7));
-    qcopy(a1 + 0xD0, a0 + 0x10);
-    func_L06_00459C38(a0, a1);
-    *(s32 *)(a1 + 0x124) = func_001163B0() % 120;
-    if (func_001163B0() & 1)
-        *(f32 *)(a1 + 0x130) = 0.3490659f;
+    qcopy(vars + 0xE0, D_L06_001B290C + 0x30 + (homeIdx << 7));
+    qcopy(vars + 0xD0, moby + 0x10);
+    StartAnimationForSizeClass(moby, vars);
+    *(s32 *)(vars + 0x124) = Rand() % 120;
+    if (Rand() & 1)
+        *(f32 *)(vars + 0x130) = 0.3490659f;
     else
-        *(f32 *)(a1 + 0x130) = -0.3490659f;
-    *(s32 *)(a1 + 0x13C) = 0;
-    a1[0x29] = 1;
+        *(f32 *)(vars + 0x130) = -0.3490659f;
+    *(s32 *)(vars + 0x13C) = 0;
+    vars[0x29] = 1;
     return 0;
 }
 
-void func_L06_0045C6D0(char *a0) {
+/* Spits out a few small particles in front of the object, along the direction it is facing. */
+void func_L06_0045C6D0(char *moby) {
     float velocity[4], pos[4], offset[4];
-    qcopy(pos, a0 + 0x10);
-    pos[2] += 3.3f + func_002A7878(-0.05f, 0.05f);
-    pos[0] += func_002A7878(-0.1f, 0.1f);
-    pos[1] += func_002A7878(-0.1f, 0.1f);
-    offset[0] = func_00283180(*(float *)(a0 + 0xF8)) * 1.5f;
-    offset[1] = func_00283198(*(float *)(a0 + 0xF8)) * 1.5f;
+    qcopy(pos, moby + 0x10);
+    pos[2] += 3.3f + RandomFloatRange(-0.05f, 0.05f);
+    pos[0] += RandomFloatRange(-0.1f, 0.1f);
+    pos[1] += RandomFloatRange(-0.1f, 0.1f);
+    offset[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * 1.5f;
+    offset[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * 1.5f;
     offset[2] = 0;
-    func_00282CC0(pos, pos, offset);
-    velocity[0] = func_00283180(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
-    velocity[1] = func_00283198(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    FastVecAdd(pos, pos, offset);
+    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = func_002A7878(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
-    func_L06_0037E6B0(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
-    func_L06_0037E6B0(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
-    if (func_002A77E0(D_L06_001B1AE8) != 1) {
-    velocity[0] = func_00283180(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
-    velocity[1] = func_00283198(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[2] = RandomFloatRange(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
+    SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
+    SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
+    if (RandomIntBelow(D_L06_001B1AE8) != 1) {
+    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = func_002A7878(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
-        func_L06_0037E6B0(pos, velocity, D_L06_001B1AE0, 0.5f, 50.4f);
+    velocity[2] = RandomFloatRange(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
+        SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE0, 0.5f, 50.4f);
     }
-    if (func_002A77E0(D_L06_001B1AE8) != 1) {
-    velocity[0] = func_00283180(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
-    velocity[1] = func_00283198(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    if (RandomIntBelow(D_L06_001B1AE8) != 1) {
+    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = func_002A7878(D_L06_001B1AD8 * 0.0166666675f, 0.0300000012f);
-        func_L06_0037E6B0(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
+    velocity[2] = RandomFloatRange(D_L06_001B1AD8 * 0.0166666675f, 0.0300000012f);
+        SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
     }
-    if (func_002A77E0(D_L06_001B1AE8) == 1) {
-    velocity[0] = func_00283180(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
-    velocity[1] = func_00283198(*(float *)(a0 + 0xF8)) * func_002A7878(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    if (RandomIntBelow(D_L06_001B1AE8) == 1) {
+    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = func_002A7878(D_L06_001B1AD8 * 0.0166666675f, D_L06_001B1ADC * 0.0166666675f);
-        func_L06_0037E6B0(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
+    velocity[2] = RandomFloatRange(D_L06_001B1AD8 * 0.0166666675f, D_L06_001B1ADC * 0.0166666675f);
+        SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
     }
 }

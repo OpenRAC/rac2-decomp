@@ -10,6 +10,7 @@ extern void func_002A7750(u8 *, s32, s32);
 extern s32 func_00273B70(u8 *);
 extern void func_0029F338(void *);
 
+/* Runs a short effect that starts up, lingers, then fades out and removes itself. */
 void func_L03_00421930(u8 *obj)
 {
     u8 *p = *(u8 **)(obj + 0x68);
@@ -23,28 +24,28 @@ void func_L03_00421930(u8 *obj)
         index = *(s16 *)(p + 0x36);
         n = 0x150;
         tbl = D_L03_00259A30;
-        func_L00_00322A98(obj, &tbl[index * n]);
-        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x28, 2, 0.0f);
-        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x14, 4, 0.0f);
-        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0xA, 6, 0.0f);
-        func_002A7750(obj, 1, -1);
+        InitPendingSlot(obj, &tbl[index * n]);
+        AppendRecordToFourEntryTable(&tbl[*(s16 *)(p + 0x36) * n], 0x28, 2, 0.0f);
+        AppendRecordToFourEntryTable(&tbl[*(s16 *)(p + 0x36) * n], 0x14, 4, 0.0f);
+        AppendRecordToFourEntryTable(&tbl[*(s16 *)(p + 0x36) * n], 0xA, 6, 0.0f);
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
         k = 0x150;
         tbl = &D_L03_00259A30[*(s16 *)(p + 0x36) * k];
-        func_L00_00322BE0(tbl, 0);
-        n = func_00273B70(obj);
+        UpdateTransformHistoryFollowers(tbl, 0);
+        n = UpdateCameraMoby(obj);
         if (n != 0) {
-            func_002A7750(obj, 2, -1);
+            SetMobyState(obj, 2, -1);
             *(u16 *)(obj + 0x34) |= 0x2800;
         }
         break;
     case 2:
-        func_00273B70(obj);
+        UpdateCameraMoby(obj);
         tbl = &D_L03_00259A30[*(s16 *)(p + 0x36) * 0x150];
-        func_L00_00322EC8(tbl);
+        ReleaseSlotList(tbl);
         if (obj[0x23] < 2) {
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
         } else {
             obj[0x23] -= 2;
         }

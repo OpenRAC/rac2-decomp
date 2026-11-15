@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { char pad[0x68]; float angle; } Slot_002B5EF8;
 
@@ -13,43 +14,44 @@ typedef struct {
 extern float func_00283BE0(float, float);
 extern float func_00283B98(float, float);
 
-void func_002B5EF8(char *self, Rec_002B5EF8 *other, float x)
+/* Tilts the left and right foot parts of an object to match how much it is turning. */
+void func_002B5EF8(char *self, Rec_002B5EF8 *ctl, float x)
 {
-    float k, w1, w2, inv, d;
+    float limit, leftWeight, rightWeight, inv, d;
 
-    if (other->left == 0 && other->right == 0)
+    if (ctl->left == 0 && ctl->right == 0)
         return;
-    if (other->flags & 0x10)
+    if (ctl->flags & 0x10)
         return;
-    w1 = 0.0f;
-    if (other->left != 0)
-        w1 = 1.0f;
-    w2 = 0.0f;
-    if (other->right != 0)
-        w2 = 1.0f;
-    inv = 1.0f / (w1 + w2);
-    w1 *= inv;
-    w2 *= inv;
-    k = 1.5707965f;
-    d = func_00283BE0(x, *(float *)(self + 0xF8));
-    if (k < d)
-        d = k;
-    else if (d < -k)
-        d = -k;
+    leftWeight = 0.0f;
+    if (ctl->left != 0)
+        leftWeight = 1.0f;
+    rightWeight = 0.0f;
+    if (ctl->right != 0)
+        rightWeight = 1.0f;
+    inv = 1.0f / (leftWeight + rightWeight);
+    leftWeight *= inv;
+    rightWeight *= inv;
+    limit = 1.5707965f;
+    d = fast_subtract_rotations(x, *(float *)(self + 0xF8));
+    if (limit < d)
+        d = limit;
+    else if (d < -limit)
+        d = -limit;
     if (*(unsigned short *)(self + 0x34) & 0x8000)
         d = -d;
-    if (other->left != 0) {
-        other->left->angle = func_00283B98(d * w1, other->left->angle);
-        if (k < other->left->angle)
-            other->left->angle = k;
-        else if (other->left->angle < -k)
-            other->left->angle = -k;
+    if (ctl->left != 0) {
+        ctl->left->angle = FastAddRotations(d * leftWeight, ctl->left->angle);
+        if (limit < ctl->left->angle)
+            ctl->left->angle = limit;
+        else if (ctl->left->angle < -limit)
+            ctl->left->angle = -limit;
     }
-    if (other->right != 0) {
-        other->right->angle = func_00283B98(d * w2, other->right->angle);
-        if (k < other->right->angle)
-            other->right->angle = k;
-        else if (other->right->angle < -k)
-            other->right->angle = -k;
+    if (ctl->right != 0) {
+        ctl->right->angle = FastAddRotations(d * rightWeight, ctl->right->angle);
+        if (limit < ctl->right->angle)
+            ctl->right->angle = limit;
+        else if (ctl->right->angle < -limit)
+            ctl->right->angle = -limit;
     }
 }

@@ -21,12 +21,13 @@ extern s32 func_00283D38(s32, s32, float);
 extern void func_0027EAE8(s32, s32, s32, s32, s32, void *);
 extern s32 func_00115DA8(char *, char *, ...);
 extern void func_L18_003044B8(s32, s32, s64, char *, s32, float);
+/* Draws the on-screen timer bar and countdown number when the player is in this special mode. Returns 1 if it drew. */
 s32 func_L18_00426AB0(void)
 {
     s32 colors[2];
     char text[16];
     u8 *state;
-    u8 *hero = D_00189E20;
+    u8 *hero = gHeroState;
     s32 middle;
     float ratio;
     float amount;
@@ -39,30 +40,30 @@ s32 func_L18_00426AB0(void)
     }
     result = 0;
     if (D_L18_001A904C[0]) {
-        handle = func_00336D50(D_L18_001A904C[0] + 0x8710, 0xDB);
-        func_00300A00((char *)handle, 0x60442D00, (float)(D_001A7340[0] / 2),
+        handle = FindTableEntryById(D_L18_001A904C[0] + 0x8710, 0xDB);
+        DrawScaledObjectTwoAxes((char *)handle, 0x60442D00, (float)(gScreenWidth[0] / 2),
                       (float)(D_L18_001B12D8 + D_L18_001B12E8), 1.0f, 1.0f, 0.0f);
-        handle = func_00336D50(D_L18_001A904C[0] + 0x8710, 0xDC);
-        func_00300A00((char *)handle, 0x55F0C070, (float)(D_001A7340[0] / 2),
+        handle = FindTableEntryById(D_L18_001A904C[0] + 0x8710, 0xDC);
+        DrawScaledObjectTwoAxes((char *)handle, 0x55F0C070, (float)(gScreenWidth[0] / 2),
                       (float)(D_L18_001B12D8 + D_L18_001B12E8), 1.0f, 1.0f, 0.0f);
         state = *(u8 **)(*(u8 **)(hero + 0x2290) + 0x68);
-        amount = func_00283CE0(*(s16 *)(state + 0x3BC));
-        ratio = amount / func_00283CE0(*(s16 *)(state + 0x3BE));
-        colors[0] = func_00283D38(D_L18_001B12C4, D_L18_001B12CC, ratio);
-        colors[1] = func_00283D38(D_L18_001B12C8, D_L18_001B12D0, ratio);
-        middle = D_001A7340[0] / 2;
-        func_0027EAE8(middle + D_L18_001B12D4, D_L18_001B12D8,
+        amount = IntToFloat(*(s16 *)(state + 0x3BC));
+        ratio = amount / IntToFloat(*(s16 *)(state + 0x3BE));
+        colors[0] = FastTweenColor(D_L18_001B12C4, D_L18_001B12CC, ratio);
+        colors[1] = FastTweenColor(D_L18_001B12C8, D_L18_001B12D0, ratio);
+        middle = gScreenWidth[0] / 2;
+        DrawScreenRectangle(middle + D_L18_001B12D4, D_L18_001B12D8,
                       (s32)((float)(middle + D_L18_001B12D4) + (float)D_L18_001B12DC * ratio),
                       D_L18_001B12D8 + D_L18_001B12E0, 0xFFFFF1, colors);
-        func_0027EAE8(middle - D_L18_001B12D4, D_L18_001B12D8,
+        DrawScreenRectangle(middle - D_L18_001B12D4, D_L18_001B12D8,
                       (s32)((float)(middle - D_L18_001B12D4) - (float)D_L18_001B12DC * ratio),
                       D_L18_001B12D8 + D_L18_001B12E0, 0xFFFFF1, colors);
         remaining = *(u16 *)(state + 0x3BC);
         if (remaining < 32 || remaining > 300 || (remaining & 24)) {
-            func_00115DA8(text, D_L18_001B1300, (s16)remaining / 60);
-            func_L18_003044B8(middle, D_L18_001B12E4 + 1, 0xFF000000, text, 3, 0.96f);
-            func_L18_003044B8(middle, D_L18_001B12E4 - 1, 0xFF000000, text, 3, 1.04f);
-            func_L18_003044B8(middle, D_L18_001B12E4, colors[0], text, 3, 1.0f);
+            Sprintf(text, D_L18_001B1300, (s16)remaining / 60);
+            FontPrintCenterScaled(middle, D_L18_001B12E4 + 1, 0xFF000000, text, 3, 0.96f);
+            FontPrintCenterScaled(middle, D_L18_001B12E4 - 1, 0xFF000000, text, 3, 1.04f);
+            FontPrintCenterScaled(middle, D_L18_001B12E4, colors[0], text, 3, 1.0f);
         }
         result = 1;
     }

@@ -28,18 +28,19 @@ extern void func_0032B3E0(void *, s32, s32, s32, s32, f32, f32, f32);
 extern s8 D_00189E20[];
 extern s8 D_002329A0[];
 
-void func_0032B0A8(s32 arg0) {
-    f32 tmp[4];
-    s8 *base = D_00189E20;
+/* Draws every trail node of an owner as two glowing sprites. */
+void func_0032B0A8(s32 owner) {
+    f32 offset[4];
+    s8 *hero = gHeroState;
     s32 i;
     for (i = 0; i < 0x80; i++) {
-        s32 p = (s32)D_002329A0 + i * 0x50;
-        if (*(s32 *)(p + 0x44) == arg0) {
-            f32 f24;
-            func_00282CC0(tmp, (void *)p, *(s32 *)(base + 0x2290) + 0x10);
-            func_0032B3E0(tmp, 0x7F7F7F, *(s32 *)(p + 0x34), 0x31, 2, *(f32 *)(p + 0x20), *(f32 *)(p + 0x2C), 0.001f);
-            f24 = *(volatile f32 *)(p + 0x24);
-            func_0032B3E0(tmp, *(s32 *)(p + 0x38), *(s32 *)(p + 0x34) >> 1, 0x31, 2, f24, *(f32 *)(p + 0x2C), 0.001f);
+        s32 node = (s32)gTrailNodes + i * 0x50;
+        if (*(s32 *)(node + 0x44) == owner) {
+            f32 secondSize;
+            FastVecAdd(offset, (void *)node, *(s32 *)(hero + 0x2290) + 0x10);
+            DrawFacingSpriteCopy(offset, 0x7F7F7F, *(s32 *)(node + 0x34), 0x31, 2, *(f32 *)(node + 0x20), *(f32 *)(node + 0x2C), 0.001f);
+            secondSize = *(volatile f32 *)(node + 0x24);
+            DrawFacingSpriteCopy(offset, *(s32 *)(node + 0x38), *(s32 *)(node + 0x34) >> 1, 0x31, 2, secondSize, *(f32 *)(node + 0x2C), 0.001f);
         }
     }
 }

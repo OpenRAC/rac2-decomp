@@ -132,8 +132,8 @@ void func_L23_0042A018(u8 *moby) {
     if (D_L23_001B1484_2 != 0) {
         vars = *(L23Spin **)(moby + 0x68);
         D_L23_001B39D0 = D_L23_001B1470 * 1.1f;
-        vars->turn = func_00283B98(vars->turn, (float)D_L23_001B1480 * 0.00029088825f);
-        f = func_00283198((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
+        vars->turn = FastAddRotations(vars->turn, (float)D_L23_001B1480 * 0.00029088825f);
+        f = FastSinOrCosB((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
         vars->alpha = (s32)(f * D_L23_001B1478);
         vars->alpha += D_L23_001B147C;
         reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
@@ -141,11 +141,11 @@ void func_L23_0042A018(u8 *moby) {
         reg |= (s64)D_L23_001B1BB8 << 6;
         reg |= (s64)vars->alpha << 32;
         pkt.tail[3] = reg;
-        tex = func_0027C878(D_L23_001B1BC0);
+        tex = GetEffectTextureDescriptor(D_L23_001B1BC0);
         pkt.tail[2] = 0xFF9000000260LL;
         pkt.tail[1] = tex;
         pkt.tail[0] = 0;
-        func_002FC560(0x47, 0x53001);
+        VU1_addGSregister(0x47, 0x53001);
         hero = D_L23_001B1484_2;
         qcopy_nc(&m[0], hero + 0xC0);
         qcopy_nc(&m[1], hero + 0xD0);
@@ -154,8 +154,8 @@ void func_L23_0042A018(u8 *moby) {
         ((float *)&m[3])[3] = 1.0f;
         qzero_nc(axis);
         ((float *)axis)[2] = vars->turn;
-        func_002833F0(rot, axis);
-        func_00283738(m, m, rot);
+        euler_rotation_basis(rot, axis);
+        multiply_matrix3x3(m, m, rot);
         if (D_L23_001B3714 == 0) {
             col = (vars->alpha << 24) + (D_L23_001B1BC4 & 0xFFFFFF);
             pkt.col[3] = col;
@@ -179,21 +179,21 @@ void func_L23_0042A018(u8 *moby) {
             for (k = 3; k >= 0; k--) {
                 s32 b = e->b;
 
-                func_00282D30(pos, &D_L23_002A6390[e->a], D_L23_001B39D0);
-                vars->spin = func_00283B98(vars->spin, D_L23_001B1BCC * 0.00029088825f);
-                func_00283C28(vars->spin);
+                FastVecScale(pos, &D_L23_002A6390[e->a], D_L23_001B39D0);
+                vars->spin = FastAddRotations(vars->spin, D_L23_001B1BCC * 0.00029088825f);
+                FastFloatHelperG(vars->spin);
                 if (D_L23_001B3714 == 0) {
-                    fa = func_00283180(vars->spin) * D_L23_001B1BD8;
-                    fb = func_00283198(vars->spin) * D_L23_001B1BDC;
-                    fc = func_00283180(vars->spin) * D_L23_001B1BE0;
-                    fd = func_00283198(vars->spin) * D_L23_001B1BE4;
+                    fa = FastSinOrCosA(vars->spin) * D_L23_001B1BD8;
+                    fb = FastSinOrCosB(vars->spin) * D_L23_001B1BDC;
+                    fc = FastSinOrCosA(vars->spin) * D_L23_001B1BE0;
+                    fd = FastSinOrCosB(vars->spin) * D_L23_001B1BE4;
                 } else {
-                    fa = func_00283180(vars->spin) * D_L23_001B1BF0;
-                    fb = func_00283198(vars->spin) * D_L23_001B1BF4;
-                    fc = func_00283180(vars->spin) * D_L23_001B1BF8;
-                    fd = func_00283198(vars->spin) * D_L23_001B1BFC;
+                    fa = FastSinOrCosA(vars->spin) * D_L23_001B1BF0;
+                    fb = FastSinOrCosB(vars->spin) * D_L23_001B1BF4;
+                    fc = FastSinOrCosA(vars->spin) * D_L23_001B1BF8;
+                    fd = FastSinOrCosB(vars->spin) * D_L23_001B1BFC;
                 }
-                f = func_002A7878(D_L23_001B1BD0, D_L23_001B1BD4);
+                f = RandomFloatRange(D_L23_001B1BD0, D_L23_001B1BD4);
                 *uvx = (D_L23_002A6D50[b][0] * fa + fb) * f;
                 *uvy = D_L23_002A6D50[b][1] * fc + fd;
                 pos++;
@@ -201,7 +201,7 @@ void func_L23_0042A018(u8 *moby) {
                 uvx += 2;
                 uvy += 2;
             }
-            func_00280B90(&pkt, m, 0);
+            draw_world_quad(&pkt, m, 0);
         }
     }
 }

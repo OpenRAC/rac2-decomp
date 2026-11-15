@@ -7,19 +7,20 @@ extern void func_00283698(void *,void *);
 extern void func_00282CF0(void *,void *,void *);
 extern void func_002830C0(void *,void *,void *);
 extern float func_00282C48(float);
+/* Checks whether a point is just under an object and inside its footprint. Returns 1 if so. */
 int func_L17_003C3A00(u8 *object,Vector *point)
 {
     Vector origin;
     float matrix[16];
     Vector transformed,delta;
     origin.q=point->q;
-    func_00283698(matrix,object+0xc0);
-    func_00282CF0(&delta,&origin,object+0x10);
+    matrix_from_basis_rows(matrix,object+0xc0);
+    FastVecSub(&delta,&origin,object+0x10);
     transformed.q=delta.q;
-    func_002830C0(&transformed,&transformed,matrix);
-    if (func_00282C48(transformed.f[0])<D_L17_001B023C &&
-        func_00282C48(transformed.f[1])<D_L17_001B0238 &&
-        func_00282C48(origin.f[2]-*(float *)(object+0x18))<4.0f)
+    transform_vector(&transformed,&transformed,matrix);
+    if (FloatAbs(transformed.f[0])<D_L17_001B023C &&
+        FloatAbs(transformed.f[1])<D_L17_001B0238 &&
+        FloatAbs(origin.f[2]-*(float *)(object+0x18))<4.0f)
         if (*(float *)(object+0x18)-origin.f[2]>0.9f) return 1;
     return 0;
 }

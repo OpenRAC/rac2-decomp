@@ -77,60 +77,60 @@ void func_002E64A0(Object *object)
     int i, j;
     unsigned char blocked;
 
-    if (!D_00214920[0]) {
-        func_002E6178(object);
-        if (!D_001A8BB0[0]) {
-            float height = func_002A89A8(object->position, 0, 0.5f);
+    if (!gEquipmentPieces[0]) {
+        SpawnEquipmentPieces(object);
+        if (!gCurrentGameMode[0]) {
+            float height = ProbeGroundHeightBelow(object->position, 0, 0.5f);
             if (height != 0.0f)
                 object->position[2] = height + D_001ABF84;
             D_001ABF88 = object->position[2];
         }
-        func_002B41A8(object, D_00214970, 0, 0, D_001ABF48, D_001ABF58, D_001ABF18, D_001ABF78,
+        InitMovementControllerParams(object, D_00214970, 0, 0, D_001ABF48, D_001ABF58, D_001ABF18, D_001ABF78,
                       D_001ABF68, D_001ABF28, D_001ABF38);
     }
     target = 0;
-    if (!D_001A8BB0[0]) {
-        func_00282D60(p, object, 0.0009765625f);
+    if (!gCurrentGameMode[0]) {
+        scale_vector(p, object, 0.0009765625f);
         p[3] += 1.0f;
-        if (func_00283DB8(p, 50.0f) == -1)
+        if (FastMathHelperA(p, 50.0f) == -1)
             return;
         if (!D_001A8BB0_gp) {
             blocked = 0;
-            if (func_00282E80(object->position, HERO) < 6.0f) {
+            if (vec_distance_xy(object->position, HERO) < 6.0f) {
                 if (object->blocked) {
                     qcopy(p, HERO + 0x60);
                     p[2] += 2.0f;
-                    if (func_002761F8(HERO + 0x60, p, 0, D_00189E20.collision, 0))
+                    if (CollLine(HERO + 0x60, p, 0, gHeroState.collision, 0))
                         blocked = 1;
                     else {
-                        func_00282CF0(old, object->position, HERO);
+                        FastVecSub(old, object->position, HERO);
                         old[2] = 0;
-                        func_00282F20(old, old, 0.4f);
-                        func_00282CC0(p, p, old);
-                        blocked = func_002761F8(HERO + 0x60, p, 0, D_00189E20.collision, 0) != 0;
+                        vec_scale_to_length(old, old, 0.4f);
+                        FastVecAdd(p, p, old);
+                        blocked = CollLine(HERO + 0x60, p, 0, gHeroState.collision, 0) != 0;
                     }
                 } else {
                     qcopy(p, HERO + 0x60);
                     p[2] += 2.0f;
-                    blocked = func_002761F8(HERO + 0x60, p, 0, *(int *)(HERO + 0x2210), 0) != 0;
+                    blocked = CollLine(HERO + 0x60, p, 0, *(int *)(HERO + 0x2210), 0) != 0;
                 }
             }
             object->blocked = blocked;
             if (object->blocked)
-                func_002AA548(D_00214978, &D_001ABF8C, D_001ABF88 + 0.75f, 0.00055555557f, 0.00055555557f, 0.0166666675f);
+                StepValueTowardTarget(D_00214978, &D_001ABF8C, D_001ABF88 + 0.75f, 0.00055555557f, 0.00055555557f, 0.0166666675f);
             else
-                func_002AA548(D_00214978, &D_001ABF8C, D_001ABF88, 0.00055555557f, 0.00055555557f, 0.0166666675f);
+                StepValueTowardTarget(D_00214978, &D_001ABF8C, D_001ABF88, 0.00055555557f, 0.00055555557f, 0.0166666675f);
         }
     }
-    func_0029FC20(object, 1, matrix);
-    func_0029FCC0(object, 1, p);
-    for (i = 0; D_00214920[i]; i++) {
+    TransformMobyJointPoint(object, 1, matrix);
+    TransformMobyJointToWorld(object, 1, p);
+    for (i = 0; gEquipmentPieces[i]; i++) {
         if (object->flags & 1)
-            D_00214920[i]->flags |= 0x41;
+            gEquipmentPieces[i]->flags |= 0x41;
         else
-            D_00214920[i]->flags &= 0xFFBE;
+            gEquipmentPieces[i]->flags &= 0xFFBE;
         {
-            Object *part = D_00214920[i];
+            Object *part = gEquipmentPieces[i];
             qcopy(old, part->position);
             qcopy(previous, part->previous);
             {
@@ -139,34 +139,34 @@ void func_002E64A0(Object *object)
             }
         }
         for (j = 0; j < 3; j++) {
-            D_00214920[i]->basis[j][0] = matrix[j * 4];
-            D_00214920[i]->basis[j][1] = matrix[j * 4 + 1];
-            D_00214920[i]->basis[j][2] = matrix[j * 4 + 2];
+            gEquipmentPieces[i]->basis[j][0] = matrix[j * 4];
+            gEquipmentPieces[i]->basis[j][1] = matrix[j * 4 + 1];
+            gEquipmentPieces[i]->basis[j][2] = matrix[j * 4 + 2];
         }
-        if (D_001A8BB0[0] == 2 && D_001A79F0[0] == 5) {
+        if (gCurrentGameMode[0] == 2 && gCurrentMapIndex[0] == 5) {
             *(Quad *)offset = 0;
             offset[0] = -0.3372f;
             offset[1] = -0.5364f;
             offset[2] = -1.79489f;
-            func_00283098(offset, offset, D_00214920[i]->basis);
-            func_00282CC0(delta, p, offset);
-            qcopy(D_00214920[i]->position, delta);
+            matrix_mul_vec3(offset, offset, gEquipmentPieces[i]->basis);
+            FastVecAdd(delta, p, offset);
+            qcopy(gEquipmentPieces[i]->position, delta);
         }
-        func_002AB6D8(D_00214920[i]->basis, D_00214920[i]->previous);
-        func_002A10E8(D_00214920[i]);
+        GetEulerAnglesFromMatrix(gEquipmentPieces[i]->basis, gEquipmentPieces[i]->previous);
+        func_002A10E8(gEquipmentPieces[i]);
         {
-            char *state = D_00214920[i]->state;
-            func_00282CF0(delta, D_00214920[i]->position, old);
-            func_002AD6F0(state + 0x20, delta, previous, D_00214920[i]->previous);
+            char *state = gEquipmentPieces[i]->state;
+            FastVecSub(delta, gEquipmentPieces[i]->position, old);
+            CombineTransformsAndStore(state + 0x20, delta, previous, gEquipmentPieces[i]->previous);
         }
-        if (D_00189E20.count >= 2 && D_00189E20.selected == D_00214920[i])
+        if (gHeroState.count >= 2 && gHeroState.selected == gEquipmentPieces[i])
             target = HERO;
-        if (D_001A8BB0[0]) {
-            D_00214920[i]->render = 0;
+        if (gCurrentGameMode[0]) {
+            gEquipmentPieces[i]->render = 0;
             object->render = 0;
         } else if (object->render)
-            D_00214920[i]->render = *(int *)(D_00214920[i]->model + 0x10);
+            gEquipmentPieces[i]->render = *(int *)(gEquipmentPieces[i]->model + 0x10);
     }
-    if (!D_001A8BB0[0])
-        func_002B44C0(object, D_00214970, target);
+    if (!gCurrentGameMode[0])
+        UpdateObjectSway(object, D_00214970, target);
 }

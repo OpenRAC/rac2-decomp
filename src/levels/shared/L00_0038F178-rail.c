@@ -17,6 +17,7 @@ extern float func_00282E20(void *), func_00283248(float, float), func_002AA2E8(f
 extern void func_00282F20(void *, void *, float), func_00282D30(void *, void *, float);
 /* Precomputes path segment lengths and steers the hero along the nearest active path. */
 typedef struct { float f[4]; } PV; typedef struct { char h[16]; PV p[1]; } PC;
+/* Measures the rail paths once, then pulls the hero along the nearest path while the hero is riding it. */
 void func_L00_0039E158(char *actor) {
     RailState *state = *(RailState **)(actor + 0x68);
     float previous[4], point[4], delta[4], step[4];
@@ -36,24 +37,24 @@ void func_L00_0039E158(char *actor) {
                 char *next = initCurve + 0x20;
                 char *current = initCurve + 0x10;
                 do {
-                    *lengths = func_00282E48(current, next);
+                    *lengths = fast_vec_dist(current, next);
                     j++;
                     next += 16;
                     lengths += 4;
                     current += 16;
                 } while (j < *(int *)initCurve - 1);
             }
-            ((PC *)initCurve)->p[j].f[3] = func_00282E48(initCurve + (j * 16 + 0x10), initCurve + 0x10);
+            ((PC *)initCurve)->p[j].f[3] = fast_vec_dist(initCurve + (j * 16 + 0x10), initCurve + 0x10);
         }
         *(u8 *)(actor + 0x30) = 0xFF;
     }
-    if (D_00189E20.state != 16) return;
+    if (gHeroState.state != 16) return;
     bestCurve = 0;
     bestDistance = 9999.0f;
     for (i = 0; i < state->count; i++) {
         curve = D_L00_001FDA80[state->paths[i]];
-        func_L00_00341FA8(curve, D_00189E20.point, point, &segment, &t, 0, 999.0f, 5.0f, 0.0f);
-        distance = func_00282E48(D_00189E20.point, point);
+        find_nearest_path_point(curve, gHeroState.point, point, &segment, &t, 0, 999.0f, 5.0f, 0.0f);
+        distance = fast_vec_dist(gHeroState.point, point);
         if (distance < bestDistance) {
             bestCurve = curve;
             qcopy(previous, point);
@@ -63,27 +64,27 @@ void func_L00_0039E158(char *actor) {
         }
     }
     if (!bestCurve) return;
-    advance = 3.7f - (float)D_00189E20.advanceState * 0.02f;
+    advance = 3.7f - (float)gHeroState.advanceState * 0.02f;
     if (advance < 0.7f) advance = 0.7f;
     {
-        int result = func_L00_00341820(bestCurve, point, &bestSegment, &bestT, 0, advance);
+        int result = Spline_AdvanceByDistance(bestCurve, point, &bestSegment, &bestT, 0, advance);
         if (state->radius < bestDistance) return;
         if (!result) {
-            func_00282CF0(step, point, previous);
-            func_00282CF0(delta, point, D_00189E20.point);
-            D_00189E20.angles.pitch = func_00283248(func_00282E20(step), step[2]);
-            D_00189E20.angles.heading = func_00283248(delta[0], delta[1]);
+            FastVecSub(step, point, previous);
+            FastVecSub(delta, point, gHeroState.point);
+            gHeroState.angles.pitch = FastMatrixHelperA(vec_length_xy(step), step[2]);
+            gHeroState.angles.heading = FastMatrixHelperA(delta[0], delta[1]);
             delta[2] = 0;
-            func_002AA2E8(&D_00189E20.angles.speed, state->speed, 0.0036111111f);
-            length = func_00282DF0(delta);
-            if (length > 0.001f) func_00282F20(D_00189E20.velocity, delta, D_00189E20.angles.speed);
-            D_00189E20.velocity[3] = 0;
-            qcopy(state->velocity, D_00189E20.velocity);
-            if (D_00189E20.timer < 30) D_00189E20.timer = 30;
+            ApproachValue(&gHeroState.angles.speed, state->speed, 0.0036111111f);
+            length = FastVecLength(delta);
+            if (length > 0.001f) vec_scale_to_length(gHeroState.velocity, delta, gHeroState.angles.speed);
+            gHeroState.velocity[3] = 0;
+            qcopy(state->velocity, gHeroState.velocity);
+            if (gHeroState.timer < 30) gHeroState.timer = 30;
         } else {
-            func_00282D30(state->velocity, state->velocity, 0.99f);
-            qcopy(D_00189E20.velocity, state->velocity);
-            D_00189E20.velocity[3] = 0;
+            FastVecScale(state->velocity, state->velocity, 0.99f);
+            qcopy(gHeroState.velocity, state->velocity);
+            gHeroState.velocity[3] = 0;
         }
     }
 }

@@ -37,32 +37,33 @@ extern float func_00282E80(void *, void *);
 
 /* Move between the initial height and the projection-table height, updating
  * the collision displacement and keeping the movement sound active. */
+/* Updates moby classes 2792 and 2793: a platform that rises and lowers between two heights when the player calls it, and carries the player. */
 void func_L14_003DECE0(char *self) {
-    Vec delta, velocity;
-    char *state = *(char **)(self + 0x68);
+    Vec moveDelta, velocity;
+    char *vars = *(char **)(self + 0x68);
     float target, speed;
     int active, blocked;
 
     switch ((unsigned char)self[0x20]) {
     case 0:
-        if (!state || *(int *)(state + 0x60) == -1) {
-            func_0029F338(self);
+        if (!vars || *(int *)(vars + 0x60) == -1) {
+            MarkMobySpawned(self);
             return;
         }
         {
             float originalHeight = *(float *)(self + 0x18);
-            *(int *)(state + 0x7C) = 0;
-            *(float *)(state + 0x70) = originalHeight;
+            *(int *)(vars + 0x7C) = 0;
+            *(float *)(vars + 0x70) = originalHeight;
         }
-        func_L14_003DF100(self, 0);
+        DrawMobyEdgeLines(self, 0);
         func_321F58(self, 1, -1);
         break;
     case 1:
         active = 0;
-        if (D_00189E20.obj == self && D_00189E20.active) {
-            func_L14_003DF200(self);
-            if (!*(int *)(state + 0x6C) || func_L14_003DF440(self) || func_L14_003DF540(self)) {
-                func_002B0C28(4, 0x279A, 1);
+        if (gHeroState.obj == self && gHeroState.active) {
+            ClampGroupEntitiesToBox(self);
+            if (!*(int *)(vars + 0x6C) || IsGroupLinkedToOwner(self) || IsGroupMisaligned(self)) {
+                TryClaimNotice(4, 0x279A, 1);
                 {
                     int flags = D_00138324 & 0x10;
                     active = flags != 0;
@@ -71,67 +72,67 @@ void func_L14_003DECE0(char *self) {
         } else {
             /* Keeping the distance guard in each height case lets the
              * compiler share the floating-point branch, as retail does. */
-            if (*(int *)(state + 0x7C)) {
-                if (D_00189E20.pos[2] - *(float *)(state + 0x70) > -0.25f) {
-                    if (func_00282E80(D_00189E20.pos, self + 0x10) < 24.0f)
+            if (*(int *)(vars + 0x7C)) {
+                if (gHeroState.pos[2] - *(float *)(vars + 0x70) > -0.25f) {
+                    if (vec_distance_xy(gHeroState.pos, self + 0x10) < 24.0f)
                         active = 1;
                 }
             } else {
-                PlayerState *player = &D_00189E20;
-                if (func_00282C48(player->pos[2] - D_L14_001B268C[*(int *)(state + 0x60)].height) < 1.0f) {
-                    if (func_00282E80(player->pos, self + 0x10) < 24.0f)
+                PlayerState *player = &gHeroState;
+                if (FloatAbs(player->pos[2] - D_L14_001B268C[*(int *)(vars + 0x60)].height) < 1.0f) {
+                    if (vec_distance_xy(player->pos, self + 0x10) < 24.0f)
                         active = 1;
                 }
             }
         }
         if (active) {
             func_321F58(self, 2, -1);
-            *(int *)(state + 0x7C) = (*(int *)(state + 0x7C) + 1) & 1;
-            func_L14_003DF100(self, 1);
+            *(int *)(vars + 0x7C) = (*(int *)(vars + 0x7C) + 1) & 1;
+            DrawMobyEdgeLines(self, 1);
         }
         break;
     case 2:
-        if (*(int *)(state + 0x7C))
-            target = D_L14_001B268C_gp[*(int *)(state + 0x60)].height;
+        if (*(int *)(vars + 0x7C))
+            target = D_L14_001B268C_gp[*(int *)(vars + 0x60)].height;
         else
-            target = *(float *)(state + 0x70);
+            target = *(float *)(vars + 0x70);
         speed = 0.00111111114f;
         blocked = 0;
-        if (*(int *)(state + 0x7C) && D_00189E20.pos[2] < *(float *)(self + 0x18) - 1.0f &&
-            func_002ACBC8(D_00189E20.pos, *(int *)(state + 0x60))) {
+        if (*(int *)(vars + 0x7C) && gHeroState.pos[2] < *(float *)(self + 0x18) - 1.0f &&
+            IsPointInCuboid(gHeroState.pos, *(int *)(vars + 0x60))) {
             blocked = 1;
             target += 1.5f;
             speed = 0.00222222228f;
         }
-        if (!blocked && func_00282C48(*(float *)(self + 0x18) - target) <= *(float *)(state + 0x74)) {
+        if (!blocked && FloatAbs(*(float *)(self + 0x18) - target) <= *(float *)(vars + 0x74)) {
             *(float *)(self + 0x18) = target;
-            *(float *)(state + 0x74) = 0.0f;
+            *(float *)(vars + 0x74) = 0.0f;
             func_321F58(self, 1, -1);
-            func_L14_003DF100(self, 0);
+            DrawMobyEdgeLines(self, 0);
             {
-                char *collision = state + 0x20;
+                char *collision = vars + 0x20;
                 func_328DA8(collision, D_L14_001A8F20, self + 0xF0, self + 0xF0);
             }
         } else {
-            func_002AA548(self + 0x18, state + 0x74, target, 0.00055555557f, speed, 0.166666672f);
+            StepValueTowardTarget(self + 0x18, vars + 0x74, target, 0.00055555557f, speed, 0.166666672f);
             velocity.q = 0;
-            velocity.f[2] = *(float *)(state + 0x74);
-            delta.q = velocity.q;
-            func_328DA8(state + 0x20, &delta, self + 0xF0, self + 0xF0);
+            velocity.f[2] = *(float *)(vars + 0x74);
+            moveDelta.q = velocity.q;
+            func_328DA8(vars + 0x20, &moveDelta, self + 0xF0, self + 0xF0);
         }
         break;
     }
-    if (func_00282C48(*(float *)(state + 0x74)) > 0.01f) {
-        unsigned char *e = (unsigned char *)D_00188660 + *(int *)(state + 0x78) * 0x70;
-        if (*(char **)(e + 0x88) != self || !e[0x74])
-            *(int *)(state + 0x78) = func_002E5CF8(0, 4, self);
+    if (FloatAbs(*(float *)(vars + 0x74)) > 0.01f) {
+        unsigned char *soundEntry = (unsigned char *)gSoundState + *(int *)(vars + 0x78) * 0x70;
+        if (*(char **)(soundEntry + 0x88) != self || !soundEntry[0x74])
+            *(int *)(vars + 0x78) = PlayMobySound(0, 4, self);
     } else {
-        int n = *(int *)(state + 0x78);
-        if (n != -1) {
-            unsigned char *e = (unsigned char *)D_00188660 + n * 0x70;
-            if (*(char **)(e + 0x88) == self && e[0x74])
-                func_002E59F8(n);
+        int soundSlot = *(int *)(vars + 0x78);
+        if (soundSlot != -1) {
+            unsigned char *soundEntry = (unsigned char *)gSoundState + soundSlot * 0x70;
+            if (*(char **)(soundEntry + 0x88) == self && soundEntry[0x74])
+                StopSoundVoice(soundSlot);
         }
-        *(int *)(state + 0x78) = -1;
+        *(int *)(vars + 0x78) = -1;
     }
 }

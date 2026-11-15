@@ -91,80 +91,81 @@ typedef struct BeamMoby {
     unsigned short oClass;
 } BeamMoby;
 
+/* Per-frame update for the Clank Zapper beam (moby class 3800, Clank Zapper). It fires the beam from the hero, hurts what it hits, shows sparks and a light, then removes itself when the timer ends. */
 void func_L00_0040BA30(BeamMoby *self)
 {
-    float old0[4];
-    float mtx[4];
-    float old20[4];
-    float dir[4];
-    float v40[4];
-    float v50[4];
+    float oldPos[4];
+    float upVec[4];
+    float startPos[4];
+    float beamDir[4];
+    float pointA[4];
+    float pointB[4];
     Hit hit;
     BeamVars *vars = self->vars;
-    float ang;
-    float r;
+    float angle;
+    float tilt;
     int i;
     int j;
     int m;
-    BeamMoby *t;
-    float s1, s2, s3, s4, s5, s6, s7, s8, s9;
-    int n;
+    BeamMoby *lockedTarget;
+    float leftFrac1, rightFrac1, size, leftFrac2, rightFrac2, sparkSize, leftFrac3, rightFrac3, handSize;
+    int spin;
     int heroNode;
-    ClassEntry *tbl;
+    ClassEntry *weaponTable;
 
-    qcopy(old0, self->pos);
-    func_002AFFD8(self->pos, mtx, 1);
-    heroNode = D_00189E20.i[0x1314 / 4];
-    func_0029FCC0(heroNode, 6, vars->left);
-    func_0029FCC0(heroNode, 7, vars->right);
-    qcopy(old20, self->pos);
-    func_00282CF0(dir, vars->end, &D_00189E20.b[0x2010]);
-    func_00282F20(dir, dir, 1.0f);
-    ang = func_00283248(*(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x10) - D_00189E20.f[0x80 / 4],
-                        *(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x14) - D_00189E20.f[0x84 / 4]);
-    if (ang < 1.5707964897155762f)
-        r = func_002A7878(0.0f, -0.7853982448577881f);
+    qcopy(oldPos, self->pos);
+    ComputeViewDirection(self->pos, upVec, 1);
+    heroNode = gHeroState.i[0x1314 / 4];
+    TransformMobyJointToWorld(heroNode, 6, vars->left);
+    TransformMobyJointToWorld(heroNode, 7, vars->right);
+    qcopy(startPos, self->pos);
+    FastVecSub(beamDir, vars->end, &gHeroState.b[0x2010]);
+    vec_scale_to_length(beamDir, beamDir, 1.0f);
+    angle = FastMatrixHelperA(*(float *)(gHeroState.ptr[0x18D0 / 4] + 0x10) - gHeroState.f[0x80 / 4],
+                        *(float *)(gHeroState.ptr[0x18D0 / 4] + 0x14) - gHeroState.f[0x84 / 4]);
+    if (angle < 1.5707964897155762f)
+        tilt = RandomFloatRange(0.0f, -0.7853982448577881f);
     else
-        r = func_002A7878(0.0f, 0.7853982448577881f);
+        tilt = RandomFloatRange(0.0f, 0.7853982448577881f);
     qcopy(vars->aim, &D_0018BE30);
     vars->aim[2] -= D_L00_001B1008;
-    func_00282CF0(vars->aim, vars->aim, &D_0018BE30);
-    func_002ACEC0(vars->aim, vars->aim, dir, r);
-    func_00282CC0(vars->aim, &D_0018BE30, vars->aim);
-    t = vars->target;
-    if (t != 0) {
-        if (t->state == 0xFE) {
+    FastVecSub(vars->aim, vars->aim, &D_0018BE30);
+    ApplyAxisRotationToQuaternion(vars->aim, vars->aim, beamDir, tilt);
+    FastVecAdd(vars->aim, &D_0018BE30, vars->aim);
+    lockedTarget = vars->target;
+    if (lockedTarget != 0) {
+        if (lockedTarget->state == 0xFE) {
             vars->target = 0;
-        } else if (t->state == 0xFD) {
+        } else if (lockedTarget->state == 0xFD) {
             vars->target = 0;
         } else {
-            func_00282CF0(v40, t->pos, self->pos);
-            if (func_00282DF0(v40) != 0.0f) {
-                char *target = func_002AB1F0(vars->target);
+            FastVecSub(pointA, lockedTarget->pos, self->pos);
+            if (FastVecLength(pointA) != 0.0f) {
+                char *target = GetMobyPrivateValue0(vars->target);
                 if (target != 0) {
-                    func_00282D30(v50, mtx, *(float *)(target + 0x10));
-                    func_00282CC0(v40, v40, v50);
-                    func_00282DF0(v40);
+                    FastVecScale(pointB, upVec, *(float *)(target + 0x10));
+                    FastVecAdd(pointA, pointA, pointB);
+                    FastVecLength(pointA);
                 }
             } else {
                 vars->target = 0;
             }
         }
     }
-    ang = func_00283C80(func_00283248(*(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x10) - D_00189E20.f[0x80 / 4],
-                                      *(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x14) - D_00189E20.f[0x84 / 4]),
-                        D_00189E20.f[0x98 / 4]);
+    angle = FastDiffRots(FastMatrixHelperA(*(float *)(gHeroState.ptr[0x18D0 / 4] + 0x10) - gHeroState.f[0x80 / 4],
+                                      *(float *)(gHeroState.ptr[0x18D0 / 4] + 0x14) - gHeroState.f[0x84 / 4]),
+                        gHeroState.f[0x98 / 4]);
     switch (self->state) {
     case 0:
         /* Each arm repeats its whole setup; the compiler cross-jumps the shared tails away. */
-        tbl = D_L00_00262570;
-        if (tbl[D_00139568.b[9]].b4 != 0) {
+        weaponTable = gWeaponTable_L00;
+        if (weaponTable[gItemSlotToRecord.b[9]].b4 != 0) {
             hit.flags = 0x110000;
             hit.owner = (char *)self;
             hit.f20 = 1;
-            hit.f1C = tbl[D_00139568.b[0x49]].f70;
+            hit.f1C = weaponTable[gItemSlotToRecord.b[0x49]].f70;
             qcopy(hit.v, vars->dir);
-            func_00282F20(&hit, &hit, 0.2f);
+            vec_scale_to_length(&hit, &hit, 0.2f);
             hit.b18 = 1;
             hit.b19 = 1;
             hit.v[3] = 5627.9248046875f;
@@ -173,163 +174,163 @@ void func_L00_0040BA30(BeamMoby *self)
             hit.flags = 0x10000;
             hit.owner = (char *)self;
             hit.f20 = 1;
-            hit.f1C = tbl[D_00139568.b[9]].f70;
+            hit.f1C = weaponTable[gItemSlotToRecord.b[9]].f70;
             qcopy(hit.v, vars->dir);
-            func_00282F20(&hit, &hit, 0.2f);
+            vec_scale_to_length(&hit, &hit, 0.2f);
             hit.b18 = 1;
             hit.b19 = 1;
             hit.v[3] = 5627.9248046875f;
             hit.h1A = self->oClass;
         }
-        if (D_L00_001B1000 * 0.01745329424738884f < ang) {
+        if (D_L00_001B1000 * 0.01745329424738884f < angle) {
             if (vars->enabled == 0)
-                { func_0029F338(self); return; }
-            if (func_002761F8(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
-                { func_0029F338(self); return; }
-            if (D_L00_001BF200.i[0x1C / 4] > 0)
-                { func_0029F338(self); return; }
-            if (D_L00_001BF200.p[0x18 / 4] == 0)
-                func_L00_0040CCA0(&D_L00_001BF200.b[0x20], 0xF, 1);
-            else if (*(int *)(D_L00_001BF200.p[0x18 / 4] + 0x98) != 0)
-                func_L00_0040CCA0(&D_L00_001BF200.b[0x20], 0xA, 1);
-            func_002E5DA0(0x15, 0, self, 0);
+                { MarkMobySpawned(self); return; }
+            if (CollLine(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
+                { MarkMobySpawned(self); return; }
+            if (gCollisionResult.i[0x1C / 4] > 0)
+                { MarkMobySpawned(self); return; }
+            if (gCollisionResult.p[0x18 / 4] == 0)
+                SpawnSmokeAndSparks(&gCollisionResult.b[0x20], 0xF, 1);
+            else if (*(int *)(gCollisionResult.p[0x18 / 4] + 0x98) != 0)
+                SpawnSmokeAndSparks(&gCollisionResult.b[0x20], 0xA, 1);
+            PlaySoundFromClassBank(0x15, 0, self, 0);
             self->state = 1;
             self->flags |= 0x41;
             vars->timer = D_L00_001B0FE4;
         } else {
-            if (func_002761F8(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
-                { func_0029F338(self); return; }
-            if (D_L00_001BF200.i[0x1C / 4] > 0)
-                { func_0029F338(self); return; }
-            if (D_L00_001BF200.p[0x18 / 4] == 0)
-                func_L00_0040CCA0(&D_L00_001BF200.b[0x20], 0xF, 0);
-            else if (*(int *)(D_L00_001BF200.p[0x18 / 4] + 0x98) != 0)
-                func_L00_0040CCA0(&D_L00_001BF200.b[0x20], 0xA, 0);
-            func_002E5DA0(0x15, 0, self, 0);
+            if (CollLine(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
+                { MarkMobySpawned(self); return; }
+            if (gCollisionResult.i[0x1C / 4] > 0)
+                { MarkMobySpawned(self); return; }
+            if (gCollisionResult.p[0x18 / 4] == 0)
+                SpawnSmokeAndSparks(&gCollisionResult.b[0x20], 0xF, 0);
+            else if (*(int *)(gCollisionResult.p[0x18 / 4] + 0x98) != 0)
+                SpawnSmokeAndSparks(&gCollisionResult.b[0x20], 0xA, 0);
+            PlaySoundFromClassBank(0x15, 0, self, 0);
             self->state = 1;
             self->flags |= 0x41;
             vars->timer = D_L00_001B0FE4;
         }
-        func_00282CF0(v40, vars->end, &D_0018BE30);
-        func_00282F20(v40, v40, func_00282DF0(v40) * 0.5f);
-        func_00282CC0(v40, &D_0018BE30, v40);
-        if (D_L00_001B1000 * 0.01745329424738884f < ang) {
+        FastVecSub(pointA, vars->end, &D_0018BE30);
+        vec_scale_to_length(pointA, pointA, FastVecLength(pointA) * 0.5f);
+        FastVecAdd(pointA, &D_0018BE30, pointA);
+        if (D_L00_001B1000 * 0.01745329424738884f < angle) {
             if (vars->enabled == 0)
                 goto bounds;
-            vars->effect = func_L00_002FCF18(v40, 10.0f, 0.0f, 1.0f, 0.1f, 0.1f);
+            vars->effect = AllocateEffectSlot_L00_2(pointA, 10.0f, 0.0f, 1.0f, 0.1f, 0.1f);
         } else {
-            vars->effect = func_L00_002FCF18(v40, 10.0f, 0.0f, 0.1f, 1.0f, 0.1f);
+            vars->effect = AllocateEffectSlot_L00_2(pointA, 10.0f, 0.0f, 0.1f, 1.0f, 0.1f);
         }
         break;
     case 1:
-        if (func_00282948(&vars->timer) != 0) {
+        if (FastFloatHelperD(&vars->timer) != 0) {
             vars->target = 0;
             if (vars->effect != -1)
-                func_00291450(vars->effect);
-            func_0029F338(self);
+                FreePointLight(vars->effect);
+            MarkMobySpawned(self);
             return;
         }
-        if (D_L00_001B1000 * 0.01745329424738884f < ang) {
+        if (D_L00_001B1000 * 0.01745329424738884f < angle) {
             if (vars->enabled != 0) {
                 for (i = 0; i < 10; i++) {
-                    char *p;
-                    s1 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v40, vars->end, vars->left);
-                    func_00282F20(v40, v40, s1 * func_00282DF0(v40));
-                    func_00282CC0(v40, vars->left, v40);
-                    s2 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v50, vars->end, vars->right);
-                    func_00282F20(v50, v50, s2 * func_00282DF0(v50));
-                    func_00282CC0(v50, vars->right, v50);
-                    n = func_002A77E0(0xFF);
-                    s3 = func_002A7878(0.35f, 0.5f);
-                    p = func_002C65A0(v40, D_L00_001A8F20, D_L00_001B0FEC, D_L00_001B0FF0, n, 0x30, 0,
-                                      s3 * 210000.0f, s3 * 42000.0f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[7];
-                    p = func_002C65A0(v50, D_L00_001A8F20, D_L00_001B0FEC, D_L00_001B0FF0, n, 0x30, 0,
-                                      s3 * 210000.0f, s3 * 42000.0f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[7];
+                    char *part;
+                    leftFrac1 = RandomFloatRange(0.0f, 1.0f);
+                    FastVecSub(pointA, vars->end, vars->left);
+                    vec_scale_to_length(pointA, pointA, leftFrac1 * FastVecLength(pointA));
+                    FastVecAdd(pointA, vars->left, pointA);
+                    rightFrac1 = RandomFloatRange(0.0f, 1.0f);
+                    FastVecSub(pointB, vars->end, vars->right);
+                    vec_scale_to_length(pointB, pointB, rightFrac1 * FastVecLength(pointB));
+                    FastVecAdd(pointB, vars->right, pointB);
+                    spin = RandomIntBelow(0xFF);
+                    size = RandomFloatRange(0.35f, 0.5f);
+                    part = SpawnGravityFadeParticle(pointA, D_L00_001A8F20, D_L00_001B0FEC, D_L00_001B0FF0, spin, 0x30, 0,
+                                      size * 210000.0f, size * 42000.0f, 0.0f, 0);
+                    if (part != 0)
+                        part[2] = (D_L00_001FE940.p[0x184 / 4])[7];
+                    part = SpawnGravityFadeParticle(pointB, D_L00_001A8F20, D_L00_001B0FEC, D_L00_001B0FF0, spin, 0x30, 0,
+                                      size * 210000.0f, size * 42000.0f, 0.0f, 0);
+                    if (part != 0)
+                        part[2] = (D_L00_001FE940.p[0x184 / 4])[7];
                 }
                 for (j = 0; j < 20; j++) {
-                    char *p;
-                    s4 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v40, vars->end, vars->left);
-                    func_00282F20(v40, v40, s4 * func_00282DF0(v40));
-                    func_00282CC0(v40, vars->left, v40);
-                    s5 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v50, vars->end, vars->right);
-                    func_00282F20(v50, v50, s5 * func_00282DF0(v50));
-                    func_00282CC0(v50, vars->right, v50);
-                    n = func_002A77E0(0xFF);
-                    s6 = func_002A7878(0.2f, 0.35f);
-                    v40[0] += func_002A78D8(0.0f, 0.02f);
-                    v40[1] += func_002A78D8(0.0f, 0.02f);
-                    v40[2] += func_002A78D8(0.0f, 0.02f);
-                    p = func_002C65A0(v40, D_L00_001A8F20, D_L00_001B0FE8, D_L00_001B0FF4, n, 0x30, 0,
-                                      s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
-                    s6 *= 0.5f;
-                    p = func_002C65A0(v40, D_L00_001A8F20, D_L00_001B0FE8, 0x808080, n, 0x30, 0,
-                                      s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
-                    v50[0] += func_002A78D8(0.0f, 0.02f);
-                    v50[1] += func_002A78D8(0.0f, 0.02f);
-                    v50[2] += func_002A78D8(0.0f, 0.02f);
-                    p = func_002C65A0(v50, D_L00_001A8F20, D_L00_001B0FE8, D_L00_001B0FF4, n, 0x30, 0,
-                                      s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
-                    s6 *= 0.5f;
-                    p = func_002C65A0(v50, D_L00_001A8F20, D_L00_001B0FE8, 0x808080, n, 0x30, 0,
-                                      s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                    char *part;
+                    leftFrac2 = RandomFloatRange(0.0f, 1.0f);
+                    FastVecSub(pointA, vars->end, vars->left);
+                    vec_scale_to_length(pointA, pointA, leftFrac2 * FastVecLength(pointA));
+                    FastVecAdd(pointA, vars->left, pointA);
+                    rightFrac2 = RandomFloatRange(0.0f, 1.0f);
+                    FastVecSub(pointB, vars->end, vars->right);
+                    vec_scale_to_length(pointB, pointB, rightFrac2 * FastVecLength(pointB));
+                    FastVecAdd(pointB, vars->right, pointB);
+                    spin = RandomIntBelow(0xFF);
+                    sparkSize = RandomFloatRange(0.2f, 0.35f);
+                    pointA[0] += RandomSignedFloatRange(0.0f, 0.02f);
+                    pointA[1] += RandomSignedFloatRange(0.0f, 0.02f);
+                    pointA[2] += RandomSignedFloatRange(0.0f, 0.02f);
+                    part = SpawnGravityFadeParticle(pointA, D_L00_001A8F20, D_L00_001B0FE8, D_L00_001B0FF4, spin, 0x30, 0,
+                                      sparkSize * 210000.0f, sparkSize * 42000.0f, 0.0f, 0);
+                    if (part != 0)
+                        part[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                    sparkSize *= 0.5f;
+                    part = SpawnGravityFadeParticle(pointA, D_L00_001A8F20, D_L00_001B0FE8, 0x808080, spin, 0x30, 0,
+                                      sparkSize * 210000.0f, sparkSize * 42000.0f, 0.0f, 0);
+                    if (part != 0)
+                        part[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                    pointB[0] += RandomSignedFloatRange(0.0f, 0.02f);
+                    pointB[1] += RandomSignedFloatRange(0.0f, 0.02f);
+                    pointB[2] += RandomSignedFloatRange(0.0f, 0.02f);
+                    part = SpawnGravityFadeParticle(pointB, D_L00_001A8F20, D_L00_001B0FE8, D_L00_001B0FF4, spin, 0x30, 0,
+                                      sparkSize * 210000.0f, sparkSize * 42000.0f, 0.0f, 0);
+                    if (part != 0)
+                        part[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                    sparkSize *= 0.5f;
+                    part = SpawnGravityFadeParticle(pointB, D_L00_001A8F20, D_L00_001B0FE8, 0x808080, spin, 0x30, 0,
+                                      sparkSize * 210000.0f, sparkSize * 42000.0f, 0.0f, 0);
+                    if (part != 0)
+                        part[2] = (D_L00_001FE940.p[0x184 / 4])[6];
                 }
-                if (vars->target != 0 && D_L00_001B19C8 % 5 == 0) {
-                    char *p;
-                    s7 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v40, vars->end, vars->left);
-                    func_00282F20(v40, v40, s7 * func_00282DF0(v40));
-                    func_00282CC0(v40, vars->left, v40);
-                    s8 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v50, vars->end, vars->right);
-                    func_00282F20(v50, v50, s8 * func_00282DF0(v50));
-                    func_00282CC0(v50, vars->right, v50);
-                    p = func_002C65A0(v40, D_L00_001A8F20, 0x1E, 0x202080, 0, 0x40, 0,
+                if (vars->target != 0 && gFrameCounter_L00 % 5 == 0) {
+                    char *part;
+                    leftFrac3 = RandomFloatRange(0.0f, 1.0f);
+                    FastVecSub(pointA, vars->end, vars->left);
+                    vec_scale_to_length(pointA, pointA, leftFrac3 * FastVecLength(pointA));
+                    FastVecAdd(pointA, vars->left, pointA);
+                    rightFrac3 = RandomFloatRange(0.0f, 1.0f);
+                    FastVecSub(pointB, vars->end, vars->right);
+                    vec_scale_to_length(pointB, pointB, rightFrac3 * FastVecLength(pointB));
+                    FastVecAdd(pointB, vars->right, pointB);
+                    part = SpawnGravityFadeParticle(pointA, D_L00_001A8F20, 0x1E, 0x202080, 0, 0x40, 0,
                                       2100.0f, 126000.0078125f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = *D_L00_001FE9F4[0];
-                    p = func_002C65A0(v50, D_L00_001A8F20, 0x1E, 0x202080, 0, 0x40, 0,
+                    if (part != 0)
+                        part[2] = *D_L00_001FE9F4[0];
+                    part = SpawnGravityFadeParticle(pointB, D_L00_001A8F20, 0x1E, 0x202080, 0, 0x40, 0,
                                       2100.0f, 126000.0078125f, 0.0f, 0);
-                    if (p != 0)
-                        p[2] = *D_L00_001FE9F4[0];
+                    if (part != 0)
+                        part[2] = *D_L00_001FE9F4[0];
                 }
             }
         } else {
             for (m = 0; m < 10; m++) {
-                char *p;
-                s9 = func_002A7878(0.25f, 0.4f) * 210000.0f;
-                p = func_002C65A0(&D_00189E20.b[0x2010], D_L00_001A8F20, 2, 0x108010, 2, 0x7F, 0x10,
-                                  s9, s9, 0.0f, 0);
-                if (p != 0)
-                    p[2] = *D_L00_001FE940.p[0x64 / 4];
-                p = func_002C65A0(&D_00189E20.b[0x2010], D_L00_001A8F20, 2, 0x208020, -1, 0x7F, 0x10,
-                                  s9, s9, 0.0f, 0);
-                if (p != 0)
-                    p[2] = *D_L00_001FE940.p[0x64 / 4];
+                char *part;
+                handSize = RandomFloatRange(0.25f, 0.4f) * 210000.0f;
+                part = SpawnGravityFadeParticle(&gHeroState.b[0x2010], D_L00_001A8F20, 2, 0x108010, 2, 0x7F, 0x10,
+                                  handSize, handSize, 0.0f, 0);
+                if (part != 0)
+                    part[2] = *D_L00_001FE940.p[0x64 / 4];
+                part = SpawnGravityFadeParticle(&gHeroState.b[0x2010], D_L00_001A8F20, 2, 0x208020, -1, 0x7F, 0x10,
+                                  handSize, handSize, 0.0f, 0);
+                if (part != 0)
+                    part[2] = *D_L00_001FE940.p[0x64 / 4];
             }
         }
-        func_L00_0040B398(self);
-        ref_L00_0040BA30_00(func_L00_0040C7D8, self);
+        UpdateLightningStrands(self);
+        ref_L00_0040BA30_00(DrawBeamSegmentsOrRibbons, self);
         break;
     }
 bounds:
     if (self->pos[0] < 2.0f || self->pos[0] > 1021.0f ||
         self->pos[1] < 2.0f || self->pos[1] > 1021.0f ||
         self->pos[2] < 2.0f || self->pos[2] > 1021.0f)
-        func_0029F338(self);
+        MarkMobySpawned(self);
 }

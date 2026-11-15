@@ -18,8 +18,8 @@ void func_L01_0042A6F0(int mode, int duration)
     camera[0x88] = mode;
     switch (mode) {
     case 3:
-        qcopy(state + 0x110, D_00189EA0);
-        func_00272550(state + 0xFC, g + 0x140, D_00189EA0);
+        qcopy(state + 0x110, gHeroPosition);
+        ComputeDirectionAngles(state + 0xFC, g + 0x140, gHeroPosition);
         /* fall through */
     case 2:
         *(int *)(transition + 4) = duration;

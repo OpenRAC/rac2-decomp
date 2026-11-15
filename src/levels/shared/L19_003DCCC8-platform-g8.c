@@ -103,6 +103,7 @@ typedef struct {
     Vector forward, right, up, rotation;
 } PlatformActor;
 
+/* Moves a platform to its destination when triggered, bobs it up and down, and tilts it as the hero stands on it. */
 void func_L19_00415598(PlatformActor *actor)
 {
     PlatformState *state = actor->vars;
@@ -118,7 +119,7 @@ void func_L19_00415598(PlatformActor *actor)
     case 0:
         qcopy(&state->tilt, &actor->rotation);
         qzero_nc(&state->tiltVelocity);
-        state->phase = func_002A7940();
+        state->phase = RandomAngle();
         if (state->destination == -1) {
             actor->flags |= 2;
             return;
@@ -135,7 +136,7 @@ void func_L19_00415598(PlatformActor *actor)
         if (!state->gate) goto inactive_actor;
         id = actor->packedGate;
         if (D_L19_0021EE94[(short)id]) goto active;
-        index = D_0019B4A8[((int)(id << 16) >> 17) + D_001A79F0[0] * 0x400];
+        index = D_0019B4A8[((int)(id << 16) >> 17) + gCurrentMapIndex[0] * 0x400];
         if (id & 1) {
             if ((index >> 4) & 7) goto active;
             goto inactive_actor;
@@ -145,10 +146,10 @@ active:
             ADVANCE_GATE();
         qcopy_nc(&actor->position, D_L19_001B2B0C + state->destination * 0x80 + 0x30);
         qcopy_nc(&actor->rotation, D_L19_001B2B0C + state->destination * 0x80 + 0x70);
-        func_002A7750(actor, 4, -1);
+        SetMobyState(actor, 4, -1);
         goto initialized;
 inactive_actor:
-        func_002A7750(actor, 1, -1);
+        SetMobyState(actor, 1, -1);
 initialized:
         {
             float initial_height = actor->position.f[2];
@@ -157,26 +158,26 @@ initialized:
         }
         break;
     case 1:
-        if (actor->triggered || func_002B38B8(actor) || state->trigger == -1 ||
-                (D_L19_001B2A1C[state->trigger * 0x100 + 0x20] == 0xfe) ||
-                (D_L19_001B2A1C[state->trigger * 0x100 + 0x20] == 0xfd)) {
+        if (actor->triggered || IsThirdPendingFlagSet(actor) || state->trigger == -1 ||
+                (gMobyArray_L19[state->trigger * 0x100 + 0x20] == 0xfe) ||
+                (gMobyArray_L19[state->trigger * 0x100 + 0x20] == 0xfd)) {
             if (state->linkedActor != -1)
-                D_L19_001B2A1C[state->linkedActor * 0x100 + 0xbc] = 1;
+                gMobyArray_L19[state->linkedActor * 0x100 + 0xbc] = 1;
             if (actor->gateId != 0xff && state->gate) {
                 ADVANCE_GATE();
-                if (state->notify) func_002A0430(actor->gateId);
+                if (state->notify) MarkTableEntryFlagged(actor->gateId);
             }
-            func_002A7750(actor, 2, -1);
+            SetMobyState(actor, 2, -1);
         }
-        if (!state->noExplosion && func_002A9640(actor, 0x40000, 0)) {
+        if (!state->noExplosion && FindOwnedEffectSlot(actor, 0x40000, 0)) {
             if (state->linkedActor != -1)
-                D_L19_001B2A1C[state->linkedActor * 0x100 + 0xbc] = 1;
-            func_00282CC0(&temp, &actor->right, &actor->up);
-            func_00282F20(&temp, &temp, 1.0f / 12.0f);
-            func_00282CC0(&origin, &actor->position, &actor->up);
-            func_002ABBB8(actor, &temp, &origin, 0.0f, 0.0f, 10, 3, 16,
+                gMobyArray_L19[state->linkedActor * 0x100 + 0xbc] = 1;
+            FastVecAdd(&temp, &actor->right, &actor->up);
+            vec_scale_to_length(&temp, &temp, 1.0f / 12.0f);
+            FastVecAdd(&origin, &actor->position, &actor->up);
+            SpawnExplosionEffects(actor, &temp, &origin, 0.0f, 0.0f, 10, 3, 16,
                 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
-            func_002B0A68((char *)actor, 31, &temp, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            SpawnDebrisForMaskedParts((char *)actor, 31, &temp, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             {
                 unsigned int event_id = actor->gateId;
                 actor->draw = 0;
@@ -184,10 +185,10 @@ initialized:
                 actor->attached = 0;
                 if (event_id != 0xff && state->gate) {
                     ADVANCE_GATE();
-                    if (state->notify) func_002A0430(actor->gateId);
+                    if (state->notify) MarkTableEntryFlagged(actor->gateId);
                 }
             }
-            func_002A7750(actor, 2, -1);
+            SetMobyState(actor, 2, -1);
         }
         actor->distance = 0xff;
         break;
@@ -196,48 +197,48 @@ initialized:
         state->progress = progress;
         if (progress > 1.0f)
             state->progress = 1.0f;
-        blend = (1.0f - func_00283180(state->progress * 3.1415927f)) * 0.5f;
-        func_00282CF0(&temp, D_L19_001B2B0C + state->destination * 0x80 + 0x30, &state->startPosition);
-        func_00282D30(&temp, &temp, blend);
+        blend = (1.0f - FastSinOrCosA(state->progress * 3.1415927f)) * 0.5f;
+        FastVecSub(&temp, D_L19_001B2B0C + state->destination * 0x80 + 0x30, &state->startPosition);
+        FastVecScale(&temp, &temp, blend);
         old_z = actor->position.f[2];
-        func_00282CC0(&actor->position, &state->startPosition, &temp);
+        FastVecAdd(&actor->position, &state->startPosition, &temp);
         state->height = actor->position.f[2];
         actor->position.f[2] = old_z;
-        actor->rotation.f[2] = func_002AA150(state->startRotation.f[2], F(D_L19_001B2B0C + state->destination * 0x80, 0x78), blend);
-        actor->rotation.f[1] = func_002AA150(state->startRotation.f[1], F(D_L19_001B2B0C + state->destination * 0x80, 0x74), blend);
-        actor->rotation.f[0] = func_002AA150(state->startRotation.f[0], F(D_L19_001B2B0C + state->destination * 0x80, 0x70), blend);
+        actor->rotation.f[2] = MoveAngleTowardTarget(state->startRotation.f[2], F(D_L19_001B2B0C + state->destination * 0x80, 0x78), blend);
+        actor->rotation.f[1] = MoveAngleTowardTarget(state->startRotation.f[1], F(D_L19_001B2B0C + state->destination * 0x80, 0x74), blend);
+        actor->rotation.f[0] = MoveAngleTowardTarget(state->startRotation.f[0], F(D_L19_001B2B0C + state->destination * 0x80, 0x70), blend);
         if (state->progress >= 1.0f) {
-            func_002A7750(actor, 3, -1);
+            SetMobyState(actor, 3, -1);
             goto finish_transition;
         }
         break;
     case 3:
 finish_transition:
-        if (state->linkedActor == -1 || !D_L19_001B2A1C[state->linkedActor * 0x100 + 0xbc]) {
+        if (state->linkedActor == -1 || !gMobyArray_L19[state->linkedActor * 0x100 + 0xbc]) {
             if (state->playerOnly) {
                 D_L19_001B9D00 = 0;
-                func_L18_002CFF48(0);
+                DetachHeroFromObject(0);
             }
             if (state->notify) {
                 if (D_0018C0D4) {
                     saved_mode = D_0018C0D4;
-                    saved_player = D_0018C0B0;
+                    saved_player = gHeroMoby_0018C0B0;
                     D_0018C0D4 = 0;
-                    D_0018C0B0 = D_0018AA38;
-                    func_002DF3F8(D_0018AA38 + 0x10, D_0018AA38 + 0xf0);
+                    gHeroMoby_0018C0B0 = D_0018AA38;
+                    CaptureCheckpointState(D_0018AA38 + 0x10, D_0018AA38 + 0xf0);
                     D_0018C0D4 = saved_mode;
-                    D_0018C0B0 = saved_player;
+                    gHeroMoby_0018C0B0 = saved_player;
                 } else
-                    func_002DF3F8(&D_00189EA0, &D_00189EB0);
+                    CaptureCheckpointState(&gHeroPosition, &D_00189EB0);
             }
-            func_002A7750(actor, 4, -1);
+            SetMobyState(actor, 4, -1);
         }
         break;
     }
     height = state->height;
     if (actor->state != 2) {
-        height += func_00283198(state->phase) * 0.1f;
-        state->phase = func_00283B98(state->phase, 0.01745329611003399f);
+        height += FastSinOrCosB(state->phase) * 0.1f;
+        state->phase = FastAddRotations(state->phase, 0.01745329611003399f);
     }
     if (state->carryingPlayer)
         height -= 0.2f;
@@ -248,34 +249,34 @@ finish_transition:
             if (!state->carryingPlayer)
                 state->velocity -= 1.0f / 60.0f;
             state->carryingPlayer = 1;
-            func_00282CF0(&temp, &D_00189EA0, &actor->position);
-            forward_dot = func_00282DB0(&temp, &actor->forward);
-            right_dot = func_00282DB0(&temp, &actor->right);
+            FastVecSub(&temp, &gHeroPosition, &actor->position);
+            forward_dot = FastVecDot(&temp, &actor->forward);
+            right_dot = FastVecDot(&temp, &actor->right);
             gain = D_L19_001B1BD0;
             origin.q = state->tilt.q;
             point.q = actor->position.q;
             target_y = gain * forward_dot;
             target_x = -gain;
             target_x *= right_dot;
-            func_002AA898((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, target_x,
+            ApproachWithVelocity((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, target_x,
                 D_L19_001B1BE0, D_L19_001B1BE4, D_L19_001B1BE8);
-            func_002AA898((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, target_y,
+            ApproachWithVelocity((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, target_y,
                 D_L19_001B1BE0, D_L19_001B1BE4, D_L19_001B1BE8);
-            func_L01_00316C48(&D_00189EA0, &camera_out, &actor->position, &origin, &state->tilt);
-            func_00282CF0(&D_00189F20, &camera_out, &D_00189EA0);
+            TransformOffsetByTwoMatrices(&gHeroPosition, &camera_out, &actor->position, &origin, &state->tilt);
+            FastVecSub(&D_00189F20, &camera_out, &gHeroPosition);
             D_00189F28 += actor->position.f[2] - point.f[2];
         } else {
             state->carryingPlayer = 0;
-            func_002AA898((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, 0.0f,
+            ApproachWithVelocity((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, 0.0f,
                 D_L19_001B1BEC, D_L19_001B1BF0, D_L19_001B1BF4);
-            func_002AA898((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, 0.0f,
+            ApproachWithVelocity((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, 0.0f,
                 D_L19_001B1BEC, D_L19_001B1BF0, D_L19_001B1BF4);
         }
-        func_002AEF28((float *)actor, (float *)(&state->yaw), (float *)(&state->yawVelocity),
+        ScaleOwnerWordsByAngles((float *)actor, (float *)(&state->yaw), (float *)(&state->yawVelocity),
             0.02007128857076168f, 0.007272206246852875f, 0.009017535485327244f);
-        actor->rotation.f[0] = func_00283B98(state->tilt.f[0], actor->rotation.f[0]);
-        actor->rotation.f[1] = func_00283B98(state->tilt.f[1], actor->rotation.f[1]);
+        actor->rotation.f[0] = FastAddRotations(state->tilt.f[0], actor->rotation.f[0]);
+        actor->rotation.f[1] = FastAddRotations(state->tilt.f[1], actor->rotation.f[1]);
     }
-    func_00282CF0(&temp, &actor->position, &old_position);
-    func_002AD6F0(&state->transformDelta, &temp, &old_rotation, &actor->rotation);
+    FastVecSub(&temp, &actor->position, &old_position);
+    CombineTransformsAndStore(&state->transformDelta, &temp, &old_rotation, &actor->rotation);
 }

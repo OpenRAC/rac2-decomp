@@ -28,14 +28,15 @@ extern f32  D_001B15A0[] __attribute__((sda));
 
 struct S272198 {
     s8 pad[0x268];
-    f32 f268;
-    s32 f26C;
+    f32 rate;
+    s32 progress;
 };
 
 extern struct S272198 D_001B5200;
 
-void func_00272198(f32 fparg0) {
-    D_001B15A0[0] = 1.0f;
-    D_001B5200.f26C = 0;
-    D_001B5200.f268 = 1.0f / fparg0;
+/* Sets how many frames a camera transition takes and restarts it. */
+void func_00272198(f32 frames) {
+    gScreenFade[0] = 1.0f;
+    gActiveCamera.progress = 0;
+    gActiveCamera.rate = 1.0f / frames;
 }

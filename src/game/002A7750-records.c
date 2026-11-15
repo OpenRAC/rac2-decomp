@@ -6,8 +6,9 @@ extern struct ImpactQueueEntry D_001BF200[];
 extern void func_00282C88(void *);
 extern float func_00282DF0(void *);
 
+/* Adds a hit effect to the impact queue for an object, merging with its earlier one if that is stronger. */
 void func_002A8F70(char *object, int kind, int bits, void *position, void *vector, float strength) {
-    int index=D_001BAF80.index;
+    int index=gCollisionHit.index;
     int flags=0;
     struct ImpactQueueEntry *entry;
     if ((unsigned char)object[0xA8]!=255) {
@@ -27,11 +28,11 @@ void func_002A8F70(char *object, int kind, int bits, void *position, void *vecto
     entry->strength=strength;
     entry->g=strength;
     entry->h=0;
-    if(func_00282DF0(vector)>0.0001f) entry->f=1;
+    if(FastVecLength(vector)>0.0001f) entry->f=1;
     else entry->f=0;
     qcopy(&D_001BF200[index].a,position);
     qcopy(&D_001BF200[index].b,vector);
     object[0xA8]=index;
-    D_001BAF80.index=(index+1)&63;
+    gCollisionHit.index=(index+1)&63;
 }
 

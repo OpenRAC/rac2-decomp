@@ -21,6 +21,8 @@ struct HitRecord {
     int one;
     char pad[12];
 };
+/* Applies damage to the thing a shot hit and makes a small spray of sparks when the target is
+   a special one. */
 void func_L05_003D1368(char *obj, char *input, float *output)
 {
     struct HitRecord hit __attribute__((aligned(16)));
@@ -36,14 +38,14 @@ void func_L05_003D1368(char *obj, char *input, float *output)
         hit.damage = D_L05_001AFC54;
     hit.one = 1;
     qcopy(hit.pos, input);
-    func_00282F20(&hit, &hit, 1.0f);
+    vec_scale_to_length(&hit, &hit, 1.0f);
     table = D_L05_001BFB00;
     hit.pos[3] = 5627.9248046875f;
     hit.type = 3;
     hit.subtype = 2;
     hit.id = *(unsigned short *)(obj + 0xAA);
     if (*(char **)(table + 0x18))
-        func_002A8E20(*(char **)(table + 0x18), &hit);
+        QueueMobyImpact(*(char **)(table + 0x18), &hit);
     func_L05_003D1E60(obj + 0x10, 0, 0);
     if (*(char **)(table + 0x18) && *(short *)(*(char **)(table + 0x18) + 0xAA) == 0x956) {
         float count = 20.0f, scale = 3.0f, spread = 2.0f;
@@ -51,17 +53,17 @@ void func_L05_003D1368(char *obj, char *input, float *output)
         for (i = 0; (float)i < count; i++) {
             float a, b;
             char *p;
-            output[0] = pos[0] + func_002A78D8(0.0f, spread);
-            output[1] = pos[1] + func_002A78D8(0.0f, spread);
-            output[2] = pos[2] + func_002A78D8(0.0f, spread);
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(vel, 0.05000000447034836f, a, b);
-            p = func_002BDCE8(output, func_002A7820(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
+            output[0] = pos[0] + RandomSignedFloatRange(0.0f, spread);
+            output[1] = pos[1] + RandomSignedFloatRange(0.0f, spread);
+            output[2] = pos[2] + RandomSignedFloatRange(0.0f, spread);
+            a = RandomAngle();
+            b = RandomAngle();
+            BuildSphericalOffset(vel, 0.05000000447034836f, a, b);
+            p = SpawnSpinningSparkParticle(output, RandomIntRange(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
             if (p) {
                 char *q = p + 0x20;
                 *(short *)(p + 0xA) = 120;
-                *(unsigned char *)(p + 8) = func_002A77E0(255);
+                *(unsigned char *)(p + 8) = RandomIntBelow(255);
                 p[3] = 0x44;
                 *(int *)(q + 4) = 2;
                 q[0xA] = 127;

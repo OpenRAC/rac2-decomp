@@ -52,115 +52,115 @@ void func_L07_003E61E0(char *actor)
     int result;
     int choices[4];
     if (D_L07_001B1E08 >= 2 && D_L07_001C9780 != I(state, 0x350)) return;
-    if (func_L07_003E69B8(actor)) goto cleanup;
+    if (InitAndUpdateShooterEntityBase(actor)) goto cleanup;
     {
         switch (B(actor, 0x95)) {
         case 0:
-            if (I(state, 0x2D4) == 1) {func_002A7750(actor, 6, 2); break;}
+            if (I(state, 0x2D4) == 1) {SetMobyState(actor, 6, 2); break;}
             if (I(state, 0x2D0)) {
-                func_002A7750(actor, 3, 1);
+                SetMobyState(actor, 3, 1);
                 I(state, 0x2D0) = 0;
-                if (I(state, 0x344) < 300) I(state, 0x344) = func_002A7820(480, 600);
+                if (I(state, 0x344) < 300) I(state, 0x344) = RandomIntRange(480, 600);
             }
             break;
         case 1:
-            if (I(state, 0x2D4) == 1) func_002A7750(actor, 6, 2);
+            if (I(state, 0x2D4) == 1) SetMobyState(actor, 6, 2);
             break;
         case 2:
-            func_L00_00424A08(0, D_L07_001B0AFC, 0.003f);
-            func_L00_00424A50(D_L07_001B0B00, 0.003f);
-            if (func_002B3890(actor))
-                func_002B60B0(actor, D_L07_001B0AEC*0.00027777778f, D_L07_001B0AF0*0.016666668f, D_L07_001B0AF4*4.848137450608192e-06f, D_L07_001B0AF8*0.0002908882452175021f);
+            follow_camera_set_distance(0, D_L07_001B0AFC, 0.003f);
+            follow_camera_set_height(D_L07_001B0B00, 0.003f);
+            if (SetSecondPendingFlag(actor))
+                SetControllerSpeedLimits(actor, D_L07_001B0AEC*0.00027777778f, D_L07_001B0AF0*0.016666668f, D_L07_001B0AF4*4.848137450608192e-06f, D_L07_001B0AF8*0.0002908882452175021f);
             if (I(state, 0x2D4) != 1 && B(actor, 0x20) != 7) {
-                if (I(state, 0x338)) func_002A7750(actor, 3, 1);
-                else func_002A7750(actor, 4, 1);
-                I(state, 0x344) = func_002A7820(580, 600);
+                if (I(state, 0x338)) SetMobyState(actor, 3, 1);
+                else SetMobyState(actor, 4, 1);
+                I(state, 0x344) = RandomIntRange(580, 600);
             }
             break;
         case 3:
-            result = func_002B1C20(actor, state + 0x140);
+            result = DispatchActionByKind(actor, state + 0x140);
             if (result & 1) {
-                func_L07_003E7240(actor);
+                SpawnEntityDeathEffects(actor);
 cleanup:
                 /* The initialization helper also reaches this shared cleanup. */
-                func_0029F338(actor);
+                MarkMobySpawned(actor);
                 return;
             }
-            if (result & 2) {func_002A7750(actor, 7, 2);I(state, 0x344) = func_002A7820(580, 600);}
+            if (result & 2) {SetMobyState(actor, 7, 2);I(state, 0x344) = RandomIntRange(580, 600);}
             break;
         }
     }
     switch (B(actor, 0x20)) {
     case 1:
-        if (func_002B3868(actor) && B(actor, 0x43) != 2) func_002A7470(actor, 2, 0, 20);
-        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) func_002A7750(actor, 2, -1);
+        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 2) StartAnimationBlended(actor, 2, 0, 20);
+        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) SetMobyState(actor, 2, -1);
         break;
     case 2: {
         float radius, angle;
-        if (func_002B3868(actor)) {
-            if (B(actor, 0x43) != 8) func_002A7470(actor, 8, 0, 20);
-            radius = func_002A7878(0, 5);
-            angle = func_002A7940();
-            F(state, 0x300) = func_00283180(angle)*radius;
-            F(state, 0x304) = func_00283198(angle)*radius;
+        if (SetFirstPendingFlag(actor)) {
+            if (B(actor, 0x43) != 8) StartAnimationBlended(actor, 8, 0, 20);
+            radius = RandomFloatRange(0, 5);
+            angle = RandomAngle();
+            F(state, 0x300) = FastSinOrCosA(angle)*radius;
+            F(state, 0x304) = FastSinOrCosB(angle)*radius;
             F(state, 0x308) = 0;
-            func_00282CC0(state + 0x300, state + 0x300, state + 0x2F0);
+            FastVecAdd(state + 0x300, state + 0x300, state + 0x2F0);
         }
-        result = func_L01_00321178(actor, state + 0x300);
-        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) func_002A7750(actor, 1, -1);
+        result = TurnMobyTowardTarget(actor, state + 0x300);
+        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) SetMobyState(actor, 1, -1);
         break;
     }
     case 3:
-        if (func_002B3868(actor)) {
+        if (SetFirstPendingFlag(actor)) {
             *(struct Choice61 *)choices = D_L07_001B0B08;
-            if (B(actor, 0x43) != choices[func_002A77E0(4)]) func_002A7470(actor, choices[func_002A77E0(4)], 0, 20);
+            if (B(actor, 0x43) != choices[RandomIntBelow(4)]) StartAnimationBlended(actor, choices[RandomIntBelow(4)], 0, 20);
         }
-        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) func_002A7750(actor, 4, -1);
+        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) SetMobyState(actor, 4, -1);
         break;
     case 4: {
         float radius, angle;
-        if (func_002B3868(actor)) {
-            if (B(actor, 0x43) != 8) func_002A7470(actor, 8, 0, 20);
-            radius = func_002A7878(0, 3);
-            angle = func_002A7940();
-            F(state, 0x300) = func_00283180(angle)*radius;
-            F(state, 0x304) = func_00283198(angle)*radius;
+        if (SetFirstPendingFlag(actor)) {
+            if (B(actor, 0x43) != 8) StartAnimationBlended(actor, 8, 0, 20);
+            radius = RandomFloatRange(0, 3);
+            angle = RandomAngle();
+            F(state, 0x300) = FastSinOrCosA(angle)*radius;
+            F(state, 0x304) = FastSinOrCosB(angle)*radius;
             F(state, 0x308) = 0;
-            func_00282CC0(state + 0x300, state + 0x300, state + 0x2F0);
+            FastVecAdd(state + 0x300, state + 0x300, state + 0x2F0);
         }
-        func_L02_00332630(actor, state + 0x210);
-        angle = func_00283248(F(state, 0x300)-F(actor, 0x10), F(state, 0x304)-F(actor, 0x14));
-        result = func_L02_00331440(actor, state + 0x300, 16, angle, -1, -1);
-        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) func_002A7750(actor, 3, -1);
+        CheckTargetPointFromOffset(actor, state + 0x210);
+        angle = FastMatrixHelperA(F(state, 0x300)-F(actor, 0x10), F(state, 0x304)-F(actor, 0x14));
+        result = MoveToTargetWithTempLimits(actor, state + 0x300, 16, angle, -1, -1);
+        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) SetMobyState(actor, 3, -1);
         break;
     }
     case 6:
-        if (func_002B3868(actor) && B(actor, 0x43) != 11) func_002A7470(actor, 11, 0, 20);
-        func_002B4FF0(actor, state + 0x210, 0);
-        if (func_00282E80(actor + 0x10, state + 0x210) < D_L07_001B0AE8) func_002A7750(actor, 7, -1);
+        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 11) StartAnimationBlended(actor, 11, 0, 20);
+        TurnTowardTargetAndStepMovement(actor, state + 0x210, 0);
+        if (vec_distance_xy(actor + 0x10, state + 0x210) < D_L07_001B0AE8) SetMobyState(actor, 7, -1);
         break;
     case 7:
-        if (func_002B3868(actor) && B(actor, 0x43) != 12) func_002A7470(actor, 12, 5, 10);
-        time = func_0029F530(actor);
-        if (time < 19) func_L01_00322288(actor, func_00283248(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14)));
+        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 12) StartAnimationBlended(actor, 12, 5, 10);
+        time = GetMobyAnimationValue(actor);
+        if (time < 19) StartMobyEffectFromEntry(actor, FastMatrixHelperA(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14)));
         else if (time<=22) {
-            func_002A8C28(actor, *(char **)(state + 0x330)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
-            func_002A8C28(actor, *(char **)(state + 0x334)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
+            SweepCollisionFromObject(actor, *(char **)(state + 0x330)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
+            SweepCollisionFromObject(actor, *(char **)(state + 0x334)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
         }
         if (B(actor, 0x60) & 2) {
-            time = func_00282E80(actor + 0x10, state + 0x210);
+            time = vec_distance_xy(actor + 0x10, state + 0x210);
             if (D_L07_001B0AE8+0.5f < time ||
-                func_00283C80(F(actor, 0xF8), func_00283248(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
-                func_002A7750(actor, 6, -1);
+                FastDiffRots(F(actor, 0xF8), FastMatrixHelperA(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
+                SetMobyState(actor, 6, -1);
         }
         break;
     case 9:
-        if (!func_002A8508(I(state, 0x2B8), -1) || F(state, 0x20) < *(short *)(state + 0x24)) func_002A7750(actor, 10, -1);
+        if (!CountMobysInGroupNotInState(I(state, 0x2B8), -1) || F(state, 0x20) < *(short *)(state + 0x24)) SetMobyState(actor, 10, -1);
         break;
     case 10:
-        if (func_002B3868(actor) && B(actor, 0x43) != 1) func_002A7470(actor, 1, 0, 2);
-        if (B(actor, 0x60) & 2) func_002A7750(actor, 6, -1);
+        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 1) StartAnimationBlended(actor, 1, 0, 2);
+        if (B(actor, 0x60) & 2) SetMobyState(actor, 6, -1);
         break;
     }
-    func_L07_003E6E00(actor);
+    FinishEntityUpdate(actor);
 }

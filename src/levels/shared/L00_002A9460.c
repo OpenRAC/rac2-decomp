@@ -33,41 +33,42 @@ extern void func_L00_00310748(void *, int, void *, float, float);
 extern int func_L00_002ADF80(void);
 
 
+/* Copies the hero position and facing onto the hero object each frame. When it is on the ground it updates the two foot contact points. */
 void func_L00_002A9460(void)
 {
-    float v[4] __attribute__((aligned(16)));
-    float t, gap;
-    unsigned char *m;
+    float footPos[4] __attribute__((aligned(16)));
+    float footHeight, footGap;
+    unsigned char *mobyPtr;
 
-    ((HeroView_L00_002A9460 *)D_00189E20)->moby[0xA8] = 0xFF;
-    qcopy(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0x10, &((HeroView_L00_002A9460 *)D_00189E20)->position);
-    func_L00_002A75D8();
-    qcopy(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0xF0, &((HeroView_L00_002A9460 *)D_00189E20)->unk90);
-    func_L00_002A76B8();
-    func_00282AB0(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0xC0, D_00189E20, 0x30);
-    func_002A0F48(((HeroView_L00_002A9460 *)D_00189E20)->moby);
-    m = ((HeroView_L00_002A9460 *)D_00189E20)->moby;
-    if ((*(unsigned char **)(m + 0x24))[6] != 0)
-        m[0x63] = 0x10;
+    ((HeroView_L00_002A9460 *)gHeroState)->moby[0xA8] = 0xFF;
+    qcopy(((HeroView_L00_002A9460 *)gHeroState)->moby + 0x10, &((HeroView_L00_002A9460 *)gHeroState)->position);
+    UpdateHeroModelTilt();
+    qcopy(((HeroView_L00_002A9460 *)gHeroState)->moby + 0xF0, &((HeroView_L00_002A9460 *)gHeroState)->unk90);
+    UpdateHeroModelWobble();
+    CopyMemoryAligned(((HeroView_L00_002A9460 *)gHeroState)->moby + 0xC0, gHeroState, 0x30);
+    func_002A0F48(((HeroView_L00_002A9460 *)gHeroState)->moby);
+    mobyPtr = ((HeroView_L00_002A9460 *)gHeroState)->moby;
+    if ((*(unsigned char **)(mobyPtr + 0x24))[6] != 0)
+        mobyPtr[0x63] = 0x10;
     else
-        m[0x63] = 0x10;
-    if (((HeroView_L00_002A9460 *)D_00189E20)->unk1F0 != 0 || *(int *)(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0x98) == 0)
+        mobyPtr[0x63] = 0x10;
+    if (((HeroView_L00_002A9460 *)gHeroState)->unk1F0 != 0 || *(int *)(((HeroView_L00_002A9460 *)gHeroState)->moby + 0x98) == 0)
         return;
-    qcopy(v, &((HeroView_L00_002A9460 *)D_00189E20)->position);
-    func_L00_002D3778(v, v, ((HeroView_L00_002A9460 *)D_00189E20)->unk254);
-    gap = ((HeroView_L00_002A9460 *)D_00189E20)->unk250 - ((HeroView_L00_002A9460 *)D_00189E20)->unk254;
-    if (gap < 0.05f)
-        gap = 0.05f;
-    func_L00_00310748(((HeroView_L00_002A9460 *)D_00189E20)->moby, 0, v, ((HeroView_L00_002A9460 *)D_00189E20)->unk264, gap);
-    t = ((HeroView_L00_002A9460 *)D_00189E20)->unk264 + 0.05f;
-    if (((HeroView_L00_002A9460 *)D_00189E20)->unk229C == 4)
-        t += 0.15f;
-    if (func_L00_002ADF80() != 0)
-        t = ((HeroView_L00_002A9460 *)D_00189E20)->unk254;
-    qcopy(v, &((HeroView_L00_002A9460 *)D_00189E20)->position);
-    func_L00_002D3778(v, v, t);
-    gap = ((HeroView_L00_002A9460 *)D_00189E20)->unk250 - t;
-    if (gap < 0.05f)
-        gap = 0.05f;
-    func_L00_00310748(((HeroView_L00_002A9460 *)D_00189E20)->moby, 1, v, ((HeroView_L00_002A9460 *)D_00189E20)->unk264, gap);
+    qcopy(footPos, &((HeroView_L00_002A9460 *)gHeroState)->position);
+    ApplyHeroModeTransformReversed(footPos, footPos, ((HeroView_L00_002A9460 *)gHeroState)->unk254);
+    footGap = ((HeroView_L00_002A9460 *)gHeroState)->unk250 - ((HeroView_L00_002A9460 *)gHeroState)->unk254;
+    if (footGap < 0.05f)
+        footGap = 0.05f;
+    StoreTransformedTableEntry(((HeroView_L00_002A9460 *)gHeroState)->moby, 0, footPos, ((HeroView_L00_002A9460 *)gHeroState)->unk264, footGap);
+    footHeight = ((HeroView_L00_002A9460 *)gHeroState)->unk264 + 0.05f;
+    if (((HeroView_L00_002A9460 *)gHeroState)->unk229C == 4)
+        footHeight += 0.15f;
+    if (IsHeroInSpecialKindOrMode() != 0)
+        footHeight = ((HeroView_L00_002A9460 *)gHeroState)->unk254;
+    qcopy(footPos, &((HeroView_L00_002A9460 *)gHeroState)->position);
+    ApplyHeroModeTransformReversed(footPos, footPos, footHeight);
+    footGap = ((HeroView_L00_002A9460 *)gHeroState)->unk250 - footHeight;
+    if (footGap < 0.05f)
+        footGap = 0.05f;
+    StoreTransformedTableEntry(((HeroView_L00_002A9460 *)gHeroState)->moby, 1, footPos, ((HeroView_L00_002A9460 *)gHeroState)->unk264, footGap);
 }

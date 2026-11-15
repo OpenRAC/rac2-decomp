@@ -105,44 +105,45 @@ extern float func_002AA3A8(float *, float *, float, float, float, float);
 
 /* func_L20_002B93E0 is defined in L20_002B7A48-g8.c (it reaches data through $gp). */
 
-void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
+/* Puts the hero into a new mode (on foot or riding) and attaches it to the given object. */
+void func_L20_002C57D0(s32 newMode, s32 animation, char *attachObject)
 {
-    char *D = D_00189E20;
-    s32 p0 = a0;
-    char *p2 = a2;
-    s32 p1 = a1;
+    char *D = gHeroState;
+    s32 p0 = newMode;
+    char *p2 = attachObject;
+    s32 p1 = animation;
     char *block;
 
-    func_L00_002AF7D0();
+    cancel_hero_item_animation();
     *(u8 *)(D + 0x22B6) = 1;
-    func_L00_002B1F90();
+    UpdateHeroSlotCallbacks();
     *(s32 *)(D + 0x2290) = *(s32 *)(D + 0xC18);
-    func_L00_00322EC8(D + 0x18E0);
-    func_L00_00322EC8(D + 0x1A30);
+    ReleaseSlotList(D + 0x18E0);
+    ReleaseSlotList(D + 0x1A30);
     *(s32 *)(*(s32 *)(D + 0x2290) + 0x9C) = -1;
     if (p0 != 4 || *(u8 *)(D + 0x22B4) != p0)
-        func_L00_002D2E68();
-    func_L00_002A6708();
-    func_L00_002A53B8();
-    block = D_00189E20;
+        SetHeroObjectsFlagBit();
+    ClearTrackedSlots();
+    ResetAllAttachmentRecords();
+    block = gHeroState;
     *(u8 *)(block + 0x22B4) = p0;
     *(s32 *)(block + 0xC14) = (s32)p2;
     *(s32 *)(block + 0x2290) = (s32)p2;
     if ((p0 & 0xFF) == 1) {
         if (D_00138320[0] & 0x10) {
-            func_0028B3D0(0x23, 0, (void *)func_0028CC98, (void *)func_0028CCE0,
-                          (void *)func_0028D1E8, 0, 0);
-            func_L00_002F6B90(3);
+            SetHudSlotContents(0x23, 0, (void *)InitRadialWeaponMenu, (void *)UpdateRadialMenuSelection,
+                          (void *)DrawRadialSelectorPanel, 0, 0);
+            RunSlotCallback(3);
         }
     }
-    func_L20_002C63F0();
-    D = D_00189E20;
+    UpdateYeedilHeroCollisionCapsule();
+    D = gHeroState;
     *(f32 *)(D + 0x250) = *(f32 *)(D + 0x258);
     *(f32 *)(D + 0x254) = *(f32 *)(D + 0x25C);
     *(u16 *)(*(s32 *)(D + 0x2290) + 0x34) |= 6;
     *(f32 *)(D + 0xC20) = 1.0f;
     *(f32 *)(D + 0xC24) = 1.0f;
-    func_L00_002D24B8();
+    ClearHeroQueuedAnimation();
     func_002A677C(*(s32 *)(D + 0x2290));
     *(u16 *)(D + 0x24F2) = p1;
     switch (p0) {
@@ -158,9 +159,9 @@ void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
         *(u16 *)(D + 0x24D4) = *(u16 *)(D + 0x24CC);
         *(s32 *)(D + 0x24CC) = 3;
     }
-    func_L20_002D7730(p1, 2);
+    YeedilEnterHeroAction(p1, 2);
     if (p0 == 4)
-        func_L00_002D2168(5.0f, 0xF, 0);
+        set_hero_animation(5.0f, 0xF, 0);
 }
 
 
@@ -168,9 +169,10 @@ void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
 
 /* func_L20_002C5D00 is defined in L20_002B7A48-g8.c (it reaches data through $gp). */
 
+/* Grows or shrinks the hero collision capsule toward the size its current pose needs. */
 void func_L20_002C63F0(void)
 {
-    HeroCapsuleState *initial = (HeroCapsuleState *)D_00189E20;
+    HeroCapsuleState *initial = (HeroCapsuleState *)gHeroState;
     switch (initial->vehicle_mode) {
     case 1:
         initial->top_target = 0.5999999642372131f;
@@ -204,22 +206,23 @@ void func_L20_002C63F0(void)
         CAPSULE.field22b0 == 18 ||
         (CAPSULE.vehicle_mode == 0 && CAPSULE.capsule_bottom < 0.53f) ||
         CAPSULE.control_mode == 17 || CAPSULE.base_condition ||
-        func_00282E80((char *)&CAPSULE + 0x240, (char *)&CAPSULE + 0x80) >
+        vec_distance_xy((char *)&CAPSULE + 0x240, (char *)&CAPSULE + 0x80) >
             CAPSULE.radius * 0.5f) {
-        func_002AA2E8(&CAPSULE.capsule_top, CAPSULE.top_target, 0.02f);
-        func_002AA2E8(&CAPSULE.capsule_bottom, CAPSULE.bottom_target, 0.02f);
-        func_002AA3A8(&CAPSULE.radius, &CAPSULE.radius_velocity,
+        ApproachValue(&CAPSULE.capsule_top, CAPSULE.top_target, 0.02f);
+        ApproachValue(&CAPSULE.capsule_bottom, CAPSULE.bottom_target, 0.02f);
+        SpringFloatToGoal(&CAPSULE.radius, &CAPSULE.radius_velocity,
                      CAPSULE.radius_target, 0.02f, 0.3f, 0.0666666701f);
     }
 }
 
+/* Checks for a wall in front of the hero and slides the hero along it instead of into it. */
 void func_L20_002C7588(int force)
 {
     Vec4 offset, start, lowerOffset, lowerStart;
     float height, radius, angle;
     float lowerHeight;
     int kind;
-    if (func_L00_002D3A58(VELOCITY) < 0.0016666668f) return;
+    if (GetViewSpaceVectorLength(VELOCITY) < 0.0016666668f) return;
     height = 0.37f;
     radius = 0.5f;
     if ((unsigned int)(PLAYER->activity - 0x11) < 2) {
@@ -229,34 +232,34 @@ void func_L20_002C7588(int force)
         height = 0.35f;
         radius = 0.27f;
     } else if (PLAYER->state == 4) height = 0.35f;
-    func_L00_002D36E0(&offset.x, 0.0f, 0.0f, 1, height);
+    BuildHeroRelativePoint(&offset.x, 0.0f, 0.0f, 1, height);
     lowerHeight = height * 0.3f;
-    func_L00_002D36E0(&lowerOffset.x, 0.0f, 0.0f, 1, lowerHeight);
-    if (force || func_00282E20(VELOCITY) < 0.01f) {
-        func_00282F20(&start, D_00189E20, radius);
-        func_00282F20(&lowerStart, D_00189E20, radius * 1.4f);
+    BuildHeroRelativePoint(&lowerOffset.x, 0.0f, 0.0f, 1, lowerHeight);
+    if (force || vec_length_xy(VELOCITY) < 0.01f) {
+        vec_scale_to_length(&start, gHeroState, radius);
+        vec_scale_to_length(&lowerStart, gHeroState, radius * 1.4f);
     } else {
-        func_L00_002D3B58((V4_F6a70b950 *)&start, (V4_F6a70b950 *)VELOCITY, 0.0f);
-        func_00282F20(&start, &start, radius);
-        func_00282D30(&lowerStart, &start, 1.4f);
+        SetViewSpaceHeight((V4_F6a70b950 *)&start, (V4_F6a70b950 *)VELOCITY, 0.0f);
+        vec_scale_to_length(&start, &start, radius);
+        FastVecScale(&lowerStart, &start, 1.4f);
     }
     kind = -1;
-    func_00282CC0(&start, &start, &offset);
-    func_00282CC0(&lowerStart, &lowerStart, &lowerOffset);
-    if (func_002761F8(&lowerOffset, &lowerStart, 2, PLAYER->object, 0) && CONTACT->count > 0)
-        kind = func_00278E78();
+    FastVecAdd(&start, &start, &offset);
+    FastVecAdd(&lowerStart, &lowerStart, &lowerOffset);
+    if (CollLine(&lowerOffset, &lowerStart, 2, PLAYER->object, 0) && CONTACT->count > 0)
+        kind = GetCollHitMaterial();
     angle = 0.0f;
-    if (func_002761F8(&offset, &start, 2, PLAYER->object, 0) && CONTACT->count > 0)
-        angle = func_L00_002D3EA8((char *)&CONTACT->normal);
+    if (CollLine(&offset, &start, 2, PLAYER->object, 0) && CONTACT->count > 0)
+        angle = GetViewSpaceAngle((char *)&CONTACT->normal);
     if (angle >= 0.8726647f || kind == 8 || kind == 12) {
         float dot;
         PLAYER->contact = CONTACT->contact;
-        func_L00_002D3B58((V4_F6a70b950 *)&CONTACT->normal, (V4_F6a70b950 *)&CONTACT->normal, 0.0f);
-        func_00282F20(&CONTACT->normal, &CONTACT->normal, 1.0f);
-        dot = func_00282DB0(&CONTACT->normal, VELOCITY);
+        SetViewSpaceHeight((V4_F6a70b950 *)&CONTACT->normal, (V4_F6a70b950 *)&CONTACT->normal, 0.0f);
+        vec_scale_to_length(&CONTACT->normal, &CONTACT->normal, 1.0f);
+        dot = FastVecDot(&CONTACT->normal, VELOCITY);
         if (dot < 0.0f) {
-            func_00282D30(&CONTACT->normal, &CONTACT->normal, -dot);
-            func_00282CC0(VELOCITY, VELOCITY, &CONTACT->normal);
+            FastVecScale(&CONTACT->normal, &CONTACT->normal, -dot);
+            FastVecAdd(VELOCITY, VELOCITY, &CONTACT->normal);
         }
     }
 }

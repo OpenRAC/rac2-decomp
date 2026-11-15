@@ -8,60 +8,61 @@ extern void func_002833F0(void *,void *), func_002A7750(void *,int,int), func_00
 extern int func_00283DB8(void *,float),func_002E59B0(void *,int),func_L00_0035F5A0(int,int,void *);
 extern float func_L02_002F21C0(void *,void *),func_00282DF0(void *);
 struct State401ED8 { char pad[0x30]; short timer30, timer32, timer34, sound; };
+/* Runs a timed hazard that waits, warns, then fires a harmful beam at the player when close, with sound and sparks. */
 void func_L02_00401ED8(char *o) {
     char *p; Vec point,a,b,c,d,e; float t; unsigned short initialTimer;
-    func_002833F0(o+0xC0,o+0xF0);
+    euler_rotation_basis(o+0xC0,o+0xF0);
     p=*(char **)(o+0x68);
     switch (*(unsigned char *)(o+0x20)) {
     case 0:
         p[9]=0; p[8]=3; *(int *)(p+0x10)=0; o[0x31]=0; initialTimer=D_L02_001B17C0;
         *(unsigned short *)(o+0x34)=(*(unsigned short *)(o+0x34)&0xEFFF)|1;
         ((struct State401ED8 *)p)->timer30=0; ((struct State401ED8 *)p)->timer32=initialTimer; ((struct State401ED8 *)p)->sound=-1;
-        func_002A7750(o,1,-1); break;
+        SetMobyState(o,1,-1); break;
     case 1:
         if (((struct State401ED8 *)p)->timer32==0) {
             if (((struct State401ED8 *)p)->timer30!=0) {
                 ((struct State401ED8 *)p)->timer32=D_L02_001B17C4+D_L02_001B17C8;
                 ((struct State401ED8 *)p)->timer34=D_L02_001B17CC;
-                func_002A7750(o,2,-1);
+                SetMobyState(o,2,-1);
             }
-        } else if (((struct State401ED8 *)p)->timer30!=0) func_00282978(p+0x32);
+        } else if (((struct State401ED8 *)p)->timer30!=0) FastDecTimer(p+0x32);
         break;
     case 2:
         if (((struct State401ED8 *)p)->timer34==0) {
             ((struct State401ED8 *)p)->timer32=D_L02_001B17D0;
-            func_002A7750(o,3,-1);
-        } else if (((struct State401ED8 *)p)->timer32>D_L02_001B17C8) func_L00_002E6EF8(func_L02_00402440,o);
+            SetMobyState(o,3,-1);
+        } else if (((struct State401ED8 *)p)->timer32>D_L02_001B17C8) AddDrawCallbackToList3(PlaceObjectByState,o);
         else if (((struct State401ED8 *)p)->timer32==0) {
             ((struct State401ED8 *)p)->timer32=D_L02_001B17C4+D_L02_001B17C8;
-            func_00282978(p+0x34);
+            FastDecTimer(p+0x34);
         }
-        func_00282978(p+0x32); break;
+        FastDecTimer(p+0x32); break;
     case 3:
         if (((struct State401ED8 *)p)->timer32!=0) {
             a.q=0;
             a.f[0]=*(float *)(o+0x10); a.f[1]=*(float *)(o+0x14); a.f[2]=*(float *)(o+0x18); a.f[3]=1;
             point.q=a.q;
-            if(func_00283DB8(&point,128.0f)>0) {
-                if(func_L02_002F21C0(o+0x10,D_00189EA0)<4.0f) {
+            if(FastMathHelperA(&point,128.0f)>0) {
+                if(DistanceSquaredXY(o+0x10,gHeroPosition)<4.0f) {
                     qcopy(&a,o+0x10); qcopy(&b,o+0x10); b.f[2]+=D_L02_001B17D4;
-                    func_L00_0031BDC0(&c,&a,&b,D_00189EA0);
-                    func_00282CF0(&d,&a,&c); func_00282CF0(&e,&a,&b);
-                    t=func_00282DF0(&d); t/=func_00282DF0(&e);
+                    ProjectPointOnSegment(&c,&a,&b,gHeroPosition);
+                    FastVecSub(&d,&a,&c); FastVecSub(&e,&a,&b);
+                    t=FastVecLength(&d); t/=FastVecLength(&e);
                     if(t<0)t=0; if(t>1)t=1;
-                    func_002A8C28(o,&c,0x10001,0,1,0,D_L02_001B17D8+(D_L02_001B17DC-D_L02_001B17D8)*t,(unsigned char)p[0x14],1);
-                } else func_002A8C28(o,o+0x10,0x10001,0,1,0,D_L02_001B17D8,(unsigned char)p[0x14],1);
-                func_L02_00402300(o); func_L00_002E6EF8(func_L02_00402440,o);
+                    SweepCollisionFromObject(o,&c,0x10001,0,1,0,D_L02_001B17D8+(D_L02_001B17DC-D_L02_001B17D8)*t,(unsigned char)p[0x14],1);
+                } else SweepCollisionFromObject(o,o+0x10,0x10001,0,1,0,D_L02_001B17D8,(unsigned char)p[0x14],1);
+                SpawnTwinPuffs(o); AddDrawCallbackToList3(PlaceObjectByState,o);
             }
-            func_00282978(p+0x32);
-            if(!func_002E59B0(o,((struct State401ED8 *)p)->sound)) ((struct State401ED8 *)p)->sound=func_L00_0035F5A0(17,4,o);
+            FastDecTimer(p+0x32);
+            if(!IsVoicePlayingForOwner(o,((struct State401ED8 *)p)->sound)) ((struct State401ED8 *)p)->sound=StartEffectInSlot(17,4,o);
         } else {
             ((struct State401ED8 *)p)->timer32=D_L02_001B17C0;
             if(((struct State401ED8 *)p)->sound!=-1) {
-                unsigned char *s=(unsigned char *)D_00188660+((struct State401ED8 *)p)->sound*0x70;
-                if(*(char **)(s+0x88)==o && (unsigned char)s[0x74])func_002E59F8(((struct State401ED8 *)p)->sound);
+                unsigned char *s=(unsigned char *)gSoundState+((struct State401ED8 *)p)->sound*0x70;
+                if(*(char **)(s+0x88)==o && (unsigned char)s[0x74])StopSoundVoice(((struct State401ED8 *)p)->sound);
             }
-            ((struct State401ED8 *)p)->sound=-1;func_002A7750(o,1,-1);
+            ((struct State401ED8 *)p)->sound=-1;SetMobyState(o,1,-1);
         } break;
     }
 }

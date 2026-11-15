@@ -36,6 +36,7 @@ extern char *func_002B39A0(char *, int, int *);
 extern float *func_002AB1F0(char *);
 extern void func_002AFD88(char *, char *, float, float, float);
 
+/* Picks what the object should aim at: a chosen target, or the best-rated one among the player, decoys, other objects in a table and a fourth group, and records it. */
 int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float range, float height)
 {
     float origin[4] __attribute__((aligned(16)));
@@ -54,31 +55,31 @@ int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float 
         *(Vec128_2B3BA8 *)origin = *point;
     else
         *(Vec128_2B3BA8 *)origin = *(Vec128_2B3BA8 *)(self + 0x10);
-    aim->target = D_00189E20.moby;
-    qcopy(&aim->position, &D_00189E20.position);
+    aim->target = gHeroState.moby;
+    qcopy(&aim->position, &gHeroState.position);
     aim->kind = 0;
     aim->found = 0;
     if (force == 0) {
-        if (D_001A8BB0 != 0)
+        if (gCurrentGameMode != 0)
             return 0;
-        if (D_00189E20.state == 0x6F)
+        if (gHeroState.state == 0x6F)
             return 0;
     }
     if (index != -1) {
-        mob = func_002B39A0(self, index, &kind);
+        mob = PickBestLinkedTarget(self, index, &kind);
         if (mob != 0) {
             aim->target = mob;
             aim->found = 1;
             aim->kind = kind;
-            if (mob != D_00189E20.moby) {
+            if (mob != gHeroState.moby) {
                 float *info;
                 qcopy(&aim->position, mob + 0x10);
-                info = func_002AB1F0(mob);
+                info = GetMobyPrivateValue0(mob);
                 if (info != 0) {
                     if (D_001A8CA0 == 0)
                         *(float *)((char *)aim + 8) += info[4];
                     else
-                        func_002AFD88(mob, (char *)aim, 0.0f, 0.0f, info[4]);
+                        AddTransformedPointToVector(mob, (char *)aim, 0.0f, 0.0f, info[4]);
                 }
             }
         }
@@ -87,9 +88,9 @@ int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float 
         best_distance = 9999999.0f;
         best = 0;
         best_kind = 0;
-        mob = D_00189E20.moby;
-        if (func_002B3B20(mob, (char *)origin, range, height)) {
-            float distance = func_002B38C8(self, mob);
+        mob = gHeroState.moby;
+        if (IsTargetWithinRangeAndHeight(mob, (char *)origin, range, height)) {
+            float distance = RateAimTarget(self, mob);
             if (distance < best_distance) {
                 best = mob;
                 best_distance = distance;
@@ -98,12 +99,12 @@ int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float 
         }
         for (i = 1; i <= D_001B1CB0[0]; i++) {
             mob = D_001B1B5C + (D_001B1CB0[i] << 8);
-            if (mob != 0 && *(short *)(mob + 0xAA) == 0xCB
+            if (mob != 0 && *(short *)(mob + 0xAA) == 0xCB /* Decoy */
                 && *(unsigned char *)(mob + 0x20) != 0xFE
                 && *(unsigned char *)(mob + 0x20) != 0xFD
                 && *(unsigned char *)(mob + 0x20) == 3
-                && func_002B3B20(mob, (char *)origin, range, height)) {
-                float distance = func_002B38C8(self, mob);
+                && IsTargetWithinRangeAndHeight(mob, (char *)origin, range, height)) {
+                float distance = RateAimTarget(self, mob);
                 if (distance < best_distance) {
                     best = mob;
                     best_distance = distance;
@@ -113,8 +114,8 @@ int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float 
         }
         for (i = 0; i < D_001A8CD4; i++) {
             mob = D_001C13E8[i];
-            if (func_002B3B20(mob, (char *)origin, range, height)) {
-                float distance = func_002B38C8(self, mob);
+            if (IsTargetWithinRangeAndHeight(mob, (char *)origin, range, height)) {
+                float distance = RateAimTarget(self, mob);
                 if (distance < best_distance) {
                     best = mob;
                     best_distance = distance;
@@ -124,11 +125,11 @@ int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float 
         }
         for (i = 1; i <= D_001B1CF0[0]; i++) {
             mob = D_001B1B5C + (D_001B1CF0[i] << 8);
-            if (mob != 0 && *(short *)(mob + 0xAA) == 0xEB0
+            if (mob != 0 && *(short *)(mob + 0xAA) == 0xEB0 /* Dark Sheep */
                 && *(unsigned char *)(mob + 0x20) != 0xFE
                 && *(unsigned char *)(mob + 0x20) != 0xFD
-                && func_002B3B20(mob, (char *)origin, range, height)) {
-                float distance = func_002B38C8(self, mob);
+                && IsTargetWithinRangeAndHeight(mob, (char *)origin, range, height)) {
+                float distance = RateAimTarget(self, mob);
                 if (distance < best_distance) {
                     best = mob;
                     best_distance = distance;
@@ -140,15 +141,15 @@ int func_002B3BA8(char *self, int index, Vec128_2B3BA8 *point, int force, float 
             aim->kind = best_kind;
             aim->found = 1;
             aim->target = best;
-            if (best == D_00189E20.moby) {
-                qcopy(&aim->position, &D_00189E20.position);
+            if (best == gHeroState.moby) {
+                qcopy(&aim->position, &gHeroState.position);
             } else {
                 float *info;
                 qcopy(&aim->position, best + 0x10);
-                info = func_002AB1F0(best);
+                info = GetMobyPrivateValue0(best);
                 if (info != 0) {
                     if (D_001A8CA0 != 0)
-                        func_002AFD88(best, (char *)aim, 0.0f, 0.0f, info[4]);
+                        AddTransformedPointToVector(best, (char *)aim, 0.0f, 0.0f, info[4]);
                     else
                         *(float *)((char *)aim + 8) += info[4];
                 }

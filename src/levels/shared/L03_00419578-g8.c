@@ -7,6 +7,7 @@ extern void func_002A7750(u8 *, s32, s32);
 extern void func_L00_003294F0(u8 *, s32);
 extern void func_L03_00419850(u8 *);
 
+/* Waits until the objects linked to this one are gone, then frees its helpers, records progress for the level and finishes. */
 void func_L03_00419578(u8 *object)
 {
     u8 *vars = *(u8 **)(object + 0x68);
@@ -21,9 +22,9 @@ void func_L03_00419578(u8 *object)
         if (*(s32 *)(vars + 0x14) != 0)
             *(u16 *)(object + 0x34) |= 0x41;
         if (*(s32 *)(vars + 8) == -1 || *(s32 *)(vars + 0xC) == -1)
-            func_002A7750(object, 2, -1);
+            SetMobyState(object, 2, -1);
         else
-            func_002A7750(object, 1, -1);
+            SetMobyState(object, 1, -1);
     case 1:
         index = *(s32 *)(vars + 8);
         if (index != -1) {
@@ -37,7 +38,7 @@ void func_L03_00419578(u8 *object)
             if (other != 0 && other[0x20] != 0xFE && other[0x20] != 0xFD)
                 break;
         }
-        func_002A7750(object, 2, -1);
+        SetMobyState(object, 2, -1);
         break;
     case 3:
         other = *(u8 **)(vars + 0x1C);
@@ -50,17 +51,17 @@ void func_L03_00419578(u8 *object)
 owner_finished:
         index = *(s32 *)(vars + 0);
         if (index != -1)
-            func_L00_003294F0(D_L03_001B2A1C + (index << 8), 1);
+            SetObjectFlagBit(D_L03_001B2A1C + (index << 8), 1);
         index = *(s32 *)(vars + 4);
         if (index != -1)
-            func_L00_003294F0(D_L03_001B2A1C + (index << 8), 1);
-        if (D_001A79F0[0] == state)
+            SetObjectFlagBit(D_L03_001B2A1C + (index << 8), 1);
+        if (gCurrentMapIndex[0] == state)
             D_001395B8[0x78] |= 1;
-        if (D_001A79F0[0] == 0xE)
+        if (gCurrentMapIndex[0] == 0xE)
             D_001395B8[0x78] |= 2;
-        func_002A7750(object, 4, -1);
+        SetMobyState(object, 4, -1);
         break;
     }
     if (*(s32 *)(vars + 0x10) != 0 && object[0x31] != 0)
-        func_L03_00419850(object);
+        DrawMobyMarkerSprite(object);
 }

@@ -13,31 +13,31 @@ extern char D_00189EA0[];
    point, follows the hero, or jumps to a random point on its anchor's ring. */
 void func_L08_00425628(char *obj)
 {
-    char *s0 = *(char **)(obj + 0x68);
-    char *s1 = s0 + 0x180;
+    char *vars = *(char **)(obj + 0x68);
+    char *target = vars + 0x180;
     float lo, hi, r;
     float c;
     char *anchor;
 
-    if (func_L01_003165E8(s1, *(s32 *)(s0 + 0x1D8), *(s32 *)(s0 + 0x1E0),
-                          *(s32 *)(s0 + 0x1DC), -1) != 0)
+    if (TestPointAgainstShapes(target, *(s32 *)(vars + 0x1D8), *(s32 *)(vars + 0x1E0),
+                          *(s32 *)(vars + 0x1DC), -1) != 0)
         return;
-    if ((func_001163B0() & 1) || *(s32 *)(s0 + 0x164) == 2 || *(s16 *)(s0 + 0x1B6) != 0) {
-        if (*(s32 *)(s0 + 0x1E8) == -1 || (func_001163B0() & 1)) {
-            qcopy(s0 + 0x180, s0 + 0x170);
+    if ((Rand() & 1) || *(s32 *)(vars + 0x164) == 2 || *(s16 *)(vars + 0x1B6) != 0) {
+        if (*(s32 *)(vars + 0x1E8) == -1 || (Rand() & 1)) {
+            qcopy(vars + 0x180, vars + 0x170);
         } else {
             lo = -3.1415927f;
             hi = 3.1415927f;
             r = 3.0f;
-            *(float *)(s0 + 0x180) = func_00283180(func_002A7878(lo, hi)) * r;
-            c = func_00283198(func_002A7878(lo, hi));
-            anchor = D_L08_001B29DC[0] + (*(s32 *)(s0 + 0x1E8) << 8) + 0x10;
-            *(float *)(s0 + 0x184) = c * r;
-            *(float *)(s0 + 0x188) = 0.0f;
-            func_00282CC0(s0 + 0x180, s0 + 0x180, anchor);
+            *(float *)(vars + 0x180) = FastSinOrCosA(RandomFloatRange(lo, hi)) * r;
+            c = FastSinOrCosB(RandomFloatRange(lo, hi));
+            anchor = D_L08_001B29DC[0] + (*(s32 *)(vars + 0x1E8) << 8) + 0x10;
+            *(float *)(vars + 0x184) = c * r;
+            *(float *)(vars + 0x188) = 0.0f;
+            FastVecAdd(vars + 0x180, vars + 0x180, anchor);
         }
     } else {
-        qcopy(s1, D_00189EA0);
+        qcopy(target, gHeroPosition);
     }
-    *(float *)(s0 + 0x188) += 6.5f;
+    *(float *)(vars + 0x188) += 6.5f;
 }

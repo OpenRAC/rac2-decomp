@@ -39,7 +39,7 @@ extern unsigned int func_00336EF8(int);
 extern void func_0028EA58(int,int,int,int,int,unsigned int *);
 extern int func_00288FB8(int);
 extern int func_0027F288(char *,int,float);
-static __inline__ int screen_y(int y) { int result = (int)((float)y * D_001B2280[0] + 0.5f); if (D_001A7B90) result += 4; return result; }
+static __inline__ int screen_y(int y) { int result = (int)((float)y * D_001B2280[0] + 0.5f); if (gIsPalVideo) result += 4; return result; }
 extern int D_001AD39C MACRO_ADDR;
 extern int D_001AD394 MACRO_ADDR;
 extern int D_001AD3A4 MACRO_ADDR;
@@ -57,40 +57,42 @@ extern int D_001AD3C8 __attribute__((sda));
 extern int D_001AD3BC __attribute__((sda));
 static __inline__ void draw_icon(int tex, int x, int y, int size, unsigned int *colors)
 {
-    func_0028EA58(tex, x, screen_y(y), size, (int)((float)size * D_001B2280[0] + 0.5f), colors);
+    DrawHudSpriteGradient(tex, x, screen_y(y), size, (int)((float)size * D_001B2280[0] + 0.5f), colors);
 }
 
+/* Draws the scrolling row of ammo icons in the vendor menu, each with its overlay pictures and
+   a pulsing frame around the selected one. */
 void func_002FA270(void)
 {
     int pulse, x;
-    int left, b;
+    int frameLeft, inset;
     int i, index, y, icon, overlay, kind, special, alpha0, alpha1;
     unsigned int color, colors[4];
     char *text;
     double distance;
-    func_002FC620(D_001AD390,D_001AD394,(int)((float)D_001AD398 * D_001B2280[0]+0.5f),screen_y(D_001AD39C));
-    if (D_0021F240.scroll < 0) D_0021F240.scroll += 4;
-    else if (D_0021F240.scroll > 0) D_0021F240.scroll -= 4;
+    SetGsScissorClamped(D_001AD390,D_001AD394,(int)((float)D_001AD398 * D_001B2280[0]+0.5f),screen_y(D_001AD39C));
+    if (gVendorMenuState.scroll < 0) gVendorMenuState.scroll += 4;
+    else if (gVendorMenuState.scroll > 0) gVendorMenuState.scroll -= 4;
     i = -5;
-    left = 233;
-    b = 4;
-    pulse = ((func_00282C30(((D_0021F240.tick*4)&63)-32)+64)*0x10202)|0x80000000;
-    func_00285548(left-(D_001AD3A0+b),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),D_001A7340,D_001A7344,
+    frameLeft = 233;
+    inset = 4;
+    pulse = ((subtract_integer_with_clamp(((gVendorMenuState.tick*4)&63)-32)+64)*0x10202)|0x80000000;
+    DrawFramebufferRect(frameLeft-(D_001AD3A0+inset),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),gScreenWidth,gScreenHeight,
         pulse);
-    b = 2;
-    func_00285548(left-(D_001AD3A0+b),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),D_001A7340,D_001A7344,0x80442d00);
-    y = D_0021F240.scroll - 47;
+    inset = 2;
+    DrawFramebufferRect(frameLeft-(D_001AD3A0+inset),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),gScreenWidth,gScreenHeight,0x80442d00);
+    y = gVendorMenuState.scroll - 47;
     do {
-        index = i + D_0021F240.selected;
-        if (index >= 0 && index < *(int *)((char *)&D_0021F240+0x740)) {
-            icon = func_0028E588(((IconInfo *)((char *)D_00239BA0 + D_00139568[D_0021F240.rows.ammo[index].id] * 224))->icon,0);
-            overlay = func_0028E588(0xeaa3,D_0021F240.rows.ammo[index].frame);
+        index = i + gVendorMenuState.selected;
+        if (index >= 0 && index < *(int *)((char *)&gVendorMenuState+0x740)) {
+            icon = GetIconFrame(((IconInfo *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[gVendorMenuState.rows.ammo[index].id] * 224))->icon,0);
+            overlay = GetIconFrame(0xeaa3,gVendorMenuState.rows.ammo[index].frame);
             special = 0;
-            kind = D_00239BA0[D_00139568[D_0021F240.rows.ammo[index].id]].color;
-            switch (D_0021F240.rows.ammo[index].id) {
+            kind = gWeaponTable_00239BA0[gItemSlotToRecord[gVendorMenuState.rows.ammo[index].id]].color;
+            switch (gVendorMenuState.rows.ammo[index].id) {
             case 12: case 14: case 17: case 18: case 53: special = 1; break;
             }
-            color = func_00336EF8(special && kind == 1 ? 2 : kind) & 0xffffff;
+            color = GetItemColorEntry(special && kind == 1 ? 2 : kind) & 0xffffff;
             distance = (double)(256.0f - (float)(y+2));
             if (distance < 0.0) distance = -distance;
             alpha0 = 128 - (int)(distance * 0.75);
@@ -103,11 +105,11 @@ void func_002FA270(void)
             alpha0 <<= 24;
             colors[3] = colors[1] = alpha1|color;
             colors[2] = colors[0] = alpha0|color;
-            x = y+(D_001AD3B4+b);
+            x = y+(D_001AD3B4+inset);
             draw_icon(icon,x+D_001AD3C8,D_001AD3B0+D_001AD3CC,D_001AD3C0,colors);
-            draw_icon(overlay,y+(D_001AD3B4+b),D_001AD3B0-D_001AD3B8,D_001AD3B8,colors);
-            icon = func_0028E588(0xeaa3,3);
-            draw_icon(icon,y+(D_001AD3B4+b),(D_001AD3B0-D_001AD3B8)+D_001AD3BC,D_001AD3B8,colors);
+            draw_icon(overlay,y+(D_001AD3B4+inset),D_001AD3B0-D_001AD3B8,D_001AD3B8,colors);
+            icon = GetIconFrame(0xeaa3,3);
+            draw_icon(icon,y+(D_001AD3B4+inset),(D_001AD3B0-D_001AD3B8)+D_001AD3BC,D_001AD3B8,colors);
         }
         i++;
         y += 56;

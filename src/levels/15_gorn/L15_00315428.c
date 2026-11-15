@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -15,42 +16,42 @@ extern char *D_L15_001B261C_base[] __asm__("D_L15_001B261C") __attribute__((sda)
 extern void *func_803804E8(int a0);
 
 /* Stores the second argument into the record the lookup returned. */
-void func_L15_003804B8(int a0, void *a1)
+void func_L15_003804B8(int id, void *value)
 {
-    void *p = func_803804E8(a0);
+    void *record = func_803804E8(id);
 
-    if (p != 0) {
-        *(void **)((char *)p + 0x158) = a1;
+    if (record != 0) {
+        *(void **)((char *)record + 0x158) = value;
     }
 }
 
-/* Counts list entries with an active object, a linked record and positive value. */
-s32 func_L15_00381CF0(char *arg0) {
-    u16 *p;
-    char *base;
-    char *e;
-    char *o;
-    u32 slot;
-    s32 v;
+/* Counts list entries with an active object, a linked cursor and positive value. */
+s32 func_L15_00381CF0(char *list) {
+    u16 *cursor;
+    char *objectBase;
+    char *entry;
+    char *vars;
+    u32 listAddr;
+    s32 info;
     s32 count = 0;
-    float f;
+    float threshold;
 
-    slot = D_L15_001FB320[(u8)arg0[0x21]];
-    if (slot == 0)
+    listAddr = D_L15_001FB320[(u8)list[0x21]];
+    if (listAddr == 0)
         return 0;
-    p = (u16 *)slot;
-    f = 0.0f;
+    cursor = (u16 *)listAddr;
+    threshold = 0.0f;
     do {
-        base = D_L15_001B261C_base[0];
-        e = (char *)(((*p & 0x7FFF) << 8) + (u32)base);
-        if ((*(u16 *)(e + 0x34) & 0x20) != 0) {
-            o = *(char **)(e + 0x68);
-            v = func_002ED688(e);
-            if (*(s32 *)o != 0 && *(s32 *)(v + 0x110) != 0 &&
-                f < *(float *)(*(s32 *)o))
+        objectBase = D_L15_001B261C_base[0];
+        entry = (char *)(((*cursor & 0x7FFF) << 8) + (u32)objectBase);
+        if ((*(u16 *)(entry + 0x34) & 0x20) != 0) {
+            vars = *(char **)(entry + 0x68);
+            info = GetMobyMotionData(entry);
+            if (*(s32 *)vars != 0 && *(s32 *)(info + 0x110) != 0 &&
+                threshold < *(float *)(*(s32 *)vars))
                 count++;
         }
-    } while (*(s16 *)p++ >= 0);
+    } while (*(s16 *)cursor++ >= 0);
     return count;
 }
 
@@ -89,21 +90,21 @@ s32 func_L15_00381CF0(char *arg0) {
 
 extern unsigned char D_L15_004328E8[];
 
-extern void func_L15_00432210(void *a0);
-extern void func_802FFC98(void *a0, void *a1);
-extern int func_803068A0(void *a0);
-extern void func_80329048(void *a0);
+extern void func_L15_00432210(void *id);
+extern void func_802FFC98(void *id, void *value);
+extern int func_803068A0(void *id);
+extern void func_80329048(void *id);
 
-/* Runs the level's per-frame update once the record is in its armed state. */
-void func_L15_004321A8(char *p)
+/* Per-frame update of this moby (class 4522): runs the level update once it is armed. */
+void func_L15_004321A8(char *moby)
 {
-    char *q = *(char **)(p + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(unsigned char *)(p + 0x20) == 1) {
-        func_L15_00432210(p);
-        func_802FFC98(D_L15_004328E8, p);
-        if (func_803068A0(q + 0x54) != 0) {
-            func_80329048(p);
+    if (*(unsigned char *)(moby + 0x20) == 1) {
+        RebuildExpiredChannelCurves(moby);
+        func_802FFC98(D_L15_004328E8, moby);
+        if (func_803068A0(vars + 0x54) != 0) {
+            func_80329048(moby);
         }
     }
 }

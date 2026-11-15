@@ -56,15 +56,16 @@ extern char r1_D_001537A0[];
    The test is written >= 0 so the error path is the fall-through and the
    success path is the branch target, letting the result load sit in the
    bgez delay slot. */
-int func_00128440(int arg0) {
-    int *buf = &r1_D_0015B180;
+/* Gives the controller server the shared buffer to use. */
+int func_00128440(int bufferAddr) {
+    int *request = &r1_D_0015B180;
 
-    buf[1] = arg0;
-    if (r1_func_0011B4C8(r1_D_0015B108, 0x80000904, 0, buf, 0x400,
-                      buf, 0x400, 0, 0) >= 0) {
+    request[1] = bufferAddr;
+    if (r1_func_0011B4C8(r1_D_0015B108, 0x80000904, 0, request, 0x400,
+                      request, 0x400, 0, 0) >= 0) {
         return r1_D_0015B180;
     } else {
-        func_00128898(r1_D_00153658);
+        DebugPrintStub(r1_D_00153658);
         return 0;
     }
 }
@@ -82,28 +83,29 @@ int func_00128440(int arg0) {
    loop registers come out in $t0-$t2 as in retail. namesrc/namedst are
    precomputed so each byte address is one base+index add, and the call
    re-takes &r1_D_0015B180 for its buffer arguments. */
-int func_001284B0(void *arg0, int arg1, int arg2) {
-    int *buf = &r1_D_0015B180;
-    char *namesrc = (char *)arg0 + 0x14;
-    char *namedst = (char *)buf + 0x14;
+/* Asks the controller server to create a socket for a controller port. Returns 0 on failure. */
+int func_001284B0(void *socketRecord, int port, int mode) {
+    int *request = &r1_D_0015B180;
+    char *namesrc = (char *)socketRecord + 0x14;
+    char *namedst = (char *)request + 0x14;
     int i;
 
-    buf[10] = arg1;
-    buf[11] = arg2;
-    ((void **)buf)[0] = ((void **)arg0)[0];
-    ((void **)buf)[1] = ((void **)arg0)[1];
-    ((void **)buf)[2] = ((void **)arg0)[2];
-    ((void **)buf)[3] = ((void **)arg0)[3];
-    ((void **)buf)[4] = ((void **)arg0)[4];
+    request[10] = port;
+    request[11] = mode;
+    ((void **)request)[0] = ((void **)socketRecord)[0];
+    ((void **)request)[1] = ((void **)socketRecord)[1];
+    ((void **)request)[2] = ((void **)socketRecord)[2];
+    ((void **)request)[3] = ((void **)socketRecord)[3];
+    ((void **)request)[4] = ((void **)socketRecord)[4];
     for (i = 0; i < 0x10; i++) {
         namedst[i] = namesrc[i];
     }
     if (r1_func_0011B4C8(r1_D_0015B108, 0x80000901, 0, &r1_D_0015B180, 0x400,
                        &r1_D_0015B180, 0x400, 0, 0) < 0) {
-        func_00128898(r1_D_00153678);
+        DebugPrintStub(r1_D_00153678);
         return 0;
     }
-    return buf[9];
+    return request[9];
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124920 */
@@ -119,8 +121,9 @@ int func_001284B0(void *arg0, int arg1, int arg2) {
  * `buf` is only assigned where it is used, so the table base and the
  * buffer share retail's saved register.
  */
+/* Finds out which device is plugged into a controller port. Returns a negative number if nothing is linked. */
 int func_00128578(int port) {
-    int *buf;
+    int *request;
 
     r1_func_00119288(r1_D_0015B580, r1_D_0015B580 + 0x80);
     r1_func_0011D960();
@@ -129,14 +132,14 @@ int func_00128578(int port) {
     if (r1_D_0015B600[port] != 1) {
         return -0xC;
     }
-    buf = &r1_D_0015B180;
-    buf[0] = port;
+    request = &r1_D_0015B180;
+    request[0] = port;
     if (r1_func_0011B4C8(r1_D_0015B108, 0x80000903, 0, &r1_D_0015B180, 0x400,
                        &r1_D_0015B180, 0x400, 0, 0) < 0) {
-        func_00128898(r1_D_001536B8);
+        DebugPrintStub(r1_D_001536B8);
         return 0;
     }
-    return buf[1];
+    return request[1];
 }
 
 
@@ -145,33 +148,34 @@ int func_00128578(int port) {
    and reply), copying the reply's bytes to arg3. `r` is assigned in both
    arms of the copy guard with one return; two returns would be
    cross-jumped into one. */
-int func_001287A8(int arg0, int arg1, int *arg2, char *arg3) {
-    int *buf = &r1_D_0015B180;
+/* Sends a command to the controller server and copies the reply bytes to the caller. */
+int func_001287A8(int port, int command, int *countPtr, char *dst) {
+    int *request = &r1_D_0015B180;
     unsigned char *src;
     int i;
-    int r;
+    int result;
 
-    buf[0] = arg0;
-    buf[1] = arg1;
-    buf[2] = *arg2;
-    if (r1_func_0011B4C8(r1_D_0015B108, 0x8000091A, 0, buf, 0x400, buf, 0x400, 0, 0) < 0) {
-        func_00128898(r1_D_001537A0);
+    request[0] = port;
+    request[1] = command;
+    request[2] = *countPtr;
+    if (r1_func_0011B4C8(r1_D_0015B108, 0x8000091A, 0, request, 0x400, request, 0x400, 0, 0) < 0) {
+        DebugPrintStub(r1_D_001537A0);
         return 0;
     }
-    r = buf[0x23];
-    if (r >= 0) {
-        *arg2 = buf[2];
+    result = request[0x23];
+    if (result >= 0) {
+        *countPtr = request[2];
         i = 0;
-        if (i < buf[2]) {
-            src = (unsigned char *)buf + 0xC;
+        if (i < request[2]) {
+            src = (unsigned char *)request + 0xC;
             do {
-                arg3[i] = src[i];
+                dst[i] = src[i];
                 i++;
-            } while (i < buf[2]);
-            r = buf[0x23];
+            } while (i < request[2]);
+            result = request[0x23];
         } else {
-            r = buf[0x23];
+            result = request[0x23];
         }
     }
-    return r;
+    return result;
 }

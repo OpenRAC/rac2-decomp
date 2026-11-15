@@ -49,15 +49,15 @@ int func_L05_00302CE8(int x, int y, int width, int height, u64 color, u8 *text, 
                     /* Characters 0x80..0xA7 also draw their glyph 0x40 entries above. */
                     if ((u8)(character + 128) < 40) {
                         int glyphIndex = *word + 64;
-                        func_0027E018(cursorX + font[glyphIndex].advance, cursorY + font[glyphIndex].y,
+                        DrawTexturedQuad(cursorX + font[glyphIndex].advance, cursorY + font[glyphIndex].y,
                                       16, 16, font[glyphIndex].u, font[glyphIndex].v, 16, 16,
                                       color, texture);
                     }
                     if (*word < 32) {
-                        func_0027E018(cursorX, cursorY + font[*word].y, 24, 16, font[*word].u,
+                        DrawTexturedQuad(cursorX, cursorY + font[*word].y, 24, 16, font[*word].u,
                                       font[*word].v, 24, 16, color, texture);
                     } else if (*word > 32) {
-                        func_0027E018(cursorX, cursorY + font[*word].y, 16, 16, font[*word].u,
+                        DrawTexturedQuad(cursorX, cursorY + font[*word].y, 16, 16, font[*word].u,
                                       font[*word].v, 16, 16, color, texture);
                     }
                     cursorX += font[*word].advance;

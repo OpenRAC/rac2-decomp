@@ -44,125 +44,127 @@ typedef struct {
     u8 pad6c[0x84];
     UpdateVector rotation;
 } UpdateObject;
-void func_L17_003C7C70(UpdateObject *o)
+/* Moves a tilting platform: it waits for a trigger, wobbles, tips over along an arc, then
+   swings back up to where it started (moby class 2359). */
+void func_L17_003C7C70(UpdateObject *moby)
 {
     float oldpos[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float oldrot[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
-    UpdateState *s;
+    UpdateState *vars;
     float first_rate;
     float rate_scale = 0.000290888245f;
     first_rate=360.0f/D_L17_001B03B4;
-    *(Quad *)oldpos=o->position.q;
-    *(Quad *)oldrot=o->rotation.q;
-    s=o->state;
-    s->flags8c|=1;
-    s->flags3e|=8;
-    o->flags34|=0x20;
-    func_002AEE70(o,&s->a0,&s->a4,D_L17_001B03B8,first_rate*rate_scale,-1.0f);
-    func_002AEF28(o,&s->a8,&s->ac,D_L17_001B03BC,(360.0f/D_L17_001B03C0)*rate_scale,(360.0f/D_L17_001B03C4)*rate_scale);
-    switch(o->mode) {
+    *(Quad *)oldpos=moby->position.q;
+    *(Quad *)oldrot=moby->rotation.q;
+    vars=moby->state;
+    vars->flags8c|=1;
+    vars->flags3e|=8;
+    moby->flags34|=0x20;
+    UpdateWrappedAngleOffset(moby,&vars->a0,&vars->a4,D_L17_001B03B8,first_rate*rate_scale,-1.0f);
+    ScaleOwnerWordsByAngles(moby,&vars->a8,&vars->ac,D_L17_001B03BC,(360.0f/D_L17_001B03C0)*rate_scale,(360.0f/D_L17_001B03C4)*rate_scale);
+    switch(moby->mode) {
     case 0:
-        s->origin.q=*(Quad *)oldpos;
-        o->mode=1;
+        vars->origin.q=*(Quad *)oldpos;
+        moby->mode=1;
         break;
     case 1:
-        if(func_L00_00324120(o)) {
-            func_002A7750(o,2,-1);
-            s->b0=func_00283CF0(D_L17_001B03C8*60.0f);
+        if(IsCurrentSelectedId(moby)) {
+            SetMobyState(moby,2,-1);
+            vars->b0=FloatToInt(D_L17_001B03C8*60.0f);
         }
         break;
     case 2: {
-        float t;
-        if(func_002B3868(o))func_002E5CF8(0,0,o);
-        if(s->b0==60)func_002E5CF8(0,0,o);
-        if(func_00282948(&s->b0)) {
-            s->b4=func_00283CF0(D_L17_001B03CC*60.0f);
-            o->mode=3;
+        float progress;
+        if(SetFirstPendingFlag(moby))PlayMobySound(0,0,moby);
+        if(vars->b0==60)PlayMobySound(0,0,moby);
+        if(FastFloatHelperD(&vars->b0)) {
+            vars->b4=FloatToInt(D_L17_001B03CC*60.0f);
+            moby->mode=3;
         } else {
-            rot[0]=func_00283198(func_002ABB18(func_00283CE0(s->b0)*0.75f))*0.017453294f;
-            rot[1]=func_00283180(func_002ABB18(func_00283CE0(s->b0)*0.89f))*0.017453294f;
-            if((float)s->b4>D_L17_001B03C8*60.0f-30.0f) {
-                t=func_00283CE0(s->b0)/(D_L17_001B03C8*60.0f-30.0f);
-                o->rotation.f[0]=o->rotation.f[0]*t+rot[0]*(1.0f-t);
-                o->rotation.f[1]=o->rotation.f[1]*t+rot[1]*(1.0f-t);
+            rot[0]=FastSinOrCosB(WrapAngleToPi(IntToFloat(vars->b0)*0.75f))*0.017453294f;
+            rot[1]=FastSinOrCosA(WrapAngleToPi(IntToFloat(vars->b0)*0.89f))*0.017453294f;
+            if((float)vars->b4>D_L17_001B03C8*60.0f-30.0f) {
+                progress=IntToFloat(vars->b0)/(D_L17_001B03C8*60.0f-30.0f);
+                moby->rotation.f[0]=moby->rotation.f[0]*progress+rot[0]*(1.0f-progress);
+                moby->rotation.f[1]=moby->rotation.f[1]*progress+rot[1]*(1.0f-progress);
             } else {
-                o->rotation.f[1]=rot[1];
-                o->rotation.f[0]=rot[0];
+                moby->rotation.f[1]=rot[1];
+                moby->rotation.f[0]=rot[0];
             }
         }
         break;
     }
     case 3: {
-        float t,f,b,ax,ay;
-        t=func_00283CE0(s->b4)/(D_L17_001B03CC*60.0f);
-        f=(1.0f-t)*D_L17_001B03D4;
-        o->rotation.f[1]=0;
-        o->rotation.f[0]=(1.0f-t)*1.57079649f;
-        ax=func_00283180(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        float progress,f,b,ax,ay;
+        progress=IntToFloat(vars->b4)/(D_L17_001B03CC*60.0f);
+        f=(1.0f-progress)*D_L17_001B03D4;
+        moby->rotation.f[1]=0;
+        moby->rotation.f[0]=(1.0f-progress)*1.57079649f;
+        ax=FastSinOrCosA(FastAddRotations(1.57079649f,moby->rotation.f[2]));
+        b=FastSinOrCosB(moby->rotation.f[0]);
         ax*=f*b;
-        o->position.f[0]=ax;
-        ay=func_00283198(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        moby->position.f[0]=ax;
+        ay=FastSinOrCosB(FastAddRotations(1.57079649f,moby->rotation.f[2]));
+        b=FastSinOrCosB(moby->rotation.f[0]);
         ay*=f*b;
-        o->position.f[1]=ay;
-        o->position.f[2]=0;
-        o->position.f[0]+=s->origin.f[0];
-        ay+=s->origin.f[1];
-        o->position.f[1]=ay;
-        f*=func_00283180(o->rotation.f[0]);
-        o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=func_00283180(t*1.57079649f)*D_L17_001B03D8;
-        s->flags8c&=~1;
-        s->flags3e&=~8;
-        o->flags34&=~0x20;
-        if(func_00282948(&s->b4)) {
-            o->mode=4;
-            s->b8=func_00283CF0(D_L17_001B03D0*60.0f);
+        moby->position.f[1]=ay;
+        moby->position.f[2]=0;
+        moby->position.f[0]+=vars->origin.f[0];
+        ay+=vars->origin.f[1];
+        moby->position.f[1]=ay;
+        f*=FastSinOrCosA(moby->rotation.f[0]);
+        moby->position.f[2]=vars->origin.f[2]-f;
+        moby->position.f[2]-=FastSinOrCosA(progress*1.57079649f)*D_L17_001B03D8;
+        vars->flags8c&=~1;
+        vars->flags3e&=~8;
+        moby->flags34&=~0x20;
+        if(FastFloatHelperD(&vars->b4)) {
+            moby->mode=4;
+            vars->b8=FloatToInt(D_L17_001B03D0*60.0f);
         }
         break;
     }
     case 4: {
-        float t,f,b,c,ax,ay;
-        t=func_00283CE0(s->b8)/(D_L17_001B03D0*60.0f);
-        *(Quad *)rot=o->rotation.q;
-        c=1.0f-t;
+        float progress,f,b,c,ax,ay;
+        progress=IntToFloat(vars->b8)/(D_L17_001B03D0*60.0f);
+        *(Quad *)rot=moby->rotation.q;
+        c=1.0f-progress;
         f=(1.0f-c)*D_L17_001B03D4;
-        o->rotation.f[0]=func_00283C28((rot[0]*c+c*4.71238947f)+1.57079649f);
-        o->rotation.f[1]=rot[1]*c;
-        ax=func_00283180(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        moby->rotation.f[0]=FastFloatHelperG((rot[0]*c+c*4.71238947f)+1.57079649f);
+        moby->rotation.f[1]=rot[1]*c;
+        ax=FastSinOrCosA(FastAddRotations(1.57079649f,moby->rotation.f[2]));
+        b=FastSinOrCosB(moby->rotation.f[0]);
         ax*=f*b;
-        o->position.f[0]=ax;
-        ay=func_00283198(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        moby->position.f[0]=ax;
+        ay=FastSinOrCosB(FastAddRotations(1.57079649f,moby->rotation.f[2]));
+        b=FastSinOrCosB(moby->rotation.f[0]);
         ay*=f*b;
-        o->position.f[1]=ay;
-        o->position.f[2]=0;
-        o->position.f[0]+=s->origin.f[0];
-        ay+=s->origin.f[1];
-        o->position.f[1]=ay;
-        f*=func_00283180(o->rotation.f[0]);
-        o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=func_00283180(c*1.57079649f)*D_L17_001B03D8;
-        s->flags8c&=~1;
-        s->flags3e&=~8;
-        o->flags34&=~0x20;
-        if(func_00282948(&s->b8)) {
-            o->mode=1;
+        moby->position.f[1]=ay;
+        moby->position.f[2]=0;
+        moby->position.f[0]+=vars->origin.f[0];
+        ay+=vars->origin.f[1];
+        moby->position.f[1]=ay;
+        f*=FastSinOrCosA(moby->rotation.f[0]);
+        moby->position.f[2]=vars->origin.f[2]-f;
+        moby->position.f[2]-=FastSinOrCosA(c*1.57079649f)*D_L17_001B03D8;
+        vars->flags8c&=~1;
+        vars->flags3e&=~8;
+        moby->flags34&=~0x20;
+        if(FastFloatHelperD(&vars->b8)) {
+            moby->mode=1;
             {
-                Quad home = s->origin.q;
-                o->rotation.q=*(Quad *)rot;
-                o->position.q=home;
+                Quad home = vars->origin.q;
+                moby->rotation.q=*(Quad *)rot;
+                moby->position.q=home;
             }
         }
         break;
     }
     }
-    if(o->mode<3) {
-        func_00282CF0(pos,&o->position,oldpos);
-        func_002AD6F0((u8 *)s+0x50,pos,oldrot,&o->rotation);
+    if(moby->mode<3) {
+        FastVecSub(pos,&moby->position,oldpos);
+        CombineTransformsAndStore((u8 *)vars+0x50,pos,oldrot,&moby->rotation);
     }
 }

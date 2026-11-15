@@ -12,16 +12,16 @@ extern void func_L07_003F6C40(u8 *a, u8 *b, void *c, f32 d);
 extern void func_0029FCC0(u8 *a, s32 b, void *c);
 extern int func_002E5CF8(int, int, char *);
 
-void func_L07_003F8C38(u8 *a0)
+void func_L07_003F8C38(u8 *moby)
 {
-    u8 *s1;
-    u8 *s2 = *(u8 **)(a0 + 0x68);
-    u8 buf[16];
+    u8 *member;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 framePos[16];
 
-    s1 = func_L07_003F6B88(*(u8 **)(s2 + 0x184));
-    if (s1 == 0)
+    member = FindActiveMobyInGroup(*(u8 **)(vars + 0x184));
+    if (member == 0)
         return;
-    func_0029FCC0(a0, 0, buf);
-    func_002E5CF8(5, 0, (char *)a0);
-    func_L07_003F6C40(s1, a0, buf, D_L07_001B23CC[*(s32 *)(s2 + 0x174)].f38 + 0.5f);
+    TransformMobyJointToWorld(moby, 0, framePos);
+    PlayMobySound(5, 0, (char *)moby);
+    InitHomingBomb(member, moby, framePos, D_L07_001B23CC[*(s32 *)(vars + 0x174)].f38 + 0.5f);
 }

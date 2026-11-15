@@ -100,6 +100,7 @@ extern int r1_func_0011B4C8();
 
 /* rac1-decomp src/core/00119D88.c: func_0011BF80 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/library/sceopen.c, sceOpen. */
+/* Opens a file on the IOP and returns a file number, or a negative error code. */
 s32 func_0011E0D8(const u8 *path, s32 flags, ...)
 {
     struct SemaphoreParameters semaphore_parameters;
@@ -121,7 +122,7 @@ s32 func_0011E0D8(const u8 *path, s32 flags, ...)
     if (r1_D_0012FD94_1BF80[0] == 0) {
         r1_func_0011BCB0();
     }
-    if (func_0011E010() != 0) {
+    if (AreFileIoBuffersEqual() != 0) {
         r1_func_0011BC70_1BF80();
         return -0x10004;
     }

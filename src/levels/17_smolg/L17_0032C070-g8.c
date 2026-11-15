@@ -32,19 +32,19 @@ extern float func_00282C48(float);
    pair takes 0.000290888245f (arcseconds to radians) times the shared 0x1B0330 word, with the
    record's own 0x12C float as the third argument in the type-3 arm and -1.0f otherwise; the
    0x120/0x124 pair then takes the other two scaled words. */
-void func_L17_003C7018(char *arg0)
+void func_L17_003C7018(char *moby)
 {
-    char *state = *(char **)(arg0 + 0x68);
+    char *state = *(char **)(moby + 0x68);
 
-    if (*(u8 *)(arg0 + 0x20) == 3) {
-        func_002AEE70(arg0, state + 0x11C, state + 0x118, D_L17_001B032C,
+    if (*(u8 *)(moby + 0x20) == 3) {
+        UpdateWrappedAngleOffset(moby, state + 0x11C, state + 0x118, D_L17_001B032C,
                       D_L17_001B0330 * 0.000290888245f,
                       *(f32 *)(state + 0x12C));
     } else {
-        func_002AEE70(arg0, state + 0x11C, state + 0x118, D_L17_001B032C,
+        UpdateWrappedAngleOffset(moby, state + 0x11C, state + 0x118, D_L17_001B032C,
                       D_L17_001B0330 * 0.000290888245f, -1.0f);
     }
-    func_002AEF28(arg0, state + 0x120, state + 0x124, D_L17_001B0334,
+    ScaleOwnerWordsByAngles(moby, state + 0x120, state + 0x124, D_L17_001B0334,
                   D_L17_001B0338 * 0.000290888245f,
                   D_L17_001B033C * 0.000290888245f);
 }
@@ -52,19 +52,19 @@ void func_L17_003C7018(char *arg0)
 /* Transforms the level's fixed point through the object's own matrix, then through the
    object's second matrix, and keeps the result when both coordinates stay inside the
    shared bound and the object's own height is within two of the fixed point's. */
-int func_L17_003C70E0(char *a0)
+int func_L17_003C70E0(char *moby)
 {
-    float v[4];
-    float m[12];
+    float localPoint[4];
+    float matrix[12];
 
-    func_00282CF0(v, D_00189EA0, a0 + 0x10);
-    func_002836E8(m, a0 + 0xC0);
-    func_00283098(v, v, m);
-    if (!(func_00282C48(v[0]) <= D_L17_001B0360))
+    FastVecSub(localPoint, gHeroPosition, moby + 0x10);
+    FastMatrixHelperC(matrix, moby + 0xC0);
+    matrix_mul_vec3(localPoint, localPoint, matrix);
+    if (!(FloatAbs(localPoint[0]) <= D_L17_001B0360))
         return 0;
-    if (!(func_00282C48(v[1]) <= D_L17_001B0360))
+    if (!(FloatAbs(localPoint[1]) <= D_L17_001B0360))
         return 0;
-    if (func_00282C48(D_00189EA0[2] - *(float *)(a0 + 0x18)) < 2.0f)
+    if (FloatAbs(gHeroPosition[2] - *(float *)(moby + 0x18)) < 2.0f)
         return 1;
     return 0;
 }
@@ -74,25 +74,25 @@ extern s32 D_001B2748;
 /* Scales the level's shared word by the object's own signed halfword, takes it modulo
    sixty and paints the object with 0x80FFFFFF when the remainder is under fifteen and
    with 0x80404040 otherwise; then it sets the sub-object's two flag words. */
-void func_L17_003BCBC8(s32 a0)
+void func_L17_003BCBC8(s32 moby)
 {
-    s32 v1 = D_001B2748;
-    s32 d = 60;
-    s32 v0 = *(short *)(a0 + 0xB2);
-    s32 c1 = 0x80404040;
-    s32 t0 = 0x80FFFFFF;
-    s32 a1;
-    s32 a3;
+    s32 frame = D_001B2748;
+    s32 period = 60;
+    s32 value = *(short *)(moby + 0xB2);
+    s32 dimColor = 0x80404040;
+    s32 brightColor = 0x80FFFFFF;
+    s32 color;
+    s32 vars;
 
-    v1 = v1 + v0;
-    v0 = v1 % d;
-    if (v0 >= 15)
-        a1 = c1;
+    frame = frame + value;
+    value = frame % period;
+    if (value >= 15)
+        color = dimColor;
     else
-        a1 = t0;
-    *(s32 *)(a0 + 0x78) = a1;
-    a3 = *(s32 *)(a0 + 0x68);
-    *(u32 *)(a3 + 0x8C) |= 1;
-    *(u16 *)(a3 + 0x3E) |= 8;
-    *(u8 *)(a0 + 0x30) = 0;
+        color = brightColor;
+    *(s32 *)(moby + 0x78) = color;
+    vars = *(s32 *)(moby + 0x68);
+    *(u32 *)(vars + 0x8C) |= 1;
+    *(u16 *)(vars + 0x3E) |= 8;
+    *(u8 *)(moby + 0x30) = 0;
 }

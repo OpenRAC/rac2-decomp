@@ -55,164 +55,165 @@ extern void func_002AD7B8(s32);
 extern void func_00288CB0(s32,s32);
 extern void func_L07_003F8D90(u8 *);
 
-void func_L07_003F7048(u8 *a)
+/* Updates the boss. It runs the boss's states: waiting, intro, walking, several attacks, taking hits and the final death, and keeps its parts up to date every frame. */
+void func_L07_003F7048(u8 *moby)
 {
     f32 pos[4];
     f32 rot[4];
-    u8 *s = P(a,0x68);
-    func_L07_003F7BF0(a);
-    switch (a[0x95]) {
+    u8 *vars = P(moby,0x68);
+    UpdatePhasedDamageState(moby);
+    switch (moby[0x95]) {
     case 0:
     case 1:
-        if (a[0x20] != 3 && a[0x20] != 11) func_L07_003F8780(a);
-        if (a[0x95] == 0) D_L07_001B2CB8 = 0.6981318f;
+        if (moby[0x20] != 3 && moby[0x20] != 11) SetupBossScreenEffect(moby);
+        if (moby[0x95] == 0) D_L07_001B2CB8 = 0.6981318f;
         break;
     case 2:
-        if (P(s,0x450)) {
-            func_L00_002D7140(P(s,0x450));
-            P(s,0x450)=0;
+        if (P(vars,0x450)) {
+            EndCameraOverride(P(vars,0x450));
+            P(vars,0x450)=0;
         }
         break;
     }
-    switch (a[0x20]) {
+    switch (moby[0x20]) {
     case 1:
-        if (func_002ACBC8(D_00189EA0,W(s,0x170))) {
+        if (IsPointInCuboid(gHeroPosition,W(vars,0x170))) {
             D_L07_001B104C=1;
             if (!D_0013962A) {
-                if (func_00288AA0(D_L07_001BF400,0x4f)) {
-                    func_00288BE8(D_L07_001BF400);
-                    func_002A7750(a,2,-1);
+                if (PushRequestQueue(D_L07_001BF400,0x4f)) {
+                    LaunchQueuedRequest(D_L07_001BF400);
+                    SetMobyState(moby,2,-1);
                     goto start_path;
                 }
             }
-            func_L07_003F7968(a,0,2);
-            qcopy_nc(s+0x3e0,D_L07_001B23CC[0][W(s,0x174)].pos);
-            F(s,0x3e8)+=1.5f;
+            StartBossMoveTier(moby,0,2);
+            qcopy_nc(vars+0x3e0,D_L07_001B23CC[0][W(vars,0x174)].pos);
+            F(vars,0x3e8)+=1.5f;
 start_path:
-            func_L01_00323310(W(s,0x18c),-1);
+            QueueKeyedRequest(W(vars,0x18c),-1);
         }
         break;
     case 2:
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_0013962A=1;
-            func_00282F20(pos,(u8 *)&D_L07_001B23CC[0][W(s,0x174)]+0x10,8.0f);
-            func_00282CC0(pos,pos,D_L07_001B23CC[0][W(s,0x174)].pos);
+            vec_scale_to_length(pos,(u8 *)&D_L07_001B23CC[0][W(vars,0x174)]+0x10,8.0f);
+            FastVecAdd(pos,pos,D_L07_001B23CC[0][W(vars,0x174)].pos);
             qzero_nc(rot);
-            rot[2]=func_00283248(D_L07_001B23CC[0][W(s,0x174)].pos[0]-pos[0],D_L07_001B23CC[0][W(s,0x174)].pos[1]-pos[1]);
-            func_L00_002B9D60(pos,rot,0,1);
-            func_L07_003F7968(a,0,2);
-            qcopy_nc(s+0x3e0,D_L07_001B23CC[0][W(s,0x174)].pos);
-            F(s,0x3e8)+=1.5f;
+            rot[2]=FastMatrixHelperA(D_L07_001B23CC[0][W(vars,0x174)].pos[0]-pos[0],D_L07_001B23CC[0][W(vars,0x174)].pos[1]-pos[1]);
+            ResetHeroPositionAndDirection(pos,rot,0,1);
+            StartBossMoveTier(moby,0,2);
+            qcopy_nc(vars+0x3e0,D_L07_001B23CC[0][W(vars,0x174)].pos);
+            F(vars,0x3e8)+=1.5f;
         }
         break;
     case 3:
-        func_L07_003F80B8(a,-1.0f);
-        if (H(a,0x96)>=121) func_002A7750(a,4,-1);
+        MoveBossTowardTarget(moby,-1.0f);
+        if (H(moby,0x96)>=121) SetMobyState(moby,4,-1);
         break;
     case 4:
-        if (func_002B3868(a)) {
-            func_L07_003F9028(a);
-            W(s,0x42c)=60;
+        if (SetFirstPendingFlag(moby)) {
+            SelectBossIdleAnimation(moby);
+            W(vars,0x42c)=60;
         }
-        func_L07_003F80B8(a,-1.0f);
-        if (!W(s,0x42c)) {
-            W(s,0x43c)=func_L07_003F8908(a);
-            func_002A7750(a,5,-1);
+        MoveBossTowardTarget(moby,-1.0f);
+        if (!W(vars,0x42c)) {
+            W(vars,0x43c)=ChooseEnemyNextAction_L07(moby);
+            SetMobyState(moby,5,-1);
         }
         break;
     case 5:
-        if (func_002B3868(a)) func_L07_003F9028(a);
-        func_L07_003F80B8(a,-1.0f);
-        if (H(a,0x96)==W(s,0x444)-W(s,0x448))
-            func_L07_003EF1E0(P(s,0x414),W(s,0x448),W(s,0x448)+10);
-        else if (H(a,0x96)==W(s,0x444)-D_L07_001B1044)
-            func_L07_003F8828(a,s+0x140);
-        else if (W(s,0x444)<H(a,0x96))
-            func_002A7750(a,W(s,0x43c),-1);
-        if (W(s,0x43c)==7) {
-            s32 n = func_00283CF0(45.3f);
-            if (H(a,0x96)==W(s,0x444)-n) func_002E5CF8(8,0,a);
+        if (SetFirstPendingFlag(moby)) SelectBossIdleAnimation(moby);
+        MoveBossTowardTarget(moby,-1.0f);
+        if (H(moby,0x96)==W(vars,0x444)-W(vars,0x448))
+            StartMobyTimerState(P(vars,0x414),W(vars,0x448),W(vars,0x448)+10);
+        else if (H(moby,0x96)==W(vars,0x444)-D_L07_001B1044)
+            StoreAttachedPosition(moby,vars+0x140);
+        else if (W(vars,0x444)<H(moby,0x96))
+            SetMobyState(moby,W(vars,0x43c),-1);
+        if (W(vars,0x43c)==7) {
+            s32 n = FloatToInt(45.3f);
+            if (H(moby,0x96)==W(vars,0x444)-n) PlayMobySound(8,0,moby);
         }
         break;
     case 6: case 7: case 8: case 9:
-        if (func_002B3868(a)) func_L07_003F9088(a);
-        func_L07_003F80B8(a,-1.0f);
-        if (a[0x42]==a[0x43]) {
-            if (func_002AEB60(a,1.0f)) {
-                switch (a[0x20]) {
-                case 7: func_L07_003F8AB0(a); break;
-                case 6: func_L07_003F8BB0(a); break;
-                case 9: func_L07_003F8C38(a); break;
-                case 8: func_L07_003F8CD0(a); break;
+        if (SetFirstPendingFlag(moby)) SelectBossAttackAnimation(moby);
+        MoveBossTowardTarget(moby,-1.0f);
+        if (moby[0x42]==moby[0x43]) {
+            if (IsValueWithinStepOfThreshold(moby,1.0f)) {
+                switch (moby[0x20]) {
+                case 7: FireBeamAttack(moby); break;
+                case 6: QueryJointPoseForEffect(moby); break;
+                case 9: SpawnGroupMemberEffect(moby); break;
+                case 8: LaunchGroupMembersAway(moby); break;
                 }
-            } else if (a[0x60]&2) {
-                if (func_00282948(s+0x438)) func_002A7750(a,4,-1);
-                else func_002A7750(a,5,-1);
+            } else if (moby[0x60]&2) {
+                if (FastFloatHelperD(vars+0x438)) SetMobyState(moby,4,-1);
+                else SetMobyState(moby,5,-1);
             }
         }
         break;
     case 10:
-        if (func_002B3868(a)) {
-            if (a[0x43]!=7) func_002A7470(a,7,0,20);
+        if (SetFirstPendingFlag(moby)) {
+            if (moby[0x43]!=7) StartAnimationBlended(moby,7,0,20);
         }
-        func_L07_003F80B8(a,-1.0f);
-        if (a[0x60]&2) func_002A7750(a,11,-1);
+        MoveBossTowardTarget(moby,-1.0f);
+        if (moby[0x60]&2) SetMobyState(moby,11,-1);
         break;
     case 11:
-        if (func_002B3868(a)) {
-            if (a[0x43]!=4) func_002A7470(a,4,0,20);
-            F(s,0x434)=1.0833334f;
+        if (SetFirstPendingFlag(moby)) {
+            if (moby[0x43]!=4) StartAnimationBlended(moby,4,0,20);
+            F(vars,0x434)=1.0833334f;
         }
-        func_L07_003F80B8(a,F(s,0x434));
-        func_002AA2E8((f32 *)(s+0x434),0.0f,0.0055555557f);
-        func_002AA2E8((f32 *)(s+0x3e8),18.0f,0.033333335f);
-        if (!a[0x31]) {
-            func_002A7750(a,1,2);
-            func_L07_003F78F8(a);
+        MoveBossTowardTarget(moby,F(vars,0x434));
+        ApproachValue((f32 *)(vars+0x434),0.0f,0.0055555557f);
+        ApproachValue((f32 *)(vars+0x3e8),18.0f,0.033333335f);
+        if (!moby[0x31]) {
+            SetMobyState(moby,1,2);
+            ResetBossAndChildren(moby);
         }
         break;
     case 12:
-        if (func_002B3868(a)) {
-            if (a[0x43]!=7) func_002A7470(a,7,0,20);
-            F(s,0x3e8)+=1.0f;
-            W(s,0x440)=600;
-            if (F(s,0x20)==0.0f && !a[0x7f]) func_002A6C58(a,10,3);
+        if (SetFirstPendingFlag(moby)) {
+            if (moby[0x43]!=7) StartAnimationBlended(moby,7,0,20);
+            F(vars,0x3e8)+=1.0f;
+            W(vars,0x440)=600;
+            if (F(vars,0x20)==0.0f && !moby[0x7f]) SetDeathBits(moby,10,3);
         }
-        func_L07_003F80B8(a,-1.0f);
-        if (F(s,0x20)<=0.0f) {
+        MoveBossTowardTarget(moby,-1.0f);
+        if (F(vars,0x20)<=0.0f) {
             D_0018C2C4=40.0f;
-            func_002A8C28(a,D_L07_001B23CC[0][W(s,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
+            SweepCollisionFromObject(moby,D_L07_001B23CC[0][W(vars,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
         }
-        if (a[0x60]&2) {
-            if (F(s,0x20)<=0.0f) func_002A7750(a,13,2);
+        if (moby[0x60]&2) {
+            if (F(vars,0x20)<=0.0f) SetMobyState(moby,13,2);
             else {
-                switch(W(s,0x420)) {
+                switch(W(vars,0x420)) {
                 case 3: break;
-                case 4: func_L07_003EECE0(D_L07_001B22DC[0]+(W(s,0x178)<<8)); break;
-                case 5: func_L07_003EECE0(D_L07_001B22DC[0]+(W(s,0x17c)<<8)); break;
+                case 4: ResetPathFollowerToPathPoint(gMobyArray_L07[0]+(W(vars,0x178)<<8)); break;
+                case 5: ResetPathFollowerToPathPoint(gMobyArray_L07[0]+(W(vars,0x17c)<<8)); break;
                 }
-                func_002A7750(a,4,-1);
-                W(s,0x440)=0;
+                SetMobyState(moby,4,-1);
+                W(vars,0x440)=0;
             }
         }
         break;
     case 13:
-        if (func_00288AA0(D_L07_001BF400,0x50)) {
-            func_00288AA0(D_L07_001BF400,0x51);
-            func_00288AA0(D_L07_001BF400,8);
-            func_00288AA0(D_L07_001BF400,0x52);
-            func_00288BE8(D_L07_001BF400);
-            func_002A7750(a,14,-1);
+        if (PushRequestQueue(D_L07_001BF400,0x50)) {
+            PushRequestQueue(D_L07_001BF400,0x51);
+            PushRequestQueue(D_L07_001BF400,8);
+            PushRequestQueue(D_L07_001BF400,0x52);
+            LaunchQueuedRequest(D_L07_001BF400);
+            SetMobyState(moby,14,-1);
         }
         break;
     case 14:
-        if (((H(a,0x34)^1)&1) && D_L07_001A8F00==2) func_L07_003F78F8(a);
-        func_002A8C28(a,D_L07_001B23CC[0][W(s,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
-        if (!func_002F5D10() && D_L07_001A8F00!=2 && D_L07_001A8F00!=1 && D_0018C0BC!=20) {
-            func_002AD7B8(8);
-            func_00288CB0(8,1);
+        if (((H(moby,0x34)^1)&1) && D_L07_001A8F00==2) ResetBossAndChildren(moby);
+        SweepCollisionFromObject(moby,D_L07_001B23CC[0][W(vars,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
+        if (!IsEitherModeTwo() && D_L07_001A8F00!=2 && D_L07_001A8F00!=1 && D_0018C0BC!=20) {
+            MarkFlagAndAppendToList(8);
+            SetSmallDataValueAndRefresh(8,1);
         }
         break;
     }
-    func_L07_003F8D90(a);
+    UpdateSiberiusGunAiming(moby);
 }

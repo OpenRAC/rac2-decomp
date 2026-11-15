@@ -29,13 +29,13 @@ void func_0031EC68(Vector4 *start, Vector4 *end, int unused2, int alpha, int unu
     Beam first, second;
     Vector4 basis[4], nearSize, farSize;
 
-    first.tex = func_0027C878(0x2F);
+    first.tex = GetEffectTextureDescriptor(0x2F);
     first.test = ((unsigned long)mode << 2) | 0x8000000040UL;
     first.alpha = 0xFF9000000260UL;
     first.color[2] = first.color[3] = 0x800000;
     first.color[0] = first.color[1] = (alpha << 24) + 0x800000;
     first.tag = 0;
-    second.tex = func_0027C878(0x30);
+    second.tex = GetEffectTextureDescriptor(0x30);
     nearSize.bits = 0;
     farSize.bits = 0;
     second.alpha = 0xFF9000000260UL;
@@ -53,19 +53,19 @@ void func_0031EC68(Vector4 *start, Vector4 *end, int unused2, int alpha, int unu
     first.uv[4] = u0 + 1; first.uv[5] = 0; first.uv[6] = u0 + 1; first.uv[7] = 1;
     second.uv[0] = u0; second.uv[1] = 0; second.uv[2] = u0; second.uv[3] = 1;
     second.uv[4] = u0 + 1; second.uv[5] = 0; second.uv[6] = u0 + 1; second.uv[7] = 1;
-    func_00282CF0(&basis[0], end, start); func_00282F20(&basis[0], &basis[0], 1);
-    func_00282CF0(&basis[1], &D_001B5340, start); func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], 1); func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
+    FastVecSub(&basis[1], &gCameraState_001B5340, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = start->bits;
     first.point[0].bits = nearSize.bits; second.point[0].bits = farSize.bits;
-    func_00282D30(&first.point[1], &first, -1); func_00282D30(&second.point[1], &second, -1);
-    func_002830C0(&first, &first, basis); func_002830C0(&first.point[1], &first.point[1], basis);
-    func_002830C0(&second, &second, basis); func_002830C0(&second.point[1], &second.point[1], basis);
+    FastVecScale(&first.point[1], &first, -1); FastVecScale(&second.point[1], &second, -1);
+    transform_vector(&first, &first, basis); transform_vector(&first.point[1], &first.point[1], basis);
+    transform_vector(&second, &second, basis); transform_vector(&second.point[1], &second.point[1], basis);
     basis[3].bits = end->bits;
     nearSize.f[2] *= 0.5f; farSize.f[2] *= 0.5f;
     first.point[2].bits = nearSize.bits; second.point[2].bits = farSize.bits;
-    func_00282D30(&first.point[3], &first.point[2], -1); func_00282D30(&second.point[3], &second.point[2], -1);
-    func_002830C0(&first.point[2], &first.point[2], basis); func_002830C0(&first.point[3], &first.point[3], basis);
-    func_002830C0(&second.point[2], &second.point[2], basis); func_002830C0(&second.point[3], &second.point[3], basis);
-    func_00280B90(&first, 0, 0); func_00280B90(&second, 0, 0);
+    FastVecScale(&first.point[3], &first.point[2], -1); FastVecScale(&second.point[3], &second.point[2], -1);
+    transform_vector(&first.point[2], &first.point[2], basis); transform_vector(&first.point[3], &first.point[3], basis);
+    transform_vector(&second.point[2], &second.point[2], basis); transform_vector(&second.point[3], &second.point[3], basis);
+    draw_world_quad(&first, 0, 0); draw_world_quad(&second, 0, 0);
 }

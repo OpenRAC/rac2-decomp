@@ -14,29 +14,29 @@ extern unsigned char *D_001F259C;
 char *func_002BDCE8(TI128 *position, int spin, TI128 *axis, int colour, int count,
                      float jitter, float lo, float hi, float size)
 {
-    char *p = func_002B9030(0x17);
+    char *p = AllocParticle(0x17);
     char *m;
     if (p != 0) {
         *(TI128 *)(p + 0x10) = *position;
         *(int *)(p + 4) = colour | 0x20000000;
         m = p + 0x20;
-        p[9] = func_00283CF0(4.0f) + 0x70;
+        p[9] = FloatToInt(4.0f) + 0x70;
         p[3] = 0x48;
         *(float *)(p + 0xC) = size;
         p[1] = 0;
         p[8] = 0;
         p[2] = *D_001F259C;
-        *(float *)(p + 0x10) += func_002A78D8(0.0f, jitter);
-        *(float *)(p + 0x14) += func_002A78D8(0.0f, jitter);
-        *(float *)(p + 0x18) += func_002A78D8(0.0f, jitter);
-        *(float *)(p + 0x1C) = func_00283CE0(count);
+        *(float *)(p + 0x10) += RandomSignedFloatRange(0.0f, jitter);
+        *(float *)(p + 0x14) += RandomSignedFloatRange(0.0f, jitter);
+        *(float *)(p + 0x18) += RandomSignedFloatRange(0.0f, jitter);
+        *(float *)(p + 0x1C) = IntToFloat(count);
         *(short *)(p + 0xA) = 10;
         *(int *)(m + 4) = 0;
         *(int *)(p + 0x20) = colour;
-        *(short *)(m + 8) = func_00283CF0(func_002A77E0(2) ? (float)spin : (float)-spin);
-        *(float *)(m + 0xC) = func_002A7878(lo, hi);
+        *(short *)(m + 8) = FloatToInt(RandomIntBelow(2) ? (float)spin : (float)-spin);
+        *(float *)(m + 0xC) = RandomFloatRange(lo, hi);
         *(TI128 *)(m + 0x10) = *axis;
-        *(float *)(m + 0x1C) = func_00283CE0(0x1E);
+        *(float *)(m + 0x1C) = IntToFloat(0x1E);
     }
     return p;
 }

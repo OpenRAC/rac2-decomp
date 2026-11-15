@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -97,6 +98,7 @@ extern void func_0029B3E0(s32, s32);
 extern u8 D_001A7B08[0x40] __attribute__((sda));
 extern s32 D_L03_001B2A38[] __attribute__((sda));
 
+/* Starts the boss area and wakes every object in the boss's group. */
 /* Raises the two flags, sets the entity up from the state's words 0x58 and 0x5C, runs the two
  * boot steps with 13 (func_002AD860 returns a value that the caller drops; declaring it that way
  * is what fixes the register choice of the table address), then hands every entity of the
@@ -106,11 +108,11 @@ void func_L03_003F1470(u8 *entity) {
     u16 *p;
     u8 *e;
 
-    func_L02_00327350(*(s32 *)(state + 0x58), *(s32 *)(state + 0x5C));
+    StartRecordEffectByIndex(*(s32 *)(state + 0x58), *(s32 *)(state + 0x5C));
     D_001A7B08[0x04] = 1;
     D_001A7B08[0x3C] = 1;
-    func_00288308(13);
-    func_002AD860(13);
+    UnlockHelpEntry(13);
+    HandleRequestSlotState(13);
     for (p = (u16 *)D_L03_001FB5A0[*(s32 *)(state + 0x80)];
          (*(s32 *)(state + 0x80) & 0xFF) != 0xFF && *(s32 *)(state + 0x80) <= D_L03_001B2A38[0] &&
          p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L03_001FB5A0[*(s32 *)(state + 0x80)]);
@@ -118,9 +120,9 @@ void func_L03_003F1470(u8 *entity) {
         e = D_L03_001B2A1C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        func_0029F338(e);
+        MarkMobySpawned(e);
     }
-    func_0029B3E0(0, -1);
+    MemcardSave(0, -1);
 }
 
 /* func_L03_003F4638 is in L03_003F4638-g8.c. */
@@ -129,6 +131,7 @@ void func_L03_003F1470(u8 *entity) {
 
 /* func_L03_003F5B70 is in L03_003F5B70-g8.c. */
 
+/* Runs the boss's helper steps every frame and counts up its frame timer. */
 /* ticks the entity's sub-states, feeds the 0x95 counter to the engine and
  * re-arms its 200-second timer */
 void func_L03_003F6080(u8 *entity) {
@@ -136,17 +139,17 @@ void func_L03_003F6080(u8 *entity) {
     u32 timer;
 
     func_320318(entity, state + 0x70);
-    func_L03_003F5B70(entity);
-    func_L03_003F64E8(entity);
-    func_L03_003F6610(entity);
-    func_L03_003F6748(entity);
-    func_L03_003F6158(entity);
+    MoveEndakoBossAlongPath(entity);
+    EaseViewAngleToBoss(entity);
+    BlendEndakoBossParts(entity);
+    WakeObjectsWhenCountersLow(entity);
+    UpdateEndakoBossAttachment(entity);
     if (*(u8 *)(entity + 0x95) >= 2)
         func_2FD088(5, 0, *(float *)(state + 0x20) / func_2F0148(*(s16 *)(state + 0x24)));
     if (*(s32 *)(state + 0x3BC) != 0)
-        func_2E77F0(func_L03_003F6948, entity);
+        func_2E77F0(DrawBossTargetMarkers, entity);
     if (*(u8 *)(entity + 0x31) != 0)
-        func_2E77F0(func_L03_003F6BA8, entity);
+        func_2E77F0(DrawBeamQuadPackets, entity);
     timer = *(u16 *)(entity + 0x96);
     if (timer <= 0xFFFE) *(u16 *)(entity + 0x96) = (u16)(timer + 1);
 }
@@ -154,6 +157,7 @@ void func_L03_003F6080(u8 *entity) {
 /* func_L03_003F62C8 lives in L03_003F09C0-g8.c (it reaches D_L03_001B108C
  * through $gp). */
 
+/* Picks a new random pose for the boss that differs from the current one. */
 /* draws a value distinct from the state's current one and stores the table word it names */
 void func_L03_003F6458(u8 *entity, s32 selector) {
     PickerState *state = *(PickerState **)(entity + 0x68);
@@ -172,6 +176,7 @@ void func_L03_003F6458(u8 *entity, s32 selector) {
 
 /* func_L03_003F64E8 lives in L03_003F64E8-g8.c */
 
+/* Blends the boss body parts and animation speed each frame. */
 /* steps the entity's two blend channels and its rate */
 void func_L03_003F6610(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
@@ -183,6 +188,7 @@ void func_L03_003F6610(u8 *entity) {
     func_324210(entity, state + 0x190, 1, 0.03f, 0.3f);
 }
 
+/* Passes each object in the boss's linked group to the engine. */
 /* hands every record of the stream at slot 0xAC to func_3A2F48 */
 void func_L03_003F66D8(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
@@ -201,6 +207,7 @@ void func_L03_003F66D8(u8 *entity) {
 
 /* func_L03_003F6748 is defined in L03_003F6748-g8.c. */
 
+/* Adds a target to the boss's list of up to 30 targets. */
 /* appends one word to the level state's 30-entry table */
 void func_L03_003F68E8(u8 *entity, u32 value) {
     LevelState *state = *(LevelState **)(entity + 0x68);
@@ -211,6 +218,7 @@ void func_L03_003F68E8(u8 *entity, u32 value) {
     }
 }
 
+/* Removes one entry from the table by copying the last entry over it. */
 void func_L03_003F6918(u8 *entity, s32 index) {
     LevelState *state = *(LevelState **)(entity + 0x68);
 
@@ -234,27 +242,28 @@ typedef struct {
 
 extern L03VoiceState D_001A63A8;
 
+/* Starts a boss voice line unless one is already playing. */
 /* Picks the free voice slot the entity asks for, unless the engine is busy
    or already holds that slot. */
-void func_L03_003F71E0(u8 *a0, s32 a1) {
-    L03VoiceState *st = &D_001A63A8;
-    s32 sel = a1;
-    u8 *a3 = *(u8 **)(a0 + 0x68);
+void func_L03_003F71E0(u8 *entity, s32 requested) {
+    L03VoiceState *voice = &gMusicState;
+    s32 slotIndex = requested;
+    u8 *vars = *(u8 **)(entity + 0x68);
     u8 *slot;
     s32 *row;
-    u32 v;
+    u32 slotWord;
 
-    if (st->active != 0) return;
-    if (st->key != -1) return;
-    if (sel == *(s32 *)(a3 + 0x40C)) return;
-    slot = a3 + sel;
-    row = (s32 *)(a3 + sel * 4);
-    v = *(u32 *)((u8 *)row + 0x3D0);
-    st->unk28 = 0;
-    st->key = (v & 0x3FFF) + 0x7D0;
+    if (voice->active != 0) return;
+    if (voice->key != -1) return;
+    if (slotIndex == *(s32 *)(vars + 0x40C)) return;
+    slot = vars + slotIndex;
+    row = (s32 *)(vars + slotIndex * 4);
+    slotWord = *(u32 *)((u8 *)row + 0x3D0);
+    voice->unk28 = 0;
+    voice->key = (slotWord & 0x3FFF) + 0x7D0;
     *(u8 *)(slot + 0x410) = 1;
-    *(s32 *)(a3 + 0x408) = 0x258;
-    *(s32 *)(a3 + 0x40C) = sel;
+    *(s32 *)(vars + 0x408) = 0x258;
+    *(s32 *)(vars + 0x40C) = slotIndex;
 }
 
 /* func_L03_004198B0 lives in L03_003F09C0-g8.c (it reaches D_L03_001A8F00
@@ -277,6 +286,7 @@ void func_L03_003F71E0(u8 *a0, s32 a1) {
  * body is byte-identical except that the two `addu` come out (index, base)
  * instead of the retail's (base, index). */
 
+/* Gives every sweeper bot in the boss's group a fresh random delay. */
 /* walks entity's stream, asking func_31BA30 for the value it stores at +0x2D8
  * of every record whose halfword at +0xAA is 0xFF3 */
 void func_L03_0041D128(u8 *entity) {
@@ -291,7 +301,7 @@ void func_L03_0041D128(u8 *entity) {
     do {
         record = D_L03_001B2A1C + ((p->raw & 0x7FFF) << 8);
         if (*(signed char *)(record + 0x20) >= 0) {
-            if (*(short *)(record + 0xAA) == 0xFF3) {
+            if (*(short *)(record + 0xAA) == 0xFF3 /* Megacorp Sweeper Bot */) {
                 u8 *owner = *(u8 **)(record + 0x68);
 
                 *(int *)(owner + 0x2D8) = func_31BA30(0x28, 0x32);
@@ -302,6 +312,7 @@ void func_L03_0041D128(u8 *entity) {
     } while (1);
 }
 
+/* Checks whether the actor has reached its path point; 1 means it did. */
 /* asks the current entry to resolve; 1 when it consumed the query */
 u32 func_L03_0041D1D8(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
@@ -320,6 +331,7 @@ u32 func_L03_0041D1D8(u8 *entity) {
 /* func_L03_0041D258 is in L03_0041D258-g8.c. */
 
 
+/* Moves a path robot along its path and plays its engine sound. */
 /* Projects the state position onto its path, clamps lateral displacement,
  * advances the path blend nearby, and maintains its movement sound. */
 void func_L03_0041DCE0(u8 *entity) {
@@ -374,6 +386,7 @@ void func_L03_0041DCE0(u8 *entity) {
 
 /* func_L03_0041EAE0 lives in L03_0041EAE0-g8.c */
 
+/* Updates the actor's small timers and effects every frame. */
 /* re-arms the entity's two channel counters and its 200-second timer */
 void func_L03_0041EF90(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
@@ -387,6 +400,7 @@ void func_L03_0041EF90(u8 *entity) {
     func_326730(entity, state + 0x200, 0, 1, 2.0f);
 }
 
+/* Switches the entity to state 6 and stores a value in its private data. */
 void func_L03_0041F008(u8 *entity, u32 value) {
     u8 *state = *(u8 **)(entity + 0x68);
 

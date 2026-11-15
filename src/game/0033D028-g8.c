@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_0033AE28(void *);
 extern void func_0033B018(void *, float, float);
@@ -16,25 +17,26 @@ extern float D_L00_001AE198 __attribute__((sda));
 extern float D_L00_001AE1A0 __attribute__((sda));
 extern float D_L00_001AE19C, D_L00_001AE1A4;
 
+/* Handles input for the audio options menu: moves the cursor, changes the two volume levels, and flips the sound mode. */
 int func_0033D028(char *object, int flags)
 {
     char *p = object + 8;
     float *vec;
 
-    func_0033AE28(p);
+    UpdateButtonPromptBar(p);
     vec = *(float **)(object + 0x33C);
-    func_0033B018(p, vec[0], vec[1]);
+    SetMenuAnchorPosition(p, vec[0], vec[1]);
     vec = *(float **)(object + 0x33C);
-    func_00335E38(object + 0x2AC, vec[0] + D_L00_001AE198,
+    SetFirstFloat4(object + 0x2AC, vec[0] + D_L00_001AE198,
                  vec[1] + D_L00_001AE19C, 0.0f, 0.0f);
     vec = *(float **)(object + 0x33C);
-    func_00335E38(object + 0x2F4, vec[0] + D_L00_001AE1A0,
+    SetFirstFloat4(object + 0x2F4, vec[0] + D_L00_001AE1A0,
                  vec[1] + D_L00_001AE1A4, 0.0f, 0.0f);
     if (flags & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         *(int *)(object + 0x2A8) = (*(int *)(object + 0x2A8) + 2) % 3;
     } else if (flags & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         *(int *)(object + 0x2A8) = (*(int *)(object + 0x2A8) + 1) % 3;
     } else if (D_00138340.w0 & 0x8000) {
         switch (*(int *)(object + 0x2A8)) {
@@ -65,16 +67,16 @@ int func_0033D028(char *object, int flags)
     } else if (flags & 0x40) {
         if (*(int *)(object + 0x2A8) == 2) {
             int value;
-            func_002E5E58(4, 0, 0);
+            PlaySoundFromGlobalBank(4, 0, 0);
             value = *(int *)(D_001A7B94 + 4) == 0;
             *(int *)(D_001A7B94 + 4) = value;
-            func_00132938(!value);
+            SendSoundCommand11_00132938(!value);
         } else {
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         }
     }
-    func_00336B98(object + 0x2F4, *(int *)(D_001A7B94 + 8));
-    func_00336B98(object + 0x2AC, *(int *)(D_001A7B94 + 12));
-    func_002E4860();
+    SetMeterValue(object + 0x2F4, *(int *)(D_001A7B94 + 8));
+    SetMeterValue(object + 0x2AC, *(int *)(D_001A7B94 + 12));
+    SetDefaultSoundGroupVolumes();
     return (flags >> 6) & 1;
 }

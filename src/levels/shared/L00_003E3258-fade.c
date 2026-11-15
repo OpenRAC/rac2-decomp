@@ -20,37 +20,38 @@ extern void func_L00_003E80A8(int, char *);
 extern void func_002A0488(char *, int, int, int);
 extern void func_0029F338(char *);
 
+/* Fades each object in the list. When a fade ends, it restores the object and runs its finish function, or deletes it, and drops it from the list. */
 void func_L00_003E7C88(void) {
     int i;
     i = 0;
-    if (i < D_L00_001B2B60[0]) {
-        FadeEntry *base = D_L00_0024EFC0;
+    if (i < gFadingMobyCount[0]) {
+        FadeEntry *base = gFadingMobyList;
         FadeEntry *prev = (FadeEntry *)((char *)base - 32);
         float zero = 0.0f;
         do {
             float *fade = (float *)((char *)base + (i * 32 + 12));
-            FadeEntry *p = &D_L00_0024EFC0[i];
-            char *o = p->object;
+            FadeEntry *entry = &gFadingMobyList[i];
+            char *fadeObject = entry->object;
             if (*fade != zero) {
                 ref_L00_003E7C88_00(fade, 0.0f, D_L00_001B065C * 0.01666666753590107f);
-                func_L00_003E7E40(o, D_L00_001B0648, *fade);
-                func_L00_003E80A8(i, D_L00_001B0650[0]);
+                SpawnModelTrailParticles(fadeObject, D_L00_001B0648, *fade);
+                SetFadingObjectAlphaAndColor(i, D_L00_001B0650[0]);
             } else {
                 int callbacks = (int)&base->callback;
                 void (**callback)(char *) = (void (**)(char *))(i * 32 + callbacks);
                 if (*callback) {
-                    func_002A0488(o, p->rgb[0], p->rgb[1], p->rgb[2]);
-                    *(unsigned char *)(o + 35) = 128;
-                    *(unsigned short *)(o + 52) &= ~2;
-                    (*callback)(o);
-                } else func_0029F338(o);
+                    set_moby_color(fadeObject, entry->rgb[0], entry->rgb[1], entry->rgb[2]);
+                    *(unsigned char *)(fadeObject + 35) = 128;
+                    *(unsigned short *)(fadeObject + 52) &= ~2;
+                    (*callback)(fadeObject);
+                } else MarkMobySpawned(fadeObject);
                 {
-                    FadeEntry *end = (FadeEntry *)(D_L00_001B2B60[0] * 32 + (int)prev);
-                    D_L00_001B2B60[0]--;
-                    D_L00_0024EFC0[i] = *end;
+                    FadeEntry *end = (FadeEntry *)(gFadingMobyCount[0] * 32 + (int)prev);
+                    gFadingMobyCount[0]--;
+                    gFadingMobyList[i] = *end;
                 }
             }
             i++;
-        } while (i < D_L00_001B2B60[0]);
+        } while (i < gFadingMobyCount[0]);
     }
 }

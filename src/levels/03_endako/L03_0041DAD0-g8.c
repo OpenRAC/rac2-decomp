@@ -15,12 +15,13 @@ extern void func_L03_0041E240(u8 *);
 
 typedef struct { u8 pad[0x120]; f32 rate[3]; } RateView;
 
+/* Sets up the path robot on its first frame and checks if it was hit. */
 void func_L03_0041DAD0(u8 *self) {
     u8 *st = *(u8 **)(self + 0x68);
 
     if (self[0x20] == 0) {
-        st[0x48] = func_00283CF0(20.0f);
-        st[0x4A] = func_00283CF0(14.399999618530273f);
+        st[0x48] = FloatToInt(20.0f);
+        st[0x4A] = FloatToInt(14.399999618530273f);
         st[0x60] = 7;
         *(f32 *)(st + 0x8C) = 0.4000000059604645f;
         *(s32 *)(st + 0x98) = 3;
@@ -39,23 +40,23 @@ void func_L03_0041DAD0(u8 *self) {
         *(s32 *)(st + 0x1D8) = -1;
         *(s32 *)(st + 0x350) = -1;
         if (*(s32 *)(st + 0x210) == -1) {
-            func_0029F338(self);
+            MarkMobySpawned(self);
             return;
         }
-        func_002A7750(self, 1, 0);
+        SetMobyState(self, 1, 0);
         if (self[0x43] != 0)
-            func_002A7470(self, 0, 0, 0);
+            StartAnimationBlended(self, 0, 0, 0);
     }
     if (self[0x31] != 0) {
-        if (func_00282E48(self + 0x10, D_L03_001B9980) < 48.0f) {
-            func_002A93B0(self);
+        if (fast_vec_dist(self + 0x10, D_L03_001B9980) < 48.0f) {
+            UpdateMobyGroundCheck(self);
             self[0x6F] = 0x2D;
         }
     }
     ((RateView *)st)->rate[2] = D_L03_001B1BC0 * 0.01666666753590107f;
     ((RateView *)st)->rate[0] = D_L03_001B1BC4 * 0.00027777778450399637f;
     ((RateView *)st)->rate[1] = D_L03_001B1BC8 * 0.00027777778450399637f;
-    if (func_002B0ED8(self, st + 0x50, 0))
-        func_L03_0041E240(self);
-    func_002B3BA8(self, *(s32 *)(st + 0x214), 0, 0, 16.0f, 0.0f);
+    if (ApplyDamageToObject(self, st + 0x50, 0))
+        MarkRivetBotsInStream(self);
+    SelectAimTarget_002B3BA8(self, *(s32 *)(st + 0x214), 0, 0, 16.0f, 0.0f);
 }

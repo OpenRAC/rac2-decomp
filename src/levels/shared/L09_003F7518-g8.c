@@ -10,15 +10,16 @@ extern void func_002A7470(void *, int, int, int);
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 #define B(p,o) (*(unsigned char *)((p)+(o)))
-void func_L09_003F7518(char *object, int state, int a2, int a3) {
+/* Switches the enemy and its partner to a new animation and sets how fast it turns and moves in that animation. */
+void func_L09_003F7518(char *object, int state, int startFrame, int blendTime) {
     char *data = *(char **)(object+0x68);
-    func_0026FEB8(D_L09_001B10A8, *(short *)(object+0xB2), state);
+    STUB_printf(D_L09_001B10A8, *(short *)(object+0xB2), state);
     if (state == 12) {
-        func_002B60B0(object, D_L09_001B0F0C * 0.00027777778f, D_L09_001B0F10 * 0.016666667f,
+        SetControllerSpeedLimits(object, D_L09_001B0F0C * 0.00027777778f, D_L09_001B0F10 * 0.016666667f,
                       D_L09_001B0F1C * 0.0000048481374f, D_L09_001B0F20 * 0.00029088825f);
         F(data,0x118) += F(data,0x118);
     } else {
-        func_002B60B0(object, D_L09_001B0F14 * 0.00027777778f, D_L09_001B0F18 * 0.016666667f,
+        SetControllerSpeedLimits(object, D_L09_001B0F14 * 0.00027777778f, D_L09_001B0F18 * 0.016666667f,
                       D_L09_001B0F1C * 0.0000048481374f, D_L09_001B0F20 * 0.00029088825f);
         F(data,0x118) += F(data,0x118);
     }
@@ -35,8 +36,8 @@ void func_L09_003F7518(char *object, int state, int a2, int a3) {
         B(data,0xC2)=10; B(data,0xC3)=17; B(data,0xC6)=0;
     }
     if ((I(data,0x428) || (I(data,0x2DC)!=-1 && I(data,0x2DC)==I(data,0x2B0))) && state!=15) {
-        if (B(object,0x43)!=14) func_002A7470(object,14,a2,a3);
-    } else if (B(object,0x43)!=state) func_002A7470(object,state,a2,a3);
+        if (B(object,0x43)!=14) StartAnimationBlended(object,14,startFrame,blendTime);
+    } else if (B(object,0x43)!=state) StartAnimationBlended(object,state,startFrame,blendTime);
     { char *partner=*(char **)(data+0x2F8);
-    if (partner && B(partner,0x43)!=state) func_002A7470(partner,state,a2,a3); }
+    if (partner && B(partner,0x43)!=state) StartAnimationBlended(partner,state,startFrame,blendTime); }
 }

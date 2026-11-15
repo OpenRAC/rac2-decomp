@@ -25,37 +25,37 @@ extern float D_001AA318 __attribute__((sda));
 
 #define LERP(lo, hi, t) (((hi) - (lo)) * (t) + (lo))
 
-void func_002BC508(char *p)
+void func_002BC508(char *particle)
 {
-    char *q = p + 0x20;
-    float speed, a, b, t;
+    char *motion = particle + 0x20;
+    float speed, lifeLeft, maxLife, lifeFraction;
 
-    p[8] = (unsigned char)p[8] + (unsigned char)q[0x1E];
-    func_00282CC0(p + 0x10, p + 0x10, q);
-    speed = -func_00282DF0(q);
-    func_002AA548(p + 0x30, &speed, 0.0f, 0.0f, D_001AA348 * 0.00027777778f, speed);
-    func_00282F20(q, q, -speed);
-    *(float *)(p + 0x18) += D_001AA34C * 0.016666667f;
-    a = func_00283CE0(*(short *)(p + 0xA));
-    b = func_00283CE0((unsigned char)q[0x1D]);
-    t = a / b;
-    if (q[0x1F] & 1)
-        *(float *)(p + 0xC) = LERP(D_001AA33C, D_001AA338, t) * 210000.0f;
+    particle[8] = (unsigned char)particle[8] + (unsigned char)motion[0x1E];
+    FastVecAdd(particle + 0x10, particle + 0x10, motion);
+    speed = -FastVecLength(motion);
+    StepValueTowardTarget(particle + 0x30, &speed, 0.0f, 0.0f, D_001AA348 * 0.00027777778f, speed);
+    vec_scale_to_length(motion, motion, -speed);
+    *(float *)(particle + 0x18) += D_001AA34C * 0.016666667f;
+    lifeLeft = IntToFloat(*(short *)(particle + 0xA));
+    maxLife = IntToFloat((unsigned char)motion[0x1D]);
+    lifeFraction = lifeLeft / maxLife;
+    if (motion[0x1F] & 1)
+        *(float *)(particle + 0xC) = LERP(D_001AA33C, D_001AA338, lifeFraction) * 210000.0f;
     else
-        *(float *)(p + 0xC) = LERP(D_001AA31C, D_001AA318, t) * 210000.0f;
-    *(int *)(p + 4) = func_00283D38(*(int *)(q + 0x18), *(int *)(q + 0x14), t);
-    if (*(short *)(p + 0xA) < 15) {
-        a = func_00283CE0(*(short *)(p + 0xA));
-        b = func_00283CE0(10);
-        *(int *)(p + 4) = func_00283D38(*(int *)(p + 4) & 0xFFFFFF, *(int *)(p + 4), a / b);
+        *(float *)(particle + 0xC) = LERP(D_001AA31C, D_001AA318, lifeFraction) * 210000.0f;
+    *(int *)(particle + 4) = FastTweenColor(*(int *)(motion + 0x18), *(int *)(motion + 0x14), lifeFraction);
+    if (*(short *)(particle + 0xA) < 15) {
+        lifeLeft = IntToFloat(*(short *)(particle + 0xA));
+        maxLife = IntToFloat(10);
+        *(int *)(particle + 4) = FastTweenColor(*(int *)(particle + 4) & 0xFFFFFF, *(int *)(particle + 4), lifeLeft / maxLife);
     }
-    if (*(float *)(p + 0x10) < 2.0f || *(float *)(p + 0x10) > 1021.0f ||
-        *(float *)(p + 0x14) < 2.0f || *(float *)(p + 0x14) > 1021.0f ||
-        *(float *)(p + 0x18) < 2.0f || *(float *)(p + 0x18) > 1021.0f ||
-        func_00282978(p + 0xA)) {
-        func_002B9180(p);
+    if (*(float *)(particle + 0x10) < 2.0f || *(float *)(particle + 0x10) > 1021.0f ||
+        *(float *)(particle + 0x14) < 2.0f || *(float *)(particle + 0x14) > 1021.0f ||
+        *(float *)(particle + 0x18) < 2.0f || *(float *)(particle + 0x18) > 1021.0f ||
+        FastDecTimer(particle + 0xA)) {
+        KillParticle(particle);
         return;
     }
-    if (*(float *)(q + 0x10) < 0.01f)
-        --*(short *)(p + 0xA);
+    if (*(float *)(motion + 0x10) < 0.01f)
+        --*(short *)(particle + 0xA);
 }

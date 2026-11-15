@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /*
  * Disassembled at 0x002cd220
@@ -49,11 +50,12 @@ extern char F7cb419c1_D_001F2840[];
 extern int F7cb419c1_FUN_002DE618(int arg);
 
 /* Candidate function: FUN_002d3390 */
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
 unsigned long long func_002D3390(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C960();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -61,6 +63,7 @@ extern char *D_001A8CFC[] __attribute__((sda));
 extern float ref_L00_002D33C0_00[];
 extern void ref_L00_002D33C0_01(unsigned char *, float *);
 
+/* Sets up the model preview helper object for the menu if the menu is open. */
 int func_002D33C0(void)
 {
     if (D_001A8CFC[0] != 0)
@@ -86,15 +89,16 @@ extern MenuGameState D_00138180;
 extern CallbackState D_001F2840;
 extern void func_0029C5D0(int);
 
+/* Handles button input for a menu page: reports cancel or accept, and otherwise passes the current message to the page handler. */
 int func_002D3400(void)
 {
-    int flags = D_00138180.flags;
+    int flags = gPadState.flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -105,16 +109,17 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_0029C5D0(D_00138180.message);
+        func_0029C5D0(gPadState.message);
     return result;
 }
 
 extern void func_0029C5A0(void);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
 int func_002D3488(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C5A0();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -126,13 +131,14 @@ extern void func_003435A0(char *, char *);
 extern char D_00259F58[];
 extern char D_0025D0E0[];
 
+/* Sets up the first model preview object of the menu with its model data. */
 int func_002D34B8(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_003435B0(D_001A8CFC[0] + 0x3C108, 0);
-        func_00343538(D_001A8CFC[0] + 0x3C108, D_00259F58);
-        func_00343580(D_001A8CFC[0] + 0x3C108);
-        func_003435A0(D_001A8CFC[0] + 0x3C108, D_0025D0E0);
+        SetMenuTitleMode(D_001A8CFC[0] + 0x3C108, 0);
+        FillMenuItemList(D_001A8CFC[0] + 0x3C108, D_00259F58);
+        ClearMenuListSelectionState(D_001A8CFC[0] + 0x3C108);
+        SetMenuExtraValue(D_001A8CFC[0] + 0x3C108, D_0025D0E0);
     }
     return 0;
 }
@@ -140,13 +146,14 @@ int func_002D34B8(void)
 extern char D_00259CE0[];
 extern char D_0025D288[];
 
+/* Sets up the second model preview object of the menu with its model data. */
 int func_002D3538(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_003435B0(D_001A8CFC[0] + 0x3C108, 1);
-        func_00343538(D_001A8CFC[0] + 0x3C108, D_00259CE0);
-        func_00343580(D_001A8CFC[0] + 0x3C108);
-        func_003435A0(D_001A8CFC[0] + 0x3C108, D_0025D288);
+        SetMenuTitleMode(D_001A8CFC[0] + 0x3C108, 1);
+        FillMenuItemList(D_001A8CFC[0] + 0x3C108, D_00259CE0);
+        ClearMenuListSelectionState(D_001A8CFC[0] + 0x3C108);
+        SetMenuExtraValue(D_001A8CFC[0] + 0x3C108, D_0025D288);
     }
     return 0;
 }
@@ -200,15 +207,15 @@ int func_002D3D88(int index, int x)
     double distance;
     int mode;
 
-    texture = func_0028E588(0xea97, D_0026CFD0[index].icon);
-    distance = func_001234F0(256.0f - (float)left);
-    if (func_00123028(distance, 0.0) < 0)
-        distance = func_00122A98(0.0, distance);
-    leftAlpha = 128 - func_00123130(func_00122B00(distance, 0.75));
-    distance = func_001234F0(256.0f - (float)(x + 40));
-    if (func_00123028(distance, 0.0) < 0)
-        distance = func_00122A98(0.0, distance);
-    rightAlpha = 128 - func_00123130(func_00122B00(distance, 0.75));
+    texture = GetIconFrame(0xea97, D_0026CFD0[index].icon);
+    distance = FloatToDouble(256.0f - (float)left);
+    if (CompareDoubles(distance, 0.0) < 0)
+        distance = SubtractDoubles(0.0, distance);
+    leftAlpha = 128 - DoubleToInt(MultiplyDoubles(distance, 0.75));
+    distance = FloatToDouble(256.0f - (float)(x + 40));
+    if (CompareDoubles(distance, 0.0) < 0)
+        distance = SubtractDoubles(0.0, distance);
+    rightAlpha = 128 - DoubleToInt(MultiplyDoubles(distance, 0.75));
     if (leftAlpha < 0)
         leftAlpha = 0;
     if (rightAlpha < 0)
@@ -222,13 +229,14 @@ int func_002D3D88(int index, int x)
     mode = D_001B23A0[0];
     y = scaled_screen_coord(mode, 334.0f, 4.0f);
     height = scaled_screen_size(mode, 40.0f, 0);
-    return func_0028EA58(texture, left, y, 40, height, colors);
+    return DrawHudSpriteGradient(texture, left, y, 40, height, colors);
 }
 
 /* func_002D3FA0 is defined in 002D3FA0-options-g8.c. */
 
 /* func_002D4948 is defined in 002D4948-options-g8.c. */
 
+/* Updates the saved choice number in the menu state using a helper. */
 int func_002D4E10(void)
 {
     char *p = F7cb419c1_D_001F2840;
@@ -242,6 +250,7 @@ int func_002D4E10(void)
 
 extern int D_0025BA80;
 
+/* Clears the menu counter back to zero. */
 int func_002D5038(void) {
     D_0025BA80 = 0;
     return 0;
@@ -252,9 +261,10 @@ int func_002D5038(void) {
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void *func_00341558(void *);
 
+/* Stores the preview object of the open menu into the given menu item. */
 int func_002D5290(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = func_00341558(D_001A8CFC[0] + 0x3BE08);
+        *(void **)(object + 0x34) = GetSelectedTabEntryValue(D_001A8CFC[0] + 0x3BE08);
     return 0;
 }
 
@@ -267,12 +277,13 @@ extern void func_00341540(char *, char *, char *, char *);
 extern void func_00341610(char *, int);
 extern char D_002615F8[], D_00261698[], D_00261750[];
 
+/* Sets up the preview object of the open menu with its data tables and turns it on. */
 int func_002D5480(void)
 {
-    func_00287E80();
+    ClearMenuCounter_00287E80();
     if (D_001A8CFC[0] != 0) {
-        func_00341540(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
-        func_00341610(D_001A8CFC[0] + 0x3BE08, 1);
+        SetTabbedMenuTables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
+        SwitchTabbedMenuTab(D_001A8CFC[0] + 0x3BE08, 1);
     }
     return 0;
 }
@@ -280,6 +291,7 @@ int func_002D5480(void)
 extern int D_00138344;
 extern void func_0029CF08(int);
 
+/* Runs the common menu button handling with the current pressed buttons. */
 int func_002D54F0(void) {
     func_0029CF08(D_00138344);
     return 0;
@@ -288,6 +300,7 @@ int func_002D54F0(void) {
 extern int D_00138344;
 extern void func_0029CF08(int);
 
+/* Runs the common menu button handling with the current pressed buttons. */
 int func_002D5518(void) {
     func_0029CF08(D_00138344);
     return 0;

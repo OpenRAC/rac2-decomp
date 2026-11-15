@@ -72,7 +72,7 @@ extern L04Base004 D_L04_001BD380;
 /* Walks the level's list of objects and, for the one with the object's own id, asks the
    level's helper to clear it and sets the level's three timers. */
 /* Same body as func_L04_00439870, with this function's own callees. */
-void func_L04_00423178(u8 *arg) {
+void func_L04_00423178(u8 *moby) {
     u32 *elem;
     s32 i;
 
@@ -80,7 +80,7 @@ void func_L04_00423178(u8 *arg) {
         if (D_001A7A40 != 0) {
             for (i = 0; i < D_L04_001BD380.count; i++) {
                 elem = D_L04_001BD380.entries[i];
-                if (*(s16 *)((u8 *)elem + 0xAA) == *(s16 *)(arg + 0xAA)) {
+                if (*(s16 *)((u8 *)elem + 0xAA) == *(s16 *)(moby + 0xAA)) {
                     if (D_L04_001B1DE1 == 0) {
                         func_3325E0(elem, 0, &D_L04_001B1DE0);
                         D_L04_001B1E00 = 2.75f;

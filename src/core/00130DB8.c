@@ -34,11 +34,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-u32 func_00130DB8(s32 arg0) {
+/* Waits until the picture unit is idle, or tells whether it is busy. */
+u32 func_00130DB8(s32 mode) {
     u32 result;
 
     result = 0;
-    switch (arg0) {
+    switch (mode) {
     case 0:
         while (((s32)IPU_CTRL) < 0) {
         }

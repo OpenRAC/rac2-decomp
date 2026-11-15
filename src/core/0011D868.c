@@ -35,6 +35,7 @@ extern s32 r1_func_00118CB0(s32);
  * (retail puts buf[2] in the slot). Under the game's 2.95.3 no order was
  * exact (8/92 at best), which is what kept this one open.
  */
+/* Creates the two locks used by the file system code, the first time it is called. */
 void func_0011D868(void) {
     int buf[8];
     if (r1_D_0012FDA0 == -1) {
@@ -60,16 +61,17 @@ void func_0011D868(void) {
  * %hi(r1_D_0012FDA0) for the whole function), which is 2.9-ee's allocation;
  * 2.95.3 parked the %hi in $4 instead.
  */
+/* Finds an unused slot in the file table and marks it as taken. Returns 0 if all slots are used. */
 void *func_0011D8C8(void) {
-    char *p;
+    char *slot;
 
-    func_0011D868();
+    InitFileSemaphores();
     r1_func_00118CB0(r1_D_0012FDA0);
-    for (p = r1_D_00157E80; p < r1_D_00157E80 + 0x200; p += 0x10) {
-        if (*(int *)(p + 0x4) == 0) {
-            *(int *)(p + 0x4) = 0x10000000;
+    for (slot = r1_D_00157E80; slot < r1_D_00157E80 + 0x200; slot += 0x10) {
+        if (*(int *)(slot + 0x4) == 0) {
+            *(int *)(slot + 0x4) = 0x10000000;
             r1_func_00118C90(r1_D_0012FDA0);
-            return p;
+            return slot;
         }
     }
     r1_func_00118C90(r1_D_0012FDA0);

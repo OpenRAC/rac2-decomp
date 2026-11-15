@@ -10,59 +10,60 @@ extern void func_00282CC0(void *,void *,void *);
 extern unsigned char *D_001F2634;
 /* Follows an animated source joint, easing size and alpha toward their limits.
  * Corresponds to RAC1's update_animated_source_attached_fade_in_out_effect_particle. */
-void func_002C3430(char *p)
+/* Updates a glow that sticks to a joint of another object, grows and shrinks, and fades. */
+void func_002C3430(char *particle)
 {
-    char *q;
-    float a[4], b[4];
-    float f;
+    char *motion;
+    float jointPos[4], offset[4];
+    float limit;
 
-    if (!p)
+    if (!particle)
         return;
-    q = p + 32;
-    if (func_00282978((short *)(p + 10)) || !*(char **)q ||
-        *(signed char *)(*(char **)q + 32) < 0) {
-        func_002B9180(p);
+    motion = particle + 32;
+    if (FastDecTimer((short *)(particle + 10)) || !*(char **)motion ||
+        *(signed char *)(*(char **)motion + 32) < 0) {
+        KillParticle(particle);
         return;
     }
-    *(short *)(q + 12) = (*(unsigned short *)(q + 12) + 1) & 15;
-    if (*(float *)(p + 12) < 159600.0f) {
-        *(float *)(p + 12) += 3989.999755859375f;
-        if (*(float *)(p + 12) > 159600.0f)
-            *(float *)(p + 12) = 159600.0f;
-    } else if (*(float *)(p + 12) > 159600.0f) {
-        *(float *)(p + 12) -= 15959.9990234375f;
-        if (*(float *)(p + 12) < 159600.0f)
-            *(float *)(p + 12) = 159600.0f;
+    *(short *)(motion + 12) = (*(unsigned short *)(motion + 12) + 1) & 15;
+    if (*(float *)(particle + 12) < 159600.0f) {
+        *(float *)(particle + 12) += 3989.999755859375f;
+        if (*(float *)(particle + 12) > 159600.0f)
+            *(float *)(particle + 12) = 159600.0f;
+    } else if (*(float *)(particle + 12) > 159600.0f) {
+        *(float *)(particle + 12) -= 15959.9990234375f;
+        if (*(float *)(particle + 12) < 159600.0f)
+            *(float *)(particle + 12) = 159600.0f;
     }
-    *(float *)(q + 8) += 0.001f;
-    p[8] = func_00283CF0(*(float *)(q + 8) * 255.0f);
-    p[2] = D_001F2634[*(short *)(q + 12)];
-    if (*(float *)(p + 12) <= 159600.0f || *(float *)(q + 16) > 0.0f)
-        *(float *)(q + 4) += *(float *)(q + 16);
+    *(float *)(motion + 8) += 0.001f;
+    particle[8] = FloatToInt(*(float *)(motion + 8) * 255.0f);
+    particle[2] = D_001F2634[*(short *)(motion + 12)];
+    if (*(float *)(particle + 12) <= 159600.0f || *(float *)(motion + 16) > 0.0f)
+        *(float *)(motion + 4) += *(float *)(motion + 16);
     {
-        float x;
-        if (*(float *)(p + 12) <= 159600.0f) {
-            x = *(float *)(q + 4);
-            f = 0.3f;
+        float size;
+        if (*(float *)(particle + 12) <= 159600.0f) {
+            size = *(float *)(motion + 4);
+            limit = 0.3f;
         } else {
-            x = *(float *)(q + 4);
-            f = 0.15f;
+            size = *(float *)(motion + 4);
+            limit = 0.15f;
         }
-        if (!(f < x)) {
-            if (x < 0.0f) {
-                func_002B9180(p);
+        if (!(limit < size)) {
+            if (size < 0.0f) {
+                KillParticle(particle);
                 return;
             }
         } else {
-            *(float *)(q + 16) = -*(float *)(q + 16);
-            *(float *)(q + 4) = x + *(float *)(q + 16);
+            *(float *)(motion + 16) = -*(float *)(motion + 16);
+            *(float *)(motion + 4) = size + *(float *)(motion + 16);
         }
     }
-    *(int *)(p + 4) = (*(int *)(p + 4) & 0xffffff) +
-        (func_00283CF0(*(float *)(q + 4) * 256.0f) << 24);
-    *(float *)(q + 20) += (1.0f - *(float *)(q + 20)) * 0.175f;
-    func_0029FCC0(*(void **)q, *(short *)(q + 14), a);
-    func_00282CF0(b, D_001B5340, a);
-    func_00282F20(b, b, *(float *)(q + 20));
-    func_00282CC0(p + 16, (char *)a, (char *)b);
+    *(int *)(particle + 4) = (*(int *)(particle + 4) & 0xffffff) +
+        (FloatToInt(*(float *)(motion + 4) * 256.0f) << 24);
+    *(float *)(motion + 20) += (1.0f - *(float *)(motion + 20)) * 0.175f;
+    TransformMobyJointToWorld(*(void **)motion, *(short *)(motion + 14), jointPos);
+    FastVecSub(offset, gCameraState_001B5340, jointPos);
+    vec_scale_to_length(offset, offset, *(float *)(motion + 20));
+    FastVecAdd(particle + 16, (char *)jointPos, (char *)offset);
 }

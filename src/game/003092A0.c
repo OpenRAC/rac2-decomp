@@ -49,48 +49,49 @@ extern s32 func_0026F7F8(s32), func_00282948(void *);
 extern void func_0029F338(void *), func_0027CFD0(void *, void *);
 extern void func_00308768(void), func_00308DB8(void *);
 /* Adapted from RAC1 update_beam_effect_lifecycle (OpenRAC, GPL-3.0). */
+/* Switches the beam effect on and off depending on what the player is doing. It grows and shrinks while it is on. */
 void func_003092A0(void *p) {
-    O_4198 *o = (O_4198 *)p;
-    V_4198 *v = o->v;
-    s32 flag = 0;
-    s32 st;
+    O_4198 *beamObj = (O_4198 *)p;
+    V_4198 *v = beamObj->v;
+    s32 wantActive = 0;
+    s32 heroMode;
 
-    if ((&D_00189E20)->i1338 == 3 || func_0026F7F8(3) == 8) {
-        if (o->state == 1 || o->state == 3) {
-            st = (&D_00189E20)->i2294;
-            if ((u32)(st - 0xB) < 4
-                || (st == 0x1B && ((u8 *)(&D_00189E20)->p2290)[0x42] == ((u8 *)(&D_00189E20)->p2290)[0x43]
-                    && (&D_00189E20)->fC38 >= 6.0f && (&D_00189E20)->fC38 <= 16.0f)) {
-                if (!(&D_00189E20)->i49E) flag = 1;
+    if ((&gHeroState)->i1338 == 3 || EmptyStubF7F8(3) == 8) {
+        if (beamObj->state == 1 || beamObj->state == 3) {
+            heroMode = (&gHeroState)->i2294;
+            if ((u32)(heroMode - 0xB) < 4
+                || (heroMode == 0x1B && ((u8 *)(&gHeroState)->p2290)[0x42] == ((u8 *)(&gHeroState)->p2290)[0x43]
+                    && (&gHeroState)->fC38 >= 6.0f && (&gHeroState)->fC38 <= 16.0f)) {
+                if (!(&gHeroState)->i49E) wantActive = 1;
             }
-            if ((&D_00189E20)->i2294 == 0x82 && (D_00138320 & 0x40)) flag = 1;
-            if ((&D_00189E20)->i2294 == 0x10) {
-                if ((&D_00189E20)->i1B8 < 44) {
-                    flag = 1;
+            if ((&gHeroState)->i2294 == 0x82 && (D_00138320 & 0x40)) wantActive = 1;
+            if ((&gHeroState)->i2294 == 0x10) {
+                if ((&gHeroState)->i1B8 < 44) {
+                    wantActive = 1;
                 }
             }
-            if ((&D_00189E20)->i2294 == 0x21) {
-                if ((&D_00189E20)->i1B8 < 15
-                    || (33 < (&D_00189E20)->i1B8 && (&D_00189E20)->i34E != 0)) {
-                    flag = 1;
+            if ((&gHeroState)->i2294 == 0x21) {
+                if ((&gHeroState)->i1B8 < 15
+                    || (33 < (&gHeroState)->i1B8 && (&gHeroState)->i34E != 0)) {
+                    wantActive = 1;
                 }
             }
-            if ((&D_00189E20)->i2294 == 8) flag = 1;
-            if ((&D_00189E20)->i2294 == 0x82) flag = 1;
+            if ((&gHeroState)->i2294 == 8) wantActive = 1;
+            if ((&gHeroState)->i2294 == 0x82) wantActive = 1;
         }
     }
-    switch (o->state) {
+    switch (beamObj->state) {
     case 0:
-        o->f18 += 0.5f;
-        o->state = 1;
-        o->u30 = 0xFF;
-        o->u34 |= 1;
+        beamObj->f18 += 0.5f;
+        beamObj->state = 1;
+        beamObj->u30 = 0xFF;
+        beamObj->u34 |= 1;
         break;
     case 1:
-        if ((func_0026F7F8(3) != 3 && func_0026F7F8(3) != 8) || !D_00189E20.i1314) {
-            func_0029F338(o);
-        } else if (flag != 0) {
-            o->state = 2;
+        if ((EmptyStubF7F8(3) != 3 && EmptyStubF7F8(3) != 8) || !gHeroState.i1314) {
+            MarkMobySpawned(beamObj);
+        } else if (wantActive != 0) {
+            beamObj->state = 2;
             v->i0 = 2;
             v->f30 = 0.0125f / 2;
             v->f34 = 0.2f / 2;
@@ -107,10 +108,10 @@ void func_003092A0(void *p) {
         v->f24 += v->f34;
         v->f28 += v->f38;
         v->f2C += v->f3C;
-        v->i8 = (&D_00189E20)->i1310;
-        func_0027CFD0(func_00308768, o);
-        if (func_00282948(v) != 0) {
-            o->state = 3;
+        v->i8 = (&gHeroState)->i1310;
+        RegisterOverlayDrawCallback(draw_joint_aligned_beam_effect, beamObj);
+        if (FastFloatHelperD(v) != 0) {
+            beamObj->state = 3;
             v->f20 = 0.0125f;
             v->f24 = 0.2f;
             v->f28 = 0.05f;
@@ -119,10 +120,10 @@ void func_003092A0(void *p) {
         }
         break;
     case 3:
-        v->i8 = (&D_00189E20)->i1310;
-        func_0027CFD0(func_00308768, o);
-        if (flag == 0) {
-            o->state = 4;
+        v->i8 = (&gHeroState)->i1310;
+        RegisterOverlayDrawCallback(draw_joint_aligned_beam_effect, beamObj);
+        if (wantActive == 0) {
+            beamObj->state = 4;
             v->i0 = 8;
             v->f30 = 0.0125f / 8;
             v->f34 = 0.2f / 8;
@@ -130,19 +131,19 @@ void func_003092A0(void *p) {
             v->f3C = 0.025f / 8;
         } else {
             v->f20 = 0.0125f;
-            func_00308DB8(o);
+            SpawnBeamTrailParticles(beamObj);
         }
         break;
     case 4:
-        if (func_00282948(v) != 0) {
-            o->state = 1;
+        if (FastFloatHelperD(v) != 0) {
+            beamObj->state = 1;
         } else {
             v->f20 -= v->f30;
             v->f24 -= v->f34;
             v->f28 -= v->f38;
             v->f2C -= v->f3C;
-            v->i8 = (&D_00189E20)->i1310;
-            func_0027CFD0(func_00308768, o);
+            v->i8 = (&gHeroState)->i1310;
+            RegisterOverlayDrawCallback(draw_joint_aligned_beam_effect, beamObj);
         }
         break;
     }

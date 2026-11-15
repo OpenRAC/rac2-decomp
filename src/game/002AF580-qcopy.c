@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern int func_002AB1F0(char *);
@@ -55,10 +56,10 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
     while (node) {
         if (!((unsigned char *)node)[0x31])
             goto next;
-        special = func_002ABB78(node);
+        special = IsMobyInSpecialClassRange(node);
         if (special && !allowSpecial)
             goto next;
-        info = (float *)func_002AB1F0(node);
+        info = (float *)GetMobyPrivateValue0(node);
         if (!info)
             goto next;
         if (*info <= 0.0f && !special)
@@ -79,62 +80,62 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
         }
         *(TI128 *)pos = *(TI128 *)(node + 0x10);
         if (D_001A8CA0 || D_0018A168) {
-            func_00282D30(offset, node + 0xE0, info[4]);
-            func_00282CC0(pos, pos, offset);
+            FastVecScale(offset, node + 0xE0, info[4]);
+            FastVecAdd(pos, pos, offset);
         } else {
             pos[2] += info[4];
         }
-        func_00282CF0(delta, pos, origin);
-        dist = func_00282DF0(delta);
+        FastVecSub(delta, pos, origin);
+        dist = FastVecLength(delta);
         if (range < dist || dist < 0.1f)
             goto next;
         zero = 0.0f;
-        fraction = func_002A7AA8(-2.0f, zero, 1.0f, zero, dist / range);
+        fraction = cubic_hermite_scalar(-2.0f, zero, 1.0f, zero, dist / range);
         horizontal = zero;
         elevation = horizontal;
         if (angle < 3.141593f || vertical < 3.141593f) {
             if (!D_001A8CA0) {
-                temp = func_00283248(delta[0], delta[1]);
-                horizontal = func_00283C80(temp, func_00283248(direction[0], direction[1]));
+                temp = FastMatrixHelperA(delta[0], delta[1]);
+                horizontal = FastDiffRots(temp, FastMatrixHelperA(direction[0], direction[1]));
                 limit = angle;
                 if (zero < angleMin)
                     limit = angleMin + (angle - angleMin) * fraction;
                 if (limit <= horizontal)
                     goto next;
-                temp = func_00283248(func_00282E20(delta), delta[2]);
-                elevation = func_00283C80(temp, func_00283248(func_00282E20(direction), direction[2]));
+                temp = FastMatrixHelperA(vec_length_xy(delta), delta[2]);
+                elevation = FastDiffRots(temp, FastMatrixHelperA(vec_length_xy(direction), direction[2]));
                 limit = vertical;
                 if (zero < verticalMin)
                     limit = verticalMin + (vertical - verticalMin) * fraction;
                 if (limit <= elevation)
                     goto next;
             } else {
-                func_002AFFD8(origin, axis, 1);
-                func_00282D30(projection, axis, func_00282DB0(axis, delta));
-                func_00282CF0(side, delta, projection);
-                temp = func_00282DB0(axis, direction);
-                func_00282D30(component, axis, temp);
-                func_00282CF0(other, direction, component);
-                dot = func_00282DB0(other, side);
+                ComputeViewDirection(origin, axis, 1);
+                FastVecScale(projection, axis, FastVecDot(axis, delta));
+                FastVecSub(side, delta, projection);
+                temp = FastVecDot(axis, direction);
+                FastVecScale(component, axis, temp);
+                FastVecSub(other, direction, component);
+                dot = FastVecDot(other, side);
                 if (dot < zero)
                     goto next;
-                lenSide = func_00282DF0(side);
+                lenSide = FastVecLength(side);
                 if (lenSide == zero)
                     goto next;
-                lenOther = func_00282DF0(other);
+                lenOther = FastVecLength(other);
                 if (lenOther == zero)
                     goto next;
-                horizontal = 1.57079637f - func_002831B0(dot / (lenSide * lenOther));
+                horizontal = 1.57079637f - FastAngleHelper(dot / (lenSide * lenOther));
                 limit = angle;
                 if (zero < angleMin)
                     limit = angleMin + (angle - angleMin) * fraction;
                 if (limit <= horizontal)
                     goto next;
-                func_00282D30(combined, side, lenOther / lenSide);
-                func_00282CC0(combined, combined, component);
-                lenCombined = func_00282DF0(combined);
-                dot2 = func_00282DB0(combined, delta);
-                elevation = 1.57079637f - func_002831B0(dot2 / (lenCombined * dist));
+                FastVecScale(combined, side, lenOther / lenSide);
+                FastVecAdd(combined, combined, component);
+                lenCombined = FastVecLength(combined);
+                dot2 = FastVecDot(combined, delta);
+                elevation = 1.57079637f - FastAngleHelper(dot2 / (lenCombined * dist));
                 limit = vertical;
                 if (zero < verticalMin)
                     limit = verticalMin + (vertical - verticalMin) * fraction;
@@ -148,20 +149,20 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
             score = scaled * range;
         }
         if (score < bestScore) {
-            if (!func_002761F8(origin, pos, 18, node, 0))
+            if (!CollLine(origin, pos, 18, node, 0))
                 goto found;
-            if (D_001A79F0 == 11) {
-                char *target = D_001BAF80.target;
+            if (gCurrentMapIndex == 11) {
+                char *target = gCollisionHit.target;
                 if (!target)
                     goto next;
-                if (*(short *)(target + 0xAA) == 0xC20)
+                if (*(short *)(target + 0xAA) == 0xC20 /* Turret */)
                     goto found;
             }
             {
-                char *target = D_001BAF80.target;
+                char *target = gCollisionHit.target;
                 if (!target)
                     goto next;
-                if (!func_003004E0(*(short *)(target + 0xAA)))
+                if (!IsIdInList(*(short *)(target + 0xAA)))
                     goto next;
             }
         found:

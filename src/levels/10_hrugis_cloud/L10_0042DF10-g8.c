@@ -45,46 +45,46 @@ extern Actor *D_L10_001B2528;
    D_L10_001B1780. Classes 0x1315 and 0x1327 get 1.5 times their class scale. */
 Actor *func_L10_0042DF10(int arg)
 {
-    Actor *p;
-    CloudWork *st;
+    Actor *cloud;
+    CloudWork *work;
     int index;
-    int kind = func_002A77E0(5);
+    int kind = RandomIntBelow(5);
 
-    if (kind == 0) p = func_0029EFD0(0x1315);
-    else if (kind == 1) p = func_0029EFD0(0x1328);
-    else p = func_0029EFD0(0x1327);
-    if (p) {
-        p->state = 0;
-        p->alpha = 255;
-        p->flags = 255;
-        p->active = 1;
-        st = p->work;
-        func_002A0488(p, 20, 20, 20);
-        index = func_002A77E0(5);
-        st->index = index;
-        qcopy(&p->pos, D_L10_002BABF0 + index * 16);
-        p->pos[0] += func_002A7878(5.0f, -5.0f);
-        p->pos[1] += func_002A7878(5.0f, -5.0f);
-        p->pos[2] += func_002A7878(5.0f, -5.0f);
-        p->rx = func_002A7940();
-        p->ry = func_002A7940();
-        p->rz = func_002A7940();
-        st->timer = func_002A77E0(3600);
-        st->arg = arg;
+    if (kind == 0) cloud = CreateMoby(0x1315 /* moby class 4885 */);
+    else if (kind == 1) cloud = CreateMoby(0x1328 /* moby class 4904 */);
+    else cloud = CreateMoby(0x1327 /* moby class 4903 */);
+    if (cloud) {
+        cloud->state = 0;
+        cloud->alpha = 255;
+        cloud->flags = 255;
+        cloud->active = 1;
+        work = cloud->work;
+        set_moby_color(cloud, 20, 20, 20);
+        index = RandomIntBelow(5);
+        work->index = index;
+        qcopy(&cloud->pos, D_L10_002BABF0 + index * 16);
+        cloud->pos[0] += RandomFloatRange(5.0f, -5.0f);
+        cloud->pos[1] += RandomFloatRange(5.0f, -5.0f);
+        cloud->pos[2] += RandomFloatRange(5.0f, -5.0f);
+        cloud->rx = RandomAngle();
+        cloud->ry = RandomAngle();
+        cloud->rz = RandomAngle();
+        work->timer = RandomIntBelow(3600);
+        work->arg = arg;
         if (!D_L10_001B1780) {
-            Actor *cur = D_L10_001B2528;
-            while (cur) {
-                if (cur->kind == 0xFBF) D_L10_001B1780 = cur;
-                cur = cur->next;
+            Actor *node = D_L10_001B2528;
+            while (node) {
+                if (node->kind == 0xFBF /* moby class 4031 */) D_L10_001B1780 = node;
+                node = node->next;
             }
         }
-        if (p->kind == 0x1315)
-            p->scale = *(float *)(p->classData + 0x24) * 1.5f;
-        else if (p->kind == 0x1328)
-            p->scale = *(float *)(p->classData + 0x24);
-        else if (p->kind == 0x1327)
-            p->scale = *(float *)(p->classData + 0x24) * 1.5f;
-        return p;
+        if (cloud->kind == 0x1315 /* moby class 4885 */)
+            cloud->scale = *(float *)(cloud->classData + 0x24) * 1.5f;
+        else if (cloud->kind == 0x1328 /* moby class 4904 */)
+            cloud->scale = *(float *)(cloud->classData + 0x24);
+        else if (cloud->kind == 0x1327 /* moby class 4903 */)
+            cloud->scale = *(float *)(cloud->classData + 0x24) * 1.5f;
+        return cloud;
     }
     return 0;
 }

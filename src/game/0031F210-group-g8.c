@@ -10,6 +10,7 @@
 
 extern void func_0029F338(void *);
 
+/* Removes the two attached part objects of the given entries. */
 void func_00325D30(char *object, char *entries)
 {
     int count = 1;
@@ -17,8 +18,8 @@ void func_00325D30(char *object, char *entries)
         char *child = *(char **)entries;
         count--;
         entries += 4;
-        if (child != 0 && *(short *)(child + 0xAA) == 0xAA2)
-            func_0029F338(child);
+        if (child != 0 && *(short *)(child + 0xAA) == 0xAA2 /* moby class 2722 */)
+            MarkMobySpawned(child);
     } while (count >= 0);
 }
 
@@ -29,15 +30,16 @@ extern unsigned short *D_001EE5A0[];
 extern void func_00325EC0(char *);
 extern void func_0027CFD0(void (*)(char *), char *);
 
+/* Copies a shared counter value to every member of the object's group that has the same kind. It then schedules the group's glow effects. */
 void func_00325DA0(unsigned char *object, int *field)
 {
     unsigned short *p;
     unsigned char *e;
     int offset;
 
-    if (*field != D_001B1688) {
+    if (*field != gGameTime) {
         if (object[0x21] == 0xFF) {
-            *field = D_001B1688;
+            *field = gGameTime;
         } else {
             offset = (char *)field - *(char **)(object + 0x68);
             for (p = D_001EE5A0[object[0x21]];
@@ -48,9 +50,9 @@ void func_00325DA0(unsigned char *object, int *field)
                 if (e == 0)
                     break;
                 if (*(short *)(e + 0xAA) == *(short *)(object + 0xAA))
-                    *(int *)(*(char **)(e + 0x68) + ((offset >> 2) << 2)) = D_001B1688;
+                    *(int *)(*(char **)(e + 0x68) + ((offset >> 2) << 2)) = gGameTime;
             }
         }
-        func_0027CFD0(func_00325EC0, (char *)object);
+        RegisterOverlayDrawCallback(DrawGroupJointGlows, (char *)object);
     }
 }

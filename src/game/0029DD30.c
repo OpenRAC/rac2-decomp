@@ -19,6 +19,7 @@ extern unsigned short ref_L00_0030EDB0_00;
 #define FLAG (((Flag_29DD30 *)D_001395B8)->value)
 #define WORD (((Word_29DD30 *)D_00139768)->value)
 
+/* Checks two status values, sets a sound or text id to match, and returns 0, 1 or 2 for the combination. */
 int func_0029DD30(void)
 {
     if (FLAG == 0 && WORD >= 0) {

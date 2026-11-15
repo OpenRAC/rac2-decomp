@@ -126,7 +126,7 @@ extern void func_002FC220(void), func_002FC280(void);
 extern void func_002FC3C0(unsigned long long);
 extern long long func_002FCB00(int, int, int, int);
 
-static inline BootMemcard *Memcard(void) { BootMemcard *mc = D_001393E0; return mc; }
+static inline BootMemcard *Memcard(void) { BootMemcard *mc = gMemcardState; return mc; }
 static inline int CardType(BootMemcard *mc) { return mc->card[0].type; }
 static inline int CardFormat(BootMemcard *mc) { return mc->card[0].format; }
 static inline int CardStatus(BootMemcard *mc) { return mc->card[0].status; }
@@ -143,67 +143,67 @@ void func_0026EDE8(void)
     float time;
 
     D_001A8C88[0] = 1;
-    func_00290C60();
+    InitOnce();
     {
         LoaderMemory *memory = &D_001BAEC0;
-        LoaderDisc *disc = &D_0014B540;
-        func_002B7B18((int)memory->archive + 0x400000, disc->offset + disc->base, disc->count);
+        LoaderDisc *disc = &gCopySetupData;
+        StartDiscRead((int)memory->archive + 0x400000, disc->offset + disc->base, disc->count);
     }
-    while (D_001393E0->state == 2 && D_001393E0->next_state < 0) {
-        func_00298F00();
-        func_00298178();
-        func_001261F0(0);
+    while (gMemcardState->state == 2 && gMemcardState->next_state < 0) {
+        UpdateMemoryCardState();
+        UpdateMapStateMachine();
+        GetGsCurrentField(0);
     }
-    while (D_001393E0->state != 2 || D_001393E0->next_state >= 0) {
-        func_00298F00();
-        func_00298178();
-        func_001261F0(0);
+    while (gMemcardState->state != 2 || gMemcardState->next_state >= 0) {
+        UpdateMemoryCardState();
+        UpdateMapStateMachine();
+        GetGsCurrentField(0);
     }
     for (;;) {
         if (!(CardType(Memcard()) != 2
               || (CardFormat(Memcard()) != 0 && CardStatus(Memcard()) < -1 && CardFree(Memcard()) < 475)))
             break;
         loaded = 1;
-        if (D_001393E0->state < 3 && D_001393E0->next_state < 0) {
-            if (D_001393E0->card[0].type != 2)
-                func_0026EAC8((int)D_01806380);
-            else if (D_001393E0->card[0].status != -4)
-                func_0026EAC8((int)D_0180DA80);
-            if (D_001393E0->next_state < 0) {
-                D_001393E0->next_state = 7;
-                D_001393E0->next_card = 0;
+        if (gMemcardState->state < 3 && gMemcardState->next_state < 0) {
+            if (gMemcardState->card[0].type != 2)
+                DrawSplashScreenFrame((int)D_01806380);
+            else if (gMemcardState->card[0].status != -4)
+                DrawSplashScreenFrame((int)D_0180DA80);
+            if (gMemcardState->next_state < 0) {
+                gMemcardState->next_state = 7;
+                gMemcardState->next_card = 0;
             }
         }
-        func_002B9000();
-        func_00298F00();
-        func_00298178();
+        PollPadPorts();
+        UpdateMemoryCardState();
+        UpdateMapStateMachine();
         if (frames <= 119)
             frames++;
-        func_001261F0(0);
+        GetGsCurrentField(0);
         if (frames >= 61) {
-            if (D_00138180.pressed & 0xFFFF0FFF)
+            if (gPadState.pressed & 0xFFFF0FFF)
                 break;
         }
     }
-    func_00290758();
+    InitLevelSystems();
     if (loaded) {
         int i;
-        func_0027D330(5);
+        FadeToBlack(5);
         for (i = 29; i >= 0; i--)
-            func_001261F0(0);
+            GetGsCurrentField(0);
     }
     {
         LoaderMemory *memory = &D_001BAEC0;
-        func_002B7CE0(1);
-        func_0011AEA0(0);
-        func_0029D4D0((int)memory->archive + 0x400000, (int)memory->archive);
-        func_0011AEA0(0);
-        func_002EED08();
+        PumpMusicAndDiscRead(1);
+        FlushCache(0);
+        fast_decompress((int)memory->archive + 0x400000, (int)memory->archive);
+        FlushCache(0);
+        ResetBufferSlotTable();
         archive = memory->archive;
-        func_0026EA00(archive->offsets[0x50 / 4] + (int)archive);
+        ShowSplashImage(archive->offsets[0x50 / 4] + (int)archive);
         D_001A7280[2] = memory->archive;
-        func_00292888();
-        func_002B67E0(archive->offsets[8 / 4] + (int)archive, 0);
+        LoadHudBanks();
+        StartSoundBankLoad(archive->offsets[8 / 4] + (int)archive, 0);
         {
             LoaderBank *bank = (LoaderBank *)(archive->offsets[0] + (int)archive);
             D_001B1604 = (char *)bank + bank->code + bank->size;
@@ -223,142 +223,142 @@ void func_0026EDE8(void)
                 tables[i][j].data += (int)tables[i] - 8;
         }
     }
-    D_00254E78.count = counts[D_001A7BB0[4]];
-    D_001B1840 = tables[D_001A7BB0[4]];
+    gSubtitleState.count = counts[D_001A7BB0[4]];
+    gSubtitleEntries = tables[D_001A7BB0[4]];
     image = (char *)(archive->offsets[0x10 / 4] + (int)archive);
     extra = (char *)(archive->offsets[0x60 / 4] + (int)archive);
     {
         int i;
         for (i = 44; i >= 0; i--)
-            func_001261F0(0);
+            GetGsCurrentField(0);
     }
-    func_0027D330(30);
+    FadeToBlack(30);
     {
         int i;
         for (i = 29; i >= 0; i--)
-            func_001261F0(0);
+            GetGsCurrentField(0);
     }
-    func_0026EA00(archive->offsets[0x58 / 4] + (int)archive);
+    ShowSplashImage(archive->offsets[0x58 / 4] + (int)archive);
     {
         LoaderSound *sound;
-        D_00189E20.enabled = 1;
-        sound = &D_001A63A8;
+        gHeroState.enabled = 1;
+        sound = &gMusicState;
         D_001A8BBC[0] = 20;
         D_001B16A8[0] = 20;
         D_001B16AC[0] = (int)D_00238C80;
         sound->flag = 0;
-        D_001A8BB8[0] = -2;
-        D_001A8BB0[0] = 0;
-        D_001A8BB4[0] = 0;
+        gRequestedGameMode[0] = -2;
+        gCurrentGameMode[0] = 0;
+        gPreviousGameMode[0] = 0;
         D_001B1684[0] = 0;
     }
-    func_00294F10();
-    func_0028AB70();
-    func_0029CD48();
-    func_002C9C20();
+    SetupMapScreen();
+    InitializeHudSlotsAndBuffers();
+    InitLevelObjectCallbacks();
+    ResetMenuSlots();
     {
         int i;
         for (i = 24; i >= 0; i--)
-            func_001261F0(0);
+            GetGsCurrentField(0);
     }
-    func_0027D330(30);
+    FadeToBlack(30);
     frames = 1800;
     D_001B1598[0] = 0;
-    func_001261F0(0);
-    func_00284E80();
-    func_00133220();
+    GetGsCurrentField(0);
+    QueryDisplayBuffer();
+    SetSoundCurrentBufferFlag();
     D_001A7478 = 3;
-    func_00288AA0((unsigned char *)&D_001BAD40, 0xB2);
-    func_00288BE8(&D_001BAD40);
-    func_002B4C18();
+    PushRequestQueue((unsigned char *)&D_001BAD40, 0xB2);
+    LaunchQueuedRequest(&D_001BAD40);
+    ApplyPendingGameModeChange();
     while (!D_001A8B84[0]) {
-        D_001B1840 = tables[D_001A7BB0[4]];
-        D_00254E78.count = counts[D_001A7BB0[4]];
+        gSubtitleEntries = tables[D_001A7BB0[4]];
+        gSubtitleState.count = counts[D_001A7BB0[4]];
         /* T1_COUNT, the timer-1 counter register. */
         D_001A7200 += T1_COUNT;
         T1_COUNT = 0;
-        func_00280710();
-        func_002FC280();
-        func_002FC220();
-        func_00284FC0();
-        func_00285338();
-        func_00284EA8();
-        func_00132028();
-        state = D_001A8BB0[0];
+        ProcessScreenCopyRegions();
+        SubmitBufferedDmaChain();
+        SwapPacketBuffer();
+        PutDrawBufferSmall();
+        QueueSecondStripPacket();
+        AppendDrawListHeader();
+        snd_Pump();
+        state = gCurrentGameMode[0];
         switch (state) {
         case -1:
         case 0:
-            if (D_001A8BB4[0] == 3 || frames >= 1800) {
+            if (gPreviousGameMode[0] == 3 || frames >= 1800) {
                 frames = 0;
-                func_0026EC58((unsigned short *)sequence);
+                FillShuffledTileTable((unsigned short *)sequence);
                 D_001BAD40.active = 1;
                 D_001A7478 = 2;
                 D_001BAD40.sequence = sequence;
-                func_00288AA0((unsigned char *)&D_001BAD40, sequence[1]);
-                func_00288BE8(&D_001BAD40);
+                PushRequestQueue((unsigned char *)&D_001BAD40, sequence[1]);
+                LaunchQueuedRequest(&D_001BAD40);
             } else {
-                func_002FCB00((int)(image + 0x10), D_001A72D0[3], 512, 416);
-                func_002B49E0(3, 1, 6, 0, 0);
+                UploadTextureBlocksReturnTex0((int)(image + 0x10), D_001A72D0[3], 512, 416);
+                BeginSlotRequest(3, 1, 6, 0, 0);
             }
             break;
         case 1:
-            func_002F5FB8();
+            PlayMovie_002F5FB8();
             if (extra) {
                 int i;
-                func_0026EA00((int)extra);
+                ShowSplashImage((int)extra);
                 for (i = 29; i >= 0; i--)
-                    func_001261F0(0);
-                func_0027D330(30);
+                    GetGsCurrentField(0);
+                FadeToBlack(30);
                 extra = 0;
             }
             break;
         case 3:
             frames++;
-            func_002B9000();
+            PollPadPorts();
             if (D_00138320[0])
                 frames = 0;
-            func_002CA8A8();
-            func_0027C520();
+            UpdatePauseMenu();
+            CallFrameHelperWithZero();
             if (frames >= 1800) {
                 frames = 0;
-                func_002B4B70(0, 0);
+                EndSlotRequest(0, 0);
             }
             break;
         case 4:
-            func_002B9000();
-            func_00286738();
-            func_0027C4A8();
+            PollPadPorts();
+            UpdateModalState();
+            RenderFrameWithExtraLayers();
             break;
         case 6:
-            func_002B9000();
-            func_002E9268();
-            func_002EA8E8();
+            PollPadPorts();
+            UpdatePlaybackScene();
+            DrawTransitionBackground();
             break;
         default:
-            func_00282A28();
+            TrapAlways();
             break;
         }
-        if (D_001A8BB0[0] != state)
+        if (gCurrentGameMode[0] != state)
             D_001B1684[0] = 0;
         else
             D_001B1684[0]++;
-        func_00298F00();
-        func_00298178();
-        func_002FC3C0(1);
-        time = func_00283CE0(T1_COUNT);
-        D_001B168C = time * (D_001A7B90[0] ? 0.0000868055578f : 0.000104166669f);
-        func_0027B948();
-        func_002B4C18();
+        UpdateMemoryCardState();
+        UpdateMapStateMachine();
+        WaitForDmaStatusBits(1);
+        time = IntToFloat(T1_COUNT);
+        D_001B168C = time * (gIsPalVideo[0] ? 0.0000868055578f : 0.000104166669f);
+        ResetGsRegistersPr();
+        ApplyPendingGameModeChange();
         D_001B1598[0]++;
-        func_001261F0(0);
+        GetGsCurrentField(0);
     }
     if (D_001A7290[0] != D_001A7A10[4])
-        func_00292078(D_001A7A10[4]);
-    if (D_001A72C0[0] != (D_00239BA0 + D_00139568.index)->mode)
-        func_00292408((D_00239BA0 + D_00139568.index)->mode);
-    if (D_00152C00.audio != (D_001A7AF2[0] & 31))
-        func_002926B8(D_001A7AF2[0] & 31);
-    if (D_00152C00.format != (D_001A7AF0[0] & 3))
-        func_002925F0(D_001A7AF0[0] & 3);
-    func_002EC408();
+        LoadTexturePackToVram(D_001A7A10[4]);
+    if (D_001A72C0[0] != (gWeaponTable_00239BA0 + gItemSlotToRecord.index)->mode)
+        LoadPackSingleTexture((gWeaponTable_00239BA0 + gItemSlotToRecord.index)->mode);
+    if (gHeroMoby_00152C00.audio != (D_001A7AF2[0] & 31))
+        LoadDiscTableTexture(D_001A7AF2[0] & 31);
+    if (gHeroMoby_00152C00.format != (gEquipmentBits[0] & 3))
+        LoadDiscTableEntryForDraw(gEquipmentBits[0] & 3);
+    RunLevelTransition();
 }

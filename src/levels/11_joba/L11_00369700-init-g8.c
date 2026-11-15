@@ -14,7 +14,9 @@ extern InitEntry12 D_L11_0021E9F0[];
 extern int * volatile D_L11_001AA7F0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L11_001CAEA0;
 
-int func_L11_00369700(char *obj) {
+/* Fills in the menu rows for the entries the player has, then selects the entry that is
+   currently chosen. */
+int func_L11_00369700(char *menu) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
@@ -25,11 +27,11 @@ int func_L11_00369700(char *obj) {
     }
     list = D_L11_001AA7F0;
     D_L11_0021E9F0[i].id = 0;
-    *(int *)(obj + 0x40) = 0;
-    *(unsigned int *)(obj + 0x30) |= 0x8000;
+    *(int *)(menu + 0x40) = 0;
+    *(unsigned int *)(menu + 0x30) |= 0x8000;
     for (i = 0, entry = list[0]; entry; entry = D_L11_001AA7F0[++i]) {
         if (D_L11_001CAEA0.selected == entry) {
-            *(int *)(obj + 0x40) = i;
+            *(int *)(menu + 0x40) = i;
             break;
         }
     }

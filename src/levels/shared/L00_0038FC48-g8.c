@@ -22,18 +22,18 @@ void func_L00_0038FC48(char *actor) {
         state->child[3] = D_L00_001B1E9C + state->index[3] * 0x100;
         break;
     case 1:
-        contact = func_002A9640(actor, 0x10000, 0);
-        func_00282948(&state->cooldown);
+        contact = FindOwnedEffectSlot(actor, 0x10000, 0);
+        FastFloatHelperD(&state->cooldown);
         if (contact && state->cooldown == 0) {
             *(unsigned char *)(actor + 0xA8) = 0xFF;
             state->cooldown = D_L00_001AF024;
-            if (--state->remaining <= 0) { func_0029F338(actor); return; }
+            if (--state->remaining <= 0) { MarkMobySpawned(actor); return; }
         }
         if (*(unsigned char *)(state->child[0] + 0x20) == 0x50 ||
             *(unsigned char *)(state->child[1] + 0x20) == 0x50 ||
             *(unsigned char *)(state->child[2] + 0x20) == 0x50 ||
             *(unsigned char *)(state->child[3] + 0x20) == 0x50) {
-            if (func_00282948(&state->timer)) {
+            if (FastFloatHelperD(&state->timer)) {
                 state->timer = D_L00_001AF020;
                 slot = state->child;
                 for (i = 0; i < 4; i++, slot++) {

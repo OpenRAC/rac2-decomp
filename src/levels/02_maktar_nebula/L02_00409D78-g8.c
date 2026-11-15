@@ -80,81 +80,82 @@ extern int func_L01_00305E18(int),func_002ACBC8(void *,int);
 extern void func_0028A180(int,int),func_00288E18(int,int),func_L01_002EABA8(int,int,int,int,int);
 extern int func_L02_00400CC8(void *),func_00282948(void *),func_L02_003D6BB0(void *),func_002B38B8(void *);
 extern void func_L00_003672F8(void),func_L00_002B9D60(void *,void *,int,int);
-void func_L02_00409D78(char *e) {
-    HintState *s=*(HintState **)(e+0x68);
+/* Watches how the player is doing and shows a help hint or message when the player seems stuck and has not seen it recently. Update handler of moby class 3108. */
+void func_L02_00409D78(char *moby) {
+    HintState *hints=*(HintState **)(moby+0x68);
 
-    switch(B(e,0x20)) { default: return; case 0: {
-        B(e,0x30)=255; s->value60=0;s->value64=0;s->value50=0;s->value90=0;
-        s->value94=1200;s->value2C=180;s->value98=600;
-        func_002A7750(e,1,-1);
+    switch(B(moby,0x20)) { default: return; case 0: {
+        B(moby,0x30)=255; hints->value60=0;hints->value64=0;hints->value50=0;hints->value90=0;
+        hints->value94=1200;hints->value2C=180;hints->value98=600;
+        SetMobyState(moby,1,-1);
     break; } case 1: {
         HintHistory *base;
-        int mode=func_L01_00305E18(2);
-        if(mode==2 && func_L01_00305E18(0)!=mode) {
+        int mode=GetTableEntryShort(2);
+        if(mode==2 && GetTableEntryShort(0)!=mode) {
             base=(HintHistory *)&D_001395B8;
-            if(!(((HintFlags *)base)->intro&4) && func_002ACBC8(D_00189EA0,s->value9C) && (D_001A7390[0]-D_0018C750.time1CC>432000 || !D_0018C750.count1C8)) {
-                ((HintFlags *)base)->intro|=4;func_0028A180(0xa3c,0x93);
+            if(!(((HintFlags *)base)->intro&4) && IsPointInCuboid(gHeroPosition,hints->value9C) && (D_001A7390[0]-gProgressStatistics.time1CC>432000 || !gProgressStatistics.count1C8)) {
+                ((HintFlags *)base)->intro|=4;QueueHintMessage(0xa3c,0x93);
             }
         }
-        base=&D_0018C958;
+        base=&gSubtitleHistory;
         if(base->countF0<65535) {
-            if(D_001A7AF8[0x2E]) base->countF0=65535;
-            else if(func_002ACBC8(D_00189EA0,I(s,0))) {
+            if(gItemOwnedFlags[0x2E]) base->countF0=65535;
+            else if(IsPointInCuboid(gHeroPosition,I(hints,0))) {
                 if(base->countF0) {
-                    if(timer_sda-base->timeF4>1080 || !base->timeF4)func_00288E18(0x9bd,0x14);
+                    if(timer_sda-base->timeF4>1080 || !base->timeF4)RequestSubtitleVoiceLine(0x9bd,0x14);
                     else if(base->timeF4<timer_sda)base->timeF4=timer_sda;
                 } else {
                     base->countF0++; if(base->timeF4<timer_sda)base->timeF4=timer_sda;
-                    base->levelsF8=(base->levelsF8|(1<<D_001A79F0[0]))|0x80000000;
+                    base->levelsF8=(base->levelsF8|(1<<gCurrentMapIndex[0]))|0x80000000;
                 }
             }
         }
         if(D_L02_001A8FF0 && !I(D_L02_0027FD48,0) && I(D_L02_0027FD48,0x24)==-1) {
-            base=&D_0018C958;
-            if(base->flags158>=0)func_00288E18(0x9c5,0x1c);
+            base=&gSubtitleHistory;
+            if(base->flags158>=0)RequestSubtitleVoiceLine(0x9c5,0x1c);
             if(base->time154+base->count152>=D_001A7390[0]-2) {
                 int count = base->count152+1;
                 base->count152=count;
-                if((count&0xffff)>=3600){func_00288E18(0x9c5,0x1c);base->count152=0;}
+                if((count&0xffff)>=3600){RequestSubtitleVoiceLine(0x9c5,0x1c);base->count152=0;}
             } else {if(base->time154<D_001A7390[0])base->time154=D_001A7390[0];base->count152=0;}
         }
-        func_L01_002EABA8(0x9bf,0x16,2,s->value10,s->value14);
-        if(D_0018C958.count120<65535) {
-            if(D_0018C750.count54>=3 || func_002ACBC8(D_00189EA0,s->value24))D_0018C958.count120=65535;
-            else if(func_002ACBC8(D_00189EA0,s->value20)) {
-                if(timer_sda-D_0018C958.time124>1080 || !D_0018C958.time124)func_00288E18(0x9c1,0x18);
-                else if(D_0018C958.time124<timer_sda)D_0018C958.time124=timer_sda;
+        TriggerSubtitleInCuboid(0x9bf,0x16,2,hints->value10,hints->value14);
+        if(gSubtitleHistory.count120<65535) {
+            if(gProgressStatistics.count54>=3 || IsPointInCuboid(gHeroPosition,hints->value24))gSubtitleHistory.count120=65535;
+            else if(IsPointInCuboid(gHeroPosition,hints->value20)) {
+                if(timer_sda-gSubtitleHistory.time124>1080 || !gSubtitleHistory.time124)RequestSubtitleVoiceLine(0x9c1,0x18);
+                else if(gSubtitleHistory.time124<timer_sda)gSubtitleHistory.time124=timer_sda;
             }
         }
-        func_L01_002EABA8(0x9c2,0x19,1,s->value30,s->value34);
-        if(!D_0018C958.count138) {
-            if(!s->value3C && unlock_sda)s->value3C=1;
-            if(D_001A7AF8[0x26])D_0018C958.count138=65535;
-            if(s->value3C && func_002ACBC8(D_00189EA0,s->value38))func_00288E18(0x9c3,0x1a);
+        TriggerSubtitleInCuboid(0x9c2,0x19,1,hints->value30,hints->value34);
+        if(!gSubtitleHistory.count138) {
+            if(!hints->value3C && unlock_sda)hints->value3C=1;
+            if(gItemOwnedFlags[0x26])gSubtitleHistory.count138=65535;
+            if(hints->value3C && IsPointInCuboid(gHeroPosition,hints->value38))RequestSubtitleVoiceLine(0x9c3,0x1a);
         }
-        func_L01_002EABA8(0x9c4,0x1b,0,s->value44,-1);
-        if(func_L02_00400CC8(D_L02_001B359C+(s->value68<<8))) {
-            if(func_00282948(&s->value94) && (((D_001395B8.timers>>D_001A79F0[0])^1)&1)) {
-                if(!D_0018C750.countF0 || D_001A7390[0]-D_0018C750.timeF4>42000)func_0028A180(0x9c9,0x20);
-                D_001395B8.timers|=1<<D_001A79F0[0];
+        TriggerSubtitleInCuboid(0x9c4,0x1b,0,hints->value44,-1);
+        if(IsArenaChallengeRunning(gMobyPool_L02+(hints->value68<<8))) {
+            if(FastFloatHelperD(&hints->value94) && (((D_001395B8.timers>>gCurrentMapIndex[0])^1)&1)) {
+                if(!gProgressStatistics.countF0 || D_001A7390[0]-gProgressStatistics.timeF4>42000)QueueHintMessage(0x9c9,0x20);
+                D_001395B8.timers|=1<<gCurrentMapIndex[0];
             }
-            if(func_L02_003D6BB0(D_L02_001B359C+(s->value6C<<8)) && (!D_0018C750.count1BC || D_001A7390[0]-D_0018C750.time1C0>72000) && func_00282948(&s->value98) && D_0018C958.value2C0>=0)func_00288E18(0x9e3,0x3a);
+            if(IsChainbladeStateActive(gMobyPool_L02+(hints->value6C<<8)) && (!gProgressStatistics.count1BC || D_001A7390[0]-gProgressStatistics.time1C0>72000) && FastFloatHelperD(&hints->value98) && gSubtitleHistory.value2C0>=0)RequestSubtitleVoiceLine(0x9e3,0x3a);
         }
         if(D_L02_001A8FF0) {
-            if(func_002ACBC8(D_00189EA0,s->value4C) && !D_0018C958.count15C) {func_0028A180(0x9c6,0x1d);s->value90=216000;}
-            if(func_00282948(&s->value90)){func_0028A180(0x9c6,0x1d);s->value90=216000;}
-            if(D_001A7390[0]-D_0018C750.time1A8<60)s->value90=216000;
+            if(IsPointInCuboid(gHeroPosition,hints->value4C) && !gSubtitleHistory.count15C) {QueueHintMessage(0x9c6,0x1d);hints->value90=216000;}
+            if(FastFloatHelperD(&hints->value90)){QueueHintMessage(0x9c6,0x1d);hints->value90=216000;}
+            if(D_001A7390[0]-gProgressStatistics.time1A8<60)hints->value90=216000;
         }
-        if(func_002ACBC8(D_00189EA0,s->value78) && (!D_0018C750.count1BC || D_001A7390[0]-D_0018C750.time1C0>72000) && !D_001395B8.hint && D_0018C958.value2C0>=0)func_00288E18(0x9e3,0x3a);
-        if(func_002ACBC8(D_00189EA0,s->value38))D_001395B8.hint=1;
-        if(D_001A7AF8[0x2E])func_L01_002EABA8(0x9f1,0x48,2,s->value7C,-1);
-        if(D_L02_001B30C8<3 && D_001A7AF8[0x26] && !func_002B38B8(objects_sda+(s->value88<<8)) && func_002ACBC8(D_00189EA0,s->value80)) {
+        if(IsPointInCuboid(gHeroPosition,hints->value78) && (!gProgressStatistics.count1BC || D_001A7390[0]-gProgressStatistics.time1C0>72000) && !D_001395B8.hint && gSubtitleHistory.value2C0>=0)RequestSubtitleVoiceLine(0x9e3,0x3a);
+        if(IsPointInCuboid(gHeroPosition,hints->value38))D_001395B8.hint=1;
+        if(gItemOwnedFlags[0x2E])TriggerSubtitleInCuboid(0x9f1,0x48,2,hints->value7C,-1);
+        if(gFrameCounter_L02<3 && gItemOwnedFlags[0x26] && !IsThirdPendingFlagSet(objects_sda+(hints->value88<<8)) && IsPointInCuboid(gHeroPosition,hints->value80)) {
             char *q;
-            func_L00_003672F8();q=D_L02_001B368C+(s->value84<<7);func_L00_002B9D60(q+0x30,q+0x70,0,1);
+            SetFlagToOne();q=D_L02_001B368C+(hints->value84<<7);ResetHeroPositionAndDirection(q+0x30,q+0x70,0,1);
         }
-        if(func_002ACBC8(D_00189EA0,s->value28)) {
-            if(D_001A7390[0]-D_0018C958.time61C>120 || !D_0018C958.time61C)func_00288E18(0xa2b,0x82);
-            else if(D_0018C958.time61C<D_001A7390[0])D_0018C958.time61C=D_001A7390[0];
+        if(IsPointInCuboid(gHeroPosition,hints->value28)) {
+            if(D_001A7390[0]-gSubtitleHistory.time61C>120 || !gSubtitleHistory.time61C)RequestSubtitleVoiceLine(0xa2b,0x82);
+            else if(gSubtitleHistory.time61C<D_001A7390[0])gSubtitleHistory.time61C=D_001A7390[0];
         }
     }
     }

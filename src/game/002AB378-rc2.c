@@ -30,49 +30,50 @@ struct Ord3 {
 };
 extern struct Ord3 D_001A9EA0;
 
-void func_002AB378(f32 *arg0, f32 *arg1) {
-    struct Ord3 ord = D_001A9EA0;
-    f32 t[3][3];
-    f32 tr;
-    f32 s;
+/* Turns a rotation matrix into a quaternion. */
+void func_002AB378(f32 *quat, f32 *matrix) {
+    struct Ord3 nextAxis = D_001A9EA0;
+    f32 m[3][3];
+    f32 trace;
+    f32 scale;
     s32 i;
     s32 j;
     s32 k;
 
-    tr = arg1[0] + arg1[5] + arg1[10];
-    if (tr > 0.0f) {
-        s = func_00282C10(tr + 1.0f);
-        arg0[3] = s * 0.5f;
-        s = 0.5f / s;
-        arg0[0] = (arg1[9] - arg1[6]) * s;
-        arg0[1] = (arg1[2] - arg1[8]) * s;
-        arg0[2] = (arg1[4] - arg1[1]) * s;
+    trace = matrix[0] + matrix[5] + matrix[10];
+    if (trace > 0.0f) {
+        scale = square_root(trace + 1.0f);
+        quat[3] = scale * 0.5f;
+        scale = 0.5f / scale;
+        quat[0] = (matrix[9] - matrix[6]) * scale;
+        quat[1] = (matrix[2] - matrix[8]) * scale;
+        quat[2] = (matrix[4] - matrix[1]) * scale;
     } else {
-        t[0][1] = arg1[1];
-        t[0][2] = arg1[2];
-        t[1][0] = arg1[4];
-        t[1][2] = arg1[6];
-        t[2][0] = arg1[8];
-        t[2][1] = arg1[9];
-        t[0][0] = arg1[0];
-        t[1][1] = arg1[5];
-        t[2][2] = arg1[10];
+        m[0][1] = matrix[1];
+        m[0][2] = matrix[2];
+        m[1][0] = matrix[4];
+        m[1][2] = matrix[6];
+        m[2][0] = matrix[8];
+        m[2][1] = matrix[9];
+        m[0][0] = matrix[0];
+        m[1][1] = matrix[5];
+        m[2][2] = matrix[10];
         i = 0;
-        if (arg1[0] < arg1[5]) {
+        if (matrix[0] < matrix[5]) {
             i = 1;
         }
-        if (t[i][i] < arg1[10]) {
+        if (m[i][i] < matrix[10]) {
             i = 2;
         }
-        j = ord.w[i];
-        k = ord.w[j];
-        s = func_00282C10(t[i][i] - (t[j][j] + t[k][k]) + 1.0f);
-        arg0[i] = s * 0.5f;
-        if (s != 0.0f) {
-            s = 0.5f / s;
+        j = nextAxis.w[i];
+        k = nextAxis.w[j];
+        scale = square_root(m[i][i] - (m[j][j] + m[k][k]) + 1.0f);
+        quat[i] = scale * 0.5f;
+        if (scale != 0.0f) {
+            scale = 0.5f / scale;
         }
-        arg0[3] = (t[k][j] - t[j][k]) * s;
-        arg0[j] = (t[j][i] + t[i][j]) * s;
-        arg0[k] = (t[k][i] + t[i][k]) * s;
+        quat[3] = (m[k][j] - m[j][k]) * scale;
+        quat[j] = (m[j][i] + m[i][j]) * scale;
+        quat[k] = (m[k][i] + m[i][k]) * scale;
     }
 }

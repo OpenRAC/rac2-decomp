@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_002ED688();
 
@@ -74,26 +75,28 @@ extern ListOverrideObject *D_L00_00226700[];
 extern ListOverridePair D_L00_0022D600[];
 
 /* Picks a float threshold (1.0 or 8.0) from a callee status code, compares a probed float against it, and returns a boolean that also latches a trailing probe. */
-int func_002EEB00(int *a0)
+/* Checks if the follower has reached its target (closer than 1.0, or 8.0 in state 2) and is not dying; returns 1 if so. */
+int func_002EEB00(int *owner)
 {
-    int s2 = 0;
-    int s1 = func_002ED688(a0);
-    float f20 = 1.0f;
+    int result = 0;
+    int vars = GetMobyMotionData(owner);
+    float threshold = 1.0f;
 
-    if (func_002EE6A8(a0) == 2)
-        f20 = 8.0f;
+    if (GetFollowerState(owner) == 2)
+        threshold = 8.0f;
 
-    if (s1 != 0) {
-        if (func_00282E48_4((char *)a0 + 16, (char *)s1 + 96) < f20)
-            s2 = func_002EE6A8(a0) != 8;
+    if (vars != 0) {
+        if (func_00282E48_4((char *)owner + 16, (char *)vars + 96) < threshold)
+            result = GetFollowerState(owner) != 8;
 
-        s2 = func_00282948_1((char *)s1 + 304) != 0 ? 1 : s2;
+        result = func_00282948_1((char *)vars + 304) != 0 ? 1 : result;
     }
 
-    return s2;
+    return result;
 }
 
 
+/* Empties the table of 64 buffer slots and resets the buffer cursor. */
 void func_002EED08(void)
 {
     int i;
@@ -106,48 +109,50 @@ void func_002EED08(void)
 }
 
 /* shared native body of family 5a29d35dd7a7809a */
-int func_002EED58(int p0, int p1, int p2, int p3)
+/* Sends some 16-byte records to the buffer, and stores a new slot that reserves room for the records. Returns the slot number, or a negative error if there is no room. */
+int func_002EED58(int tag, int sendCount, int recordCount, int label)
 {
-    int args[4];
-    int n, k;
+    int request[4];
+    int slot, index;
 
-    if (D_001A7240.end - (D_001A7240.cursor - D_001A7240.start) < p2 * 16)
+    if (D_001A7240.end - (D_001A7240.cursor - D_001A7240.start) < recordCount * 16)
         return -1;
     if (D_001A7240.count == 64)
         return -2;
 
-    args[0] = p0;
-    args[1] = D_001A7240.cursor;
-    args[2] = p1 * 16;
-    args[3] = 0;
-    func_0011AFE0(args, 1);
+    request[0] = tag;
+    request[1] = D_001A7240.cursor;
+    request[2] = sendCount * 16;
+    request[3] = 0;
+    sceSifSetDma(request, 1);
 
-    n = D_001A7240.count;
-    k = n;
-    n = n + 1;
-    D_001A7240.count = n;
-    *(int *)(D_L03_00226150 + k * 16) = D_001A7240.cursor;
-    *(int *)(D_L03_00226150 + k * 16 + 4) = p2;
-    *(int *)(D_L03_00226150 + k * 16 + 8) = p3;
-    D_001A7240.cursor = D_001A7240.cursor + p2 * 16;
-    return k;
+    slot = D_001A7240.count;
+    index = slot;
+    slot = slot + 1;
+    D_001A7240.count = slot;
+    *(int *)(D_L03_00226150 + index * 16) = D_001A7240.cursor;
+    *(int *)(D_L03_00226150 + index * 16 + 4) = recordCount;
+    *(int *)(D_L03_00226150 + index * 16 + 8) = label;
+    D_001A7240.cursor = D_001A7240.cursor + recordCount * 16;
+    return index;
 }
 
 typedef struct { int address, count, reserved[2]; } TransferRow16;
 extern TransferRow16 D_L00_002254D0[];
 
-int func_002EEE50(int tag, unsigned int index, int start, int count)
+/* Sends part of an already reserved buffer slot. Returns 0 on success or a negative error code. */
+int func_002EEE50(int tag, unsigned int slot, int firstRecord, int count)
 {
     int request[4];
-    if (index >= 64 || D_L00_002254D0[index].count == 0)
+    if (slot >= 64 || D_L00_002254D0[slot].count == 0)
         return -3;
-    if (D_L00_002254D0[index].count < start + count)
+    if (D_L00_002254D0[slot].count < firstRecord + count)
         return -1;
     request[0] = tag;
-    request[1] = D_L00_002254D0[index].address + start * 16;
+    request[1] = D_L00_002254D0[slot].address + firstRecord * 16;
     request[2] = count * 16;
     request[3] = 0;
-    func_0011AFE0(request, 1);
+    sceSifSetDma(request, 1);
     return 0;
 }
 
@@ -164,37 +169,39 @@ extern StashBlock_r002EEFE0 r1_D_001DD568[];
 extern int func_002EEFE0(unsigned int);
 
 /* rac1-decomp src/game/stash.c: func_00234350 */
-int func_002EEFE0(unsigned int arg0) {
-    if (arg0 >= 0x40) {
+/* Returns how many 16-byte records the given buffer slot holds, or -3 if the slot number is out of range. */
+int func_002EEFE0(unsigned int slot) {
+    if (slot >= 0x40) {
         return -3;
     }
-    return r1_D_001DD568[arg0].qwc;
+    return r1_D_001DD568[slot].qwc;
 }
 
 
 /* func_002EF1E8 is in 002EEB00-g8.c. */
 
 /* shared native body of family 9328256ba62fe2c4 */
+/* Walks every terrain draw list and patches the drawing settings of each entry with the override values for its type. */
 void func_002EF310(void)
 {
-    struct Node *p = &D_L05_00226A00;
+    struct Node *table = &D_L05_00226A00;
 
-    if (p->elems != 0) {
+    if (table->elems != 0) {
         do {
-            struct Elem *e = p->elems;
+            struct Elem *elem = table->elems;
 
-            if (p->count > 0) {
-                int n = p->count;
+            if (table->count > 0) {
+                int remaining = table->count;
 
                 do {
-                    short *t = D_L05_00226700[e->f35];
-                    if (t[0] != 0) e->f0 = (e->f0 & 0xFFFFC000u) | (unsigned int)t[0];
-                    if (t[1] != 0) e->f48 = (e->f48 & 0xFFFFC000u) | (unsigned int)t[1];
-                    e++;
-                } while (--n);
+                    short *override = D_L05_00226700[elem->f35];
+                    if (override[0] != 0) elem->f0 = (elem->f0 & 0xFFFFC000u) | (unsigned int)override[0];
+                    if (override[1] != 0) elem->f48 = (elem->f48 & 0xFFFFC000u) | (unsigned int)override[1];
+                    elem++;
+                } while (--remaining);
             }
-            p++;
-        } while (p->elems != 0);
+            table++;
+        } while (table->elems != 0);
     }
 }
 
@@ -214,13 +221,14 @@ ASM_FUNC("asm/game", func_002F0B78);
 /* Original assembly: $at as a working register and trapping add/addi; the compiler cannot emit them. */
 ASM_FUNC("asm/game", func_002F0D00);
 
+/* Runs one set of render steps for the level using the current list position. */
 void func_002F0E08(void)
 {
     extern int D_001A72D0 __attribute__((sda));
     extern void func_002F3300(int);
     extern void func_002FC748(void);
     func_002F3300(D_001A72D0);
-    func_002FC748();
+    AppendVu1DmaChainTable1();
 }
 
 /* apply nonzero signed halfword overrides to selected object rows; observed count0F, rows1C, stride50 and key33 */

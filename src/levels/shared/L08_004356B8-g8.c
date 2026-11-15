@@ -16,49 +16,50 @@ extern void func_00282D30(void *, void *, float);
 extern float func_00283248(float, float);
 extern float func_00283B98(float, float);
 
+/* Per-frame update of moby class 2456: it slides between two points toward a target and turns to face it. It deletes itself when the target is gone. */
 /* Interpolates an object between two points and turns it toward its target. */
-void func_L08_004356B8(u8 *self)
+void func_L08_004356B8(u8 *moby)
 {
     float base[4] __attribute__((aligned(16)));
     float endpoint[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
-    u8 *vars = *(u8 **)(self+0x68);
+    u8 *vars = *(u8 **)(moby+0x68);
     u8 *target;
     float distance;
     float limit, scale;
     int result;
-    *(float *)(self+0x2C) = *(float *)(*(u8 **)(self+0x24)+0x24) *
+    *(float *)(moby+0x2C) = *(float *)(*(u8 **)(moby+0x24)+0x24) *
         (D_L08_001B1F94 + (D_L08_001B1F98-D_L08_001B1F94)* *(float *)(vars+0x18));
-    self[0x23] = D_L08_001B1F9C;
+    moby[0x23] = D_L08_001B1F9C;
     target = *(u8 **)(vars+0x10);
     if (!target || target[0x20]==0xFE || target[0x20]==0xFD) {
-        func_0029F338(self);
+        MarkMobySpawned(moby);
         return;
     }
-    distance = func_00282E80(target+0x10, vars);
+    distance = vec_distance_xy(target+0x10, vars);
     limit = D_L08_001B1F7C;
     *(float *)(vars+0xC) = D_L08_001B1FA4;
-    result = func_00283DB8(vars,limit);
+    result = FastMathHelperA(vars,limit);
     qcopy(base, vars);
     base[2] += D_L08_001B1F8C;
     delta[0] = D_L08_001B1F80;
     delta[1] = D_L08_001B1F84;
     delta[2] = D_L08_001B1F88;
-    func_00283098(delta,delta,D_L08_001B9D30);
-    func_00282CC0(endpoint,delta,D_L08_001B9D30-140);
-    if (distance < D_L08_001B1F78) func_L08_003D3928(self,vars);
+    matrix_mul_vec3(delta,delta,D_L08_001B9D30);
+    FastVecAdd(endpoint,delta,D_L08_001B9D30-140);
+    if (distance < D_L08_001B1F78) UpdateNearestTarget(moby,vars);
     if (distance < D_L08_001B1F7C && (result > 0 || distance < D_L08_001B031C[0]))
         *(float *)(vars+0x18) += D_L08_001B1F90;
     else *(float *)(vars+0x18) -= D_L08_001B1F90;
     if (*(float *)(vars+0x18)>1.0f) *(float *)(vars+0x18)=1.0f;
     else if (*(float *)(vars+0x18)<0.0f) *(float *)(vars+0x18)=0.0f;
-    func_00282CF0(delta,base,endpoint);
-    func_00282D30(delta,delta,*(float *)(vars+0x18));
-    func_00282CC0(self+0x10,endpoint,delta);
-    *(float *)(self+0xF8) = func_00283248(*(float *)vars-*(float *)(self+0x10),*(float *)(vars+4)-*(float *)(self+0x14));
-    distance = func_00282E80(self+0x10,vars);
-    distance = func_00283248(distance,*(float *)(vars+8)-*(float *)(self+0x18));
+    FastVecSub(delta,base,endpoint);
+    FastVecScale(delta,delta,*(float *)(vars+0x18));
+    FastVecAdd(moby+0x10,endpoint,delta);
+    *(float *)(moby+0xF8) = FastMatrixHelperA(*(float *)vars-*(float *)(moby+0x10),*(float *)(vars+4)-*(float *)(moby+0x14));
+    distance = vec_distance_xy(moby+0x10,vars);
+    distance = FastMatrixHelperA(distance,*(float *)(vars+8)-*(float *)(moby+0x18));
     scale = D_L08_001B1FA0*0.00029088825f;
-    *(float *)(self+0xF4) = -distance;
-    *(float *)(self+0xF0) = func_00283B98(*(float *)(self+0xF0),scale);
+    *(float *)(moby+0xF4) = -distance;
+    *(float *)(moby+0xF0) = FastAddRotations(*(float *)(moby+0xF0),scale);
 }

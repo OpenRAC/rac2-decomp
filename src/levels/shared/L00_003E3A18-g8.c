@@ -114,46 +114,46 @@ void func_L00_003E3A18(u8 *object)
     float horizontal, vertical, blend;
 
     if ((u8)object[0x42] == (u8)object[0x43] && ((u8)object[0x60] & 2))
-        func_002A75E0(object, 1, 0, 2, 0);
-    if (D_00189E20.state == 3) {
+        StartAnimationBlendedWithFlags(object, 1, 0, 2, 0);
+    if (gHeroState.state == 3) {
         if ((u8)object[0x20] == 0) return;
         D_L00_001B15D0 = D_L00_001B05C4;
         D_L00_001B15D4 = D_L00_001B05C8;
         D_L00_001B15D8 = D_L00_001B05CC;
         D_L00_001B15CC = D_L00_001B05D0;
-        func_0026FF08(0, 3, 1.1243411302566528f, 0.005f, 0.2f, 0.0f);
-        if (data->light >= 0) func_00291450(data->light);
+        SetCameraValueTarget(0, 3, 1.1243411302566528f, 0.005f, 0.2f, 0.0f);
+        if (data->light >= 0) FreePointLight(data->light);
         data->light = -1;
         D_L00_001AA0F8 = 224;
-        func_L00_00368F58(1);
+        UpdateFrameTimeScales(1);
         return;
     }
-    if (D_00189E20.mode == 111) {
+    if (gHeroState.mode == 111) {
         if ((u8)object[0x20] == 4) return;
         object[0x20] = 4;
-        if (data->light >= 0) func_00291450(data->light);
+        if (data->light >= 0) FreePointLight(data->light);
         data->light = -1;
         D_L00_001B15D0 = D_L00_001B05C4;
         D_L00_001B15D4 = D_L00_001B05C8;
         D_L00_001B15D8 = D_L00_001B05CC;
         D_L00_001B15CC = D_L00_001B05D0;
-        func_0026FF08(0, 3, 1.1243411302566528f, 0.005f, 0.2f, 0.0f);
-        func_L00_00368F58(1);
+        SetCameraValueTarget(0, 3, 1.1243411302566528f, 0.005f, 0.2f, 0.0f);
+        UpdateFrameTimeScales(1);
         return;
     }
     if ((u8)object[0x20] == 4) object[0x20] = 1;
     qcopy(position, object + 0x10);
-    if (D_00189E20.scope) {
-        if (D_L00_001B19C8 & 4) {
+    if (gHeroState.scope) {
+        if (gFrameCounter_L00 & 4) {
             data->target = 0;
             data->targeting = 0;
-            func_00282F20(first, D_L00_001B8DC0.forward, 128.0f);
-            func_00282CC0(first, first, D_L00_001B8DC0.position);
-            if (func_002761F8(D_L00_001B8DC0.position, first, 16, D_00189E20.camera, 0)) {
+            vec_scale_to_length(first, gCameraPosition_L00.forward, 128.0f);
+            FastVecAdd(first, first, gCameraPosition_L00.position);
+            if (CollLine(gCameraPosition_L00.position, first, 16, gHeroState.camera, 0)) {
                 target = D_L00_001BF218;
                 if (target && (u8)target[0x31]) {
-                    health = func_002AB1F0(target);
-                    if (func_002ABB78(target) || (health && *health > 0.0f &&
+                    health = GetMobyPrivateValue0(target);
+                    if (IsMobyInSpecialClassRange(target) || (health && *health > 0.0f &&
                         *(char **)(target + 0x24) && *(short *)(*(char **)(target + 0x24) + 0x46) == 5)) {
                         data->target = target;
                         data->targeting = 1;
@@ -161,15 +161,15 @@ void func_L00_003E3A18(u8 *object)
                 }
             }
         }
-        if (D_00189E20.delay == 0) {
+        if (gHeroState.delay == 0) {
             if (data->targeting) {
                 if (++data->targetFrames > 20) data->targetFrames = 0;
-                if (data->cooldown <= 0.0f && func_L00_002D4040(-1) && data->targetFrames >= 11)
-                    func_00273318(object, 0x400000FF, 0, 32, -1, 4, 1.5f, 0.0f, 90.0f);
+                if (data->cooldown <= 0.0f && get_ammo(-1) && data->targetFrames >= 11)
+                    AddMobyMarker(object, 0x400000FF, 0, 32, -1, 4, 1.5f, 0.0f, 90.0f);
             }
-            if (data->cooldown > 0.0f && func_L00_002D4040(-1)) color = 0x600000FF;
+            if (data->cooldown > 0.0f && get_ammo(-1)) color = 0x600000FF;
             else color = 0x600FFF0F;
-            func_00273318(object, color, 0, 39, -1, 4, 2.0f, 0.0f, 90.0f);
+            AddMobyMarker(object, color, 0, 39, -1, 4, 2.0f, 0.0f, 90.0f);
         }
     }
     switch ((u8)object[0x20]) {
@@ -177,7 +177,7 @@ void func_L00_003E3A18(u8 *object)
         data->scoped = 0;
         data->cooldown = 0.36666667461395264f;
         object[0x20] = 3;
-        angle = func_00283248(1.0f, D_L00_001BD370);
+        angle = FastMatrixHelperA(1.0f, D_L00_001BD370);
         angle += angle;
         data->initialFov = angle;
         data->zoomFov = angle + (0.174532949924469f - angle) * 0.25f;
@@ -190,48 +190,48 @@ void func_L00_003E3A18(u8 *object)
         data->targetFrames = 0;
         data->target = 0;
         data->light = -1;
-        data->resource = func_L00_00329E90(object, 0, &loaded);
+        data->resource = AcquireEntitySlot(object, 0, &loaded);
         if (!loaded) {
-            cursor = func_L00_0032A088(*(short *)(object + 0xAA), data->resource);
+            cursor = GetSlotBody(*(short *)(object + 0xAA), data->resource);
             data->resourceBase = cursor;
             base = cursor;
-            offsets = func_L00_0032A0B8(*(short *)(object + 0xAA), data->resource);
-            cursor = func_L00_00329FF0(base + 12);
+            offsets = GetSlotHeader(*(short *)(object + 0xAA), data->resource);
+            cursor = RoundUpToMultipleOf16_L00(base + 12);
             slot = (char **)base;
             for (remaining = 2; remaining >= 0; remaining--) {
                 *slot = cursor;
                 cursor += 0xF00;
                 slot++;
             }
-            cursor = func_L00_00329FF0(cursor);
+            cursor = RoundUpToMultipleOf16_L00(cursor);
             offsets[0] = cursor - base;
-            func_00282A88(cursor, 0x120);
-            cursor = func_L00_00329FF0(cursor + 0x120);
+            FastMemoryHelperB(cursor, 0x120);
+            cursor = RoundUpToMultipleOf16_L00(cursor + 0x120);
             offsets[1] = cursor - base;
-            func_00282A88(cursor, 0x1E00);
+            FastMemoryHelperB(cursor, 0x1E00);
         }
         if (data->resource >= 0) ref_L00_003E3A18_00(data->resource);
         break;
     case 1:
-        if (D_00189E20.mode == 1) func_L00_002C42E0(29, 1);
-        if (D_00189E20.scope) {
+        if (gHeroState.mode == 1) SetHeroAction_L00(29, 1);
+        if (gHeroState.scope) {
             if (data->scoped == 0) D_L00_001AA0F8 = 0;
             data->scoped = 1;
         }
-        if (D_00189E20.controller) D_00189E20.saved = D_00189E20.controller;
-        if (D_00189E20.scope) {
+        if (gHeroState.controller) gHeroState.saved = gHeroState.controller;
+        if (gHeroState.scope) {
             if (D_00138320 & 8) data->zoomFov -= 0.01f;
             else if (D_00138320 & 2) data->zoomFov += 0.01f;
             if (data->zoomFov > data->initialFov) data->zoomFov = data->initialFov;
             else if (data->zoomFov < 0.174532949924469f) data->zoomFov = 0.174532949924469f;
-            func_0026FF08(0, 3, data->zoomFov, 0.02f, 0.2f, 0.0f);
-            func_L00_00368F58(0);
+            SetCameraValueTarget(0, 3, data->zoomFov, 0.02f, 0.2f, 0.0f);
+            UpdateFrameTimeScales(0);
         } else if (data->scoped) {
             data->zoomFov = data->initialFov + (0.174532949924469f - data->initialFov) * 0.25f;
-            func_0026FF08(0, 3, data->initialFov, 0.005f, 0.2f, 0.0f);
+            SetCameraValueTarget(0, 3, data->initialFov, 0.005f, 0.2f, 0.0f);
             data->scoped = 0;
             D_L00_001AA0F8 = 224;
-            func_L00_00368F58(1);
+            UpdateFrameTimeScales(1);
         }
         fraction = (data->zoomFov - 0.174532949924469f) / (data->initialFov - 0.174532949924469f);
         horizontal = (D_L00_001B05C4 - 0.03f) * fraction + 0.03f;
@@ -241,57 +241,57 @@ void func_L00_003E3A18(u8 *object)
         D_L00_001B15CC = blend;
         D_L00_001B15D4 = vertical;
         canFire = 1;
-        if (D_00189E20.scope) {
-            if (!func_00282948(&D_00189E20.delay)) canFire = 0;
-        } else D_00189E20.delay = 40;
-        if (D_00189E20.blocked == 0 && (D_00138180[0x1A4/4] & D_00189E20.input) && canFire) {
-            if (func_L00_002D3F30(-1, 1)) {
-                func_L00_002AF568();
-                data->sound = func_L00_002D6998(D_L00_00296AA0);
+        if (gHeroState.scope) {
+            if (!FastFloatHelperD(&gHeroState.delay)) canFire = 0;
+        } else gHeroState.delay = 40;
+        if (gHeroState.blocked == 0 && (gPadState[0x1A4/4] & gHeroState.input) && canFire) {
+            if (SpendWeaponAmmo(-1, 1)) {
+                start_equipped_item_animation();
+                data->sound = CopyRecordsToFreeSlots(D_L00_00296AA0);
                 data->firingDelay = 2;
                 object[0x20] = 2;
-                func_002A7470(object, 2, 0, 0);
-            } else func_002E5CF8(1, 0, object);
-            if ((D_00138180[0x1A0/4] & D_00189E20.input) && func_L00_002D4040(-1) && D_00189E20.active) break;
+                StartAnimationBlended(object, 2, 0, 0);
+            } else PlayMobySound(1, 0, object);
+            if ((gPadState[0x1A0/4] & gHeroState.input) && get_ammo(-1) && gHeroState.active) break;
             if (data->sound >= 0) {
-                func_L00_002D6B70(data->sound);
+                ResetActiveSlots(data->sound);
                 data->sound = -1;
             }
         }
         break;
     case 2:
-        if (D_00189E20.controller) D_00189E20.saved = D_00189E20.controller;
-        if (func_00282978(&data->firingDelay) || data->scoped) {
-            func_002E5CF8(0, 0, object);
-            func_L00_003E4508(object);
-            tuning = (UpdateTuning *)(D_0013957F * 224 + (char *)D_L00_00262570);
+        if (gHeroState.controller) gHeroState.saved = gHeroState.controller;
+        if (FastDecTimer(&data->firingDelay) || data->scoped) {
+            PlayMobySound(0, 0, object);
+            AimAndSpawnBeamWithMuzzleFlashes(object);
+            tuning = (UpdateTuning *)(D_0013957F * 224 + (char *)gWeaponTable_L00);
         data->cooldown = 1.0f / tuning->rate;
             object[0x20] = 3;
         }
         break;
     case 3:
-        if (func_002829D8(&data->cooldown)) object[0x20] = 1;
+        if (FastVectorHelperB(&data->cooldown)) object[0x20] = 1;
         break;
     }
     if (data->flashTimer) {
-        if (func_00282948(&data->flashTimer)) {
-            if (data->light >= 0) func_00291450(data->light);
+        if (FastFloatHelperD(&data->flashTimer)) {
+            if (data->light >= 0) FreePointLight(data->light);
             data->light = -1;
         } else {
             if (data->light == -1)
-                data->light = func_00291308(10.0f, object + 0x10, 0xFF0000FF, 0.0f);
+                data->light = AddPointLight(10.0f, object + 0x10, 0xFF0000FF, 0.0f);
             if (data->light >= 0) {
-                if (D_00189E20.alternate == 1) {
-                    func_0029FCC0(object, 0, first);
-                    func_00282F20(second, object + 0xD0, -1.5f);
+                if (gHeroState.alternate == 1) {
+                    TransformMobyJointToWorld(object, 0, first);
+                    vec_scale_to_length(second, object + 0xD0, -1.5f);
                 } else {
-                    func_0029FCC0(object, 0, first);
-                    func_00282F20(second, D_00189E20.direction, 1.5f);
+                    TransformMobyJointToWorld(object, 0, first);
+                    vec_scale_to_length(second, gHeroState.direction, 1.5f);
                 }
-                func_00282CC0(D_L00_001C6F40[data->light].position, first, second);
+                FastVecAdd(D_L00_001C6F40[data->light].position, first, second);
                 D_L00_001C6F40[data->light].position[3] = 10.0f;
-                intensity = func_00283CE0(data->flashTimer);
-                intensity /= func_00283CE0(30);
+                intensity = IntToFloat(data->flashTimer);
+                intensity /= IntToFloat(30);
                 D_L00_001C6F40[data->light].red = intensity;
                 intensity *= 0.7f;
                 D_L00_001C6F40[data->light].green = intensity;

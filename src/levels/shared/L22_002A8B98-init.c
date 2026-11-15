@@ -27,8 +27,8 @@ extern void func_L00_003B09F8(void);
 /* Install this level's player parameters and start the shared subsystems. */
 void func_L22_002A8B98(void)
 {
-    s32 special_level = D_001A79F0[0] == 0x1A;
-    LevelPlayerPrefix *state = &D_00189E20;
+    s32 special_level = gCurrentMapIndex[0] == 0x1A;
+    LevelPlayerPrefix *state = &gHeroState;
 
     state->parameter250 = 0.8f;
     state->parameter254 = 0.7f;
@@ -39,8 +39,8 @@ void func_L22_002A8B98(void)
     state->special_level = special_level;
     D_001A73A0[0] = 0;
     state->state = 0;
-    func_L00_002D24B8();
-    func_L22_002C9898(0, 1);
-    func_L00_003B09F8();
+    ClearHeroQueuedAnimation();
+    SetHeroAction_L22(0, 1);
+    ResetTrailSlots();
     state->entry_table = D_L22_001B1920;
 }

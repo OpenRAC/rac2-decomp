@@ -38,39 +38,40 @@ extern void func_002E4AC8(void);
 extern s16 func_002B7CE0(int);
 extern void func_002B8518(void);
 
+/* Leaves the pause screen: restores the saved camera and display values and lets the game run normally again. */
 void func_002CA790(void)
 {
-    GameState_2CA790 *s = (GameState_2CA790 *)(void *)D_001F2840;
+    GameState_2CA790 *pauseState = (GameState_2CA790 *)(void *)gPauseMenuState;
     TI128 *dst;
-    TI128 *src = (TI128 *)((char *)s + 0x50);
+    TI128 *src = (TI128 *)((char *)pauseState + 0x50);
     int mode;
 
-    *(int *)(void *)D_001F2840 = 0;
-    func_002FC138();
-    dst = (TI128 *)D_001B5340;
+    *(int *)(void *)gPauseMenuState = 0;
+    SelectPacketBufferSetup();
+    dst = (TI128 *)gCameraState_001B5340;
     qcopy(dst, src);
-    src = (TI128 *)((char *)s + 0x60);
+    src = (TI128 *)((char *)pauseState + 0x60);
     qcopy(dst + 1, src);
-    *(float *)D_001B90F0 = s->field_0F8;
-    func_0028B338(0);
-    func_00279FF0();
-    mode = s->field_01C;
-    s->field_11C = 0;
-    s->field_114 = 0;
-    s->field_020 = 0;
-    s->field_118 = 0;
+    *(float *)D_001B90F0 = pauseState->field_0F8;
+    select_moby_context(0);
+    ApplyDisplayConfiguration();
+    mode = pauseState->field_01C;
+    pauseState->field_11C = 0;
+    pauseState->field_114 = 0;
+    pauseState->field_020 = 0;
+    pauseState->field_118 = 0;
     if (mode == 3 || mode == 4 || mode == 6 || mode == 5) {
-        func_0027D330(0x10);
+        FadeToBlack(0x10);
     }
-    func_00132B28(0x5D);
-    if (((GameState_2CA790 *)(void *)D_001F2840)->field_01C != 2 || func_00288D30() == 0)
-        func_002B7320();
-    func_00132028();
-    func_002E4AC8();
-    mode = ((GameState_2CA790 *)(void *)D_001F2840)->field_0DB;
+    SendSoundCommand23(0x5D);
+    if (((GameState_2CA790 *)(void *)gPauseMenuState)->field_01C != 2 || IsFlagWordSet() == 0)
+        music_Unpause();
+    snd_Pump();
+    UpdateSoundVoices();
+    mode = ((GameState_2CA790 *)(void *)gPauseMenuState)->field_0DB;
     if (mode) {
-        func_002B7CE0(1);
-        ((GameState_2CA790 *)(void *)D_001F2840)->field_0DB = 0;
+        PumpMusicAndDiscRead(1);
+        ((GameState_2CA790 *)(void *)gPauseMenuState)->field_0DB = 0;
     }
-    func_002B8518();
+    ClearPadPortState();
 }

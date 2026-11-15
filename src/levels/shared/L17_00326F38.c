@@ -8,15 +8,16 @@ extern void func_2EEEB8(void *, void *, void *);
 
 /* transforms a point given in three floats through the sub-object's matrix, rescales it and
    writes it back through the descriptor */
-void func_L17_00326F38(char *a0, char *a1, float f12, float f13, float f14)
+/* Turns a point given as three numbers into world space using the object's matrix and size, and adds it to the output. */
+void func_L17_00326F38(char *object, char *output, float x, float y, float z)
 {
-    float v[3];
+    float point[3];
 
-    v[0] = f12;
-    v[1] = f13;
-    v[2] = f14;
-    func_2EF398(v, v, a0 + 0xC0);
-    func_2EEF40(v, v, *(float *)(a0 + 0x2C));
-    func_2EEEB8(a1, a1, v);
+    point[0] = x;
+    point[1] = y;
+    point[2] = z;
+    func_2EF398(point, point, object + 0xC0);
+    func_2EEF40(point, point, *(float *)(object + 0x2C));
+    func_2EEEB8(output, output, point);
 }
 

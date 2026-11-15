@@ -62,7 +62,7 @@ static __inline__ void ReleaseSound(int index, unsigned char *object)
 {
     unsigned char *entry;
     if (index != -1) {
-        entry = D_00188660 + index * 0x70;
+        entry = gSoundState + index * 0x70;
         if (*(unsigned char **)(entry + 0x88) == object && entry[0x74])
             ref_L00_003D4A20_06(index);
     }
@@ -111,11 +111,11 @@ void func_L00_003D4A20(unsigned char *object)
         state[0x25] = 0;
         *(int *)(state+0x30) = 0;
         *(int *)(state+0x2c) = D_L00_001B0264;
-        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)D_00189E20.position;
+        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)gHeroState.position;
         {
-            unsigned char *current = D_00188660 + (signed char)state[0x27] * 0x70;
+            unsigned char *current = gSoundState + (signed char)state[0x27] * 0x70;
             if (*(unsigned char **)(current+0x88) != object || !current[0x74]) {
-                unsigned char *fallback = D_00188660 - 0x70;
+                unsigned char *fallback = gSoundState - 0x70;
                 state[0x27] = -1;
                 if (*(unsigned char **)(fallback+0x88) != object || !fallback[0x74])
                     state[0x27] = ref_L00_003D4A20_01(1, 4, object);
@@ -131,19 +131,19 @@ void func_L00_003D4A20(unsigned char *object)
     case 1:
         if ((object[0x60]&2) && object[0x43] != 1) ref_L00_003D4A20_00(object, 1, 0, 10);
         {
-            unsigned char *current = D_00188660 + (signed char)state[0x27] * 0x70;
+            unsigned char *current = gSoundState + (signed char)state[0x27] * 0x70;
             if (*(unsigned char **)(current+0x88) != object || !current[0x74]) {
-                unsigned char *fallback = D_00188660 - 0x70;
+                unsigned char *fallback = gSoundState - 0x70;
                 state[0x27] = -1;
                 if (*(unsigned char **)(fallback+0x88) != object || !fallback[0x74])
                     state[0x27] = ref_L00_003D4A20_01(1, 4, object);
             }
         }
         displaced = 0;
-        if (D_00189E20.state != 129 && ref_L00_003D4A20_03(state+0x60, D_00189E20.position)>400.0f) displaced = 1;
+        if (gHeroState.state != 129 && ref_L00_003D4A20_03(state+0x60, gHeroState.position)>400.0f) displaced = 1;
         if (displaced) {
-            if (D_001A79F0 == 7 && D_00189E20.attached && *(short *)(D_00189E20.attached+0xaa) == 0x11d9) {
-                ref_L00_003D4A20_04(temp, D_00189E20.position, state+0x60);
+            if (gCurrentMapIndex == 7 && gHeroState.attached && *(short *)(gHeroState.attached+0xaa) == 0x11d9 /* moby class 4569 */) {
+                ref_L00_003D4A20_04(temp, gHeroState.position, state+0x60);
                 ref_L00_003D4A20_05(object+0x10, object+0x10, temp);
             } else {
                 ReleaseSound((signed char)state[0x27], object);
@@ -153,12 +153,12 @@ void func_L00_003D4A20(unsigned char *object)
                 goto destroy;
             }
         }
-        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)D_00189E20.position;
+        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)gHeroState.position;
         if (*(int *)(state+0x20)>20 && (object[0x60]&2)) {
             if (object[0x43] != 1) ref_L00_003D4A20_00(object, 1, 0, ref_L00_003D4A20_07(7, 12));
             *(float *)(object+0x48) = ref_L00_003D4A20_08(0.95f, 1.05f);
         }
-        if ((unsigned char)state[0x25]<*(int *)(state+0x40) && D_00189E20.mode != 22 && D_00189E20.mode != 20 && !D_00189E20.flag) {
+        if ((unsigned char)state[0x25]<*(int *)(state+0x40) && gHeroState.mode != 22 && gHeroState.mode != 20 && !gHeroState.flag) {
             ref_L00_003D4A20_09(object, state);
             ref_L00_003D4A20_10(object, state);
         } else {
@@ -182,20 +182,20 @@ void func_L00_003D4A20(unsigned char *object)
 destroy:
             ((KilonoidObjectView *)object)->flags &= 0xfdff;
             if (*(int *)(state+0x38) != -1)
-                D_L00_001B02B0[*(int *)(state+0x38)] = 0;
+                gKilonoidSlots[*(int *)(state+0x38)] = 0;
             ref_L00_003D4A20_13(object);
             return;
         }
         zero = 0;
         qcopy(temp, object+0x10);
         ref_L00_003D4A20_14(temp, D_L00_001B027C);
-        r = (func_001163B0()+48)&63;
-        g = (func_001163B0()+32)&63;
-        b = func_001163B0()&47;
+        r = (Rand()+48)&63;
+        g = (Rand()+32)&63;
+        b = Rand()&47;
         r |= g << 8;
         r |= b << 16;
         color = r | (D_L00_001B0288 << 24);
-        flip = func_001163B0()%2;
+        flip = Rand()%2;
         if (*(int *)(state+0x20)&1) flip = -flip;
         n = ref_L00_003D4A20_07(D_L00_001B0274, D_L00_001B0278);
         f = ref_L00_003D4A20_08(D_L00_001B0280, D_L00_001B0284);
@@ -209,9 +209,9 @@ destroy:
     {
         unsigned char *position = object+0x10;
         if (!D_L00_001ADB2C) {
-            if (D_00189E20.state == 39) ref_L00_003D4A20_05(position, position, D_00189E20.displacement);
+            if (gHeroState.state == 39) ref_L00_003D4A20_05(position, position, gHeroState.displacement);
             else {
-                ref_L00_003D4A20_05(temp, position, D_00189E20.velocity);
+                ref_L00_003D4A20_05(temp, position, gHeroState.velocity);
                 ref_L00_003D4A20_17(position, position, temp, 0.4f);
                 ref_L00_003D4A20_18(position, position, temp, 0.625f);
             }
@@ -221,11 +221,11 @@ destroy:
         ref_L00_003D4A20_21(object, state);
     }
 basis:
-    heroMoby = D_00189E20.moby;
+    heroMoby = gHeroState.moby;
     qcopy(object+0xc0, heroMoby+0xc0);
     qcopy(object+0xd0, heroMoby+0xd0);
     qcopy(object+0xe0, heroMoby+0xe0);
-    if (D_00189E20.mode == 15) {
+    if (gHeroState.mode == 15) {
         qcopy(object+0xc0, heroMoby+0xd0);
         ref_L00_003D4A20_22(object+0xd0, heroMoby+0xc0, -1.0f);
     }

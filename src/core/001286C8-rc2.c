@@ -30,29 +30,30 @@ extern s8 D_00143130[];
 extern s8 D_00143180[];
 extern s8 D_0013B990[];
 
-s32 func_001286C8(s32 arg0, s32 arg1, s32 *arg2, u8 *arg3) {
-    s32 var_a1;
-    s32 r;
-    s8 *base;
+/* Sends a command with extra data to the vibration (rumble) server. Returns 1 on success. */
+s32 func_001286C8(s32 port, s32 command, s32 *sizePtr, u8 *data) {
+    s32 i;
+    s32 result;
+    s8 *packet;
 
-    base = D_00143180;
-    *(s32 *)D_00143180 = arg0;
-    *(s32 *)(base + 4) = arg1;
-    *(s32 *)(base + 8) = *arg2;
-    var_a1 = 0;
-    if (*arg2 > 0) {
-        base += 0xC;
+    packet = D_00143180;
+    *(s32 *)D_00143180 = port;
+    *(s32 *)(packet + 4) = command;
+    *(s32 *)(packet + 8) = *sizePtr;
+    i = 0;
+    if (*sizePtr > 0) {
+        packet += 0xC;
         do {
-            base[var_a1] = arg3[var_a1];
-            var_a1 += 1;
-        } while (var_a1 < *arg2);
+            packet[i] = data[i];
+            i += 1;
+        } while (i < *sizePtr);
     }
-    if (func_0011D810(D_00143130, var_a1) == 1) {
+    if (IsRpcHandleValid(D_00143130, i) == 1) {
         return 0;
     }
-    r = func_0011D620(D_00143130, 0x8000091B, 1, D_00143180, 0x400, D_00143180, 0x400, 0, 0);
-    if (r < 0) {
-        func_00128898(D_0013B990);
+    result = CallRpcServer(D_00143130, 0x8000091B, 1, D_00143180, 0x400, D_00143180, 0x400, 0, 0);
+    if (result < 0) {
+        DebugPrintStub(D_0013B990);
         return 0;
     }
     return 1;

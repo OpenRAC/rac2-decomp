@@ -12,22 +12,22 @@ void func_L00_0039E600(char *actor) {
     char *state = *(char **)(actor + 0x68);
     char *owner, *ownerState;
     *(float *)(state + 4) += (D_L00_001AFFA4 + D_L00_001AFFA4) * 0.016666668f;
-    if (func_00282948((int *)(state + 8)) || D_L00_001AFFA4 * 1.1f <= *(float *)(state + 4)) {
-        func_0029F338(actor);
+    if (FastFloatHelperD((int *)(state + 8)) || D_L00_001AFFA4 * 1.1f <= *(float *)(state + 4)) {
+        MarkMobySpawned(actor);
         return;
     }
     owner = *(char **)state;
-    if (!owner || *(short *)(owner + 0xAA) != 0xA5D || *(unsigned char *)(owner + 0x20) == 0xFE || *(unsigned char *)(owner + 0x20) == 0xFD) {
-        func_0029F338(actor);
+    if (!owner || *(short *)(owner + 0xAA) != 0xA5D /* Sheepinator */ || *(unsigned char *)(owner + 0x20) == 0xFE || *(unsigned char *)(owner + 0x20) == 0xFD) {
+        MarkMobySpawned(actor);
         return;
     }
     ownerState = *(char **)(owner + 0x68);
-    func_00282C88((Quad *)(actor + 0x10));
+    ClearVector128((Quad *)(actor + 0x10));
     *(float *)(actor + 0x14) = -*(float *)(state + 4);
-    func_00283098(actor + 0x10, actor + 0x10, *(char **)state + 0xC0);
-    func_00282CC0(actor + 0x10, actor + 0x10, ownerState);
+    matrix_mul_vec3(actor + 0x10, actor + 0x10, *(char **)state + 0xC0);
+    FastVecAdd(actor + 0x10, actor + 0x10, ownerState);
     *(Quad *)(actor + 0xF0) = *(Quad *)(*(char **)state + 0xF0);
     if (*(float *)(state + 4) > D_L00_001AFFA4)
-        *(unsigned char *)(actor + 0x23) = func_00283CF0((1.0f - (*(float *)(state + 4) - D_L00_001AFFA4) * 10.0f) * 127.0f);
+        *(unsigned char *)(actor + 0x23) = FloatToInt((1.0f - (*(float *)(state + 4) - D_L00_001AFFA4) * 10.0f) * 127.0f);
     *(float *)(actor + 0x2C) = *(float *)(state + 0xC) * 0.1f + (*(float *)(state + 0xC) * *(float *)(state + 4)) / D_L00_001AFFA4;
 }

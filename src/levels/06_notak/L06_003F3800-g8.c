@@ -59,23 +59,23 @@ void func_L06_003F3800(char *moby)
     int first;
     char *state = *(char **)(moby + 0x68);
 
-    func_L06_003F3690(moby, state);
+    UpdateSpawnerDamageTimer(moby, state);
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0: {
         char *child;
         if (D_L06_001B2348) {
             child = 0;
-            while (!func_002A8600(&child, *(int *)(state + 0x84), 0, 0))
-                func_0029F338(child);
+            while (!GetFirstMobyInGroup(&child, *(int *)(state + 0x84), 0, 0))
+                MarkMobySpawned(child);
             *(unsigned char *)(moby + 0x20) = 1;
         }
         break;
     }
     case 1: {
-        func_L06_003F3690(moby, state);
-        if (!func_00282978(state + 0x7E))
+        UpdateSpawnerDamageTimer(moby, state);
+        if (!FastDecTimer(state + 0x7E))
             break;
-        if (!func_002A77E0(7)) {
+        if (!RandomIntBelow(7)) {
             anchor = 0;
             hasAnchor = 0;
             path_points = 0;
@@ -85,11 +85,11 @@ void func_L06_003F3800(char *moby)
                 hasAnchor = 1;
             }
             if (*(int *)(state + 0x78) != -1) {
-                path = D_L06_001FE500[*(int *)(state + 0x78)];
+                path = gPathList[*(int *)(state + 0x78)];
                 path_points = path + 0x10;
                 path_count = *(int *)path;
             }
-            func_L04_003429F8(moby, state + 0xF0, anchor, hasAnchor,
+            FindHeroOrMobyTarget(moby, state + 0xF0, anchor, hasAnchor,
                              path_points, path_count,
                              *(float *)(state + 0x70));
         } else {
@@ -104,7 +104,7 @@ void func_L06_003F3800(char *moby)
         }
         if (*(int *)(state + 0x134) == 2)
             break;
-        slot = func_L06_003F3760(moby, state);
+        slot = CountFlockMembersAndFindFreeSlot(moby, state);
         if (*(unsigned char *)(state + 0x81) >= *(unsigned char *)(state + 0x80) || slot == -1)
             break;
         region = 0;
@@ -115,7 +115,7 @@ void func_L06_003F3800(char *moby)
                 int index = ((int *)(state + 0x90))[i];
                 if (index != -1) {
                     char *candidate = D_L06_001B290C + index * 0x80;
-                    float current = func_00282E48(D_00189EA0, candidate + 0x30);
+                    float current = fast_vec_dist(gHeroPosition, candidate + 0x30);
                     if (current < nearest) {
                         region = candidate;
                         nearest = current;
@@ -123,19 +123,19 @@ void func_L06_003F3800(char *moby)
                 }
             }
             if (!region) {
-                func_00282CF0(point, state + 0xF0, moby + 0x10);
-                func_00282D30(point, point, 0.5f);
+                FastVecSub(point, state + 0xF0, moby + 0x10);
+                FastVecScale(point, point, 0.5f);
                 if (*(float *)(state + 0x70) > 3.0f)
-                    func_00282FB8(point, point, 3.0f);
-                if (func_00282DF0(point) < 3.0f)
-                    func_00282F20(point, point, 3.0f);
-                func_00282CC0(point, point, moby + 0x10);
+                    FastVectorDivideHelper(point, point, 3.0f);
+                if (FastVecLength(point) < 3.0f)
+                    vec_scale_to_length(point, point, 3.0f);
+                FastVecAdd(point, point, moby + 0x10);
             } else {
                 qcopy(point, region + 0x30);
             }
         } else {
             int i;
-            first = func_002A7820(0, 3);
+            first = RandomIntRange(0, 3);
             /* regions[k] is read twice (cse merges the loads): that keeps the
              * search at 30 insns at expand time, so jump1 does not copy the
              * loop's exit test in front of the loop. */
@@ -150,55 +150,55 @@ void func_L06_003F3800(char *moby)
                 float radius = *(float *)(state + 0x70);
                 if (radius < 3.0f)
                     radius = 3.0f;
-                func_L02_0031E9E8(point, radius);
-                func_00282CC0(point, point, moby + 0x10);
+                RandomPlanarOffset(point, radius);
+                FastVecAdd(point, point, moby + 0x10);
             } else {
                 qcopy(point, region + 0x30);
             }
         }
         if (region) {
-            func_00282D30(delta, region, func_002A7878(-1.0f, 1.0f));
-            func_00282CC0(point, point, delta);
-            func_00282D30(delta, region + 0x10, func_002A7878(-1.0f, 1.0f));
-            func_00282CC0(point, point, delta);
+            FastVecScale(delta, region, RandomFloatRange(-1.0f, 1.0f));
+            FastVecAdd(point, point, delta);
+            FastVecScale(delta, region + 0x10, RandomFloatRange(-1.0f, 1.0f));
+            FastVecAdd(point, point, delta);
         }
         {
-            float height = func_002A89A8(point, 0, 0.5f);
+            float height = ProbeGroundHeightBelow(point, 0, 0.5f);
             if (height != 0.0f)
                 point[2] = height;
         }
-        func_00282CF0(delta, point, moby + 0x10);
+        FastVecSub(delta, point, moby + 0x10);
         {
-            float distance = func_00282DF0(delta) * 0.01000000071f;
-            func_00282F20(delta, delta, distance);
-            func_0029FCC0(moby, 0, origin);
-            func_00282F20(step, delta, 0.05f);
-            func_002ACB48(step, 0.025f);
-            func_00282CC0(origin, origin, step);
-            delta[2] = func_L00_0031CDD0(origin, point, 0, distance, -0.002722222358f);
+            float distance = FastVecLength(delta) * 0.01000000071f;
+            vec_scale_to_length(delta, delta, distance);
+            TransformMobyJointToWorld(moby, 0, origin);
+            vec_scale_to_length(step, delta, 0.05f);
+            AddRandomOffsetToVector(step, 0.025f);
+            FastVecAdd(origin, origin, step);
+            delta[2] = ComputeShotLaunchSpeed(origin, point, 0, distance, -0.002722222358f);
         }
-        ((SpawnerSlots *)state)->children[slot] = func_L06_003F3EF0(moby, origin, delta,
+        ((SpawnerSlots *)state)->children[slot] = CreateFlockMember(moby, origin, delta,
                                            *(unsigned char *)(state + 0x83), (unsigned char)slot);
-        func_002E5CF8(0, 0, moby);
+        PlayMobySound(0, 0, moby);
         *(short *)(state + 0x7E) = *(short *)(state + 0x7C);
         (*(unsigned char *)(state + 0x81))++;
         break;
     }
     case 2:
-        func_002ABBB8(moby, state + 0x60, 0, 0.0f, 0.0f, 30, 8, 20, 8.0f, 4.0f, 18.0f, 1.0f, 1, 15.0f, 1, 1, -1, 0,
+        SpawnExplosionEffects(moby, state + 0x60, 0, 0.0f, 0.0f, 30, 8, 20, 8.0f, 4.0f, 18.0f, 1.0f, 1, 15.0f, 1, 1, -1, 0,
                       0x810001);
-        func_002E5DA0(1, 0, moby, 0x75D);
-        func_L02_0032B468(moby, 0x6C5, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
+        PlaySoundFromClassBank(1, 0, moby, 0x75D);
+        SpawnFlyingFragment(moby, 0x6C5, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
                           D_L06_001A8F20, D_L06_001A8F20, D_L06_001A8F20);
-        func_L02_0032B468(moby, 0x6C6, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
+        SpawnFlyingFragment(moby, 0x6C6, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
                           D_L06_001A8F20, D_L06_001A8F20, D_L06_001A8F20);
-        func_L02_0032B468(moby, 0x6C7, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
+        SpawnFlyingFragment(moby, 0x6C7, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
                           D_L06_001A8F20, D_L06_001A8F20, D_L06_001A8F20);
-        func_0029F338(moby);
+        MarkMobySpawned(moby);
         return;
     }
-    if (*(unsigned char *)(moby + 0x31) && func_00282E48(moby + 0x10, D_L06_001B9840) < 24.0f) {
-        func_002A93B0(moby);
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L06_001B9840) < 24.0f) {
+        UpdateMobyGroundCheck(moby);
         *(unsigned char *)(moby + 0x6F) = 0x16;
     }
 }

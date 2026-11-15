@@ -1,3 +1,4 @@
+#include "names.h"
 /* Advances animation frames and decodes the current and next poses. */
 
 typedef union Frame310D30 {
@@ -79,7 +80,7 @@ void func_L00_00310D30(void *unused, AnimationState310D30 *state)
         }
     }
     if (state->currentPacked) {
-        func_L00_003110E8(state, state->currentTrack, state->currentFrame, state->currentData);
+        BuildDataBlockFromTables(state, state->currentTrack, state->currentFrame, state->currentData);
     } else {
         Track310D30 *track = state->model->tracks[state->currentTrack];
         if (track->extra == 0xff) {
@@ -88,11 +89,11 @@ void func_L00_00310D30(void *unused, AnimationState310D30 *state)
             func_002A1130((unsigned char *)(track->data + track->frames) + track->extra * 4,
                 track->data[state->currentFrame].word,
                 state->currentData, state->model->joints);
-            func_0011AEA0(0);
+            FlushCache(0);
         }
     }
     if (state->nextPacked) {
-        func_L00_003110E8(state, state->nextTrack, state->nextFrame, state->nextData);
+        BuildDataBlockFromTables(state, state->nextTrack, state->nextFrame, state->nextData);
     } else {
         Track310D30 *track = state->model->tracks[state->nextTrack];
         if (track->extra == 0xff) {
@@ -101,7 +102,7 @@ void func_L00_00310D30(void *unused, AnimationState310D30 *state)
             func_002A1130((unsigned char *)(track->data + track->frames) + track->extra * 4,
                 track->data[state->nextFrame].word,
                 state->nextData, state->model->joints);
-            func_0011AEA0(0);
+            FlushCache(0);
         }
     }
     func_L00_00314D40(state);

@@ -15,8 +15,9 @@ extern void func_L02_003A6FE8(char *);
 extern int func_L02_002EF388(char *, char *, char *, char **, int);
 extern char *func_L20_0039BDF0(char *, char *, int, int);
 
-char *func_L20_004431E0(char *arg0, TI128 *arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Takes the first usable object of the enemy group, moves it to the given place and starts it with a small effect. Returns that object. */
+char *func_L20_004431E0(char *moby, TI128 *position) {
+    char *state = *(char **)(moby + 0x68);
     u16 *rec;
     char *found = 0;
     Vector431E0 buf;
@@ -27,22 +28,22 @@ char *func_L20_004431E0(char *arg0, TI128 *arg1) {
          rec++) {
         char *e = D_L20_001B2F9C + ((*rec & 0x7FFF) << 8);
 
-        if (e != 0 && func_00312B58(e) != 0)
+        if (e != 0 && IsMobyInState6(e) != 0)
             found = e;
         break;
     }
     if (found != 0) {
         char *p = found + 0x10;
-        char *s2;
+        char *foundVars;
 
-        qcopy(p, arg1);
-        func_L02_003A6FE8(found);
-        func_L02_002EF388(found, p, found + 0xF0, 0, 0);
-        s2 = *(char **)(found + 0x68);
-        *(int *)(s2 + 0xAC) |= 8;
+        qcopy(p, position);
+        InitNanotechCrateMoby(found);
+        FuseObjectWithLinkedObjects(found, p, found + 0xF0, 0, 0);
+        foundVars = *(char **)(found + 0x68);
+        *(int *)(foundVars + 0xAC) |= 8;
         qcopy(&buf, p);
         buf.component[2] -= 0.5f;
-        func_L20_0039BDF0(found, (char *)&buf, 0x168, 0);
+        CreateGlowEffectMoby(found, (char *)&buf, 0x168, 0);
     }
     return found;
 }

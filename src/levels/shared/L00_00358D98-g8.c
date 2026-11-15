@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* -G8 unit: the two registry words this body passes by address are small data (the retail reaches
  * them with `addiu $a0,$gp,0x35A0`), so the function lives here; see config/cflags.txt. */
@@ -18,26 +19,28 @@ extern void func_L00_00374348(int *a, int *b);
 extern void func_L00_00373D40(int *a, int *b);
 
 /* Dispatch on a mode word held in the level's own data, once the module's registry word is set. */
+/* Runs the purchase confirmation step that matches the current menu mode. */
 void func_L00_00374708(void)
 {
-    int *d = D_L00_0022F7C0;
-    int v;
+    int *menu = gPurchaseMenuModel;
+    int mode;
 
-    if (d[0x84 / 4] == 0)
+    if (menu[0x84 / 4] == 0)
         return;
-    v = d[0x50 / 4];
-    if (v == 0)
-        func_002F8918(&D_001B2590, &D_001B2594);
-    else if (v == 1)
-        func_L00_00373F48(&D_001B2590, &D_001B2594);
-    else if (v == 2)
-        func_L00_00374348(&D_001B2590, &D_001B2594);
-    else if (v == 3)
-        func_L00_00373D40(&D_001B2590, &D_001B2594);
+    mode = menu[0x50 / 4];
+    if (mode == 0)
+        VendorPurchaseDialogUpdate(&D_001B2590, &D_001B2594);
+    else if (mode == 1)
+        UpdateItemPurchaseConfirmation(&D_001B2590, &D_001B2594);
+    else if (mode == 2)
+        UpdatePurchaseConfirmationDialog(&D_001B2590, &D_001B2594);
+    else if (mode == 3)
+        UpdateSelectedItemPurchaseDialog(&D_001B2590, &D_001B2594);
 }
 
 extern int D_L00_001AD410 __attribute__((sda));
 extern void ref_L00_0036ADB0_00(void *, float);
+/* Resets all 64 entries of a table to the same starting value. */
 void func_L00_0036ADB0(void)
 {
     int i = 0;
@@ -62,6 +65,7 @@ extern ResetBlock D_L00_002214D0[128];
 extern int D_L00_001AC598 __attribute__((sda));
 extern int D_L00_001AC59C __attribute__((sda));
 
+/* Sets the saved menu state back to its start values and clears the 128 menu slots. */
 void func_L00_00367308(void) {
     int i;
 

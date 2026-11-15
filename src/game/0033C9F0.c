@@ -1,3 +1,4 @@
+#include "names.h"
 
 
 #ifndef RAC2_T_U8_FE9770B1E
@@ -34,29 +35,30 @@ extern void func_0033B0A8_1(u8_Fe9770b1e *, f32_Fe9770b1e);
 
 extern void func_L00_00432448(u8_Fe9770b1e *, s32_Fe9770b1e);
 
+/* Sets up a menu with a button prompt bar, its labels and position, then runs its first update. */
 void func_0033C9F0(u8_Fe9770b1e *self, void *arg) {
-    u8_Fe9770b1e *sub;
-    void *first, *second, *third;
+    u8_Fe9770b1e *prompt;
+    void *textA, *textB, *textC;
     *(void **)self = arg;
     if (arg != 0) {
-        void *t = func_00336E40_1(arg);
-        void *p = func_00336DA8_1(16, t);
-        *(void **)(self + 684) = p;
-        ((s32_Fe9770b1e *)p)[1] = 0;
-        ((s32_Fe9770b1e *)p)[2] = 0;
-        ((s32_Fe9770b1e *)p)[3] = 0;
-        ((s32_Fe9770b1e *)p)[0] = 0;
+        void *owner = func_00336E40_1(arg);
+        void *allocation = func_00336DA8_1(16, owner);
+        *(void **)(self + 684) = allocation;
+        ((s32_Fe9770b1e *)allocation)[1] = 0;
+        ((s32_Fe9770b1e *)allocation)[2] = 0;
+        ((s32_Fe9770b1e *)allocation)[3] = 0;
+        ((s32_Fe9770b1e *)allocation)[0] = 0;
     }
-    sub = self + 8;
+    prompt = self + 8;
     ((f32_Fe9770b1e *)*(void **)(self + 684))[0] = 255.0f;
     ((f32_Fe9770b1e *)*(void **)(self + 684))[1] = 195.0f;
-    func_0033ABD8_1(sub, arg, D_L04_001AE0B8);
-    first = func_00288FB8_1(11667);
-    second = func_00288FB8_1(11598);
-    third = func_00288FB8_1(11599);
-    func_0033B050_1(sub, first, second, third);
-    func_0033B030_1(sub, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_0033B0A8_1(sub, 0.2f);
+    func_0033ABD8_1(prompt, arg, D_L04_001AE0B8);
+    textA = func_00288FB8_1(11667);
+    textB = func_00288FB8_1(11598);
+    textC = func_00288FB8_1(11599);
+    func_0033B050_1(prompt, textA, textB, textC);
+    func_0033B030_1(prompt, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    func_0033B0A8_1(prompt, 0.2f);
     *(s32_Fe9770b1e *)(self + 680) = 0;
-    func_L00_00432448(self, 0);
+    HandleMenuPageInputA_L00(self, 0);
 }

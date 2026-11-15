@@ -26,20 +26,21 @@
 
 extern void func_00132DF0(s32 a0, s32 a1, void *a2, s32 a3, s64 t0);
 
-void func_00133340(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9, s32 arg10, s64 arg11) {
-    s32 buf[8];
-    s32 p02;
-    s32 p13;
+/* Packs eight sound values and sends command 0x2C with a reply callback. */
+void func_00133340(s32 p0, s32 p1, s32 lo0, s32 lo1, s32 hi0, s32 hi1, s32 p4, s32 p5, s32 p6, s32 p7, s32 callback, s64 callbackData) {
+    s32 payload[8];
+    s32 packed02;
+    s32 packed13;
 
-    p13 = ((u32)arg5 << 16) | (arg3 & 0xFFFF);
-    p02 = ((u32)arg4 << 16) | (arg2 & 0xFFFF);
-    buf[0] = arg0;
-    buf[1] = arg1;
-    buf[2] = p02;
-    buf[3] = p13;
-    buf[4] = arg6;
-    buf[5] = arg7;
-    buf[6] = arg8;
-    buf[7] = arg9;
-    func_00132DF0(0x2C, 0x20, buf, arg10, arg11);
+    packed13 = ((u32)hi1 << 16) | (lo1 & 0xFFFF);
+    packed02 = ((u32)hi0 << 16) | (lo0 & 0xFFFF);
+    payload[0] = p0;
+    payload[1] = p1;
+    payload[2] = packed02;
+    payload[3] = packed13;
+    payload[4] = p4;
+    payload[5] = p5;
+    payload[6] = p6;
+    payload[7] = p7;
+    QueueSoundCommand(0x2C, 0x20, payload, callback, callbackData);
 }

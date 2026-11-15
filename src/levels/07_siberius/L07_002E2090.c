@@ -5,14 +5,16 @@
 
 extern void *ref_L07_002E2090_00(void *, void *, void *, void *, void *, void *, int, void *, unsigned int);
 
-void *func_L07_002E2090(void *a0, float *a1, float *a2, void *a3, int t0, void *t1, unsigned int t2) {
-    float v1[4];
-    float v2[4];
-    float f;
-    qzero_nc(v1);
-    qzero_nc(v2);
-    f = (a2[2] - a1[2]) * 0.4f;
-    v1[2] = f;
-    v2[2] = -f;
-    return ref_L07_002E2090_00(a0, a1, v1, a2, v2, a3, t0, t1, t2);
+/* Spawns an effect between two points, pushing it forward and back along the depth axis by 40
+   percent of the gap between them. */
+void *func_L07_002E2090(void *owner, float *startPos, float *endPos, void *extra, int option, void *extraData, unsigned int extraFlags) {
+    float startVelocity[4];
+    float endVelocity[4];
+    float depthSpeed;
+    qzero_nc(startVelocity);
+    qzero_nc(endVelocity);
+    depthSpeed = (endPos[2] - startPos[2]) * 0.4f;
+    startVelocity[2] = depthSpeed;
+    endVelocity[2] = -depthSpeed;
+    return ref_L07_002E2090_00(owner, startPos, startVelocity, endPos, endVelocity, extra, option, extraData, extraFlags);
 }

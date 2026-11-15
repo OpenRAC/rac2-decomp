@@ -29,18 +29,19 @@ extern s32  D_001B1888[] __attribute__((sda));
 
 extern s32 func_0029D4D0();
 
-void func_00292B20(s32 arg0, s32 arg1) {
-    s32 temp_a0;
-    s32 temp_a1;
-    s32 tmp0;
-    s32 tmp1;
+/* Unpacks the packed data of one HUD bank into the given memory address and clears that bank's flag. */
+void func_00292B20(s32 bankIndex, s32 target) {
+    s32 root;
+    s32 alignedTarget;
+    s32 bankBase;
+    s32 entryBase;
 
-    temp_a1 = (arg1 + 0xF) & 0xFFFFFFF0;
-    if (temp_a1 != 0) {
-        temp_a0 = D_001A7288;
-        tmp1 = temp_a0 + (arg0 * 8);
-        func_0029D4D0((*(s32 *)((char *)(tmp1) + (0x20))) + temp_a0, temp_a1);
+    alignedTarget = (target + 0xF) & 0xFFFFFFF0;
+    if (alignedTarget != 0) {
+        root = D_001A7288;
+        entryBase = root + (bankIndex * 8);
+        fast_decompress((*(s32 *)((char *)(entryBase) + (0x20))) + root, alignedTarget);
     }
-    tmp0 = D_001B1888[0] + (arg0 * 4);
-    (*(s32 *)((char *)(tmp0) + (0x74))) = 0;
+    bankBase = D_001B1888[0] + (bankIndex * 4);
+    (*(s32 *)((char *)(bankBase) + (0x74))) = 0;
 }

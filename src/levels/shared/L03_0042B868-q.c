@@ -9,18 +9,19 @@ typedef int Q128 __attribute__((mode(TI)));
 extern void func_00282D08(void *, void *, void *, float);
 extern float func_00282E48(void *, void *);
 
-void func_L03_0042B868(char *a0, Q128 *a1, Q128 *a2)
+/* Sets up an object between two points: it sits at the midpoint and remembers the distance between them. */
+void func_L03_0042B868(char *moby, Q128 *start, Q128 *end)
 {
-    char *p;
+    char *vars;
 
-    if (a0 == 0)
+    if (moby == 0)
         return;
     {
-        p = *(char **)(a0 + 0x68);
-        qcopy(p, a1);
-        qcopy(p + 0x10, a2);
-        func_00282D08(p + 0x30, a1, a2, 0.5f);
-        *(Q128 *)(a0 + 0x10) = *(Q128 *)(p + 0x30);
-        *(float *)(p + 0x3C) = func_00282E48(a1, a2);
+        vars = *(char **)(moby + 0x68);
+        qcopy(vars, start);
+        qcopy(vars + 0x10, end);
+        lerp_vector(vars + 0x30, start, end, 0.5f);
+        *(Q128 *)(moby + 0x10) = *(Q128 *)(vars + 0x30);
+        *(float *)(vars + 0x3C) = fast_vec_dist(start, end);
     }
 }

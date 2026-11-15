@@ -3,6 +3,7 @@
    j up with the source table indexed by it: loop.c reverses the counter and emits the
    reduced table pointer and count after the hoisted invariants, retail's preheader order. */
 #include "include_asm.h"
+#include "names.h"
 typedef struct { char pad0[0x30]; int a30; int count34; char pad38[0xC]; short n44; char pad46[0xA]; char *obj50; char pad54[0x138]; char *list[1]; } State_2ED0A0;
 extern State_2ED0A0 D_001B8840;
 extern void func_00282CC0(unsigned char *, unsigned char *, unsigned char *);
@@ -18,6 +19,7 @@ extern void func_00283098(char *, char *, char *);
 extern void func_00282CF0(char *, char *, char *);
 extern void func_00282F20(char *, char *, float);
 
+/* Moves the four backdrop quads of the scene to follow a special object. */
 void func_002ED0A0(void)
 {
     char *record;
@@ -26,22 +28,22 @@ void func_002ED0A0(void)
     int limit = 0x270F;
     int i;
 
-    if (D_001B8840.a30 == 0) {
+    if (gScenePlaybackState.a30 == 0) {
         index = 0x32;
         flag = 1;
     }
     if (index == -1)
         return;
-    if (D_001B8840.count34 < index)
+    if (gScenePlaybackState.count34 < index)
         return;
-    if (limit < D_001B8840.count34)
+    if (limit < gScenePlaybackState.count34)
         return;
-    D_001B8840.obj50 = D_002628D0;
+    gScenePlaybackState.obj50 = D_002628D0;
     record = 0;
-    for (i = 0; i < D_001B8840.n44; i++) {
-        char *entry = D_001B8840.list[i];
+    for (i = 0; i < gScenePlaybackState.n44; i++) {
+        char *entry = gScenePlaybackState.list[i];
 
-        if (*(short *)(entry + 0xAA) == 0xD54) {
+        if (*(short *)(entry + 0xAA) == 0xD54 /* moby class 3412 */) {
             record = entry;
             break;
         }
@@ -52,13 +54,13 @@ void func_002ED0A0(void)
         int j;
 
         for (j = 0; j < 4; j++) {
-            func_00283098(base, (char *)&D_001AC200 + j * 0x10, record + 0xC0);
-            func_00282CC0((unsigned char *)base, (unsigned char *)base, (unsigned char *)(record + 0x10));
-            func_00282CF0(buf, D_001B5340, base);
-            func_00282F20(buf, buf, 0.15f);
-            func_00282CC0((unsigned char *)base, (unsigned char *)base, (unsigned char *)buf);
+            matrix_mul_vec3(base, (char *)&D_001AC200 + j * 0x10, record + 0xC0);
+            FastVecAdd((unsigned char *)base, (unsigned char *)base, (unsigned char *)(record + 0x10));
+            FastVecSub(buf, gCameraState_001B5340, base);
+            vec_scale_to_length(buf, buf, 0.15f);
+            FastVecAdd((unsigned char *)base, (unsigned char *)base, (unsigned char *)buf);
             base += 0x10;
         }
     }
-    *(int *)(D_001B8840.obj50 + 0x68) = (int)D_001B8840.list[flag];
+    *(int *)(gScenePlaybackState.obj50 + 0x68) = (int)gScenePlaybackState.list[flag];
 }

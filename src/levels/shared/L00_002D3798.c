@@ -177,30 +177,31 @@ extern int func_00283D38_1(int, int, float);
 extern void func_L00_00326048(int, float *, int, int, float);
 
 /* Dispatches on one byte of a fixed global table: when it is zero it copies a 16-byte block from the second argument to the first and then accumulates two table-derived floats, each scaled by the third argument, into the first two words of that block; when it is 1 or 2 it builds a 16-byte vector from two table-derived values and a zero, fills two 64-byte matrices through helper routines, composes them into a vector and passes that vector with the two pointers to a closing routine. */
+/* Moves a point sideways, by the distance given, relative to the current camera or view mode. */
 void func_L00_002D3798(V4_F6a70b950 *out, V4_F6a70b950 *in, float scale)
 {
-    char *p = D_00189E20_19;
-    unsigned char mode;
-    float z;
+    char *heroBase = D_00189E20_19;
+    unsigned char viewMode;
+    float zero;
 
-    mode = *(unsigned char *)(p + 8899);
+    viewMode = *(unsigned char *)(heroBase + 8899);
 
-    switch (mode) {
+    switch (viewMode) {
     case 0:
         *out = *in;
-        *(float *)out += func_00283180_6(*(float *)(*(int *)(p + 8848) + 248)) * scale;
-        *(float *)((char *)out + 4) += func_00283198_6(*(float *)(*(int *)(p + 8848) + 248)) * scale;
+        *(float *)out += func_00283180_6(*(float *)(*(int *)(heroBase + 8848) + 248)) * scale;
+        *(float *)((char *)out + 4) += func_00283198_6(*(float *)(*(int *)(heroBase + 8848) + 248)) * scale;
         break;
     case 1:
     case 2: {
         float m[16];
         float v[4];
 
-        z = 0.0f;
-        v[0] = func_00283180_6(z) * scale;
-        v[1] = func_00283198_6(z) * scale;
-        v[2] = z;
-        func_00283410_4(m, (char *)*(int *)(p + 8848) + 240);
+        zero = 0.0f;
+        v[0] = func_00283180_6(zero) * scale;
+        v[1] = func_00283198_6(zero) * scale;
+        v[2] = zero;
+        func_00283410_4(m, (char *)*(int *)(heroBase + 8848) + 240);
         func_002830C0_6(v, v, m);
         func_00282CC0_16(out, in, v);
         break;
@@ -209,176 +210,184 @@ void func_L00_002D3798(V4_F6a70b950 *out, V4_F6a70b950 *in, float scale)
 }
 
 /* Reads a byte state from a global root; when zero it copies a 16-byte vector and adds a float to its third element, otherwise (state 1 or 2) it builds a 4x4 matrix from a global object and transforms a vector by it. */
-void func_L00_002D38A0(V4_Fe23fe324 *a0, V4_Fe23fe324 *a1, float f)
+/* Offsets a point by the given amount along the view height direction, turned by the current view mode. */
+void func_L00_002D38A0(V4_Fe23fe324 *out, V4_Fe23fe324 *in, float amount)
 {
-    char *p = D_00189E20_33;
-    unsigned char raw = p[8899];
-    int state = raw;
-    float m[4][4];
-    float v[4];
+    char *heroBase = D_00189E20_33;
+    unsigned char modeByte = heroBase[8899];
+    int viewMode = modeByte;
+    float matrix[4][4];
+    float offset[4];
 
-    if (state == 0) {
-        *a0 = *a1;
-        ((float *)a0)[2] += f;
+    if (viewMode == 0) {
+        *out = *in;
+        ((float *)out)[2] += amount;
         return;
     }
-    if (state < 0)
+    if (viewMode < 0)
         return;
-    if (state >= 3)
+    if (viewMode >= 3)
         return;
-    func_00282C88_6(v);
-    v[2] = f;
-    func_00283410_10(m, *(int *)(p + 8848) + 240);
-    func_002830C0_11(v, v, m);
-    func_00282CC0_37(a0, a1, v);
+    func_00282C88_6(offset);
+    offset[2] = amount;
+    func_00283410_10(matrix, *(int *)(heroBase + 8848) + 240);
+    func_002830C0_11(offset, offset, matrix);
+    func_00282CC0_37(out, in, offset);
 }
 
 /* switches on a state byte in a shared table: copies 16 bytes and clears the third word, or computes a dot product that scales a vector and subtracts it into the destination */
+/* Flattens a vector against the current view mode, removing the part that points along the view direction. */
 void func_L00_002D3960(char *dst, char *src)
 {
-    char local[16];
-    char *base;
-    float f;
+    char projected[16];
+    char *heroBase;
+    float dot;
 
-    base = D_00189E20_14;
-    switch (*(unsigned char *)(base + 8899)) {
+    heroBase = D_00189E20_14;
+    switch (*(unsigned char *)(heroBase + 8899)) {
     case 0:
         *(V4_Fc186f630 *)dst = *(V4_Fc186f630 *)src;
         *(int *)(dst + 8) = 0;
         break;
     case 1:
-        func_00282F20_5(local, base + 672, 1.0f);
-        f = func_00282DB0_2(local, src);
-        func_00282D30_11(local, local, f);
-        func_00282CF0_8(dst, src, local);
+        func_00282F20_5(projected, heroBase + 672, 1.0f);
+        dot = func_00282DB0_2(projected, src);
+        func_00282D30_11(projected, projected, dot);
+        func_00282CF0_8(dst, src, projected);
         break;
     case 2:
-        f = func_00282DB0_2(base + 704, src);
-        func_00282D30_11(local, base + 704, f);
-        func_00282CF0_8(dst, src, local);
+        dot = func_00282DB0_2(heroBase + 704, src);
+        func_00282D30_11(projected, heroBase + 704, dot);
+        func_00282CF0_8(dst, src, projected);
         break;
     }
 }
 
 /* Reads one byte and one pointer from a shared global; returns a callee float when the byte is zero, returns 0.0f when the byte is outside 0..2, otherwise fills three stack locals through three callees and returns the last callee float. */
-float func_L00_002D3A58(char *arg)
+/* Returns the length of a vector after turning it into the current view mode space. */
+float func_L00_002D3A58(char *vec)
 {
-    char first[64];
-    char second[64];
-    char third[16];
-    unsigned char *p = D_00189E20_4;
-    int flag = p[8899];
+    char matrix[64];
+    char inverse[64];
+    char result[16];
+    unsigned char *heroBase = D_00189E20_4;
+    int viewMode = heroBase[8899];
 
-    if (flag == 0)
-        return func_00282E20_1(arg);
-    if (flag < 0)
+    if (viewMode == 0)
+        return func_00282E20_1(vec);
+    if (viewMode < 0)
         return 0.0f;
-    if (flag >= 3)
+    if (viewMode >= 3)
         return 0.0f;
-    func_00283410_2(first, (char *)(*(int *)(p + 8848) + 240));
-    func_00283698_1(second, first);
-    func_002830C0_1(third, arg, second);
-    return func_00282E20_1(third);
+    func_00283410_2(matrix, (char *)(*(int *)(heroBase + 8848) + 240));
+    func_00283698_1(inverse, matrix);
+    func_002830C0_1(result, vec, inverse);
+    return func_00282E20_1(result);
 }
 
 extern void func_00283098(void *a, void *b, void *c);
 
+/* Returns the height part of a vector after turning it into the current view mode space. */
 float func_L00_002D3B00(char *in)
 {
-    char *p = (char *)&D_00189E20_11;
-    int mode = *(unsigned char *)(p + 8899);
-    float local[4];
+    char *heroBase = (char *)&D_00189E20_11;
+    int viewMode = *(unsigned char *)(heroBase + 8899);
+    float rotated[4];
 
-    if (mode == 0)
+    if (viewMode == 0)
         return *(float *)(in + 8);
-    if (mode < 0)
+    if (viewMode < 0)
         return 0.0f;
-    if (mode >= 3)
+    if (viewMode >= 3)
         return 0.0f;
-    func_00283098(local, in, p + 64);
-    return local[2];
+    matrix_mul_vec3(rotated, in, heroBase + 64);
+    return rotated[2];
 }
 
 extern void func_002830C0(void *a, void *b, void *c);
 
+/* Copies a vector into view space, sets its height to the given value, and turns it back. */
 void func_L00_002D3B58(V4_F6a70b950 *dst, V4_F6a70b950 *src, float k)
 {
-    char *p = (char *)&D_00189E20_11;
-    int mode = *(unsigned char *)(p + 8899);
+    char *heroBase = (char *)&D_00189E20_11;
+    int viewMode = *(unsigned char *)(heroBase + 8899);
 
-    if (mode == 0) {
+    if (viewMode == 0) {
         *dst = *src;
         ((float *)dst)[2] = k;
         return;
     }
-    if (mode < 0)
+    if (viewMode < 0)
         return;
-    if (mode >= 3)
+    if (viewMode >= 3)
         return;
-    func_002830C0(dst, src, p + 64);
+    transform_vector(dst, src, heroBase + 64);
     ((float *)dst)[2] = k;
-    func_002830C0(dst, dst, p);
+    transform_vector(dst, dst, heroBase);
 }
 
 /* reads a mode byte from a global block; when zero it forwards the arguments to one helper, otherwise it range-checks the byte and drives two helpers with the object and block pointers */
-void func_L00_002D3BD8(char *a0, int a1, float f12)
+/* Sets a vector to a given length in view space, then turns it back to world space. */
+void func_L00_002D3BD8(char *vec, int source, float length)
 {
-    unsigned char *d = D_00189E20_18;
-    float f20;
-    int v;
+    unsigned char *heroBase = D_00189E20_18;
+    float savedLength;
+    int viewMode;
 
-    f20 = f12;
-    v = d[8899];
-    if (v == 0) {
-        func_00282F70(a0, a1, f12);
+    savedLength = length;
+    viewMode = heroBase[8899];
+    if (viewMode == 0) {
+        FastVectorNormalizeHelper(vec, source, length);
         return;
     }
-    if (v < 0)
+    if (viewMode < 0)
         return;
-    if (v >= 3)
+    if (viewMode >= 3)
         return;
-    func_002830C0_5(a0, a1, (char *)d + 64);
-    func_00282F70(a0, a0, f20);
-    func_002830C0_5(a0, a0, (char *)d);
+    func_002830C0_5(vec, source, (char *)heroBase + 64);
+    FastVectorNormalizeHelper(vec, vec, savedLength);
+    func_002830C0_5(vec, vec, (char *)heroBase);
 }
 
 /* Flag-gated record update: copies 16 bytes src->dst and scales dst+8 by k when a byte flag is zero, otherwise runs two helper calls with DATA0+64 and DATA0 offsets and scales the same field between them. */
+/* Scales the height part of a vector in view space, then turns it back to world space. */
 void func_L00_002D3C68(char *dst, char *src, float k)
 {
-    char *base = D_00189E20_31;
-    int flag = *(unsigned char *)(base + 8899);
+    char *heroBase = D_00189E20_31;
+    int viewMode = *(unsigned char *)(heroBase + 8899);
 
-    if (flag == 0) {
+    if (viewMode == 0) {
         *(V4_Fd337d953 *)dst = *(V4_Fd337d953 *)src;
         *(float *)(dst + 8) = *(float *)(dst + 8) * k;
         return;
     }
-    if (flag < 0)
+    if (viewMode < 0)
         return;
-    if (flag >= 3)
+    if (viewMode >= 3)
         return;
-    func_002830C0_9(dst, src, base + 64);
+    func_002830C0_9(dst, src, heroBase + 64);
     *(float *)(dst + 8) = *(float *)(dst + 8) * k;
-    func_002830C0_9(dst, dst, base);
+    func_002830C0_9(dst, dst, heroBase);
 }
 
 /* dispatches on one byte of a global table with a three-case switch: case 0 scales two floats of the destination by the incoming scale, cases 1 and 2 first run a helper over the destination with a table at +64, scale the same two floats and then run a second helper with the destination as both source and destination */
+/* Scales the sideways parts of a vector in view space, then turns it back to world space. */
 void func_L00_002D3CF8(float *dst, void *src, float scale)
 {
-    char *d = D_00189E20_32;
-    int v = *(unsigned char *)(d + 8899);
+    char *heroBase = D_00189E20_32;
+    int viewMode = *(unsigned char *)(heroBase + 8899);
 
-    switch (v) {
+    switch (viewMode) {
     case 0:
         dst[0] = dst[0] * scale;
         dst[1] = dst[1] * scale;
         break;
     case 1:
     case 2:
-        func_002830C0_10(dst, src, d + 64);
+        func_002830C0_10(dst, src, heroBase + 64);
         dst[0] = dst[0] * scale;
         dst[1] = dst[1] * scale;
-        func_002830C0_10(dst, dst, d);
+        func_002830C0_10(dst, dst, heroBase);
         break;
     }
 
@@ -404,24 +413,25 @@ extern int D_L00_00139688[];
 
 extern int D_0018B068;
 
-int func_L00_002D3F30(int a0, int a1)
+/* Spends the given amount of ammo for a weapon slot if there is enough. Returns 1 on success and 0 if there is not enough. */
+int func_L00_002D3F30(int slotIndex, int cost)
 {
-    int idx = a0;
-    unsigned char b;
-    Entry_262570 *e;
-    int word;
+    int slot = slotIndex;
+    unsigned char typeIndex;
+    Entry_262570 *entry;
+    int current;
 
-    if (idx == -1)
-        idx = D_0018B068;
-    b = D_L00_00139568[idx];
+    if (slot == -1)
+        slot = D_0018B068;
+    typeIndex = D_L00_00139568[slot];
 
-    e = &D_L00_00262570[b];
-    if (e->f8E == 0)
+    entry = &gWeaponTable_L00[typeIndex];
+    if (entry->f8E == 0)
         return 1;
-    word = D_L00_00139688[idx];
-    if (word < a1)
+    current = D_L00_00139688[slot];
+    if (current < cost)
         return 0;
-    D_L00_00139688[idx] = word - a1;
+    D_L00_00139688[slot] = current - cost;
     return 1;
 }
 
@@ -430,6 +440,7 @@ int func_L00_002D3F30(int a0, int a1)
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
+/* Returns its argument unchanged. */
 unsigned long func_L00_002D3FB0(unsigned long param_1)
 {
   return param_1;
@@ -453,41 +464,44 @@ extern int D_L00_00139688[];
 
 extern int D_0018B068;
 
-int func_L00_002D4040(int a0)
+/* Returns how much ammo a weapon slot has, or 1 if that weapon has no ammo limit. */
+int func_L00_002D4040(int slotIndex)
 {
-    int idx = a0;
-    unsigned char b;
-    Entry_262570 *e;
+    int slot = slotIndex;
+    unsigned char typeIndex;
+    Entry_262570 *entry;
 
-    if (idx == -1)
-        idx = D_0018B068;
-    b = D_L00_00139568[idx];
+    if (slot == -1)
+        slot = D_0018B068;
+    typeIndex = D_L00_00139568[slot];
 
-    e = &D_L00_00262570[b];
-    if (e->f8E == 0)
+    entry = &gWeaponTable_L00[typeIndex];
+    if (entry->f8E == 0)
         return 1;
-    return D_L00_00139688[idx];
+    return D_L00_00139688[slot];
 }
 
 extern void func_L00_002C42E0(int, int);
 
-void func_L00_002D40A0(V4_F6a70b950 *v, int mode, float t)
+/* Stores a target, a mode and a time on the hero, and starts hero state 98 unless the hero is already in states 98 to 100. */
+void func_L00_002D40A0(V4_F6a70b950 *vec, int mode, float time)
 {
-    char *addr = (char *)&D_00189E20_11 + 0x18A0;
-    int x;
+    char *heroBase = (char *)&D_00189E20_11 + 0x18A0;
+    int heroState;
 
-    *(V4_F6a70b950 *)addr = *v;
+    *(V4_F6a70b950 *)heroBase = *vec;
     /* rebase the copy destination (base + 0x18A0) back to the record base */
-    addr -= 0x18A0;
-    x = *(int *)(addr + 0x2294);
-    *(int *)(addr + 0x18B0) = mode;
-    *(float *)(addr + 0x18AC) = t;
-    if ((unsigned)(x - 98) >= 3)
-        func_L00_002C42E0(98, 2);
+    heroBase -= 0x18A0;
+    heroState = *(int *)(heroBase + 0x2294);
+    *(int *)(heroBase + 0x18B0) = mode;
+    *(float *)(heroBase + 0x18AC) = time;
+    if ((unsigned)(heroState - 98) >= 3)
+        SetHeroAction_L00(98, 2);
 }
 
 extern int D_0018C0B4;
 
+/* Returns 1 or 2 depending on which of hero states 98 to 100 is running, otherwise 0. */
 int func_L00_002D40F0(void)
 {
     switch (D_0018C0B4) {
@@ -535,7 +549,7 @@ void func_L00_002D4140(void)
         mode = 1;
     } else if (D_00189E20_4140.platform) {
         mode = 1;
-        func_00283CE0(120 - D_00189E20_4140.platform_timer);
+        IntToFloat(120 - D_00189E20_4140.platform_timer);
         blend = D_00189E20_4140.platform_timer;
     } else {
         D_00189E20_4140.platform = 0;
@@ -545,38 +559,38 @@ void func_L00_002D4140(void)
 
     if (!mode)
         return;
-    object = func_002AD0B0(D_00189E20_4140.platform);
+    object = GetMobyPrivateValue2(D_00189E20_4140.platform);
     if (!object)
         return;
 
     if (((D_00189E20_4140.state2 == 0 || D_00189E20_4140.state2 == 12) &&
-         func_00282DF0(&D_00189E20_4140.f160) == 0.0f &&
+         FastVecLength(&D_00189E20_4140.f160) == 0.0f &&
          D_00189E20_4140.platform_timer == 0 && D_00189E20_4140.f216 == 0) ||
         (unsigned)(D_00189E20_4140.state - 23) < 2) {
         if (((D_00189E20_4140.platform_flags ^ 1) & 1)) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
                 qcopy(delta, &D_00189E20_4140.ledge_offset);
-                delta[0] += func_00283180(func_00283B98(D_00189E20_4140.ledge_angle,
+                delta[0] += FastSinOrCosA(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
-                delta[1] += func_00283198(func_00283B98(D_00189E20_4140.ledge_angle,
+                delta[1] += FastSinOrCosB(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
                 delta[2] -= -1.43f;
-                func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.ledge_offset, &D_00189E20_4140.rot, next, hero_pos);
-                func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
+                TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
                         &D_00189E20_4140.rot, delta, hero_pos);
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.ledge_offset, &D_00189E20_4140.rot, &D_00189E20_4140.f350,
                         hero_pos);
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
+                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
                         &D_00189E20_4140.rot, &D_00189E20_4140.f370, hero_pos);
             } else if (object->flags & 4) {
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.pos, &D_00189E20_4140.rot, &D_00189E20_4140.f350, delta);
             } else {
-                func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.pos, &D_00189E20_4140.rot, next, hero_pos);
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform, next, hero_pos,
+                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform, next, hero_pos,
                         &D_00189E20_4140.f350, delta);
             }
             D_00189E20_4140.platform_flags |= 1;
@@ -587,7 +601,7 @@ void func_L00_002D4140(void)
     if ((D_00189E20_4140.state2 == 0 || D_00189E20_4140.state2 == 12) && D_00189E20_4140.f1a4 == 0.0f &&
         D_00189E20_4140.platform_timer == 0) {
         if (!(D_00189E20_4140.platform_flags & 2)) {
-            func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+            GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                     &D_00189E20_4140.rot, delta, &D_00189E20_4140.f360);
             D_00189E20_4140.platform_flags |= 2;
         }
@@ -596,12 +610,12 @@ void func_L00_002D4140(void)
 
     if (D_00189E20_4140.platform_flags & 3)
         mode = 2;
-    func_00282C88(delta);
-    func_00282C88(next);
+    ClearVector128(delta);
+    ClearVector128(next);
 
     if (blend != 0.0f) {
         int flags;
-        float planar = func_00282E20(&D_00189E20_4140.platform_delta);
+        float planar = vec_length_xy(&D_00189E20_4140.platform_delta);
 
         flags = object->flags;
         height = D_00189E20_4140.platform_delta.f[2];
@@ -612,33 +626,33 @@ void func_L00_002D4140(void)
             if (flags & 16)
                 rate = 20.0f;
             rate *= 0.00027777778f;
-            func_002AA2E8(&height, 0.0f, blend * 0.0069444445f);
-            func_002AA2E8(&length, 0.0f, rate * blend);
-            func_00282F70((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
+            ApproachValue(&height, 0.0f, blend * 0.0069444445f);
+            ApproachValue(&length, 0.0f, rate * blend);
+            FastVectorNormalizeHelper((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
             delta[2] = height;
         } else if (D_00189E20_4140.platform) {
-            func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+            TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                     &D_00189E20_4140.rot, local_pos, local_rot);
             if (D_00189E20_4140.f226 == 0)
                 D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
-            func_00282CF0(delta, local_pos, &D_00189E20_4140.pos);
+            FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
             qcopy(&D_00189E20_4140.platform_delta, delta);
         } else
             qcopy(delta, &D_00189E20_4140.platform_delta);
         qcopy(next, delta);
     } else if (mode == 1) {
-        func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+        TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                 &D_00189E20_4140.rot, local_pos, local_rot);
         if (D_00189E20_4140.f226 == 0)
             D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
-        func_00282CF0(delta, local_pos, &D_00189E20_4140.pos);
+        FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
         qcopy(&D_00189E20_4140.platform_delta, delta);
     } else if (mode == 2) {
-        func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+        TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                 &D_00189E20_4140.rot, hero_pos, hero_rot);
-        func_002AD470(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f350,
+        ApplyCollisionPushToObject(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f350,
                 &D_00189E20_4140.f360, anchor_pos, anchor_rot);
-        func_002AD470(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f370,
+        ApplyCollisionPushToObject(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f370,
                 &D_00189E20_4140.f360, anchor2_pos, anchor2_rot);
         if (D_00189E20_4140.f226 == 0) {
             if ((D_00189E20_4140.state == 1 || D_00189E20_4140.state == 29) &&
@@ -650,58 +664,60 @@ void func_L00_002D4140(void)
         }
         if (D_00189E20_4140.platform_flags & 1) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
-                offset[0] = func_00283180(D_00189E20_4140.ledge_angle) * 0.45f;
-                offset[1] = func_00283198(D_00189E20_4140.ledge_angle) * 0.45f;
+                offset[0] = FastSinOrCosA(D_00189E20_4140.ledge_angle) * 0.45f;
+                offset[1] = FastSinOrCosB(D_00189E20_4140.ledge_angle) * 0.45f;
                 offset[2] = 0;
-                func_00282CC0(offset, offset, anchor2_pos);
+                FastVecAdd(offset, offset, anchor2_pos);
                 offset[2] += -1.43f;
-                func_00282CF0(delta, hero_pos, &D_00189E20_4140.pos);
+                FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
                 qcopy(&D_00189E20_4140.ledge_offset, offset);
-                D_00189E20_4140.ledge_angle = func_00283248(anchor_pos[0] - anchor2_pos[0],
+                D_00189E20_4140.ledge_angle = FastMatrixHelperA(anchor_pos[0] - anchor2_pos[0],
                         anchor_pos[1] - anchor2_pos[1]);
             } else {
                 float distance;
 
-                func_00282CF0(delta, anchor_pos, &D_00189E20_4140.pos);
-                distance = func_00282DF0(delta);
+                FastVecSub(delta, anchor_pos, &D_00189E20_4140.pos);
+                distance = FastVecLength(delta);
                 if (distance < 0.0001f) {
-                    func_00282C88(delta);
+                    ClearVector128(delta);
                     qcopy(&D_00189E20_4140.pos, anchor_pos);
                 } else if (distance > 2.0f) {
-                    func_00282C88(delta);
+                    ClearVector128(delta);
                     D_00189E20_4140.platform_flags &= ~2;
                     D_00189E20_4140.platform_flags &= ~1;
                 }
-                func_00282CC0(&D_00189E20_4140.ledge_offset, &D_00189E20_4140.ledge_offset, delta);
-                func_00282CF0(offset, delta, &D_00189E20_4140.f150);
-                if (func_00282DF0(offset) > 0.1f)
+                FastVecAdd(&D_00189E20_4140.ledge_offset, &D_00189E20_4140.ledge_offset, delta);
+                FastVecSub(offset, delta, &D_00189E20_4140.f150);
+                if (FastVecLength(offset) > 0.1f)
                     D_00189E20_4140.platform_flags &= ~1;
             }
         } else {
-            func_00282CF0(delta, hero_pos, &D_00189E20_4140.pos);
+            FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
             qcopy(next, delta);
         }
         qcopy(&D_00189E20_4140.platform_delta, delta);
     }
 
-    func_00282CC0(&D_00189E20_4140.f100, &D_00189E20_4140.f100, delta);
-    D_00189E20_4140.f100.f[3] = func_00283BE0(D_00189E20_4140.rot.f[2], old_yaw);
+    FastVecAdd(&D_00189E20_4140.f100, &D_00189E20_4140.f100, delta);
+    D_00189E20_4140.f100.f[3] = fast_subtract_rotations(D_00189E20_4140.rot.f[2], old_yaw);
 }
 
 
 extern int func_003425F8(int, float, char *, char *);
 
+/* Runs a check on the hero and, if it succeeds, sets a hero field to 4. */
 void func_L00_002D49F0(void)
 {
-    char *p = (char *)&D_00189E20_11;
+    char *heroBase = (char *)&D_00189E20_11;
 
-    if (func_003425F8(*(short *)(p + 0x24FE), *(float *)(p + 0x264), p + 0x80, p + 0x80)) {
-        *(short *)(p + 0x216) = 4;
+    if (func_003425F8(*(short *)(heroBase + 0x24FE), *(float *)(heroBase + 0x264), heroBase + 0x80, heroBase + 0x80)) {
+        *(short *)(heroBase + 0x216) = 4;
     }
 }
 
 extern int ref_L00_002D4A38_00 __attribute__((sda));
 
+/* Fades the colors of the level glow objects back and forth over time. */
 void func_L00_002D4A38(void)
 {
     Node_F882f1178 *node;
@@ -718,16 +734,16 @@ void func_L00_002D4A38(void)
     node = (Node_F882f1178 *)D_00189E20_11.p1364;
     if (node != 0) {
         if (D_L00_001A8F00 != 2) {
-            float limit;
-            int which;
+            float angle;
+            int targetColor;
 
-            limit = func_00283B98_4(D_00189E20_11.f2510, 0.049451004713773727f);
-            D_00189E20_11.f2510 = limit;
-            which = 0x1ee628;
-            if (limit > 0.0f && limit < 1.9198623895645142f) {
-                which = 0x1e1ed2;
+            angle = func_00283B98_4(D_00189E20_11.f2510, 0.049451004713773727f);
+            D_00189E20_11.f2510 = angle;
+            targetColor = 0x1ee628;
+            if (angle > 0.0f && angle < 1.9198623895645142f) {
+                targetColor = 0x1e1ed2;
             }
-            node->field120 = func_00283D38_1(node->field120, which, 0.070000000298023224f);
+            node->field120 = func_00283D38_1(node->field120, targetColor, 0.070000000298023224f);
         } else {
             D_00189E20_11.f2510 = func_00283B98_4(D_00189E20_11.f2510, 0.026179943233728409f);
             node->field120 = func_00283D38_1(0x1e1ed2, 0x1e1e50,
@@ -736,10 +752,10 @@ void func_L00_002D4A38(void)
     }
     if (D_00189E20_11.p1368 != 0) {
         if (D_L00_001A8F00 == 2)
-            func_L00_00326048((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
+            StoreAngleUpdateResult((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
                     0.026179943233728409f);
         else
-            func_L00_00326048((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
+            StoreAngleUpdateResult((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
                     0.040724355727434158f);
     }
 }
@@ -755,30 +771,31 @@ extern void func_L00_002B0968(char *);
 /* One-shot spawn: arms the state word, and when the slot is free asks the allocator for a
    0x50A object, writes its flags, the packed constant at +0x38 and the level's tag, then runs
    the two level entry points on the argument. */
-void func_L00_002D4D98(char *arg0) {
-    char *base = D_00189E20_4D98;
-    char *node;
+/* Creates the glow object for the level effect if it does not exist yet, then runs the two level update steps. */
+void func_L00_002D4D98(char *object) {
+    char *heroBase = D_00189E20_4D98;
+    char *glowObject;
 
-    *(int *)(base + 0x12E8) = 0x2F;
-    if (*(int *)(base + 0x12C0) == 0) {
-        node = func_0029EFD0(0x50A);
-        if (node != 0) {
-            *(unsigned short *)(node + 0x32) = 0x20;
-            *(unsigned short *)(node + 0x34) =
-                *(unsigned short *)(node + 0x34) | 2;
-            *(unsigned char *)(node + 0x31) = 1;
-            *(unsigned long *)(node + 0x38) = 0x20202000000000UL;
-            *(int *)(node + 0x64) = 0;
-            if (*(unsigned char *)(*(int *)(node + 0x24) + 6) != 0)
-                *(unsigned char *)(node + 0x63) = 0x10;
-            *(unsigned short *)(node + 0x34) =
-                *(unsigned short *)(node + 0x34) | 0x800;
-            *(int *)(base + 0x12C0) = (int)node;
-            *(int *)(base + 0x12E4) = 2;
+    *(int *)(heroBase + 0x12E8) = 0x2F;
+    if (*(int *)(heroBase + 0x12C0) == 0) {
+        glowObject = CreateMoby(0x50A);
+        if (glowObject != 0) {
+            *(unsigned short *)(glowObject + 0x32) = 0x20;
+            *(unsigned short *)(glowObject + 0x34) =
+                *(unsigned short *)(glowObject + 0x34) | 2;
+            *(unsigned char *)(glowObject + 0x31) = 1;
+            *(unsigned long *)(glowObject + 0x38) = 0x20202000000000UL;
+            *(int *)(glowObject + 0x64) = 0;
+            if (*(unsigned char *)(*(int *)(glowObject + 0x24) + 6) != 0)
+                *(unsigned char *)(glowObject + 0x63) = 0x10;
+            *(unsigned short *)(glowObject + 0x34) =
+                *(unsigned short *)(glowObject + 0x34) | 0x800;
+            *(int *)(heroBase + 0x12C0) = (int)glowObject;
+            *(int *)(heroBase + 0x12E4) = 2;
         }
     }
-    func_L00_002AA178(arg0);
-    func_L00_002B0968(arg0);
+    SpawnEffectFromRecord(object);
+    update_hero_item_mobys(object);
 }
 
 /* func_L00_002D4E58 is in L00_002D4E58-g8.c (-G8). */
@@ -801,7 +818,8 @@ extern int D_001A7A0C __attribute__((sda));
    sum to *a0. *a1 gets the final sum. The retail unit returns int without setting it: $v0 is
    live at the exit, which keeps the load of D_001A7A0C out of the exit branch's delay slot
    (a void function gives that slot to the load, as a $gp access). */
-int func_L00_002D5E30(int *a0, int *a1, int *a2) {
+/* Adds up table entries until the running total passes a limit. Reports the totals through the three pointers. */
+int func_L00_002D5E30(int *lastSumOut, int *totalOut, int *bonusOut) {
     int sum = 0;
     int i = 0;
     short *second = &D_L00_00262260[1];
@@ -809,32 +827,33 @@ int func_L00_002D5E30(int *a0, int *a1, int *a2) {
 
     for (; i < 77 && *first >= 0 && (sum += *first) <= (D_001A7A0C >> 5);
          i++, second += 2, first += 2) {
-        *a2 += *second;
-        *a0 = sum;
+        *bonusOut += *second;
+        *lastSumOut = sum;
     }
-    *a1 = sum;
+    *totalOut = sum;
 }
 
 extern int D_001A7908 __attribute__((sda));
 extern char *D_L00_001B8E10;
 extern unsigned char D_00189E20[];
 
+/* Returns 1 when a hero action is allowed right now. Returns 0 in several special modes and hero states. */
 int func_L00_002D6418(void)
 {
-    int v;
+    int value;
 
     if (D_001A7908 == 0)
         return 0;
-    v = D_L00_001A8F00;
-    if (v == 2 || v == 6)
+    value = D_L00_001A8F00;
+    if (value == 2 || value == 6)
         return 0;
-    if (D_L00_001B8E10 != 0 && *(short *)(D_L00_001B8E10 + 0x86) == 5)
+    if (gFollowCameraObject != 0 && *(short *)(gFollowCameraObject + 0x86) == 5)
         return 0;
-    if (D_00189E20[0x22B4] != 0 || *(int *)(D_00189E20 + 0x229C) == 0x14 ||
-        *(int *)(D_00189E20 + 0x24CC) == 0)
+    if (gHeroState[0x22B4] != 0 || *(int *)(gHeroState + 0x229C) == 0x14 ||
+        *(int *)(gHeroState + 0x24CC) == 0)
         return 0;
-    v = *(int *)(D_00189E20 + 0x2294);
-    if (v == 0x6F || v == 0x31 || v == 0x1C || v == 0x8C)
+    value = *(int *)(gHeroState + 0x2294);
+    if (value == 0x6F || value == 0x31 || value == 0x1C || value == 0x8C)
         return 0;
     return 1;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* -G8 sibling of src/game/0027F128.c. */
 
@@ -12,6 +13,7 @@ extern void func_00285708(int, int, int, int, void *);
 extern void func_001244B8(int, int);
 extern void func_00280670(void *, int);
 
+/* Copies the marked screen regions into spare buffers, one at a time, and clears each mark when done. */
 void func_00280710(void) {
     u8 *buffers[2];
     int current, next, i, index;
@@ -25,9 +27,9 @@ void func_00280710(void) {
     for (i = 31; i >= 0; i--) {
         if (D_001B8A10[i].flags & 4) {
             next = i;
-            func_00285708(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
+            CaptureScreenRect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
                           buffers[current]);
-            func_001244B8(0, 0);
+            WaitGsPathsIdle(0, 0);
         }
     }
     if (next == -1) return;
@@ -38,16 +40,16 @@ void func_00280710(void) {
         for (i = index - 1; i >= 0; i--) {
             if (D_001B8A10[i].flags & 4) {
                 next = i;
-                func_00285708(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
+                CaptureScreenRect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
                               buffers[current]);
             }
         }
-        func_00280670(buffers[1 - current], index);
+        ComputeRegionThresholdRatio(buffers[1 - current], index);
         if ((D_001B8A10 + index)->flags & 1) {
             (D_001B8A10 + index)->flags &= ~5;
             D_001B1658--;
         }
-        if (next >= 0) func_001244B8(0, 0);
+        if (next >= 0) WaitGsPathsIdle(0, 0);
         index = next;
     }
 }

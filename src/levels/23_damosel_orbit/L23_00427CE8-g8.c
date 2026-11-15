@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L23_00427CE8 is a unit of its own: it reads $gp data (-G8) and needs the opt-in
    quadword-copy profile and its scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier,
@@ -117,59 +118,61 @@ extern void func_L12_004081F8(u8 *);
    or the hit is near, else a second probe) and leaves, otherwise it moves the object; state 1
    spawns the burst and removes it. It then integrates the velocity, turns two matrix rows and
    registers the next update. */
+/* Per-frame update of a flying shot. It checks what the shot hits, plays hit effects and
+   removes it, or moves it on and turns it. */
 void func_L23_00427CE8(u8 *moby) {
     L23Flight *vars = *(L23Flight **)(moby + 0x68);
     TI16 target[1];
-    L23Probe q1;
+    L23Probe rayProbe;
     TI16 vecA[1];
     TI16 vecB[1];
-    L23Probe q2;
+    L23Probe missProbe;
 
     if (moby[0xBC] == 0) {
         vars->frames += 1;
         if (vars->frames > 0xF0) {
             if (moby[0xBC] == 0) {
-                func_002A7750(moby, 1, -1);
+                SetMobyState(moby, 1, -1);
             }
         }
         switch (moby[0x20]) {
         case 0: {
-            func_00282CC0(target, moby + 0x10, vars);
-            func_002A8C00(&q1, moby, 0x90003, vars, vars->radius);
-            q1.id = *(u16 *)(moby + 0xAA);
-            if (func_002761F8(moby + 0x10, target, 0, moby, 0) != 0) {
-                float dist = func_00282E48(D_L23_001B36C0, D_L23_001C0A80.point);
+            FastVecAdd(target, moby + 0x10, vars);
+            make_hit_descriptor(&rayProbe, moby, 0x90003, vars, vars->radius);
+            rayProbe.id = *(u16 *)(moby + 0xAA);
+            if (CollLine(moby + 0x10, target, 0, moby, 0) != 0) {
+                float dist = fast_vec_dist(D_L23_001B36C0, gLastRayHit.point);
                 u8 *player = D_00189E20_2.player;
-                s32 isPlayer = D_L23_001C0A80.hit == player;
+                s32 isPlayer = gLastRayHit.hit == player;
 
                 if (isPlayer || dist < D_L23_001B1ADC) {
-                    TI16 t;
+                    TI16 posCopy;
                     s32 radius;
 
-                    func_00282D30(vecA, player + 0xE0, 3.5f);
-                    func_00282CC0(vecA, vecA, D_00189E20_2.camera);
-                    func_0032C700(vecA, 1, 5, 5, 5, 0x19, 0x4B, 0, 1.5f, 20.0f, 0, 1, 0, 0);
+                    FastVecScale(vecA, player + 0xE0, 3.5f);
+                    FastVecAdd(vecA, vecA, D_00189E20_2.camera);
+                    SpawnExplosion(vecA, 1, 5, 5, 5, 0x19, 0x4B, 0, 1.5f, 20.0f, 0, 1, 0, 0);
                     radius = (s32)vars->radius;
-                    t = *(TI16 *)(moby + 0x10);
-                    vecB[0] = t;
-                    func_L23_0041E5B0(moby, 0x10007, radius, vecB, 0, 0);
+                    posCopy = *(TI16 *)(moby + 0x10);
+                    vecB[0] = posCopy;
+                    PlayEffectOnTarget(moby, 0x10007, radius, vecB, 0, 0);
                     if (isPlayer) {
-                        func_L00_0035F5A0(0x20, 0, 0);
+                        StartEffectInSlot(0x20, 0, 0);
                     }
                     if (moby[0xBC] == 0) {
-                        func_002A7750(moby, 1, -1);
+                        SetMobyState(moby, 1, -1);
                     }
                 } else {
                     vecA[0] = *(TI16 *)vars;
-                    func_00282D30(vecA, vecA, 3.0f);
+                    FastVecScale(vecA, vecA, 3.0f);
                     ((float *)vecA)[2] = 1.0f;
                     ((float *)vecA)[3] = 5627.9248046875f;
-                    func_002A8C00(&q2, moby, 0x90003, vecA, vars->radius);
-                    q2.b19 = 1;
-                    q2.id = *(u16 *)(moby + 0xAA);
-                    q2.b18 = 0;
+                    make_hit_descriptor(&missProbe, moby, 0x90003, vecA, vars->radius);
+                    missProbe.b19 = 1;
+                    missProbe.id = *(u16 *)(moby + 0xAA);
+                    missProbe.b18 = 0;
                     if (moby[0xBC] == 0) {
-                        func_002A7750(moby, 1, -1);
+                        SetMobyState(moby, 1, -1);
                     }
                 }
                 return;
@@ -177,13 +180,13 @@ void func_L23_00427CE8(u8 *moby) {
             if (moby[0xBC] == 0) {
                 *(TI16 *)(moby + 0x10) = target[0];
             }
-            func_00282D30(vecA, vars, -0.5f);
-            func_00282C88(vecB);
+            FastVecScale(vecA, vars, -0.5f);
+            ClearVector128(vecB);
             break;
         }
         case 1:
-            func_L16_00406080(moby + 0x10, 0, 0x19, 0x19, 0x19, 0x19, 0, 0, 4.5f, 1, 0);
-            func_0029F338(moby);
+            CreateFlashEffectMoby(moby + 0x10, 0, 0x19, 0x19, 0x19, 0x19, 0, 0, 4.5f, 1, 0);
+            MarkMobySpawned(moby);
             return;
         }
     }
@@ -203,7 +206,7 @@ void func_L23_00427CE8(u8 *moby) {
     if (vars->vel[3] > D_L23_001B1A1C) {
         vars->vel[3] = D_L23_001B1A1C;
     }
-    func_002ACEC0(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
-    func_002ACEC0(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
-    func_L00_002E6EF8((void *)func_L12_004081F8, moby);
+    ApplyAxisRotationToQuaternion(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
+    ApplyAxisRotationToQuaternion(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
+    AddDrawCallbackToList3((void *)DrawBlastProjectileGlow, moby);
 }

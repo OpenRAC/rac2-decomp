@@ -1,24 +1,26 @@
+#include "names.h"
 extern int func_00282978(short *);
 extern void func_00282CC0(char *, char *, char *);
 extern void func_002B9180(void *);
 extern unsigned char *D_001F26D0[];
 extern float D_001AA384 __attribute__((sda));
 
+/* Updates a drifting particle that falls once its timer runs out, and removes it when it is too small. */
 void func_002C8268(char *self)
 {
     char *state = self + 32;
     char *pos;
 
-    if (func_00282978((short *)(self + 10)))
+    if (FastDecTimer((short *)(self + 10)))
         *(float *)(state + 8) -= *(float *)(state + 24);
     pos = self + 16;
-    func_00282CC0(pos, pos, state);
-    func_00282CC0(pos, pos, *(char **)(state + 28));
+    FastVecAdd(pos, pos, state);
+    FastVecAdd(pos, pos, *(char **)(state + 28));
     self[8] = (unsigned char)self[8] + *(unsigned char *)(state + 20);
     if ((unsigned char)self[2] == D_001F26D0[0][0])
         *(float *)(self + 12) += D_001AA384 * 3500.000244140625f;
     if (*(float *)(self + 24) < *(float *)(state + 16))
-        func_002B9180(self);
+        KillParticle(self);
 }
 
 extern void func_00282D30(char *, char *, float);
@@ -26,30 +28,32 @@ extern float func_00283CE0(int);
 extern int func_00283CF0(float);
 extern float D_001AA3D8 __attribute__((sda));
 
+/* Updates a slowing particle that fades out and is removed when its timer ends. */
 void func_002C7888(char *self)
 {
     char *state = self + 32;
-    float f;
+    float ratio;
     int colour;
 
-    func_00282D30(state, state, D_001AA3D8);
+    FastVecScale(state, state, D_001AA3D8);
     *(float *)(state + 8) -= *(float *)(state + 0x1C);
-    func_00282CC0(self + 16, self + 16, state);
+    FastVecAdd(self + 16, self + 16, state);
     if (*(short *)(self + 10) < *(int *)(state + 16)) {
-        f = func_00283CE0(*(short *)(self + 10));
-        f = f / func_00283CE0(*(int *)(state + 16));
-        colour = (func_00283CF0(f * 64.0f) << 24) | 0x808080;
+        ratio = IntToFloat(*(short *)(self + 10));
+        ratio = ratio / IntToFloat(*(int *)(state + 16));
+        colour = (FloatToInt(ratio * 64.0f) << 24) | 0x808080;
         *(int *)(self + 4) = colour | 0x8080;
     } else {
         colour = 0x40800000;
         *(int *)(self + 4) = colour | 0x8080;
     }
     self[8] = (unsigned char)self[8] + *(unsigned char *)(state + 20);
-    if (func_00282978((short *)(self + 10)))
-        func_002B9180(self);
+    if (FastDecTimer((short *)(self + 10)))
+        KillParticle(self);
 }
 
 #include "include_asm.h"
+#include "names.h"
 
 /* The three handler slots and the string table are read through $gp, so this
  * function needs the -G8 profile of the sibling file. */
@@ -87,6 +91,7 @@ extern int D_001AA748 __attribute__((sda));
 extern int func_002D5E70(char *object, int *result);
 
 /* Mode dispatcher: two handler slots are called, one mode names a string. */
+/* Runs the action for a menu mode, such as calling a stored handler. */
 int func_002CB820(int mode)
 {
     int result = 0;
@@ -106,7 +111,7 @@ int func_002CB820(int mode)
         result = 1;
         break;
     case 3:
-        result = func_002D5B38(3, D_0025BA90);
+        result = SendMenuRequest(3, D_0025BA90);
         break;
     case 4:
         if (D_001AA42C)
@@ -143,28 +148,29 @@ extern int func_0029C290(int);
 extern int func_002D6F38(int);
 extern int func_0029C300(int);
 
+/* Checks the current menu page and reacts to button presses on it. */
 int func_002CBAE0(void)
 {
     int result = 0;
 
-    if (D_001F2840.source == D_00259018) {
-        if (D_00138180.flags & 0x910) {
-            D_001F2840.state = D_001F2840.value == 4 ? 2 : 1;
+    if (gPauseMenuState.source == D_00259018) {
+        if (gPadState.flags & 0x910) {
+            gPauseMenuState.state = gPauseMenuState.value == 4 ? 2 : 1;
             result = 1;
-        } else if (D_00210ACC[0](D_00138180.flags) >= 0) {
+        } else if (D_00210ACC[0](gPadState.flags) >= 0) {
             result = 1;
         }
-    } else if (D_001F2840.source == D_0025A738) {
+    } else if (gPauseMenuState.source == D_0025A738) {
         func_0029CE38();
-    } else if (D_001F2840.source == D_0025A498 && !D_001AB910) {
+    } else if (gPauseMenuState.source == D_0025A498 && !D_001AB910) {
         func_0029C290(0);
-    } else if (D_001F2840.source == D_0025A190 && !D_001AB910) {
-        if (func_002D6F38(0))
-            D_001F2840.state = D_001F2840.value == 4 ? 2 : 1;
-        func_0029C300(D_00138180.flags);
-        result = D_001F2840.destination != D_0025A498;
-    } else if ((D_001F2840.source == D_0025A058 && !D_001AB910)
-               || (D_001F2840.source == D_00259B48 && !D_001AB910)) {
+    } else if (gPauseMenuState.source == D_0025A190 && !D_001AB910) {
+        if (DrawMapScreen(0))
+            gPauseMenuState.state = gPauseMenuState.value == 4 ? 2 : 1;
+        func_0029C300(gPadState.flags);
+        result = gPauseMenuState.destination != D_0025A498;
+    } else if ((gPauseMenuState.source == D_0025A058 && !D_001AB910)
+               || (gPauseMenuState.source == D_00259B48 && !D_001AB910)) {
         /* nothing: only the tests remain */
     }
     return result;
@@ -209,41 +215,42 @@ extern void func_0029B720(int);
 extern void func_0029B698(int);
 extern void func_002FC280(void);
 
+/* Closes the menu after a short wait and saves any changed choices. */
 void func_002CA5D0(void)
 {
     int i, j;
 
-    if (((MenuState_2CA5D0 *)&D_001F2840)->frames < 10)
+    if (((MenuState_2CA5D0 *)&gPauseMenuState)->frames < 10)
         return;
-    func_002FC3C0(1);
-    func_002FC1D8();
-    if (((MenuState_2CA5D0 *)&D_001F2840)->object) {
+    WaitForDmaStatusBits(1);
+    ResetPacketBuffer();
+    if (((MenuState_2CA5D0 *)&gPauseMenuState)->object) {
         for (i = 0; i < 14; i++) {
-            char *obj = ((CallbackGroup_2CA5D0 *)((MenuState_2CA5D0 *)&D_001F2840)->object)->children[i];
+            char *obj = ((CallbackGroup_2CA5D0 *)((MenuState_2CA5D0 *)&gPauseMenuState)->object)->children[i];
             if (obj && *(void (**)(char *, int))(obj + 12))
                 (*(void (**)(char *, int))(obj + 12))(obj, 0);
         }
-        ((MenuState_2CA5D0 *)&D_001F2840)->object = 0;
+        ((MenuState_2CA5D0 *)&gPauseMenuState)->object = 0;
     }
     for (j = 0; j < 4; j++) {
         int old = D_001A7398[j];
-        int selected = ((MenuState_2CA5D0 *)&D_001F2840)->choices[j];
+        int selected = ((MenuState_2CA5D0 *)&gPauseMenuState)->choices[j];
         if (old != selected)
-            ((SavedChoices_2CA5D0 *)&D_00189E20)->choices[j] = selected ? selected : 0x77;
+            ((SavedChoices_2CA5D0 *)&gHeroState)->choices[j] = selected ? selected : 0x77;
     }
-    D_001A72D4 = ((MenuState_2CA5D0 *)&D_001F2840)->value;
-    func_0028B160(0, D_001B1888->c[0], 0);
-    func_0028AFE8(2);
+    D_001A72D4 = ((MenuState_2CA5D0 *)&gPauseMenuState)->value;
+    Hud_SendResidentBank(0, D_001B1888->c[0], 0);
+    UnlinkHudBankGroup(2);
     if (D_001B1888->c[3])
-        func_0028AFE8(3);
+        UnlinkHudBankGroup(3);
     if (D_001B1888->c[4])
-        func_0028AFE8(4);
-    func_0029B720(360);
-    func_0029B698(180);
-    ((MenuState_2CA5D0 *)&D_001F2840)->state = 5;
-    ((MenuState_2CA5D0 *)&D_001F2840)->field4 = 0;
-    ((MenuState_2CA5D0 *)&D_001F2840)->mode = 2;
-    ((Flags_2CA5D0 *)D_001BAF80)->flags &= 0x7FFFFFFF;
-    func_002FC280();
-    func_002FC3C0(1);
+        UnlinkHudBankGroup(4);
+    ForwardValueToLevelObjectB(360);
+    ForwardValueToLevelObject(180);
+    ((MenuState_2CA5D0 *)&gPauseMenuState)->state = 5;
+    ((MenuState_2CA5D0 *)&gPauseMenuState)->field4 = 0;
+    ((MenuState_2CA5D0 *)&gPauseMenuState)->mode = 2;
+    ((Flags_2CA5D0 *)gCollisionHit)->flags &= 0x7FFFFFFF;
+    SubmitBufferedDmaChain();
+    WaitForDmaStatusBits(1);
 }

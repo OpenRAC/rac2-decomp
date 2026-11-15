@@ -34,24 +34,25 @@ extern s32 ref_L07_003F8908_07 __attribute__((sda));
 extern s32 ref_L07_003F8908_08 __attribute__((sda));
 extern s32 ref_L07_003F8908_09 __attribute__((sda));
 
-s32 func_L07_003F8908(void *arg0) {
+/* Picks the enemy's next action from its current phase and a random roll, and sets up the timer and handlers for it. Returns the chosen action number. */
+s32 func_L07_003F8908(void *moby) {
     s32 one  = 1;
-    u8 *temp_s0 ;
-    s32 var_s1 ;
-    s32 temp_v1 ;
-    s32 temp_v0;
-    s32 var_v0;
-    s32 var_v1;
-    s32 var_a0;
-    s32 var_a1;
+    u8 *vars ;
+    s32 action ;
+    s32 phase ;
+    s32 roll;
+    s32 handlerB;
+    s32 handlerA;
+    s32 rangeMin;
+    s32 rangeMax;
 
-    temp_s0 = *(u8 **)((u8 *)arg0 + 0x68);
-    temp_v1 = *(s32 *)(temp_s0 + 0x420);
-    var_s1 = 7;
-    if (temp_v1 != one) {
-        var_s1 = 7;
-        if (temp_v1 < 2) {
-            if (temp_v1 != 0) {
+    vars = *(u8 **)((u8 *)moby + 0x68);
+    phase = *(s32 *)(vars + 0x420);
+    action = 7;
+    if (phase != one) {
+        action = 7;
+        if (phase < 2) {
+            if (phase != 0) {
                 goto state_default;
             }
         } else {
@@ -61,76 +62,76 @@ s32 func_L07_003F8908(void *arg0) {
     }
 
     one = ref_L07_003F8908_00(0xFF) & 1;
-    temp_v1 = 6;
+    phase = 6;
     if (one != 0) {
-        var_s1 = temp_v1;
+        action = phase;
     }
     goto dispatch;
 
 state_default:
-    temp_v0 = ref_L07_003F8908_00(*(s32 *)(temp_s0 + 0x420) + 1);
-    switch (temp_v0) {
+    roll = ref_L07_003F8908_00(*(s32 *)(vars + 0x420) + 1);
+    switch (roll) {
     case 0:
-        var_s1 = 7;
+        action = 7;
         break;
     case 1:
-        var_s1 = 6;
+        action = 6;
         break;
     case 2:
-        if (*(s32 *)(temp_s0 + 0x458) != 0) {
-            var_s1 = 8;
-            ref_L07_003F8908_02((void *)(temp_s0 + 0x458), 0, 1);
+        if (*(s32 *)(vars + 0x458) != 0) {
+            action = 8;
+            ref_L07_003F8908_02((void *)(vars + 0x458), 0, 1);
         } else {
             {
-                    s32 arg0  = 2;
+                    s32 mode  = 2;
 
-                    var_s1 = 6;
-                    temp_v0 = ref_L07_003F8908_00(arg0);
-                    temp_v1 = 7;
-                    if (temp_v0 != 0) {
-                        var_s1 = temp_v1;
+                    action = 6;
+                    roll = ref_L07_003F8908_00(mode);
+                    phase = 7;
+                    if (roll != 0) {
+                        action = phase;
                     }
                 }
         }
         break;
     case 3:
-        var_s1 = 9;
+        action = 9;
         break;
     }
 
 dispatch:
-switch (var_s1) {
+switch (action) {
     case 7:
-        var_v1 = ref_L07_003F8908_05;
-        var_a0 = 3;
-        var_v0 = ref_L07_003F8908_08;
-        var_a1 = 5;
+        handlerA = ref_L07_003F8908_05;
+        rangeMin = 3;
+        handlerB = ref_L07_003F8908_08;
+        rangeMax = 5;
         goto block_35;
     case 6:
-        var_v1 = ref_L07_003F8908_04;
-        var_a0 = 2;
-        var_v0 = ref_L07_003F8908_07;
-        var_a1 = 3;
+        handlerA = ref_L07_003F8908_04;
+        rangeMin = 2;
+        handlerB = ref_L07_003F8908_07;
+        rangeMax = 3;
         goto block_35;
     case 8:
-        *(s32 *)(temp_s0 + 0x438) = 1;
-        *(s32 *)(temp_s0 + 0x41C) = ref_L07_003F8908_03(*(s32 *)(temp_s0 + 0x180));
+        *(s32 *)(vars + 0x438) = 1;
+        *(s32 *)(vars + 0x41C) = ref_L07_003F8908_03(*(s32 *)(vars + 0x180));
         goto block_36;
     case 9:
-        var_v1 = ref_L07_003F8908_06;
-        var_a0 = 1;
-        var_v0 = ref_L07_003F8908_09;
-        var_a1 = 3;
+        handlerA = ref_L07_003F8908_06;
+        rangeMin = 1;
+        handlerB = ref_L07_003F8908_09;
+        rangeMax = 3;
         goto block_35;
     default:
-        return var_s1;
+        return action;
     }
 
 block_35:
-    *(s32 *)(temp_s0 + 0x444) = var_v1;
-    *(s32 *)(temp_s0 + 0x448) = var_v0;
-    *(s32 *)(temp_s0 + 0x438) = ref_L07_003F8908_01(var_a0, var_a1);
+    *(s32 *)(vars + 0x444) = handlerA;
+    *(s32 *)(vars + 0x448) = handlerB;
+    *(s32 *)(vars + 0x438) = ref_L07_003F8908_01(rangeMin, rangeMax);
 
 block_36:
-    return var_s1;
+    return action;
 }

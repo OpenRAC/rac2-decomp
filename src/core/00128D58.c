@@ -3,10 +3,10 @@
 
 typedef struct {
     char unk_00[4];
-    int  unk_04;
-    int  unk_08;
-    char *unk_0C;
-    char unk_10[0x320];
+    int  isLinked;
+    int  linkHandle;
+    char *dmaBuffer;
+    char buttonSlots[0x320];
 } Ent330;
 
 extern Ent330 r1_D_0015B640[];
@@ -32,14 +32,15 @@ extern int func_00128E98(unsigned char *, int *);
    success, records the handle in its table entry. The failure path needs
    its own early return: with one shared `return t` the compiler moves the
    result copy to the end of the function. */
-int func_00128D58(int arg0) {
-    int t = func_00128578(arg0);
-    if (t < 0) {
-        return t;
+/* Links the driver to a controller port and remembers the handle. */
+int func_00128D58(int port) {
+    int handle = SceDbcGetDepNumber(port);
+    if (handle < 0) {
+        return handle;
     }
-    r1_D_0015B640[arg0].unk_08 = t;
-    r1_D_0015B640[arg0].unk_04 = 1;
-    return t;
+    r1_D_0015B640[port].linkHandle = handle;
+    r1_D_0015B640[port].isLinked = 1;
+    return handle;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00125078 */
@@ -59,13 +60,14 @@ int func_00128D58(int arg0) {
  * order", which was wrong. It is operand order, and it is steerable:
  * give the table a real element type and index it. See Ent330 above.
  */
-void *func_00128DB0(int arg0) {
-    char *p = r1_D_0015B640[arg0].unk_0C;
+/* Returns whichever of the two controller data buffers was written most recently. */
+void *func_00128DB0(int port) {
+    char *padBuf = r1_D_0015B640[port].dmaBuffer;
     char *slot[2];
 
-    slot[0] = p;
-    slot[1] = p + 0x80;
-    r1_func_00119288(p, p + 0x100);
+    slot[0] = padBuf;
+    slot[1] = padBuf + 0x80;
+    r1_func_00119288(padBuf, padBuf + 0x100);
     return slot[*(int *)(slot[0] + 0x7C) < *(int *)(slot[1] + 0x7C)];
 }
 
@@ -77,14 +79,15 @@ void *func_00128DB0(int arg0) {
    is retail's (the same idiom as func_00128DB0). Exact under this file's
    2.9-ee; under 2.95.3 it was a word long. */
 /* The old note's decode, exact since 001236F0.c builds with 2.9-ee. */
-int func_00128E18(int arg0) {
-    char *p = r1_D_0015B640[arg0].unk_0C;
+/* Returns 1 if the controller data has changed since the last check, otherwise 0. */
+int func_00128E18(int port) {
+    char *padBuf = r1_D_0015B640[port].dmaBuffer;
     char *slot[2];
 
-    slot[0] = p;
-    slot[1] = p + 0x80;
-    if (*(int *)(p + 0x7C) == 0 ||
-        (r1_D_00132ED8[0] == *(int *)(p + 0x7C) &&
+    slot[0] = padBuf;
+    slot[1] = padBuf + 0x80;
+    if (*(int *)(padBuf + 0x7C) == 0 ||
+        (r1_D_00132ED8[0] == *(int *)(padBuf + 0x7C) &&
          r1_D_00132ED8[1] == *(int *)(slot[1] + 0x7C))) {
         return 0;
     }
@@ -101,6 +104,7 @@ int func_00128E18(int arg0) {
    the slot's type and both counters. Initialising b before the loop
    sets i gives i the shorter live range, so this file's compiler
    (2.9-ee) allocates it first, as retail. */
+/* Turns a bit mask of buttons into a list of button slots. */
 int func_00128E98(unsigned char *src, int *out) {
     int bit;
     int a;
@@ -155,20 +159,21 @@ extern int r1_func_00124A70(int, Mode128F48, int *, int);
    trip. The fields are 64-bit, so each insert is a doubleword and/or,
    and the struct is passed by value. `if (r >= 0) return out;` keeps
    retail's two returns; an `r = out` spelling becomes slt/movz. */
-int func_00128F48(int arg0, int arg1) {
+/* Sends a command to a controller port and returns the result value. */
+int func_00128F48(int port, int dst) {
     Mode128F48 m;
     int out;
-    int r;
+    int status;
 
     m.a = 2;
     m.b = 2;
     m.c = 3;
     m.d = 1;
-    r = r1_func_00124A70(arg0, m, &out, arg1);
-    if (r >= 0) {
+    status = r1_func_00124A70(port, m, &out, dst);
+    if (status >= 0) {
         return out;
     }
-    return r;
+    return status;
 }
 
 extern void *func_001153D4(void *, const void *, unsigned int);
@@ -198,11 +203,11 @@ int func_00128FD0(int port, int second_size, void *second, int first_size, void 
     m.c = 3;
     m.d = 1;
     packet.sizes[1] = first_size;
-    func_001153D4(packet.buffer, first, first_size);
+    memcpy_001153D4(packet.buffer, first, first_size);
     packet.sizes[0] = second_size;
     first_size += (int)&packet;
-    func_001153D4((void *)(first_size + 8), second, second_size);
-    return func_001286C8(port, m, &result, (unsigned char *)&packet);
+    memcpy_001153D4((void *)(first_size + 8), second, second_size);
+    return SendVibrationCommand(port, m, &result, (unsigned char *)&packet);
 }
 
 ASM_FUNC("asm/core", func_001290BC);

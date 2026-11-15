@@ -14,6 +14,7 @@ extern float func_002A78D8(float, float);
 extern float func_00283B98(float, float);
 extern float func_002A7878(float, float);
 extern void func_002AF000(void *, float, float, float);
+/* Looks for a target for the thrown object and, when it has one, launches it toward it with a random upward kick. */
 void func_00304D38(char *obj)
 {
     SpawnVec origin, pos;
@@ -23,11 +24,11 @@ void func_00304D38(char *obj)
     SpawnVec up;
     int output;
     SpawnRecord *rec = *(SpawnRecord **)(obj + 0x68);
-    func_002FE8D8(obj + 0x10, &origin);
-    func_0029FCC0(obj, 0, &pos);
+    GetObjectFacingDirection(obj + 0x10, &origin);
+    TransformMobyJointToWorld(obj, 0, &pos);
     if (rec->target == 0) {
         params = D_001AEC10;
-        rec->target = func_002AF580(&pos, obj + 0xC0, 6.2831855f, 6.2831855f, &output, 0, 0, 0, D_001AEC04, 0.0f, 0.0f, 0, &params);
+        rec->target = SelectBestTargetInCone(&pos, obj + 0xC0, 6.2831855f, 6.2831855f, &output, 0, 0, 0, D_001AEC04, 0.0f, 0.0f, 0, &params);
         if (rec->target) {
             obj[0x20] = 4;
             rec->timer = 0.0f;
@@ -41,18 +42,18 @@ void func_00304D38(char *obj)
             up.q = 0;
             up.f[2] = 1.0f;
             qcopy(&matrix[0], direction);
-            func_00282DD8(&matrix[1], &matrix[0], &up);
-            func_00282F20(&matrix[1], &matrix[1], 1.0f);
-            func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
+            FastVecCross(&matrix[1], &matrix[0], &up);
+            vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
+            FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
             matrix[3].f[0] = 0;
             matrix[3].f[1] = 0;
             matrix[3].f[2] = 0;
             matrix[3].f[3] = 1;
-            func_002AB6D8(&matrix, &angles);
+            GetEulerAnglesFromMatrix(&matrix, &angles);
             {
-                float angle = func_00283B98(angles.f[2], func_002A78D8(0.78539824f, 1.5707965f));
-                float elevation = func_002A7878(-0.1f, 0.45f);
-                func_002AF000(&rec->velocity, 1.0f, angle, elevation);
+                float angle = FastAddRotations(angles.f[2], RandomSignedFloatRange(0.78539824f, 1.5707965f));
+                float elevation = RandomFloatRange(-0.1f, 0.45f);
+                BuildSphericalOffset(&rec->velocity, 1.0f, angle, elevation);
             }
         }
         qcopy(&rec->previous, direction);

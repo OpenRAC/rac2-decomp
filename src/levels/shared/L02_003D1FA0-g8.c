@@ -17,23 +17,23 @@ void func_L02_003D1FA0(float *pos, int count) {
     float scale;
     int i, sign;
     char *particle;
-    func_00282CF0(dir, D_L02_001BA500, pos);
-    func_00282F20(offset, dir, 0.3f);
+    FastVecSub(dir, gCameraPosition_L02, pos);
+    vec_scale_to_length(offset, dir, 0.3f);
     dir[2] = 0.0f;
     axis[0] = 0.0f; axis[1] = 0.0f; axis[2] = 1.0f; axis[3] = 1.0f;
     for (i=0;i<count;i++) {
-        scale = func_002A7878(D_L02_001B0164, D_L02_001B0168);
-        sign = func_002A77E0(2); if (!sign) sign--;
-        func_002ACEC0(func_002A7878(-1.047197699546814f, 1.047197699546814f), vel, dir, axis);
-        func_00282F20(vel, vel, func_002A7878(D_L02_001B0150, D_L02_001B0154) * (1.0f / 60.0f));
-        vel[2] = func_002A7878(D_L02_001B0158, D_L02_001B015C) * (1.0f / 60.0f);
-        func_00282CC0(out, pos, offset);
-        pos[0] += func_002A78D8(0.0f, 0.15f);
-        pos[1] += func_002A78D8(0.0f, 0.15f);
-        pos[2] += func_002A78D8(0.0f, 0.15f);
-        particle = func_002C2210(scale * 0.1f, out, 60, scale, 0x7F007F40, 0, sign, vel, 0, D_L02_001B0160);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
-        particle = func_002C2210(scale * 0.07f, out, 60, scale * 0.7f, 0x047F047F, 1, -sign, vel, 0, D_L02_001B0160);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        scale = RandomFloatRange(D_L02_001B0164, D_L02_001B0168);
+        sign = RandomIntBelow(2); if (!sign) sign--;
+        ApplyAxisRotationToQuaternion(RandomFloatRange(-1.047197699546814f, 1.047197699546814f), vel, dir, axis);
+        vec_scale_to_length(vel, vel, RandomFloatRange(D_L02_001B0150, D_L02_001B0154) * (1.0f / 60.0f));
+        vel[2] = RandomFloatRange(D_L02_001B0158, D_L02_001B015C) * (1.0f / 60.0f);
+        FastVecAdd(out, pos, offset);
+        pos[0] += RandomSignedFloatRange(0.0f, 0.15f);
+        pos[1] += RandomSignedFloatRange(0.0f, 0.15f);
+        pos[2] += RandomSignedFloatRange(0.0f, 0.15f);
+        particle = SpawnGroundEffectParticle(scale * 0.1f, out, 60, scale, 0x7F007F40, 0, sign, vel, 0, D_L02_001B0160);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
+        particle = SpawnGroundEffectParticle(scale * 0.07f, out, 60, scale * 0.7f, 0x047F047F, 1, -sign, vel, 0, D_L02_001B0160);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }

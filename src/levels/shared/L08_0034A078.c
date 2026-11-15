@@ -6,27 +6,28 @@ extern int func_002A77E0(int);
 extern int func_002A7820(int, int);
 extern float func_00283CE0(int);
 extern unsigned char *D_L08_001FF794;
+/* Creates a short-lived particle at a position with a velocity and owner, and returns it (or 0 if none is free). */
 unsigned char *func_L08_0034A078(void *position, void *velocity, int kind, void *owner)
 {
-    unsigned char *particle = func_002B9030(0x45);
+    unsigned char *particle = AllocParticle(0x45);
     if (particle) {
         unsigned char *data;
         int lifetime;
         qcopy(particle + 0x10, position);
         {
-            int display = func_00283CF0(4.0f);
+            int display = FloatToInt(4.0f);
             data = particle + 0x20;
             particle[9] = display + 0x70;
         }
         particle[1] = 0;
         particle[3] = 0x48;
-        *(float *)(particle + 0xc) = func_002A7878(8000.0f, 50000.0f);
-        particle[8] = func_002A77E0(256);
+        *(float *)(particle + 0xc) = RandomFloatRange(8000.0f, 50000.0f);
+        particle[8] = RandomIntBelow(256);
         particle[2] = *D_L08_001FF794;
-        lifetime = func_002A7820(10, 30);
+        lifetime = RandomIntRange(10, 30);
         *(short *)(particle + 0xa) = lifetime;
         {
-            float age = func_00283CE0((short)lifetime);
+            float age = IntToFloat((short)lifetime);
             *(void **)(data + 0x1c) = owner;
             *(float *)(data + 0x10) = 1.0f / age;
         }
