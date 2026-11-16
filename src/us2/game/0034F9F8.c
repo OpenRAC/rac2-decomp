@@ -29,7 +29,7 @@ typedef struct {
     char *f58;
     char *f5c;
 } SlotObject;
-extern void stub_empty_17(char *, long long);
+extern void stub_empty_16(char *, long long);
 extern void func_002A05A8(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
@@ -41,7 +41,7 @@ void menu_attach_slot_packets_us2(char *obj)
     char *sub = obj + 0xC00;
     SlotObject *s = (SlotObject *)sub;
 
-    stub_empty_17(sub, 0);
+    stub_empty_16(sub, 0);
     func_002A05A8(sub);
     if (s->f42 != 0xFF) {
         EntryTable *table = s->f24;

@@ -147,13 +147,6 @@
 #define ShowSplashImage_pal                            func_PAL_0026E838
 #define gfx_draw_splash_screen_frame_pal               func_PAL_0026E928
 #define RunBootTitleLoop_pal                           func_PAL_0026EC50
-#define stub_empty_2_pal                               func_PAL_0026F580
-#define stub_empty_5_pal                               func_PAL_0026F598
-#define stub_empty_9_pal                               func_PAL_0026F5B8
-#define stub_empty_19_pal                              func_PAL_0026F608
-#define stub_empty_21_pal                              func_PAL_0026F620
-#define stub_empty_30_pal                              func_PAL_0026F670
-#define stub_empty_31_pal                              func_PAL_0026F678
 #define tex_load_pif_from_disc_table_pal               func_PAL_0026FCB8
 #define cam_begin_mode_change_pal                      func_PAL_00270D50
 #define cam_advance_blend_pal                          func_PAL_00270FC0
@@ -193,7 +186,6 @@
 #define help_show_message_for_id_pal                   func_PAL_00288E20
 #define subtitle_request_voice_line_pal                func_PAL_00289730
 #define subtitle_update_state_machine_pal              func_PAL_00289AA8
-#define subtitle_box_draw_nothing_pal                  func_PAL_0028A468
 #define DrawSubtitleBox_pal                            func_PAL_0028A470
 #define UpdateBoltCounter_pal                          func_PAL_0028ACC0
 #define DrawBoltCounterDeltas_pal                      func_PAL_0028B038
@@ -617,7 +609,6 @@
 #define CalculateAimedLaunchVelocity_pal               func_PAL_002FEF98
 #define coll_trace_projectile_to_impact_pal            func_PAL_002FF5F8
 #define BeginPreviewTransition_pal                     func_PAL_00300130
-#define stub_empty_flags_pal                           func_PAL_00300300
 #define UpdateObjectPreviewSequence_pal                func_PAL_003004C8
 #define part_spawn_mode_effect_object_pal              func_PAL_00300C98
 #define EmitParticlesBeforeCamera_pal                  func_PAL_00300EA8
@@ -729,7 +720,6 @@
 #define part_spawn_flying_chunk_b_pal                  func_PAL_0032B4A8
 #define part_emit_spark_burst_pal                      func_PAL_0032B650
 #define hero_check_under_falling_object_pal            func_PAL_0032B730
-#define moby_do_nothing_pal                            func_PAL_0032B920
 #define blast_update_pal                               func_PAL_0032B930
 #define part_init_trail_sparkle_pairs_pal              func_PAL_0032C220
 #define part_claim_debris_piece_pal                    func_PAL_0032C3B0
@@ -778,9 +768,7 @@
 #define msg_box_init_short_pal                         func_PAL_0033A528
 #define text_panel_mode_scale_pal                      func_PAL_0033A598
 #define text_panel_update_fade_pal                     func_PAL_0033A5F0
-#define ui_nop_c_pal                                   func_PAL_0033A930
 #define text_panel_draw_pal                            func_PAL_0033A9B0
-#define ui_nop_d_pal                                   func_PAL_0033AE40
 #define mission_screen_init_parts_pal                  func_PAL_0033AEF8
 #define mission_screen_init_pal                        func_PAL_0033AF68
 #define mission_screen_place_parts_pal                 func_PAL_0033B218
@@ -891,7 +879,6 @@
 #define tab_menu_get_records_pal                       func_PAL_00343638
 #define tab_menu_switch_tab_pal                        func_PAL_00343690
 #define tab_menu_update_cursor_pal                     func_PAL_003437C8
-#define tab_menu_noop_pal                              func_PAL_00343830
 #define tab_menu_update_list_pal                       func_PAL_00343838
 #define tab_menu_update_pal                            func_PAL_00343928
 #define tab_menu_draw_list_pal                         func_PAL_00343AD0

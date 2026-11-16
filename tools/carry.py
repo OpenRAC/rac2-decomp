@@ -26,6 +26,8 @@ Every program of V is compared with the same program of v1.01, one code section 
    word, every `jal` target, and the first word after a `jr $ra` and its delay slot that is
    not zero. A piece's size stops after its last return's delay slot when only zeros follow.
 
+The boot's empty level hooks are alike, so they are paired by their callers instead (hooks()).
+
 Then the catalogue rules of tools/levels.py apply unchanged: the linker's filler and an
 epilogue's residue are not functions, and identical code (V's own levels.identity, its own
 resident memory compared) is one function, the k-th copy in each level being one.
@@ -221,6 +223,78 @@ def calls(aligned: dict, version: str) -> None:
                         break
         if not changed:
             return
+
+
+# The delay slots of an empty function: nothing, or a zero result (daddu $v0, $zero, $zero).
+EMPTY_SLOTS = (0x00000000, 0x0000102D)
+
+
+def hooks(aligned: dict, version: str) -> None:
+    """The boot's empty 8-byte functions (the level hooks each level fills) are alike, so the
+    alignment pairs them by order, and the order does not hold where a release has more of them.
+    The calls say which is which: a v1.01 function with a place in V that calls a hook calls V's
+    hook at the same word. A hook no such call names takes its place in the run between two that
+    have, where both moved alike. Run before calls(), which then sees the callers as the same."""
+    levels.select("us")
+    us = texts("boot")
+    us_rows = levels.read_boot_functions()
+    levels.select(version)
+    v = texts("boot")
+
+    def empty(spans, a, n):
+        w = levels.words(read(spans, a, n))
+        return n == 8 and len(w) == 2 and w[0] == JR_RA and w[1] in EMPTY_SLOTS
+
+    ext = aligned["boot"]
+    us_hooks = {a: (name, read(us, a, 8)) for name, a, n in us_rows if empty(us, a, n)}
+    v_hooks = {e[0]: read(v, e[0], 8) for e in ext if empty(v, e[0], e[1])}
+    # The callers: v1.01's function each of V's extents takes the place of, and else the one
+    # function of V of the same shape (immediates and targets aside), wherever it moved.
+    def shape(b: bytes) -> tuple:
+        # The instructions with their immediates and jump targets left out.
+        return tuple(w if w >> 26 == 0 else w & 0xFC000000 if w >> 26 in (2, 3) else w & 0xFFFF0000
+                     for w in levels.words(b))
+
+    us_shapes: dict[tuple, list[int]] = {}
+    for _, a, n in us_rows:
+        us_shapes.setdefault((shape(read(us, a, n)), n), []).append(a)
+    v_shapes: dict[tuple, list[int]] = {}
+    for e in ext:
+        v_shapes.setdefault((shape(read(v, e[0], e[1])), e[1]), []).append(e[0])
+    callers = {(e[0], e[1], e[5]) for e in ext if e[5] is not None}
+    for key, places in v_shapes.items():
+        if len(places) == 1 and len(us_shapes.get(key, ())) == 1:
+            callers.add((places[0], key[1], us_shapes[key][0]))
+    votes: dict[int, set[int]] = {}
+    for va, n, ua in sorted(callers):
+        mine, theirs = levels.words(read(us, ua, n)), levels.words(read(v, va, n))
+        for i, (x, y) in enumerate(zip(mine, theirs)):
+            if x >> 26 != 3 or y >> 26 != 3:
+                continue
+            h = ((ua + 4 * i) & 0xF0000000) | ((x & 0x3FFFFFF) << 2)
+            r = ((va + 4 * i) & 0xF0000000) | ((y & 0x3FFFFFF) << 2)
+            if h in us_hooks and r in v_hooks:
+                votes.setdefault(h, set()).add(r)
+    paired = {h: next(iter(rs)) for h, rs in votes.items() if len(rs) == 1}
+    taken = [r for r in paired.values()]
+    paired = {h: r for h, r in paired.items() if taken.count(r) == 1 and v_hooks[r] == us_hooks[h][1]}
+    known = sorted(paired)
+    for h in sorted(set(us_hooks) - set(paired)):
+        before, after = [k for k in known if k < h], [k for k in known if k > h]
+        if not before or not after:
+            continue
+        a, b = before[-1], after[0]
+        r = paired[a] + (h - a)
+        if b - a == paired[b] - paired[a] and v_hooks.get(r) == us_hooks[h][1] and r not in paired.values():
+            paired[h] = r
+    at = {r: h for h, r in paired.items()}
+    names = {at[r]: us_hooks[at[r]][0] for r in at}
+    for k, (va, n, name, how, was, ua) in enumerate(ext):
+        if va in at:
+            h = at[va]
+            ext[k] = (va, n, names[h], "same", names[h], h)
+        elif va in v_hooks and (ua in paired or name in names.values()):
+            ext[k] = (va, n, None, "changed", was, ua)
 
 
 def branch_target(x: int, at: int) -> int | None:
@@ -862,6 +936,7 @@ def main() -> None:
     for p, ext in aligned.items():
         aligned[p] = [(e[0], e[1], None, "changed", e[4], e[5]) if e[3] == "same" and e[2] in kept_out else e
                       for e in ext]
+    hooks(aligned, version)
     calls(aligned, version)
     joins(aligned, version)
     levels.select(version)

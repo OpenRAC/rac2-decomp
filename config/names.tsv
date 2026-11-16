@@ -24760,16 +24760,6 @@ func_PAL_L06_0045C220	spinning_trigger_burst_update_pal	descriptive	config/names
 func_PAL_L17_0041FC60	spray_effect_update_pal	descriptive	config/names_local.tsv		
 func_PAL_L03_003CB2E8	spring_holder_update_pal	descriptive	config/names_local.tsv		
 func_PAL_L12_003E5DD8	squirrel_alert_for_object_pal	descriptive	config/names_local.tsv		
-func_PAL_0026F608	stub_empty_19_pal	descriptive	config/names_local.tsv		
-func_US2_0026F7A0	stub_empty_19_us2	descriptive	config/names_local.tsv		
-func_PAL_0026F620	stub_empty_21_pal	descriptive	config/names_local.tsv		
-func_US2_0026F7B8	stub_empty_21_us2	descriptive	config/names_local.tsv		
-func_PAL_0026F580	stub_empty_2_pal	descriptive	config/names_local.tsv		
-func_US2_0026F718	stub_empty_2_us2	descriptive	config/names_local.tsv		
-func_PAL_0026F598	stub_empty_5_pal	descriptive	config/names_local.tsv		
-func_US2_0026F730	stub_empty_5_us2	descriptive	config/names_local.tsv		
-func_PAL_0026F5B8	stub_empty_9_pal	descriptive	config/names_local.tsv		
-func_US2_0026F750	stub_empty_9_us2	descriptive	config/names_local.tsv		
 func_PAL_L05_0041EF70	stub_l05_empty_pal	descriptive	config/names_local.tsv		
 func_PAL_L00_00449870	sub_object_get_value_first_pal	descriptive	config/names_local.tsv		
 func_US2_L00_00445228	sub_object_get_value_first_us2	descriptive	config/names_local.tsv		
@@ -25129,7 +25119,6 @@ func_PAL_L06_004248E8	actor_move_toward_goal_pal	descriptive	config/names_local.
 func_PAL_L02_00405040	actor_pick_idle_message_pal	descriptive	config/names_local.tsv		
 func_PAL_L06_004235E8	actor_steer_toward_goal_pal	descriptive	config/names_local.tsv		
 func_PAL_L06_004240F0	actor_tick_timers_spawn_dust_pal	descriptive	config/names_local.tsv		
-func_US2_0026F810	actuator_calc_power_us2	descriptive	config/names_local.tsv		
 func_PAL_L02_003C7F88	advance_path_follower_pal	descriptive	config/names_local.tsv		
 func_PAL_L17_00394220	aging_projectile_update_pal	descriptive	config/names_local.tsv		
 func_PAL_L00_0040E9F0	aimed_projectile_spawn_pal	descriptive	config/names_local.tsv		
@@ -26416,7 +26405,6 @@ func_PAL_0030FB38	moby_apply_hit_damage_game_pal	descriptive	config/names_local.
 func_PAL_L16_004164B8	moby_bob_along_sine_wave_pal	descriptive	config/names_local.tsv		
 func_PAL_L04_003FFB98	moby_damage_in_firing_cone_pal	descriptive	config/names_local.tsv		
 func_PAL_L04_003FDE38	moby_destroy_effects_with_burst_pal	descriptive	config/names_local.tsv		
-func_PAL_0032B920	moby_do_nothing_pal	descriptive	config/names_local.tsv		
 func_PAL_L09_003EDEE8	moby_ease_turn_angles_pal	descriptive	config/names_local.tsv		
 func_PAL_00334CB0	moby_explode_and_hurt_nearby_pal	descriptive	config/names_local.tsv		
 func_PAL_L00_00390728	moby_fade_colour_by_countdown_pal	descriptive	config/names_local.tsv		
@@ -27177,11 +27165,6 @@ func_PAL_L14_003E3E84	spread_weapon_update_pal	descriptive	config/names_local.ts
 func_PAL_L00_002AF458	start_equipped_item_animation_pal	descriptive	config/names_local.tsv		
 func_PAL_L16_003ADB58	start_vendor_beam_pulse_pal	descriptive	config/names_local.tsv		
 func_PAL_L01_003A9CB8	steered_moby_update_pal	descriptive	config/names_local.tsv		
-func_PAL_0026F670	stub_empty_30_pal	descriptive	config/names_local.tsv		
-func_PAL_0026F678	stub_empty_31_pal	descriptive	config/names_local.tsv		
-func_US2_0026F808	stub_empty_31_us2	descriptive	config/names_local.tsv		
-func_US2_0026F818	stub_empty_32_us2	descriptive	config/names_local.tsv		
-func_PAL_00300300	stub_empty_flags_pal	descriptive	config/names_local.tsv		
 func_US2_L00_0043FEA0	stub_l00_return_arg_2_us2	descriptive	config/names_local.tsv		
 func_PAL_L00_0043E7B8	sub_object_cleanup_pal	descriptive	config/names_local.tsv		
 func_US2_L00_0043A4B8	sub_object_cleanup_us2	descriptive	config/names_local.tsv		
@@ -27193,7 +27176,6 @@ func_PAL_L00_004406A0	sub_object_init_chain_copy_pal	descriptive	config/names_lo
 func_US2_L00_0043C380	sub_object_init_chain_copy_us2	descriptive	config/names_local.tsv		
 func_PAL_L00_0043EBB8	sub_object_init_chain_pal	descriptive	config/names_local.tsv		
 func_US2_L00_0043A8D8	sub_object_init_chain_us2	descriptive	config/names_local.tsv		
-func_PAL_0028A468	subtitle_box_draw_nothing_pal	descriptive	config/names_local.tsv		
 func_PAL_00289730	subtitle_request_voice_line_pal	descriptive	config/names_local.tsv		
 func_US2_00289840	subtitle_request_voice_line_us2	descriptive	config/names_local.tsv		
 func_PAL_00289AA8	subtitle_update_state_machine_pal	descriptive	config/names_local.tsv		
@@ -27241,7 +27223,6 @@ func_PAL_L00_003F0458	synthenoid_update_pal	descriptive	config/names_local.tsv
 func_US2_0029D368	tab_menu_draw_2_call_us2	descriptive	config/names_local.tsv		
 func_US2_0029D2F8	tab_menu_draw_call_us2	descriptive	config/names_local.tsv		
 func_PAL_00343638	tab_menu_get_records_pal	descriptive	config/names_local.tsv		
-func_PAL_00343830	tab_menu_noop_pal	descriptive	config/names_local.tsv		
 func_PAL_00343690	tab_menu_switch_tab_pal	descriptive	config/names_local.tsv		
 func_US2_0029D398	tab_menu_update_2_call_us2	descriptive	config/names_local.tsv		
 func_US2_0029D328	tab_menu_update_call_us2	descriptive	config/names_local.tsv		
@@ -27429,10 +27410,6 @@ func_US2_0029D4B8	two_toggle_b_panel_draw_us2	descriptive	config/names_local.tsv
 func_US2_0029D4E8	two_toggle_b_panel_update_us2	descriptive	config/names_local.tsv		
 func_PAL_0033F738	two_toggle_b_update_pal	descriptive	config/names_local.tsv		
 func_US2_0033E8B0	two_toggle_b_update_us2	descriptive	config/names_local.tsv		
-func_PAL_0033A930	ui_nop_c_pal	descriptive	config/names_local.tsv		
-func_US2_00339A80	ui_nop_c_us2	descriptive	config/names_local.tsv		
-func_PAL_0033AE40	ui_nop_d_pal	descriptive	config/names_local.tsv		
-func_US2_00339F90	ui_nop_d_us2	descriptive	config/names_local.tsv		
 func_PAL_L01_00397578	update_camera_pose_trigger_pal	descriptive	config/names_local.tsv		
 func_PAL_L03_003C70B8	update_commanded_moby_pal	descriptive	config/names_local.tsv		
 func_PAL_002E7270	update_equipment_pieces_pal	descriptive	config/names_local.tsv		
@@ -27521,3 +27498,4 @@ func_PAL_L19_0042451C	yeti_group_spawner_update_pal	descriptive	config/names_loc
 func_PAL_L19_00421568	yeti_init_stats_pal	descriptive	config/names_local.tsv		
 func_PAL_L19_004205C8	yeti_update_pal	descriptive	config/names_local.tsv		
 func_PAL_L12_00425A08	zone_color_pulse_update_pal	descriptive	config/names_local.tsv		
+func_US2_0026F7E0	stub_empty_us2	descriptive	config/names_local.tsv		

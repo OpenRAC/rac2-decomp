@@ -77,7 +77,7 @@ extern int math_fast_float_d(void *);
 extern float math_fabs(float);
 extern float vec_distance_xy(void *, void *);
 extern float gravity_get_center_distance(void *);
-extern unsigned int stub_empty_8(int, int);
+extern unsigned int stub_empty_7(int, int);
 extern void value_forward_three_args_us2(int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int subtract_integer_with_clamp(int);
@@ -158,7 +158,7 @@ void UpdateWeaponAmmoPickup_us2(PickupObject *object)
         if (allow) {
             item = data->weapon;
             previous = g_item_ammo_counts[item];
-            stub_empty_8(item, data->amount);
+            stub_empty_7(item, data->amount);
             if (g_item_ammo_counts[item] > previous) {
                 count = g_item_ammo_counts[item] - previous;
                 value_forward_three_args_us2(count == 1 ?

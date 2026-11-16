@@ -151,12 +151,12 @@ extern int g_map_overlay_state[];
 extern void FadeToBlack(int);
 extern void menu_set_pause_scale_inverse(float);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int stub_empty_25(void);
-extern int stub_empty_25(void);
+extern int stub_empty_24(void);
+extern int stub_empty_24(void);
 extern void data_set_small_value_and_refresh(int, int);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_update_info_panel_pal(int);
-extern int stub_empty_24(void);
+extern int stub_empty_23(void);
 
 /* Handles input on the map page: close, select or move the map target, starting the level load or message when a new target is chosen (PAL). */
 int menu_page_select_handle_input_pal(void)
@@ -192,7 +192,7 @@ int menu_page_select_handle_input_pal(void)
             snd_play_from_global_bank(4, 0, 0);
             if (base[0x230 / 4] != 0 && g_mission_active_flag == 0 && base[0x230 / 4] == 2) {
                 request_begin_slot(6, 2, 1, 0x19, 0);
-            } else if (stub_empty_24() && stub_empty_25()) {
+            } else if (stub_empty_23() && stub_empty_24()) {
                 data_set_small_value_and_refresh(g_map_overlay_state[0x230 / 4], 1);
             } else {
                 request_begin_slot(6, 2, 1, g_map_overlay_state[0x230 / 4], 0);

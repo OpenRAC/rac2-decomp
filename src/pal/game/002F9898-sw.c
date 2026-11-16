@@ -23,7 +23,7 @@ extern volatile PurchaseInput g_pad_state;
 extern int GetSelectedShopItemPrice(void);
 extern void shop_build_vendor_weapon_list(int);
 extern int PlayMobySound(int, int, void *);
-extern int stub_empty_8(int, int);
+extern int stub_empty_7(int, int);
 extern char *GetLocalizedString(int);
 extern void shop_set_message_text(int);
 extern void help_unlock_entry(int);

@@ -82,7 +82,7 @@ extern void UpdateEquipmentPieces_us2(void *);
 extern void render_environment_mapped_object(void);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_002A0F48(void *);
-extern void stub_empty_17(void *, int);
+extern void stub_empty_16(void *, int);
 extern s32 UpdateSoundVoices(void);
 extern void UpdateLightingEnvironment(void);
 extern void game_update_idle_frame_counters(void);
@@ -165,7 +165,7 @@ int cutscene_update_scripted_actors_us2(void)
             func_002A0F48(actor);
             if (actor->type == 0) {
                 D_00189E20_9.focus = actor;
-                stub_empty_17(actor, 1);
+                stub_empty_16(actor, 1);
             }
         }
     }

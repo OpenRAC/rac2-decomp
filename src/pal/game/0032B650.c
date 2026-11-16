@@ -46,7 +46,7 @@ extern int g_surface_height_tiles[] __attribute__((sda));
 extern int g_surface_box_count[] __attribute__((sda));
 extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
 extern void RippleDisturb(int, int, int, float, float, float, float);
-extern int stub_empty_30_pal(void);
+extern int stub_empty_30(void);
 
 /* Checks whether a falling chunk is over the hero: the chunk lands on the hero, ripples the
    water, counts the hit and may resume the music (PAL: same as USA v1.01). */
@@ -87,7 +87,7 @@ void hero_check_under_falling_object_pal(char *self)
                 }
                 if (obj_state[0x14] == 0) {
                     RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
-                    if (stub_empty_30_pal() == 0) {
+                    if (stub_empty_30() == 0) {
                         object[0xBC] += 1;
                         if (object[0xBC] >= 25) {
                             music = g_music_state;
@@ -111,8 +111,3 @@ void hero_check_under_falling_object_pal(char *self)
     }
 }
 
-
-/* Empty overlay draw callback; does nothing. */
-void moby_do_nothing_pal(void)
-{
-}

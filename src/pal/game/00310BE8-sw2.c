@@ -12,9 +12,9 @@ typedef struct {
 } FollowVars;
 extern char g_hero_state[];
 extern u32 g_pad_pressed_flags;
-extern unsigned int stub_empty_2_pal(int);
-extern unsigned int stub_empty_9_pal(int, int);
-extern void stub_empty_13(int, int, float);
+extern unsigned int stub_empty(int);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_12(int, int, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void gfx_register_world_draw_callback(void (*)(char *), char *);
@@ -39,7 +39,7 @@ void swingshot_update_pal(u8 *self)
     f32 hit_pos[4];
 
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        stub_empty_9_pal(0x1D, 1);
+        stub_empty_8(0x1D, 1);
     data = *(FollowVars **)(self + 0x68);
     if (data == 0)
         return;
@@ -130,10 +130,10 @@ have:
         hit_pos[2] += 0.5f;
         if (CollLine(hit_pos, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->f[0x31C / 4] > 0.5f) {
-                stub_empty_9_pal(6, 1);
+                stub_empty_8(6, 1);
             } else {
-                stub_empty_9_pal(0, 0);
-                stub_empty_13(stub_empty_2_pal(0), 0, 12.0f);
+                stub_empty_8(0, 0);
+                stub_empty_12(stub_empty(0), 0, 12.0f);
             }
             self[0x20] = 6;
         } else if (dist < fast_vec_dist(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10)) {
@@ -156,9 +156,9 @@ have:
         delta[2] += 0.5f;
         if (CollLine(delta, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->h[0x34E / 2] != 0) {
-                stub_empty_9_pal(6, 1);
+                stub_empty_8(6, 1);
             } else {
-                stub_empty_9_pal(0, 1);
+                stub_empty_8(0, 1);
             }
             self[0x20] = 6;
         } else {
@@ -172,20 +172,20 @@ have:
                 if (data->target != 0 && fast_vec_dist(data->target + 0x10, &((Hero *)g_hero_state)->q[0x80 / 16]) > 3.5f) {
                     if ((g_pad_pressed_flags & ((Hero *)g_hero_state)->u[0x1230 / 4]) == 0) {
                         ((Hero *)g_hero_state)->i[0xAC8 / 4] = 1;
-                        stub_empty_9_pal(0, 0);
-                        stub_empty_13(stub_empty_2_pal(0), 0, 12.0f);
+                        stub_empty_8(0, 0);
+                        stub_empty_12(stub_empty(0), 0, 12.0f);
                         self[0x20] = 6;
                     } else {
                         PlayMobySound(2, 0, (char *)self);
                         if (((Hero *)g_hero_state)->i[0xAB8 / 4] != 0) {
-                            stub_empty_9_pal(0x25, 1);
+                            stub_empty_8(0x25, 1);
                         } else {
-                            stub_empty_9_pal(0x24, 1);
+                            stub_empty_8(0x24, 1);
                         }
                         self[0x20] = 5;
                     }
                 } else {
-                    stub_empty_9_pal(0, 1);
+                    stub_empty_8(0, 1);
                     self[0x20] = 6;
                 }
             }
@@ -302,10 +302,10 @@ have:
         delta[2] += 0.5f;
         if (CollLine(delta, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->f[0x31C / 4] > 0.5f) {
-                stub_empty_9_pal(6, 1);
+                stub_empty_8(6, 1);
             } else {
-                stub_empty_9_pal(0, 0);
-                stub_empty_13(stub_empty_2_pal(0), 0, 12.0f);
+                stub_empty_8(0, 0);
+                stub_empty_12(stub_empty(0), 0, 12.0f);
             }
             self[0x20] = 0x13;
         } else {

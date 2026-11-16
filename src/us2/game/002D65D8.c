@@ -10,12 +10,12 @@ extern int g_map_overlay_state[];
 extern void FadeToBlack(int);
 extern void menu_set_pause_scale_inverse(float);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int stub_empty_25(void);
-extern int stub_empty_25(void);
+extern int stub_empty_24(void);
+extern int stub_empty_24(void);
 extern void data_set_small_value_and_refresh(int, int);
 extern int request_begin_slot(int, int, int, int, int);
 extern int info_panel_update_call_us2(int);
-extern int stub_empty_24(void);
+extern int stub_empty_23(void);
 
 extern int ref_US2_002D65D8_00(void);
 extern int ref_US2_002D65D8_01(void);

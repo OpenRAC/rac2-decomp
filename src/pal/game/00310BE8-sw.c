@@ -12,9 +12,9 @@ typedef struct {
 } FollowVars;
 extern char g_hero_state[];
 extern u32 g_pad_pressed_flags;
-extern unsigned int stub_empty_2_pal(int);
-extern unsigned int stub_empty_9_pal(int, int);
-extern void stub_empty_13(int, int, float);
+extern unsigned int stub_empty(int);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_12(int, int, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void gfx_register_world_draw_callback(void (*)(char *), char *);

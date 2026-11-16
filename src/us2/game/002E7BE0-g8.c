@@ -61,8 +61,8 @@ extern int g_screen_flash_alpha __attribute__((sda));
 extern TransitionMoby *g_moby_pool_end;
 extern void mem_clear(void *, int, int);
 extern void gfx_select_packet_buffer_setup(void);
-extern unsigned int stub_empty_9_us2(int, int);
-extern void stub_empty_4(void);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_3(void);
 extern void load_parts_set_from_disc(int, int);
 extern void load_select_segment_update_world(int);
 extern int UpdateSoundVoices(void);
@@ -96,9 +96,9 @@ void level_transition_scene_start_us2(int mode)
     g_screen_fade = 1.0f;
     g_packet_buffer_size = offset;
     g_screen_flash_alpha = 0;
-    stub_empty_9_us2(0x61, 2);
+    stub_empty_8(0x61, 2);
     g_hero_state.flag = 1;
-    stub_empty_4();
+    stub_empty_3();
 
     object = g_hero_moby_default.object;
     p = g_moby_pool_end;

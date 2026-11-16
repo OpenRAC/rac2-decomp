@@ -82,8 +82,8 @@ extern void level_forward_value(int);
 extern void level_forward_pair(int, int);
 extern int PlayMobySound(int, int, void *);
 extern void subtitle_clear_state(void);
-extern unsigned int stub_empty_9_pal(int, int);
-extern void stub_empty_4(void);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_3(void);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float FastAddRotations(float, float);
 extern void SetCamera5Pose(void *, void *, int, int, int);
@@ -208,10 +208,10 @@ void OpenVendorMenu_pal(char *moby)
     g_current_game_mode = 5;
     g_screen_fade = 0.0f;
     g_screen_flash_alpha = 0;
-    stub_empty_9_pal(97, 1);
+    stub_empty_8(97, 1);
     g_hero_state.flag22BC = 1;
     g_hero_state.flag22B5 = 1;
-    stub_empty_4();
+    stub_empty_3();
     if (!g_vendor_menu_state.restore) {
         if (g_display_mode_flag) matrix_mul_vec3(g_vendor_menu_state.position, g_shop_moby_offset_b, g_vendor_menu_state.moby + 0xC0);
         else matrix_mul_vec3(g_vendor_menu_state.position, g_shop_moby_offset_a, g_vendor_menu_state.moby + 0xC0);

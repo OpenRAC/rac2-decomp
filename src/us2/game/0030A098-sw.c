@@ -47,7 +47,7 @@ typedef struct {
 } O_4198;
 extern G_4198 g_hero_state;
 extern s32 g_pad_pressed_flags;
-extern s32 stub_empty_31_us2(s32), math_fast_float_d(void *);
+extern s32 stub_empty_29(s32), math_fast_float_d(void *);
 extern void moby_mark_spawned(void *), gfx_register_overlay_draw_callback(void *, void *);
 extern void draw_joint_aligned_beam_effect(void), beam_spawn_trail_particles(void *);
 
@@ -58,7 +58,7 @@ void beam_effect_update_us2(void *object) {
     s32 flag = 0;
     s32 hero_move_state;
 
-    if ((&g_hero_state)->i1338 == 3 || stub_empty_31_us2(3) == 8) {
+    if ((&g_hero_state)->i1338 == 3 || stub_empty_29(3) == 8) {
         if (moby->state == 1 || moby->state == 3) {
             hero_move_state = (&g_hero_state)->i2294;
             if ((u32)(hero_move_state - 0xB) < 4
@@ -90,7 +90,7 @@ void beam_effect_update_us2(void *object) {
         moby->u34 |= 1;
         break;
     case 1:
-        if ((stub_empty_31_us2(3) != 3 && stub_empty_31_us2(3) != 8) || !g_hero_state.i1314) {
+        if ((stub_empty_29(3) != 3 && stub_empty_29(3) != 8) || !g_hero_state.i1314) {
             moby_mark_spawned(moby);
         } else if (flag != 0) {
             moby->state = 2;

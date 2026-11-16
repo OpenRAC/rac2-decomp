@@ -24,18 +24,18 @@ extern int g_beam_reset_flag __attribute__((sda));
 extern int gfx_add_point_light(void *, int, float, float);
 extern int math_fast_float_d(void *);
 extern void beam_draw_ribbons_level(void *);
-extern void stub_empty_12(void);
+extern void stub_empty_11(void);
 extern void SpawnEffectBurst(void *, int);
 extern void gfx_free_point_light(int), matrix_mul_vec3(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecAdd(void *, void *, void *), InitializeBoltPointChain(void *), beam_update_chain_points(void *);
-extern void stub_empty_12(void);
+extern void stub_empty_11(void);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
 extern float IntToFloat(int);
-extern void stub_empty_11(void);
+extern void stub_empty_10(void);
 
 /* Maintains the beam's endpoint, light fade and looping sound state. */
 void beam_actor_update_us2(u8 *moby) {
@@ -102,11 +102,11 @@ void beam_actor_update_us2(u8 *moby) {
                 snd_stop_voice(beam->sound);
         }
         beam->sound = -1;
-        if (active) { stub_empty_11(); moby[0x20] = 3; }
+        if (active) { stub_empty_10(); moby[0x20] = 3; }
         if ((((Pad *)g_pad_state)->u[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && !((Hero *)g_hero_state)->b[0x22BC]) {
             SpawnEffectBurst(moby, 20);
-            if (active) { stub_empty_11(); moby[0x20] = 3; }
-            else { PlayMobySound(2, 0, moby); beam->target = 0; moby[0x20] = 1; stub_empty_12(); }
+            if (active) { stub_empty_10(); moby[0x20] = 3; }
+            else { PlayMobySound(2, 0, moby); beam->target = 0; moby[0x20] = 1; stub_empty_11(); }
         }
         break;
     case 3:
@@ -116,7 +116,7 @@ void beam_actor_update_us2(u8 *moby) {
         }
         if ((((Pad *)g_pad_state)->u[0x1A8 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || !active || ((Hero *)g_hero_state)->b[0x22BC]) {
             beam->target = 0; beam->length = 0;
-            stub_empty_12(); moby[0x20] = 1;
+            stub_empty_11(); moby[0x20] = 1;
         }
         break;
     case 2: case 4: case 5: default: break;

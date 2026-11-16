@@ -123,14 +123,7 @@
 #define g_moby_array_cursor                            D_US2_L19_001B1F5C
 #define g_moby_spawn_counter                           D_US2_L19_001B1F60
 #define RunBootTitleLoop_us2                           func_US2_0026EDE8
-#define stub_empty_2_us2                               func_US2_0026F718
-#define stub_empty_5_us2                               func_US2_0026F730
-#define stub_empty_9_us2                               func_US2_0026F750
-#define stub_empty_19_us2                              func_US2_0026F7A0
-#define stub_empty_21_us2                              func_US2_0026F7B8
-#define stub_empty_31_us2                              func_US2_0026F808
-#define actuator_calc_power_us2                        func_US2_0026F810
-#define stub_empty_32_us2                              func_US2_0026F818
+#define stub_empty_us2                                 func_US2_0026F7E0
 #define cam_update_state_us2                           func_US2_00272378
 #define seq_update_disc_player_us2                     func_US2_00278FD0
 #define gfx_configure_projection_us2                   func_US2_0027B858
@@ -453,9 +446,7 @@
 #define msg_box_init_short_us2                         func_US2_00339678
 #define text_panel_get_scale_us2                       func_US2_003396E8
 #define text_panel_update_fade_us2                     func_US2_00339740
-#define ui_nop_c_us2                                   func_US2_00339A80
 #define text_panel_draw_us2                            func_US2_00339B00
-#define ui_nop_d_us2                                   func_US2_00339F90
 #define mission_screen_init_parts_us2                  func_US2_0033A048
 #define mission_screen_init_us2                        func_US2_0033A0B8
 #define mission_screen_place_parts_us2                 func_US2_0033A368

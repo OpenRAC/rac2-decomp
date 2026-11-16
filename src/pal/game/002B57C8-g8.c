@@ -25,7 +25,7 @@ extern void UpdateViewContext(void);
 extern void scene_end_playback_pal(void);
 extern void shop_reset_menu_camera_pal(void);
 extern void moby_show_all(void);
-extern void stub_empty_flags_pal(void);
+extern void game_noop(void);
 extern void gfx_lighting_wrapper_pal(void);
 extern void math_trap_always(void);
 extern void request_set_setting_a_pal(int);
@@ -99,7 +99,7 @@ L1_7:
     moby_show_all();
     goto E1;
 L1_8:
-    stub_empty_flags_pal();
+    game_noop();
     goto E1;
 L1_9:
     gfx_lighting_wrapper_pal();

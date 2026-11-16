@@ -37,12 +37,11 @@ extern int CollLine(void *, void *, int, void *, int);
 extern void moby_compute_throw_velocity(void *, void *, void *, float, float, float);
 extern int vec_fast_helper_b(void *);
 extern int math_fast_float_d(void *);
-extern unsigned int stub_empty_8(int, int);
-extern int stub_empty_5(int, int);
-extern void stub_empty_10(int);
+extern unsigned int stub_empty_7(int, int);
+extern int stub_empty_5();
+extern void stub_empty_9(int);
 extern int PlayMobySound(int, int, void *);
-extern int stub_empty_6(int);
-extern void stub_empty_11();
+extern void stub_empty_10();
 extern float moby_get_anim_value(void *);
 extern void thrown_item_launch(void *, void *, void *);
 extern void AddMobyToIndexList(void *, void *, int);
@@ -50,9 +49,9 @@ extern void *thrown_item_spawn(void *, void *, void *);
 #define THROW_FLOAT(p,o) (*(float *)((char *)(p)+(o)))
 #define THROW_INT(p,o) (*(int *)((char *)(p)+(o)))
 #define THROW_PTR(p,o) (*(unsigned char **)((char *)(p)+(o)))
-extern unsigned int stub_empty_9_pal(int, int);
-extern void stub_empty_12();
-extern int stub_empty_7(int);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_11();
+extern int stub_empty_6(int);
 
 /* Updates the hero's item thrower. It holds the item in the hand, shows the aim, and throws it when fire is pressed (PAL build). */
 void UpdateProjectileThrower_pal(unsigned char *self)
@@ -95,7 +94,7 @@ void UpdateProjectileThrower_pal(unsigned char *self)
     }
     if (!THROW_PTR(data,0x50) || THROW_PTR(data,0x50)[0x20]==0xFE || THROW_PTR(data,0x50)[0x20]==0xFD)
         THROW_PTR(data,0x50)=0;
-    if (g_hero_state.mode==1) stub_empty_9_pal(0x1D,1);
+    if (g_hero_state.mode==1) stub_empty_8(0x1D,1);
     if (THROW_PTR(data,0x50) && !g_hero_state.locked) {
         held_data=THROW_PTR(THROW_PTR(data,0x50),0x68);
         velocity.q=0;
@@ -166,11 +165,11 @@ void UpdateProjectileThrower_pal(unsigned char *self)
         if(self[0x60]&2) self[0x20]=2;
         /* Fall through. */
     case 2:
-        if(g_hero_state.mode==1) stub_empty_9_pal(0x1D,1);
+        if(g_hero_state.mode==1) stub_empty_8(0x1D,1);
         if(self[0x42]==self[0x43] && self[0x42]==3 && (self[0x60]&2)) anim_start_blended(self,1,0,2);
         if(THROW_FLOAT(data,0x58)==0 && !g_hero_state.locked && (g_pad_state.buttons&g_hero_state.fireMask)) {
             if(stub_empty_5(-1,1)) {
-                stub_empty_11(4);
+                stub_empty_10(4);
                 if(self[0x43]!=3) anim_start_blended(self,3,0,2);
                 self[0x20]=3;
                 {
@@ -179,8 +178,8 @@ void UpdateProjectileThrower_pal(unsigned char *self)
                 }
             } else PlayMobySound(4,0,self);
         }
-        if(!(g_pad_state.buttons&g_hero_state.fireMask) || !stub_empty_7(-1)) {
-            if(g_hero_state.action>=8 || !g_hero_state.active) stub_empty_12();
+        if(!(g_pad_state.buttons&g_hero_state.fireMask) || !stub_empty_6(-1)) {
+            if(g_hero_state.action>=8 || !g_hero_state.active) stub_empty_11();
         }
         break;
     case 3:
@@ -202,7 +201,7 @@ void UpdateProjectileThrower_pal(unsigned char *self)
     }
     math_fast_float_d(data+0x54);
     if(THROW_PTR(data,0x50)) qcopy(THROW_PTR(data,0x50)+0x10,data+0x40);
-    else if(!THROW_INT(data,0x54) && stub_empty_7(-1)) {
+    else if(!THROW_INT(data,0x54) && stub_empty_6(-1)) {
         qzero_nc(&aim);
         THROW_PTR(data,0x50)=thrown_item_spawn(self,data+0x40,&aim);
     }

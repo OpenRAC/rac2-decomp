@@ -15,14 +15,14 @@ extern int g_pause_widget_icons_c[1] __attribute__((sda));
 extern int g_pause_widget_icons_d[1] __attribute__((sda));
 extern int g_pause_widget_data[];
 extern unsigned char g_hero_state[];
-extern int stub_empty_23(void), stub_empty_24(void), stub_empty_25(void), stub_empty_27(void), stub_empty_28(void), stub_empty_29(void), stub_empty_30(void), menu_always_return_true(void);
+extern int stub_empty_22(void), stub_empty_23(void), stub_empty_24(void), stub_empty_25(void), stub_empty_26(void), stub_empty_27(void), stub_empty_28(void), menu_always_return_true(void);
 extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), menu_page_set_labels_us2(char *, int, int *);
 extern int menu_choice_list_update_widgets_us2(char *, int);
 /* Sets up the choices shown in the menu list, depending on what the game is doing (USA v2.00). */
 void ConfigureMenuChoiceList_us2(void)
 {
     if (!g_resident_data_base[0]) return;
-    if (stub_empty_28()) {
+    if (stub_empty_26()) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
         menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 5, g_pause_icons_five_a);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), g_pause_sprite_values);
@@ -36,7 +36,7 @@ void ConfigureMenuChoiceList_us2(void)
         func_US2_00349368((g_resident_data_base[0] + 0x39160), 1, 1);
         func_US2_00349368((g_resident_data_base[0] + 0x39160), 4, 1);
         { char *menu = (g_resident_data_base[0] + 0x39160); *(int *)(menu + 0x4AC) = 0; }
-    } else if (stub_empty_24() && stub_empty_25()) {
+    } else if (stub_empty_23() && stub_empty_24()) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
         menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 5, g_pause_icons_five_b);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), g_pause_sprite_values);
@@ -44,13 +44,13 @@ void ConfigureMenuChoiceList_us2(void)
         *(int **)(menu + 0x484) = g_pause_widget_icons_c;
         func_US2_00349368(menu, 0, 1);
         }
-        func_US2_00349368((g_resident_data_base[0] + 0x39160), 1, stub_empty_23() ^ 1);
-        func_US2_00349368((g_resident_data_base[0] + 0x39160), 2, stub_empty_23() ^ 1);
+        func_US2_00349368((g_resident_data_base[0] + 0x39160), 1, stub_empty_22() ^ 1);
+        func_US2_00349368((g_resident_data_base[0] + 0x39160), 2, stub_empty_22() ^ 1);
         func_US2_00349368((g_resident_data_base[0] + 0x39160), 3, 1);
-        func_US2_00349368((g_resident_data_base[0] + 0x39160), 4, stub_empty_23() ^ 1);
+        func_US2_00349368((g_resident_data_base[0] + 0x39160), 4, stub_empty_22() ^ 1);
         func_US2_003492A8((g_resident_data_base[0] + 0x39160), 0);
         { char *menu = (g_resident_data_base[0] + 0x39160); *(int *)(menu + 0x4AC) = 0; }
-    } else if (stub_empty_27()) {
+    } else if (stub_empty_25()) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
         menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 3, g_pause_icons_three);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), g_pause_sprite_values);
@@ -62,7 +62,7 @@ void ConfigureMenuChoiceList_us2(void)
         func_US2_00349368((g_resident_data_base[0] + 0x39160), 1, 1);
         func_US2_00349368((g_resident_data_base[0] + 0x39160), 2, 1);
         { char *menu = (g_resident_data_base[0] + 0x39160); *(int *)(menu + 0x4AC) = 0; }
-    } else if (stub_empty_30() == 0x31 || stub_empty_29() || stub_empty_30() == 0x1C) {
+    } else if (stub_empty_28() == 0x31 || stub_empty_27() || stub_empty_28() == 0x1C) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
         menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 2, g_pause_icons_two);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), g_pause_sprite_values);

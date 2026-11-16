@@ -482,6 +482,27 @@ class Carry(unittest.TestCase):
         self.assertEqual(out[0x2028], (0x2028, 24, "h", "same"))
 
 
+class Hooks(unittest.TestCase):
+    def test_hooks_are_paired_by_their_callers(self):
+        # V has one more hook in front; the order pairs every hook with the wrong one. The caller
+        # names the first and the last, the one between takes its place in the run.
+        jal = lambda t: 0x0C000000 | (t >> 2)
+        us = code(jal(0x2000), NOP, jal(0x2010), NOP) + code(JR_RA, NOP) * 3
+        v = code(jal(0x2008), NOP, jal(0x2018), NOP) + code(JR_RA, NOP) * 4
+        programs = {"us": [(0x1000, us[:16]), (0x2000, us[16:])], "us2": [(0x1000, v[:16]), (0x2000, v[16:])]}
+        chosen = ["us"]
+        aligned = {"boot": [(0x1000, 16, "caller", "same", "caller", 0x1000),
+                            (0x2000, 8, "h0", "same", "h0", 0x2000), (0x2008, 8, "h1", "same", "h1", 0x2008),
+                            (0x2010, 8, "h2", "same", "h2", 0x2010), (0x2018, 8, None, "cut", None, None)]}
+        rows = [("caller", 0x1000, 16), ("h0", 0x2000, 8), ("h1", 0x2008, 8), ("h2", 0x2010, 8)]
+        with patch.object(levels, "select", side_effect=lambda v: chosen.__setitem__(0, v)), \
+             patch.object(levels, "read_boot_functions", return_value=rows), \
+             patch.object(carry, "texts", side_effect=lambda p: programs[chosen[0]]):
+            carry.hooks(aligned, "us2")
+        self.assertEqual([(e[0], e[2]) for e in aligned["boot"]],
+                         [(0x1000, "caller"), (0x2000, None), (0x2008, "h0"), (0x2010, "h1"), (0x2018, "h2")])
+
+
 class Demotion(unittest.TestCase):
     """tools/carry.py --demote: what the build disproves, without realigning the release."""
 

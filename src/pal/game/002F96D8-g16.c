@@ -16,10 +16,10 @@ extern int g_current_game_mode __attribute__((sda));
 extern Vec4_2F8768 g_shop_camera_vec __attribute__((sda));
 extern void set_animation_parameter(int, int);
 extern void hud_tick_countdown(void);
-extern unsigned int stub_empty_9_pal(int, int);
-extern void stub_empty_5_pal(void);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_4(void);
 extern int func_PAL_00299538(void);
-extern void stub_empty_15(char *, void *, int, int);
+extern void stub_empty_14(char *, void *, int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float FastAddRotations(float, float);
@@ -45,9 +45,9 @@ void shop_reset_menu_camera_pal(void)
     g_vendor_menu_state.f78 = -1;
     hud_tick_countdown();
     g_current_game_mode = 0;
-    stub_empty_9_pal(0, 1);
+    stub_empty_8(0, 1);
     g_hero_state[0x22B5] = 0;
-    stub_empty_5_pal();
+    stub_empty_4();
     if (g_vendor_menu_state.f60 == 0) {
         pose_flag = func_PAL_00299538();
         qcopy(&in, &g_shop_camera_vec);
@@ -56,7 +56,7 @@ void shop_reset_menu_camera_pal(void)
         dir[0] = 0;
         dir[1] = 0;
         dir[2] = FastAddRotations(*(float *)(g_vendor_menu_state.obj + 0xF8), 3.1415927f);
-        stub_empty_15((char *)&out, dir, 0, pose_flag);
+        stub_empty_14((char *)&out, dir, 0, pose_flag);
         cam_set_mode_state(2);
     }
     g_vendor_menu_state.obj[0x20] = 1;

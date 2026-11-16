@@ -27,7 +27,7 @@ extern int flag_is_third_pending_set(void *);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void game_set_slowdown_factor_pal(void);
 extern int game_is_either_mode_two(void);
-extern void stub_empty_15(void *, void *, int, int);
+extern void stub_empty_14(void *, void *, int, int);
 
 extern unsigned int g_request_flag_table[];
 typedef struct {
@@ -134,7 +134,7 @@ void item_reward_trigger_update_pal(Thing *moby)
         if (game_is_either_mode_two() == 0) {
             if (vars->link != -1) {
                 char *record = g_vec_record_table + (vars->link << 7);
-                stub_empty_15(record + 0x30, record + 0x70, 0, 1);
+                stub_empty_14(record + 0x30, record + 0x70, 0, 1);
             }
             moby_set_state(moby, 4, -1);
         }
